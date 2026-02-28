@@ -1,7 +1,8 @@
 {
-  "name": "secret-villain-server",
+  "name": "secret-villain-game",
   "version": "1.0.0",
-  "description": "NodeJS server for secret villain game",
+  "description": "Secret Villain Game - Monorepo",
+  "private": true,
   "homepage": "https://github.com/rmartz/secret-villain-game#readme",
   "bugs": {
     "url": "https://github.com/rmartz/secret-villain-game/issues"
@@ -13,22 +14,23 @@
   "license": "ISC",
   "author": "Reed Martz",
   "type": "module",
-  "main": "index.js",
+  "workspaces": [
+    "backend",
+    "ui"
+  ],
   "scripts": {
-    "start": "node --import tsx src/server/index.ts",
-    "build": "npx tsc",
-    "test": "node --import tsx --test"
-  },
-  "dependencies": {
-    "express": "^5.2.1"
+    "dev": "npm run dev --workspaces --if-present",
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "backend:dev": "npm --workspace=@secret-villain/backend run dev",
+    "backend:build": "npm --workspace=@secret-villain/backend run build",
+    "backend:start": "npm --workspace=@secret-villain/backend start",
+    "backend:test": "npm --workspace=@secret-villain/backend test",
+    "ui:dev": "npm --workspace=@secret-villain/ui run dev",
+    "ui:build": "npm --workspace=@secret-villain/ui run build",
+    "ui:preview": "npm --workspace=@secret-villain/ui run preview"
   },
   "devDependencies": {
-    "@types/express": "^5.0.6",
-    "@types/node": "^25.0.3",
-    "@types/supertest": "^7.2.0",
-    "supertest": "^7.2.2",
-    "ts-node": "^10.9.2",
-    "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "@vitejs/plugin-react": "^4.2.0"
   }
 }
