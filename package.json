@@ -17,7 +17,7 @@
   "scripts": {
     "start": "node --import tsx src/server/index.ts",
     "build": "npx tsc",
-    "test": "node --test"
+    "test": "node --import tsx --test"
   },
   "dependencies": {
     "express": "^5.2.1"
@@ -25,6 +25,8 @@
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^25.0.3",
+    "@types/supertest": "^7.2.0",
+    "supertest": "^7.2.2",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
