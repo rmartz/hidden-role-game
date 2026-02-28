@@ -1,65 +1,84 @@
-import type { Request, Response } from "express";
+import { Controller, Post, Get, Route, Response, Body, Path } from "tsoa";
 import type { Game, Player } from '../../lib/models';
-import { ServerResponseStatus, type GameResponse } from '../models';
+import { ServerResponseStatus, type GameResponse, type ServerError } from '../models';
 import { randomUUID } from "crypto";
 import type { GameListService } from "../services/GameListService";
-import { BaseController } from "./BaseController";
 
-export const GameControllerPaths = {
-    createGame: '/game/create',
-    getGame: '/game/:gameId',
-    joinGame: '/game/:gameId/join'
+interface JoinGameRequest {
+    playerName: string;
 }
 
-export class GameController extends BaseController {
+@Route("game")
+export class GameController extends Controller {
     private gameListService: GameListService;
 
     constructor(gameListService: GameListService) {
         super();
         this.gameListService = gameListService;
+    }
 
-        this.router.post(GameControllerPaths.createGame, (req: Request, res: Response<GameResponse<Game>>) => {
-            const gameId = randomUUID();
+    /**
+     * Create a new game
+     * @returns Created game object
+     */
+    @Post("create")
+    @Response<GameResponse<Game>>(200, "Game created successfully")
+    @Response<ServerError>(500, "Server error")
+    async createGame(): Promise<GameResponse<Game>> {
+        const gameId = randomUUID();
 
-            if (this.gameListService.getGame(gameId)) {
-                res.status(500).json({ status: ServerResponseStatus.ERROR, error: 'An unknown error occurred' });
-                return;
-            }
+        if (this.gameListService.getGame(gameId)) {
+            this.setStatus(500);
+            return { status: ServerResponseStatus.ERROR, error: 'An unknown error occurred' };
+        }
 
-            const game: Game = {
-                id: gameId,
-                players: []
-            };
-            this.gameListService.addGame(game);
-            res.json({ status: ServerResponseStatus.SUCCESS, data: game });
-        });
+        const game: Game = {
+            id: gameId,
+            players: []
+        };
+        this.gameListService.addGame(game);
+        return { status: ServerResponseStatus.SUCCESS, data: game };
+    }
 
-        this.router.get(GameControllerPaths.getGame, (req: Request, res: Response<GameResponse<Game>>) => {
-            const { gameId } = req.params;
+    /**
+     * Get a game by ID
+     * @param gameId The game ID
+     * @returns The game object
+     */
+    @Get("{gameId}")
+    @Response<GameResponse<Game>>(200, "Game retrieved successfully")
+    @Response<ServerError>(404, "Game not found")
+    async getGame(@Path() gameId: string): Promise<GameResponse<Game>> {
+        const game = gameId ? this.gameListService.getGame(gameId) : undefined;
+        if (!game) {
+            this.setStatus(404);
+            return { status: ServerResponseStatus.ERROR, error: 'Game not found' };
+        }
+        return { status: ServerResponseStatus.SUCCESS, data: game };
+    }
 
-            const game = gameId ? this.gameListService.getGame(gameId) : undefined;
-            if (!game) {
-                res.status(404).json({ status: ServerResponseStatus.ERROR, error: 'Game not found' });
-                return;
-            }
-            res.json({ status: ServerResponseStatus.SUCCESS, data: game });
-        });
+    /**
+     * Join a game
+     * @param gameId The game ID
+     * @param body Player name
+     * @returns Updated game object with new player
+     */
+    @Post("{gameId}/join")
+    @Response<GameResponse<Game>>(201, "Player joined successfully")
+    @Response<ServerError>(404, "Game not found")
+    async joinGame(@Path() gameId: string, @Body() body: JoinGameRequest): Promise<GameResponse<Game>> {
+        const game = gameId ? this.gameListService.getGame(gameId) : undefined;
+        if (!game) {
+            this.setStatus(404);
+            return { status: ServerResponseStatus.ERROR, error: 'Game not found' };
+        }
 
-
-        this.router.post(GameControllerPaths.joinGame, (req: Request, res: Response<GameResponse<Game>>) => {
-            const { gameId } = req.params;
-            const game = gameId ? this.gameListService.getGame(gameId) : undefined;
-            if (!game) {
-                res.status(404).json({ status: ServerResponseStatus.ERROR, error: 'Game not found' });
-                return;
-            }
-
-            const newPlayer: Player = {
-                id: randomUUID(),
-                name: req.body.playerName
-            };
-            game.players.push(newPlayer);
-            res.status(201).json({ status: ServerResponseStatus.SUCCESS, data: game });
-        });
+        const newPlayer: Player = {
+            id: randomUUID(),
+            name: body.playerName
+        };
+        game.players.push(newPlayer);
+        this.setStatus(201);
+        return { status: ServerResponseStatus.SUCCESS, data: game };
     }
 }

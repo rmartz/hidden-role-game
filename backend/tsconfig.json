@@ -14,6 +14,9 @@
     "types": [
       "node"
     ],
+    // Decorator support
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     // Other Outputs
     "sourceMap": true,
     "declaration": true,

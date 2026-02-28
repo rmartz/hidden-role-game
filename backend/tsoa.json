@@ -1,0 +1,19 @@
+{
+  "entryFile": "src/server/index.ts",
+  "noImplicitAdditionalProperties": "throw-on-extras",
+  "controllerPathGlobs": ["src/server/controllers/**/*.ts"],
+  "spec": {
+    "outputDirectory": "dist",
+    "specVersion": 3,
+    "info": {
+      "title": "Secret Villain Game API",
+      "version": "1.0.0",
+      "description": "API for the Secret Villain Game"
+    },
+    "basePath": "/"
+  },
+  "routes": {
+    "outputDirectory": "dist",
+    "routesFileName": "routes.ts"
+  }
+}

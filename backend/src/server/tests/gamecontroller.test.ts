@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert";
 import { GameController } from "../controllers/GameController.js";
 import { GameListService } from "../services/GameListService.js";
+import { setupTestRoutes } from "./setup.js";
 import request from "supertest";
 
 const api = express()
@@ -11,8 +12,7 @@ api.use(express.urlencoded({ extended: true }))
 api.use(express.json())
 
 const gameListService = new GameListService();
-const gameController = new GameController(gameListService);
-api.use('/', gameController.router)
+setupTestRoutes(api, gameListService);
 
 
 describe("GameController", () => {
