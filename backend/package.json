@@ -18,7 +18,7 @@
   "scripts": {
     "dev": "node --import tsx src/server/index.ts",
     "start": "node dist/server/index.js",
-    "build": "tsc && npx tsoa spec",
+    "build": "npx tsc && npx tsoa spec",
     "generate:api": "npx tsoa spec",
     "test": "node --import tsx --test"
   },
