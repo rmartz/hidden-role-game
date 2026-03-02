@@ -5,7 +5,7 @@ export type GameResponse = GameResponse_Game_;
 export type GamePlayer = Player;
 
 export class ApiClient {
-  constructor(baseUrl: string = "http://localhost:3000") {
+  constructor(baseUrl: string = "http://localhost:7001") {
     OpenAPI.BASE = baseUrl;
   }
 

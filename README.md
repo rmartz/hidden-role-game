@@ -98,7 +98,7 @@ npm run ui:preview      # Preview production build
 
 - **Framework**: Express.js
 - **Language**: TypeScript
-- **Port**: 3000
+- **Port**: 7001
 - **Test Framework**: Node.js built-in test runner
 
 ## Frontend Configuration
@@ -107,7 +107,7 @@ npm run ui:preview      # Preview production build
 - **Language**: TypeScript
 - **Build Tool**: Vite
 - **Test Framework**: Vitest
-- **Dev Port**: 5173
+- **Dev Port**: 3000
 
 ## Deploying
 

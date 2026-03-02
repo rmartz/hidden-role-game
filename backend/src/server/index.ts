@@ -5,7 +5,7 @@ import { GameController } from "./controllers/GameController";
 import { GameListService } from "./services/GameListService";
 
 const app: Express = express();
-const port = 3000;
+const port = 7001;
 
 // Dependency injection
 const gameListService = new GameListService();
