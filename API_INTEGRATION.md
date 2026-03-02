@@ -5,6 +5,7 @@ This monorepo uses **OpenAPI/Swagger** for API contracts between the backend and
 ## Architecture
 
 ### Backend (OpenAPI Definition)
+
 The backend uses **tsoa** decorators to automatically generate an OpenAPI specification:
 
 1. **Controllers** are decorated with `@tsoa` decorators (`@Controller`, `@Get`, `@Post`, etc.)
@@ -12,6 +13,7 @@ The backend uses **tsoa** decorators to automatically generate an OpenAPI specif
 3. The spec describes all endpoints, request/response types, and status codes
 
 ### Frontend (Type-Safe Client)
+
 The frontend automatically generates TypeScript types from the OpenAPI spec:
 
 1. `npm run ui:generate:client` generates `ui/src/api/types.ts` using **openapi-typescript**
@@ -23,9 +25,10 @@ The frontend automatically generates TypeScript types from the OpenAPI spec:
 ### When You Add/Change an API Endpoint
 
 1. **Update the Backend**
+
    ```typescript
    // backend/src/server/controllers/GameController.ts
-   
+
    @Post("my-endpoint")
    @Response<MyResponseType>(200, "Success")
    async myEndpoint(@Body() body: MyRequestType): Promise<MyResponseType> {
@@ -34,11 +37,13 @@ The frontend automatically generates TypeScript types from the OpenAPI spec:
    ```
 
 2. **Generate the Updated Spec**
+
    ```bash
    npm run backend:build  # Compiles TypeScript and generates swagger.json
    ```
 
 3. **Generate Frontend Types**
+
    ```bash
    npm run ui:generate:client  # Generates types.ts from swagger.json
    ```
@@ -53,11 +58,13 @@ The frontend automatically generates TypeScript types from the OpenAPI spec:
 ## Files
 
 ### Backend
+
 - `backend/tsoa.json` - tsoa configuration for spec generation
 - `backend/src/server/controllers/GameController.ts` - Controller with @tsoa decorators
 - `backend/dist/swagger.json` - **Generated** OpenAPI specification
 
 ### Frontend
+
 - `ui/src/api/types.ts` - **Generated** TypeScript types from OpenAPI spec
 - `ui/src/api/client.ts` - Handwritten API client wrapper
 - `ui/src/api/index.ts` - API exports
@@ -90,7 +97,7 @@ npm run ui:generate:client
 ✅ **Autocomplete** - IDE suggestions in frontend code  
 ✅ **Documentation** - OpenAPI spec serves as API documentation  
 ✅ **Zero Runtime Magic** - No code generation at runtime, just types  
-✅ **Changes Propagate** - Update backend → regenerate types → frontend gets updated types  
+✅ **Changes Propagate** - Update backend → regenerate types → frontend gets updated types
 
 ## Testing
 

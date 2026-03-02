@@ -32,11 +32,13 @@ This will install dependencies for both backend and frontend workspaces.
 ### Development
 
 Run all workspaces in development mode:
+
 ```bash
 npm run dev
 ```
 
 Or run individual workspaces:
+
 ```bash
 npm run backend:dev
 npm run ui:dev
@@ -45,11 +47,13 @@ npm run ui:dev
 ### Building
 
 Build all workspaces:
+
 ```bash
 npm run build
 ```
 
 Or build specific workspaces:
+
 ```bash
 npm run backend:build
 npm run ui:build
@@ -58,11 +62,13 @@ npm run ui:build
 ### Testing
 
 Run tests for all workspaces:
+
 ```bash
 npm test
 ```
 
 Or run tests for specific workspace:
+
 ```bash
 npm run backend:test
 ```
@@ -70,6 +76,7 @@ npm run backend:test
 ### Backend Only
 
 Start the backend server:
+
 ```bash
 npm run backend:dev      # Development mode with hot reload
 npm run backend:start    # Production mode
@@ -80,6 +87,7 @@ npm run backend:test     # Run tests
 ### Frontend Only
 
 Start the frontend dev server:
+
 ```bash
 npm run ui:dev          # Development mode
 npm run ui:build        # Build for production

@@ -8,12 +8,8 @@
     // See also https://aka.ms/tsconfig/module
     "module": "es2022",
     "target": "esnext",
-    "lib": [
-      "esnext"
-    ],
-    "types": [
-      "node"
-    ],
+    "lib": ["esnext"],
+    "types": ["node"],
     // Decorator support
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
@@ -39,6 +35,6 @@
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "moduleResolution": "bundler",
-    "skipLibCheck": true,
+    "skipLibCheck": true
   }
 }

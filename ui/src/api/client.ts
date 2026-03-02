@@ -1,11 +1,11 @@
-import type { paths } from './types';
+import type { paths } from "./types";
 
-type Methods = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+type Methods = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 export class ApiClient {
   private baseUrl: string;
 
-  constructor(baseUrl: string = 'http://localhost:3000') {
+  constructor(baseUrl: string = "http://localhost:3000") {
     this.baseUrl = baseUrl;
   }
 
@@ -14,17 +14,22 @@ export class ApiClient {
     path: string,
     options?: {
       body?: unknown;
-    }
+    },
   ): Promise<T> {
     const url = `${this.baseUrl}${path}`;
-    
-    const response = await fetch(url, {
+
+    const init: RequestInit = {
       method,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: options?.body ? JSON.stringify(options.body) : undefined,
-    });
+    };
+
+    if (options?.body) {
+      init.body = JSON.stringify(options.body);
+    }
+
+    const response = await fetch(url, init);
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -35,26 +40,22 @@ export class ApiClient {
 
   // Game endpoints
   createGame() {
-    return this.request<paths['/game/create']['post']['responses']['200']['content']['application/json']>(
-      'POST',
-      '/game/create'
-    );
+    return this.request<
+      paths["/game/create"]["post"]["responses"]["200"]["content"]["application/json"]
+    >("POST", "/game/create");
   }
 
   getGame(gameId: string) {
-    return this.request<paths['/game/{gameId}']['get']['responses']['200']['content']['application/json']>(
-      'GET',
-      `/game/${gameId}`
-    );
+    return this.request<
+      paths["/game/{gameId}"]["get"]["responses"]["200"]["content"]["application/json"]
+    >("GET", `/game/${gameId}`);
   }
 
   joinGame(gameId: string, playerName: string) {
-    return this.request<paths['/game/{gameId}/join']['post']['responses']['201']['content']['application/json']>(
-      'POST',
-      `/game/${gameId}/join`,
-      {
-        body: { playerName },
-      }
-    );
+    return this.request<
+      paths["/game/{gameId}/join"]["post"]["responses"]["201"]["content"]["application/json"]
+    >("POST", `/game/${gameId}/join`, {
+      body: { playerName },
+    });
   }
 }

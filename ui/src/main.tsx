@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { createRoot } from 'react-dom/client';
-import { ApiClient } from './api/client';
+import { useState } from "react";
+import { createRoot } from "react-dom/client";
+import { ApiClient } from "./api/client";
 
 const api = new ApiClient();
 
@@ -15,14 +15,14 @@ const App = () => {
       setLoading(true);
       setError(null);
       const response = await api.createGame();
-      if (response.status === 'success') {
+      if (response.status === "success") {
         setGameId(response.data.id);
         setGamePlayers(response.data.players);
       } else {
-        setError(response.error || 'Failed to create game');
+        setError(response.error || "Failed to create game");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoading(false);
     }
@@ -35,28 +35,30 @@ const App = () => {
       setError(null);
       const playerName = `Player ${gamePlayers.length + 1}`;
       const response = await api.joinGame(gameId, playerName);
-      if (response.status === 'success') {
+      if (response.status === "success") {
         setGamePlayers(response.data.players);
       } else {
-        setError(response.error || 'Failed to join game');
+        setError(response.error || "Failed to join game");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
+    <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
       <h1>Secret Villain Game</h1>
       <p>Frontend with type-safe API client generated from OpenAPI spec</p>
-      
-      {error && <div style={{ color: 'red', marginBottom: '10px' }}>Error: {error}</div>}
-      
+
+      {error && (
+        <div style={{ color: "red", marginBottom: "10px" }}>Error: {error}</div>
+      )}
+
       {!gameId ? (
         <button onClick={handleCreateGame} disabled={loading}>
-          {loading ? 'Creating...' : 'Create Game'}
+          {loading ? "Creating..." : "Create Game"}
         </button>
       ) : (
         <div>
@@ -68,7 +70,7 @@ const App = () => {
             ))}
           </ul>
           <button onClick={handleJoinGame} disabled={loading}>
-            {loading ? 'Joining...' : 'Join Game'}
+            {loading ? "Joining..." : "Join Game"}
           </button>
         </div>
       )}
@@ -76,9 +78,8 @@ const App = () => {
   );
 };
 
-const container = document.getElementById('root');
+const container = document.getElementById("root");
 if (container) {
   const root = createRoot(container);
   root.render(<App />);
 }
-
