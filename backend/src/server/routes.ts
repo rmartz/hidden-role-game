@@ -5,5 +5,6 @@ import type { Express } from "express";
  * For development, we provide a stub that will be replaced.
  */
 export function RegisterRoutes(app: Express) {
+  void app;
   // Routes will be generated here by tsoa during build
 }
