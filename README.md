@@ -37,6 +37,8 @@ Run all workspaces in development mode:
 npm run dev
 ```
 
+This starts backend (`http://localhost:7001`) and UI (`http://localhost:3000`) concurrently.
+
 Or run individual workspaces:
 
 ```bash

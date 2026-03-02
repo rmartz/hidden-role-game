@@ -23,6 +23,8 @@
     "test": "node --import tsx --test"
   },
   "dependencies": {
+    "@types/cors": "^2.8.19",
+    "cors": "^2.8.6",
     "express": "^5.2.1"
   },
   "devDependencies": {
