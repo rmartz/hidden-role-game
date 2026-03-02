@@ -1,61 +1,23 @@
-import type { paths } from "./types";
+import { DefaultService, OpenAPI } from "./generated";
+import type { GameResponse_Game_, Player } from "./generated";
 
-type Methods = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
+export type GameResponse = GameResponse_Game_;
+export type GamePlayer = Player;
 
 export class ApiClient {
-  private baseUrl: string;
-
   constructor(baseUrl: string = "http://localhost:3000") {
-    this.baseUrl = baseUrl;
+    OpenAPI.BASE = baseUrl;
   }
 
-  private async request<T>(
-    method: Methods,
-    path: string,
-    options?: {
-      body?: unknown;
-    },
-  ): Promise<T> {
-    const url = `${this.baseUrl}${path}`;
-
-    const init: RequestInit = {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-
-    if (options?.body) {
-      init.body = JSON.stringify(options.body);
-    }
-
-    const response = await fetch(url, init);
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    return response.json() as Promise<T>;
+  createGame(): Promise<GameResponse> {
+    return DefaultService.createGame();
   }
 
-  // Game endpoints
-  createGame() {
-    return this.request<
-      paths["/game/create"]["post"]["responses"]["200"]["content"]["application/json"]
-    >("POST", "/game/create");
+  getGame(gameId: string): Promise<GameResponse> {
+    return DefaultService.getGame(gameId);
   }
 
-  getGame(gameId: string) {
-    return this.request<
-      paths["/game/{gameId}"]["get"]["responses"]["200"]["content"]["application/json"]
-    >("GET", `/game/${gameId}`);
-  }
-
-  joinGame(gameId: string, playerName: string) {
-    return this.request<
-      paths["/game/{gameId}/join"]["post"]["responses"]["201"]["content"]["application/json"]
-    >("POST", `/game/${gameId}/join`, {
-      body: { playerName },
-    });
+  joinGame(gameId: string, playerName: string): Promise<GameResponse> {
+    return DefaultService.joinGame(gameId, { playerName });
   }
 }

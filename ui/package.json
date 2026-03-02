@@ -10,17 +10,18 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "generate:client": "openapi-typescript ../backend/dist/swagger.json -o src/api/types.ts"
+    "generate:openapi": "cd ../backend && npm run generate:api",
+    "generate:client": "npm run generate:openapi && openapi --input ../backend/dist/openapi.yaml --output src/api/generated --client fetch",
+    "postinstall": "npm run generate:client"
   },
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@apidevtools/swagger-parser": "^12.1.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
-    "openapi-typescript": "^7.13.0",
+    "openapi-typescript-codegen": "^0.30.0",
     "typescript": "^5.9.3",
     "vite": "^5.0.0",
     "vitest": "^1.0.0"

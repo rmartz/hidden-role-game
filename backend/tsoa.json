@@ -4,6 +4,8 @@
   "controllerPathGlobs": ["src/server/controllers/**/*.ts"],
   "spec": {
     "outputDirectory": "dist",
+    "specFileBaseName": "openapi",
+    "yaml": true,
     "specVersion": 3,
     "info": {
       "title": "Secret Villain Game API",

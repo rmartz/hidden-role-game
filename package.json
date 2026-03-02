@@ -25,6 +25,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "prepare": "husky",
+    "postinstall": "npm --workspace=@secret-villain/ui run generate:client",
     "backend:dev": "npm --workspace=@secret-villain/backend run dev",
     "backend:build": "npm --workspace=@secret-villain/backend run build",
     "backend:start": "npm --workspace=@secret-villain/backend start",

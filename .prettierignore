@@ -2,4 +2,4 @@ node_modules
 dist
 backend/dist
 ui/dist
-ui/src/api/types.ts
+ui/src/api/generated

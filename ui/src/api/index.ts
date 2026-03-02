@@ -1,2 +1,2 @@
 export { ApiClient } from "./client";
-export type * from "./types";
+export type { GamePlayer, GameResponse } from "./client";

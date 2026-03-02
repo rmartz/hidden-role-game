@@ -1,15 +1,13 @@
 import { useState } from "react";
 import { createRoot } from "react-dom/client";
 import { ApiClient } from "./api/client";
-import type { components } from "./api/types";
+import type { GamePlayer } from "./api/client";
 
 const api = new ApiClient();
 
 const App = () => {
   const [gameId, setGameId] = useState<string | null>(null);
-  const [gamePlayers, setGamePlayers] = useState<
-    components["schemas"]["Player"][]
-  >([]);
+  const [gamePlayers, setGamePlayers] = useState<GamePlayer[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

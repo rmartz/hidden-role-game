@@ -1,6 +1,6 @@
 # API Integration Guide
 
-This monorepo uses **OpenAPI/Swagger** for API contracts between the backend and frontend, with automatic TypeScript type generation.
+This monorepo uses **OpenAPI** for API contracts between the backend and frontend, with automatic client generation.
 
 ## Architecture
 
@@ -9,16 +9,16 @@ This monorepo uses **OpenAPI/Swagger** for API contracts between the backend and
 The backend uses **tsoa** decorators to automatically generate an OpenAPI specification:
 
 1. **Controllers** are decorated with `@tsoa` decorators (`@Controller`, `@Get`, `@Post`, etc.)
-2. Building the backend with `npm run backend:build` generates `backend/dist/swagger.json`
+2. Building the backend with `npm run backend:build` generates `backend/dist/openapi.yaml`
 3. The spec describes all endpoints, request/response types, and status codes
 
-### Frontend (Type-Safe Client)
+### Frontend (Generated Client)
 
-The frontend automatically generates TypeScript types from the OpenAPI spec:
+The frontend automatically generates a typed API client from the OpenAPI spec:
 
-1. `npm run ui:generate:client` generates `ui/src/api/types.ts` using **openapi-typescript**
-2. A handwritten `ApiClient` class (`ui/src/api/client.ts`) provides a simple fetch-based wrapper
-3. All API calls are fully type-safe with autocomplete
+1. `npm --workspace=@secret-villain/ui run generate:client` regenerates `ui/src/api/generated/` using **openapi-typescript-codegen**
+2. `ui/src/api/client.ts` wraps the generated service methods for app-level usage
+3. Generated files are intentionally not source-tracked
 
 ## Workflow
 
@@ -39,13 +39,13 @@ The frontend automatically generates TypeScript types from the OpenAPI spec:
 2. **Generate the Updated Spec**
 
    ```bash
-   npm run backend:build  # Compiles TypeScript and generates swagger.json
+   npm run backend:build  # Compiles TypeScript and generates openapi.yaml
    ```
 
-3. **Generate Frontend Types**
+3. **Generate Frontend Client**
 
    ```bash
-   npm run ui:generate:client  # Generates types.ts from swagger.json
+   npm --workspace=@secret-villain/ui run generate:client  # Generates client from openapi.yaml
    ```
 
 4. **Use in Frontend with Type Safety**
@@ -61,12 +61,12 @@ The frontend automatically generates TypeScript types from the OpenAPI spec:
 
 - `backend/tsoa.json` - tsoa configuration for spec generation
 - `backend/src/server/controllers/GameController.ts` - Controller with @tsoa decorators
-- `backend/dist/swagger.json` - **Generated** OpenAPI specification
+- `backend/dist/openapi.yaml` - **Generated** OpenAPI specification
 
 ### Frontend
 
-- `ui/src/api/types.ts` - **Generated** TypeScript types from OpenAPI spec
-- `ui/src/api/client.ts` - Handwritten API client wrapper
+- `ui/src/api/generated/` - **Generated** API client from OpenAPI spec (not tracked in git)
+- `ui/src/api/client.ts` - Thin wrapper around generated client
 - `ui/src/api/index.ts` - API exports
 - `ui/package.json` - `generate:client` script
 
@@ -76,18 +76,18 @@ You can regenerate everything with:
 
 ```bash
 # From root
-npm run backend:build && npm run ui:generate:client
+npm run backend:build && npm --workspace=@secret-villain/ui run generate:client
 
 # Or individually
 npm run backend:build
-npm run ui:generate:client
+npm --workspace=@secret-villain/ui run generate:client
 ```
 
 ## Adding New Endpoints
 
 1. Add a new method to `GameController` with @tsoa decorators
 2. Document request/response types in decorators
-3. Run `npm run backend:build` and `npm run ui:generate:client`
+3. Run `npm run backend:build` and `npm --workspace=@secret-villain/ui run generate:client`
 4. The frontend now has fully typed access to the new endpoint
 
 ## Benefits
