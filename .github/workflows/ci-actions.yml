@@ -12,70 +12,88 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
       - uses: actions/setup-node@v4
         with:
           node-version: 24.x
-          cache: "npm"
-      - run: npm ci
-      - run: npm --workspace=@secret-villain/backend test
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter=@secret-villain/backend test
 
   backend-lint:
     name: Backend Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
       - uses: actions/setup-node@v4
         with:
           node-version: 24.x
-          cache: "npm"
-      - run: npm ci
-      - run: npm --workspace=@secret-villain/backend run lint
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter=@secret-villain/backend run lint
 
   frontend-tests:
     name: Frontend Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
       - uses: actions/setup-node@v4
         with:
           node-version: 24.x
-          cache: "npm"
-      - run: npm ci
-      - run: npm --workspace=@secret-villain/ui test
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter=@secret-villain/ui test
 
   frontend-lint:
     name: Frontend Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
       - uses: actions/setup-node@v4
         with:
           node-version: 24.x
-          cache: "npm"
-      - run: npm ci
-      - run: npm --workspace=@secret-villain/ui run lint
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter=@secret-villain/ui run lint
 
   frontend-build:
     name: Frontend Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
       - uses: actions/setup-node@v4
         with:
           node-version: 24.x
-          cache: "npm"
-      - run: npm ci
-      - run: npm --workspace=@secret-villain/ui run build
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter=@secret-villain/ui run build
 
   api-schema-stale:
     name: API Schema Up To Date
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
       - uses: actions/setup-node@v4
         with:
           node-version: 24.x
-          cache: "npm"
-      - run: npm ci
-      - run: npm --workspace=@secret-villain/backend run generate:api
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter=@secret-villain/backend run generate:api
       - run: git diff --exit-code backend/openapi/openapi.yaml

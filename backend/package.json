@@ -16,11 +16,11 @@
   "type": "module",
   "main": "dist/server/index.js",
   "scripts": {
-    "postinstall": "npx tsoa routes",
-    "dev": "npx tsoa routes && node --import tsx src/server/index.ts",
+    "postinstall": "tsoa routes",
+    "dev": "tsoa routes && node --import tsx src/server/index.ts",
     "start": "node dist/server/index.js",
-    "build": "npx tsoa routes && npx tsc && npx tsoa spec",
-    "generate:api": "npx tsoa routes && npx tsoa spec",
+    "build": "tsoa routes && tsc && tsoa spec",
+    "generate:api": "tsoa routes && tsoa spec",
     "test": "node --import tsx --test 'src/**/*.test.ts'",
     "lint": "eslint ."
   },

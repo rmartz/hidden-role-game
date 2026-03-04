@@ -10,9 +10,9 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest",
-    "generate:openapi": "cd ../backend && npm run generate:api",
-    "generate:client": "npm run generate:openapi && openapi --input ../backend/openapi/openapi.yaml --output src/api/generated --client fetch",
-    "postinstall": "npm run generate:client",
+    "generate:openapi": "pnpm --filter=@secret-villain/backend run generate:api",
+    "generate:client": "pnpm run generate:openapi && openapi --input ../backend/openapi/openapi.yaml --output src/api/generated --client fetch",
+    "postinstall": "pnpm run generate:client",
     "lint": "eslint ."
   },
   "dependencies": {
