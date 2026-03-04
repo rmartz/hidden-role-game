@@ -1,7 +1,7 @@
 import express from "express";
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { GameListService } from "../services/GameListService.js";
+import { LobbyService } from "../services/LobbyService.js";
 import { setupTestRoutes } from "./setup.js";
 import request from "supertest";
 
@@ -10,8 +10,8 @@ const api = express();
 api.use(express.urlencoded({ extended: true }));
 api.use(express.json());
 
-const gameListService = new GameListService();
-setupTestRoutes(api, gameListService);
+const lobbyService = new LobbyService();
+setupTestRoutes(api, lobbyService);
 
 describe("LobbyController", () => {
   it("should create a game", async () => {
@@ -71,7 +71,7 @@ describe("LobbyController", () => {
     );
     assert.equal(
       response.body.error,
-      "Game not found",
+      "Lobby not found",
       "Error message should indicate game not found",
     );
   });
@@ -145,7 +145,7 @@ describe("LobbyController", () => {
     );
     assert.equal(
       response.body.error,
-      "Game not found",
+      "Lobby not found",
       "Error message should indicate game not found",
     );
   });

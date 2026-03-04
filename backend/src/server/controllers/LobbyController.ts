@@ -6,7 +6,7 @@ import {
   type ServerResponse,
 } from "../models";
 import { randomUUID } from "crypto";
-import type { GameListService } from "../services/GameListService";
+import type { LobbyService } from "../services/LobbyService";
 
 interface JoinGameRequest {
   playerName: string;
@@ -14,16 +14,16 @@ interface JoinGameRequest {
 
 @Route("lobby")
 export class LobbyController extends Controller {
-  private gameListService: GameListService;
+  private lobbyListService: LobbyService;
 
-  constructor(gameListService: GameListService) {
+  constructor(lobbyListService: LobbyService) {
     super();
-    this.gameListService = gameListService;
+    this.lobbyListService = lobbyListService;
   }
 
   /**
    * Create a new lobby
-   * @returns Created lobby object
+   * @returns Created lobby
    */
   @Post("create")
   @Response<ServerResponse<Lobby>>(200, "Lobby created successfully")
@@ -31,7 +31,7 @@ export class LobbyController extends Controller {
   async createGame(): Promise<ServerResponse<Lobby>> {
     const lobbyId = randomUUID();
 
-    if (this.gameListService.getLobby(lobbyId)) {
+    if (this.lobbyListService.getLobby(lobbyId)) {
       this.setStatus(500);
       return {
         status: ServerResponseStatus.Error,
@@ -43,44 +43,44 @@ export class LobbyController extends Controller {
       id: lobbyId,
       players: [],
     };
-    this.gameListService.addLobby(lobby);
+    this.lobbyListService.addLobby(lobby);
     return { status: ServerResponseStatus.Success, data: lobby };
   }
 
   /**
    * Get a lobby by ID
-   * @param gameId The lobby ID
-   * @returns The lobby object
+   * @param lobbyId The lobby ID
+   * @returns The lobby
    */
-  @Get("{gameId}")
+  @Get("{lobbyId}")
   @Response<ServerResponse<Lobby>>(200, "Lobby retrieved successfully")
-  @Response<ServerError>(404, "Game not found")
-  async getGame(@Path() gameId: string): Promise<ServerResponse<Lobby>> {
-    const lobby = gameId ? this.gameListService.getLobby(gameId) : undefined;
+  @Response<ServerError>(404, "Lobby not found")
+  async getGame(@Path() lobbyId: string): Promise<ServerResponse<Lobby>> {
+    const lobby = lobbyId ? this.lobbyListService.getLobby(lobbyId) : undefined;
     if (!lobby) {
       this.setStatus(404);
-      return { status: ServerResponseStatus.Error, error: "Game not found" };
+      return { status: ServerResponseStatus.Error, error: "Lobby not found" };
     }
     return { status: ServerResponseStatus.Success, data: lobby };
   }
 
   /**
    * Join a lobby
-   * @param gameId The lobby ID
+   * @param lobbyId The lobby ID
    * @param body Player name
-   * @returns Updated lobby object with new player
+   * @returns Updated lobby with new player
    */
-  @Post("{gameId}/join")
+  @Post("{lobbyId}/join")
   @Response<ServerResponse<Lobby>>(201, "Player joined successfully")
-  @Response<ServerError>(404, "Game not found")
+  @Response<ServerError>(404, "Lobby not found")
   async joinGame(
-    @Path() gameId: string,
+    @Path() lobbyId: string,
     @Body() body: JoinGameRequest,
   ): Promise<ServerResponse<Lobby>> {
-    const lobby = gameId ? this.gameListService.getLobby(gameId) : undefined;
+    const lobby = lobbyId ? this.lobbyListService.getLobby(lobbyId) : undefined;
     if (!lobby) {
       this.setStatus(404);
-      return { status: ServerResponseStatus.Error, error: "Game not found" };
+      return { status: ServerResponseStatus.Error, error: "Lobby not found" };
     }
 
     const newPlayer: LobbyPlayer = {

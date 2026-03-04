@@ -1,14 +1,10 @@
 import type { Express } from "express";
 import { LobbyController } from "../controllers/LobbyController";
-import type { GameListService } from "../services/GameListService";
+import type { LobbyService } from "../services/LobbyService";
 
-export function setupTestRoutes(
-  app: Express,
-  gameListService: GameListService,
-) {
-  const lobbyController = new LobbyController(gameListService);
+export function setupTestRoutes(app: Express, lobbyListService: LobbyService) {
+  const lobbyController = new LobbyController(lobbyListService);
 
-  // Manually setup the routes for testing
   app.post("/lobby/create", async (req, res, next) => {
     try {
       const result = await lobbyController.createGame();
@@ -18,9 +14,9 @@ export function setupTestRoutes(
     }
   });
 
-  app.get("/lobby/:gameId", async (req, res, next) => {
+  app.get("/lobby/:lobbyId", async (req, res, next) => {
     try {
-      const result = await lobbyController.getGame(req.params.gameId);
+      const result = await lobbyController.getGame(req.params.lobbyId);
       if (result.status === "error") {
         res.status(404).json(result);
       } else {
@@ -31,10 +27,10 @@ export function setupTestRoutes(
     }
   });
 
-  app.post("/lobby/:gameId/join", async (req, res, next) => {
+  app.post("/lobby/:lobbyId/join", async (req, res, next) => {
     try {
       const result = await lobbyController.joinGame(
-        req.params.gameId,
+        req.params.lobbyId,
         req.body,
       );
       if (result.status === "error") {

@@ -1,6 +1,6 @@
 import type { Lobby } from "../../lib/models";
 
-export class GameListService {
+export class LobbyService {
   private lobbies: Record<string, Lobby> = {};
 
   public addLobby(lobby: Lobby) {
