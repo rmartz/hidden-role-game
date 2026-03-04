@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getLobby, joinLobby, removePlayer, getPlayerId } from "@/lib/api";
+import { getLobby, removePlayer, getPlayerId } from "@/lib/api";
+import JoinPrompt from "./JoinPrompt";
+import PlayerList from "./PlayerList";
 
 export default function LobbyPage() {
   const { lobbyId } = useParams<{ lobbyId: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [playerName, setPlayerName] = useState("");
 
   const {
     data: lobby,
@@ -25,18 +25,6 @@ export default function LobbyPage() {
       return response.data;
     },
     refetchInterval: (query) => (query.state.data ? 30_000 : false),
-  });
-
-  const joinMutation = useMutation({
-    mutationFn: async () => {
-      const response = await joinLobby(lobbyId, playerName);
-      if (response.status === "error")
-        throw new Error(response.error ?? "Failed to join lobby");
-      return response.data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
-    },
   });
 
   const myPlayerId = getPlayerId();
@@ -56,6 +44,10 @@ export default function LobbyPage() {
     },
   });
 
+  function handleRefetch() {
+    refetch();
+  }
+
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
       <h1>Secret Villain Game</h1>
@@ -71,33 +63,7 @@ export default function LobbyPage() {
         </div>
       )}
 
-      {!isLoading && lobby === null && (
-        <div>
-          <p>Enter your name to join this lobby.</p>
-          {joinMutation.error && (
-            <div style={{ color: "red", marginBottom: "10px" }}>
-              Error: {joinMutation.error.message}
-            </div>
-          )}
-          <div style={{ marginBottom: "10px" }}>
-            <label>
-              Your name:{" "}
-              <input
-                type="text"
-                value={playerName}
-                onChange={(e) => setPlayerName(e.target.value)}
-                placeholder="Enter your name"
-              />
-            </label>
-          </div>
-          <button
-            onClick={() => joinMutation.mutate()}
-            disabled={joinMutation.isPending || playerName.trim() === ""}
-          >
-            {joinMutation.isPending ? "Joining..." : "Join Lobby"}
-          </button>
-        </div>
-      )}
+      {!isLoading && lobby === null && <JoinPrompt lobbyId={lobbyId} />}
 
       {removeMutation.error && (
         <div style={{ color: "red", marginBottom: "10px" }}>
@@ -106,52 +72,16 @@ export default function LobbyPage() {
       )}
 
       {lobby && (
-        <>
-          <p>
-            Owner:{" "}
-            {lobby.players.find((p) => p.id === lobby.ownerPlayerId)?.name}
-          </p>
-          <p>
-            Players: {lobby.players.length}{" "}
-            <button onClick={() => refetch()} disabled={isFetching}>
-              {isFetching ? "Refreshing..." : "Refresh"}
-            </button>
-          </p>
-          <ul>
-            {lobby.players.map((player) => (
-              <li
-                key={player.id}
-                style={{ display: "flex", gap: "8px", alignItems: "center" }}
-              >
-                {player.name}
-                {player.id === myPlayerId && !isOwner && !gameStarted && (
-                  <button
-                    onClick={() => {
-                      if (window.confirm("Leave this lobby?"))
-                        removeMutation.mutate(player.id);
-                    }}
-                    disabled={removeMutation.isPending}
-                  >
-                    Leave
-                  </button>
-                )}
-                {isOwner && player.id !== myPlayerId && !gameStarted && (
-                  <button
-                    onClick={() => {
-                      if (
-                        window.confirm(`Remove ${player.name} from the lobby?`)
-                      )
-                        removeMutation.mutate(player.id);
-                    }}
-                    disabled={removeMutation.isPending}
-                  >
-                    Remove
-                  </button>
-                )}
-              </li>
-            ))}
-          </ul>
-        </>
+        <PlayerList
+          lobby={lobby}
+          userPlayerId={myPlayerId}
+          showRemovePlayer={isOwner}
+          gameStarted={gameStarted}
+          isFetching={isFetching}
+          isRemovePending={removeMutation.isPending}
+          onRefetch={handleRefetch}
+          onRemovePlayer={(playerId: string) => removeMutation.mutate(playerId)}
+        />
       )}
     </div>
   );
