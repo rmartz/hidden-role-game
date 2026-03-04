@@ -1,13 +1,13 @@
-import type { Game } from "../../lib/models";
+import type { Lobby } from "../../lib/models";
 
 export class GameListService {
-  private games: Record<string, Game> = {};
+  private lobbies: Record<string, Lobby> = {};
 
-  public addGame(game: Game) {
-    this.games[game.id] = game;
+  public addLobby(lobby: Lobby) {
+    this.lobbies[lobby.id] = lobby;
   }
 
-  public getGame(gameId: string): Game | undefined {
-    return this.games[gameId];
+  public getLobby(lobbyId: string): Lobby | undefined {
+    return this.lobbies[lobbyId];
   }
 }

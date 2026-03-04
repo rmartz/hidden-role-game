@@ -25,25 +25,22 @@ describe("GameController", () => {
       "success",
       "Response status should be success",
     );
-    assert(response.body.data.id, "Game should have an id");
+    assert(response.body.data.id, "Lobby should have an id");
     assert(
       Array.isArray(response.body.data.players),
-      "Game should have a players array",
+      "Lobby should have a players array",
     );
     assert.equal(
       response.body.data.players.length,
       0,
-      "New game should have no players",
+      "New lobby should have no players",
     );
   });
 
   it("should get a game by id", async () => {
-    // First create a game
     const createResponse = await request(api).post("/game/create").expect(200);
-
     const gameId = createResponse.body.data.id;
 
-    // Then retrieve it
     const getResponse = await request(api)
       .get(`/game/${gameId}`)
       .expect("Content-Type", /json/)
@@ -54,10 +51,10 @@ describe("GameController", () => {
       "success",
       "Response status should be success",
     );
-    assert.equal(getResponse.body.data.id, gameId, "Game id should match");
+    assert.equal(getResponse.body.data.id, gameId, "Lobby id should match");
     assert(
       Array.isArray(getResponse.body.data.players),
-      "Game should have a players array",
+      "Lobby should have a players array",
     );
   });
 
@@ -80,12 +77,9 @@ describe("GameController", () => {
   });
 
   it("should allow a player to join a game", async () => {
-    // First create a game
     const createResponse = await request(api).post("/game/create").expect(200);
-
     const gameId = createResponse.body.data.id;
 
-    // Then join the game
     const joinResponse = await request(api)
       .post(`/game/${gameId}/join`)
       .send({ playerName: "Alice" })
@@ -97,27 +91,23 @@ describe("GameController", () => {
       "success",
       "Response status should be success",
     );
-    assert.equal(joinResponse.body.data.id, gameId, "Game id should match");
+    assert.equal(joinResponse.body.data.id, gameId, "Lobby id should match");
     assert.equal(
       joinResponse.body.data.players.length,
       1,
-      "Game should have one player",
+      "Lobby should have one player",
     );
-    assert.equal(
-      joinResponse.body.data.players[0].name,
-      "Alice",
-      "Player name should be Alice",
-    );
-    assert(joinResponse.body.data.players[0].id, "Player should have an id");
+
+    const player = joinResponse.body.data.players[0];
+    assert.equal(player.name, "Alice", "Player name should be Alice");
+    assert(player.id, "Player should have an id");
+    assert(player.sessionId, "Player should have a sessionId");
   });
 
   it("should allow multiple players to join a game", async () => {
-    // Create a game
     const createResponse = await request(api).post("/game/create").expect(200);
-
     const gameId = createResponse.body.data.id;
 
-    // First player joins
     const join1 = await request(api)
       .post(`/game/${gameId}/join`)
       .send({ playerName: "Alice" })
@@ -125,7 +115,6 @@ describe("GameController", () => {
 
     assert.equal(join1.body.data.players.length, 1);
 
-    // Second player joins
     const join2 = await request(api)
       .post(`/game/${gameId}/join`)
       .send({ playerName: "Bob" })
@@ -134,7 +123,7 @@ describe("GameController", () => {
     assert.equal(
       join2.body.data.players.length,
       2,
-      "Game should have two players",
+      "Lobby should have two players",
     );
     assert.equal(
       join2.body.data.players[1].name,
@@ -159,6 +148,36 @@ describe("GameController", () => {
       response.body.error,
       "Game not found",
       "Error message should indicate game not found",
+    );
+  });
+
+  it("should expose sessionId only to the matching player when getting a game", async () => {
+    const createResponse = await request(api).post("/game/create").expect(200);
+    const gameId = createResponse.body.data.id;
+
+    const joinResponse = await request(api)
+      .post(`/game/${gameId}/join`)
+      .send({ playerName: "Alice" })
+      .expect(201);
+
+    const aliceSessionId = joinResponse.body.data.players[0].sessionId;
+
+    // Without sessionId: no sessionIds exposed
+    const publicView = await request(api).get(`/game/${gameId}`).expect(200);
+    assert.equal(
+      publicView.body.data.players[0].sessionId,
+      undefined,
+      "sessionId should not be exposed without matching sessionId",
+    );
+
+    // With Alice's sessionId: her sessionId is included
+    const aliceView = await request(api)
+      .get(`/game/${gameId}?sessionId=${aliceSessionId}`)
+      .expect(200);
+    assert.equal(
+      aliceView.body.data.players[0].sessionId,
+      aliceSessionId,
+      "sessionId should be exposed to the matching player",
     );
   });
 });

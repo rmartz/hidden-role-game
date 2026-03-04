@@ -20,7 +20,8 @@ export function setupTestRoutes(
 
   app.get("/game/:gameId", async (req, res, next) => {
     try {
-      const result = await gameController.getGame(req.params.gameId);
+      const sessionId = req.query.sessionId as string | undefined;
+      const result = await gameController.getGame(req.params.gameId, sessionId);
       if (result.status === "error") {
         res.status(404).json(result);
       } else {

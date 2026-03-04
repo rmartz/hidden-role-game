@@ -1,5 +1,14 @@
-import { Controller, Post, Get, Route, Response, Body, Path } from "tsoa";
-import type { Game, Player } from "../../lib/models";
+import {
+  Controller,
+  Post,
+  Get,
+  Route,
+  Response,
+  Body,
+  Path,
+  Query,
+} from "tsoa";
+import type { Lobby, LobbyPlayer, PublicLobby } from "../../lib/models";
 import {
   ServerResponseStatus,
   type GameResponse,
@@ -22,16 +31,16 @@ export class GameController extends Controller {
   }
 
   /**
-   * Create a new game
-   * @returns Created game object
+   * Create a new lobby
+   * @returns Created lobby object
    */
   @Post("create")
-  @Response<GameResponse<Game>>(200, "Game created successfully")
+  @Response<GameResponse<Lobby>>(200, "Lobby created successfully")
   @Response<ServerError>(500, "Server error")
-  async createGame(): Promise<GameResponse<Game>> {
-    const gameId = randomUUID();
+  async createGame(): Promise<GameResponse<Lobby>> {
+    const lobbyId = randomUUID();
 
-    if (this.gameListService.getGame(gameId)) {
+    if (this.gameListService.getLobby(lobbyId)) {
       this.setStatus(500);
       return {
         status: ServerResponseStatus.ERROR,
@@ -39,56 +48,73 @@ export class GameController extends Controller {
       };
     }
 
-    const game: Game = {
-      id: gameId,
+    const lobby: Lobby = {
+      id: lobbyId,
       players: [],
     };
-    this.gameListService.addGame(game);
-    return { status: ServerResponseStatus.SUCCESS, data: game };
+    this.gameListService.addLobby(lobby);
+    return { status: ServerResponseStatus.SUCCESS, data: lobby };
   }
 
   /**
-   * Get a game by ID
-   * @param gameId The game ID
-   * @returns The game object
+   * Get a lobby by ID
+   * @param gameId The lobby ID
+   * @param sessionId The requesting player's session ID
+   * @returns The lobby object
    */
   @Get("{gameId}")
-  @Response<GameResponse<Game>>(200, "Game retrieved successfully")
+  @Response<GameResponse<PublicLobby>>(200, "Lobby retrieved successfully")
   @Response<ServerError>(404, "Game not found")
-  async getGame(@Path() gameId: string): Promise<GameResponse<Game>> {
-    const game = gameId ? this.gameListService.getGame(gameId) : undefined;
-    if (!game) {
+  async getGame(
+    @Path() gameId: string,
+    @Query() sessionId?: string,
+  ): Promise<GameResponse<PublicLobby>> {
+    const lobby = gameId ? this.gameListService.getLobby(gameId) : undefined;
+    if (!lobby) {
       this.setStatus(404);
       return { status: ServerResponseStatus.ERROR, error: "Game not found" };
     }
-    return { status: ServerResponseStatus.SUCCESS, data: game };
+
+    const publicLobby: PublicLobby = {
+      id: lobby.id,
+      players: lobby.players.map((player) => ({
+        id: player.id,
+        name: player.name,
+        ...(player.sessionId === sessionId
+          ? { sessionId: player.sessionId }
+          : {}),
+      })),
+    };
+
+    return { status: ServerResponseStatus.SUCCESS, data: publicLobby };
   }
 
   /**
-   * Join a game
-   * @param gameId The game ID
+   * Join a lobby
+   * @param gameId The lobby ID
    * @param body Player name
-   * @returns Updated game object with new player
+   * @returns Updated lobby object with new player
    */
   @Post("{gameId}/join")
-  @Response<GameResponse<Game>>(201, "Player joined successfully")
+  @Response<GameResponse<Lobby>>(201, "Player joined successfully")
   @Response<ServerError>(404, "Game not found")
   async joinGame(
     @Path() gameId: string,
     @Body() body: JoinGameRequest,
-  ): Promise<GameResponse<Game>> {
-    const game = gameId ? this.gameListService.getGame(gameId) : undefined;
-    if (!game) {
+  ): Promise<GameResponse<Lobby>> {
+    const lobby = gameId ? this.gameListService.getLobby(gameId) : undefined;
+    if (!lobby) {
       this.setStatus(404);
       return { status: ServerResponseStatus.ERROR, error: "Game not found" };
     }
 
-    const newPlayer: Player = {
+    const newPlayer: LobbyPlayer = {
       id: randomUUID(),
       name: body.playerName,
+      sessionId: randomUUID(),
     };
-    game.players.push(newPlayer);
+    lobby.players.push(newPlayer);
     this.setStatus(201);
-    return { status: ServerResponseStatus.SUCCESS, data: game };
+    return { status: ServerResponseStatus.SUCCESS, data: lobby };
   }
 }
