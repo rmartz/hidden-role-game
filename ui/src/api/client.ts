@@ -1,12 +1,7 @@
 import { DefaultService, OpenAPI } from "./generated";
-import type {
-  GameResponse_Lobby_,
-  GameResponse_PublicLobby_,
-  LobbyPlayer,
-} from "./generated";
+import type { GameResponse_Lobby_, LobbyPlayer } from "./generated";
 
 export type LobbyResponse = GameResponse_Lobby_;
-export type PublicLobbyResponse = GameResponse_PublicLobby_;
 export type GamePlayer = LobbyPlayer;
 
 export class ApiClient {
@@ -18,7 +13,7 @@ export class ApiClient {
     return DefaultService.createGame();
   }
 
-  getGame(gameId: string): Promise<PublicLobbyResponse> {
+  getGame(gameId: string): Promise<LobbyResponse> {
     return DefaultService.getGame(gameId);
   }
 

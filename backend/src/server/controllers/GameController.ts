@@ -3,7 +3,6 @@ import type { Lobby, LobbyPlayer } from "../../lib/models";
 import {
   ServerResponseStatus,
   type GameResponse,
-  type PublicLobby,
   type ServerError,
 } from "../models";
 import { randomUUID } from "crypto";
@@ -54,21 +53,15 @@ export class GameController extends Controller {
    * @returns The lobby object
    */
   @Get("{gameId}")
-  @Response<GameResponse<PublicLobby>>(200, "Lobby retrieved successfully")
+  @Response<GameResponse<Lobby>>(200, "Lobby retrieved successfully")
   @Response<ServerError>(404, "Game not found")
-  async getGame(@Path() gameId: string): Promise<GameResponse<PublicLobby>> {
+  async getGame(@Path() gameId: string): Promise<GameResponse<Lobby>> {
     const lobby = gameId ? this.gameListService.getLobby(gameId) : undefined;
     if (!lobby) {
       this.setStatus(404);
       return { status: ServerResponseStatus.ERROR, error: "Game not found" };
     }
-
-    const publicLobby: PublicLobby = {
-      id: lobby.id,
-      players: lobby.players.map(({ id, name }) => ({ id, name })),
-    };
-
-    return { status: ServerResponseStatus.SUCCESS, data: publicLobby };
+    return { status: ServerResponseStatus.SUCCESS, data: lobby };
   }
 
   /**
@@ -93,7 +86,6 @@ export class GameController extends Controller {
     const newPlayer: LobbyPlayer = {
       id: randomUUID(),
       name: body.playerName,
-      sessionId: randomUUID(),
     };
     lobby.players.push(newPlayer);
     this.setStatus(201);

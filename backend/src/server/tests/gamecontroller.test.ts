@@ -101,7 +101,6 @@ describe("GameController", () => {
     const player = joinResponse.body.data.players[0];
     assert.equal(player.name, "Alice", "Player name should be Alice");
     assert(player.id, "Player should have an id");
-    assert(player.sessionId, "Player should have a sessionId");
   });
 
   it("should allow multiple players to join a game", async () => {
@@ -148,23 +147,6 @@ describe("GameController", () => {
       response.body.error,
       "Game not found",
       "Error message should indicate game not found",
-    );
-  });
-
-  it("should not expose sessionId when getting a game", async () => {
-    const createResponse = await request(api).post("/game/create").expect(200);
-    const gameId = createResponse.body.data.id;
-
-    await request(api)
-      .post(`/game/${gameId}/join`)
-      .send({ playerName: "Alice" })
-      .expect(201);
-
-    const getResponse = await request(api).get(`/game/${gameId}`).expect(200);
-    assert.equal(
-      getResponse.body.data.players[0].sessionId,
-      undefined,
-      "sessionId should not be exposed in getGame response",
     );
   });
 });

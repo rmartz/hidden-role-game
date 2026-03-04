@@ -1,25 +1,6 @@
-// --- Lobby Players (flat, no public/private split) ---
-
 export interface LobbyPlayer {
   id: string;
   name: string;
-  sessionId: string;
-}
-
-// --- Game Players (structured state, once game exists) ---
-
-export interface PublicPlayerState {
-  id: string;
-  name: string;
-}
-
-export interface PrivatePlayerState {
-  sessionId: string;
-}
-
-export interface Player {
-  publicState: PublicPlayerState;
-  privateState: PrivatePlayerState;
 }
 
 // --- Game Status (no Lobby — Lobby is a separate concept) ---
@@ -51,7 +32,7 @@ export type GameStatusState =
 
 export interface Game {
   status: GameStatusState;
-  players: Player[];
+  players: LobbyPlayer[];
 }
 
 // --- Lobby (top-level entity; game is absent until started) ---
