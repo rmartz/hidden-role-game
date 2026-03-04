@@ -12,4 +12,11 @@ export class LobbyService {
   }
 }
 
-export const lobbyService = new LobbyService();
+declare global {
+   
+  var lobbyServiceInstance: LobbyService | undefined;
+}
+
+export const lobbyService: LobbyService =
+  globalThis.lobbyServiceInstance ??
+  (globalThis.lobbyServiceInstance = new LobbyService());
