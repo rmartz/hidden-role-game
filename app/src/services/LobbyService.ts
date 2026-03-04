@@ -22,8 +22,12 @@ export class LobbyService {
       return null;
     }
 
-    if (!lobby.players.some((p) => p.sessionId === lobby.ownerSessionId)) {
-      lobby.ownerSessionId = lobby.players[0].sessionId;
+    const newOwner = lobby.players[0];
+    if (
+      newOwner &&
+      !lobby.players.some((p) => p.sessionId === lobby.ownerSessionId)
+    ) {
+      lobby.ownerSessionId = newOwner.sessionId;
     }
 
     return lobby;

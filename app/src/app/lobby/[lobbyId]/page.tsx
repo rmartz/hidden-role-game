@@ -108,6 +108,10 @@ export default function LobbyPage() {
       {lobby && (
         <>
           <p>
+            Owner:{" "}
+            {lobby.players.find((p) => p.id === lobby.ownerPlayerId)?.name}
+          </p>
+          <p>
             Players: {lobby.players.length}{" "}
             <button onClick={() => refetch()} disabled={isFetching}>
               {isFetching ? "Refreshing..." : "Refresh"}
