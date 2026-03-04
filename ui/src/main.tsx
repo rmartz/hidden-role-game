@@ -15,7 +15,7 @@ const App = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await api.createGame();
+      const response = await api.createLobby();
       if (response.status === "success") {
         setGameId(response.data.id);
         setGamePlayers(response.data.players);
@@ -35,7 +35,7 @@ const App = () => {
       setLoading(true);
       setError(null);
       const playerName = `Player ${gamePlayers.length + 1}`;
-      const response = await api.joinGame(gameId, playerName);
+      const response = await api.joinLobby(gameId, playerName);
       if (response.status === "success") {
         setGamePlayers(response.data.players);
       } else {

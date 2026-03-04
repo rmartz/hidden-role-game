@@ -28,7 +28,7 @@ export class LobbyController extends Controller {
   @Post("create")
   @Response<ServerResponse<Lobby>>(200, "Lobby created successfully")
   @Response<ServerError>(500, "Server error")
-  async createGame(): Promise<ServerResponse<Lobby>> {
+  async createLobby(): Promise<ServerResponse<Lobby>> {
     const lobbyId = randomUUID();
 
     if (this.lobbyListService.getLobby(lobbyId)) {
@@ -55,7 +55,7 @@ export class LobbyController extends Controller {
   @Get("{lobbyId}")
   @Response<ServerResponse<Lobby>>(200, "Lobby retrieved successfully")
   @Response<ServerError>(404, "Lobby not found")
-  async getGame(@Path() lobbyId: string): Promise<ServerResponse<Lobby>> {
+  async getLobby(@Path() lobbyId: string): Promise<ServerResponse<Lobby>> {
     const lobby = lobbyId ? this.lobbyListService.getLobby(lobbyId) : undefined;
     if (!lobby) {
       this.setStatus(404);
@@ -73,7 +73,7 @@ export class LobbyController extends Controller {
   @Post("{lobbyId}/join")
   @Response<ServerResponse<Lobby>>(201, "Player joined successfully")
   @Response<ServerError>(404, "Lobby not found")
-  async joinGame(
+  async joinLobby(
     @Path() lobbyId: string,
     @Body() body: JoinLobbyRequest,
   ): Promise<ServerResponse<Lobby>> {

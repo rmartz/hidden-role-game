@@ -9,15 +9,15 @@ export class ApiClient {
     OpenAPI.BASE = baseUrl;
   }
 
-  createGame(): Promise<LobbyResponse> {
-    return DefaultService.createGame();
+  createLobby(): Promise<LobbyResponse> {
+    return DefaultService.createLobby();
   }
 
-  getGame(gameId: string): Promise<LobbyResponse> {
-    return DefaultService.getGame(gameId);
+  getLobby(gameId: string): Promise<LobbyResponse> {
+    return DefaultService.getLobby(gameId);
   }
 
-  joinGame(gameId: string, playerName: string): Promise<LobbyResponse> {
-    return DefaultService.joinGame(gameId, { playerName });
+  joinLobby(gameId: string, playerName: string): Promise<LobbyResponse> {
+    return DefaultService.joinLobby(gameId, { playerName });
   }
 }
