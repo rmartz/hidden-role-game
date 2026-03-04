@@ -3,14 +3,11 @@ import cors from "cors";
 import express from "express";
 import { RegisterRoutes } from "./routes";
 import { LobbyController } from "./controllers/LobbyController";
-import { LobbyService } from "./services/LobbyService";
+import { lobbyService } from "./services/LobbyService";
 
 const app: Express = express();
 const port = 7001;
 const uiOrigin = process.env["UI_ORIGIN"] ?? "http://localhost:3000";
-
-// Dependency injection
-const lobbyListService = new LobbyService();
 
 // Middleware
 app.use(
@@ -27,4 +24,4 @@ app.listen(port, () => {
   console.log(`Secret Villain Game server listening on port ${port}`);
 });
 
-export { LobbyController, lobbyListService };
+export { LobbyController, lobbyService };

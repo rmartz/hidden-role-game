@@ -6,7 +6,7 @@ import {
   type ServerResponse,
 } from "../models";
 import { randomUUID } from "crypto";
-import type { LobbyService } from "../services/LobbyService";
+import { lobbyService, type LobbyService } from "../services/LobbyService";
 
 interface JoinLobbyRequest {
   playerName: string;
@@ -16,7 +16,7 @@ interface JoinLobbyRequest {
 export class LobbyController extends Controller {
   private lobbyListService: LobbyService;
 
-  constructor(lobbyListService: LobbyService) {
+  constructor(lobbyListService: LobbyService = lobbyService) {
     super();
     this.lobbyListService = lobbyListService;
   }

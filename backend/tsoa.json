@@ -15,7 +15,7 @@
     "basePath": "/"
   },
   "routes": {
-    "outputDirectory": "dist",
+    "routesDir": "src/server",
     "routesFileName": "routes.ts"
   }
 }

@@ -11,3 +11,5 @@ export class LobbyService {
     return this.lobbies[lobbyId];
   }
 }
+
+export const lobbyService = new LobbyService();
