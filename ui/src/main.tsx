@@ -22,7 +22,7 @@ const App = () => {
       } else {
         setError(response.error || "Failed to create game");
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setLoading(false);
