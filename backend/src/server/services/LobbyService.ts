@@ -17,3 +17,5 @@ export class LobbyService {
     return lobby.players.some((p) => p.sessionId === sessionId);
   }
 }
+
+export const lobbyService = new LobbyService();

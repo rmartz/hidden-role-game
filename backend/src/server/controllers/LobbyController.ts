@@ -20,7 +20,7 @@ import {
   type JoinLobbyRequest,
 } from "../models";
 import { randomUUID } from "crypto";
-import type { LobbyService } from "../services/LobbyService";
+import { lobbyService, type LobbyService } from "../services/LobbyService";
 
 function toPublicLobby(lobby: Lobby): PublicLobby {
   const mapPlayers = (ps: LobbyPlayer[]): PublicLobbyPlayer[] =>
@@ -41,7 +41,7 @@ function toPublicLobby(lobby: Lobby): PublicLobby {
 export class LobbyController extends Controller {
   private lobbyListService: LobbyService;
 
-  constructor(lobbyListService: LobbyService) {
+  constructor(lobbyListService: LobbyService = lobbyService) {
     super();
     this.lobbyListService = lobbyListService;
   }
