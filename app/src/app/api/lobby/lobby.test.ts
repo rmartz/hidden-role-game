@@ -262,7 +262,7 @@ describe("Lobby API", () => {
       expect(res.status).toBe(403);
     });
 
-    it("should return null lobby when last player leaves", async () => {
+    it("should prevent the owner from leaving the lobby", async () => {
       const createRes = await createLobby(
         postRequest("http://localhost/api/lobby/create", {
           playerName: "Alice",
@@ -281,45 +281,7 @@ describe("Lobby API", () => {
         ),
         makePlayerParams(data.lobby.id, alice.id),
       );
-      expect(res.status).toBe(200);
-      const body = await res.json();
-      expect(body.status).toBe("success");
-      expect(body.data.lobby).toBeNull();
-    });
-
-    it("should transfer ownership when the owner leaves", async () => {
-      const createRes = await createLobby(
-        postRequest("http://localhost/api/lobby/create", {
-          playerName: "Alice",
-        }),
-      );
-      const { data: createData } = await createRes.json();
-      const { lobby, sessionId: aliceSession } = createData;
-      const alice = lobby.players[0];
-
-      await joinLobby(
-        postRequest(`http://localhost/api/lobby/${lobby.id}/join`, {
-          playerName: "Bob",
-        }),
-        makeParams(lobby.id),
-      );
-
-      const res = await removePlayer(
-        new Request(
-          `http://localhost/api/lobby/${lobby.id}/players/${alice.id}`,
-          {
-            method: "DELETE",
-            headers: { "x-session-id": aliceSession },
-          },
-        ),
-        makePlayerParams(lobby.id, alice.id),
-      );
-      expect(res.status).toBe(200);
-      const body = await res.json();
-      expect(body.status).toBe("success");
-      expect(body.data.lobby.players).toHaveLength(1);
-      expect(body.data.lobby.players[0].name).toBe("Bob");
-      expect(body.data.lobby.ownerPlayerId).toBe(body.data.lobby.players[0].id);
+      expect(res.status).toBe(403);
     });
 
     it("should return 404 when removing a player from a nonexistent lobby", async () => {

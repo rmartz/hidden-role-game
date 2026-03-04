@@ -36,6 +36,16 @@ export async function DELETE(
     );
   }
 
+  if (callerIsOwner && callerIsTarget) {
+    return Response.json(
+      {
+        status: ServerResponseStatus.Error,
+        error: "Owner cannot leave the lobby",
+      },
+      { status: 403 },
+    );
+  }
+
   if (lobby.game) {
     return Response.json(
       {

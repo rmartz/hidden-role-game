@@ -11,24 +11,11 @@ export class LobbyService {
     return this.lobbies[lobbyId];
   }
 
-  public removePlayer(lobbyId: string, playerId: string): Lobby | null {
+  public removePlayer(lobbyId: string, playerId: string): Lobby | undefined {
     const lobby = this.lobbies[lobbyId];
-    if (!lobby) return null;
+    if (!lobby) return undefined;
 
     lobby.players = lobby.players.filter((p) => p.id !== playerId);
-
-    if (lobby.players.length === 0) {
-      delete this.lobbies[lobbyId];
-      return null;
-    }
-
-    const newOwner = lobby.players[0];
-    if (
-      newOwner &&
-      !lobby.players.some((p) => p.sessionId === lobby.ownerSessionId)
-    ) {
-      lobby.ownerSessionId = newOwner.sessionId;
-    }
 
     return lobby;
   }
