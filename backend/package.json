@@ -16,6 +16,7 @@
   "type": "module",
   "main": "dist/server/index.js",
   "scripts": {
+    "postinstall": "npx tsoa routes",
     "dev": "npx tsoa routes && node --import tsx src/server/index.ts",
     "start": "node dist/server/index.js",
     "build": "npx tsoa routes && npx tsc && npx tsoa spec",

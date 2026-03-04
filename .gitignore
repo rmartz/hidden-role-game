@@ -1,3 +1,4 @@
 node_modules/
 dist/
 ui/src/api/generated/
+backend/src/server/routes.ts
