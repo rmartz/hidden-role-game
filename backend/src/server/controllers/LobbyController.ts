@@ -28,7 +28,7 @@ export class LobbyController extends Controller {
   @Post("create")
   @Response<ServerResponse<Lobby>>(200, "Lobby created successfully")
   @Response<ServerError>(500, "Server error")
-  async createLobby(): Promise<any> {
+  async createLobby(): Promise<ServerResponse<Lobby>> {
     const lobbyId = randomUUID();
 
     if (this.lobbyListService.getLobby(lobbyId)) {
