@@ -7,8 +7,8 @@ export default [
     ignores: [
       "**/dist/**",
       "**/node_modules/**",
-      "ui/src/api/generated/**",
-      "backend/src/server/routes.ts",
+      "**/.next/**",
+      "**/next-env.d.ts",
     ],
   },
   js.configs.recommended,

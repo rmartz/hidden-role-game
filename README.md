@@ -1,119 +1,76 @@
-# Secret Villain Game - Monorepo
+# Secret Villain Game
 
-This is a monorepo containing both the backend server and React frontend for the Secret Villain Game.
+A multiplayer social deduction game. Currently in early development — lobby creation and joining is functional.
+
+## Tech Stack
+
+- **[Next.js 15](https://nextjs.org/)** — fullstack React framework (App Router)
+- **TypeScript** — strict mode throughout
+- **pnpm** — package manager with workspaces
+- **Vitest** — test runner
 
 ## Project Structure
 
 ```
 secret-villain-game/
-├── backend/           # Node.js Express API server
-│   ├── src/
-│   ├── package.json
-│   └── tsconfig.json
-├── ui/                # React frontend
-│   ├── src/
-│   ├── package.json
-│   ├── tsconfig.json
-│   ├── vite.config.ts
-│   └── index.html
-└── package.json       # Root monorepo config
+├── app/                        # Next.js app (frontend + backend in one)
+│   └── src/
+│       ├── app/
+│       │   ├── page.tsx               # Main UI
+│       │   ├── layout.tsx             # Root layout
+│       │   └── api/lobby/             # API Route Handlers
+│       │       ├── create/route.ts    # POST /api/lobby/create
+│       │       └── [lobbyId]/
+│       │           ├── route.ts       # GET /api/lobby/:id
+│       │           └── join/route.ts  # POST /api/lobby/:id/join
+│       ├── lib/
+│       │   ├── models/         # Core domain models (Lobby, Player, Game)
+│       │   └── api.ts          # Client-side fetch wrapper
+│       ├── server/
+│       │   ├── models/         # API response types (public-facing)
+│       │   └── lobby-helpers.ts
+│       └── services/
+│           └── LobbyService.ts # In-memory lobby store (singleton)
+├── package.json                # Workspace root (tooling: ESLint, Prettier, Husky)
+└── pnpm-workspace.yaml
 ```
 
 ## Getting Started
 
-### Install Dependencies
-
 ```bash
-npm install
+# Install dependencies
+pnpm install
+
+# Start development server (http://localhost:3000)
+pnpm dev
+
+# Run tests
+pnpm test
+
+# Build for production
+pnpm build
 ```
 
-This will install dependencies for both backend and frontend workspaces.
+## API
 
-### Development
+All API routes are served by the same Next.js process — no separate server needed.
 
-Run all workspaces in development mode:
+| Method | Path                  | Description                                      |
+| ------ | --------------------- | ------------------------------------------------ |
+| `POST` | `/api/lobby/create`   | Create a lobby; returns lobby + session ID       |
+| `GET`  | `/api/lobby/:id`      | Get lobby state (requires `x-session-id` header) |
+| `POST` | `/api/lobby/:id/join` | Join a lobby; returns lobby + session ID         |
 
-```bash
-npm run dev
-```
+Session IDs are stored in `localStorage` and sent as the `x-session-id` header. They are never included in lobby responses — only returned once on create/join.
 
-This starts backend (`http://localhost:7001`) and UI (`http://localhost:3000`) concurrently.
-
-Or run individual workspaces:
-
-```bash
-npm run backend:dev
-npm run ui:dev
-```
-
-### Building
-
-Build all workspaces:
+## Development
 
 ```bash
-npm run build
+# Lint
+pnpm lint
+
+# Format
+pnpm format
 ```
 
-Or build specific workspaces:
-
-```bash
-npm run backend:build
-npm run ui:build
-```
-
-### Testing
-
-Run tests for all workspaces:
-
-```bash
-npm test
-```
-
-Or run tests for specific workspace:
-
-```bash
-npm run backend:test
-```
-
-### Backend Only
-
-Start the backend server:
-
-```bash
-npm run backend:dev      # Development mode with hot reload
-npm run backend:start    # Production mode
-npm run backend:build    # Build TypeScript
-npm run backend:test     # Run tests
-```
-
-### Frontend Only
-
-Start the frontend dev server:
-
-```bash
-npm run ui:dev          # Development mode
-npm run ui:build        # Build for production
-npm run ui:preview      # Preview production build
-```
-
-## Backend Configuration
-
-- **Framework**: Express.js
-- **Language**: TypeScript
-- **Port**: 7001
-- **Test Framework**: Node.js built-in test runner
-
-## Frontend Configuration
-
-- **Framework**: React 18
-- **Language**: TypeScript
-- **Build Tool**: Vite
-- **Test Framework**: Vitest
-- **Dev Port**: 3000
-
-## Deploying
-
-Each workspace is independently deployable:
-
-- **Backend**: Deploy `backend/dist/` or run with `npm run backend:start`
-- **Frontend**: Deploy `ui/dist/` to any static hosting service
+CI runs on every PR: **Tests**, **Lint**, and **Build**.
