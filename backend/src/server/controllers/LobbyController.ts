@@ -12,7 +12,7 @@ interface JoinGameRequest {
   playerName: string;
 }
 
-@Route("game")
+@Route("lobby")
 export class LobbyController extends Controller {
   private gameListService: GameListService;
 

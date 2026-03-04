@@ -16,7 +16,7 @@ setupTestRoutes(api, gameListService);
 describe("LobbyController", () => {
   it("should create a game", async () => {
     const response = await request(api)
-      .post("/game/create")
+      .post("/lobby/create")
       .expect("Content-Type", /json/)
       .expect(200);
 
@@ -38,11 +38,11 @@ describe("LobbyController", () => {
   });
 
   it("should get a game by id", async () => {
-    const createResponse = await request(api).post("/game/create").expect(200);
+    const createResponse = await request(api).post("/lobby/create").expect(200);
     const gameId = createResponse.body.data.id;
 
     const getResponse = await request(api)
-      .get(`/game/${gameId}`)
+      .get(`/lobby/${gameId}`)
       .expect("Content-Type", /json/)
       .expect(200);
 
@@ -60,7 +60,7 @@ describe("LobbyController", () => {
 
   it("should return 404 when getting a game that does not exist", async () => {
     const response = await request(api)
-      .get("/game/nonexistent-game-id")
+      .get("/lobby/nonexistent-game-id")
       .expect("Content-Type", /json/)
       .expect(404);
 
@@ -77,11 +77,11 @@ describe("LobbyController", () => {
   });
 
   it("should allow a player to join a game", async () => {
-    const createResponse = await request(api).post("/game/create").expect(200);
+    const createResponse = await request(api).post("/lobby/create").expect(200);
     const gameId = createResponse.body.data.id;
 
     const joinResponse = await request(api)
-      .post(`/game/${gameId}/join`)
+      .post(`/lobby/${gameId}/join`)
       .send({ playerName: "Alice" })
       .expect("Content-Type", /json/)
       .expect(201);
@@ -104,18 +104,18 @@ describe("LobbyController", () => {
   });
 
   it("should allow multiple players to join a game", async () => {
-    const createResponse = await request(api).post("/game/create").expect(200);
+    const createResponse = await request(api).post("/lobby/create").expect(200);
     const gameId = createResponse.body.data.id;
 
     const join1 = await request(api)
-      .post(`/game/${gameId}/join`)
+      .post(`/lobby/${gameId}/join`)
       .send({ playerName: "Alice" })
       .expect(201);
 
     assert.equal(join1.body.data.players.length, 1);
 
     const join2 = await request(api)
-      .post(`/game/${gameId}/join`)
+      .post(`/lobby/${gameId}/join`)
       .send({ playerName: "Bob" })
       .expect(201);
 
@@ -133,7 +133,7 @@ describe("LobbyController", () => {
 
   it("should return 404 when joining a game that does not exist", async () => {
     const response = await request(api)
-      .post("/game/nonexistent-id/join")
+      .post("/lobby/nonexistent-id/join")
       .send({ playerName: "Alice" })
       .expect("Content-Type", /json/)
       .expect(404);
