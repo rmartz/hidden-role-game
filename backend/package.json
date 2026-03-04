@@ -16,10 +16,10 @@
   "type": "module",
   "main": "dist/server/index.js",
   "scripts": {
-    "dev": "node --import tsx src/server/index.ts",
+    "dev": "npx tsoa routes && node --import tsx src/server/index.ts",
     "start": "node dist/server/index.js",
-    "build": "npx tsc && npx tsoa spec",
-    "generate:api": "npx tsoa spec",
+    "build": "npx tsoa routes && npx tsc && npx tsoa spec",
+    "generate:api": "npx tsoa routes && npx tsoa spec",
     "test": "node --import tsx --test 'src/**/*.test.ts'",
     "lint": "eslint ."
   },
