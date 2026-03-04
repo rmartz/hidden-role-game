@@ -1,7 +1,7 @@
 import { DefaultService, OpenAPI } from "./generated";
-import type { GameResponse_Lobby_, LobbyPlayer } from "./generated";
+import type { ServerResponse_Lobby_, LobbyPlayer } from "./generated";
 
-export type LobbyResponse = GameResponse_Lobby_;
+export type LobbyResponse = ServerResponse_Lobby_;
 export type GamePlayer = LobbyPlayer;
 
 export class ApiClient {
