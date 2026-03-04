@@ -151,33 +151,20 @@ describe("GameController", () => {
     );
   });
 
-  it("should expose sessionId only to the matching player when getting a game", async () => {
+  it("should not expose sessionId when getting a game", async () => {
     const createResponse = await request(api).post("/game/create").expect(200);
     const gameId = createResponse.body.data.id;
 
-    const joinResponse = await request(api)
+    await request(api)
       .post(`/game/${gameId}/join`)
       .send({ playerName: "Alice" })
       .expect(201);
 
-    const aliceSessionId = joinResponse.body.data.players[0].sessionId;
-
-    // Without sessionId: no sessionIds exposed
-    const publicView = await request(api).get(`/game/${gameId}`).expect(200);
+    const getResponse = await request(api).get(`/game/${gameId}`).expect(200);
     assert.equal(
-      publicView.body.data.players[0].sessionId,
+      getResponse.body.data.players[0].sessionId,
       undefined,
-      "sessionId should not be exposed without matching sessionId",
-    );
-
-    // With Alice's sessionId: her sessionId is included
-    const aliceView = await request(api)
-      .get(`/game/${gameId}?sessionId=${aliceSessionId}`)
-      .expect(200);
-    assert.equal(
-      aliceView.body.data.players[0].sessionId,
-      aliceSessionId,
-      "sessionId should be exposed to the matching player",
+      "sessionId should not be exposed in getGame response",
     );
   });
 });

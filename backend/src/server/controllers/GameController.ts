@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Post,
-  Get,
-  Route,
-  Response,
-  Body,
-  Path,
-  Query,
-} from "tsoa";
+import { Controller, Post, Get, Route, Response, Body, Path } from "tsoa";
 import type { Lobby, LobbyPlayer } from "../../lib/models";
 import {
   ServerResponseStatus,
@@ -60,16 +51,12 @@ export class GameController extends Controller {
   /**
    * Get a lobby by ID
    * @param gameId The lobby ID
-   * @param sessionId The requesting player's session ID
    * @returns The lobby object
    */
   @Get("{gameId}")
   @Response<GameResponse<PublicLobby>>(200, "Lobby retrieved successfully")
   @Response<ServerError>(404, "Game not found")
-  async getGame(
-    @Path() gameId: string,
-    @Query() sessionId?: string,
-  ): Promise<GameResponse<PublicLobby>> {
+  async getGame(@Path() gameId: string): Promise<GameResponse<PublicLobby>> {
     const lobby = gameId ? this.gameListService.getLobby(gameId) : undefined;
     if (!lobby) {
       this.setStatus(404);
@@ -78,13 +65,7 @@ export class GameController extends Controller {
 
     const publicLobby: PublicLobby = {
       id: lobby.id,
-      players: lobby.players.map((player) => ({
-        id: player.id,
-        name: player.name,
-        ...(player.sessionId === sessionId
-          ? { sessionId: player.sessionId }
-          : {}),
-      })),
+      players: lobby.players.map(({ id, name }) => ({ id, name })),
     };
 
     return { status: ServerResponseStatus.SUCCESS, data: publicLobby };

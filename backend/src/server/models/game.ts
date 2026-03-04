@@ -17,7 +17,6 @@ export interface PublicGame {
 export interface PublicLobbyPlayer {
   id: string;
   name: string;
-  sessionId?: string; // only present for the requesting player
 }
 
 export interface PublicLobby {
