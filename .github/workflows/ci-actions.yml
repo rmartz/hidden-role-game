@@ -66,3 +66,16 @@ jobs:
           cache: "npm"
       - run: npm ci
       - run: npm --workspace=@secret-villain/ui run build
+
+  api-schema-stale:
+    name: API Schema Up To Date
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: "npm"
+      - run: npm ci
+      - run: npm --workspace=@secret-villain/backend run generate:api
+      - run: git diff --exit-code backend/openapi/openapi.yaml

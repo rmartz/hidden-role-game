@@ -190,8 +190,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-      description:
-        Create a new lobby. The requesting player becomes the first player
+      description: Create a new lobby. The requesting player becomes the first player
         and owner.
       security: []
       parameters: []
