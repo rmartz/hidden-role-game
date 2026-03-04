@@ -34,6 +34,6 @@ export async function POST(request: Request): Promise<Response> {
   lobbyService.addLobby(lobby);
   return Response.json({
     status: ServerResponseStatus.Success,
-    data: { lobby: toPublicLobby(lobby), sessionId },
+    data: { lobby: toPublicLobby(lobby), sessionId, playerId: owner.id },
   });
 }

@@ -7,6 +7,7 @@ export interface PublicLobbyPlayer {
 
 export interface PublicLobby {
   id: string;
+  ownerPlayerId: string;
   players: PublicLobbyPlayer[];
   game?: { status: GameStatusState; players: PublicLobbyPlayer[] };
 }
@@ -22,4 +23,5 @@ export interface JoinLobbyRequest {
 export interface LobbyJoinResponse {
   lobby: PublicLobby;
   sessionId: string;
+  playerId: string;
 }
