@@ -1,7 +1,7 @@
 import express from "express";
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { GameListService } from "../services/GameListService.js";
+import { LobbyService } from "../services/LobbyService.js";
 import { setupTestRoutes } from "./setup.js";
 import request from "supertest";
 
@@ -10,13 +10,13 @@ const api = express();
 api.use(express.urlencoded({ extended: true }));
 api.use(express.json());
 
-const gameListService = new GameListService();
-setupTestRoutes(api, gameListService);
+const lobbyService = new LobbyService();
+setupTestRoutes(api, lobbyService);
 
-describe("GameController", () => {
+describe("LobbyController", () => {
   it("should create a game", async () => {
     const response = await request(api)
-      .post("/game/create")
+      .post("/lobby/create")
       .expect("Content-Type", /json/)
       .expect(200);
 
@@ -25,27 +25,24 @@ describe("GameController", () => {
       "success",
       "Response status should be success",
     );
-    assert(response.body.data.id, "Game should have an id");
+    assert(response.body.data.id, "Lobby should have an id");
     assert(
       Array.isArray(response.body.data.players),
-      "Game should have a players array",
+      "Lobby should have a players array",
     );
     assert.equal(
       response.body.data.players.length,
       0,
-      "New game should have no players",
+      "New lobby should have no players",
     );
   });
 
   it("should get a game by id", async () => {
-    // First create a game
-    const createResponse = await request(api).post("/game/create").expect(200);
-
+    const createResponse = await request(api).post("/lobby/create").expect(200);
     const gameId = createResponse.body.data.id;
 
-    // Then retrieve it
     const getResponse = await request(api)
-      .get(`/game/${gameId}`)
+      .get(`/lobby/${gameId}`)
       .expect("Content-Type", /json/)
       .expect(200);
 
@@ -54,16 +51,16 @@ describe("GameController", () => {
       "success",
       "Response status should be success",
     );
-    assert.equal(getResponse.body.data.id, gameId, "Game id should match");
+    assert.equal(getResponse.body.data.id, gameId, "Lobby id should match");
     assert(
       Array.isArray(getResponse.body.data.players),
-      "Game should have a players array",
+      "Lobby should have a players array",
     );
   });
 
   it("should return 404 when getting a game that does not exist", async () => {
     const response = await request(api)
-      .get("/game/nonexistent-game-id")
+      .get("/lobby/nonexistent-game-id")
       .expect("Content-Type", /json/)
       .expect(404);
 
@@ -74,20 +71,17 @@ describe("GameController", () => {
     );
     assert.equal(
       response.body.error,
-      "Game not found",
+      "Lobby not found",
       "Error message should indicate game not found",
     );
   });
 
   it("should allow a player to join a game", async () => {
-    // First create a game
-    const createResponse = await request(api).post("/game/create").expect(200);
-
+    const createResponse = await request(api).post("/lobby/create").expect(200);
     const gameId = createResponse.body.data.id;
 
-    // Then join the game
     const joinResponse = await request(api)
-      .post(`/game/${gameId}/join`)
+      .post(`/lobby/${gameId}/join`)
       .send({ playerName: "Alice" })
       .expect("Content-Type", /json/)
       .expect(201);
@@ -97,44 +91,38 @@ describe("GameController", () => {
       "success",
       "Response status should be success",
     );
-    assert.equal(joinResponse.body.data.id, gameId, "Game id should match");
+    assert.equal(joinResponse.body.data.id, gameId, "Lobby id should match");
     assert.equal(
       joinResponse.body.data.players.length,
       1,
-      "Game should have one player",
+      "Lobby should have one player",
     );
-    assert.equal(
-      joinResponse.body.data.players[0].name,
-      "Alice",
-      "Player name should be Alice",
-    );
-    assert(joinResponse.body.data.players[0].id, "Player should have an id");
+
+    const player = joinResponse.body.data.players[0];
+    assert.equal(player.name, "Alice", "Player name should be Alice");
+    assert(player.id, "Player should have an id");
   });
 
   it("should allow multiple players to join a game", async () => {
-    // Create a game
-    const createResponse = await request(api).post("/game/create").expect(200);
-
+    const createResponse = await request(api).post("/lobby/create").expect(200);
     const gameId = createResponse.body.data.id;
 
-    // First player joins
     const join1 = await request(api)
-      .post(`/game/${gameId}/join`)
+      .post(`/lobby/${gameId}/join`)
       .send({ playerName: "Alice" })
       .expect(201);
 
     assert.equal(join1.body.data.players.length, 1);
 
-    // Second player joins
     const join2 = await request(api)
-      .post(`/game/${gameId}/join`)
+      .post(`/lobby/${gameId}/join`)
       .send({ playerName: "Bob" })
       .expect(201);
 
     assert.equal(
       join2.body.data.players.length,
       2,
-      "Game should have two players",
+      "Lobby should have two players",
     );
     assert.equal(
       join2.body.data.players[1].name,
@@ -145,7 +133,7 @@ describe("GameController", () => {
 
   it("should return 404 when joining a game that does not exist", async () => {
     const response = await request(api)
-      .post("/game/nonexistent-id/join")
+      .post("/lobby/nonexistent-id/join")
       .send({ playerName: "Alice" })
       .expect("Content-Type", /json/)
       .expect(404);
@@ -157,7 +145,7 @@ describe("GameController", () => {
     );
     assert.equal(
       response.body.error,
-      "Game not found",
+      "Lobby not found",
       "Error message should indicate game not found",
     );
   });

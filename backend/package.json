@@ -20,7 +20,7 @@
     "start": "node dist/server/index.js",
     "build": "npx tsc && npx tsoa spec",
     "generate:api": "npx tsoa spec",
-    "test": "node --import tsx --test"
+    "test": "node --import tsx --test 'src/**/*.test.ts'"
   },
   "dependencies": {
     "@types/cors": "^2.8.19",

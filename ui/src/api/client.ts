@@ -1,23 +1,23 @@
 import { DefaultService, OpenAPI } from "./generated";
-import type { GameResponse_Game_, Player } from "./generated";
+import type { ServerResponse_Lobby_, LobbyPlayer } from "./generated";
 
-export type GameResponse = GameResponse_Game_;
-export type GamePlayer = Player;
+export type LobbyResponse = ServerResponse_Lobby_;
+export type GamePlayer = LobbyPlayer;
 
 export class ApiClient {
   constructor(baseUrl: string = "http://localhost:7001") {
     OpenAPI.BASE = baseUrl;
   }
 
-  createGame(): Promise<GameResponse> {
-    return DefaultService.createGame();
+  createLobby(): Promise<LobbyResponse> {
+    return DefaultService.createLobby();
   }
 
-  getGame(gameId: string): Promise<GameResponse> {
-    return DefaultService.getGame(gameId);
+  getLobby(gameId: string): Promise<LobbyResponse> {
+    return DefaultService.getLobby(gameId);
   }
 
-  joinGame(gameId: string, playerName: string): Promise<GameResponse> {
-    return DefaultService.joinGame(gameId, { playerName });
+  joinLobby(gameId: string, playerName: string): Promise<LobbyResponse> {
+    return DefaultService.joinLobby(gameId, { playerName });
   }
 }
