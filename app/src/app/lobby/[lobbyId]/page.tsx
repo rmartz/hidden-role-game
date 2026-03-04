@@ -19,6 +19,7 @@ export default function LobbyPage() {
         throw new Error(response.error ?? "Failed to load lobby");
       return response.data;
     },
+    refetchInterval: 30_000,
   });
 
   return (
