@@ -3,3 +3,4 @@ dist
 backend/dist
 ui/dist
 ui/src/api/generated
+backend/src/server/routes.ts

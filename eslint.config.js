@@ -4,7 +4,12 @@ import tseslint from "typescript-eslint";
 
 export default [
   {
-    ignores: ["**/dist/**", "**/node_modules/**", "ui/src/api/generated/**"],
+    ignores: [
+      "**/dist/**",
+      "**/node_modules/**",
+      "ui/src/api/generated/**",
+      "backend/src/server/routes.ts",
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
