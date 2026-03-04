@@ -22,6 +22,10 @@ import {
 import { randomUUID } from "crypto";
 import { lobbyService, type LobbyService } from "../services/LobbyService";
 
+function isValidSession(lobby: Lobby, sessionId: string): boolean {
+  return lobby.players.some((p) => p.sessionId === sessionId);
+}
+
 function toPublicLobby(lobby: Lobby): PublicLobby {
   const mapPlayers = (ps: LobbyPlayer[]): PublicLobbyPlayer[] =>
     ps.map((p) => ({ id: p.id, name: p.name }));
@@ -102,10 +106,7 @@ export class LobbyController extends Controller {
     @Header("x-session-id") sessionId?: string,
   ): Promise<ServerResponse<PublicLobby>> {
     const lobby = lobbyId ? this.lobbyListService.getLobby(lobbyId) : undefined;
-    if (
-      !lobby ||
-      !this.lobbyListService.isValidSession(lobbyId, sessionId ?? "")
-    ) {
+    if (!lobby || !isValidSession(lobby, sessionId ?? "")) {
       this.setStatus(404);
       return { status: ServerResponseStatus.Error, error: "Lobby not found" };
     }
