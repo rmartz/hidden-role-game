@@ -4,3 +4,4 @@ backend/dist
 ui/dist
 ui/src/api/generated
 backend/src/server/routes.ts
+backend/openapi/openapi.yaml
