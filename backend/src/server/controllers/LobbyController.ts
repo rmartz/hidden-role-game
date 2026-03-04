@@ -8,7 +8,7 @@ import {
 import { randomUUID } from "crypto";
 import type { LobbyService } from "../services/LobbyService";
 
-interface JoinGameRequest {
+interface JoinLobbyRequest {
   playerName: string;
 }
 
@@ -75,7 +75,7 @@ export class LobbyController extends Controller {
   @Response<ServerError>(404, "Lobby not found")
   async joinGame(
     @Path() lobbyId: string,
-    @Body() body: JoinGameRequest,
+    @Body() body: JoinLobbyRequest,
   ): Promise<ServerResponse<Lobby>> {
     const lobby = lobbyId ? this.lobbyListService.getLobby(lobbyId) : undefined;
     if (!lobby) {
