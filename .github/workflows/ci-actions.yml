@@ -20,7 +20,7 @@ jobs:
           node-version: 24.x
           cache: "pnpm"
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter=@secret-villain/app test
+      - run: pnpm -r test
 
   lint:
     name: Lint
@@ -35,7 +35,7 @@ jobs:
           node-version: 24.x
           cache: "pnpm"
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter=@secret-villain/app run lint
+      - run: pnpm -r run lint
 
   build:
     name: Build
@@ -50,4 +50,4 @@ jobs:
           node-version: 24.x
           cache: "pnpm"
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter=@secret-villain/app run build
+      - run: pnpm -r run build
