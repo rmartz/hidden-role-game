@@ -13,7 +13,6 @@ export class LobbyService {
 }
 
 declare global {
-   
   var lobbyServiceInstance: LobbyService | undefined;
 }
 

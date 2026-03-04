@@ -30,11 +30,11 @@
     ]
   },
   "lint-staged": {
-    "*.{js,mjs,cjs,ts,tsx,jsx,json,md,yml,yaml}": [
-      "prettier --write"
-    ],
     "*.{js,mjs,cjs,ts,tsx,jsx}": [
       "eslint --fix"
+    ],
+    "*.{js,mjs,cjs,ts,tsx,jsx,json,md,yml,yaml}": [
+      "prettier --write"
     ]
   },
   "devDependencies": {
