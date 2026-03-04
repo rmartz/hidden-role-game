@@ -1,4 +1,4 @@
-name: CI - build
+name: CI
 
 on:
   push:
@@ -7,19 +7,62 @@ on:
     branches: ["main"]
 
 jobs:
-  build:
+  backend-tests:
+    name: Backend Tests
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [24.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
       - uses: actions/checkout@v4
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 24.x
           cache: "npm"
       - run: npm ci
-      - run: npm run build
-      - run: npm run test
+      - run: npm --workspace=@secret-villain/backend test
+
+  backend-lint:
+    name: Backend Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: "npm"
+      - run: npm ci
+      - run: npm --workspace=@secret-villain/backend run lint
+
+  frontend-tests:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: "npm"
+      - run: npm ci
+      - run: npm --workspace=@secret-villain/ui test
+
+  frontend-lint:
+    name: Frontend Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: "npm"
+      - run: npm ci
+      - run: npm --workspace=@secret-villain/ui run lint
+
+  frontend-build:
+    name: Frontend Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: "npm"
+      - run: npm ci
+      - run: npm --workspace=@secret-villain/ui run build
