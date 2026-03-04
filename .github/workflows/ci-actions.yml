@@ -7,8 +7,8 @@ on:
     branches: ["main"]
 
 jobs:
-  backend-tests:
-    name: Backend Tests
+  tests:
+    name: Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,10 +20,10 @@ jobs:
           node-version: 24.x
           cache: "pnpm"
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter=@secret-villain/backend test
+      - run: pnpm --filter=@secret-villain/app test
 
-  backend-lint:
-    name: Backend Lint
+  lint:
+    name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -35,10 +35,10 @@ jobs:
           node-version: 24.x
           cache: "pnpm"
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter=@secret-villain/backend run lint
+      - run: pnpm --filter=@secret-villain/app run lint
 
-  frontend-tests:
-    name: Frontend Tests
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -50,50 +50,4 @@ jobs:
           node-version: 24.x
           cache: "pnpm"
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter=@secret-villain/ui test
-
-  frontend-lint:
-    name: Frontend Lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24.x
-          cache: "pnpm"
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter=@secret-villain/ui run lint
-
-  frontend-build:
-    name: Frontend Build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24.x
-          cache: "pnpm"
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter=@secret-villain/ui run build
-
-  api-schema-stale:
-    name: API Schema Up To Date
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24.x
-          cache: "pnpm"
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter=@secret-villain/backend run generate:api
-      - run: git diff --exit-code backend/openapi/openapi.yaml
+      - run: pnpm --filter=@secret-villain/app run build

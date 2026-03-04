@@ -15,25 +15,17 @@
   "author": "Reed Martz",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -n backend,ui -c yellow,cyan \"pnpm run backend:dev\" \"pnpm run ui:dev\"",
-    "build": "pnpm -r run build",
-    "test": "pnpm -r run test",
+    "dev": "pnpm --filter=@secret-villain/app run dev",
+    "build": "pnpm --filter=@secret-villain/app run build",
+    "test": "pnpm --filter=@secret-villain/app test",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "prepare": "husky",
-    "backend:dev": "pnpm --filter=@secret-villain/backend run dev",
-    "backend:build": "pnpm --filter=@secret-villain/backend run build",
-    "backend:start": "pnpm --filter=@secret-villain/backend start",
-    "backend:test": "pnpm --filter=@secret-villain/backend test",
-    "ui:dev": "pnpm --filter=@secret-villain/ui run dev",
-    "ui:build": "pnpm --filter=@secret-villain/ui run build",
-    "ui:preview": "pnpm --filter=@secret-villain/ui run preview"
+    "prepare": "husky"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "@nestjs/core",
-      "@openapitools/openapi-generator-cli",
-      "esbuild"
+      "esbuild",
+      "sharp"
     ]
   },
   "lint-staged": {
@@ -46,8 +38,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@vitejs/plugin-react": "^4.2.0",
-    "concurrently": "^9.2.1",
     "eslint": "^10.0.2",
     "globals": "^17.4.0",
     "husky": "^9.1.7",
