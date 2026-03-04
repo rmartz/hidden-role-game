@@ -34,7 +34,7 @@ export class LobbyController extends Controller {
     if (this.gameListService.getLobby(lobbyId)) {
       this.setStatus(500);
       return {
-        status: ServerResponseStatus.ERROR,
+        status: ServerResponseStatus.Error,
         error: "An unknown error occurred",
       };
     }
@@ -44,7 +44,7 @@ export class LobbyController extends Controller {
       players: [],
     };
     this.gameListService.addLobby(lobby);
-    return { status: ServerResponseStatus.SUCCESS, data: lobby };
+    return { status: ServerResponseStatus.Success, data: lobby };
   }
 
   /**
@@ -59,9 +59,9 @@ export class LobbyController extends Controller {
     const lobby = gameId ? this.gameListService.getLobby(gameId) : undefined;
     if (!lobby) {
       this.setStatus(404);
-      return { status: ServerResponseStatus.ERROR, error: "Game not found" };
+      return { status: ServerResponseStatus.Error, error: "Game not found" };
     }
-    return { status: ServerResponseStatus.SUCCESS, data: lobby };
+    return { status: ServerResponseStatus.Success, data: lobby };
   }
 
   /**
@@ -80,7 +80,7 @@ export class LobbyController extends Controller {
     const lobby = gameId ? this.gameListService.getLobby(gameId) : undefined;
     if (!lobby) {
       this.setStatus(404);
-      return { status: ServerResponseStatus.ERROR, error: "Game not found" };
+      return { status: ServerResponseStatus.Error, error: "Game not found" };
     }
 
     const newPlayer: LobbyPlayer = {
@@ -89,6 +89,6 @@ export class LobbyController extends Controller {
     };
     lobby.players.push(newPlayer);
     this.setStatus(201);
-    return { status: ServerResponseStatus.SUCCESS, data: lobby };
+    return { status: ServerResponseStatus.Success, data: lobby };
   }
 }

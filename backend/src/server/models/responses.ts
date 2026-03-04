@@ -1,6 +1,6 @@
 export enum ServerResponseStatus {
-  SUCCESS = "success",
-  ERROR = "error",
+  Success = "success",
+  Error = "error",
 }
 
 export interface BaseServerResponse {
@@ -8,12 +8,12 @@ export interface BaseServerResponse {
 }
 
 export interface ServerError extends BaseServerResponse {
-  status: ServerResponseStatus.ERROR;
+  status: ServerResponseStatus.Error;
   error: string;
 }
 
 export interface ServerSuccess<T> extends BaseServerResponse {
-  status: ServerResponseStatus.SUCCESS;
+  status: ServerResponseStatus.Success;
   data: T;
 }
 
