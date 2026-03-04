@@ -15,6 +15,8 @@ export default function LobbyPage() {
     data: lobby,
     error,
     isLoading,
+    refetch,
+    isFetching,
   } = useQuery({
     queryKey: ["lobby", lobbyId],
     queryFn: async () => {
@@ -105,7 +107,12 @@ export default function LobbyPage() {
 
       {lobby && (
         <>
-          <p>Players: {lobby.players.length}</p>
+          <p>
+            Players: {lobby.players.length}{" "}
+            <button onClick={() => refetch()} disabled={isFetching}>
+              {isFetching ? "Refreshing..." : "Refresh"}
+            </button>
+          </p>
           <ul>
             {lobby.players.map((player) => (
               <li
