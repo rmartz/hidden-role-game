@@ -106,7 +106,7 @@ export class LobbyController extends Controller {
     @Header("x-session-id") sessionId?: string,
   ): Promise<ServerResponse<PublicLobby>> {
     const lobby = lobbyId ? this.lobbyListService.getLobby(lobbyId) : undefined;
-    if (!lobby || !isValidSession(lobby, sessionId ?? "")) {
+    if (!lobby || !sessionId || !isValidSession(lobby, sessionId)) {
       this.setStatus(404);
       return { status: ServerResponseStatus.Error, error: "Lobby not found" };
     }
