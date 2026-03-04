@@ -124,7 +124,7 @@ export default function LobbyPage() {
                 style={{ display: "flex", gap: "8px", alignItems: "center" }}
               >
                 {player.name}
-                {player.id === myPlayerId && !gameStarted && (
+                {player.id === myPlayerId && !isOwner && !gameStarted && (
                   <button
                     onClick={() => {
                       if (window.confirm("Leave this lobby?"))
