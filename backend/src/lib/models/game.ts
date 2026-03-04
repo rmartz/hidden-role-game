@@ -61,27 +61,3 @@ export interface Lobby {
   players: LobbyPlayer[];
   game?: Game;
 }
-
-// --- Public-facing API types ---
-
-export interface PublicPlayer {
-  publicState: PublicPlayerState;
-  privateState?: PrivatePlayerState; // only present for the requesting player
-}
-
-export interface PublicGame {
-  status: GameStatusState;
-  players: PublicPlayer[];
-}
-
-export interface PublicLobbyPlayer {
-  id: string;
-  name: string;
-  sessionId?: string; // only present for the requesting player
-}
-
-export interface PublicLobby {
-  id: string;
-  players: PublicLobbyPlayer[];
-  game?: PublicGame;
-}

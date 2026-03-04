@@ -8,10 +8,11 @@ import {
   Path,
   Query,
 } from "tsoa";
-import type { Lobby, LobbyPlayer, PublicLobby } from "../../lib/models";
+import type { Lobby, LobbyPlayer } from "../../lib/models";
 import {
   ServerResponseStatus,
   type GameResponse,
+  type PublicLobby,
   type ServerError,
 } from "../models";
 import { randomUUID } from "crypto";
