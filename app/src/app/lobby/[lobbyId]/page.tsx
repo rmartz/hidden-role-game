@@ -115,7 +115,10 @@ export default function LobbyPage() {
                 {player.name}
                 {player.id === myPlayerId && !gameStarted && (
                   <button
-                    onClick={() => removeMutation.mutate(player.id)}
+                    onClick={() => {
+                      if (window.confirm("Leave this lobby?"))
+                        removeMutation.mutate(player.id);
+                    }}
                     disabled={removeMutation.isPending}
                   >
                     Leave
@@ -123,7 +126,12 @@ export default function LobbyPage() {
                 )}
                 {isOwner && player.id !== myPlayerId && !gameStarted && (
                   <button
-                    onClick={() => removeMutation.mutate(player.id)}
+                    onClick={() => {
+                      if (
+                        window.confirm(`Remove ${player.name} from the lobby?`)
+                      )
+                        removeMutation.mutate(player.id);
+                    }}
                     disabled={removeMutation.isPending}
                   >
                     Remove
