@@ -1,6 +1,7 @@
 export interface LobbyPlayer {
   id: string;
   name: string;
+  sessionId: string;
 }
 
 // --- Game Status (no Lobby — Lobby is a separate concept) ---
@@ -39,6 +40,7 @@ export interface Game {
 
 export interface Lobby {
   id: string;
+  ownerSessionId: string;
   players: LobbyPlayer[];
   game?: Game;
 }

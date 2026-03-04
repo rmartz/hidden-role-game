@@ -6,6 +6,8 @@ import type { GamePlayer } from "./api/client";
 const api = new ApiClient();
 
 const App = () => {
+  const [playerName, setPlayerName] = useState("");
+  const [lobbyIdInput, setLobbyIdInput] = useState("");
   const [gameId, setGameId] = useState<string | null>(null);
   const [gamePlayers, setGamePlayers] = useState<GamePlayer[]>([]);
   const [loading, setLoading] = useState(false);
@@ -15,12 +17,12 @@ const App = () => {
     try {
       setLoading(true);
       setError(null);
-      const response = await api.createLobby();
+      const response = await api.createLobby(playerName);
       if (response.status === "success") {
-        setGameId(response.data.id);
-        setGamePlayers(response.data.players);
+        setGameId(response.data.lobby.id);
+        setGamePlayers(response.data.lobby.players);
       } else {
-        setError(response.error || "Failed to create game");
+        setError(response.error || "Failed to create lobby");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -30,16 +32,16 @@ const App = () => {
   };
 
   const handleJoinGame = async () => {
-    if (!gameId) return;
+    if (!lobbyIdInput.trim()) return;
     try {
       setLoading(true);
       setError(null);
-      const playerName = `Player ${gamePlayers.length + 1}`;
-      const response = await api.joinLobby(gameId, playerName);
+      const response = await api.joinLobby(lobbyIdInput, playerName);
       if (response.status === "success") {
-        setGamePlayers(response.data.players);
+        setGameId(response.data.lobby.id);
+        setGamePlayers(response.data.lobby.players);
       } else {
-        setError(response.error || "Failed to join game");
+        setError(response.error || "Failed to join lobby");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -51,28 +53,63 @@ const App = () => {
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
       <h1>Secret Villain Game</h1>
-      <p>Frontend with type-safe API client generated from OpenAPI spec</p>
 
       {error && (
         <div style={{ color: "red", marginBottom: "10px" }}>Error: {error}</div>
       )}
 
       {!gameId ? (
-        <button onClick={handleCreateGame} disabled={loading}>
-          {loading ? "Creating..." : "Create Game"}
-        </button>
+        <div>
+          <div style={{ marginBottom: "10px" }}>
+            <label>
+              Your name:{" "}
+              <input
+                type="text"
+                value={playerName}
+                onChange={(e) => setPlayerName(e.target.value)}
+                placeholder="Enter your name"
+              />
+            </label>
+          </div>
+          <div style={{ marginBottom: "10px" }}>
+            <label>
+              Lobby ID:{" "}
+              <input
+                type="text"
+                value={lobbyIdInput}
+                onChange={(e) => setLobbyIdInput(e.target.value)}
+                placeholder="Leave blank to create a new lobby"
+              />
+            </label>
+          </div>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <button
+              onClick={handleCreateGame}
+              disabled={loading || playerName.trim() === ""}
+            >
+              {loading ? "Creating..." : "Create Lobby"}
+            </button>
+            <button
+              onClick={handleJoinGame}
+              disabled={
+                loading ||
+                playerName.trim() === "" ||
+                lobbyIdInput.trim() === ""
+              }
+            >
+              {loading ? "Joining..." : "Join Lobby"}
+            </button>
+          </div>
+        </div>
       ) : (
         <div>
-          <p>Game ID: {gameId}</p>
+          <p>Lobby ID: {gameId}</p>
           <p>Players: {gamePlayers.length}</p>
           <ul>
             {gamePlayers.map((player) => (
               <li key={player.id}>{player.name}</li>
             ))}
           </ul>
-          <button onClick={handleJoinGame} disabled={loading}>
-            {loading ? "Joining..." : "Join Game"}
-          </button>
         </div>
       )}
     </div>
