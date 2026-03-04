@@ -17,4 +17,4 @@ export interface ServerSuccess<T> extends BaseServerResponse {
   data: T;
 }
 
-export type GameResponse<T> = ServerSuccess<T> | ServerError;
+export type ServerResponse<T> = ServerSuccess<T> | ServerError;

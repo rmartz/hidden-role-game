@@ -2,7 +2,7 @@ import type { Express } from "express";
 import cors from "cors";
 import express from "express";
 import { RegisterRoutes } from "./routes";
-import { GameController } from "./controllers/GameController";
+import { LobbyController } from "./controllers/LobbyController";
 import { GameListService } from "./services/GameListService";
 
 const app: Express = express();
@@ -27,4 +27,4 @@ app.listen(port, () => {
   console.log(`Secret Villain Game server listening on port ${port}`);
 });
 
-export { GameController, gameListService };
+export { LobbyController, gameListService };

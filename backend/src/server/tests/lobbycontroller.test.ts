@@ -13,7 +13,7 @@ api.use(express.json());
 const gameListService = new GameListService();
 setupTestRoutes(api, gameListService);
 
-describe("GameController", () => {
+describe("LobbyController", () => {
   it("should create a game", async () => {
     const response = await request(api)
       .post("/game/create")
