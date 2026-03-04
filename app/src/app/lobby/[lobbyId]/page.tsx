@@ -39,7 +39,9 @@ export default function LobbyPage() {
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
       <h1>Secret Villain Game</h1>
-      <p>Lobby ID: {lobbyId}</p>
+      <p>
+        Lobby: <a href={`/lobby/${lobbyId}`}>{lobbyId}</a>
+      </p>
 
       {isLoading && <p>Loading...</p>}
 
