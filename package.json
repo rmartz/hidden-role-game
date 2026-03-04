@@ -14,25 +14,27 @@
   "license": "ISC",
   "author": "Reed Martz",
   "type": "module",
-  "workspaces": [
-    "backend",
-    "ui"
-  ],
   "scripts": {
-    "dev": "concurrently -n backend,ui -c yellow,cyan \"npm run backend:dev\" \"npm run ui:dev\"",
-    "build": "npm run build --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present",
+    "dev": "concurrently -n backend,ui -c yellow,cyan \"pnpm run backend:dev\" \"pnpm run ui:dev\"",
+    "build": "pnpm -r run build",
+    "test": "pnpm -r run test",
     "lint": "eslint .",
     "format": "prettier --write .",
     "prepare": "husky",
-    "postinstall": "npm --workspace=@secret-villain/ui run generate:client",
-    "backend:dev": "npm --workspace=@secret-villain/backend run dev",
-    "backend:build": "npm --workspace=@secret-villain/backend run build",
-    "backend:start": "npm --workspace=@secret-villain/backend start",
-    "backend:test": "npm --workspace=@secret-villain/backend test",
-    "ui:dev": "npm --workspace=@secret-villain/ui run dev",
-    "ui:build": "npm --workspace=@secret-villain/ui run build",
-    "ui:preview": "npm --workspace=@secret-villain/ui run preview"
+    "backend:dev": "pnpm --filter=@secret-villain/backend run dev",
+    "backend:build": "pnpm --filter=@secret-villain/backend run build",
+    "backend:start": "pnpm --filter=@secret-villain/backend start",
+    "backend:test": "pnpm --filter=@secret-villain/backend test",
+    "ui:dev": "pnpm --filter=@secret-villain/ui run dev",
+    "ui:build": "pnpm --filter=@secret-villain/ui run build",
+    "ui:preview": "pnpm --filter=@secret-villain/ui run preview"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@openapitools/openapi-generator-cli",
+      "esbuild"
+    ]
   },
   "lint-staged": {
     "*.{js,mjs,cjs,ts,tsx,jsx,json,md,yml,yaml}": [
