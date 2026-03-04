@@ -8,8 +8,10 @@ export function isValidSession(lobby: Lobby, sessionId: string): boolean {
 export function toPublicLobby(lobby: Lobby): PublicLobby {
   const mapPlayers = (ps: LobbyPlayer[]): PublicLobbyPlayer[] =>
     ps.map((p) => ({ id: p.id, name: p.name }));
+  const owner = lobby.players.find((p) => p.sessionId === lobby.ownerSessionId);
   return {
     id: lobby.id,
+    ownerPlayerId: owner?.id ?? "",
     players: mapPlayers(lobby.players),
     ...(lobby.game && {
       game: {

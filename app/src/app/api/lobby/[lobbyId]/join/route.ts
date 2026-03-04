@@ -30,7 +30,7 @@ export async function POST(
   return Response.json(
     {
       status: ServerResponseStatus.Success,
-      data: { lobby: toPublicLobby(lobby), sessionId },
+      data: { lobby: toPublicLobby(lobby), sessionId, playerId: newPlayer.id },
     },
     { status: 201 },
   );

@@ -5,6 +5,7 @@ import type {
 } from "@/server/models";
 
 const SESSION_KEY = "x-session-id";
+const PLAYER_ID_KEY = "player-id";
 
 function getSessionId(): string | null {
   if (typeof window === "undefined") return null;
@@ -13,6 +14,20 @@ function getSessionId(): string | null {
 
 function saveSessionId(sessionId: string): void {
   localStorage.setItem(SESSION_KEY, sessionId);
+}
+
+export function getPlayerId(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(PLAYER_ID_KEY);
+}
+
+function savePlayerId(playerId: string): void {
+  localStorage.setItem(PLAYER_ID_KEY, playerId);
+}
+
+function saveJoinData(sessionId: string, playerId: string): void {
+  saveSessionId(sessionId);
+  savePlayerId(playerId);
 }
 
 export type { PublicLobbyPlayer } from "@/server/models";
@@ -27,7 +42,7 @@ export async function createLobby(
   });
   const data: ServerResponse<LobbyJoinResponse> = await response.json();
   if (data.status === "success") {
-    saveSessionId(data.data.sessionId);
+    saveJoinData(data.data.sessionId, data.data.playerId);
   }
   return data;
 }
@@ -53,7 +68,21 @@ export async function joinLobby(
   });
   const data: ServerResponse<LobbyJoinResponse> = await response.json();
   if (data.status === "success") {
-    saveSessionId(data.data.sessionId);
+    saveJoinData(data.data.sessionId, data.data.playerId);
   }
   return data;
+}
+
+export async function removePlayer(
+  lobbyId: string,
+  playerId: string,
+): Promise<ServerResponse<{ lobby: PublicLobby | null }>> {
+  const sessionId = getSessionId();
+  const headers: HeadersInit = { "Content-Type": "application/json" };
+  if (sessionId) headers["x-session-id"] = sessionId;
+  const response = await fetch(`/api/lobby/${lobbyId}/players/${playerId}`, {
+    method: "DELETE",
+    headers,
+  });
+  return response.json();
 }
