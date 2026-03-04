@@ -1,51 +1,44 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import { getLobby } from "@/lib/api";
-import type { PublicLobbyPlayer } from "@/lib/api";
 
 export default function LobbyPage() {
   const { lobbyId } = useParams<{ lobbyId: string }>();
-  const [players, setPlayers] = useState<PublicLobbyPlayer[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchLobby() {
-      try {
-        const response = await getLobby(lobbyId);
-        if (response.status === "success") {
-          setPlayers(response.data.players);
-        } else {
-          setError(response.error || "Failed to load lobby");
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchLobby();
-  }, [lobbyId]);
+  const {
+    data: lobby,
+    error,
+    isLoading,
+  } = useQuery({
+    queryKey: ["lobby", lobbyId],
+    queryFn: async () => {
+      const response = await getLobby(lobbyId);
+      if (response.status === "error")
+        throw new Error(response.error ?? "Failed to load lobby");
+      return response.data;
+    },
+  });
 
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
       <h1>Secret Villain Game</h1>
       <p>Lobby ID: {lobbyId}</p>
 
-      {loading && <p>Loading...</p>}
+      {isLoading && <p>Loading...</p>}
 
       {error && (
-        <div style={{ color: "red", marginBottom: "10px" }}>Error: {error}</div>
+        <div style={{ color: "red", marginBottom: "10px" }}>
+          Error: {error.message}
+        </div>
       )}
 
-      {!loading && !error && (
+      {lobby && (
         <>
-          <p>Players: {players.length}</p>
+          <p>Players: {lobby.players.length}</p>
           <ul>
-            {players.map((player) => (
+            {lobby.players.map((player) => (
               <li key={player.id}>{player.name}</li>
             ))}
           </ul>
