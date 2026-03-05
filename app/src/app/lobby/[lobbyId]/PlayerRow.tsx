@@ -3,21 +3,25 @@ import type { PublicLobbyPlayer } from "@/server/models";
 interface Props {
   player: PublicLobbyPlayer;
   ownerPlayerId: string;
-  userPlayerId: string | null;
+  isCurrentUser: boolean;
+  showLeave: boolean;
   showRemovePlayer: boolean;
-  gameStarted: boolean;
-  isRemovePending: boolean;
+  showMakeOwner: boolean;
+  disabled: boolean;
   onRemovePlayer: (playerId: string) => void;
+  onTransferOwner: (playerId: string) => void;
 }
 
 export default function PlayerRow({
   player,
   ownerPlayerId,
-  userPlayerId,
+  isCurrentUser,
+  showLeave,
   showRemovePlayer,
-  gameStarted,
-  isRemovePending,
+  showMakeOwner,
+  disabled,
   onRemovePlayer,
+  onTransferOwner,
 }: Props) {
   function handleLeave() {
     if (window.confirm("Leave this lobby?")) onRemovePlayer(player.id);
@@ -28,18 +32,28 @@ export default function PlayerRow({
       onRemovePlayer(player.id);
   }
 
+  function handleTransferOwner() {
+    if (window.confirm(`Make ${player.name} the lobby owner?`))
+      onTransferOwner(player.id);
+  }
+
   return (
     <li style={{ display: "flex", gap: "8px", alignItems: "center" }}>
       {player.name}
       {player.id === ownerPlayerId && "(Lobby owner)"}
-      {player.id === userPlayerId && !showRemovePlayer && !gameStarted && (
-        <button onClick={handleLeave} disabled={isRemovePending}>
+      {isCurrentUser && showLeave && (
+        <button onClick={handleLeave} disabled={disabled}>
           Leave
         </button>
       )}
-      {showRemovePlayer && player.id !== userPlayerId && !gameStarted && (
-        <button onClick={handleRemove} disabled={isRemovePending}>
+      {!isCurrentUser && showRemovePlayer && (
+        <button onClick={handleRemove} disabled={disabled}>
           Remove
+        </button>
+      )}
+      {!isCurrentUser && showMakeOwner && (
+        <button onClick={handleTransferOwner} disabled={disabled}>
+          Make Owner
         </button>
       )}
     </li>
