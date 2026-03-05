@@ -1,11 +1,13 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { getGameState } from "@/lib/api";
 
 export default function GamePage() {
   const { gameId } = useParams<{ gameId: string }>();
+  const router = useRouter();
 
   const {
     data: gameState,
@@ -14,11 +16,20 @@ export default function GamePage() {
   } = useQuery({
     queryKey: ["game", gameId],
     queryFn: async () => {
-      const response = await getGameState(gameId);
-      if (response.status === "error") throw new Error(response.error);
-      return response.data;
+      const { data, httpStatus } = await getGameState(gameId);
+      if (httpStatus === 401 || httpStatus === 403)
+        throw new Error(`${httpStatus}`);
+      if (data.status === "error") throw new Error(data.error);
+      return data.data;
     },
+    retry: false,
   });
+
+  useEffect(() => {
+    if (error?.message === "401" || error?.message === "403") {
+      router.push("/");
+    }
+  }, [error, router]);
 
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
@@ -26,7 +37,7 @@ export default function GamePage() {
 
       {isLoading && <p>Loading...</p>}
 
-      {error && (
+      {error && error.message !== "401" && error.message !== "403" && (
         <div style={{ color: "red", marginBottom: "10px" }}>
           Error: {error.message}
         </div>

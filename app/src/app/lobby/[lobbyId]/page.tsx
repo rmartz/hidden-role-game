@@ -29,15 +29,18 @@ export default function LobbyPage() {
   } = useQuery({
     queryKey: ["lobby", lobbyId],
     queryFn: async () => {
-      const response = await getLobby(lobbyId);
-      if (response.status === "error") return null;
-      return response.data;
+      const { data, httpStatus } = await getLobby(lobbyId);
+      if (httpStatus === 404 || httpStatus === 403)
+        throw new Error(`${httpStatus}`);
+      if (data.status === "error") return null;
+      return data.data;
     },
     refetchInterval: (query) => {
       if (!query.state.data) return false;
       if (query.state.data.gameId) return false;
       return 3_000;
     },
+    retry: false,
   });
 
   const myPlayerId = getPlayerId();
@@ -47,6 +50,12 @@ export default function LobbyPage() {
   useEffect(() => {
     if (gameId) router.push(`/game/${gameId}`);
   }, [gameId, router]);
+
+  useEffect(() => {
+    if (error?.message === "404" || error?.message === "403") {
+      router.push("/");
+    }
+  }, [error, router]);
 
   const removeMutation = useMutation({
     mutationFn: (targetPlayerId: string) =>
@@ -91,7 +100,7 @@ export default function LobbyPage() {
 
       {isLoading && <p>Loading...</p>}
 
-      {error && (
+      {error && error.message !== "404" && error.message !== "403" && (
         <div style={{ color: "red", marginBottom: "10px" }}>
           Error: {error.message}
         </div>

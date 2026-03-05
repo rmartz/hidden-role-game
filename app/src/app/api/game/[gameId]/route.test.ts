@@ -68,14 +68,34 @@ describe("GET /api/game/[gameId]", () => {
     expect(Array.isArray(body.data.visibleTeammates)).toBe(true);
   });
 
-  it("should return 404 when the game does not exist", async () => {
+  it("should return 401 with no session header", async () => {
+    const res = await getGameState(
+      new Request("http://localhost/api/game/nonexistent-id"),
+      makeGameParams("nonexistent-id"),
+    );
+    expect(res.status).toBe(401);
+  });
+
+  it("should return 403 when the game does not exist", async () => {
     const res = await getGameState(
       new Request("http://localhost/api/game/nonexistent-id", {
         headers: { "x-session-id": "any-session-id" },
       }),
       makeGameParams("nonexistent-id"),
     );
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(403);
+  });
+
+  it("should return 403 with wrong session header for a valid game", async () => {
+    const { gameId } = await setupStartedGame();
+
+    const res = await getGameState(
+      new Request(`http://localhost/api/game/${gameId}`, {
+        headers: { "x-session-id": "not-a-real-session-id" },
+      }),
+      makeGameParams(gameId),
+    );
+    expect(res.status).toBe(403);
   });
 
   it("should show bad role player their teammates", async () => {
