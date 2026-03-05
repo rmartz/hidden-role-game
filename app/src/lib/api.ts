@@ -97,10 +97,10 @@ export async function startGame(
   const sessionId = getSessionId();
   const headers: HeadersInit = { "Content-Type": "application/json" };
   if (sessionId) headers["x-session-id"] = sessionId;
-  const response = await fetch(`/api/lobby/${lobbyId}/start`, {
+  const response = await fetch("/api/game/create", {
     method: "POST",
     headers,
-    body: JSON.stringify({ roleSlots }),
+    body: JSON.stringify({ lobbyId, roleSlots }),
   });
   return response.json();
 }

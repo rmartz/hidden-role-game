@@ -4,7 +4,7 @@ import { GET as getLobby } from "./[lobbyId]/route";
 import { POST as joinLobby } from "./[lobbyId]/join/route";
 import { DELETE as removePlayer } from "./[lobbyId]/players/[playerId]/route";
 import { PUT as transferOwner } from "./[lobbyId]/owner/route";
-import { POST as startGame } from "./[lobbyId]/start/route";
+import { POST as startGame } from "../game/create/route";
 import { GET as getGameState } from "../game/[gameId]/route";
 
 function makeParams(lobbyId: string) {
@@ -419,20 +419,20 @@ describe("Lobby API", () => {
       const { lobbyId, aliceSession } = await setupLobbyWithPlayers();
 
       const res = await startGame(
-        new Request(`http://localhost/api/lobby/${lobbyId}/start`, {
+        new Request("http://localhost/api/game/create", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "x-session-id": aliceSession,
           },
           body: JSON.stringify({
+            lobbyId,
             roleSlots: [
               { roleId: "good", count: 1 },
               { roleId: "bad", count: 1 },
             ],
           }),
         }),
-        makeParams(lobbyId),
       );
       expect(res.status).toBe(200);
       const body = await res.json();
@@ -444,15 +444,17 @@ describe("Lobby API", () => {
       const { lobbyId, aliceSession } = await setupLobbyWithPlayers();
 
       const res = await startGame(
-        new Request(`http://localhost/api/lobby/${lobbyId}/start`, {
+        new Request("http://localhost/api/game/create", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "x-session-id": aliceSession,
           },
-          body: JSON.stringify({ roleSlots: [{ roleId: "good", count: 1 }] }),
+          body: JSON.stringify({
+            lobbyId,
+            roleSlots: [{ roleId: "good", count: 1 }],
+          }),
         }),
-        makeParams(lobbyId),
       );
       expect(res.status).toBe(400);
     });
@@ -461,20 +463,20 @@ describe("Lobby API", () => {
       const { lobbyId, bobSession } = await setupLobbyWithPlayers();
 
       const res = await startGame(
-        new Request(`http://localhost/api/lobby/${lobbyId}/start`, {
+        new Request("http://localhost/api/game/create", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "x-session-id": bobSession,
           },
           body: JSON.stringify({
+            lobbyId,
             roleSlots: [
               { roleId: "good", count: 1 },
               { roleId: "bad", count: 1 },
             ],
           }),
         }),
-        makeParams(lobbyId),
       );
       expect(res.status).toBe(403);
     });
@@ -487,27 +489,25 @@ describe("Lobby API", () => {
       ];
 
       await startGame(
-        new Request(`http://localhost/api/lobby/${lobbyId}/start`, {
+        new Request("http://localhost/api/game/create", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "x-session-id": aliceSession,
           },
-          body: JSON.stringify({ roleSlots: slots }),
+          body: JSON.stringify({ lobbyId, roleSlots: slots }),
         }),
-        makeParams(lobbyId),
       );
 
       const res = await startGame(
-        new Request(`http://localhost/api/lobby/${lobbyId}/start`, {
+        new Request("http://localhost/api/game/create", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "x-session-id": aliceSession,
           },
-          body: JSON.stringify({ roleSlots: slots }),
+          body: JSON.stringify({ lobbyId, roleSlots: slots }),
         }),
-        makeParams(lobbyId),
       );
       expect(res.status).toBe(409);
     });
@@ -532,20 +532,20 @@ describe("Lobby API", () => {
       const { data: joinData } = await joinRes.json();
 
       const startRes = await startGame(
-        new Request(`http://localhost/api/lobby/${lobby.id}/start`, {
+        new Request("http://localhost/api/game/create", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "x-session-id": aliceSession,
           },
           body: JSON.stringify({
+            lobbyId: lobby.id,
             roleSlots: [
               { roleId: "good", count: 1 },
               { roleId: "bad", count: 1 },
             ],
           }),
         }),
-        makeParams(lobby.id),
       );
       const { data: startData } = await startRes.json();
 

@@ -1,37 +1,13 @@
 import type { GameStatusState, Team } from "@/lib/models";
-
-export interface PublicLobbyPlayer {
-  id: string;
-  name: string;
-}
-
-export interface PublicLobby {
-  id: string;
-  ownerPlayerId: string;
-  players: PublicLobbyPlayer[];
-  gameId?: string;
-}
-
-export interface CreateLobbyRequest {
-  playerName: string;
-}
-
-export interface JoinLobbyRequest {
-  playerName: string;
-}
-
-export interface LobbyJoinResponse {
-  lobby: PublicLobby;
-  sessionId: string;
-  playerId: string;
-}
+import type { PublicLobbyPlayer } from "./lobby";
 
 export interface RoleSlot {
   roleId: string;
   count: number;
 }
 
-export interface StartGameRequest {
+export interface CreateGameRequest {
+  lobbyId: string;
   roleSlots: RoleSlot[];
 }
 

@@ -1,16 +1,13 @@
 import { ServerResponseStatus } from "@/server/models";
-import type { StartGameRequest } from "@/server/models";
+import type { CreateGameRequest } from "@/server/models";
 import { lobbyService } from "@/services/LobbyService";
 import { gameService } from "@/services/GameService";
 import { isValidSession, toPublicLobby } from "@/server/lobby-helpers";
 import { ROLE_DEFINITIONS } from "@/lib/roles";
 
-export async function POST(
-  request: Request,
-  { params }: { params: Promise<{ lobbyId: string }> },
-): Promise<Response> {
-  const { lobbyId } = await params;
+export async function POST(request: Request): Promise<Response> {
   const sessionId = request.headers.get("x-session-id") ?? undefined;
+  const { lobbyId, roleSlots }: CreateGameRequest = await request.json();
   const lobby = lobbyService.getLobby(lobbyId);
 
   if (!lobby) {
@@ -43,8 +40,6 @@ export async function POST(
       { status: 409 },
     );
   }
-
-  const { roleSlots }: StartGameRequest = await request.json();
 
   const totalSlots = roleSlots.reduce((sum, s) => sum + s.count, 0);
   if (totalSlots !== lobby.players.length) {
