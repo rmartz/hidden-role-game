@@ -1,4 +1,4 @@
-# Secret Villain Game
+# Hidden Role Game
 
 A multiplayer social deduction game. Currently in early development — lobby creation and joining is functional.
 
@@ -12,7 +12,7 @@ A multiplayer social deduction game. Currently in early development — lobby cr
 ## Project Structure
 
 ```
-secret-villain-game/
+hidden-role-game/
 ├── app/                        # Next.js app (frontend + backend in one)
 │   └── src/
 │       ├── app/

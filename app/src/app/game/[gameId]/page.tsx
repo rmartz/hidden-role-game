@@ -22,7 +22,7 @@ export default function GamePage() {
 
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
-      <h1>Secret Villain Game</h1>
+      <h1>Hidden Role Game</h1>
 
       {isLoading && <p>Loading...</p>}
 

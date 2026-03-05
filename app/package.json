@@ -1,7 +1,7 @@
 {
-  "name": "@secret-villain/app",
+  "name": "@hidden-role/app",
   "version": "1.0.0",
-  "description": "Secret Villain Game",
+  "description": "Hidden Role Game",
   "private": true,
   "scripts": {
     "dev": "next dev",
