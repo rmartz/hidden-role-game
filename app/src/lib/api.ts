@@ -73,6 +73,21 @@ export async function joinLobby(
   return data;
 }
 
+export async function transferOwner(
+  lobbyId: string,
+  playerId: string,
+): Promise<ServerResponse<{ lobby: PublicLobby }>> {
+  const sessionId = getSessionId();
+  const headers: HeadersInit = { "Content-Type": "application/json" };
+  if (sessionId) headers["x-session-id"] = sessionId;
+  const response = await fetch(`/api/lobby/${lobbyId}/owner`, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({ playerId }),
+  });
+  return response.json();
+}
+
 export async function removePlayer(
   lobbyId: string,
   playerId: string,

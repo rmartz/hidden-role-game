@@ -4,23 +4,27 @@ import PlayerRow from "./PlayerRow";
 interface Props {
   lobby: PublicLobby;
   userPlayerId: string | null;
+  showLeave: boolean;
   showRemovePlayer: boolean;
-  gameStarted: boolean;
+  showMakeOwner: boolean;
   isFetching: boolean;
-  isRemovePending: boolean;
+  disabled: boolean;
   onRefetch: () => void;
   onRemovePlayer: (playerId: string) => void;
+  onTransferOwner: (playerId: string) => void;
 }
 
 export default function PlayerList({
   lobby,
   userPlayerId,
+  showLeave,
   showRemovePlayer,
-  gameStarted,
+  showMakeOwner,
   isFetching,
-  isRemovePending,
+  disabled,
   onRefetch,
   onRemovePlayer,
+  onTransferOwner,
 }: Props) {
   return (
     <>
@@ -36,11 +40,13 @@ export default function PlayerList({
             key={player.id}
             player={player}
             ownerPlayerId={lobby.ownerPlayerId}
-            userPlayerId={userPlayerId}
+            isCurrentUser={player.id === userPlayerId}
+            showLeave={showLeave}
             showRemovePlayer={showRemovePlayer}
-            gameStarted={gameStarted}
-            isRemovePending={isRemovePending}
+            showMakeOwner={showMakeOwner}
+            disabled={disabled}
             onRemovePlayer={onRemovePlayer}
+            onTransferOwner={onTransferOwner}
           />
         ))}
       </ul>

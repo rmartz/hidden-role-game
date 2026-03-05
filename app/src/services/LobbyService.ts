@@ -11,6 +11,20 @@ export class LobbyService {
     return this.lobbies[lobbyId];
   }
 
+  public transferOwner(
+    lobbyId: string,
+    targetPlayerId: string,
+  ): Lobby | undefined {
+    const lobby = this.lobbies[lobbyId];
+    if (!lobby) return undefined;
+
+    const target = lobby.players.find((p) => p.id === targetPlayerId);
+    if (!target) return undefined;
+
+    lobby.ownerSessionId = target.sessionId;
+    return lobby;
+  }
+
   public removePlayer(lobbyId: string, playerId: string): Lobby | undefined {
     const lobby = this.lobbies[lobbyId];
     if (!lobby) return undefined;

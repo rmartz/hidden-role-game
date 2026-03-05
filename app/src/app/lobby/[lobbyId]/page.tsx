@@ -2,7 +2,7 @@
 
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getLobby, removePlayer, getPlayerId } from "@/lib/api";
+import { getLobby, removePlayer, transferOwner, getPlayerId } from "@/lib/api";
 import JoinPrompt from "./JoinPrompt";
 import PlayerList from "./PlayerList";
 
@@ -44,6 +44,15 @@ export default function LobbyPage() {
     },
   });
 
+  const transferOwnerMutation = useMutation({
+    mutationFn: (targetPlayerId: string) =>
+      transferOwner(lobbyId, targetPlayerId),
+    onSuccess: (response) => {
+      if (response.status === "error") return;
+      queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
+    },
+  });
+
   function handleRefetch() {
     refetch();
   }
@@ -75,12 +84,20 @@ export default function LobbyPage() {
         <PlayerList
           lobby={lobby}
           userPlayerId={myPlayerId}
+          showLeave={!isOwner}
           showRemovePlayer={isOwner}
-          gameStarted={gameStarted}
+          showMakeOwner={isOwner}
           isFetching={isFetching}
-          isRemovePending={removeMutation.isPending}
+          disabled={
+            removeMutation.isPending ||
+            transferOwnerMutation.isPending ||
+            gameStarted
+          }
           onRefetch={handleRefetch}
           onRemovePlayer={(playerId: string) => removeMutation.mutate(playerId)}
+          onTransferOwner={(playerId: string) =>
+            transferOwnerMutation.mutate(playerId)
+          }
         />
       )}
     </div>
