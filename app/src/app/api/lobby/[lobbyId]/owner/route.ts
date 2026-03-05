@@ -34,7 +34,7 @@ export async function PUT(
     );
   }
 
-  if (lobby.game) {
+  if (lobby.gameId) {
     return Response.json(
       {
         status: ServerResponseStatus.Error,

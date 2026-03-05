@@ -46,7 +46,7 @@ export async function DELETE(
     );
   }
 
-  if (lobby.game) {
+  if (lobby.gameId) {
     return Response.json(
       {
         status: ServerResponseStatus.Error,

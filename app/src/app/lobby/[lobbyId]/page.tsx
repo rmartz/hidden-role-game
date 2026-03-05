@@ -1,10 +1,19 @@
 "use client";
 
+import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getLobby, removePlayer, transferOwner, getPlayerId } from "@/lib/api";
+import {
+  getLobby,
+  removePlayer,
+  transferOwner,
+  startGame,
+  getPlayerId,
+} from "@/lib/api";
+import type { RoleSlot } from "@/server/models";
 import JoinPrompt from "./JoinPrompt";
 import PlayerList from "./PlayerList";
+import RoleConfig from "./RoleConfig";
 
 export default function LobbyPage() {
   const { lobbyId } = useParams<{ lobbyId: string }>();
@@ -24,12 +33,20 @@ export default function LobbyPage() {
       if (response.status === "error") return null;
       return response.data;
     },
-    refetchInterval: (query) => (query.state.data ? 30_000 : false),
+    refetchInterval: (query) => {
+      if (!query.state.data) return false;
+      if (query.state.data.gameId) return false;
+      return 3_000;
+    },
   });
 
   const myPlayerId = getPlayerId();
   const isOwner = !!lobby && lobby.ownerPlayerId === myPlayerId;
-  const gameStarted = !!lobby?.game;
+  const gameId = lobby?.gameId;
+
+  useEffect(() => {
+    if (gameId) router.push(`/game/${gameId}`);
+  }, [gameId, router]);
 
   const removeMutation = useMutation({
     mutationFn: (targetPlayerId: string) =>
@@ -41,6 +58,14 @@ export default function LobbyPage() {
       } else {
         queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
       }
+    },
+  });
+
+  const startGameMutation = useMutation({
+    mutationFn: (roleSlots: RoleSlot[]) => startGame(lobbyId, roleSlots),
+    onSuccess: (response) => {
+      if (response.status === "error") return;
+      queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
     },
   });
 
@@ -80,6 +105,14 @@ export default function LobbyPage() {
         </div>
       )}
 
+      {lobby && isOwner && !gameId && (
+        <RoleConfig
+          playerCount={lobby.players.length}
+          disabled={startGameMutation.isPending}
+          onStartGame={(roleSlots) => startGameMutation.mutate(roleSlots)}
+        />
+      )}
+
       {lobby && (
         <PlayerList
           lobby={lobby}
@@ -91,7 +124,8 @@ export default function LobbyPage() {
           disabled={
             removeMutation.isPending ||
             transferOwnerMutation.isPending ||
-            gameStarted
+            startGameMutation.isPending ||
+            gameId !== undefined
           }
           onRefetch={handleRefetch}
           onRemovePlayer={(playerId: string) => removeMutation.mutate(playerId)}

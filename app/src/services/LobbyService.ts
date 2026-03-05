@@ -11,6 +11,13 @@ export class LobbyService {
     return this.lobbies[lobbyId];
   }
 
+  public setGameId(lobbyId: string, gameId: string): Lobby | undefined {
+    const lobby = this.lobbies[lobbyId];
+    if (!lobby) return undefined;
+    lobby.gameId = gameId;
+    return lobby;
+  }
+
   public transferOwner(
     lobbyId: string,
     targetPlayerId: string,
