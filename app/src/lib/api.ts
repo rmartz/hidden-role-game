@@ -2,6 +2,8 @@ import type {
   ServerResponse,
   PublicLobby,
   LobbyJoinResponse,
+  RoleSlot,
+  PlayerGameState,
 } from "@/server/models";
 
 const SESSION_KEY = "x-session-id";
@@ -85,6 +87,31 @@ export async function transferOwner(
     headers,
     body: JSON.stringify({ playerId }),
   });
+  return response.json();
+}
+
+export async function startGame(
+  lobbyId: string,
+  roleSlots: RoleSlot[],
+): Promise<ServerResponse<{ lobby: PublicLobby }>> {
+  const sessionId = getSessionId();
+  const headers: HeadersInit = { "Content-Type": "application/json" };
+  if (sessionId) headers["x-session-id"] = sessionId;
+  const response = await fetch(`/api/lobby/${lobbyId}/start`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ roleSlots }),
+  });
+  return response.json();
+}
+
+export async function getGameState(
+  lobbyId: string,
+): Promise<ServerResponse<PlayerGameState>> {
+  const sessionId = getSessionId();
+  const headers: HeadersInit = {};
+  if (sessionId) headers["x-session-id"] = sessionId;
+  const response = await fetch(`/api/lobby/${lobbyId}/game`, { headers });
   return response.json();
 }
 

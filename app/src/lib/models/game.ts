@@ -29,11 +29,32 @@ export type GameStatusState =
   | PlayingGameStatus
   | FinishedGameStatus;
 
+// --- Roles ---
+
+export enum Team {
+  Good = "Good",
+  Bad = "Bad",
+}
+
+export interface RoleDefinition {
+  id: string;
+  name: string;
+  team: Team;
+  canSeeTeammates: boolean;
+  knownToTeammates: boolean;
+}
+
+export interface PlayerRoleAssignment {
+  playerId: string;
+  roleDefinitionId: string;
+}
+
 // --- Game (exists only after the game has been started) ---
 
 export interface Game {
   status: GameStatusState;
   players: LobbyPlayer[];
+  roleAssignments: PlayerRoleAssignment[];
 }
 
 // --- Lobby (top-level entity; game is absent until started) ---
