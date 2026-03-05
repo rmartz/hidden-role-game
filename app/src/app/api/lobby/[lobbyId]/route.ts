@@ -10,10 +10,24 @@ export async function GET(
   const sessionId = request.headers.get("x-session-id") ?? undefined;
   const lobby = lobbyService.getLobby(lobbyId);
 
-  if (!lobby || !sessionId || !isValidSession(lobby, sessionId)) {
+  if (!lobby) {
     return Response.json(
       { status: ServerResponseStatus.Error, error: "Lobby not found" },
       { status: 404 },
+    );
+  }
+
+  if (!sessionId) {
+    return Response.json(
+      { status: ServerResponseStatus.Error, error: "No session" },
+      { status: 401 },
+    );
+  }
+
+  if (!isValidSession(lobby, sessionId)) {
+    return Response.json(
+      { status: ServerResponseStatus.Error, error: "Invalid session" },
+      { status: 403 },
     );
   }
 

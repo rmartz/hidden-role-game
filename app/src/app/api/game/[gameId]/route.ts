@@ -13,22 +13,19 @@ export async function GET(
 ): Promise<Response> {
   const { gameId } = await params;
   const sessionId = request.headers.get("x-session-id") ?? undefined;
-  const game = gameService.getGame(gameId);
-
-  if (!game) {
+  if (!sessionId) {
     return Response.json(
-      { status: ServerResponseStatus.Error, error: "Game not found" },
-      { status: 404 },
+      { status: ServerResponseStatus.Error, error: "No session" },
+      { status: 401 },
     );
   }
 
-  const caller = sessionId
-    ? game.players.find((p) => p.sessionId === sessionId)
-    : undefined;
+  const game = gameService.getGame(gameId);
+  const caller = game?.players.find((p) => p.sessionId === sessionId);
 
-  if (!caller) {
+  if (!game || !caller) {
     return Response.json(
-      { status: ServerResponseStatus.Error, error: "Unauthorized" },
+      { status: ServerResponseStatus.Error, error: "Forbidden" },
       { status: 403 },
     );
   }

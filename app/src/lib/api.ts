@@ -51,12 +51,12 @@ export async function createLobby(
 
 export async function getLobby(
   lobbyId: string,
-): Promise<ServerResponse<PublicLobby>> {
+): Promise<{ data: ServerResponse<PublicLobby>; httpStatus: number }> {
   const sessionId = getSessionId();
   const headers: HeadersInit = {};
   if (sessionId) headers["x-session-id"] = sessionId;
   const response = await fetch(`/api/lobby/${lobbyId}`, { headers });
-  return response.json();
+  return { data: await response.json(), httpStatus: response.status };
 }
 
 export async function joinLobby(
@@ -107,12 +107,12 @@ export async function startGame(
 
 export async function getGameState(
   gameId: string,
-): Promise<ServerResponse<PlayerGameState>> {
+): Promise<{ data: ServerResponse<PlayerGameState>; httpStatus: number }> {
   const sessionId = getSessionId();
   const headers: HeadersInit = {};
   if (sessionId) headers["x-session-id"] = sessionId;
   const response = await fetch(`/api/game/${gameId}`, { headers });
-  return response.json();
+  return { data: await response.json(), httpStatus: response.status };
 }
 
 export async function removePlayer(

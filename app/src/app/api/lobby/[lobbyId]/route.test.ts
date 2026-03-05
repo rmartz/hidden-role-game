@@ -7,7 +7,7 @@ import {
 } from "@/app/api/test-utils";
 
 describe("GET /api/lobby/[lobbyId]", () => {
-  it("should return 404 with no session header", async () => {
+  it("should return 401 with no session header", async () => {
     const createRes = await createLobby(
       postRequest("http://localhost/api/lobby/create", { playerName: "Alice" }),
     );
@@ -18,10 +18,10 @@ describe("GET /api/lobby/[lobbyId]", () => {
       new Request(`http://localhost/api/lobby/${lobbyId}`),
       makeParams(lobbyId),
     );
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(401);
   });
 
-  it("should return 404 with wrong session header", async () => {
+  it("should return 403 with wrong session header", async () => {
     const createRes = await createLobby(
       postRequest("http://localhost/api/lobby/create", { playerName: "Alice" }),
     );
@@ -34,7 +34,7 @@ describe("GET /api/lobby/[lobbyId]", () => {
       }),
       makeParams(lobbyId),
     );
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(403);
   });
 
   it("should return the lobby with a valid session", async () => {
