@@ -5,16 +5,16 @@ import { useQuery } from "@tanstack/react-query";
 import { getGameState } from "@/lib/api";
 
 export default function GamePage() {
-  const { lobbyId } = useParams<{ lobbyId: string }>();
+  const { gameId } = useParams<{ gameId: string }>();
 
   const {
     data: gameState,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["game", lobbyId],
+    queryKey: ["game", gameId],
     queryFn: async () => {
-      const response = await getGameState(lobbyId);
+      const response = await getGameState(gameId);
       if (response.status === "error") throw new Error(response.error);
       return response.data;
     },

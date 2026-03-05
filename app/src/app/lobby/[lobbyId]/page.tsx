@@ -35,18 +35,18 @@ export default function LobbyPage() {
     },
     refetchInterval: (query) => {
       if (!query.state.data) return false;
-      if (query.state.data.game) return false;
+      if (query.state.data.gameId) return false;
       return 3_000;
     },
   });
 
   const myPlayerId = getPlayerId();
   const isOwner = !!lobby && lobby.ownerPlayerId === myPlayerId;
-  const gameStarted = !!lobby?.game;
+  const gameId = lobby?.gameId;
 
   useEffect(() => {
-    if (gameStarted) router.push(`/game/${lobbyId}`);
-  }, [gameStarted, lobbyId, router]);
+    if (gameId) router.push(`/game/${gameId}`);
+  }, [gameId, router]);
 
   const removeMutation = useMutation({
     mutationFn: (targetPlayerId: string) =>
@@ -105,7 +105,7 @@ export default function LobbyPage() {
         </div>
       )}
 
-      {lobby && isOwner && !gameStarted && (
+      {lobby && isOwner && !gameId && (
         <RoleConfig
           playerCount={lobby.players.length}
           disabled={startGameMutation.isPending}
@@ -125,7 +125,7 @@ export default function LobbyPage() {
             removeMutation.isPending ||
             transferOwnerMutation.isPending ||
             startGameMutation.isPending ||
-            gameStarted
+            gameId !== undefined
           }
           onRefetch={handleRefetch}
           onRemovePlayer={(playerId: string) => removeMutation.mutate(playerId)}

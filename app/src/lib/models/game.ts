@@ -52,6 +52,8 @@ export interface PlayerRoleAssignment {
 // --- Game (exists only after the game has been started) ---
 
 export interface Game {
+  id: string;
+  lobbyId: string;
   status: GameStatusState;
   players: LobbyPlayer[];
   roleAssignments: PlayerRoleAssignment[];
@@ -63,5 +65,5 @@ export interface Lobby {
   id: string;
   ownerSessionId: string;
   players: LobbyPlayer[];
-  game?: Game;
+  gameId?: string;
 }

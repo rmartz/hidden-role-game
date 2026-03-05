@@ -4,48 +4,35 @@ import type {
   PublicRoleInfo,
   VisibleTeammate,
 } from "@/server/models";
-import { lobbyService } from "@/services/LobbyService";
-import { isValidSession } from "@/server/lobby-helpers";
+import { gameService } from "@/services/GameService";
 import { ROLE_DEFINITIONS } from "@/lib/roles";
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ lobbyId: string }> },
+  { params }: { params: Promise<{ gameId: string }> },
 ): Promise<Response> {
-  const { lobbyId } = await params;
+  const { gameId } = await params;
   const sessionId = request.headers.get("x-session-id") ?? undefined;
-  const lobby = lobbyService.getLobby(lobbyId);
+  const game = gameService.getGame(gameId);
 
-  if (!lobby) {
+  if (!game) {
     return Response.json(
-      { status: ServerResponseStatus.Error, error: "Lobby not found" },
+      { status: ServerResponseStatus.Error, error: "Game not found" },
       { status: 404 },
     );
   }
 
-  if (!sessionId || !isValidSession(lobby, sessionId)) {
+  const caller = sessionId
+    ? game.players.find((p) => p.sessionId === sessionId)
+    : undefined;
+
+  if (!caller) {
     return Response.json(
       { status: ServerResponseStatus.Error, error: "Unauthorized" },
       { status: 403 },
     );
   }
 
-  if (!lobby.game) {
-    return Response.json(
-      { status: ServerResponseStatus.Error, error: "Game not started" },
-      { status: 404 },
-    );
-  }
-
-  const caller = lobby.players.find((p) => p.sessionId === sessionId);
-  if (!caller) {
-    return Response.json(
-      { status: ServerResponseStatus.Error, error: "Player not found" },
-      { status: 404 },
-    );
-  }
-
-  const { game } = lobby;
   const myAssignment = game.roleAssignments.find(
     (r) => r.playerId === caller.id,
   );

@@ -9,7 +9,7 @@ export interface PublicLobby {
   id: string;
   ownerPlayerId: string;
   players: PublicLobbyPlayer[];
-  game?: { status: GameStatusState; players: PublicLobbyPlayer[] };
+  gameId?: string;
 }
 
 export interface CreateLobbyRequest {

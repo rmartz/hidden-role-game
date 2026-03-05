@@ -1,6 +1,7 @@
 import { ServerResponseStatus } from "@/server/models";
 import type { StartGameRequest } from "@/server/models";
 import { lobbyService } from "@/services/LobbyService";
+import { gameService } from "@/services/GameService";
 import { isValidSession, toPublicLobby } from "@/server/lobby-helpers";
 import { ROLE_DEFINITIONS } from "@/lib/roles";
 
@@ -36,7 +37,7 @@ export async function POST(
     );
   }
 
-  if (lobby.game) {
+  if (lobby.gameId) {
     return Response.json(
       { status: ServerResponseStatus.Error, error: "Game already started" },
       { status: 409 },
@@ -69,7 +70,8 @@ export async function POST(
     }
   }
 
-  const updated = lobbyService.startGame(lobbyId, roleSlots);
+  const game = gameService.createGame(lobbyId, lobby.players, roleSlots);
+  const updated = lobbyService.setGameId(lobbyId, game.id);
   if (!updated) {
     return Response.json(
       { status: ServerResponseStatus.Error, error: "Failed to start game" },

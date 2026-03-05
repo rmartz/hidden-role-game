@@ -5,7 +5,7 @@ import { POST as joinLobby } from "./[lobbyId]/join/route";
 import { DELETE as removePlayer } from "./[lobbyId]/players/[playerId]/route";
 import { PUT as transferOwner } from "./[lobbyId]/owner/route";
 import { POST as startGame } from "./[lobbyId]/start/route";
-import { GET as getGameState } from "./[lobbyId]/game/route";
+import { GET as getGameState } from "../game/[gameId]/route";
 
 function makeParams(lobbyId: string) {
   return { params: Promise.resolve({ lobbyId }) };
@@ -13,6 +13,10 @@ function makeParams(lobbyId: string) {
 
 function makePlayerParams(lobbyId: string, playerId: string) {
   return { params: Promise.resolve({ lobbyId, playerId }) };
+}
+
+function makeGameParams(gameId: string) {
+  return { params: Promise.resolve({ gameId }) };
 }
 
 function postRequest(url: string, body: unknown): Request {
@@ -433,7 +437,7 @@ describe("Lobby API", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.status).toBe("success");
-      expect(body.data.lobby.game).toBeDefined();
+      expect(body.data.lobby.gameId).toBeDefined();
     });
 
     it("should return 400 when role slot count does not match player count", async () => {
@@ -527,7 +531,7 @@ describe("Lobby API", () => {
       );
       const { data: joinData } = await joinRes.json();
 
-      await startGame(
+      const startRes = await startGame(
         new Request(`http://localhost/api/lobby/${lobby.id}/start`, {
           method: "POST",
           headers: {
@@ -543,22 +547,24 @@ describe("Lobby API", () => {
         }),
         makeParams(lobby.id),
       );
+      const { data: startData } = await startRes.json();
 
       return {
         lobbyId: lobby.id as string,
+        gameId: startData.lobby.gameId as string,
         aliceSession: aliceSession as string,
         bobSession: joinData.sessionId as string,
       };
     }
 
     it("should return the player game state for a valid session", async () => {
-      const { lobbyId, aliceSession } = await setupStartedGame();
+      const { gameId, aliceSession } = await setupStartedGame();
 
       const res = await getGameState(
-        new Request(`http://localhost/api/lobby/${lobbyId}/game`, {
+        new Request(`http://localhost/api/game/${gameId}`, {
           headers: { "x-session-id": aliceSession },
         }),
-        makeParams(lobbyId),
+        makeGameParams(gameId),
       );
       expect(res.status).toBe(200);
       const body = await res.json();
@@ -569,39 +575,32 @@ describe("Lobby API", () => {
       expect(Array.isArray(body.data.visibleTeammates)).toBe(true);
     });
 
-    it("should return 404 when the game has not started", async () => {
-      const createRes = await createLobby(
-        postRequest("http://localhost/api/lobby/create", {
-          playerName: "Alice",
-        }),
-      );
-      const { data } = await createRes.json();
-
+    it("should return 404 when the game does not exist", async () => {
       const res = await getGameState(
-        new Request(`http://localhost/api/lobby/${data.lobby.id}/game`, {
-          headers: { "x-session-id": data.sessionId },
+        new Request("http://localhost/api/game/nonexistent-id", {
+          headers: { "x-session-id": "any-session-id" },
         }),
-        makeParams(data.lobby.id),
+        makeGameParams("nonexistent-id"),
       );
       expect(res.status).toBe(404);
     });
 
     it("should show bad role player their teammates", async () => {
-      const { lobbyId, aliceSession, bobSession } = await setupStartedGame();
+      const { gameId, aliceSession, bobSession } = await setupStartedGame();
 
       const aliceRes = await getGameState(
-        new Request(`http://localhost/api/lobby/${lobbyId}/game`, {
+        new Request(`http://localhost/api/game/${gameId}`, {
           headers: { "x-session-id": aliceSession },
         }),
-        makeParams(lobbyId),
+        makeGameParams(gameId),
       );
       const aliceBody = await aliceRes.json();
 
       const bobRes = await getGameState(
-        new Request(`http://localhost/api/lobby/${lobbyId}/game`, {
+        new Request(`http://localhost/api/game/${gameId}`, {
           headers: { "x-session-id": bobSession },
         }),
-        makeParams(lobbyId),
+        makeGameParams(gameId),
       );
       const bobBody = await bobRes.json();
 

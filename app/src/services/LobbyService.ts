@@ -1,6 +1,4 @@
-import { GameStatus } from "@/lib/models";
-import type { Lobby, PlayerRoleAssignment } from "@/lib/models";
-import type { RoleSlot } from "@/server/models";
+import type { Lobby } from "@/lib/models";
 
 export class LobbyService {
   private lobbies: Record<string, Lobby> = {};
@@ -11,6 +9,13 @@ export class LobbyService {
 
   public getLobby(lobbyId: string): Lobby | undefined {
     return this.lobbies[lobbyId];
+  }
+
+  public setGameId(lobbyId: string, gameId: string): Lobby | undefined {
+    const lobby = this.lobbies[lobbyId];
+    if (!lobby) return undefined;
+    lobby.gameId = gameId;
+    return lobby;
   }
 
   public transferOwner(
@@ -24,37 +29,6 @@ export class LobbyService {
     if (!target) return undefined;
 
     lobby.ownerSessionId = target.sessionId;
-    return lobby;
-  }
-
-  public startGame(lobbyId: string, roleSlots: RoleSlot[]): Lobby | undefined {
-    const lobby = this.lobbies[lobbyId];
-    if (!lobby) return undefined;
-
-    const roleIds: string[] = [];
-    for (const slot of roleSlots) {
-      for (let i = 0; i < slot.count; i++) {
-        roleIds.push(slot.roleId);
-      }
-    }
-
-    for (let i = roleIds.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      const tmp = roleIds[i]!;
-      roleIds[i] = roleIds[j]!;
-      roleIds[j] = tmp;
-    }
-
-    const roleAssignments: PlayerRoleAssignment[] = lobby.players.map(
-      (p, i) => ({ playerId: p.id, roleDefinitionId: roleIds[i]! }),
-    );
-
-    lobby.game = {
-      status: { type: GameStatus.Playing },
-      players: [...lobby.players],
-      roleAssignments,
-    };
-
     return lobby;
   }
 

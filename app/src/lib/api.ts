@@ -106,12 +106,12 @@ export async function startGame(
 }
 
 export async function getGameState(
-  lobbyId: string,
+  gameId: string,
 ): Promise<ServerResponse<PlayerGameState>> {
   const sessionId = getSessionId();
   const headers: HeadersInit = {};
   if (sessionId) headers["x-session-id"] = sessionId;
-  const response = await fetch(`/api/lobby/${lobbyId}/game`, { headers });
+  const response = await fetch(`/api/game/${gameId}`, { headers });
   return response.json();
 }
 
