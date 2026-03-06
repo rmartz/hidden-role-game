@@ -33,6 +33,7 @@ async function setupStartedGame() {
       },
       body: JSON.stringify({
         lobbyId: lobby.id,
+        gameMode: "secret-villain",
         roleSlots: [
           { roleId: "good", count: 1 },
           { roleId: "bad", count: 1 },

@@ -5,7 +5,6 @@ import type {
   VisibleTeammate,
 } from "@/server/models";
 import { gameService } from "@/services/GameService";
-import { ROLE_DEFINITIONS } from "@/lib/roles";
 
 export async function GET(
   request: Request,
@@ -30,6 +29,8 @@ export async function GET(
     );
   }
 
+  const roleDefs = gameService.getRoleDefinitions(game.gameMode);
+
   const myAssignment = game.roleAssignments.find(
     (r) => r.playerId === caller.id,
   );
@@ -40,7 +41,7 @@ export async function GET(
     );
   }
 
-  const myRoleDef = ROLE_DEFINITIONS.find(
+  const myRoleDef = roleDefs.find(
     (r) => r.id === myAssignment.roleDefinitionId,
   );
   if (!myRoleDef) {
@@ -63,7 +64,7 @@ export async function GET(
   if (myRoleDef.canSeeTeammates) {
     for (const assignment of game.roleAssignments) {
       if (assignment.playerId === caller.id) continue;
-      const roleDef = ROLE_DEFINITIONS.find(
+      const roleDef = roleDefs.find(
         (r) => r.id === assignment.roleDefinitionId,
       );
       if (!roleDef?.knownToTeammates) continue;

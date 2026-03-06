@@ -29,6 +29,12 @@ export type GameStatusState =
   | PlayingGameStatus
   | FinishedGameStatus;
 
+// --- Game Modes ---
+
+export enum GameMode {
+  SecretVillain = "secret-villain",
+}
+
 // --- Roles ---
 
 export enum Team {
@@ -54,6 +60,7 @@ export interface PlayerRoleAssignment {
 export interface Game {
   id: string;
   lobbyId: string;
+  gameMode: GameMode;
   status: GameStatusState;
   players: LobbyPlayer[];
   roleAssignments: PlayerRoleAssignment[];

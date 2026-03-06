@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -10,6 +10,8 @@ import {
   startGame,
   getPlayerId,
 } from "@/lib/api";
+import { GameMode } from "@/lib/models";
+import { GAME_MODE_ROLES, GAME_MODE_NAMES } from "@/lib/game-modes";
 import type { RoleSlot } from "@/server/models";
 import JoinPrompt from "./JoinPrompt";
 import PlayerList from "./PlayerList";
@@ -19,6 +21,9 @@ export default function LobbyPage() {
   const { lobbyId } = useParams<{ lobbyId: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const [selectedGameMode, setSelectedGameMode] = useState<GameMode>(
+    GameMode.SecretVillain,
+  );
 
   const {
     data: lobby,
@@ -71,7 +76,8 @@ export default function LobbyPage() {
   });
 
   const startGameMutation = useMutation({
-    mutationFn: (roleSlots: RoleSlot[]) => startGame(lobbyId, roleSlots),
+    mutationFn: (roleSlots: RoleSlot[]) =>
+      startGame(lobbyId, roleSlots, selectedGameMode),
     onSuccess: (response) => {
       if (response.status === "error") return;
       queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
@@ -114,9 +120,29 @@ export default function LobbyPage() {
         </div>
       )}
 
+      {isOwner && !gameId && (
+        <div style={{ marginTop: "20px" }}>
+          <label>
+            Game Mode:{" "}
+            <select
+              value={selectedGameMode}
+              onChange={(e) => setSelectedGameMode(e.target.value as GameMode)}
+            >
+              {Object.values(GameMode).map((mode) => (
+                <option key={mode} value={mode}>
+                  {GAME_MODE_NAMES[mode]}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+      )}
+
       {lobby && isOwner && !gameId && (
         <RoleConfig
+          key={selectedGameMode}
           playerCount={lobby.players.length}
+          roleDefinitions={GAME_MODE_ROLES[selectedGameMode]}
           disabled={startGameMutation.isPending}
           onStartGame={(roleSlots) => startGameMutation.mutate(roleSlots)}
         />

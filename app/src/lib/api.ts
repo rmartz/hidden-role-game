@@ -1,3 +1,4 @@
+import type { GameMode } from "@/lib/models";
 import type {
   ServerResponse,
   PublicLobby,
@@ -93,6 +94,7 @@ export async function transferOwner(
 export async function startGame(
   lobbyId: string,
   roleSlots: RoleSlot[],
+  gameMode: GameMode,
 ): Promise<ServerResponse<{ lobby: PublicLobby }>> {
   const sessionId = getSessionId();
   const headers: HeadersInit = { "Content-Type": "application/json" };
@@ -100,7 +102,7 @@ export async function startGame(
   const response = await fetch("/api/game/create", {
     method: "POST",
     headers,
-    body: JSON.stringify({ lobbyId, roleSlots }),
+    body: JSON.stringify({ lobbyId, roleSlots, gameMode }),
   });
   return response.json();
 }

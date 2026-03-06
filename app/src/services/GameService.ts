@@ -1,22 +1,37 @@
 import { randomUUID } from "crypto";
-import { GameStatus } from "@/lib/models";
-import type { Game, LobbyPlayer } from "@/lib/models";
+import { GameStatus, GameMode } from "@/lib/models";
+import type { Game, LobbyPlayer, RoleDefinition } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
-import { assignRoles } from "./assignRoles";
+import {
+  secretVillainService,
+  SecretVillainService,
+} from "./SecretVillainService";
+
+type GameModeService = Pick<
+  SecretVillainService,
+  "getRoleDefinitions" | "createRoleAssignments"
+>;
 
 export class GameService {
   private games: Record<string, Game> = {};
+
+  private readonly modeServices: Record<GameMode, GameModeService> = {
+    [GameMode.SecretVillain]: secretVillainService,
+  };
 
   public createGame(
     lobbyId: string,
     players: LobbyPlayer[],
     roleSlots: RoleSlot[],
+    gameMode: GameMode,
   ): Game {
-    const roleAssignments = assignRoles(players, roleSlots);
+    const service = this.modeServices[gameMode];
+    const roleAssignments = service.createRoleAssignments(players, roleSlots);
 
     const game: Game = {
       id: randomUUID(),
       lobbyId,
+      gameMode,
       status: { type: GameStatus.Playing },
       players: [...players],
       roleAssignments,
@@ -28,6 +43,10 @@ export class GameService {
 
   public getGame(gameId: string): Game | undefined {
     return this.games[gameId];
+  }
+
+  public getRoleDefinitions(gameMode: GameMode): RoleDefinition[] {
+    return this.modeServices[gameMode].getRoleDefinitions();
   }
 }
 

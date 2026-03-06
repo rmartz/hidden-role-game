@@ -39,6 +39,7 @@ describe("POST /api/game/create", () => {
         },
         body: JSON.stringify({
           lobbyId,
+          gameMode: "secret-villain",
           roleSlots: [
             { roleId: "good", count: 1 },
             { roleId: "bad", count: 1 },
@@ -64,6 +65,7 @@ describe("POST /api/game/create", () => {
         },
         body: JSON.stringify({
           lobbyId,
+          gameMode: "secret-villain",
           roleSlots: [{ roleId: "good", count: 1 }],
         }),
       }),
@@ -83,6 +85,7 @@ describe("POST /api/game/create", () => {
         },
         body: JSON.stringify({
           lobbyId,
+          gameMode: "secret-villain",
           roleSlots: [
             { roleId: "good", count: 1 },
             { roleId: "bad", count: 1 },
@@ -107,7 +110,11 @@ describe("POST /api/game/create", () => {
           "Content-Type": "application/json",
           "x-session-id": aliceSession,
         },
-        body: JSON.stringify({ lobbyId, roleSlots: slots }),
+        body: JSON.stringify({
+          lobbyId,
+          gameMode: "secret-villain",
+          roleSlots: slots,
+        }),
       }),
     );
 
@@ -118,7 +125,11 @@ describe("POST /api/game/create", () => {
           "Content-Type": "application/json",
           "x-session-id": aliceSession,
         },
-        body: JSON.stringify({ lobbyId, roleSlots: slots }),
+        body: JSON.stringify({
+          lobbyId,
+          gameMode: "secret-villain",
+          roleSlots: slots,
+        }),
       }),
     );
     expect(res.status).toBe(409);
