@@ -12,11 +12,11 @@ import {
   getPlayerId,
 } from "@/lib/api";
 import { GameMode } from "@/lib/models";
-import { GAME_MODE_ROLES, GAME_MODE_NAMES } from "@/lib/game-modes";
+import { GAME_MODE_ROLES } from "@/lib/game-modes";
 import type { RoleSlot } from "@/server/models";
 import JoinPrompt from "./JoinPrompt";
 import PlayerList from "./PlayerList";
-import RoleConfig from "./RoleConfig";
+import GameConfigurationPanel from "./GameConfigurationPanel";
 
 export default function LobbyPage() {
   const { lobbyId } = useParams<{ lobbyId: string }>();
@@ -26,13 +26,7 @@ export default function LobbyPage() {
     GameMode.SecretVillain,
   );
 
-  const {
-    data: lobby,
-    error,
-    isLoading,
-    refetch,
-    isFetching,
-  } = useQuery({
+  const fetchLobby = useQuery({
     queryKey: ["lobby", lobbyId],
     queryFn: async () => {
       const { data, httpStatus } = await getLobby(lobbyId);
@@ -50,18 +44,22 @@ export default function LobbyPage() {
   });
 
   const myPlayerId = getPlayerId();
-  const isOwner = !!lobby && lobby.ownerPlayerId === myPlayerId;
-  const gameId = lobby?.gameId;
+  const isOwner =
+    !!fetchLobby.data && fetchLobby.data.ownerPlayerId === myPlayerId;
+  const gameId = fetchLobby.data?.gameId;
 
   useEffect(() => {
     if (gameId) router.push(`/game/${gameId}`);
   }, [gameId, router]);
 
   useEffect(() => {
-    if (error?.message === "404" || error?.message === "403") {
+    if (
+      fetchLobby.error?.message === "404" ||
+      fetchLobby.error?.message === "403"
+    ) {
       router.push("/");
     }
-  }, [error, router]);
+  }, [fetchLobby.error, router]);
 
   const removeMutation = useMutation({
     mutationFn: (targetPlayerId: string) =>
@@ -104,7 +102,7 @@ export default function LobbyPage() {
   });
 
   function handleRefetch() {
-    refetch();
+    fetchLobby.refetch();
   }
 
   return (
@@ -114,15 +112,19 @@ export default function LobbyPage() {
         Lobby: <a href={`/lobby/${lobbyId}`}>{lobbyId}</a>
       </p>
 
-      {isLoading && <p>Loading...</p>}
+      {fetchLobby.isLoading && <p>Loading...</p>}
 
-      {error && error.message !== "404" && error.message !== "403" && (
-        <div style={{ color: "red", marginBottom: "10px" }}>
-          Error: {error.message}
-        </div>
+      {fetchLobby.error &&
+        fetchLobby.error.message !== "404" &&
+        fetchLobby.error.message !== "403" && (
+          <div style={{ color: "red", marginBottom: "10px" }}>
+            Error: {fetchLobby.error.message}
+          </div>
+        )}
+
+      {!fetchLobby.isLoading && fetchLobby.data === null && (
+        <JoinPrompt lobbyId={lobbyId} />
       )}
-
-      {!isLoading && lobby === null && <JoinPrompt lobbyId={lobbyId} />}
 
       {removeMutation.error && (
         <div style={{ color: "red", marginBottom: "10px" }}>
@@ -130,83 +132,48 @@ export default function LobbyPage() {
         </div>
       )}
 
-      {lobby && !gameId && (isOwner || lobby.config.showConfigToPlayers) && (
-        <div style={{ marginTop: "20px" }}>
-          {isOwner ? (
-            <label>
-              Game Mode:{" "}
-              <select
-                value={selectedGameMode}
-                onChange={(e) =>
-                  setSelectedGameMode(e.target.value as GameMode)
-                }
-              >
-                {Object.values(GameMode).map((mode) => (
-                  <option key={mode} value={mode}>
-                    {GAME_MODE_NAMES[mode]}
-                  </option>
-                ))}
-              </select>
-            </label>
-          ) : (
-            <p>Game Mode: {GAME_MODE_NAMES[lobby.config.gameMode]}</p>
-          )}
-          <div
-            style={{
-              marginTop: "10px",
-              display: "flex",
-              flexDirection: "column",
-              gap: "6px",
-            }}
-          >
-            <label>
-              <input
-                type="checkbox"
-                checked={lobby.config.showConfigToPlayers}
-                disabled={!isOwner || updateConfigMutation.isPending}
-                onChange={(e) =>
-                  updateConfigMutation.mutate({
-                    showConfigToPlayers: e.target.checked,
-                  })
-                }
-              />{" "}
-              Show game configuration to all players
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={lobby.config.showRolesInPlay}
-                disabled={!isOwner || updateConfigMutation.isPending}
-                onChange={(e) =>
-                  updateConfigMutation.mutate({
-                    showRolesInPlay: e.target.checked,
-                  })
-                }
-              />{" "}
-              Show roles in play when game starts
-            </label>
-          </div>
-        </div>
-      )}
+      {fetchLobby.data &&
+        !gameId &&
+        (isOwner || fetchLobby.data.config.showConfigToPlayers) &&
+        (isOwner ? (
+          <GameConfigurationPanel
+            key={selectedGameMode}
+            config={fetchLobby.data.config}
+            roleDefinitions={GAME_MODE_ROLES[selectedGameMode]}
+            playerCount={fetchLobby.data.players.length}
+            readOnly={false}
+            selectedGameMode={selectedGameMode}
+            isPending={
+              updateConfigMutation.isPending || startGameMutation.isPending
+            }
+            onGameModeChange={setSelectedGameMode}
+            onShowConfigChange={(value) =>
+              updateConfigMutation.mutate({ showConfigToPlayers: value })
+            }
+            onShowRolesInPlayChange={(value) =>
+              updateConfigMutation.mutate({ showRolesInPlay: value })
+            }
+            onStartGame={(roleSlots: RoleSlot[]) =>
+              startGameMutation.mutate(roleSlots)
+            }
+          />
+        ) : (
+          <GameConfigurationPanel
+            config={fetchLobby.data.config}
+            roleDefinitions={GAME_MODE_ROLES[fetchLobby.data.config.gameMode]}
+            playerCount={fetchLobby.data.players.length}
+            readOnly={true}
+          />
+        ))}
 
-      {lobby && isOwner && !gameId && (
-        <RoleConfig
-          key={selectedGameMode}
-          playerCount={lobby.players.length}
-          roleDefinitions={GAME_MODE_ROLES[selectedGameMode]}
-          disabled={startGameMutation.isPending}
-          onStartGame={(roleSlots) => startGameMutation.mutate(roleSlots)}
-        />
-      )}
-
-      {lobby && (
+      {fetchLobby.data && (
         <PlayerList
-          lobby={lobby}
+          lobby={fetchLobby.data}
           userPlayerId={myPlayerId}
           showLeave={!isOwner}
           showRemovePlayer={isOwner}
           showMakeOwner={isOwner}
-          isFetching={isFetching}
+          isFetching={fetchLobby.isFetching}
           disabled={
             removeMutation.isPending ||
             transferOwnerMutation.isPending ||
