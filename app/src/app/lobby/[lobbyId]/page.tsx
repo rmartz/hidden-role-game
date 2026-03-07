@@ -99,7 +99,7 @@ export default function LobbyPage() {
       updateLobbyConfig(lobbyId, config),
     onSuccess: (response) => {
       if (response.status === "error") return;
-      queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
+      queryClient.setQueryData(["lobby", lobbyId], response.data.lobby);
     },
   });
 
