@@ -56,6 +56,11 @@ export interface PlayerRoleAssignment {
   roleDefinitionId: string;
 }
 
+export interface RoleSlot {
+  roleId: string;
+  count: number;
+}
+
 export interface GamePlayer extends LobbyPlayer {
   visibleRoles: PlayerRoleAssignment[];
 }
@@ -69,6 +74,7 @@ export interface Game {
   status: GameStatusState;
   players: GamePlayer[];
   roleAssignments: PlayerRoleAssignment[];
+  showRolesInPlay: boolean;
 }
 
 // --- Lobby (top-level entity; game is absent until started) ---
@@ -77,5 +83,9 @@ export interface Lobby {
   id: string;
   ownerSessionId: string;
   players: LobbyPlayer[];
+  gameMode: GameMode;
+  roleSlots: RoleSlot[];
+  showConfigToPlayers: boolean;
+  showRolesInPlay: boolean;
   gameId?: string;
 }

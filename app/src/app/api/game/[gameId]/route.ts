@@ -50,11 +50,16 @@ export async function GET(
     ];
   });
 
+  const rolesInPlay: PublicRoleInfo[] | null = game.showRolesInPlay
+    ? gameService.getRolesInPlay(game)
+    : null;
+
   const gameState: PlayerGameState = {
     status: game.status,
     players: game.players.map((p) => ({ id: p.id, name: p.name })),
     myRole,
     visibleTeammates,
+    rolesInPlay,
   };
 
   return Response.json({

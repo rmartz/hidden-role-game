@@ -10,7 +10,7 @@ export async function DELETE(
   const { lobbyId, playerId } = await params;
   const sessionId = request.headers.get("x-session-id") ?? undefined;
 
-  const auth = authenticateLobby(lobbyId, sessionId);
+  const auth = authenticateLobby(lobbyId, sessionId, { requireNoGame: true });
   if (auth instanceof Response) return auth;
   const { lobby } = auth;
 
@@ -27,16 +27,9 @@ export async function DELETE(
     return errorResponse("Owner cannot leave the lobby", 403);
   }
 
-  if (lobby.gameId) {
-    return errorResponse(
-      "Cannot remove players after the game has started",
-      409,
-    );
-  }
-
   const updated = lobbyService.removePlayer(lobbyId, playerId);
   return Response.json({
     status: ServerResponseStatus.Success,
-    data: { lobby: updated ? toPublicLobby(updated) : null },
+    data: { lobby: updated ? toPublicLobby(updated, sessionId) : null },
   });
 }

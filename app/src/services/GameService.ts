@@ -7,7 +7,7 @@ import type {
   PlayerRoleAssignment,
   RoleDefinition,
 } from "@/lib/models";
-import type { RoleSlot } from "@/server/models";
+import type { RoleSlot, PublicRoleInfo } from "@/server/models";
 import { secretVillainService } from "./SecretVillainService";
 import { avalonService } from "./AvalonService";
 import { werewolfService } from "./WerewolfService";
@@ -61,6 +61,7 @@ export class GameService {
     players: LobbyPlayer[],
     roleSlots: RoleSlot[],
     gameMode: GameMode,
+    showRolesInPlay: boolean,
   ): Game {
     const service = this.modeServices[gameMode];
     const roleDefs = service.getRoleDefinitions();
@@ -73,6 +74,7 @@ export class GameService {
       status: { type: GameStatus.Playing },
       players: this.buildGamePlayers(players, roleAssignments, roleDefs),
       roleAssignments,
+      showRolesInPlay,
     };
 
     this.games[game.id] = game;
@@ -85,6 +87,16 @@ export class GameService {
 
   public getRoleDefinitions(gameMode: GameMode): RoleDefinition[] {
     return this.modeServices[gameMode].getRoleDefinitions();
+  }
+
+  public getRolesInPlay(game: Game): PublicRoleInfo[] {
+    const roleDefs = this.getRoleDefinitions(game.gameMode);
+    const roleDefById = new Map(roleDefs.map((r) => [r.id, r]));
+    return game.roleAssignments.reduce<PublicRoleInfo[]>((acc, assignment) => {
+      const def = roleDefById.get(assignment.roleDefinitionId);
+      if (!def || acc.some((r) => r.id === def.id)) return acc;
+      return [...acc, { id: def.id, name: def.name, team: def.team }];
+    }, []);
   }
 }
 

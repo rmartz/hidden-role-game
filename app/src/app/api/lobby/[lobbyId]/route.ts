@@ -14,6 +14,6 @@ export async function GET(
 
   return Response.json({
     status: ServerResponseStatus.Success,
-    data: toPublicLobby(auth.lobby),
+    data: toPublicLobby(auth.lobby, sessionId),
   });
 }

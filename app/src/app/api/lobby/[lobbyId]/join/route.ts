@@ -28,7 +28,11 @@ export async function POST(
   return Response.json(
     {
       status: ServerResponseStatus.Success,
-      data: { lobby: toPublicLobby(lobby), sessionId, playerId: newPlayer.id },
+      data: {
+        lobby: toPublicLobby(lobby, sessionId),
+        sessionId,
+        playerId: newPlayer.id,
+      },
     },
     { status: 201 },
   );

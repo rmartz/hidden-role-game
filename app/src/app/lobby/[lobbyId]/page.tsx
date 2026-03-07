@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -8,30 +8,21 @@ import {
   removePlayer,
   transferOwner,
   startGame,
+  updateLobbyConfig,
   getPlayerId,
 } from "@/lib/api";
-import { GameMode } from "@/lib/models";
-import { GAME_MODE_ROLES, GAME_MODE_NAMES } from "@/lib/game-modes";
+import type { GameMode } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
 import JoinPrompt from "./JoinPrompt";
 import PlayerList from "./PlayerList";
-import RoleConfig from "./RoleConfig";
+import GameConfigurationPanel from "./GameConfigurationPanel";
 
 export default function LobbyPage() {
   const { lobbyId } = useParams<{ lobbyId: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [selectedGameMode, setSelectedGameMode] = useState<GameMode>(
-    GameMode.SecretVillain,
-  );
 
-  const {
-    data: lobby,
-    error,
-    isLoading,
-    refetch,
-    isFetching,
-  } = useQuery({
+  const fetchLobby = useQuery({
     queryKey: ["lobby", lobbyId],
     queryFn: async () => {
       const { data, httpStatus } = await getLobby(lobbyId);
@@ -49,18 +40,22 @@ export default function LobbyPage() {
   });
 
   const myPlayerId = getPlayerId();
-  const isOwner = !!lobby && lobby.ownerPlayerId === myPlayerId;
-  const gameId = lobby?.gameId;
+  const isOwner =
+    !!fetchLobby.data && fetchLobby.data.ownerPlayerId === myPlayerId;
+  const gameId = fetchLobby.data?.gameId;
 
   useEffect(() => {
     if (gameId) router.push(`/game/${gameId}`);
   }, [gameId, router]);
 
   useEffect(() => {
-    if (error?.message === "404" || error?.message === "403") {
+    if (
+      fetchLobby.error?.message === "404" ||
+      fetchLobby.error?.message === "403"
+    ) {
       router.push("/");
     }
-  }, [error, router]);
+  }, [fetchLobby.error, router]);
 
   const removeMutation = useMutation({
     mutationFn: (targetPlayerId: string) =>
@@ -76,8 +71,13 @@ export default function LobbyPage() {
   });
 
   const startGameMutation = useMutation({
-    mutationFn: (roleSlots: RoleSlot[]) =>
-      startGame(lobbyId, roleSlots, selectedGameMode),
+    mutationFn: ({
+      roleSlots,
+      gameMode,
+    }: {
+      roleSlots: RoleSlot[];
+      gameMode: GameMode;
+    }) => startGame(lobbyId, roleSlots, gameMode),
     onSuccess: (response) => {
       if (response.status === "error") return;
       queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
@@ -93,8 +93,17 @@ export default function LobbyPage() {
     },
   });
 
+  const updateConfigMutation = useMutation({
+    mutationFn: (config: Parameters<typeof updateLobbyConfig>[1]) =>
+      updateLobbyConfig(lobbyId, config),
+    onSuccess: (response) => {
+      if (response.status === "error") return;
+      queryClient.setQueryData(["lobby", lobbyId], response.data.lobby);
+    },
+  });
+
   function handleRefetch() {
-    refetch();
+    fetchLobby.refetch();
   }
 
   return (
@@ -104,15 +113,19 @@ export default function LobbyPage() {
         Lobby: <a href={`/lobby/${lobbyId}`}>{lobbyId}</a>
       </p>
 
-      {isLoading && <p>Loading...</p>}
+      {fetchLobby.isLoading && <p>Loading...</p>}
 
-      {error && error.message !== "404" && error.message !== "403" && (
-        <div style={{ color: "red", marginBottom: "10px" }}>
-          Error: {error.message}
-        </div>
+      {fetchLobby.error &&
+        fetchLobby.error.message !== "404" &&
+        fetchLobby.error.message !== "403" && (
+          <div style={{ color: "red", marginBottom: "10px" }}>
+            Error: {fetchLobby.error.message}
+          </div>
+        )}
+
+      {!fetchLobby.isLoading && fetchLobby.data === null && (
+        <JoinPrompt lobbyId={lobbyId} />
       )}
-
-      {!isLoading && lobby === null && <JoinPrompt lobbyId={lobbyId} />}
 
       {removeMutation.error && (
         <div style={{ color: "red", marginBottom: "10px" }}>
@@ -120,42 +133,38 @@ export default function LobbyPage() {
         </div>
       )}
 
-      {isOwner && !gameId && (
-        <div style={{ marginTop: "20px" }}>
-          <label>
-            Game Mode:{" "}
-            <select
-              value={selectedGameMode}
-              onChange={(e) => setSelectedGameMode(e.target.value as GameMode)}
-            >
-              {Object.values(GameMode).map((mode) => (
-                <option key={mode} value={mode}>
-                  {GAME_MODE_NAMES[mode]}
-                </option>
-              ))}
-            </select>
-          </label>
-        </div>
-      )}
+      {fetchLobby.data &&
+        !gameId &&
+        (isOwner || fetchLobby.data.config.showConfigToPlayers) &&
+        (isOwner ? (
+          <GameConfigurationPanel
+            config={fetchLobby.data.config}
+            playerCount={fetchLobby.data.players.length}
+            readOnly={false}
+            isPending={
+              updateConfigMutation.isPending || startGameMutation.isPending
+            }
+            onConfigChange={(config) => updateConfigMutation.mutate(config)}
+            onStartGame={(roleSlots, gameMode) =>
+              startGameMutation.mutate({ roleSlots, gameMode })
+            }
+          />
+        ) : (
+          <GameConfigurationPanel
+            config={fetchLobby.data.config}
+            playerCount={fetchLobby.data.players.length}
+            readOnly={true}
+          />
+        ))}
 
-      {lobby && isOwner && !gameId && (
-        <RoleConfig
-          key={selectedGameMode}
-          playerCount={lobby.players.length}
-          roleDefinitions={GAME_MODE_ROLES[selectedGameMode]}
-          disabled={startGameMutation.isPending}
-          onStartGame={(roleSlots) => startGameMutation.mutate(roleSlots)}
-        />
-      )}
-
-      {lobby && (
+      {fetchLobby.data && (
         <PlayerList
-          lobby={lobby}
+          lobby={fetchLobby.data}
           userPlayerId={myPlayerId}
           showLeave={!isOwner}
           showRemovePlayer={isOwner}
           showMakeOwner={isOwner}
-          isFetching={isFetching}
+          isFetching={fetchLobby.isFetching}
           disabled={
             removeMutation.isPending ||
             transferOwnerMutation.isPending ||
