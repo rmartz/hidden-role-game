@@ -1,6 +1,7 @@
 import { ServerResponseStatus } from "@/server/models";
+import { authenticateLobby, errorResponse } from "@/server/api-helpers";
+import { toPublicLobby } from "@/server/lobby-helpers";
 import { lobbyService } from "@/services/LobbyService";
-import { isValidSession, toPublicLobby } from "@/server/lobby-helpers";
 
 export async function DELETE(
   request: Request,
@@ -8,21 +9,10 @@ export async function DELETE(
 ): Promise<Response> {
   const { lobbyId, playerId } = await params;
   const sessionId = request.headers.get("x-session-id") ?? undefined;
-  const lobby = lobbyService.getLobby(lobbyId);
 
-  if (!lobby) {
-    return Response.json(
-      { status: ServerResponseStatus.Error, error: "Lobby not found" },
-      { status: 404 },
-    );
-  }
-
-  if (!sessionId || !isValidSession(lobby, sessionId)) {
-    return Response.json(
-      { status: ServerResponseStatus.Error, error: "Unauthorized" },
-      { status: 403 },
-    );
-  }
+  const auth = authenticateLobby(lobbyId, sessionId);
+  if (auth instanceof Response) return auth;
+  const { lobby } = auth;
 
   const callerIsOwner = lobby.ownerSessionId === sessionId;
   const callerIsTarget = lobby.players.some(
@@ -30,29 +20,17 @@ export async function DELETE(
   );
 
   if (!callerIsOwner && !callerIsTarget) {
-    return Response.json(
-      { status: ServerResponseStatus.Error, error: "Unauthorized" },
-      { status: 403 },
-    );
+    return errorResponse("Unauthorized", 403);
   }
 
   if (callerIsOwner && callerIsTarget) {
-    return Response.json(
-      {
-        status: ServerResponseStatus.Error,
-        error: "Owner cannot leave the lobby",
-      },
-      { status: 403 },
-    );
+    return errorResponse("Owner cannot leave the lobby", 403);
   }
 
   if (lobby.gameId) {
-    return Response.json(
-      {
-        status: ServerResponseStatus.Error,
-        error: "Cannot remove players after the game has started",
-      },
-      { status: 409 },
+    return errorResponse(
+      "Cannot remove players after the game has started",
+      409,
     );
   }
 

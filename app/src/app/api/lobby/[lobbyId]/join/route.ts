@@ -3,6 +3,7 @@ import type { LobbyPlayer } from "@/lib/models";
 import { ServerResponseStatus, type JoinLobbyRequest } from "@/server/models";
 import { lobbyService } from "@/services/LobbyService";
 import { toPublicLobby } from "@/server/lobby-helpers";
+import { errorResponse } from "@/server/api-helpers";
 
 export async function POST(
   request: Request,
@@ -13,10 +14,7 @@ export async function POST(
   const lobby = lobbyService.getLobby(lobbyId);
 
   if (!lobby) {
-    return Response.json(
-      { status: ServerResponseStatus.Error, error: "Lobby not found" },
-      { status: 404 },
-    );
+    return errorResponse("Lobby not found", 404);
   }
 
   const sessionId = randomUUID();
