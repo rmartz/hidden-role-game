@@ -9,6 +9,7 @@ import type {
 import type { RoleSlot } from "@/server/models";
 import { secretVillainService } from "./SecretVillainService";
 import { avalonService } from "./AvalonService";
+import { werewolfService } from "./WerewolfService";
 
 interface GameModeService {
   getRoleDefinitions(): RoleDefinition[];
@@ -24,6 +25,7 @@ export class GameService {
   private readonly modeServices: Record<GameMode, GameModeService> = {
     [GameMode.SecretVillain]: secretVillainService,
     [GameMode.Avalon]: avalonService,
+    [GameMode.Werewolf]: werewolfService,
   };
 
   public createGame(

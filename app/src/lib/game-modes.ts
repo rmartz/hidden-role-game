@@ -42,9 +42,24 @@ export const GAME_MODE_ROLES: Record<GameMode, RoleDefinition[]> = {
       canSeeTeam: [],
     },
   ],
+  [GameMode.Werewolf]: [
+    {
+      id: "werewolf-good",
+      name: "Good Role",
+      team: Team.Good,
+      canSeeTeam: [],
+    },
+    {
+      id: "werewolf-bad",
+      name: "Bad Role",
+      team: Team.Bad,
+      canSeeTeam: [],
+    },
+  ],
 };
 
 export const GAME_MODE_NAMES: Record<GameMode, string> = {
   [GameMode.SecretVillain]: "Secret Villain",
   [GameMode.Avalon]: "Avalon",
+  [GameMode.Werewolf]: "Werewolf",
 };
