@@ -1,13 +1,21 @@
+import { GameMode } from "@/lib/models";
 import { ServerResponseStatus } from "@/server/models";
 import type { CreateGameRequest } from "@/server/models";
 import { lobbyService } from "@/services/LobbyService";
 import { gameService } from "@/services/GameService";
 import { isValidSession, toPublicLobby } from "@/server/lobby-helpers";
-import { ROLE_DEFINITIONS } from "@/lib/roles";
 
 export async function POST(request: Request): Promise<Response> {
   const sessionId = request.headers.get("x-session-id") ?? undefined;
-  const { lobbyId, roleSlots }: CreateGameRequest = await request.json();
+  const { lobbyId, roleSlots, gameMode }: CreateGameRequest =
+    await request.json();
+
+  if (!Object.values(GameMode).includes(gameMode)) {
+    return Response.json(
+      { status: ServerResponseStatus.Error, error: "Unknown game mode" },
+      { status: 400 },
+    );
+  }
   const lobby = lobbyService.getLobby(lobbyId);
 
   if (!lobby) {
@@ -52,7 +60,9 @@ export async function POST(request: Request): Promise<Response> {
     );
   }
 
-  const validRoleIds = new Set(ROLE_DEFINITIONS.map((r) => r.id));
+  const validRoleIds = new Set(
+    gameService.getRoleDefinitions(gameMode).map((r) => r.id),
+  );
   for (const slot of roleSlots) {
     if (!validRoleIds.has(slot.roleId)) {
       return Response.json(
@@ -65,7 +75,12 @@ export async function POST(request: Request): Promise<Response> {
     }
   }
 
-  const game = gameService.createGame(lobbyId, lobby.players, roleSlots);
+  const game = gameService.createGame(
+    lobbyId,
+    lobby.players,
+    roleSlots,
+    gameMode,
+  );
   const updated = lobbyService.setGameId(lobbyId, game.id);
   if (!updated) {
     return Response.json(

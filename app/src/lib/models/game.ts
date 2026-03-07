@@ -29,6 +29,14 @@ export type GameStatusState =
   | PlayingGameStatus
   | FinishedGameStatus;
 
+// --- Game Modes ---
+
+export enum GameMode {
+  SecretVillain = "secret-villain",
+  Avalon = "avalon",
+  Werewolf = "werewolf",
+}
+
 // --- Roles ---
 
 export enum Team {
@@ -40,8 +48,7 @@ export interface RoleDefinition {
   id: string;
   name: string;
   team: Team;
-  canSeeTeammates: boolean;
-  knownToTeammates: boolean;
+  canSeeTeam: Team[];
 }
 
 export interface PlayerRoleAssignment {
@@ -49,13 +56,18 @@ export interface PlayerRoleAssignment {
   roleDefinitionId: string;
 }
 
+export interface GamePlayer extends LobbyPlayer {
+  visibleRoles: PlayerRoleAssignment[];
+}
+
 // --- Game (exists only after the game has been started) ---
 
 export interface Game {
   id: string;
   lobbyId: string;
+  gameMode: GameMode;
   status: GameStatusState;
-  players: LobbyPlayer[];
+  players: GamePlayer[];
   roleAssignments: PlayerRoleAssignment[];
 }
 
