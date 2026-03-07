@@ -140,6 +140,7 @@ export default function GameConfigurationPanel(props: Props) {
         <>
           <RoleConfig
             roleDefinitions={roleDefinitions}
+            roleSlots={config.roleSlots}
             playerCount={playerCount}
             readOnly={false}
             disabled={props.isPending}

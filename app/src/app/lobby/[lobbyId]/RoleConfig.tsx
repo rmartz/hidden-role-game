@@ -11,6 +11,7 @@ interface ReadOnlyProps {
 
 interface EditableProps {
   roleDefinitions: RoleDefinition[];
+  roleSlots?: RoleSlot[];
   playerCount: number;
   readOnly: false;
   disabled: boolean;
@@ -22,8 +23,13 @@ type Props = ReadOnlyProps | EditableProps;
 export default function RoleConfig(props: Props) {
   const { roleDefinitions, playerCount, readOnly } = props;
 
+  const slotMap = new Map(
+    (!readOnly ? props.roleSlots : undefined)?.map((s) => [s.roleId, s.count]),
+  );
   const [counts, setCounts] = useState<Record<string, number>>(
-    Object.fromEntries(roleDefinitions.map((r) => [r.id, 0])),
+    Object.fromEntries(
+      roleDefinitions.map((r) => [r.id, slotMap.get(r.id) ?? 0]),
+    ),
   );
 
   const total = Object.values(counts).reduce((sum, c) => sum + c, 0);
