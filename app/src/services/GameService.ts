@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { GameStatus, GameMode } from "@/lib/models";
 import type {
   Game,
+  GamePlayer,
   LobbyPlayer,
   PlayerRoleAssignment,
   RoleDefinition,
@@ -28,6 +29,33 @@ export class GameService {
     [GameMode.Werewolf]: werewolfService,
   };
 
+  private buildGamePlayers(
+    players: LobbyPlayer[],
+    roleAssignments: PlayerRoleAssignment[],
+    roleDefs: RoleDefinition[],
+  ): GamePlayer[] {
+    const roleDefById = new Map(roleDefs.map((r) => [r.id, r]));
+    const playerById = new Map(players.map((p) => [p.id, p]));
+
+    return roleAssignments.map((assignment) => {
+      const player = playerById.get(assignment.playerId)!;
+      const myRoleDef = roleDefById.get(assignment.roleDefinitionId);
+
+      const visibleRoles: PlayerRoleAssignment[] = [];
+      if (myRoleDef && myRoleDef.canSeeTeam.length > 0) {
+        const visibleTeams = new Set(myRoleDef.canSeeTeam);
+        for (const other of roleAssignments) {
+          if (other.playerId === assignment.playerId) continue;
+          const roleDef = roleDefById.get(other.roleDefinitionId);
+          if (!roleDef || !visibleTeams.has(roleDef.team)) continue;
+          visibleRoles.push(other);
+        }
+      }
+
+      return { ...player, visibleRoles };
+    });
+  }
+
   public createGame(
     lobbyId: string,
     players: LobbyPlayer[],
@@ -35,6 +63,7 @@ export class GameService {
     gameMode: GameMode,
   ): Game {
     const service = this.modeServices[gameMode];
+    const roleDefs = service.getRoleDefinitions();
     const roleAssignments = service.createRoleAssignments(players, roleSlots);
 
     const game: Game = {
@@ -42,7 +71,7 @@ export class GameService {
       lobbyId,
       gameMode,
       status: { type: GameStatus.Playing },
-      players: [...players],
+      players: this.buildGamePlayers(players, roleAssignments, roleDefs),
       roleAssignments,
     };
 

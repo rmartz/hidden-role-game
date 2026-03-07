@@ -1,9 +1,5 @@
 import { ServerResponseStatus } from "@/server/models";
-import type {
-  PlayerGameState,
-  PublicRoleInfo,
-  VisibleTeammate,
-} from "@/server/models";
+import type { PlayerGameState, PublicRoleInfo } from "@/server/models";
 import { gameService } from "@/services/GameService";
 
 export async function GET(
@@ -60,23 +56,19 @@ export async function GET(
     team: myRoleDef.team,
   };
 
-  const visibleTeammates: VisibleTeammate[] = [];
-  if (myRoleDef.canSeeTeam.length > 0) {
-    const visibleTeams = new Set(myRoleDef.canSeeTeam);
-    for (const assignment of game.roleAssignments) {
-      if (assignment.playerId === caller.id) continue;
-      const roleDef = roleDefs.find(
-        (r) => r.id === assignment.roleDefinitionId,
-      );
-      if (!roleDef || !visibleTeams.has(roleDef.team)) continue;
-      const player = game.players.find((p) => p.id === assignment.playerId);
-      if (!player) continue;
-      visibleTeammates.push({
+  const playerById = new Map(game.players.map((p) => [p.id, p]));
+  const roleDefById = new Map(roleDefs.map((r) => [r.id, r]));
+  const visibleTeammates = caller.visibleRoles.flatMap((assignment) => {
+    const player = playerById.get(assignment.playerId);
+    const roleDef = roleDefById.get(assignment.roleDefinitionId);
+    if (!player || !roleDef) return [];
+    return [
+      {
         player: { id: player.id, name: player.name },
         role: { id: roleDef.id, name: roleDef.name, team: roleDef.team },
-      });
-    }
-  }
+      },
+    ];
+  });
 
   const gameState: PlayerGameState = {
     status: game.status,

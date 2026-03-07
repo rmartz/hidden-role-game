@@ -56,6 +56,10 @@ export interface PlayerRoleAssignment {
   roleDefinitionId: string;
 }
 
+export interface GamePlayer extends LobbyPlayer {
+  visibleRoles: PlayerRoleAssignment[];
+}
+
 // --- Game (exists only after the game has been started) ---
 
 export interface Game {
@@ -63,7 +67,7 @@ export interface Game {
   lobbyId: string;
   gameMode: GameMode;
   status: GameStatusState;
-  players: LobbyPlayer[];
+  players: GamePlayer[];
   roleAssignments: PlayerRoleAssignment[];
 }
 
