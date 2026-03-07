@@ -51,11 +51,7 @@ export async function GET(
   });
 
   const rolesInPlay: PublicRoleInfo[] | null = game.showRolesInPlay
-    ? game.roleAssignments.reduce<PublicRoleInfo[]>((acc, assignment) => {
-        const def = roleDefById.get(assignment.roleDefinitionId);
-        if (!def || acc.some((r) => r.id === def.id)) return acc;
-        return [...acc, { id: def.id, name: def.name, team: def.team }];
-      }, [])
+    ? gameService.getRolesInPlay(game)
     : null;
 
   const gameState: PlayerGameState = {

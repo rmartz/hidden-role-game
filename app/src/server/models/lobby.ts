@@ -5,13 +5,17 @@ export interface PublicLobbyPlayer {
   name: string;
 }
 
+export interface GameConfig {
+  showConfigToPlayers: boolean;
+  showRolesInPlay: boolean;
+}
+
 export interface PublicLobby {
   id: string;
   ownerPlayerId: string;
   players: PublicLobbyPlayer[];
   gameMode: GameMode;
-  showConfigToPlayers: boolean;
-  showRolesInPlay: boolean;
+  config: GameConfig;
   roleSlots?: RoleSlot[];
   gameId?: string;
 }

@@ -156,7 +156,7 @@ export default function LobbyPage() {
             <label>
               <input
                 type="checkbox"
-                checked={lobby?.showConfigToPlayers ?? false}
+                checked={lobby?.config.showConfigToPlayers ?? false}
                 disabled={updateConfigMutation.isPending}
                 onChange={(e) =>
                   updateConfigMutation.mutate({
@@ -169,7 +169,7 @@ export default function LobbyPage() {
             <label>
               <input
                 type="checkbox"
-                checked={lobby?.showRolesInPlay ?? false}
+                checked={lobby?.config.showRolesInPlay ?? false}
                 disabled={updateConfigMutation.isPending}
                 onChange={(e) =>
                   updateConfigMutation.mutate({
