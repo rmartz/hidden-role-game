@@ -34,6 +34,7 @@ export type GameStatusState =
 export enum GameMode {
   SecretVillain = "secret-villain",
   Avalon = "avalon",
+  Werewolf = "werewolf",
 }
 
 // --- Roles ---

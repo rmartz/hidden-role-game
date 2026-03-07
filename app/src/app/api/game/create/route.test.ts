@@ -206,4 +206,30 @@ describe("POST /api/game/create", () => {
     );
     expect(res.status).toBe(409);
   });
+
+  it("should allow starting a Werewolf game with Werewolf role slots", async () => {
+    const { lobbyId, aliceSession } = await setupLobbyWithPlayers();
+
+    const res = await startGame(
+      new Request("http://localhost/api/game/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-session-id": aliceSession,
+        },
+        body: JSON.stringify({
+          lobbyId,
+          gameMode: "werewolf",
+          roleSlots: [
+            { roleId: "werewolf-good", count: 1 },
+            { roleId: "werewolf-bad", count: 1 },
+          ],
+        }),
+      }),
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.status).toBe("success");
+    expect(body.data.lobby.gameId).toBeDefined();
+  });
 });
