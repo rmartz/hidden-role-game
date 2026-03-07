@@ -16,12 +16,12 @@ export function toPublicLobby(
     id: lobby.id,
     ownerPlayerId: owner?.id ?? "",
     players: lobby.players.map((p) => ({ id: p.id, name: p.name })),
-    gameMode: lobby.gameMode,
     config: {
+      gameMode: lobby.gameMode,
       showConfigToPlayers: lobby.showConfigToPlayers,
       showRolesInPlay: lobby.showRolesInPlay,
+      ...(showRoleSlots && { roleSlots: lobby.roleSlots }),
     },
-    ...(showRoleSlots && { roleSlots: lobby.roleSlots }),
     ...(lobby.gameId && { gameId: lobby.gameId }),
   };
 }
