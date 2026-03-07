@@ -1,61 +1,13 @@
-import { GameMode, Team } from "@/lib/models";
+import { GameMode } from "@/lib/models";
 import type { RoleDefinition } from "@/lib/models";
+import { SECRET_VILLAIN_ROLES } from "@/lib/game-modes/secret-villain-roles";
+import { AVALON_ROLES } from "@/lib/game-modes/avalon-roles";
+import { WEREWOLF_ROLES } from "@/lib/game-modes/werewolf-roles";
 
 export const GAME_MODE_ROLES: Record<GameMode, RoleDefinition[]> = {
-  [GameMode.SecretVillain]: [
-    {
-      id: "good",
-      name: "Good Role",
-      team: Team.Good,
-      canSeeTeam: [],
-    },
-    {
-      id: "bad",
-      name: "Bad Role",
-      team: Team.Bad,
-      canSeeTeam: [Team.Bad],
-    },
-    {
-      id: "special-bad",
-      name: "Special Bad Role",
-      team: Team.Bad,
-      canSeeTeam: [],
-    },
-  ],
-  [GameMode.Avalon]: [
-    {
-      id: "avalon-good",
-      name: "Good Role",
-      team: Team.Good,
-      canSeeTeam: [],
-    },
-    {
-      id: "avalon-special-good",
-      name: "Special Good Role",
-      team: Team.Good,
-      canSeeTeam: [Team.Bad],
-    },
-    {
-      id: "avalon-bad",
-      name: "Bad Role",
-      team: Team.Bad,
-      canSeeTeam: [],
-    },
-  ],
-  [GameMode.Werewolf]: [
-    {
-      id: "werewolf-good",
-      name: "Good Role",
-      team: Team.Good,
-      canSeeTeam: [],
-    },
-    {
-      id: "werewolf-bad",
-      name: "Bad Role",
-      team: Team.Bad,
-      canSeeTeam: [],
-    },
-  ],
+  [GameMode.SecretVillain]: SECRET_VILLAIN_ROLES,
+  [GameMode.Avalon]: AVALON_ROLES,
+  [GameMode.Werewolf]: WEREWOLF_ROLES,
 };
 
 export const GAME_MODE_NAMES: Record<GameMode, string> = {
