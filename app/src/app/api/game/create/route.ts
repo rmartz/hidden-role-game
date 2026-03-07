@@ -3,7 +3,8 @@ import { ServerResponseStatus } from "@/server/models";
 import type { CreateGameRequest } from "@/server/models";
 import { lobbyService } from "@/services/LobbyService";
 import { gameService } from "@/services/GameService";
-import { isValidSession, toPublicLobby } from "@/server/lobby-helpers";
+import { toPublicLobby } from "@/server/lobby-helpers";
+import { authenticateLobby, errorResponse } from "@/server/api-helpers";
 
 export async function POST(request: Request): Promise<Response> {
   const sessionId = request.headers.get("x-session-id") ?? undefined;
@@ -11,53 +12,20 @@ export async function POST(request: Request): Promise<Response> {
     await request.json();
 
   if (!Object.values(GameMode).includes(gameMode)) {
-    return Response.json(
-      { status: ServerResponseStatus.Error, error: "Unknown game mode" },
-      { status: 400 },
-    );
-  }
-  const lobby = lobbyService.getLobby(lobbyId);
-
-  if (!lobby) {
-    return Response.json(
-      { status: ServerResponseStatus.Error, error: "Lobby not found" },
-      { status: 404 },
-    );
+    return errorResponse("Unknown game mode", 400);
   }
 
-  if (!sessionId || !isValidSession(lobby, sessionId)) {
-    return Response.json(
-      { status: ServerResponseStatus.Error, error: "Unauthorized" },
-      { status: 403 },
-    );
-  }
-
-  if (lobby.ownerSessionId !== sessionId) {
-    return Response.json(
-      {
-        status: ServerResponseStatus.Error,
-        error: "Only the owner can start the game",
-      },
-      { status: 403 },
-    );
-  }
+  const auth = authenticateLobby(lobbyId, sessionId, { requireOwner: true });
+  if (auth instanceof Response) return auth;
+  const { lobby } = auth;
 
   if (lobby.gameId) {
-    return Response.json(
-      { status: ServerResponseStatus.Error, error: "Game already started" },
-      { status: 409 },
-    );
+    return errorResponse("Game already started", 409);
   }
 
   const totalSlots = roleSlots.reduce((sum, s) => sum + s.count, 0);
   if (totalSlots !== lobby.players.length) {
-    return Response.json(
-      {
-        status: ServerResponseStatus.Error,
-        error: "Role slot count must match player count",
-      },
-      { status: 400 },
-    );
+    return errorResponse("Role slot count must match player count", 400);
   }
 
   const validRoleIds = new Set(
@@ -65,13 +33,7 @@ export async function POST(request: Request): Promise<Response> {
   );
   for (const slot of roleSlots) {
     if (!validRoleIds.has(slot.roleId)) {
-      return Response.json(
-        {
-          status: ServerResponseStatus.Error,
-          error: `Unknown role: ${slot.roleId}`,
-        },
-        { status: 400 },
-      );
+      return errorResponse(`Unknown role: ${slot.roleId}`, 400);
     }
   }
 
@@ -83,10 +45,7 @@ export async function POST(request: Request): Promise<Response> {
   );
   const updated = lobbyService.setGameId(lobbyId, game.id);
   if (!updated) {
-    return Response.json(
-      { status: ServerResponseStatus.Error, error: "Failed to start game" },
-      { status: 500 },
-    );
+    return errorResponse("Failed to start game", 500);
   }
 
   return Response.json({
