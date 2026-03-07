@@ -33,6 +33,6 @@ export async function GET(
 
   return Response.json({
     status: ServerResponseStatus.Success,
-    data: toPublicLobby(lobby),
+    data: toPublicLobby(lobby, sessionId),
   });
 }

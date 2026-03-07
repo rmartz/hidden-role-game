@@ -1,4 +1,4 @@
-import type { Lobby } from "@/lib/models";
+import type { GameMode, Lobby, RoleSlot } from "@/lib/models";
 
 export class LobbyService {
   private lobbies: Record<string, Lobby> = {};
@@ -37,6 +37,28 @@ export class LobbyService {
     if (!lobby) return undefined;
 
     lobby.players = lobby.players.filter((p) => p.id !== playerId);
+
+    return lobby;
+  }
+
+  public updateConfig(
+    lobbyId: string,
+    config: {
+      showConfigToPlayers?: boolean;
+      showRolesInPlay?: boolean;
+      gameMode?: GameMode;
+      roleSlots?: RoleSlot[];
+    },
+  ): Lobby | undefined {
+    const lobby = this.lobbies[lobbyId];
+    if (!lobby) return undefined;
+
+    if (config.showConfigToPlayers !== undefined)
+      lobby.showConfigToPlayers = config.showConfigToPlayers;
+    if (config.showRolesInPlay !== undefined)
+      lobby.showRolesInPlay = config.showRolesInPlay;
+    if (config.gameMode !== undefined) lobby.gameMode = config.gameMode;
+    if (config.roleSlots !== undefined) lobby.roleSlots = config.roleSlots;
 
     return lobby;
   }

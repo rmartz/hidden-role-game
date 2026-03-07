@@ -1,5 +1,8 @@
+import { GameMode } from "@/lib/models";
 import { ServerResponseStatus } from "@/server/models";
+import type { UpdateLobbyConfigRequest } from "@/server/models";
 import { lobbyService } from "@/services/LobbyService";
+import { gameService } from "@/services/GameService";
 import { isValidSession, toPublicLobby } from "@/server/lobby-helpers";
 
 export async function PUT(
@@ -28,7 +31,7 @@ export async function PUT(
     return Response.json(
       {
         status: ServerResponseStatus.Error,
-        error: "Only the owner can transfer ownership",
+        error: "Only the owner can update the configuration",
       },
       { status: 403 },
     );
@@ -38,19 +41,46 @@ export async function PUT(
     return Response.json(
       {
         status: ServerResponseStatus.Error,
-        error: "Cannot transfer ownership after the game has started",
+        error: "Cannot update configuration after the game has started",
       },
       { status: 409 },
     );
   }
 
-  const { playerId } = await request.json();
-  const updated = lobbyService.transferOwner(lobbyId, playerId);
+  const body: UpdateLobbyConfigRequest = await request.json();
 
+  if (
+    body.gameMode !== undefined &&
+    !Object.values(GameMode).includes(body.gameMode)
+  ) {
+    return Response.json(
+      { status: ServerResponseStatus.Error, error: "Unknown game mode" },
+      { status: 400 },
+    );
+  }
+
+  if (body.roleSlots !== undefined && body.gameMode !== undefined) {
+    const validRoleIds = new Set(
+      gameService.getRoleDefinitions(body.gameMode).map((r) => r.id),
+    );
+    for (const slot of body.roleSlots) {
+      if (!validRoleIds.has(slot.roleId)) {
+        return Response.json(
+          {
+            status: ServerResponseStatus.Error,
+            error: `Unknown role: ${slot.roleId}`,
+          },
+          { status: 400 },
+        );
+      }
+    }
+  }
+
+  const updated = lobbyService.updateConfig(lobbyId, body);
   if (!updated) {
     return Response.json(
-      { status: ServerResponseStatus.Error, error: "Player not found" },
-      { status: 404 },
+      { status: ServerResponseStatus.Error, error: "Failed to update config" },
+      { status: 500 },
     );
   }
 

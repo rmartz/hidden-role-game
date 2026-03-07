@@ -8,6 +8,7 @@ import {
   removePlayer,
   transferOwner,
   startGame,
+  updateLobbyConfig,
   getPlayerId,
 } from "@/lib/api";
 import { GameMode } from "@/lib/models";
@@ -93,6 +94,15 @@ export default function LobbyPage() {
     },
   });
 
+  const updateConfigMutation = useMutation({
+    mutationFn: (config: Parameters<typeof updateLobbyConfig>[1]) =>
+      updateLobbyConfig(lobbyId, config),
+    onSuccess: (response) => {
+      if (response.status === "error") return;
+      queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
+    },
+  });
+
   function handleRefetch() {
     refetch();
   }
@@ -135,6 +145,41 @@ export default function LobbyPage() {
               ))}
             </select>
           </label>
+          <div
+            style={{
+              marginTop: "10px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "6px",
+            }}
+          >
+            <label>
+              <input
+                type="checkbox"
+                checked={lobby?.showConfigToPlayers ?? false}
+                disabled={updateConfigMutation.isPending}
+                onChange={(e) =>
+                  updateConfigMutation.mutate({
+                    showConfigToPlayers: e.target.checked,
+                  })
+                }
+              />{" "}
+              Show role configuration to all players
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={lobby?.showRolesInPlay ?? false}
+                disabled={updateConfigMutation.isPending}
+                onChange={(e) =>
+                  updateConfigMutation.mutate({
+                    showRolesInPlay: e.target.checked,
+                  })
+                }
+              />{" "}
+              Show roles in play when game starts
+            </label>
+          </div>
         </div>
       )}
 

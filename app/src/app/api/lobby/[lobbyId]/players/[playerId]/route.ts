@@ -59,6 +59,6 @@ export async function DELETE(
   const updated = lobbyService.removePlayer(lobbyId, playerId);
   return Response.json({
     status: ServerResponseStatus.Success,
-    data: { lobby: updated ? toPublicLobby(updated) : null },
+    data: { lobby: updated ? toPublicLobby(updated, sessionId) : null },
   });
 }

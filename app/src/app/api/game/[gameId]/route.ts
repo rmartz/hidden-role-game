@@ -70,11 +70,20 @@ export async function GET(
     ];
   });
 
+  const rolesInPlay: PublicRoleInfo[] | null = game.showRolesInPlay
+    ? game.roleAssignments.reduce<PublicRoleInfo[]>((acc, assignment) => {
+        const def = roleDefById.get(assignment.roleDefinitionId);
+        if (!def || acc.some((r) => r.id === def.id)) return acc;
+        return [...acc, { id: def.id, name: def.name, team: def.team }];
+      }, [])
+    : null;
+
   const gameState: PlayerGameState = {
     status: game.status,
     players: game.players.map((p) => ({ id: p.id, name: p.name })),
     myRole,
     visibleTeammates,
+    rolesInPlay,
   };
 
   return Response.json({

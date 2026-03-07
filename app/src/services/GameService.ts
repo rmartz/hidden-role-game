@@ -61,6 +61,7 @@ export class GameService {
     players: LobbyPlayer[],
     roleSlots: RoleSlot[],
     gameMode: GameMode,
+    showRolesInPlay: boolean,
   ): Game {
     const service = this.modeServices[gameMode];
     const roleDefs = service.getRoleDefinitions();
@@ -73,6 +74,7 @@ export class GameService {
       status: { type: GameStatus.Playing },
       players: this.buildGamePlayers(players, roleAssignments, roleDefs),
       roleAssignments,
+      showRolesInPlay,
     };
 
     this.games[game.id] = game;

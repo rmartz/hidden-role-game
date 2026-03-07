@@ -1,10 +1,7 @@
-import type { GameStatusState, GameMode, Team } from "@/lib/models";
+import type { GameStatusState, GameMode, RoleSlot, Team } from "@/lib/models";
 import type { PublicLobbyPlayer } from "./lobby";
 
-export interface RoleSlot {
-  roleId: string;
-  count: number;
-}
+export type { RoleSlot };
 
 export interface CreateGameRequest {
   lobbyId: string;
@@ -28,4 +25,5 @@ export interface PlayerGameState {
   players: PublicLobbyPlayer[];
   myRole: PublicRoleInfo;
   visibleTeammates: VisibleTeammate[];
+  rolesInPlay: PublicRoleInfo[] | null;
 }

@@ -5,6 +5,7 @@ import type {
   LobbyJoinResponse,
   RoleSlot,
   PlayerGameState,
+  UpdateLobbyConfigRequest,
 } from "@/server/models";
 
 const SESSION_KEY = "x-session-id";
@@ -115,6 +116,21 @@ export async function getGameState(
   if (sessionId) headers["x-session-id"] = sessionId;
   const response = await fetch(`/api/game/${gameId}`, { headers });
   return { data: await response.json(), httpStatus: response.status };
+}
+
+export async function updateLobbyConfig(
+  lobbyId: string,
+  config: UpdateLobbyConfigRequest,
+): Promise<ServerResponse<{ lobby: PublicLobby }>> {
+  const sessionId = getSessionId();
+  const headers: HeadersInit = { "Content-Type": "application/json" };
+  if (sessionId) headers["x-session-id"] = sessionId;
+  const response = await fetch(`/api/lobby/${lobbyId}/config`, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify(config),
+  });
+  return response.json();
 }
 
 export async function removePlayer(

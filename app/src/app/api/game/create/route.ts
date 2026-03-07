@@ -80,6 +80,7 @@ export async function POST(request: Request): Promise<Response> {
     lobby.players,
     roleSlots,
     gameMode,
+    lobby.showRolesInPlay,
   );
   const updated = lobbyService.setGameId(lobbyId, game.id);
   if (!updated) {
@@ -91,6 +92,6 @@ export async function POST(request: Request): Promise<Response> {
 
   return Response.json({
     status: ServerResponseStatus.Success,
-    data: { lobby: toPublicLobby(updated) },
+    data: { lobby: toPublicLobby(updated, sessionId) },
   });
 }
