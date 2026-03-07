@@ -130,21 +130,27 @@ export default function LobbyPage() {
         </div>
       )}
 
-      {isOwner && !gameId && (
+      {lobby && !gameId && (isOwner || lobby.config.showConfigToPlayers) && (
         <div style={{ marginTop: "20px" }}>
-          <label>
-            Game Mode:{" "}
-            <select
-              value={selectedGameMode}
-              onChange={(e) => setSelectedGameMode(e.target.value as GameMode)}
-            >
-              {Object.values(GameMode).map((mode) => (
-                <option key={mode} value={mode}>
-                  {GAME_MODE_NAMES[mode]}
-                </option>
-              ))}
-            </select>
-          </label>
+          {isOwner ? (
+            <label>
+              Game Mode:{" "}
+              <select
+                value={selectedGameMode}
+                onChange={(e) =>
+                  setSelectedGameMode(e.target.value as GameMode)
+                }
+              >
+                {Object.values(GameMode).map((mode) => (
+                  <option key={mode} value={mode}>
+                    {GAME_MODE_NAMES[mode]}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : (
+            <p>Game Mode: {GAME_MODE_NAMES[lobby.config.gameMode]}</p>
+          )}
           <div
             style={{
               marginTop: "10px",
@@ -156,21 +162,21 @@ export default function LobbyPage() {
             <label>
               <input
                 type="checkbox"
-                checked={lobby?.config.showConfigToPlayers ?? false}
-                disabled={updateConfigMutation.isPending}
+                checked={lobby.config.showConfigToPlayers}
+                disabled={!isOwner || updateConfigMutation.isPending}
                 onChange={(e) =>
                   updateConfigMutation.mutate({
                     showConfigToPlayers: e.target.checked,
                   })
                 }
               />{" "}
-              Show role configuration to all players
+              Show game configuration to all players
             </label>
             <label>
               <input
                 type="checkbox"
-                checked={lobby?.config.showRolesInPlay ?? false}
-                disabled={updateConfigMutation.isPending}
+                checked={lobby.config.showRolesInPlay}
+                disabled={!isOwner || updateConfigMutation.isPending}
                 onChange={(e) =>
                   updateConfigMutation.mutate({
                     showRolesInPlay: e.target.checked,
