@@ -61,13 +61,14 @@ export async function GET(
   };
 
   const visibleTeammates: VisibleTeammate[] = [];
-  if (myRoleDef.canSeeTeammates) {
+  if (myRoleDef.canSeeTeam.length > 0) {
+    const visibleTeams = new Set(myRoleDef.canSeeTeam);
     for (const assignment of game.roleAssignments) {
       if (assignment.playerId === caller.id) continue;
       const roleDef = roleDefs.find(
         (r) => r.id === assignment.roleDefinitionId,
       );
-      if (!roleDef?.knownToTeammates) continue;
+      if (!roleDef || !visibleTeams.has(roleDef.team)) continue;
       const player = game.players.find((p) => p.id === assignment.playerId);
       if (!player) continue;
       visibleTeammates.push({

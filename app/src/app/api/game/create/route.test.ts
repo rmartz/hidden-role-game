@@ -96,6 +96,78 @@ describe("POST /api/game/create", () => {
     expect(res.status).toBe(403);
   });
 
+  it("should allow starting an Avalon game with Avalon role slots", async () => {
+    const { lobbyId, aliceSession } = await setupLobbyWithPlayers();
+
+    const res = await startGame(
+      new Request("http://localhost/api/game/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-session-id": aliceSession,
+        },
+        body: JSON.stringify({
+          lobbyId,
+          gameMode: "avalon",
+          roleSlots: [
+            { roleId: "avalon-good", count: 1 },
+            { roleId: "avalon-bad", count: 1 },
+          ],
+        }),
+      }),
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.status).toBe("success");
+    expect(body.data.lobby.gameId).toBeDefined();
+  });
+
+  it("should return 400 when using a role from the wrong game mode", async () => {
+    const { lobbyId, aliceSession } = await setupLobbyWithPlayers();
+
+    const res = await startGame(
+      new Request("http://localhost/api/game/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-session-id": aliceSession,
+        },
+        body: JSON.stringify({
+          lobbyId,
+          gameMode: "avalon",
+          roleSlots: [
+            { roleId: "good", count: 1 },
+            { roleId: "bad", count: 1 },
+          ],
+        }),
+      }),
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it("should return 400 for an unknown game mode", async () => {
+    const { lobbyId, aliceSession } = await setupLobbyWithPlayers();
+
+    const res = await startGame(
+      new Request("http://localhost/api/game/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-session-id": aliceSession,
+        },
+        body: JSON.stringify({
+          lobbyId,
+          gameMode: "not-a-real-mode",
+          roleSlots: [
+            { roleId: "good", count: 1 },
+            { roleId: "bad", count: 1 },
+          ],
+        }),
+      }),
+    );
+    expect(res.status).toBe(400);
+  });
+
   it("should return 409 when the game has already started", async () => {
     const { lobbyId, aliceSession } = await setupLobbyWithPlayers();
     const slots = [

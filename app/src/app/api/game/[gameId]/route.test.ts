@@ -99,7 +99,7 @@ describe("GET /api/game/[gameId]", () => {
     expect(res.status).toBe(403);
   });
 
-  it("should show bad role player their teammates", async () => {
+  it("should show Secret Villain bad role player their bad teammates", async () => {
     const { gameId, aliceSession, bobSession } = await setupStartedGame();
 
     const aliceRes = await getGameState(
@@ -118,14 +118,77 @@ describe("GET /api/game/[gameId]", () => {
     );
     const bobBody = await bobRes.json();
 
-    // The player with "bad" role should see their teammates (who are knownToTeammates)
-    // The player with "good" role should see nobody
+    // Bad role can see Bad team players; with only 1 bad player there are none to see
     const badPlayer =
       aliceBody.data.myRole.id === "bad" ? aliceBody.data : bobBody.data;
     const goodPlayer =
       aliceBody.data.myRole.id === "good" ? aliceBody.data : bobBody.data;
 
-    expect(badPlayer.visibleTeammates).toHaveLength(0); // bad has no other bad players
+    expect(badPlayer.visibleTeammates).toHaveLength(0); // no other bad players
     expect(goodPlayer.visibleTeammates).toHaveLength(0); // good cannot see anyone
+  });
+
+  it("should show Avalon special good role player all bad role players", async () => {
+    const createRes = await createLobby(
+      postRequest("http://localhost/api/lobby/create", { playerName: "Alice" }),
+    );
+    const { data: createData } = await createRes.json();
+    const { lobby, sessionId: aliceSession } = createData;
+
+    const joinRes = await joinLobby(
+      postRequest(`http://localhost/api/lobby/${lobby.id}/join`, {
+        playerName: "Bob",
+      }),
+      makeLobbyParams(lobby.id),
+    );
+    const { data: joinData } = await joinRes.json();
+    const bobSession = joinData.sessionId as string;
+
+    const startRes = await startGame(
+      new Request("http://localhost/api/game/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-session-id": aliceSession,
+        },
+        body: JSON.stringify({
+          lobbyId: lobby.id,
+          gameMode: "avalon",
+          roleSlots: [
+            { roleId: "avalon-special-good", count: 1 },
+            { roleId: "avalon-bad", count: 1 },
+          ],
+        }),
+      }),
+    );
+    const { data: startData } = await startRes.json();
+    const gameId = startData.lobby.gameId as string;
+
+    const aliceRes = await getGameState(
+      new Request(`http://localhost/api/game/${gameId}`, {
+        headers: { "x-session-id": aliceSession },
+      }),
+      makeGameParams(gameId),
+    );
+    const aliceBody = await aliceRes.json();
+
+    const bobRes = await getGameState(
+      new Request(`http://localhost/api/game/${gameId}`, {
+        headers: { "x-session-id": bobSession },
+      }),
+      makeGameParams(gameId),
+    );
+    const bobBody = await bobRes.json();
+
+    const specialGoodPlayer =
+      aliceBody.data.myRole.id === "avalon-special-good"
+        ? aliceBody.data
+        : bobBody.data;
+    const badPlayer =
+      aliceBody.data.myRole.id === "avalon-bad" ? aliceBody.data : bobBody.data;
+
+    expect(specialGoodPlayer.visibleTeammates).toHaveLength(1);
+    expect(specialGoodPlayer.visibleTeammates[0].role.id).toBe("avalon-bad");
+    expect(badPlayer.visibleTeammates).toHaveLength(0);
   });
 });
