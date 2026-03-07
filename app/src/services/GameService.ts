@@ -13,6 +13,7 @@ import { avalonService } from "./AvalonService";
 import { werewolfService } from "./WerewolfService";
 
 interface GameModeService {
+  readonly minPlayers: number;
   getRoleDefinitions(): RoleDefinition[];
   createRoleAssignments(
     players: LobbyPlayer[],
@@ -89,7 +90,8 @@ export class GameService {
   }
 
   public defaultRoleCount(gameMode: GameMode, numPlayers: number): RoleSlot[] {
-    return this.modeServices[gameMode].defaultRoleCount(numPlayers);
+    const service = this.modeServices[gameMode];
+    return service.defaultRoleCount(Math.max(numPlayers, service.minPlayers));
   }
 }
 
