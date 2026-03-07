@@ -33,6 +33,7 @@ export type GameStatusState =
 
 export enum GameMode {
   SecretVillain = "secret-villain",
+  Avalon = "avalon",
 }
 
 // --- Roles ---
@@ -46,8 +47,7 @@ export interface RoleDefinition {
   id: string;
   name: string;
   team: Team;
-  canSeeTeammates: boolean;
-  knownToTeammates: boolean;
+  canSeeTeam: Team[];
 }
 
 export interface PlayerRoleAssignment {

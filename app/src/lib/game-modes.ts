@@ -7,26 +7,44 @@ export const GAME_MODE_ROLES: Record<GameMode, RoleDefinition[]> = {
       id: "good",
       name: "Good Role",
       team: Team.Good,
-      canSeeTeammates: false,
-      knownToTeammates: false,
+      canSeeTeam: [],
     },
     {
       id: "bad",
       name: "Bad Role",
       team: Team.Bad,
-      canSeeTeammates: true,
-      knownToTeammates: true,
+      canSeeTeam: [Team.Bad],
     },
     {
       id: "special-bad",
       name: "Special Bad Role",
       team: Team.Bad,
-      canSeeTeammates: false,
-      knownToTeammates: true,
+      canSeeTeam: [],
+    },
+  ],
+  [GameMode.Avalon]: [
+    {
+      id: "avalon-good",
+      name: "Good Role",
+      team: Team.Good,
+      canSeeTeam: [],
+    },
+    {
+      id: "avalon-special-good",
+      name: "Special Good Role",
+      team: Team.Good,
+      canSeeTeam: [Team.Bad],
+    },
+    {
+      id: "avalon-bad",
+      name: "Bad Role",
+      team: Team.Bad,
+      canSeeTeam: [],
     },
   ],
 };
 
 export const GAME_MODE_NAMES: Record<GameMode, string> = {
   [GameMode.SecretVillain]: "Secret Villain",
+  [GameMode.Avalon]: "Avalon",
 };

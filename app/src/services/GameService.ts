@@ -1,22 +1,29 @@
 import { randomUUID } from "crypto";
 import { GameStatus, GameMode } from "@/lib/models";
-import type { Game, LobbyPlayer, RoleDefinition } from "@/lib/models";
+import type {
+  Game,
+  LobbyPlayer,
+  PlayerRoleAssignment,
+  RoleDefinition,
+} from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
-import {
-  secretVillainService,
-  SecretVillainService,
-} from "./SecretVillainService";
+import { secretVillainService } from "./SecretVillainService";
+import { avalonService } from "./AvalonService";
 
-type GameModeService = Pick<
-  SecretVillainService,
-  "getRoleDefinitions" | "createRoleAssignments"
->;
+interface GameModeService {
+  getRoleDefinitions(): RoleDefinition[];
+  createRoleAssignments(
+    players: LobbyPlayer[],
+    roleSlots: RoleSlot[],
+  ): PlayerRoleAssignment[];
+}
 
 export class GameService {
   private games: Record<string, Game> = {};
 
   private readonly modeServices: Record<GameMode, GameModeService> = {
     [GameMode.SecretVillain]: secretVillainService,
+    [GameMode.Avalon]: avalonService,
   };
 
   public createGame(
