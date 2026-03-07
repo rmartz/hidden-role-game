@@ -13,6 +13,7 @@ export function errorResponse(error: string, status: number): Response {
 
 interface LobbyAuthOptions {
   requireOwner?: boolean;
+  requireNoGame?: boolean;
 }
 
 export function authenticateLobby(
@@ -20,7 +21,7 @@ export function authenticateLobby(
   sessionId: string | undefined,
   options: LobbyAuthOptions = {},
 ): Response | { lobby: Lobby; sessionId: string } {
-  const { requireOwner = false } = options;
+  const { requireOwner = false, requireNoGame = false } = options;
 
   if (!sessionId) {
     return errorResponse("No session", 401);
@@ -37,6 +38,10 @@ export function authenticateLobby(
 
   if (requireOwner && lobby.ownerSessionId !== sessionId) {
     return errorResponse("Unauthorized", 403);
+  }
+
+  if (requireNoGame && lobby.gameId) {
+    return errorResponse("Game already started", 409);
   }
 
   return { lobby, sessionId };

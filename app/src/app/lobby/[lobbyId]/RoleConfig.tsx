@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { RoleDefinition } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
 
@@ -14,7 +14,7 @@ interface EditableProps {
   playerCount: number;
   readOnly: false;
   disabled: boolean;
-  onStartGame: (roleSlots: RoleSlot[]) => void;
+  onRoleSlotsChange: (roleSlots: RoleSlot[]) => void;
 }
 
 type Props = ReadOnlyProps | EditableProps;
@@ -27,18 +27,20 @@ export default function RoleConfig(props: Props) {
   );
 
   const total = Object.values(counts).reduce((sum, c) => sum + c, 0);
-  const isValid = total === playerCount;
+
+  useEffect(() => {
+    if (readOnly) return;
+    const timer = setTimeout(() => {
+      const roleSlots: RoleSlot[] = roleDefinitions
+        .filter((r) => (counts[r.id] ?? 0) > 0)
+        .map((r) => ({ roleId: r.id, count: counts[r.id] ?? 0 }));
+      props.onRoleSlotsChange(roleSlots);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [counts]);
 
   function handleChange(roleId: string, value: number) {
     setCounts((prev) => ({ ...prev, [roleId]: Math.max(0, value) }));
-  }
-
-  function handleStartGame() {
-    if (readOnly) return;
-    const roleSlots: RoleSlot[] = roleDefinitions
-      .filter((r) => (counts[r.id] ?? 0) > 0)
-      .map((r) => ({ roleId: r.id, count: counts[r.id] ?? 0 }));
-    props.onStartGame(roleSlots);
   }
 
   const displayCounts = readOnly
@@ -96,11 +98,6 @@ export default function RoleConfig(props: Props) {
           </li>
         ))}
       </ul>
-      {!readOnly && (
-        <button onClick={handleStartGame} disabled={props.disabled || !isValid}>
-          Start Game
-        </button>
-      )}
     </div>
   );
 }

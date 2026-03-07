@@ -13,16 +13,11 @@ export async function PUT(
   const { lobbyId } = await params;
   const sessionId = request.headers.get("x-session-id") ?? undefined;
 
-  const auth = authenticateLobby(lobbyId, sessionId, { requireOwner: true });
+  const auth = authenticateLobby(lobbyId, sessionId, {
+    requireOwner: true,
+    requireNoGame: true,
+  });
   if (auth instanceof Response) return auth;
-  const { lobby } = auth;
-
-  if (lobby.gameId) {
-    return errorResponse(
-      "Cannot update configuration after the game has started",
-      409,
-    );
-  }
 
   const body: UpdateLobbyConfigRequest = await request.json();
 

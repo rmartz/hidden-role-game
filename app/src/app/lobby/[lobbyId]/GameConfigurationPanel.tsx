@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { GameMode } from "@/lib/models";
 import type { RoleDefinition } from "@/lib/models";
 import { GAME_MODE_NAMES } from "@/lib/game-modes";
@@ -23,6 +24,7 @@ interface EditableProps {
   onGameModeChange: (mode: GameMode) => void;
   onShowConfigChange: (value: boolean) => void;
   onShowRolesInPlayChange: (value: boolean) => void;
+  onRoleSlotsChange: (roleSlots: RoleSlot[]) => void;
   onStartGame: (roleSlots: RoleSlot[]) => void;
 }
 
@@ -30,6 +32,18 @@ type Props = ReadOnlyProps | EditableProps;
 
 export default function GameConfigurationPanel(props: Props) {
   const { config, roleDefinitions, playerCount, readOnly } = props;
+
+  const [currentRoleSlots, setCurrentRoleSlots] = useState<RoleSlot[]>(
+    config.roleSlots ?? [],
+  );
+
+  const totalSlots = currentRoleSlots.reduce((sum, s) => sum + s.count, 0);
+  const isValid = totalSlots === playerCount;
+
+  function handleRoleSlotsChange(roleSlots: RoleSlot[]) {
+    setCurrentRoleSlots(roleSlots);
+    if (!readOnly) props.onRoleSlotsChange(roleSlots);
+  }
 
   return (
     <div style={{ marginTop: "20px" }}>
@@ -95,13 +109,21 @@ export default function GameConfigurationPanel(props: Props) {
           readOnly={true}
         />
       ) : (
-        <RoleConfig
-          roleDefinitions={roleDefinitions}
-          playerCount={playerCount}
-          readOnly={false}
-          disabled={props.isPending}
-          onStartGame={props.onStartGame}
-        />
+        <>
+          <RoleConfig
+            roleDefinitions={roleDefinitions}
+            playerCount={playerCount}
+            readOnly={false}
+            disabled={props.isPending}
+            onRoleSlotsChange={handleRoleSlotsChange}
+          />
+          <button
+            onClick={() => props.onStartGame(currentRoleSlots)}
+            disabled={props.isPending || !isValid}
+          >
+            Start Game
+          </button>
+        </>
       )}
     </div>
   );

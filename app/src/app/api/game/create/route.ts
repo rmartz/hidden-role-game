@@ -15,13 +15,12 @@ export async function POST(request: Request): Promise<Response> {
     return errorResponse("Unknown game mode", 400);
   }
 
-  const auth = authenticateLobby(lobbyId, sessionId, { requireOwner: true });
+  const auth = authenticateLobby(lobbyId, sessionId, {
+    requireOwner: true,
+    requireNoGame: true,
+  });
   if (auth instanceof Response) return auth;
   const { lobby } = auth;
-
-  if (lobby.gameId) {
-    return errorResponse("Game already started", 409);
-  }
 
   const totalSlots = roleSlots.reduce((sum, s) => sum + s.count, 0);
   if (totalSlots !== lobby.players.length) {

@@ -153,6 +153,9 @@ export default function LobbyPage() {
             onShowRolesInPlayChange={(value) =>
               updateConfigMutation.mutate({ showRolesInPlay: value })
             }
+            onRoleSlotsChange={(roleSlots: RoleSlot[]) =>
+              updateConfigMutation.mutate({ roleSlots })
+            }
             onStartGame={(roleSlots: RoleSlot[]) =>
               startGameMutation.mutate(roleSlots)
             }
