@@ -13,7 +13,6 @@ export function errorResponse(error: string, status: number): Response {
 
 interface LobbyAuthOptions {
   requireOwner?: boolean;
-  invalidSessionStatus?: number;
 }
 
 export function authenticateLobby(
@@ -21,7 +20,7 @@ export function authenticateLobby(
   sessionId: string | undefined,
   options: LobbyAuthOptions = {},
 ): Response | { lobby: Lobby; sessionId: string } {
-  const { requireOwner = false, invalidSessionStatus = 403 } = options;
+  const { requireOwner = false } = options;
 
   if (!sessionId) {
     return errorResponse("No session", 401);
@@ -33,7 +32,7 @@ export function authenticateLobby(
   }
 
   if (!isValidSession(lobby, sessionId)) {
-    return errorResponse("Unauthorized", invalidSessionStatus);
+    return errorResponse("Unauthorized", 403);
   }
 
   if (requireOwner && lobby.ownerSessionId !== sessionId) {
