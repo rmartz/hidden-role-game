@@ -19,6 +19,17 @@ export class SecretVillainService {
   ): PlayerRoleAssignment[] {
     return assignRoles(players, roleSlots);
   }
+
+  defaultRoleCount(numPlayers: number): RoleSlot[] {
+    const specialBad = 1;
+    const bad = Math.floor((numPlayers - 1) / 2) - 1;
+    const good = numPlayers - specialBad - bad;
+    return [
+      { roleId: "special-bad", count: specialBad },
+      { roleId: "bad", count: bad },
+      { roleId: "good", count: good },
+    ];
+  }
 }
 
 export const secretVillainService = new SecretVillainService();

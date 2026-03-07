@@ -56,6 +56,11 @@ export interface PlayerRoleAssignment {
   roleDefinitionId: string;
 }
 
+export interface RoleSlot {
+  roleId: string;
+  count: number;
+}
+
 export interface GamePlayer extends LobbyPlayer {
   visibleRoles: PlayerRoleAssignment[];
 }
@@ -77,5 +82,7 @@ export interface Lobby {
   id: string;
   ownerSessionId: string;
   players: LobbyPlayer[];
+  gameMode: GameMode;
+  roleSlots: RoleSlot[];
   gameId?: string;
 }

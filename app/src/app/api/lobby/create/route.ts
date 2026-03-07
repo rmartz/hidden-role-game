@@ -1,7 +1,8 @@
 import { randomUUID } from "crypto";
-import type { LobbyPlayer } from "@/lib/models";
+import { GameMode, type LobbyPlayer } from "@/lib/models";
 import { ServerResponseStatus, type CreateLobbyRequest } from "@/server/models";
 import { lobbyService } from "@/services/LobbyService";
+import { gameService } from "@/services/GameService";
 import { toPublicLobby } from "@/server/lobby-helpers";
 
 export async function POST(request: Request): Promise<Response> {
@@ -25,10 +26,13 @@ export async function POST(request: Request): Promise<Response> {
     sessionId,
   };
 
+  const defaultGameMode = GameMode.SecretVillain;
   const lobby = {
     id: lobbyId,
     ownerSessionId: sessionId,
     players: [owner],
+    gameMode: defaultGameMode,
+    roleSlots: gameService.defaultRoleCount(defaultGameMode, 1),
   };
 
   lobbyService.addLobby(lobby);

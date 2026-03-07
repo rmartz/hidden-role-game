@@ -19,6 +19,15 @@ export class WerewolfService {
   ): PlayerRoleAssignment[] {
     return assignRoles(players, roleSlots);
   }
+
+  defaultRoleCount(numPlayers: number): RoleSlot[] {
+    const bad = Math.floor(numPlayers / 3);
+    const good = numPlayers - bad;
+    return [
+      { roleId: "werewolf-bad", count: bad },
+      { roleId: "werewolf-good", count: good },
+    ];
+  }
 }
 
 export const werewolfService = new WerewolfService();

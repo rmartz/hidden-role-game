@@ -19,6 +19,17 @@ export class AvalonService {
   ): PlayerRoleAssignment[] {
     return assignRoles(players, roleSlots);
   }
+
+  defaultRoleCount(numPlayers: number): RoleSlot[] {
+    const bad = Math.floor((numPlayers - 1) / 2);
+    const specialGood = 1;
+    const good = numPlayers - bad - specialGood;
+    return [
+      { roleId: "avalon-bad", count: bad },
+      { roleId: "avalon-special-good", count: specialGood },
+      { roleId: "avalon-good", count: good },
+    ];
+  }
 }
 
 export const avalonService = new AvalonService();

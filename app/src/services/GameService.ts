@@ -18,6 +18,7 @@ interface GameModeService {
     players: LobbyPlayer[],
     roleSlots: RoleSlot[],
   ): PlayerRoleAssignment[];
+  defaultRoleCount(numPlayers: number): RoleSlot[];
 }
 
 export class GameService {
@@ -85,6 +86,10 @@ export class GameService {
 
   public getRoleDefinitions(gameMode: GameMode): RoleDefinition[] {
     return this.modeServices[gameMode].getRoleDefinitions();
+  }
+
+  public defaultRoleCount(gameMode: GameMode, numPlayers: number): RoleSlot[] {
+    return this.modeServices[gameMode].defaultRoleCount(numPlayers);
   }
 }
 

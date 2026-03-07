@@ -11,6 +11,8 @@ export function toPublicLobby(lobby: Lobby): PublicLobby {
     id: lobby.id,
     ownerPlayerId: owner?.id ?? "",
     players: lobby.players.map((p) => ({ id: p.id, name: p.name })),
+    gameMode: lobby.gameMode,
+    roleSlots: lobby.roleSlots,
     ...(lobby.gameId && { gameId: lobby.gameId }),
   };
 }

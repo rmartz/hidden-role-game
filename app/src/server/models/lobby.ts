@@ -1,3 +1,5 @@
+import type { GameMode, RoleSlot } from "@/lib/models";
+
 export interface PublicLobbyPlayer {
   id: string;
   name: string;
@@ -7,6 +9,8 @@ export interface PublicLobby {
   id: string;
   ownerPlayerId: string;
   players: PublicLobbyPlayer[];
+  gameMode: GameMode;
+  roleSlots: RoleSlot[];
   gameId?: string;
 }
 
