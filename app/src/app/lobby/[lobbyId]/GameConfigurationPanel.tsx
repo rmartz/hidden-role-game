@@ -1,49 +1,76 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GameMode } from "@/lib/models";
-import type { RoleDefinition } from "@/lib/models";
-import { GAME_MODE_NAMES } from "@/lib/game-modes";
-import type { GameConfig, RoleSlot } from "@/server/models";
+import { GAME_MODE_NAMES, GAME_MODE_ROLES } from "@/lib/game-modes";
+import type {
+  GameConfig,
+  RoleSlot,
+  UpdateLobbyConfigRequest,
+} from "@/server/models";
 import RoleConfig from "./RoleConfig";
 
 interface ReadOnlyProps {
   config: GameConfig;
-  roleDefinitions: RoleDefinition[];
   playerCount: number;
   readOnly: true;
 }
 
 interface EditableProps {
   config: GameConfig;
-  roleDefinitions: RoleDefinition[];
   playerCount: number;
   readOnly: false;
-  selectedGameMode: GameMode;
   isPending: boolean;
-  onGameModeChange: (mode: GameMode) => void;
-  onShowConfigChange: (value: boolean) => void;
-  onShowRolesInPlayChange: (value: boolean) => void;
-  onRoleSlotsChange: (roleSlots: RoleSlot[]) => void;
-  onStartGame: (roleSlots: RoleSlot[]) => void;
+  onConfigChange: (config: UpdateLobbyConfigRequest) => void;
+  onStartGame: (roleSlots: RoleSlot[], gameMode: GameMode) => void;
 }
 
 type Props = ReadOnlyProps | EditableProps;
 
 export default function GameConfigurationPanel(props: Props) {
-  const { config, roleDefinitions, playerCount, readOnly } = props;
+  const { config, playerCount, readOnly } = props;
 
+  const [selectedGameMode, setSelectedGameMode] = useState<GameMode>(
+    config.gameMode,
+  );
+  const [showConfigToPlayers, setShowConfigToPlayers] = useState(
+    config.showConfigToPlayers,
+  );
+  const [showRolesInPlay, setShowRolesInPlay] = useState(
+    config.showRolesInPlay,
+  );
   const [currentRoleSlots, setCurrentRoleSlots] = useState<RoleSlot[]>(
     config.roleSlots ?? [],
   );
 
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (readOnly) return;
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    const timer = setTimeout(() => {
+      props.onConfigChange({
+        gameMode: selectedGameMode,
+        showConfigToPlayers,
+        showRolesInPlay,
+        roleSlots: currentRoleSlots,
+      });
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [
+    selectedGameMode,
+    showConfigToPlayers,
+    showRolesInPlay,
+    currentRoleSlots,
+  ]);
+
+  const roleDefinitions =
+    GAME_MODE_ROLES[readOnly ? config.gameMode : selectedGameMode];
   const totalSlots = currentRoleSlots.reduce((sum, s) => sum + s.count, 0);
   const isValid = totalSlots === playerCount;
-
-  function handleRoleSlotsChange(roleSlots: RoleSlot[]) {
-    setCurrentRoleSlots(roleSlots);
-    if (!readOnly) props.onRoleSlotsChange(roleSlots);
-  }
 
   return (
     <div style={{ marginTop: "20px" }}>
@@ -53,8 +80,11 @@ export default function GameConfigurationPanel(props: Props) {
         <label>
           Game Mode:{" "}
           <select
-            value={props.selectedGameMode}
-            onChange={(e) => props.onGameModeChange(e.target.value as GameMode)}
+            value={selectedGameMode}
+            onChange={(e) => {
+              setSelectedGameMode(e.target.value as GameMode);
+              setCurrentRoleSlots([]);
+            }}
           >
             {Object.values(GameMode).map((mode) => (
               <option key={mode} value={mode}>
@@ -76,12 +106,12 @@ export default function GameConfigurationPanel(props: Props) {
         <label>
           <input
             type="checkbox"
-            checked={config.showConfigToPlayers}
+            checked={showConfigToPlayers}
             disabled={readOnly || props.isPending}
             onChange={
               readOnly
                 ? undefined
-                : (e) => props.onShowConfigChange(e.target.checked)
+                : (e) => setShowConfigToPlayers(e.target.checked)
             }
           />{" "}
           Show game configuration to all players
@@ -89,12 +119,10 @@ export default function GameConfigurationPanel(props: Props) {
         <label>
           <input
             type="checkbox"
-            checked={config.showRolesInPlay}
+            checked={showRolesInPlay}
             disabled={readOnly || props.isPending}
             onChange={
-              readOnly
-                ? undefined
-                : (e) => props.onShowRolesInPlayChange(e.target.checked)
+              readOnly ? undefined : (e) => setShowRolesInPlay(e.target.checked)
             }
           />{" "}
           Show roles in play when game starts
@@ -115,10 +143,12 @@ export default function GameConfigurationPanel(props: Props) {
             playerCount={playerCount}
             readOnly={false}
             disabled={props.isPending}
-            onRoleSlotsChange={handleRoleSlotsChange}
+            onRoleSlotsChange={setCurrentRoleSlots}
           />
           <button
-            onClick={() => props.onStartGame(currentRoleSlots)}
+            onClick={() =>
+              props.onStartGame(currentRoleSlots, selectedGameMode)
+            }
             disabled={props.isPending || !isValid}
           >
             Start Game

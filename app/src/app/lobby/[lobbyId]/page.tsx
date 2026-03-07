@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -11,8 +11,7 @@ import {
   updateLobbyConfig,
   getPlayerId,
 } from "@/lib/api";
-import { GameMode } from "@/lib/models";
-import { GAME_MODE_ROLES } from "@/lib/game-modes";
+import type { GameMode } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
 import JoinPrompt from "./JoinPrompt";
 import PlayerList from "./PlayerList";
@@ -22,9 +21,6 @@ export default function LobbyPage() {
   const { lobbyId } = useParams<{ lobbyId: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [selectedGameMode, setSelectedGameMode] = useState<GameMode>(
-    GameMode.SecretVillain,
-  );
 
   const fetchLobby = useQuery({
     queryKey: ["lobby", lobbyId],
@@ -75,8 +71,13 @@ export default function LobbyPage() {
   });
 
   const startGameMutation = useMutation({
-    mutationFn: (roleSlots: RoleSlot[]) =>
-      startGame(lobbyId, roleSlots, selectedGameMode),
+    mutationFn: ({
+      roleSlots,
+      gameMode,
+    }: {
+      roleSlots: RoleSlot[];
+      gameMode: GameMode;
+    }) => startGame(lobbyId, roleSlots, gameMode),
     onSuccess: (response) => {
       if (response.status === "error") return;
       queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
@@ -137,33 +138,20 @@ export default function LobbyPage() {
         (isOwner || fetchLobby.data.config.showConfigToPlayers) &&
         (isOwner ? (
           <GameConfigurationPanel
-            key={selectedGameMode}
             config={fetchLobby.data.config}
-            roleDefinitions={GAME_MODE_ROLES[selectedGameMode]}
             playerCount={fetchLobby.data.players.length}
             readOnly={false}
-            selectedGameMode={selectedGameMode}
             isPending={
               updateConfigMutation.isPending || startGameMutation.isPending
             }
-            onGameModeChange={setSelectedGameMode}
-            onShowConfigChange={(value) =>
-              updateConfigMutation.mutate({ showConfigToPlayers: value })
-            }
-            onShowRolesInPlayChange={(value) =>
-              updateConfigMutation.mutate({ showRolesInPlay: value })
-            }
-            onRoleSlotsChange={(roleSlots: RoleSlot[]) =>
-              updateConfigMutation.mutate({ roleSlots })
-            }
-            onStartGame={(roleSlots: RoleSlot[]) =>
-              startGameMutation.mutate(roleSlots)
+            onConfigChange={(config) => updateConfigMutation.mutate(config)}
+            onStartGame={(roleSlots, gameMode) =>
+              startGameMutation.mutate({ roleSlots, gameMode })
             }
           />
         ) : (
           <GameConfigurationPanel
             config={fetchLobby.data.config}
-            roleDefinitions={GAME_MODE_ROLES[fetchLobby.data.config.gameMode]}
             playerCount={fetchLobby.data.players.length}
             readOnly={true}
           />
