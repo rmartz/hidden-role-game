@@ -166,9 +166,7 @@ export default function LobbyPage() {
             config={fetchLobby.data.config}
             playerCount={fetchLobby.data.players.length}
             readOnly={false}
-            isPending={
-              updateConfigMutation.isPending || startGameMutation.isPending
-            }
+            isPending={startGameMutation.isPending}
             onConfigChange={(config) => {
               updateConfigMutation.mutate(config);
             }}
@@ -192,12 +190,7 @@ export default function LobbyPage() {
           showRemovePlayer={isOwner}
           showMakeOwner={isOwner}
           isFetching={fetchLobby.isFetching}
-          disabled={
-            removeMutation.isPending ||
-            transferOwnerMutation.isPending ||
-            startGameMutation.isPending ||
-            gameId !== undefined
-          }
+          disabled={startGameMutation.isPending || gameId !== undefined}
           onRefetch={handleRefetch}
           onRemovePlayer={(playerId: string) => {
             removeMutation.mutate(playerId);
