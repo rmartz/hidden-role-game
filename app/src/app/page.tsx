@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
@@ -8,6 +8,7 @@ import {
   joinLobby,
   getLobby,
   getLobbyId,
+  getPlayerId,
   clearSession,
 } from "@/lib/api";
 import { ServerResponseStatus } from "@/server/models";
@@ -18,6 +19,7 @@ export default function Home() {
   const [lobbyIdInput, setLobbyIdInput] = useState("");
 
   const storedLobbyId = getLobbyId();
+  const myPlayerId = getPlayerId();
 
   const storedLobbyQuery = useQuery({
     queryKey: ["stored-lobby", storedLobbyId],
@@ -33,6 +35,15 @@ export default function Home() {
     },
     enabled: !!storedLobbyId,
   });
+
+  const storedPlayerName =
+    storedLobbyQuery.data?.players.find((p) => p.id === myPlayerId)?.name ?? "";
+
+  useEffect(() => {
+    if (storedPlayerName && !playerName) {
+      setPlayerName(storedPlayerName);
+    }
+  }, [storedPlayerName, playerName]);
 
   const createMutation = useMutation({
     mutationFn: async () => {
@@ -60,7 +71,12 @@ export default function Home() {
 
   const error = createMutation.error?.message ?? joinMutation.error?.message;
   const loading = createMutation.isPending || joinMutation.isPending;
-  const activeLobby = storedLobbyQuery.data;
+  // Hide the active lobby panel once a create/join is in progress to avoid
+  // it flashing into view after localStorage is written but before navigation.
+  const activeLobby =
+    loading || createMutation.isSuccess || joinMutation.isSuccess
+      ? null
+      : storedLobbyQuery.data;
 
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
