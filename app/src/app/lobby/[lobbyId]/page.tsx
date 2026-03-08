@@ -11,7 +11,6 @@ import {
   updateLobbyConfig,
   getPlayerId,
   getLobbyId,
-  clearSession,
 } from "@/lib/api";
 import { ServerResponseStatus } from "@/server/models";
 import type { GameMode } from "@/lib/models";
@@ -19,7 +18,6 @@ import type { RoleSlot } from "@/server/models";
 import JoinPrompt from "./JoinPrompt";
 import PlayerList from "./PlayerList";
 import GameConfigurationPanel from "./GameConfigurationPanel";
-import LobbyConflictResolution from "./LobbyConflictResolution";
 
 export default function LobbyPage() {
   const { lobbyId } = useParams<{ lobbyId: string }>();
@@ -43,42 +41,31 @@ export default function LobbyPage() {
       if (query.state.data.gameId) return false;
       return 3_000;
     },
+    enabled: !hasDifferentLobby,
     retry: false,
-  });
-
-  const conflictLobbyQuery = useQuery({
-    queryKey: ["conflict-lobby", storedLobbyId],
-    queryFn: async () => {
-      if (!storedLobbyId) return null;
-      const { data, httpStatus } = await getLobby(storedLobbyId);
-      if (httpStatus === 404 || httpStatus === 403) {
-        clearSession();
-        return null;
-      }
-      if (data.status === ServerResponseStatus.Error) return null;
-      return data.data;
-    },
-    enabled: hasDifferentLobby,
   });
 
   const myPlayerId = getPlayerId();
   const isOwner =
     !!fetchLobby.data && fetchLobby.data.ownerPlayerId === myPlayerId;
   const gameId = fetchLobby.data?.gameId;
-  const conflictLobby = conflictLobbyQuery.data ?? null;
+
+  useEffect(() => {
+    if (hasDifferentLobby) router.replace(`/lobby/${lobbyId}/conflict`);
+  }, [hasDifferentLobby, lobbyId, router]);
 
   useEffect(() => {
     if (gameId) router.push(`/game/${gameId}`);
   }, [gameId, router]);
 
   useEffect(() => {
-    if (fetchLobby.error?.message === "404") {
+    if (
+      fetchLobby.error?.message === "404" ||
+      fetchLobby.error?.message === "403"
+    ) {
       router.push("/");
     }
-    if (fetchLobby.error?.message === "403" && !hasDifferentLobby) {
-      router.push("/");
-    }
-  }, [fetchLobby.error, router, hasDifferentLobby]);
+  }, [fetchLobby.error, router]);
 
   const removeMutation = useMutation({
     mutationFn: (targetPlayerId: string) =>
@@ -125,23 +112,11 @@ export default function LobbyPage() {
     },
   });
 
-  const leavePreviousMutation = useMutation({
-    mutationFn: async () => {
-      if (!storedLobbyId || !myPlayerId) return;
-      await removePlayer(storedLobbyId, myPlayerId);
-      clearSession();
-    },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({
-        queryKey: ["conflict-lobby", storedLobbyId],
-      });
-      void fetchLobby.refetch();
-    },
-  });
-
   function handleRefetch() {
     void fetchLobby.refetch();
   }
+
+  if (hasDifferentLobby) return null;
 
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
@@ -149,17 +124,6 @@ export default function LobbyPage() {
       <p>
         Lobby: <a href={`/lobby/${lobbyId}`}>{lobbyId}</a>
       </p>
-
-      {conflictLobby && storedLobbyId && (
-        <LobbyConflictResolution
-          conflictLobby={conflictLobby}
-          conflictLobbyId={storedLobbyId}
-          isLeaving={leavePreviousMutation.isPending}
-          onLeave={() => {
-            leavePreviousMutation.mutate();
-          }}
-        />
-      )}
 
       {fetchLobby.isLoading && <p>Loading...</p>}
 
@@ -171,7 +135,7 @@ export default function LobbyPage() {
           </div>
         )}
 
-      {!fetchLobby.isLoading && fetchLobby.data === null && !conflictLobby && (
+      {!fetchLobby.isLoading && fetchLobby.data === null && (
         <JoinPrompt lobbyId={lobbyId} />
       )}
 
