@@ -5,7 +5,7 @@ import { lobbyService } from "@/services/LobbyService";
 import { toPublicLobby } from "@/server/lobby-helpers";
 
 export async function POST(request: Request): Promise<Response> {
-  const body: CreateLobbyRequest = await request.json();
+  const body = (await request.json()) as CreateLobbyRequest;
   const lobbyId = randomUUID();
 
   if (lobbyService.getLobby(lobbyId)) {

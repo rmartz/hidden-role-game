@@ -10,7 +10,7 @@ export async function POST(
   { params }: { params: Promise<{ lobbyId: string }> },
 ): Promise<Response> {
   const { lobbyId } = await params;
-  const body: JoinLobbyRequest = await request.json();
+  const body = (await request.json()) as JoinLobbyRequest;
   const lobby = lobbyService.getLobby(lobbyId);
 
   if (!lobby) {

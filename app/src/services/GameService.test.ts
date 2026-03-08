@@ -65,7 +65,7 @@ describe("GameService.getRolesInPlay", () => {
     const result = service.getRolesInPlay(game);
 
     expect(result).toHaveLength(1);
-    expect(result[0].id).toBe("good");
+    expect(result[0]!.id).toBe("good");
   });
 
   it("deduplicates even when all players share the same role", () => {
@@ -78,7 +78,7 @@ describe("GameService.getRolesInPlay", () => {
     const result = service.getRolesInPlay(game);
 
     expect(result).toHaveLength(1);
-    expect(result[0].id).toBe("good");
+    expect(result[0]!.id).toBe("good");
   });
 
   it("skips assignments whose role definition id is not found", () => {
@@ -90,6 +90,6 @@ describe("GameService.getRolesInPlay", () => {
     const result = service.getRolesInPlay(game);
 
     expect(result).toHaveLength(1);
-    expect(result[0].id).toBe("good");
+    expect(result[0]!.id).toBe("good");
   });
 });

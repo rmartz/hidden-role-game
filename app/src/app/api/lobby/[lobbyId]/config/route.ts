@@ -19,7 +19,7 @@ export async function PUT(
   });
   if (auth instanceof Response) return auth;
 
-  const body: UpdateLobbyConfigRequest = await request.json();
+  const body = (await request.json()) as UpdateLobbyConfigRequest;
 
   if (
     body.gameMode !== undefined &&
