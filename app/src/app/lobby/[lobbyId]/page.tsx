@@ -10,6 +10,8 @@ import {
   startGame,
   updateLobbyConfig,
   getPlayerId,
+  getLobbyId,
+  clearSession,
 } from "@/lib/api";
 import { ServerResponseStatus } from "@/server/models";
 import type { GameMode } from "@/lib/models";
@@ -22,6 +24,9 @@ export default function LobbyPage() {
   const { lobbyId } = useParams<{ lobbyId: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
+
+  const storedLobbyId = getLobbyId();
+  const hasDifferentLobby = storedLobbyId !== null && storedLobbyId !== lobbyId;
 
   const fetchLobby = useQuery({
     queryKey: ["lobby", lobbyId],
@@ -40,10 +45,26 @@ export default function LobbyPage() {
     retry: false,
   });
 
+  const conflictLobbyQuery = useQuery({
+    queryKey: ["conflict-lobby", storedLobbyId],
+    queryFn: async () => {
+      if (!storedLobbyId) return null;
+      const { data, httpStatus } = await getLobby(storedLobbyId);
+      if (httpStatus === 404 || httpStatus === 403) {
+        clearSession();
+        return null;
+      }
+      if (data.status === ServerResponseStatus.Error) return null;
+      return data.data;
+    },
+    enabled: hasDifferentLobby,
+  });
+
   const myPlayerId = getPlayerId();
   const isOwner =
     !!fetchLobby.data && fetchLobby.data.ownerPlayerId === myPlayerId;
   const gameId = fetchLobby.data?.gameId;
+  const conflictLobby = conflictLobbyQuery.data ?? null;
 
   useEffect(() => {
     if (gameId) router.push(`/game/${gameId}`);
@@ -103,6 +124,20 @@ export default function LobbyPage() {
     },
   });
 
+  const leavePreviousMutation = useMutation({
+    mutationFn: async () => {
+      if (!storedLobbyId || !myPlayerId) return;
+      await removePlayer(storedLobbyId, myPlayerId);
+      clearSession();
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: ["conflict-lobby", storedLobbyId],
+      });
+      void fetchLobby.refetch();
+    },
+  });
+
   function handleRefetch() {
     void fetchLobby.refetch();
   }
@@ -114,6 +149,46 @@ export default function LobbyPage() {
         Lobby: <a href={`/lobby/${lobbyId}`}>{lobbyId}</a>
       </p>
 
+      {conflictLobby && (
+        <div
+          style={{
+            marginBottom: "20px",
+            padding: "10px",
+            border: "1px solid #ccc",
+          }}
+        >
+          {conflictLobby.gameId ? (
+            <p>You have an active game in lobby {storedLobbyId}.</p>
+          ) : (
+            <p>You are already in lobby {storedLobbyId}.</p>
+          )}
+          <div style={{ display: "flex", gap: "10px" }}>
+            <button
+              onClick={() => {
+                const conflictGameId = conflictLobby.gameId;
+                if (conflictGameId) {
+                  router.push(`/game/${conflictGameId}`);
+                } else if (storedLobbyId) {
+                  router.push(`/lobby/${storedLobbyId}`);
+                }
+              }}
+            >
+              {conflictLobby.gameId ? "Rejoin Game" : "Rejoin Previous Lobby"}
+            </button>
+            <button
+              onClick={() => {
+                leavePreviousMutation.mutate();
+              }}
+              disabled={leavePreviousMutation.isPending}
+            >
+              {leavePreviousMutation.isPending
+                ? "Leaving..."
+                : "Leave Previous Lobby and Stay Here"}
+            </button>
+          </div>
+        </div>
+      )}
+
       {fetchLobby.isLoading && <p>Loading...</p>}
 
       {fetchLobby.error &&
@@ -124,7 +199,7 @@ export default function LobbyPage() {
           </div>
         )}
 
-      {!fetchLobby.isLoading && fetchLobby.data === null && (
+      {!fetchLobby.isLoading && fetchLobby.data === null && !conflictLobby && (
         <JoinPrompt lobbyId={lobbyId} />
       )}
 
