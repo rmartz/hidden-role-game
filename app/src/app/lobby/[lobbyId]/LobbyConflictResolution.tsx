@@ -6,15 +6,19 @@ import type { PublicLobby } from "@/server/models";
 interface LobbyConflictResolutionProps {
   conflictLobby: PublicLobby;
   conflictLobbyId: string;
-  isLeaving: boolean;
-  onLeave: () => void;
+  playerName: string;
+  onPlayerNameChange: (name: string) => void;
+  isJoining: boolean;
+  onJoin: () => void;
 }
 
 export default function LobbyConflictResolution({
   conflictLobby,
   conflictLobbyId,
-  isLeaving,
-  onLeave,
+  playerName,
+  onPlayerNameChange,
+  isJoining,
+  onJoin,
 }: LobbyConflictResolutionProps) {
   const router = useRouter();
 
@@ -42,11 +46,25 @@ export default function LobbyConflictResolution({
             }
           }}
         >
-          {conflictLobby.gameId ? "Rejoin Game" : "Rejoin Previous Lobby"}
+          {conflictLobby.gameId ? "Rejoin Game" : "Stay In Previous Lobby"}
         </button>
-        <button onClick={onLeave} disabled={isLeaving}>
-          {isLeaving ? "Leaving..." : "Leave Previous Lobby and Stay Here"}
-        </button>
+        <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+          <input
+            type="text"
+            value={playerName}
+            onChange={(e) => {
+              onPlayerNameChange(e.target.value);
+            }}
+            placeholder="Your name"
+            disabled={isJoining}
+          />
+          <button
+            onClick={onJoin}
+            disabled={isJoining || playerName.trim() === ""}
+          >
+            {isJoining ? "Joining..." : "Leave and Join This Lobby"}
+          </button>
+        </div>
       </div>
     </div>
   );

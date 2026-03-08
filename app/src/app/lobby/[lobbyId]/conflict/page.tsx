@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import {
   getLobby,
   removePlayer,
+  joinLobby,
   getPlayerId,
   getLobbyId,
   clearSession,
@@ -35,6 +36,17 @@ export default function LobbyConflictPage() {
     enabled: !!storedLobbyId,
   });
 
+  const defaultName =
+    conflictLobbyQuery.data?.players.find((p) => p.id === myPlayerId)?.name ??
+    "";
+  const [playerName, setPlayerName] = useState("");
+
+  useEffect(() => {
+    if (defaultName && !playerName) {
+      setPlayerName(defaultName);
+    }
+  }, [defaultName, playerName]);
+
   useEffect(() => {
     if (!storedLobbyId) {
       router.replace(`/lobby/${lobbyId}`);
@@ -47,11 +59,12 @@ export default function LobbyConflictPage() {
     }
   }, [conflictLobbyQuery.isLoading, conflictLobbyQuery.data, lobbyId, router]);
 
-  const leavePreviousMutation = useMutation({
+  const joinMutation = useMutation({
     mutationFn: async () => {
       if (!storedLobbyId || !myPlayerId) return;
       await removePlayer(storedLobbyId, myPlayerId);
       clearSession();
+      await joinLobby(lobbyId, playerName);
     },
     onSuccess: () => {
       router.replace(`/lobby/${lobbyId}`);
@@ -72,9 +85,11 @@ export default function LobbyConflictPage() {
       <LobbyConflictResolution
         conflictLobby={conflictLobbyQuery.data}
         conflictLobbyId={storedLobbyId}
-        isLeaving={leavePreviousMutation.isPending}
-        onLeave={() => {
-          leavePreviousMutation.mutate();
+        playerName={playerName}
+        onPlayerNameChange={setPlayerName}
+        isJoining={joinMutation.isPending}
+        onJoin={() => {
+          joinMutation.mutate();
         }}
       />
     </div>
