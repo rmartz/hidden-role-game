@@ -59,10 +59,8 @@ export async function getLobby(
   const headers: HeadersInit = {};
   if (sessionId) headers["x-session-id"] = sessionId;
   const response = await fetch(`/api/lobby/${lobbyId}`, { headers });
-  return {
-    data: (await response.json()) as ServerResponse<PublicLobby>,
-    httpStatus: response.status,
-  };
+  const data = (await response.json()) as ServerResponse<PublicLobby>;
+  return { data, httpStatus: response.status };
 }
 
 export async function joinLobby(
@@ -119,10 +117,8 @@ export async function getGameState(
   const headers: HeadersInit = {};
   if (sessionId) headers["x-session-id"] = sessionId;
   const response = await fetch(`/api/game/${gameId}`, { headers });
-  return {
-    data: (await response.json()) as ServerResponse<PlayerGameState>,
-    httpStatus: response.status,
-  };
+  const data = (await response.json()) as ServerResponse<PlayerGameState>;
+  return { data, httpStatus: response.status };
 }
 
 export async function updateLobbyConfig(
