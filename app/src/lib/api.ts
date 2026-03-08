@@ -11,6 +11,7 @@ import { ServerResponseStatus } from "@/server/models";
 
 const SESSION_KEY = "x-session-id";
 const PLAYER_ID_KEY = "player-id";
+const LOBBY_ID_KEY = "lobby-id";
 
 function getSessionId(): string | null {
   if (typeof window === "undefined") return null;
@@ -30,9 +31,29 @@ function savePlayerId(playerId: string): void {
   localStorage.setItem(PLAYER_ID_KEY, playerId);
 }
 
-function saveJoinData(sessionId: string, playerId: string): void {
+export function getLobbyId(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(LOBBY_ID_KEY);
+}
+
+function saveLobbyId(lobbyId: string): void {
+  localStorage.setItem(LOBBY_ID_KEY, lobbyId);
+}
+
+export function clearSession(): void {
+  localStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(PLAYER_ID_KEY);
+  localStorage.removeItem(LOBBY_ID_KEY);
+}
+
+function saveJoinData(
+  sessionId: string,
+  playerId: string,
+  lobbyId: string,
+): void {
   saveSessionId(sessionId);
   savePlayerId(playerId);
+  saveLobbyId(lobbyId);
 }
 
 export type { PublicLobbyPlayer } from "@/server/models";
@@ -47,7 +68,7 @@ export async function createLobby(
   });
   const data = (await response.json()) as ServerResponse<LobbyJoinResponse>;
   if (data.status === ServerResponseStatus.Success) {
-    saveJoinData(data.data.sessionId, data.data.playerId);
+    saveJoinData(data.data.sessionId, data.data.playerId, data.data.lobby.id);
   }
   return data;
 }
@@ -74,7 +95,7 @@ export async function joinLobby(
   });
   const data = (await response.json()) as ServerResponse<LobbyJoinResponse>;
   if (data.status === ServerResponseStatus.Success) {
-    saveJoinData(data.data.sessionId, data.data.playerId);
+    saveJoinData(data.data.sessionId, data.data.playerId, data.data.lobby.id);
   }
   return data;
 }

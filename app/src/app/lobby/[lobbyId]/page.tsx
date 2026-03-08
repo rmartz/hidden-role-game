@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -10,6 +10,7 @@ import {
   startGame,
   updateLobbyConfig,
   getPlayerId,
+  getLobbyId,
 } from "@/lib/api";
 import { ServerResponseStatus } from "@/server/models";
 import type { GameMode } from "@/lib/models";
@@ -22,6 +23,19 @@ export default function LobbyPage() {
   const { lobbyId } = useParams<{ lobbyId: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
+
+  // undefined = not yet read from localStorage (avoid SSR mismatch)
+  const [storedLobbyId, setStoredLobbyId] = useState<string | null | undefined>(
+    undefined,
+  );
+  useEffect(() => {
+    setStoredLobbyId(getLobbyId());
+  }, []);
+
+  const hasDifferentLobby =
+    storedLobbyId !== undefined &&
+    storedLobbyId !== null &&
+    storedLobbyId !== lobbyId;
 
   const fetchLobby = useQuery({
     queryKey: ["lobby", lobbyId],
@@ -37,6 +51,7 @@ export default function LobbyPage() {
       if (query.state.data.gameId) return false;
       return 3_000;
     },
+    enabled: storedLobbyId !== undefined && !hasDifferentLobby,
     retry: false,
   });
 
@@ -45,10 +60,17 @@ export default function LobbyPage() {
     !!fetchLobby.data && fetchLobby.data.ownerPlayerId === myPlayerId;
   const gameId = fetchLobby.data?.gameId;
 
+  // If the user has a session for a different lobby, send them to the conflict resolution page.
+  useEffect(() => {
+    if (hasDifferentLobby) router.replace(`/lobby/${lobbyId}/conflict`);
+  }, [hasDifferentLobby, lobbyId, router]);
+
+  // Once the game starts, redirect all players to the game page.
   useEffect(() => {
     if (gameId) router.push(`/game/${gameId}`);
   }, [gameId, router]);
 
+  // If the lobby doesn't exist or the session is invalid, return to the home page.
   useEffect(() => {
     if (
       fetchLobby.error?.message === "404" ||
@@ -106,6 +128,8 @@ export default function LobbyPage() {
   function handleRefetch() {
     void fetchLobby.refetch();
   }
+
+  if (storedLobbyId === undefined || hasDifferentLobby) return null;
 
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
