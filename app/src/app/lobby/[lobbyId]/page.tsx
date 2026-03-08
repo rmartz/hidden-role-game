@@ -47,7 +47,7 @@ export default function LobbyPage() {
 
   useEffect(() => {
     if (gameId) router.push(`/game/${gameId}`);
-  }, [gameId]);
+  }, [gameId, router]);
 
   useEffect(() => {
     if (
