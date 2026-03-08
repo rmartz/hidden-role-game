@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
@@ -8,6 +8,7 @@ import {
   joinLobby,
   getLobby,
   getLobbyId,
+  getPlayerId,
   clearSession,
 } from "@/lib/api";
 import { ServerResponseStatus } from "@/server/models";
@@ -18,6 +19,7 @@ export default function Home() {
   const [lobbyIdInput, setLobbyIdInput] = useState("");
 
   const storedLobbyId = getLobbyId();
+  const myPlayerId = getPlayerId();
 
   const storedLobbyQuery = useQuery({
     queryKey: ["stored-lobby", storedLobbyId],
@@ -33,6 +35,15 @@ export default function Home() {
     },
     enabled: !!storedLobbyId,
   });
+
+  const storedPlayerName =
+    storedLobbyQuery.data?.players.find((p) => p.id === myPlayerId)?.name ?? "";
+
+  useEffect(() => {
+    if (storedPlayerName && !playerName) {
+      setPlayerName(storedPlayerName);
+    }
+  }, [storedPlayerName, playerName]);
 
   const createMutation = useMutation({
     mutationFn: async () => {
