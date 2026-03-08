@@ -1,6 +1,7 @@
 import { ServerResponseStatus } from "@/server/models";
 import type { PlayerGameState, PublicRoleInfo } from "@/server/models";
 import { gameService } from "@/services/GameService";
+import { authenticateGame, errorResponse } from "@/server/api-helpers";
 
 export async function GET(
   request: Request,
@@ -8,22 +9,10 @@ export async function GET(
 ): Promise<Response> {
   const { gameId } = await params;
   const sessionId = request.headers.get("x-session-id") ?? undefined;
-  if (!sessionId) {
-    return Response.json(
-      { status: ServerResponseStatus.Error, error: "No session" },
-      { status: 401 },
-    );
-  }
 
-  const game = gameService.getGame(gameId);
-  const caller = game?.players.find((p) => p.sessionId === sessionId);
-
-  if (!game || !caller) {
-    return Response.json(
-      { status: ServerResponseStatus.Error, error: "Forbidden" },
-      { status: 403 },
-    );
-  }
+  const auth = authenticateGame(gameId, sessionId);
+  if (auth instanceof Response) return auth;
+  const { game, caller } = auth;
 
   const roleDefs = gameService.getRoleDefinitions(game.gameMode);
 
@@ -31,23 +20,14 @@ export async function GET(
     (r) => r.playerId === caller.id,
   );
   if (!myAssignment) {
-    return Response.json(
-      { status: ServerResponseStatus.Error, error: "Role not assigned" },
-      { status: 500 },
-    );
+    return errorResponse("Role not assigned", 500);
   }
 
   const myRoleDef = roleDefs.find(
     (r) => r.id === myAssignment.roleDefinitionId,
   );
   if (!myRoleDef) {
-    return Response.json(
-      {
-        status: ServerResponseStatus.Error,
-        error: "Role definition not found",
-      },
-      { status: 500 },
-    );
+    return errorResponse("Role definition not found", 500);
   }
 
   const myRole: PublicRoleInfo = {
@@ -70,11 +50,16 @@ export async function GET(
     ];
   });
 
+  const rolesInPlay: PublicRoleInfo[] | null = game.showRolesInPlay
+    ? gameService.getRolesInPlay(game)
+    : null;
+
   const gameState: PlayerGameState = {
     status: game.status,
     players: game.players.map((p) => ({ id: p.id, name: p.name })),
     myRole,
     visibleTeammates,
+    rolesInPlay,
   };
 
   return Response.json({

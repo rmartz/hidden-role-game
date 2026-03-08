@@ -33,11 +33,17 @@ export async function POST(request: Request): Promise<Response> {
     players: [owner],
     gameMode: defaultGameMode,
     roleSlots: gameService.defaultRoleCount(defaultGameMode, 1),
+    showConfigToPlayers: false,
+    showRolesInPlay: false,
   };
 
   lobbyService.addLobby(lobby);
   return Response.json({
     status: ServerResponseStatus.Success,
-    data: { lobby: toPublicLobby(lobby), sessionId, playerId: owner.id },
+    data: {
+      lobby: toPublicLobby(lobby, sessionId),
+      sessionId,
+      playerId: owner.id,
+    },
   });
 }

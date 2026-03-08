@@ -66,6 +66,19 @@ export default function GamePage() {
             </div>
           )}
 
+          {gameState.rolesInPlay && gameState.rolesInPlay.length > 0 && (
+            <div style={{ marginBottom: "20px" }}>
+              <h2>Roles In Play</h2>
+              <ul>
+                {gameState.rolesInPlay.map((r) => (
+                  <li key={r.id}>
+                    {r.name} — {r.team}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <div>
             <h2>All Players</h2>
             <ul>

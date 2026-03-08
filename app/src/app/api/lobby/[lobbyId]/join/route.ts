@@ -5,6 +5,7 @@ import { lobbyService } from "@/services/LobbyService";
 import { gameService } from "@/services/GameService";
 import { adjustRoleSlots } from "@/server/adjustRoleSlots";
 import { toPublicLobby } from "@/server/lobby-helpers";
+import { errorResponse } from "@/server/api-helpers";
 
 export async function POST(
   request: Request,
@@ -15,10 +16,7 @@ export async function POST(
   const lobby = lobbyService.getLobby(lobbyId);
 
   if (!lobby) {
-    return Response.json(
-      { status: ServerResponseStatus.Error, error: "Lobby not found" },
-      { status: 404 },
-    );
+    return errorResponse("Lobby not found", 404);
   }
 
   const sessionId = randomUUID();
@@ -37,7 +35,11 @@ export async function POST(
   return Response.json(
     {
       status: ServerResponseStatus.Success,
-      data: { lobby: toPublicLobby(lobby), sessionId, playerId: newPlayer.id },
+      data: {
+        lobby: toPublicLobby(lobby, sessionId),
+        sessionId,
+        playerId: newPlayer.id,
+      },
     },
     { status: 201 },
   );

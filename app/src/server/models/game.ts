@@ -25,4 +25,5 @@ export interface PlayerGameState {
   players: PublicLobbyPlayer[];
   myRole: PublicRoleInfo;
   visibleTeammates: VisibleTeammate[];
+  rolesInPlay: PublicRoleInfo[] | null;
 }

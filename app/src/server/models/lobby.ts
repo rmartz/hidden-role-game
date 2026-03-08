@@ -5,12 +5,18 @@ export interface PublicLobbyPlayer {
   name: string;
 }
 
+export interface GameConfig {
+  gameMode: GameMode;
+  showConfigToPlayers: boolean;
+  showRolesInPlay: boolean;
+  roleSlots?: RoleSlot[];
+}
+
 export interface PublicLobby {
   id: string;
   ownerPlayerId: string;
   players: PublicLobbyPlayer[];
-  gameMode: GameMode;
-  roleSlots: RoleSlot[];
+  config: GameConfig;
   gameId?: string;
 }
 
@@ -20,6 +26,13 @@ export interface CreateLobbyRequest {
 
 export interface JoinLobbyRequest {
   playerName: string;
+}
+
+export interface UpdateLobbyConfigRequest {
+  showConfigToPlayers?: boolean;
+  showRolesInPlay?: boolean;
+  gameMode?: GameMode;
+  roleSlots?: RoleSlot[];
 }
 
 export interface LobbyJoinResponse {
