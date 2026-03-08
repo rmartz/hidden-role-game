@@ -21,6 +21,17 @@ export default function LobbyConflictPage() {
   const storedLobbyId = getLobbyId();
   const myPlayerId = getPlayerId();
 
+  const targetLobbyQuery = useQuery({
+    queryKey: ["target-lobby-exists", lobbyId],
+    queryFn: async () => {
+      const { httpStatus } = await getLobby(lobbyId);
+      // 403 means the lobby exists but the session belongs to a different lobby — expected.
+      // 404 means the lobby doesn't exist at all.
+      return httpStatus !== 404;
+    },
+    retry: false,
+  });
+
   const conflictLobbyQuery = useQuery({
     queryKey: ["conflict-lobby", storedLobbyId],
     queryFn: async () => {
@@ -46,6 +57,18 @@ export default function LobbyConflictPage() {
       setPlayerName(defaultName);
     }
   }, [defaultName, playerName]);
+
+  // If the target lobby doesn't exist, redirect to the stored lobby (or home if none).
+  useEffect(() => {
+    if (!targetLobbyQuery.isLoading && targetLobbyQuery.data === false) {
+      router.replace(storedLobbyId ? `/lobby/${storedLobbyId}` : "/");
+    }
+  }, [
+    targetLobbyQuery.isLoading,
+    targetLobbyQuery.data,
+    storedLobbyId,
+    router,
+  ]);
 
   // If there's no stored lobby ID, there's nothing to conflict with — go back to the lobby.
   useEffect(() => {
@@ -74,6 +97,7 @@ export default function LobbyConflictPage() {
   });
 
   if (
+    targetLobbyQuery.isLoading ||
     conflictLobbyQuery.isLoading ||
     !conflictLobbyQuery.data ||
     !storedLobbyId
