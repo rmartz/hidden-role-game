@@ -16,7 +16,7 @@ export async function PUT(
   });
   if (auth instanceof Response) return auth;
 
-  const { playerId } = await request.json();
+  const { playerId } = (await request.json()) as { playerId: string };
   const updated = lobbyService.transferOwner(lobbyId, playerId);
 
   if (!updated) {

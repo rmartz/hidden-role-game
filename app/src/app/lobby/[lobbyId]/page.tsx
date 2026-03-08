@@ -11,6 +11,7 @@ import {
   updateLobbyConfig,
   getPlayerId,
 } from "@/lib/api";
+import { ServerResponseStatus } from "@/server/models";
 import type { GameMode } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
 import JoinPrompt from "./JoinPrompt";
@@ -27,8 +28,8 @@ export default function LobbyPage() {
     queryFn: async () => {
       const { data, httpStatus } = await getLobby(lobbyId);
       if (httpStatus === 404 || httpStatus === 403)
-        throw new Error(`${httpStatus}`);
-      if (data.status === "error") return null;
+        throw new Error(String(httpStatus));
+      if (data.status === ServerResponseStatus.Error) return null;
       return data.data;
     },
     refetchInterval: (query) => {
@@ -61,11 +62,11 @@ export default function LobbyPage() {
     mutationFn: (targetPlayerId: string) =>
       removePlayer(lobbyId, targetPlayerId),
     onSuccess: (response, targetPlayerId) => {
-      if (response.status === "error") return;
+      if (response.status === ServerResponseStatus.Error) return;
       if (targetPlayerId === myPlayerId) {
         router.push("/");
       } else {
-        queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
+        void queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
       }
     },
   });
@@ -79,8 +80,8 @@ export default function LobbyPage() {
       gameMode: GameMode;
     }) => startGame(lobbyId, roleSlots, gameMode),
     onSuccess: (response) => {
-      if (response.status === "error") return;
-      queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
+      if (response.status === ServerResponseStatus.Error) return;
+      void queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
     },
   });
 
@@ -88,8 +89,8 @@ export default function LobbyPage() {
     mutationFn: (targetPlayerId: string) =>
       transferOwner(lobbyId, targetPlayerId),
     onSuccess: (response) => {
-      if (response.status === "error") return;
-      queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
+      if (response.status === ServerResponseStatus.Error) return;
+      void queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
     },
   });
 
@@ -97,13 +98,13 @@ export default function LobbyPage() {
     mutationFn: (config: Parameters<typeof updateLobbyConfig>[1]) =>
       updateLobbyConfig(lobbyId, config),
     onSuccess: (response) => {
-      if (response.status === "error") return;
+      if (response.status === ServerResponseStatus.Error) return;
       queryClient.setQueryData(["lobby", lobbyId], response.data.lobby);
     },
   });
 
   function handleRefetch() {
-    fetchLobby.refetch();
+    void fetchLobby.refetch();
   }
 
   return (
@@ -144,10 +145,12 @@ export default function LobbyPage() {
             isPending={
               updateConfigMutation.isPending || startGameMutation.isPending
             }
-            onConfigChange={(config) => updateConfigMutation.mutate(config)}
-            onStartGame={(roleSlots, gameMode) =>
-              startGameMutation.mutate({ roleSlots, gameMode })
-            }
+            onConfigChange={(config) => {
+              updateConfigMutation.mutate(config);
+            }}
+            onStartGame={(roleSlots, gameMode) => {
+              startGameMutation.mutate({ roleSlots, gameMode });
+            }}
           />
         ) : (
           <GameConfigurationPanel
@@ -172,10 +175,12 @@ export default function LobbyPage() {
             gameId !== undefined
           }
           onRefetch={handleRefetch}
-          onRemovePlayer={(playerId: string) => removeMutation.mutate(playerId)}
-          onTransferOwner={(playerId: string) =>
-            transferOwnerMutation.mutate(playerId)
-          }
+          onRemovePlayer={(playerId: string) => {
+            removeMutation.mutate(playerId);
+          }}
+          onTransferOwner={(playerId: string) => {
+            transferOwnerMutation.mutate(playerId);
+          }}
         />
       )}
     </div>

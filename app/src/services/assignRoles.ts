@@ -26,13 +26,17 @@ export function assignRoles(
   // permutation so every player is equally likely to receive any role.
   for (let i = roleIds.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    const tmp = roleIds[i]!;
-    roleIds[i] = roleIds[j]!;
+    const tmp = roleIds[i];
+    if (tmp === undefined || roleIds[j] === undefined)
+      throw new Error("Index out of bounds during shuffle");
+    roleIds[i] = roleIds[j];
     roleIds[j] = tmp;
   }
 
-  return players.map((p, i) => ({
-    playerId: p.id,
-    roleDefinitionId: roleIds[i]!,
-  }));
+  return players.map((p, i) => {
+    const roleDefinitionId = roleIds[i];
+    if (roleDefinitionId === undefined)
+      throw new Error(`No role for player at index ${String(i)}`);
+    return { playerId: p.id, roleDefinitionId };
+  });
 }

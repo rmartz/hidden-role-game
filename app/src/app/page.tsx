@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { createLobby, joinLobby } from "@/lib/api";
+import { ServerResponseStatus } from "@/server/models";
 
 export default function Home() {
   const router = useRouter();
@@ -13,8 +14,8 @@ export default function Home() {
   const createMutation = useMutation({
     mutationFn: async () => {
       const response = await createLobby(playerName);
-      if (response.status === "error")
-        throw new Error(response.error ?? "Failed to create lobby");
+      if (response.status === ServerResponseStatus.Error)
+        throw new Error(response.error);
       return response.data;
     },
     onSuccess: (data) => {
@@ -25,8 +26,8 @@ export default function Home() {
   const joinMutation = useMutation({
     mutationFn: async () => {
       const response = await joinLobby(lobbyIdInput, playerName);
-      if (response.status === "error")
-        throw new Error(response.error ?? "Failed to join lobby");
+      if (response.status === ServerResponseStatus.Error)
+        throw new Error(response.error);
       return response.data;
     },
     onSuccess: (data) => {
@@ -51,7 +52,9 @@ export default function Home() {
           <input
             type="text"
             value={playerName}
-            onChange={(e) => setPlayerName(e.target.value)}
+            onChange={(e) => {
+              setPlayerName(e.target.value);
+            }}
             placeholder="Enter your name"
           />
         </label>
@@ -62,20 +65,26 @@ export default function Home() {
           <input
             type="text"
             value={lobbyIdInput}
-            onChange={(e) => setLobbyIdInput(e.target.value)}
+            onChange={(e) => {
+              setLobbyIdInput(e.target.value);
+            }}
             placeholder="Leave blank to create a new lobby"
           />
         </label>
       </div>
       <div style={{ display: "flex", gap: "10px" }}>
         <button
-          onClick={() => createMutation.mutate()}
+          onClick={() => {
+            createMutation.mutate();
+          }}
           disabled={loading || playerName.trim() === ""}
         >
           {createMutation.isPending ? "Creating..." : "Create Lobby"}
         </button>
         <button
-          onClick={() => joinMutation.mutate()}
+          onClick={() => {
+            joinMutation.mutate();
+          }}
           disabled={
             loading || playerName.trim() === "" || lobbyIdInput.trim() === ""
           }

@@ -79,18 +79,18 @@ export default function RoleConfig(props: Props) {
             ) : (
               <>
                 <button
-                  onClick={() =>
-                    handleChange(role.id, (counts[role.id] ?? 0) - 1)
-                  }
+                  onClick={() => {
+                    handleChange(role.id, (counts[role.id] ?? 0) - 1);
+                  }}
                   disabled={props.disabled || (counts[role.id] ?? 0) === 0}
                 >
                   -
                 </button>
                 <span>{counts[role.id] ?? 0}</span>
                 <button
-                  onClick={() =>
-                    handleChange(role.id, (counts[role.id] ?? 0) + 1)
-                  }
+                  onClick={() => {
+                    handleChange(role.id, (counts[role.id] ?? 0) + 1);
+                  }}
                   disabled={props.disabled}
                 >
                   +

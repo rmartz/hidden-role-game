@@ -7,6 +7,7 @@ import type {
   PlayerGameState,
   UpdateLobbyConfigRequest,
 } from "@/server/models";
+import { ServerResponseStatus } from "@/server/models";
 
 const SESSION_KEY = "x-session-id";
 const PLAYER_ID_KEY = "player-id";
@@ -44,8 +45,8 @@ export async function createLobby(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ playerName }),
   });
-  const data: ServerResponse<LobbyJoinResponse> = await response.json();
-  if (data.status === "success") {
+  const data = (await response.json()) as ServerResponse<LobbyJoinResponse>;
+  if (data.status === ServerResponseStatus.Success) {
     saveJoinData(data.data.sessionId, data.data.playerId);
   }
   return data;
@@ -58,7 +59,8 @@ export async function getLobby(
   const headers: HeadersInit = {};
   if (sessionId) headers["x-session-id"] = sessionId;
   const response = await fetch(`/api/lobby/${lobbyId}`, { headers });
-  return { data: await response.json(), httpStatus: response.status };
+  const data = (await response.json()) as ServerResponse<PublicLobby>;
+  return { data, httpStatus: response.status };
 }
 
 export async function joinLobby(
@@ -70,8 +72,8 @@ export async function joinLobby(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ playerName }),
   });
-  const data: ServerResponse<LobbyJoinResponse> = await response.json();
-  if (data.status === "success") {
+  const data = (await response.json()) as ServerResponse<LobbyJoinResponse>;
+  if (data.status === ServerResponseStatus.Success) {
     saveJoinData(data.data.sessionId, data.data.playerId);
   }
   return data;
@@ -89,7 +91,7 @@ export async function transferOwner(
     headers,
     body: JSON.stringify({ playerId }),
   });
-  return response.json();
+  return (await response.json()) as ServerResponse<{ lobby: PublicLobby }>;
 }
 
 export async function startGame(
@@ -105,7 +107,7 @@ export async function startGame(
     headers,
     body: JSON.stringify({ lobbyId, roleSlots, gameMode }),
   });
-  return response.json();
+  return (await response.json()) as ServerResponse<{ lobby: PublicLobby }>;
 }
 
 export async function getGameState(
@@ -115,7 +117,8 @@ export async function getGameState(
   const headers: HeadersInit = {};
   if (sessionId) headers["x-session-id"] = sessionId;
   const response = await fetch(`/api/game/${gameId}`, { headers });
-  return { data: await response.json(), httpStatus: response.status };
+  const data = (await response.json()) as ServerResponse<PlayerGameState>;
+  return { data, httpStatus: response.status };
 }
 
 export async function updateLobbyConfig(
@@ -130,7 +133,7 @@ export async function updateLobbyConfig(
     headers,
     body: JSON.stringify(config),
   });
-  return response.json();
+  return (await response.json()) as ServerResponse<{ lobby: PublicLobby }>;
 }
 
 export async function removePlayer(
@@ -144,5 +147,7 @@ export async function removePlayer(
     method: "DELETE",
     headers,
   });
-  return response.json();
+  return (await response.json()) as ServerResponse<{
+    lobby: PublicLobby | null;
+  }>;
 }
