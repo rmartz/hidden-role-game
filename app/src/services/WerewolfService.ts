@@ -7,7 +7,6 @@ import type {
 import type { RoleSlot } from "@/server/models";
 import { GAME_MODE_ROLES } from "@/lib/game-modes";
 import { assignRoles } from "./assignRoles";
-import { SecretVillainService } from "./SecretVillainService";
 
 export class WerewolfService {
   getRoleDefinitions(): RoleDefinition[] {
