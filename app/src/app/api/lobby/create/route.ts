@@ -31,10 +31,12 @@ export async function POST(request: Request): Promise<Response> {
     id: lobbyId,
     ownerSessionId: sessionId,
     players: [owner],
-    gameMode: defaultGameMode,
-    roleSlots: gameService.defaultRoleCount(defaultGameMode, 1),
-    showConfigToPlayers: false,
-    showRolesInPlay: false,
+    config: {
+      gameMode: defaultGameMode,
+      roleSlots: gameService.defaultRoleCount(defaultGameMode, 1),
+      showConfigToPlayers: false,
+      showRolesInPlay: false,
+    },
   };
 
   lobbyService.addLobby(lobby);

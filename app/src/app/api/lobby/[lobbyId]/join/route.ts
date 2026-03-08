@@ -27,10 +27,14 @@ export async function POST(
   };
   lobby.players.push(newPlayer);
   const target = gameService.defaultRoleCount(
-    lobby.gameMode,
+    lobby.config.gameMode,
     lobby.players.length,
   );
-  lobby.roleSlots = adjustRoleSlots(lobby.roleSlots, target, "add");
+  lobby.config.roleSlots = adjustRoleSlots(
+    lobby.config.roleSlots,
+    target,
+    "add",
+  );
 
   return Response.json(
     {

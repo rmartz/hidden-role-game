@@ -55,17 +55,20 @@ export class LobbyService {
     if (!lobby) return undefined;
 
     if (config.showConfigToPlayers !== undefined)
-      lobby.showConfigToPlayers = config.showConfigToPlayers;
+      lobby.config.showConfigToPlayers = config.showConfigToPlayers;
     if (config.showRolesInPlay !== undefined)
-      lobby.showRolesInPlay = config.showRolesInPlay;
-    if (config.gameMode !== undefined && config.gameMode !== lobby.gameMode) {
-      lobby.gameMode = config.gameMode;
-      lobby.roleSlots = getDefaultRoleSlots(
+      lobby.config.showRolesInPlay = config.showRolesInPlay;
+    if (
+      config.gameMode !== undefined &&
+      config.gameMode !== lobby.config.gameMode
+    ) {
+      lobby.config.gameMode = config.gameMode;
+      lobby.config.roleSlots = getDefaultRoleSlots(
         config.gameMode,
         lobby.players.length,
       );
     } else if (config.roleSlots !== undefined) {
-      lobby.roleSlots = config.roleSlots;
+      lobby.config.roleSlots = config.roleSlots;
     }
 
     return lobby;

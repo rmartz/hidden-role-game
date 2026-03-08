@@ -79,13 +79,17 @@ export interface Game {
 
 // --- Lobby (top-level entity; game is absent until started) ---
 
-export interface Lobby {
-  id: string;
-  ownerSessionId: string;
-  players: LobbyPlayer[];
+export interface LobbyConfig {
   gameMode: GameMode;
   roleSlots: RoleSlot[];
   showConfigToPlayers: boolean;
   showRolesInPlay: boolean;
+}
+
+export interface Lobby {
+  id: string;
+  ownerSessionId: string;
+  players: LobbyPlayer[];
+  config: LobbyConfig;
   gameId?: string;
 }

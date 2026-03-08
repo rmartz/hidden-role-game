@@ -32,10 +32,14 @@ export async function DELETE(
   const updated = lobbyService.removePlayer(lobbyId, playerId);
   if (updated) {
     const target = gameService.defaultRoleCount(
-      updated.gameMode,
+      updated.config.gameMode,
       updated.players.length,
     );
-    updated.roleSlots = adjustRoleSlots(updated.roleSlots, target, "remove");
+    updated.config.roleSlots = adjustRoleSlots(
+      updated.config.roleSlots,
+      target,
+      "remove",
+    );
   }
   return Response.json({
     status: ServerResponseStatus.Success,

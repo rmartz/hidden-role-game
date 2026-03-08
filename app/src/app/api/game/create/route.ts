@@ -41,7 +41,7 @@ export async function POST(request: Request): Promise<Response> {
     lobby.players,
     roleSlots,
     gameMode,
-    lobby.showRolesInPlay,
+    lobby.config.showRolesInPlay,
   );
   const updated = lobbyService.setGameId(lobbyId, game.id);
   if (!updated) {
