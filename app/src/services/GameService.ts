@@ -15,6 +15,7 @@ import type {
 import { secretVillainService } from "./SecretVillainService";
 import { avalonService } from "./AvalonService";
 import { werewolfService } from "./WerewolfService";
+import { adjustRoleSlots } from "@/server/role-slots";
 
 interface GameModeService {
   readonly minPlayers: number;
@@ -99,6 +100,16 @@ export class GameService {
   public defaultRoleCount(gameMode: GameMode, numPlayers: number): RoleSlot[] {
     const service = this.modeServices[gameMode];
     return service.defaultRoleCount(Math.max(numPlayers, service.minPlayers));
+  }
+
+  public adjustRoleSlotsForPlayer(
+    current: RoleSlot[],
+    gameMode: GameMode,
+    numPlayers: number,
+    operation: "add" | "remove",
+  ): RoleSlot[] {
+    const target = this.defaultRoleCount(gameMode, numPlayers);
+    return adjustRoleSlots(current, target, operation);
   }
 
   public getRolesInPlay(game: Game): PublicRoleInfo[] {

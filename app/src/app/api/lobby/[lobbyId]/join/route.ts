@@ -3,7 +3,6 @@ import type { LobbyPlayer } from "@/lib/models";
 import { ServerResponseStatus, type JoinLobbyRequest } from "@/server/models";
 import { lobbyService } from "@/services/LobbyService";
 import { gameService } from "@/services/GameService";
-import { adjustRoleSlots } from "@/server/role-slots";
 import { toPublicLobby } from "@/server/lobby-helpers";
 import { errorResponse } from "@/server/api-helpers";
 
@@ -26,13 +25,10 @@ export async function POST(
     sessionId,
   };
   lobby.players.push(newPlayer);
-  const target = gameService.defaultRoleCount(
+  lobby.config.roleSlots = gameService.adjustRoleSlotsForPlayer(
+    lobby.config.roleSlots,
     lobby.config.gameMode,
     lobby.players.length,
-  );
-  lobby.config.roleSlots = adjustRoleSlots(
-    lobby.config.roleSlots,
-    target,
     "add",
   );
 

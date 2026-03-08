@@ -3,7 +3,6 @@ import { authenticateLobby, errorResponse } from "@/server/api-helpers";
 import { toPublicLobby } from "@/server/lobby-helpers";
 import { lobbyService } from "@/services/LobbyService";
 import { gameService } from "@/services/GameService";
-import { adjustRoleSlots } from "@/server/role-slots";
 
 export async function DELETE(
   request: Request,
@@ -31,13 +30,10 @@ export async function DELETE(
 
   const updated = lobbyService.removePlayer(lobbyId, playerId);
   if (updated) {
-    const target = gameService.defaultRoleCount(
+    updated.config.roleSlots = gameService.adjustRoleSlotsForPlayer(
+      updated.config.roleSlots,
       updated.config.gameMode,
       updated.players.length,
-    );
-    updated.config.roleSlots = adjustRoleSlots(
-      updated.config.roleSlots,
-      target,
       "remove",
     );
   }
