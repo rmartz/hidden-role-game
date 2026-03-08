@@ -19,6 +19,7 @@ import type { RoleSlot } from "@/server/models";
 import JoinPrompt from "./JoinPrompt";
 import PlayerList from "./PlayerList";
 import GameConfigurationPanel from "./GameConfigurationPanel";
+import LobbyConflictResolution from "./LobbyConflictResolution";
 
 export default function LobbyPage() {
   const { lobbyId } = useParams<{ lobbyId: string }>();
@@ -149,44 +150,15 @@ export default function LobbyPage() {
         Lobby: <a href={`/lobby/${lobbyId}`}>{lobbyId}</a>
       </p>
 
-      {conflictLobby && (
-        <div
-          style={{
-            marginBottom: "20px",
-            padding: "10px",
-            border: "1px solid #ccc",
+      {conflictLobby && storedLobbyId && (
+        <LobbyConflictResolution
+          conflictLobby={conflictLobby}
+          conflictLobbyId={storedLobbyId}
+          isLeaving={leavePreviousMutation.isPending}
+          onLeave={() => {
+            leavePreviousMutation.mutate();
           }}
-        >
-          {conflictLobby.gameId ? (
-            <p>You have an active game in lobby {storedLobbyId}.</p>
-          ) : (
-            <p>You are already in lobby {storedLobbyId}.</p>
-          )}
-          <div style={{ display: "flex", gap: "10px" }}>
-            <button
-              onClick={() => {
-                const conflictGameId = conflictLobby.gameId;
-                if (conflictGameId) {
-                  router.push(`/game/${conflictGameId}`);
-                } else if (storedLobbyId) {
-                  router.push(`/lobby/${storedLobbyId}`);
-                }
-              }}
-            >
-              {conflictLobby.gameId ? "Rejoin Game" : "Rejoin Previous Lobby"}
-            </button>
-            <button
-              onClick={() => {
-                leavePreviousMutation.mutate();
-              }}
-              disabled={leavePreviousMutation.isPending}
-            >
-              {leavePreviousMutation.isPending
-                ? "Leaving..."
-                : "Leave Previous Lobby and Stay Here"}
-            </button>
-          </div>
-        </div>
+        />
       )}
 
       {fetchLobby.isLoading && <p>Loading...</p>}
