@@ -7,17 +7,24 @@ import type {
   PlayerRoleAssignment,
   RoleDefinition,
 } from "@/lib/models";
-import type { RoleSlot, PublicRoleInfo } from "@/server/models";
+import type {
+  RoleSlot,
+  PublicRoleInfo,
+  PlayerGameState,
+} from "@/server/models";
 import { secretVillainService } from "./SecretVillainService";
 import { avalonService } from "./AvalonService";
 import { werewolfService } from "./WerewolfService";
+import { adjustRoleSlots } from "@/server/role-slots";
 
 interface GameModeService {
+  readonly minPlayers: number;
   getRoleDefinitions(): RoleDefinition[];
   createRoleAssignments(
     players: LobbyPlayer[],
     roleSlots: RoleSlot[],
   ): PlayerRoleAssignment[];
+  defaultRoleCount(numPlayers: number): RoleSlot[];
 }
 
 export class GameService {
@@ -90,6 +97,21 @@ export class GameService {
     return this.modeServices[gameMode].getRoleDefinitions();
   }
 
+  public defaultRoleCount(gameMode: GameMode, numPlayers: number): RoleSlot[] {
+    const service = this.modeServices[gameMode];
+    return service.defaultRoleCount(Math.max(numPlayers, service.minPlayers));
+  }
+
+  public adjustRoleSlotsForPlayer(
+    current: RoleSlot[],
+    gameMode: GameMode,
+    numPlayers: number,
+    operation: "add" | "remove",
+  ): RoleSlot[] {
+    const target = this.defaultRoleCount(gameMode, numPlayers);
+    return adjustRoleSlots(current, target, operation);
+  }
+
   public getRolesInPlay(game: Game): PublicRoleInfo[] {
     const roleDefs = this.getRoleDefinitions(game.gameMode);
     const roleDefById = new Map(roleDefs.map((r) => [r.id, r]));
@@ -98,6 +120,46 @@ export class GameService {
       if (!def || acc.some((r) => r.id === def.id)) return acc;
       return [...acc, { id: def.id, name: def.name, team: def.team }];
     }, []);
+  }
+
+  public getPlayerGameState(
+    game: Game,
+    callerId: string,
+  ): PlayerGameState | null {
+    const roleDefs = this.getRoleDefinitions(game.gameMode);
+    const roleDefById = new Map(roleDefs.map((r) => [r.id, r]));
+
+    const caller = game.players.find((p) => p.id === callerId);
+    if (!caller) return null;
+
+    const myAssignment = game.roleAssignments.find(
+      (r) => r.playerId === callerId,
+    );
+    if (!myAssignment) return null;
+
+    const myRoleDef = roleDefById.get(myAssignment.roleDefinitionId);
+    if (!myRoleDef) return null;
+
+    const playerById = new Map(game.players.map((p) => [p.id, p]));
+    const visibleTeammates = caller.visibleRoles.flatMap((assignment) => {
+      const player = playerById.get(assignment.playerId);
+      const roleDef = roleDefById.get(assignment.roleDefinitionId);
+      if (!player || !roleDef) return [];
+      return [
+        {
+          player: { id: player.id, name: player.name },
+          role: { id: roleDef.id, name: roleDef.name, team: roleDef.team },
+        },
+      ];
+    });
+
+    return {
+      status: game.status,
+      players: game.players.map((p) => ({ id: p.id, name: p.name })),
+      myRole: { id: myRoleDef.id, name: myRoleDef.name, team: myRoleDef.team },
+      visibleTeammates,
+      rolesInPlay: game.showRolesInPlay ? this.getRolesInPlay(game) : null,
+    };
   }
 }
 

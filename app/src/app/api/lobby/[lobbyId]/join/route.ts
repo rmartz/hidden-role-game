@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import type { LobbyPlayer } from "@/lib/models";
 import { ServerResponseStatus, type JoinLobbyRequest } from "@/server/models";
 import { lobbyService } from "@/services/LobbyService";
+import { gameService } from "@/services/GameService";
 import { toPublicLobby } from "@/server/lobby-helpers";
 import { errorResponse } from "@/server/api-helpers";
 
@@ -24,6 +25,12 @@ export async function POST(
     sessionId,
   };
   lobby.players.push(newPlayer);
+  lobby.config.roleSlots = gameService.adjustRoleSlotsForPlayer(
+    lobby.config.roleSlots,
+    lobby.config.gameMode,
+    lobby.players.length,
+    "add",
+  );
 
   return Response.json(
     {

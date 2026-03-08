@@ -2,7 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { GameMode } from "@/lib/models";
-import { GAME_MODE_NAMES, GAME_MODE_ROLES } from "@/lib/game-modes";
+import {
+  GAME_MODE_NAMES,
+  GAME_MODE_ROLES,
+  getDefaultRoleSlots,
+} from "@/lib/game-modes";
 import type {
   GameConfig,
   RoleSlot,
@@ -43,8 +47,21 @@ export default function GameConfigurationPanel(props: Props) {
   const [currentRoleSlots, setCurrentRoleSlots] = useState<RoleSlot[]>(
     config.roleSlots ?? [],
   );
+  const [roleConfigKey, setRoleConfigKey] = useState(0);
 
   const isFirstRender = useRef(true);
+  const lastServerRoleSlotsJson = useRef(JSON.stringify(config.roleSlots));
+
+  // Sync role counts when the server updates them (e.g. a player leaves and slots are trimmed)
+  useEffect(() => {
+    if (readOnly) return;
+    const incoming = JSON.stringify(config.roleSlots);
+    if (incoming !== lastServerRoleSlotsJson.current) {
+      lastServerRoleSlotsJson.current = incoming;
+      setCurrentRoleSlots(config.roleSlots ?? []);
+      setRoleConfigKey((k) => k + 1);
+    }
+  }, [config.roleSlots, readOnly]);
 
   useEffect(() => {
     if (readOnly) return;
@@ -87,8 +104,10 @@ export default function GameConfigurationPanel(props: Props) {
           <select
             value={selectedGameMode}
             onChange={(e) => {
-              setSelectedGameMode(e.target.value as GameMode);
-              setCurrentRoleSlots([]);
+              const newMode = e.target.value as GameMode;
+              setSelectedGameMode(newMode);
+              setCurrentRoleSlots(getDefaultRoleSlots(newMode, playerCount));
+              setRoleConfigKey((k) => k + 1);
             }}
           >
             {Object.values(GameMode).map((mode) => (
@@ -150,8 +169,9 @@ export default function GameConfigurationPanel(props: Props) {
       ) : (
         <>
           <RoleConfig
+            key={roleConfigKey}
             roleDefinitions={roleDefinitions}
-            roleSlots={config.roleSlots}
+            roleSlots={currentRoleSlots}
             playerCount={playerCount}
             readOnly={false}
             disabled={props.isPending}

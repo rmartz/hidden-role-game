@@ -9,6 +9,8 @@ import { GAME_MODE_ROLES } from "@/lib/game-modes";
 import { assignRoles } from "./assignRoles";
 
 export class AvalonService {
+  readonly minPlayers = 5;
+
   getRoleDefinitions(): RoleDefinition[] {
     return GAME_MODE_ROLES[GameMode.Avalon];
   }
@@ -18,6 +20,17 @@ export class AvalonService {
     roleSlots: RoleSlot[],
   ): PlayerRoleAssignment[] {
     return assignRoles(players, roleSlots);
+  }
+
+  defaultRoleCount(numPlayers: number): RoleSlot[] {
+    const bad = Math.floor((numPlayers - 1) / 2);
+    const specialGood = 1;
+    const good = numPlayers - bad - specialGood;
+    return [
+      { roleId: "avalon-bad", count: bad },
+      { roleId: "avalon-special-good", count: specialGood },
+      { roleId: "avalon-good", count: good },
+    ];
   }
 }
 

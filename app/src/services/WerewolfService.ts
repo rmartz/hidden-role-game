@@ -9,6 +9,8 @@ import { GAME_MODE_ROLES } from "@/lib/game-modes";
 import { assignRoles } from "./assignRoles";
 
 export class WerewolfService {
+  readonly minPlayers = 5;
+
   getRoleDefinitions(): RoleDefinition[] {
     return GAME_MODE_ROLES[GameMode.Werewolf];
   }
@@ -18,6 +20,15 @@ export class WerewolfService {
     roleSlots: RoleSlot[],
   ): PlayerRoleAssignment[] {
     return assignRoles(players, roleSlots);
+  }
+
+  defaultRoleCount(numPlayers: number): RoleSlot[] {
+    const bad = Math.floor(numPlayers / 3);
+    const good = numPlayers - bad;
+    return [
+      { roleId: "werewolf-bad", count: bad },
+      { roleId: "werewolf-good", count: good },
+    ];
   }
 }
 

@@ -11,16 +11,16 @@ export function toPublicLobby(
 ): PublicLobby {
   const owner = lobby.players.find((p) => p.sessionId === lobby.ownerSessionId);
   const isOwner = callerSessionId === lobby.ownerSessionId;
-  const showRoleSlots = isOwner || lobby.showConfigToPlayers;
+  const showRoleSlots = isOwner || lobby.config.showConfigToPlayers;
   return {
     id: lobby.id,
     ownerPlayerId: owner?.id ?? "",
     players: lobby.players.map((p) => ({ id: p.id, name: p.name })),
     config: {
-      gameMode: lobby.gameMode,
-      showConfigToPlayers: lobby.showConfigToPlayers,
-      showRolesInPlay: lobby.showRolesInPlay,
-      ...(showRoleSlots && { roleSlots: lobby.roleSlots }),
+      gameMode: lobby.config.gameMode,
+      showConfigToPlayers: lobby.config.showConfigToPlayers,
+      showRolesInPlay: lobby.config.showRolesInPlay,
+      ...(showRoleSlots && { roleSlots: lobby.config.roleSlots }),
     },
     ...(lobby.gameId && { gameId: lobby.gameId }),
   };

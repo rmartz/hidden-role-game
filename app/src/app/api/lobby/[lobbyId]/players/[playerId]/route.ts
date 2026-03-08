@@ -2,6 +2,7 @@ import { ServerResponseStatus } from "@/server/models";
 import { authenticateLobby, errorResponse } from "@/server/api-helpers";
 import { toPublicLobby } from "@/server/lobby-helpers";
 import { lobbyService } from "@/services/LobbyService";
+import { gameService } from "@/services/GameService";
 
 export async function DELETE(
   request: Request,
@@ -28,6 +29,14 @@ export async function DELETE(
   }
 
   const updated = lobbyService.removePlayer(lobbyId, playerId);
+  if (updated) {
+    updated.config.roleSlots = gameService.adjustRoleSlotsForPlayer(
+      updated.config.roleSlots,
+      updated.config.gameMode,
+      updated.players.length,
+      "remove",
+    );
+  }
   return Response.json({
     status: ServerResponseStatus.Success,
     data: { lobby: updated ? toPublicLobby(updated, sessionId) : null },

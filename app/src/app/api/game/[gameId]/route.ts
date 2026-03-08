@@ -1,5 +1,4 @@
 import { ServerResponseStatus } from "@/server/models";
-import type { PlayerGameState, PublicRoleInfo } from "@/server/models";
 import { gameService } from "@/services/GameService";
 import { authenticateGame, errorResponse } from "@/server/api-helpers";
 
@@ -14,53 +13,10 @@ export async function GET(
   if (auth instanceof Response) return auth;
   const { game, caller } = auth;
 
-  const roleDefs = gameService.getRoleDefinitions(game.gameMode);
-
-  const myAssignment = game.roleAssignments.find(
-    (r) => r.playerId === caller.id,
-  );
-  if (!myAssignment) {
+  const gameState = gameService.getPlayerGameState(game, caller.id);
+  if (!gameState) {
     return errorResponse("Role not assigned", 500);
   }
-
-  const myRoleDef = roleDefs.find(
-    (r) => r.id === myAssignment.roleDefinitionId,
-  );
-  if (!myRoleDef) {
-    return errorResponse("Role definition not found", 500);
-  }
-
-  const myRole: PublicRoleInfo = {
-    id: myRoleDef.id,
-    name: myRoleDef.name,
-    team: myRoleDef.team,
-  };
-
-  const playerById = new Map(game.players.map((p) => [p.id, p]));
-  const roleDefById = new Map(roleDefs.map((r) => [r.id, r]));
-  const visibleTeammates = caller.visibleRoles.flatMap((assignment) => {
-    const player = playerById.get(assignment.playerId);
-    const roleDef = roleDefById.get(assignment.roleDefinitionId);
-    if (!player || !roleDef) return [];
-    return [
-      {
-        player: { id: player.id, name: player.name },
-        role: { id: roleDef.id, name: roleDef.name, team: roleDef.team },
-      },
-    ];
-  });
-
-  const rolesInPlay: PublicRoleInfo[] | null = game.showRolesInPlay
-    ? gameService.getRolesInPlay(game)
-    : null;
-
-  const gameState: PlayerGameState = {
-    status: game.status,
-    players: game.players.map((p) => ({ id: p.id, name: p.name })),
-    myRole,
-    visibleTeammates,
-    rolesInPlay,
-  };
 
   return Response.json({
     status: ServerResponseStatus.Success,
