@@ -59,7 +59,7 @@ export async function getLobby(
   const headers: HeadersInit = {};
   if (sessionId) headers["x-session-id"] = sessionId;
   const response = await fetch(`/api/lobby/${lobbyId}`, { headers });
-  const data = await response.json();
+  const data = (await response.json()) as ServerResponse<PublicLobby>;
   return { data, httpStatus: response.status };
 }
 
