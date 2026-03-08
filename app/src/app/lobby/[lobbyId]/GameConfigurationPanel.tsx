@@ -29,6 +29,7 @@ type Props = ReadOnlyProps | EditableProps;
 
 export default function GameConfigurationPanel(props: Props) {
   const { config, playerCount, readOnly } = props;
+  const onConfigChange = readOnly ? undefined : props.onConfigChange;
 
   const [selectedGameMode, setSelectedGameMode] = useState<GameMode>(
     config.gameMode,
@@ -52,15 +53,19 @@ export default function GameConfigurationPanel(props: Props) {
       return;
     }
     const timer = setTimeout(() => {
-      props.onConfigChange({
+      onConfigChange?.({
         gameMode: selectedGameMode,
         showConfigToPlayers,
         showRolesInPlay,
         roleSlots: currentRoleSlots,
       });
     }, 500);
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+    };
   }, [
+    readOnly,
+    onConfigChange,
     selectedGameMode,
     showConfigToPlayers,
     showRolesInPlay,
@@ -111,7 +116,9 @@ export default function GameConfigurationPanel(props: Props) {
             onChange={
               readOnly
                 ? undefined
-                : (e) => setShowConfigToPlayers(e.target.checked)
+                : (e) => {
+                    setShowConfigToPlayers(e.target.checked);
+                  }
             }
           />{" "}
           Show game configuration to all players
@@ -122,7 +129,11 @@ export default function GameConfigurationPanel(props: Props) {
             checked={showRolesInPlay}
             disabled={readOnly || props.isPending}
             onChange={
-              readOnly ? undefined : (e) => setShowRolesInPlay(e.target.checked)
+              readOnly
+                ? undefined
+                : (e) => {
+                    setShowRolesInPlay(e.target.checked);
+                  }
             }
           />{" "}
           Show roles in play when game starts
@@ -147,9 +158,9 @@ export default function GameConfigurationPanel(props: Props) {
             onRoleSlotsChange={setCurrentRoleSlots}
           />
           <button
-            onClick={() =>
-              props.onStartGame(currentRoleSlots, selectedGameMode)
-            }
+            onClick={() => {
+              props.onStartGame(currentRoleSlots, selectedGameMode);
+            }}
             disabled={props.isPending || !isValid}
           >
             Start Game

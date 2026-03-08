@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { joinLobby } from "@/lib/api";
+import { ServerResponseStatus } from "@/server/models";
 
 interface Props {
   lobbyId: string;
@@ -15,12 +16,12 @@ export default function JoinPrompt({ lobbyId }: Props) {
   const joinMutation = useMutation({
     mutationFn: async () => {
       const response = await joinLobby(lobbyId, playerName);
-      if (response.status === "error")
-        throw new Error(response.error ?? "Failed to join lobby");
+      if (response.status === ServerResponseStatus.Error)
+        throw new Error(response.error);
       return response.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
+      void queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
     },
   });
 
@@ -42,7 +43,9 @@ export default function JoinPrompt({ lobbyId }: Props) {
           <input
             type="text"
             value={playerName}
-            onChange={(e) => setPlayerName(e.target.value)}
+            onChange={(e) => {
+              setPlayerName(e.target.value);
+            }}
             placeholder="Enter your name"
           />
         </label>

@@ -38,7 +38,8 @@ export class GameService {
     const playerById = new Map(players.map((p) => [p.id, p]));
 
     return roleAssignments.map((assignment) => {
-      const player = playerById.get(assignment.playerId)!;
+      const player = playerById.get(assignment.playerId);
+      if (!player) throw new Error(`Player not found: ${assignment.playerId}`);
       const myRoleDef = roleDefById.get(assignment.roleDefinitionId);
 
       const visibleRoles: PlayerRoleAssignment[] = [];

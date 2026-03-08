@@ -8,8 +8,8 @@ import { authenticateLobby, errorResponse } from "@/server/api-helpers";
 
 export async function POST(request: Request): Promise<Response> {
   const sessionId = request.headers.get("x-session-id") ?? undefined;
-  const { lobbyId, roleSlots, gameMode }: CreateGameRequest =
-    await request.json();
+  const { lobbyId, roleSlots, gameMode } =
+    (await request.json()) as CreateGameRequest;
 
   if (!Object.values(GameMode).includes(gameMode)) {
     return errorResponse("Unknown game mode", 400);
