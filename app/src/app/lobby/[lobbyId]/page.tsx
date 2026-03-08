@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -24,8 +24,18 @@ export default function LobbyPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const storedLobbyId = getLobbyId();
-  const hasDifferentLobby = storedLobbyId !== null && storedLobbyId !== lobbyId;
+  // undefined = not yet read from localStorage (avoid SSR mismatch)
+  const [storedLobbyId, setStoredLobbyId] = useState<string | null | undefined>(
+    undefined,
+  );
+  useEffect(() => {
+    setStoredLobbyId(getLobbyId());
+  }, []);
+
+  const hasDifferentLobby =
+    storedLobbyId !== undefined &&
+    storedLobbyId !== null &&
+    storedLobbyId !== lobbyId;
 
   const fetchLobby = useQuery({
     queryKey: ["lobby", lobbyId],
@@ -116,7 +126,7 @@ export default function LobbyPage() {
     void fetchLobby.refetch();
   }
 
-  if (hasDifferentLobby) return null;
+  if (storedLobbyId === undefined || hasDifferentLobby) return null;
 
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
