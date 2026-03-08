@@ -71,13 +71,13 @@ export default function LobbyPage() {
   }, [gameId, router]);
 
   useEffect(() => {
-    if (
-      fetchLobby.error?.message === "404" ||
-      fetchLobby.error?.message === "403"
-    ) {
+    if (fetchLobby.error?.message === "404") {
       router.push("/");
     }
-  }, [fetchLobby.error, router]);
+    if (fetchLobby.error?.message === "403" && !hasDifferentLobby) {
+      router.push("/");
+    }
+  }, [fetchLobby.error, router, hasDifferentLobby]);
 
   const removeMutation = useMutation({
     mutationFn: (targetPlayerId: string) =>
