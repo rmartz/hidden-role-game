@@ -47,12 +47,14 @@ export default function LobbyConflictPage() {
     }
   }, [defaultName, playerName]);
 
+  // If there's no stored lobby ID, there's nothing to conflict with — go back to the lobby.
   useEffect(() => {
     if (!storedLobbyId) {
       router.replace(`/lobby/${lobbyId}`);
     }
   }, [storedLobbyId, lobbyId, router]);
 
+  // If the stored lobby no longer exists (cleared in queryFn on 404/403), go back to the lobby.
   useEffect(() => {
     if (!conflictLobbyQuery.isLoading && conflictLobbyQuery.data === null) {
       router.replace(`/lobby/${lobbyId}`);

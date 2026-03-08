@@ -60,14 +60,17 @@ export default function LobbyPage() {
     !!fetchLobby.data && fetchLobby.data.ownerPlayerId === myPlayerId;
   const gameId = fetchLobby.data?.gameId;
 
+  // If the user has a session for a different lobby, send them to the conflict resolution page.
   useEffect(() => {
     if (hasDifferentLobby) router.replace(`/lobby/${lobbyId}/conflict`);
   }, [hasDifferentLobby, lobbyId, router]);
 
+  // Once the game starts, redirect all players to the game page.
   useEffect(() => {
     if (gameId) router.push(`/game/${gameId}`);
   }, [gameId, router]);
 
+  // If the lobby doesn't exist or the session is invalid, return to the home page.
   useEffect(() => {
     if (
       fetchLobby.error?.message === "404" ||
