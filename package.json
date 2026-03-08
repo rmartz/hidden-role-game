@@ -18,7 +18,7 @@
     "dev": "pnpm -r run dev",
     "build": "pnpm -r run build",
     "test": "pnpm -r test",
-    "lint": "eslint .",
+    "lint": "eslint --max-warnings 0 .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky"
@@ -31,7 +31,7 @@
   },
   "lint-staged": {
     "*.{js,mjs,cjs,ts,tsx,jsx}": [
-      "eslint --fix"
+      "eslint --fix --max-warnings 0"
     ],
     "*.{js,mjs,cjs,ts,tsx,jsx,json,md,yml,yaml}": [
       "prettier --write"
