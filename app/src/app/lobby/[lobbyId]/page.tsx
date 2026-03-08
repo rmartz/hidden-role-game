@@ -51,7 +51,7 @@ export default function LobbyPage() {
       if (query.state.data.gameId) return false;
       return 3_000;
     },
-    enabled: !hasDifferentLobby,
+    enabled: storedLobbyId !== undefined && !hasDifferentLobby,
     retry: false,
   });
 
