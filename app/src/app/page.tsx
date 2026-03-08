@@ -71,7 +71,12 @@ export default function Home() {
 
   const error = createMutation.error?.message ?? joinMutation.error?.message;
   const loading = createMutation.isPending || joinMutation.isPending;
-  const activeLobby = storedLobbyQuery.data;
+  // Hide the active lobby panel once a create/join is in progress to avoid
+  // it flashing into view after localStorage is written but before navigation.
+  const activeLobby =
+    loading || createMutation.isSuccess || joinMutation.isSuccess
+      ? null
+      : storedLobbyQuery.data;
 
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
