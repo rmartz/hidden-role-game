@@ -17,18 +17,25 @@ export function adjustRoleSlots(
   const currentMap = new Map(current.map((s) => [s.roleId, s.count]));
   const targetMap = new Map(target.map((s) => [s.roleId, s.count]));
 
-  if (operation === "add") {
-    let bestRole: string | null = null;
-    let bestDiff = -Infinity;
-    for (const [roleId, targetCount] of targetMap) {
-      const diff = targetCount - (currentMap.get(roleId) ?? 0);
-      if (diff > bestDiff) {
-        bestDiff = diff;
-        bestRole = roleId;
-      }
-    }
-    if (!bestRole) return current;
+  const isAdd = operation === "add";
+  const candidates = isAdd
+    ? [...targetMap]
+    : ([...currentMap] as [string, number][]).filter(([, c]) => c > 0);
+  const otherMap = isAdd ? currentMap : targetMap;
+  const compare = (roleId: string, count: number) =>
+    count - (otherMap.get(roleId) ?? 0);
 
+  const [bestRole] = candidates.reduce<[string | null, number]>(
+    ([best, bestScore], [roleId, count]) => {
+      const score = compare(roleId, count);
+      return score > bestScore ? [roleId, score] : [best, bestScore];
+    },
+    [null, -Infinity],
+  );
+
+  if (!bestRole) return current;
+
+  if (isAdd) {
     if (currentMap.has(bestRole)) {
       return current.map((s) =>
         s.roleId === bestRole ? { ...s, count: s.count + 1 } : s,
@@ -36,18 +43,6 @@ export function adjustRoleSlots(
     }
     return [...current, { roleId: bestRole, count: 1 }];
   } else {
-    let bestRole: string | null = null;
-    let bestDiff = -Infinity;
-    for (const [roleId, currentCount] of currentMap) {
-      if (currentCount <= 0) continue;
-      const diff = currentCount - (targetMap.get(roleId) ?? 0);
-      if (diff > bestDiff) {
-        bestDiff = diff;
-        bestRole = roleId;
-      }
-    }
-    if (!bestRole) return current;
-
     return current
       .map((s) => (s.roleId === bestRole ? { ...s, count: s.count - 1 } : s))
       .filter((s) => s.count > 0);

@@ -3,7 +3,7 @@ import { authenticateLobby, errorResponse } from "@/server/api-helpers";
 import { toPublicLobby } from "@/server/lobby-helpers";
 import { lobbyService } from "@/services/LobbyService";
 import { gameService } from "@/services/GameService";
-import { adjustRoleSlots } from "@/server/adjustRoleSlots";
+import { adjustRoleSlots } from "@/server/role-slots";
 
 export async function DELETE(
   request: Request,

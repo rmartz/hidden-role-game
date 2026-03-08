@@ -3,7 +3,7 @@ import type { LobbyPlayer } from "@/lib/models";
 import { ServerResponseStatus, type JoinLobbyRequest } from "@/server/models";
 import { lobbyService } from "@/services/LobbyService";
 import { gameService } from "@/services/GameService";
-import { adjustRoleSlots } from "@/server/adjustRoleSlots";
+import { adjustRoleSlots } from "@/server/role-slots";
 import { toPublicLobby } from "@/server/lobby-helpers";
 import { errorResponse } from "@/server/api-helpers";
 
