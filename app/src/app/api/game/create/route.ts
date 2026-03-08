@@ -22,8 +22,10 @@ export async function POST(request: Request): Promise<Response> {
   if (auth instanceof Response) return auth;
   const { lobby } = auth;
 
+  const hasOwner = gameService.hasGameOwner(gameMode);
+  const roleSlotsRequired = lobby.players.length - (hasOwner ? 1 : 0);
   const totalSlots = roleSlots.reduce((sum, s) => sum + s.count, 0);
-  if (totalSlots !== lobby.players.length) {
+  if (totalSlots !== roleSlotsRequired) {
     return errorResponse("Role slot count must match player count", 400);
   }
 
@@ -36,12 +38,17 @@ export async function POST(request: Request): Promise<Response> {
     }
   }
 
+  const ownerPlayer = hasOwner
+    ? (lobby.players.find((p) => p.sessionId === lobby.ownerSessionId) ?? null)
+    : null;
+
   const game = gameService.createGame(
     lobbyId,
     lobby.players,
     roleSlots,
     gameMode,
     lobby.config.showRolesInPlay,
+    ownerPlayer?.id ?? null,
   );
   const updated = lobbyService.setGameId(lobbyId, game.id);
   if (!updated) {

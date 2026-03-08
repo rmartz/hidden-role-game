@@ -9,6 +9,7 @@ import { GAME_MODE_ROLES } from "@/lib/game-modes";
 import { assignRoles } from "./assignRoles";
 
 export class AvalonService {
+  readonly hasGameOwner = false;
   readonly minPlayers = 5;
 
   getRoleDefinitions(): RoleDefinition[] {

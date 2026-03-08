@@ -220,10 +220,8 @@ describe("POST /api/game/create", () => {
         body: JSON.stringify({
           lobbyId,
           gameMode: "werewolf",
-          roleSlots: [
-            { roleId: "werewolf-good", count: 1 },
-            { roleId: "werewolf-bad", count: 1 },
-          ],
+          // Alice (owner) is the Narrator; Bob gets the only role slot.
+          roleSlots: [{ roleId: "werewolf-good", count: 1 }],
         }),
       }),
     );

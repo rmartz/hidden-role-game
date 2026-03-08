@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getGameState } from "@/lib/api";
 import { ServerResponseStatus } from "@/server/models";
 
-export default function GamePage() {
+export default function GameOwnerPage() {
   const { gameId } = useParams<{ gameId: string }>();
   const router = useRouter();
 
@@ -33,12 +33,12 @@ export default function GamePage() {
     }
   }, [error, router]);
 
-  // Game owners have a dedicated view with all player roles.
+  // Regular players don't belong on this route.
   useEffect(() => {
-    if (gameState?.isGameOwner) {
-      router.replace(`/game/${gameId}/owner`);
+    if (gameState && !gameState.isGameOwner) {
+      router.replace(`/game/${gameId}`);
     }
-  }, [gameState?.isGameOwner, gameId, router]);
+  }, [gameState, gameId, router]);
 
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
@@ -52,28 +52,26 @@ export default function GamePage() {
         </div>
       )}
 
-      {gameState && !gameState.isGameOwner && (
+      {gameState?.isGameOwner && (
         <>
           <div style={{ marginBottom: "20px" }}>
-            <h2>Your Role</h2>
-            <p>
-              <strong>{gameState.myRole?.name}</strong> — Team:{" "}
-              {gameState.myRole?.team}
-            </p>
+            <h2>Game Owner View</h2>
+            <p>You can see all player roles.</p>
           </div>
 
-          {gameState.visibleTeammates.length > 0 && (
-            <div style={{ marginBottom: "20px" }}>
-              <h2>Your Teammates</h2>
-              <ul>
-                {gameState.visibleTeammates.map((t) => (
-                  <li key={t.player.id}>
-                    {t.player.name} — {t.role.name}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          {gameState.allRoleAssignments &&
+            gameState.allRoleAssignments.length > 0 && (
+              <div style={{ marginBottom: "20px" }}>
+                <h2>Player Roles</h2>
+                <ul>
+                  {gameState.allRoleAssignments.map((t) => (
+                    <li key={t.player.id}>
+                      {t.player.name} — {t.role.name} ({t.role.team})
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
           {gameState.rolesInPlay && gameState.rolesInPlay.length > 0 && (
             <div style={{ marginBottom: "20px" }}>

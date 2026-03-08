@@ -10,6 +10,7 @@ import { assignRoles } from "./assignRoles";
 
 export class WerewolfService {
   readonly minPlayers = 5;
+  readonly hasGameOwner = true;
 
   getRoleDefinitions(): RoleDefinition[] {
     return GAME_MODE_ROLES[GameMode.Werewolf];

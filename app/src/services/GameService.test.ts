@@ -12,6 +12,7 @@ function makeGame(roleAssignments: Game["roleAssignments"]): Game {
     players: [],
     roleAssignments,
     showRolesInPlay: true,
+    ownerPlayerId: null,
   };
 }
 
@@ -35,6 +36,7 @@ function makeGameWithPlayers(
     players,
     roleAssignments,
     showRolesInPlay,
+    ownerPlayerId: null,
   };
 }
 

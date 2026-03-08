@@ -16,6 +16,13 @@ export const GAME_MODE_NAMES: Record<GameMode, string> = {
   [GameMode.Werewolf]: "Werewolf",
 };
 
+// The title given to the game owner in each mode, or null if the mode has no game owner.
+export const GAME_MODE_OWNER_TITLES: Record<GameMode, string | null> = {
+  [GameMode.SecretVillain]: null,
+  [GameMode.Avalon]: null,
+  [GameMode.Werewolf]: "Narrator",
+};
+
 export function getDefaultRoleSlots(
   gameMode: GameMode,
   playerCount: number,

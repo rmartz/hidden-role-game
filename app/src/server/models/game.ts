@@ -23,7 +23,9 @@ export interface VisibleTeammate {
 export interface PlayerGameState {
   status: GameStatusState;
   players: PublicLobbyPlayer[];
-  myRole: PublicRoleInfo;
+  isGameOwner: boolean;
+  myRole: PublicRoleInfo | null;
   visibleTeammates: VisibleTeammate[];
   rolesInPlay: PublicRoleInfo[] | null;
+  allRoleAssignments: VisibleTeammate[] | null;
 }
