@@ -54,6 +54,14 @@ export interface RoleDefinition<
   canSeeTeam?: T[];
 }
 
+export interface GameModeConfig {
+  readonly name: string;
+  readonly minPlayers: number;
+  readonly ownerTitle: string | null;
+  readonly roles: RoleDefinition[];
+  defaultRoleCount(numPlayers: number): RoleSlot[];
+}
+
 export interface PlayerRoleAssignment {
   playerId: string;
   roleDefinitionId: string;

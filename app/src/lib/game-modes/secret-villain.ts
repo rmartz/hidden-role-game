@@ -1,4 +1,4 @@
-import type { RoleDefinition, RoleSlot } from "@/lib/models";
+import type { GameModeConfig, RoleDefinition, RoleSlot } from "@/lib/models";
 
 export enum SecretVillainRole {
   Good = "good",
@@ -45,3 +45,11 @@ export function defaultRoleCount(numPlayers: number): RoleSlot[] {
     { roleId: SecretVillainRole.Good, count: good },
   ];
 }
+
+export const SECRET_VILLAIN_CONFIG: GameModeConfig = {
+  name: "Secret Villain",
+  minPlayers: MIN_PLAYERS,
+  ownerTitle: null,
+  roles: Object.values(SECRET_VILLAIN_ROLES),
+  defaultRoleCount,
+};

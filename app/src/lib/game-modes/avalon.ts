@@ -1,4 +1,4 @@
-import type { RoleDefinition, RoleSlot } from "@/lib/models";
+import type { GameModeConfig, RoleDefinition, RoleSlot } from "@/lib/models";
 
 export enum AvalonRole {
   Good = "avalon-good",
@@ -45,3 +45,11 @@ export function defaultRoleCount(numPlayers: number): RoleSlot[] {
     { roleId: AvalonRole.Good, count: good },
   ];
 }
+
+export const AVALON_CONFIG: GameModeConfig = {
+  name: "Avalon",
+  minPlayers: MIN_PLAYERS,
+  ownerTitle: null,
+  roles: Object.values(AVALON_ROLES),
+  defaultRoleCount,
+};

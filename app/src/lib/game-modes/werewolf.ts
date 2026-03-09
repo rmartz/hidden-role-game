@@ -1,4 +1,4 @@
-import type { RoleDefinition, RoleSlot } from "@/lib/models";
+import type { GameModeConfig, RoleDefinition, RoleSlot } from "@/lib/models";
 
 export enum WerewolfRole {
   Good = "werewolf-good",
@@ -36,3 +36,11 @@ export function defaultRoleCount(numPlayers: number): RoleSlot[] {
     { roleId: WerewolfRole.Good, count: good },
   ];
 }
+
+export const WEREWOLF_CONFIG: GameModeConfig = {
+  name: "Werewolf",
+  minPlayers: MIN_PLAYERS,
+  ownerTitle: "Narrator",
+  roles: Object.values(WEREWOLF_ROLES),
+  defaultRoleCount,
+};
