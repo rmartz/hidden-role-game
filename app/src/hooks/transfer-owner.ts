@@ -1,16 +1,17 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { transferOwner } from "@/lib/api";
 import { ServerResponseStatus } from "@/server/models";
 
-export function useTransferOwner(lobbyId: string, onSuccess: () => void) {
+export function useTransferOwner(lobbyId: string) {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (targetPlayerId: string) =>
       transferOwner(lobbyId, targetPlayerId),
     onSuccess: (response) => {
       if (response.status === ServerResponseStatus.Error) return;
-      onSuccess();
+      void queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
     },
   });
 }

@@ -82,17 +82,9 @@ export default function LobbyPage() {
     }
   });
 
-  const startGameMutation = useStartGame(lobbyId, () => {
-    void queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
-  });
-
-  const transferOwnerMutation = useTransferOwner(lobbyId, () => {
-    void queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
-  });
-
-  const updateConfigMutation = useUpdateLobbyConfig(lobbyId, (lobby) => {
-    queryClient.setQueryData(["lobby", lobbyId], lobby);
-  });
+  const startGameMutation = useStartGame(lobbyId);
+  const transferOwnerMutation = useTransferOwner(lobbyId);
+  const updateConfigMutation = useUpdateLobbyConfig(lobbyId);
 
   function handleRefetch() {
     void fetchLobby.refetch();
