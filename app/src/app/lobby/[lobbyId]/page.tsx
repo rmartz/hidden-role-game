@@ -139,6 +139,7 @@ export default function LobbyPage() {
           showLeave={!isOwner}
           showRemovePlayer={isOwner}
           showMakeOwner={isOwner}
+          showRefresh={!wsConnected}
           isFetching={fetchLobby.isFetching}
           disabled={startGameMutation.isPending || gameId !== undefined}
           onRefetch={handleRefetch}
