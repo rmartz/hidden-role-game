@@ -21,13 +21,26 @@
     "lint": "eslint --max-warnings 0 .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "node scripts/fix-pnp.mjs"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
       "esbuild",
       "sharp"
-    ]
+    ],
+    "packageExtensions": {
+      "vite": {
+        "dependencies": {
+          "vitest": "*"
+        }
+      },
+      "next": {
+        "dependencies": {
+          "typescript": "*"
+        }
+      }
+    }
   },
   "lint-staged": {
     "*.{js,mjs,cjs,ts,tsx,jsx}": [

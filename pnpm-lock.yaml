@@ -4,6 +4,8 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+packageExtensionsChecksum: sha256-9c2i9dd4diTq3vbN+jqU03gjn7ke/UBiRmWmzZ0q4FU=
+
 importers:
   .:
     devDependencies:
@@ -64,7 +66,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.0.0
-        version: 3.2.4(@types/node@25.3.3)
+        version: 3.2.4(@types/node@25.3.3)(vite@5.4.21(@types/node@25.3.3))
 
 packages:
   "@babel/code-frame@7.29.0":
@@ -3580,6 +3582,7 @@ snapshots:
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
       styled-jsx: 5.1.6(@babel/core@7.29.0)(react@19.2.4)
+      typescript: 5.9.3
     optionalDependencies:
       "@next/swc-darwin-arm64": 15.5.12
       "@next/swc-darwin-x64": 15.5.12
@@ -3867,11 +3870,21 @@ snapshots:
       esbuild: 0.21.5
       postcss: 8.5.8
       rollup: 4.59.0
+      vitest: 3.2.4(@types/node@25.3.3)(vite@5.4.21(@types/node@25.3.3))
     optionalDependencies:
       "@types/node": 25.3.3
       fsevents: 2.3.3
+    transitivePeerDependencies:
+      - "@edge-runtime/vm"
+      - "@types/debug"
+      - "@vitest/browser"
+      - "@vitest/ui"
+      - happy-dom
+      - jsdom
+      - msw
+      - supports-color
 
-  vitest@3.2.4(@types/node@25.3.3):
+  vitest@3.2.4(@types/node@25.3.3)(vite@5.4.21(@types/node@25.3.3)):
     dependencies:
       "@types/chai": 5.2.3
       "@vitest/expect": 3.2.4
@@ -3908,6 +3921,7 @@ snapshots:
       - sugarss
       - supports-color
       - terser
+      - vite
 
   which@2.0.2:
     dependencies:
