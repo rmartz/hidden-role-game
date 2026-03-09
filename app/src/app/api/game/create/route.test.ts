@@ -221,7 +221,7 @@ describe("POST /api/game/create", () => {
           lobbyId,
           gameMode: "werewolf",
           // Alice (owner) is the Narrator; Bob gets the only role slot.
-          roleSlots: [{ roleId: "werewolf-good", count: 1 }],
+          roleSlots: [{ roleId: "werewolf-villager", count: 1 }],
         }),
       }),
     );
