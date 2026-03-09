@@ -28,4 +28,5 @@ export interface PlayerGameState {
   visibleTeammates: VisibleTeammate[];
   rolesInPlay: PublicRoleInfo[] | null;
   allRoleAssignments: VisibleTeammate[] | null;
+  teamLabels: Partial<Record<Team, string>>;
 }

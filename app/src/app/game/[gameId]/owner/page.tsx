@@ -49,7 +49,8 @@ export default function GameOwnerPage() {
                 <ul>
                   {gameState.allRoleAssignments.map((t) => (
                     <li key={t.player.id}>
-                      {t.player.name} — {t.role.name} ({t.role.team})
+                      {t.player.name} — {t.role.name} (
+                      {gameState.teamLabels[t.role.team] ?? t.role.team})
                     </li>
                   ))}
                 </ul>
@@ -68,15 +69,6 @@ export default function GameOwnerPage() {
               </ul>
             </div>
           )}
-
-          <div>
-            <h2>All Players</h2>
-            <ul>
-              {gameState.players.map((p) => (
-                <li key={p.id}>{p.name}</li>
-              ))}
-            </ul>
-          </div>
         </>
       )}
     </div>

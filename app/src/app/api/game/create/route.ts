@@ -22,23 +22,21 @@ export async function POST(request: Request): Promise<Response> {
   if (auth instanceof Response) return auth;
   const { lobby } = auth;
 
-  const hasOwner = gameService.hasGameOwner(gameMode);
-  const roleSlotsRequired = lobby.players.length - (hasOwner ? 1 : 0);
+  const { ownerTitle } = gameService.getModeDefinition(gameMode);
+  const roleSlotsRequired = lobby.players.length - (ownerTitle ? 1 : 0);
   const totalSlots = roleSlots.reduce((sum, s) => sum + s.count, 0);
   if (totalSlots !== roleSlotsRequired) {
     return errorResponse("Role slot count must match player count", 400);
   }
 
-  const validRoleIds = new Set(
-    gameService.getRoleDefinitions(gameMode).map((r) => r.id),
-  );
+  const { roles } = gameService.getModeDefinition(gameMode);
   for (const slot of roleSlots) {
-    if (!validRoleIds.has(slot.roleId)) {
+    if (!(slot.roleId in roles)) {
       return errorResponse(`Unknown role: ${slot.roleId}`, 400);
     }
   }
 
-  const ownerPlayer = hasOwner
+  const ownerPlayer = ownerTitle
     ? (lobby.players.find((p) => p.sessionId === lobby.ownerSessionId) ?? null)
     : null;
 
