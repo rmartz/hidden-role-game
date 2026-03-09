@@ -2,16 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import {
-  getLobby,
-  removePlayer,
-  joinLobby,
-  getPlayerId,
-  getLobbyId,
-  clearSession,
-} from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
+import { getLobby, getPlayerId, getLobbyId, clearSession } from "@/lib/api";
 import { ServerResponseStatus } from "@/server/models";
+import { useLeaveAndJoinLobby } from "@/hooks/leave-and-join-lobby";
 import LobbyConflictResolution from "../LobbyConflictResolution";
 
 export default function LobbyConflictPage() {
@@ -84,16 +78,8 @@ export default function LobbyConflictPage() {
     }
   }, [conflictLobbyQuery.isLoading, conflictLobbyQuery.data, lobbyId, router]);
 
-  const joinMutation = useMutation({
-    mutationFn: async () => {
-      if (!storedLobbyId || !myPlayerId) return;
-      await removePlayer(storedLobbyId, myPlayerId);
-      clearSession();
-      await joinLobby(lobbyId, playerName);
-    },
-    onSuccess: () => {
-      router.replace(`/lobby/${lobbyId}`);
-    },
+  const joinMutation = useLeaveAndJoinLobby(() => {
+    router.replace(`/lobby/${lobbyId}`);
   });
 
   if (
@@ -115,7 +101,13 @@ export default function LobbyConflictPage() {
         onPlayerNameChange={setPlayerName}
         isJoining={joinMutation.isPending}
         onJoin={() => {
-          joinMutation.mutate();
+          if (!storedLobbyId || !myPlayerId) return;
+          joinMutation.mutate({
+            storedLobbyId,
+            myPlayerId,
+            lobbyId,
+            playerName,
+          });
         }}
       />
     </div>

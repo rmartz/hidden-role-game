@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { joinLobby } from "@/lib/api";
-import { ServerResponseStatus } from "@/server/models";
+import { useQueryClient } from "@tanstack/react-query";
+import { useJoinLobby } from "@/hooks/join-lobby";
 
 interface Props {
   lobbyId: string;
@@ -13,20 +12,12 @@ export default function JoinPrompt({ lobbyId }: Props) {
   const queryClient = useQueryClient();
   const [playerName, setPlayerName] = useState("");
 
-  const joinMutation = useMutation({
-    mutationFn: async () => {
-      const response = await joinLobby(lobbyId, playerName);
-      if (response.status === ServerResponseStatus.Error)
-        throw new Error(response.error);
-      return response.data;
-    },
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
-    },
+  const joinMutation = useJoinLobby(() => {
+    void queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
   });
 
   function handleJoin() {
-    joinMutation.mutate();
+    joinMutation.mutate({ lobbyId, playerName });
   }
 
   return (
