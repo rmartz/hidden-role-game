@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { getLobby, getPlayerId, getLobbyId, clearSession } from "@/lib/api";
-import { ServerResponseStatus } from "@/server/models";
+import { getPlayerId, getLobbyId } from "@/lib/api";
 import { useLeaveAndJoinLobby } from "@/hooks/leave-and-join-lobby";
+import { useStoredLobbyQuery, useLobbyExistsQuery } from "@/hooks/lobby-query";
 import LobbyConflictResolution from "../LobbyConflictResolution";
 
 export default function LobbyConflictPage() {
@@ -15,31 +14,8 @@ export default function LobbyConflictPage() {
   const storedLobbyId = getLobbyId();
   const myPlayerId = getPlayerId();
 
-  const targetLobbyQuery = useQuery({
-    queryKey: ["target-lobby-exists", lobbyId],
-    queryFn: async () => {
-      const { httpStatus } = await getLobby(lobbyId);
-      // 403 means the lobby exists but the session belongs to a different lobby — expected.
-      // 404 means the lobby doesn't exist at all.
-      return httpStatus !== 404;
-    },
-    retry: false,
-  });
-
-  const conflictLobbyQuery = useQuery({
-    queryKey: ["conflict-lobby", storedLobbyId],
-    queryFn: async () => {
-      if (!storedLobbyId) return null;
-      const { data, httpStatus } = await getLobby(storedLobbyId);
-      if (httpStatus === 404 || httpStatus === 403) {
-        clearSession();
-        return null;
-      }
-      if (data.status === ServerResponseStatus.Error) return null;
-      return data.data;
-    },
-    enabled: !!storedLobbyId,
-  });
+  const targetLobbyQuery = useLobbyExistsQuery(lobbyId);
+  const conflictLobbyQuery = useStoredLobbyQuery(storedLobbyId);
 
   const defaultName =
     conflictLobbyQuery.data?.players.find((p) => p.id === myPlayerId)?.name ??

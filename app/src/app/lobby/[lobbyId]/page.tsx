@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getLobby, getPlayerId, getLobbyId } from "@/lib/api";
-import { ServerResponseStatus } from "@/server/models";
+import { useQueryClient } from "@tanstack/react-query";
+import { getPlayerId, getLobbyId } from "@/lib/api";
+import { useLobbyQuery } from "@/hooks/lobby-query";
 import { useRemovePlayer } from "@/hooks/remove-player";
 import { useStartGame } from "@/hooks/start-game";
 import { useTransferOwner } from "@/hooks/transfer-owner";
@@ -31,22 +31,8 @@ export default function LobbyPage() {
     storedLobbyId !== null &&
     storedLobbyId !== lobbyId;
 
-  const fetchLobby = useQuery({
-    queryKey: ["lobby", lobbyId],
-    queryFn: async () => {
-      const { data, httpStatus } = await getLobby(lobbyId);
-      if (httpStatus === 404 || httpStatus === 403)
-        throw new Error(String(httpStatus));
-      if (data.status === ServerResponseStatus.Error) return null;
-      return data.data;
-    },
-    refetchInterval: (query) => {
-      if (!query.state.data) return false;
-      if (query.state.data.gameId) return false;
-      return 3_000;
-    },
+  const fetchLobby = useLobbyQuery(lobbyId, {
     enabled: storedLobbyId !== undefined && !hasDifferentLobby,
-    retry: false,
   });
 
   const myPlayerId = getPlayerId();

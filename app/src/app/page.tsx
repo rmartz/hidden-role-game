@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { getLobby, getLobbyId, getPlayerId, clearSession } from "@/lib/api";
-import { ServerResponseStatus } from "@/server/models";
+import { getLobbyId, getPlayerId } from "@/lib/api";
 import { useCreateLobby } from "@/hooks/create-lobby";
 import { useJoinLobby } from "@/hooks/join-lobby";
+import { useStoredLobbyQuery } from "@/hooks/lobby-query";
 
 export default function Home() {
   const router = useRouter();
@@ -21,20 +20,7 @@ export default function Home() {
   const storedLobbyId = getLobbyId();
   const myPlayerId = getPlayerId();
 
-  const storedLobbyQuery = useQuery({
-    queryKey: ["stored-lobby", storedLobbyId],
-    queryFn: async () => {
-      if (!storedLobbyId) return null;
-      const { data, httpStatus } = await getLobby(storedLobbyId);
-      if (httpStatus === 404 || httpStatus === 403) {
-        clearSession();
-        return null;
-      }
-      if (data.status === ServerResponseStatus.Error) return null;
-      return data.data;
-    },
-    enabled: !!storedLobbyId,
-  });
+  const storedLobbyQuery = useStoredLobbyQuery(storedLobbyId);
 
   const storedPlayerName =
     storedLobbyQuery.data?.players.find((p) => p.id === myPlayerId)?.name ?? "";
