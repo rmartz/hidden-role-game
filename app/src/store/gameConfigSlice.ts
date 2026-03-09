@@ -1,0 +1,141 @@
+import { createSlice } from "@reduxjs/toolkit";
+import type { PayloadAction } from "@reduxjs/toolkit";
+import { keyBy, mapValues, sum } from "lodash";
+import { GameMode } from "@/lib/models";
+import type { RoleSlot } from "@/lib/models";
+import type { GameConfig } from "@/server/models";
+import { GAME_MODES } from "@/lib/game-modes";
+
+function computeIsValid(
+  playerCount: number,
+  roleCounts: Record<string, number>,
+): boolean {
+  return sum(Object.values(roleCounts)) === playerCount;
+}
+
+function roleCountsFromSlots(slots: RoleSlot[]): Record<string, number> {
+  return mapValues(keyBy(slots, "roleId"), "count");
+}
+
+export interface GameConfigState {
+  gameMode: GameMode;
+  playerCount: number;
+  roleCounts: Record<string, number>;
+  showConfigToPlayers: boolean;
+  showRolesInPlay: boolean;
+  isValid: boolean;
+  /** Increments on every user-initiated action. Used to detect when a sync is needed. */
+  syncVersion: number;
+}
+
+const initialState: GameConfigState = {
+  gameMode: GameMode.SecretVillain,
+  playerCount: 5,
+  roleCounts: {},
+  showConfigToPlayers: false,
+  showRolesInPlay: false,
+  isValid: false,
+  syncVersion: 0,
+};
+
+const gameConfigSlice = createSlice({
+  name: "gameConfig",
+  initialState,
+  reducers: {
+    /** Initialise (or re-sync) state from the server. Does NOT increment syncVersion. */
+    initFromServer(
+      state,
+      action: PayloadAction<{ config: GameConfig; playerCount: number }>,
+    ) {
+      const { config, playerCount } = action.payload;
+      state.gameMode = config.gameMode;
+      state.playerCount = playerCount;
+      state.roleCounts = roleCountsFromSlots(config.roleSlots ?? []);
+      state.showConfigToPlayers = config.showConfigToPlayers;
+      state.showRolesInPlay = config.showRolesInPlay;
+      state.isValid = computeIsValid(playerCount, state.roleCounts);
+    },
+
+    setGameMode(state, action: PayloadAction<GameMode>) {
+      state.gameMode = action.payload;
+      const slots = GAME_MODES[action.payload].defaultRoleCount(
+        state.playerCount,
+      );
+      state.roleCounts = roleCountsFromSlots(slots);
+      state.isValid = computeIsValid(state.playerCount, state.roleCounts);
+      state.syncVersion++;
+    },
+
+    incrementRoleCount(state, action: PayloadAction<string>) {
+      const roleId = action.payload;
+      state.roleCounts[roleId] = (state.roleCounts[roleId] ?? 0) + 1;
+      state.isValid = computeIsValid(state.playerCount, state.roleCounts);
+      state.syncVersion++;
+    },
+
+    decrementRoleCount(state, action: PayloadAction<string>) {
+      const roleId = action.payload;
+      state.roleCounts[roleId] = Math.max(
+        0,
+        (state.roleCounts[roleId] ?? 0) - 1,
+      );
+      state.isValid = computeIsValid(state.playerCount, state.roleCounts);
+      state.syncVersion++;
+    },
+
+    setRoleCount(
+      state,
+      action: PayloadAction<{ roleId: string; count: number }>,
+    ) {
+      const { roleId, count } = action.payload;
+      state.roleCounts[roleId] = Math.max(0, count);
+      state.isValid = computeIsValid(state.playerCount, state.roleCounts);
+      state.syncVersion++;
+    },
+
+    incrementPlayerCount(state) {
+      state.playerCount++;
+      state.isValid = computeIsValid(state.playerCount, state.roleCounts);
+      state.syncVersion++;
+    },
+
+    decrementPlayerCount(state) {
+      const { minPlayers } = GAME_MODES[state.gameMode];
+      state.playerCount = Math.max(minPlayers, state.playerCount - 1);
+      state.isValid = computeIsValid(state.playerCount, state.roleCounts);
+      state.syncVersion++;
+    },
+
+    setPlayerCount(state, action: PayloadAction<number>) {
+      const { minPlayers } = GAME_MODES[state.gameMode];
+      state.playerCount = Math.max(minPlayers, action.payload);
+      state.isValid = computeIsValid(state.playerCount, state.roleCounts);
+      state.syncVersion++;
+    },
+
+    setShowConfigToPlayers(state, action: PayloadAction<boolean>) {
+      state.showConfigToPlayers = action.payload;
+      state.syncVersion++;
+    },
+
+    setShowRolesInPlay(state, action: PayloadAction<boolean>) {
+      state.showRolesInPlay = action.payload;
+      state.syncVersion++;
+    },
+  },
+});
+
+export const {
+  initFromServer,
+  setGameMode,
+  incrementRoleCount,
+  decrementRoleCount,
+  setRoleCount,
+  incrementPlayerCount,
+  decrementPlayerCount,
+  setPlayerCount,
+  setShowConfigToPlayers,
+  setShowRolesInPlay,
+} = gameConfigSlice.actions;
+
+export default gameConfigSlice.reducer;
