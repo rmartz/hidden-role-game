@@ -38,13 +38,16 @@ export class GameService {
       const myRole = roles[assignment.roleDefinitionId];
 
       const visibleRoles: PlayerRoleAssignment[] = [];
-      if (myRole?.canSeeTeam && myRole.canSeeTeam.length > 0) {
-        const visibleTeams = new Set(myRole.canSeeTeam);
+      const visibleTeams = new Set(myRole?.canSeeTeam ?? []);
+      const visibleRoleIds = new Set(myRole?.canSeeRole ?? []);
+      if (visibleTeams.size > 0 || visibleRoleIds.size > 0) {
         for (const other of roleAssignments) {
           if (other.playerId === assignment.playerId) continue;
           const role = roles[other.roleDefinitionId];
-          if (!role || !visibleTeams.has(role.team)) continue;
-          visibleRoles.push(other);
+          if (!role) continue;
+          if (visibleTeams.has(role.team) || visibleRoleIds.has(role.id)) {
+            visibleRoles.push(other);
+          }
         }
       }
 

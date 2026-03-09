@@ -1,11 +1,17 @@
 import { Team } from "@/lib/models";
 import type { GameModeConfig, RoleDefinition, RoleSlot } from "@/lib/models";
 
+export enum WakesAtNight {
+  Never = "Never",
+  FirstNightOnly = "FirstNightOnly",
+  EveryNight = "EveryNight",
+}
+
 export interface WerewolfRoleDefinition extends RoleDefinition<
   WerewolfRole,
   Team
 > {
-  wakesAtNight: boolean | "first-night-only";
+  wakesAtNight: WakesAtNight;
 }
 
 export enum WerewolfRole {
@@ -25,10 +31,11 @@ const MIN_PLAYERS = 5;
 function defaultRoleCount(numPlayers: number): RoleSlot[] {
   const n = Math.max(numPlayers, MIN_PLAYERS);
   const werewolves = Math.floor(n / 3);
-  const villagers = n - werewolves;
+  const villagers = n - werewolves - 1;
   return [
     { roleId: WerewolfRole.Werewolf, count: werewolves },
     { roleId: WerewolfRole.Villager, count: villagers },
+    { roleId: WerewolfRole.Seer, count: 1 },
   ];
 }
 
@@ -37,56 +44,57 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     id: WerewolfRole.Villager,
     name: "Villager",
     team: Team.Good,
-    wakesAtNight: false,
+    wakesAtNight: WakesAtNight.Never,
   },
   [WerewolfRole.Werewolf]: {
     id: WerewolfRole.Werewolf,
     name: "Werewolf",
     team: Team.Bad,
     canSeeTeam: [Team.Bad],
-    wakesAtNight: true,
+    wakesAtNight: WakesAtNight.EveryNight,
   },
   [WerewolfRole.Seer]: {
     id: WerewolfRole.Seer,
     name: "Seer",
     team: Team.Good,
-    wakesAtNight: true,
+    wakesAtNight: WakesAtNight.EveryNight,
   },
   [WerewolfRole.Witch]: {
     id: WerewolfRole.Witch,
     name: "Witch",
     team: Team.Good,
-    wakesAtNight: true,
+    wakesAtNight: WakesAtNight.EveryNight,
   },
   [WerewolfRole.Spellcaster]: {
     id: WerewolfRole.Spellcaster,
     name: "Spellcaster",
     team: Team.Good,
-    wakesAtNight: true,
+    wakesAtNight: WakesAtNight.EveryNight,
   },
   [WerewolfRole.Mason]: {
     id: WerewolfRole.Mason,
     name: "Mason",
     team: Team.Good,
-    wakesAtNight: "first-night-only",
+    canSeeRole: [WerewolfRole.Mason],
+    wakesAtNight: WakesAtNight.FirstNightOnly,
   },
   [WerewolfRole.Chupacabra]: {
     id: WerewolfRole.Chupacabra,
     name: "Chupacabra",
     team: Team.Neutral,
-    wakesAtNight: true,
+    wakesAtNight: WakesAtNight.EveryNight,
   },
   [WerewolfRole.VillageIdiot]: {
     id: WerewolfRole.VillageIdiot,
     name: "Village Idiot",
     team: Team.Good,
-    wakesAtNight: false,
+    wakesAtNight: WakesAtNight.Never,
   },
   [WerewolfRole.Bodyguard]: {
     id: WerewolfRole.Bodyguard,
     name: "Bodyguard",
     team: Team.Good,
-    wakesAtNight: true,
+    wakesAtNight: WakesAtNight.EveryNight,
   },
 };
 

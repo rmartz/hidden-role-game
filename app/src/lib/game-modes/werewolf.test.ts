@@ -1,6 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { Team } from "@/lib/models";
-import { WEREWOLF_CONFIG, WEREWOLF_ROLES, WerewolfRole } from "./werewolf";
+import {
+  WEREWOLF_CONFIG,
+  WEREWOLF_ROLES,
+  WerewolfRole,
+  WakesAtNight,
+} from "./werewolf";
 
 describe("WEREWOLF_CONFIG.defaultRoleCount", () => {
   it("returns correct counts for minimum player count (5)", () => {
@@ -8,7 +13,8 @@ describe("WEREWOLF_CONFIG.defaultRoleCount", () => {
     const counts = Object.fromEntries(slots.map((s) => [s.roleId, s.count]));
 
     expect(counts[WerewolfRole.Werewolf]).toBe(1);
-    expect(counts[WerewolfRole.Villager]).toBe(4);
+    expect(counts[WerewolfRole.Villager]).toBe(3);
+    expect(counts[WerewolfRole.Seer]).toBe(1);
   });
 
   it("returns correct counts for 10 players", () => {
@@ -16,7 +22,8 @@ describe("WEREWOLF_CONFIG.defaultRoleCount", () => {
     const counts = Object.fromEntries(slots.map((s) => [s.roleId, s.count]));
 
     expect(counts[WerewolfRole.Werewolf]).toBe(3);
-    expect(counts[WerewolfRole.Villager]).toBe(7);
+    expect(counts[WerewolfRole.Villager]).toBe(6);
+    expect(counts[WerewolfRole.Seer]).toBe(1);
   });
 
   it("total slot count always equals numPlayers", () => {
@@ -49,17 +56,33 @@ describe("WEREWOLF_ROLES", () => {
   });
 
   it("night-waking roles are correctly configured", () => {
-    expect(WEREWOLF_ROLES[WerewolfRole.Werewolf].wakesAtNight).toBe(true);
-    expect(WEREWOLF_ROLES[WerewolfRole.Seer].wakesAtNight).toBe(true);
-    expect(WEREWOLF_ROLES[WerewolfRole.Witch].wakesAtNight).toBe(true);
-    expect(WEREWOLF_ROLES[WerewolfRole.Spellcaster].wakesAtNight).toBe(true);
-    expect(WEREWOLF_ROLES[WerewolfRole.Bodyguard].wakesAtNight).toBe(true);
-    expect(WEREWOLF_ROLES[WerewolfRole.Chupacabra].wakesAtNight).toBe(true);
-    expect(WEREWOLF_ROLES[WerewolfRole.Mason].wakesAtNight).toBe(
-      "first-night-only",
+    expect(WEREWOLF_ROLES[WerewolfRole.Werewolf].wakesAtNight).toBe(
+      WakesAtNight.EveryNight,
     );
-    expect(WEREWOLF_ROLES[WerewolfRole.Villager].wakesAtNight).toBe(false);
-    expect(WEREWOLF_ROLES[WerewolfRole.VillageIdiot].wakesAtNight).toBe(false);
+    expect(WEREWOLF_ROLES[WerewolfRole.Seer].wakesAtNight).toBe(
+      WakesAtNight.EveryNight,
+    );
+    expect(WEREWOLF_ROLES[WerewolfRole.Witch].wakesAtNight).toBe(
+      WakesAtNight.EveryNight,
+    );
+    expect(WEREWOLF_ROLES[WerewolfRole.Spellcaster].wakesAtNight).toBe(
+      WakesAtNight.EveryNight,
+    );
+    expect(WEREWOLF_ROLES[WerewolfRole.Bodyguard].wakesAtNight).toBe(
+      WakesAtNight.EveryNight,
+    );
+    expect(WEREWOLF_ROLES[WerewolfRole.Chupacabra].wakesAtNight).toBe(
+      WakesAtNight.EveryNight,
+    );
+    expect(WEREWOLF_ROLES[WerewolfRole.Mason].wakesAtNight).toBe(
+      WakesAtNight.FirstNightOnly,
+    );
+    expect(WEREWOLF_ROLES[WerewolfRole.Villager].wakesAtNight).toBe(
+      WakesAtNight.Never,
+    );
+    expect(WEREWOLF_ROLES[WerewolfRole.VillageIdiot].wakesAtNight).toBe(
+      WakesAtNight.Never,
+    );
   });
 
   it("Werewolves can see their own team", () => {
