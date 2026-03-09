@@ -9,7 +9,7 @@ import {
   useRemovePlayer,
   useStartGame,
   useTransferOwner,
-  useUpdateLobbyConfig,
+  useConfigSync,
 } from "@/hooks";
 import JoinPrompt from "./JoinPrompt";
 import PlayerList from "./PlayerList";
@@ -72,7 +72,7 @@ export default function LobbyPage() {
 
   const startGameMutation = useStartGame(lobbyId);
   const transferOwnerMutation = useTransferOwner(lobbyId);
-  const updateConfigMutation = useUpdateLobbyConfig(lobbyId);
+  const { flush: flushConfigSync } = useConfigSync(lobbyId, isOwner);
 
   function handleRefetch() {
     void fetchLobby.refetch();
@@ -116,9 +116,6 @@ export default function LobbyPage() {
             playerCount={fetchLobby.data.players.length}
             readOnly={false}
             isPending={startGameMutation.isPending}
-            onConfigChange={(config) => {
-              updateConfigMutation.mutate(config);
-            }}
             onStartGame={(roleSlots, gameMode) => {
               startGameMutation.mutate({ roleSlots, gameMode });
             }}
@@ -145,6 +142,7 @@ export default function LobbyPage() {
             removeMutation.mutate(playerId);
           }}
           onTransferOwner={(playerId: string) => {
+            flushConfigSync();
             transferOwnerMutation.mutate(playerId);
           }}
         />

@@ -1,7 +1,11 @@
-import { useState } from "react";
-import { keyBy, mapValues, pickBy, sum } from "lodash";
+import { keyBy, mapValues, sum } from "lodash";
 import type { RoleDefinition, Team } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
+import { useAppDispatch, useAppSelector } from "@/store";
+import {
+  incrementRoleCount,
+  decrementRoleCount,
+} from "@/store/gameConfigSlice";
 
 interface ReadOnlyProps {
   roleDefinitions: Record<string, RoleDefinition<string, Team>>;
@@ -12,11 +16,9 @@ interface ReadOnlyProps {
 
 interface EditableProps {
   roleDefinitions: Record<string, RoleDefinition<string, Team>>;
-  roleSlots?: RoleSlot[];
   playerCount: number;
   readOnly: false;
   disabled: boolean;
-  onRoleSlotsChange: (roleSlots: RoleSlot[]) => void;
 }
 
 type Props = ReadOnlyProps | EditableProps;
@@ -24,27 +26,14 @@ type Props = ReadOnlyProps | EditableProps;
 export default function RoleConfig(props: Props) {
   const { roleDefinitions, playerCount, readOnly } = props;
 
-  const slotCounts = keyBy(!readOnly ? props.roleSlots : [], "roleId");
-  const [counts, setCounts] = useState<Record<string, number>>(
-    mapValues(roleDefinitions, (_, roleId) => slotCounts[roleId]?.count ?? 0),
-  );
-
-  const total = sum(Object.values(counts));
-
-  function handleChange(roleId: string, value: number) {
-    const newCounts = { ...counts, [roleId]: Math.max(0, value) };
-    setCounts(newCounts);
-    if (!readOnly) {
-      const roleSlots = Object.entries(pickBy(newCounts, (v) => v > 0)).map(
-        ([roleId, count]) => ({ roleId, count }),
-      );
-      props.onRoleSlotsChange(roleSlots);
-    }
-  }
+  const dispatch = useAppDispatch();
+  const roleCounts = useAppSelector((s) => s.gameConfig.roleCounts);
 
   const displayCounts = readOnly
     ? mapValues(keyBy(props.roleSlots ?? [], "roleId"), (s) => s.count)
-    : counts;
+    : roleCounts;
+
+  const total = readOnly ? 0 : sum(Object.values(roleCounts));
 
   return (
     <div style={{ marginTop: "20px" }}>
@@ -75,16 +64,16 @@ export default function RoleConfig(props: Props) {
               <>
                 <button
                   onClick={() => {
-                    handleChange(role.id, (counts[role.id] ?? 0) - 1);
+                    dispatch(decrementRoleCount(role.id));
                   }}
-                  disabled={props.disabled || (counts[role.id] ?? 0) === 0}
+                  disabled={props.disabled || (roleCounts[role.id] ?? 0) === 0}
                 >
                   -
                 </button>
-                <span>{counts[role.id] ?? 0}</span>
+                <span>{roleCounts[role.id] ?? 0}</span>
                 <button
                   onClick={() => {
-                    handleChange(role.id, (counts[role.id] ?? 0) + 1);
+                    dispatch(incrementRoleCount(role.id));
                   }}
                   disabled={props.disabled}
                 >
