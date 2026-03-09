@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { getPlayerId, getSessionId } from "@/lib/api";
+import { getPlayerId } from "@/lib/api";
 import { LobbyChangeReason } from "@/server/models/websocket";
 import type { LobbySocketEvent } from "@/server/models/websocket";
 
@@ -13,7 +13,10 @@ const RECONNECT_DELAY_MS = 3000;
  * lobby state changes. Automatically reconnects on unexpected disconnection.
  * Returns whether the connection is active.
  */
-export function useLobbyWebSocket(lobbyId: string): { isConnected: boolean } {
+export function useLobbyWebSocket(
+  lobbyId: string,
+  sessionId: string | null,
+): { isConnected: boolean } {
   const queryClient = useQueryClient();
   const [isConnected, setIsConnected] = useState(false);
   const reconnectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -22,7 +25,6 @@ export function useLobbyWebSocket(lobbyId: string): { isConnected: boolean } {
   useEffect(() => {
     isMounted.current = true;
 
-    const sessionId = getSessionId();
     if (!sessionId) return;
 
     const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
@@ -91,7 +93,7 @@ export function useLobbyWebSocket(lobbyId: string): { isConnected: boolean } {
       }
       ws.close();
     };
-  }, [lobbyId, queryClient]);
+  }, [lobbyId, sessionId, queryClient]);
 
   return { isConnected };
 }

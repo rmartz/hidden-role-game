@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { getPlayerId, getLobbyId } from "@/lib/api";
+import { getPlayerId, getLobbyId, getSessionId } from "@/lib/api";
 import {
   useLobbyQuery,
   useLobbyWebSocket,
@@ -25,8 +25,10 @@ export default function LobbyPage() {
   const [storedLobbyId, setStoredLobbyId] = useState<string | null | undefined>(
     undefined,
   );
+  const [sessionId, setSessionId] = useState<string | null>(null);
   useEffect(() => {
     setStoredLobbyId(getLobbyId());
+    setSessionId(getSessionId());
   }, []);
 
   const hasDifferentLobby =
@@ -34,7 +36,7 @@ export default function LobbyPage() {
     storedLobbyId !== null &&
     storedLobbyId !== lobbyId;
 
-  const { isConnected: wsConnected } = useLobbyWebSocket(lobbyId);
+  const { isConnected: wsConnected } = useLobbyWebSocket(lobbyId, sessionId);
 
   const fetchLobby = useLobbyQuery(lobbyId, {
     enabled: storedLobbyId !== undefined && !hasDifferentLobby,
@@ -106,7 +108,12 @@ export default function LobbyPage() {
         )}
 
       {!fetchLobby.isLoading && fetchLobby.data === null && (
-        <JoinPrompt lobbyId={lobbyId} />
+        <JoinPrompt
+          lobbyId={lobbyId}
+          onJoined={() => {
+            setSessionId(getSessionId());
+          }}
+        />
       )}
 
       {removeMutation.error && (
