@@ -2,16 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { getPlayerId, getLobbyId } from "@/lib/api";
 import {
-  getLobby,
-  removePlayer,
-  joinLobby,
-  getPlayerId,
-  getLobbyId,
-  clearSession,
-} from "@/lib/api";
-import { ServerResponseStatus } from "@/server/models";
+  useLeaveAndJoinLobby,
+  useStoredLobbyQuery,
+  useLobbyExistsQuery,
+} from "@/hooks";
 import LobbyConflictResolution from "../LobbyConflictResolution";
 
 export default function LobbyConflictPage() {
@@ -21,31 +17,8 @@ export default function LobbyConflictPage() {
   const storedLobbyId = getLobbyId();
   const myPlayerId = getPlayerId();
 
-  const targetLobbyQuery = useQuery({
-    queryKey: ["target-lobby-exists", lobbyId],
-    queryFn: async () => {
-      const { httpStatus } = await getLobby(lobbyId);
-      // 403 means the lobby exists but the session belongs to a different lobby — expected.
-      // 404 means the lobby doesn't exist at all.
-      return httpStatus !== 404;
-    },
-    retry: false,
-  });
-
-  const conflictLobbyQuery = useQuery({
-    queryKey: ["conflict-lobby", storedLobbyId],
-    queryFn: async () => {
-      if (!storedLobbyId) return null;
-      const { data, httpStatus } = await getLobby(storedLobbyId);
-      if (httpStatus === 404 || httpStatus === 403) {
-        clearSession();
-        return null;
-      }
-      if (data.status === ServerResponseStatus.Error) return null;
-      return data.data;
-    },
-    enabled: !!storedLobbyId,
-  });
+  const targetLobbyQuery = useLobbyExistsQuery(lobbyId);
+  const conflictLobbyQuery = useStoredLobbyQuery(storedLobbyId);
 
   const defaultName =
     conflictLobbyQuery.data?.players.find((p) => p.id === myPlayerId)?.name ??
@@ -84,17 +57,14 @@ export default function LobbyConflictPage() {
     }
   }, [conflictLobbyQuery.isLoading, conflictLobbyQuery.data, lobbyId, router]);
 
-  const joinMutation = useMutation({
-    mutationFn: async () => {
-      if (!storedLobbyId || !myPlayerId) return;
-      await removePlayer(storedLobbyId, myPlayerId);
-      clearSession();
-      await joinLobby(lobbyId, playerName);
-    },
-    onSuccess: () => {
-      router.replace(`/lobby/${lobbyId}`);
-    },
+  const joinMutation = useLeaveAndJoinLobby(() => {
+    router.replace(`/lobby/${lobbyId}`);
   });
+
+  function handleJoin() {
+    if (!storedLobbyId || !myPlayerId) return;
+    joinMutation.mutate({ storedLobbyId, myPlayerId, lobbyId, playerName });
+  }
 
   if (
     targetLobbyQuery.isLoading ||
@@ -114,9 +84,7 @@ export default function LobbyConflictPage() {
         playerName={playerName}
         onPlayerNameChange={setPlayerName}
         isJoining={joinMutation.isPending}
-        onJoin={() => {
-          joinMutation.mutate();
-        }}
+        onJoin={handleJoin}
       />
     </div>
   );

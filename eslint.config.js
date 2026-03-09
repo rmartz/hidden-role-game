@@ -10,6 +10,7 @@ export default tseslint.config(
       "**/node_modules/**",
       "**/.next/**",
       "**/next-env.d.ts",
+      "app/vitest.config.ts",
     ],
   },
   js.configs.recommended,
