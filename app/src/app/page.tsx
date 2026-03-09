@@ -2,39 +2,23 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-  createLobby,
-  joinLobby,
-  getLobby,
-  getLobbyId,
-  getPlayerId,
-  clearSession,
-} from "@/lib/api";
-import { ServerResponseStatus } from "@/server/models";
+import { getLobbyId, getPlayerId } from "@/lib/api";
+import { useCreateLobby, useJoinLobby, useStoredLobbyQuery } from "@/hooks";
 
 export default function Home() {
   const router = useRouter();
   const [playerName, setPlayerName] = useState("");
   const [lobbyIdInput, setLobbyIdInput] = useState("");
 
+  const createMutation = useCreateLobby();
+  const joinMutation = useJoinLobby((data) => {
+    router.push(`/lobby/${data.lobby.id}`);
+  });
+
   const storedLobbyId = getLobbyId();
   const myPlayerId = getPlayerId();
 
-  const storedLobbyQuery = useQuery({
-    queryKey: ["stored-lobby", storedLobbyId],
-    queryFn: async () => {
-      if (!storedLobbyId) return null;
-      const { data, httpStatus } = await getLobby(storedLobbyId);
-      if (httpStatus === 404 || httpStatus === 403) {
-        clearSession();
-        return null;
-      }
-      if (data.status === ServerResponseStatus.Error) return null;
-      return data.data;
-    },
-    enabled: !!storedLobbyId,
-  });
+  const storedLobbyQuery = useStoredLobbyQuery(storedLobbyId);
 
   const storedPlayerName =
     storedLobbyQuery.data?.players.find((p) => p.id === myPlayerId)?.name ?? "";
@@ -44,30 +28,6 @@ export default function Home() {
       setPlayerName(storedPlayerName);
     }
   }, [storedPlayerName, playerName]);
-
-  const createMutation = useMutation({
-    mutationFn: async () => {
-      const response = await createLobby(playerName);
-      if (response.status === ServerResponseStatus.Error)
-        throw new Error(response.error);
-      return response.data;
-    },
-    onSuccess: (data) => {
-      router.push(`/lobby/${data.lobby.id}`);
-    },
-  });
-
-  const joinMutation = useMutation({
-    mutationFn: async () => {
-      const response = await joinLobby(lobbyIdInput, playerName);
-      if (response.status === ServerResponseStatus.Error)
-        throw new Error(response.error);
-      return response.data;
-    },
-    onSuccess: (data) => {
-      router.push(`/lobby/${data.lobby.id}`);
-    },
-  });
 
   const error = createMutation.error?.message ?? joinMutation.error?.message;
   const loading = createMutation.isPending || joinMutation.isPending;
@@ -150,7 +110,7 @@ export default function Home() {
       <div style={{ display: "flex", gap: "10px" }}>
         <button
           onClick={() => {
-            createMutation.mutate();
+            createMutation.mutate(playerName);
           }}
           disabled={loading || playerName.trim() === ""}
         >
@@ -158,7 +118,7 @@ export default function Home() {
         </button>
         <button
           onClick={() => {
-            joinMutation.mutate();
+            joinMutation.mutate({ lobbyId: lobbyIdInput, playerName });
           }}
           disabled={
             loading || playerName.trim() === "" || lobbyIdInput.trim() === ""

@@ -2,19 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
+import { getPlayerId, getLobbyId } from "@/lib/api";
 import {
-  getLobby,
-  removePlayer,
-  transferOwner,
-  startGame,
-  updateLobbyConfig,
-  getPlayerId,
-  getLobbyId,
-} from "@/lib/api";
-import { ServerResponseStatus } from "@/server/models";
-import type { GameMode } from "@/lib/models";
-import type { RoleSlot } from "@/server/models";
+  useLobbyQuery,
+  useRemovePlayer,
+  useStartGame,
+  useTransferOwner,
+  useUpdateLobbyConfig,
+} from "@/hooks";
 import JoinPrompt from "./JoinPrompt";
 import PlayerList from "./PlayerList";
 import GameConfigurationPanel from "./GameConfigurationPanel";
@@ -37,22 +33,8 @@ export default function LobbyPage() {
     storedLobbyId !== null &&
     storedLobbyId !== lobbyId;
 
-  const fetchLobby = useQuery({
-    queryKey: ["lobby", lobbyId],
-    queryFn: async () => {
-      const { data, httpStatus } = await getLobby(lobbyId);
-      if (httpStatus === 404 || httpStatus === 403)
-        throw new Error(String(httpStatus));
-      if (data.status === ServerResponseStatus.Error) return null;
-      return data.data;
-    },
-    refetchInterval: (query) => {
-      if (!query.state.data) return false;
-      if (query.state.data.gameId) return false;
-      return 3_000;
-    },
+  const fetchLobby = useLobbyQuery(lobbyId, {
     enabled: storedLobbyId !== undefined && !hasDifferentLobby,
-    retry: false,
   });
 
   const myPlayerId = getPlayerId();
@@ -80,50 +62,17 @@ export default function LobbyPage() {
     }
   }, [fetchLobby.error, router]);
 
-  const removeMutation = useMutation({
-    mutationFn: (targetPlayerId: string) =>
-      removePlayer(lobbyId, targetPlayerId),
-    onSuccess: (response, targetPlayerId) => {
-      if (response.status === ServerResponseStatus.Error) return;
-      if (targetPlayerId === myPlayerId) {
-        router.push("/");
-      } else {
-        void queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
-      }
-    },
-  });
-
-  const startGameMutation = useMutation({
-    mutationFn: ({
-      roleSlots,
-      gameMode,
-    }: {
-      roleSlots: RoleSlot[];
-      gameMode: GameMode;
-    }) => startGame(lobbyId, roleSlots, gameMode),
-    onSuccess: (response) => {
-      if (response.status === ServerResponseStatus.Error) return;
+  const removeMutation = useRemovePlayer(lobbyId, (targetPlayerId) => {
+    if (targetPlayerId === myPlayerId) {
+      router.push("/");
+    } else {
       void queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
-    },
+    }
   });
 
-  const transferOwnerMutation = useMutation({
-    mutationFn: (targetPlayerId: string) =>
-      transferOwner(lobbyId, targetPlayerId),
-    onSuccess: (response) => {
-      if (response.status === ServerResponseStatus.Error) return;
-      void queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
-    },
-  });
-
-  const updateConfigMutation = useMutation({
-    mutationFn: (config: Parameters<typeof updateLobbyConfig>[1]) =>
-      updateLobbyConfig(lobbyId, config),
-    onSuccess: (response) => {
-      if (response.status === ServerResponseStatus.Error) return;
-      queryClient.setQueryData(["lobby", lobbyId], response.data.lobby);
-    },
-  });
+  const startGameMutation = useStartGame(lobbyId);
+  const transferOwnerMutation = useTransferOwner(lobbyId);
+  const updateConfigMutation = useUpdateLobbyConfig(lobbyId);
 
   function handleRefetch() {
     void fetchLobby.refetch();
