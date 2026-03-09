@@ -1,4 +1,4 @@
-import type { RoleDefinition } from "@/lib/models";
+import type { RoleDefinition, RoleSlot } from "@/lib/models";
 
 export enum AvalonRole {
   Good = "avalon-good",
@@ -32,3 +32,16 @@ export const AVALON_ROLES: Record<
     team: AvalonTeam.Bad,
   },
 };
+
+export const MIN_PLAYERS = 5;
+
+export function defaultRoleCount(numPlayers: number): RoleSlot[] {
+  const bad = Math.floor((numPlayers - 1) / 2);
+  const specialGood = 1;
+  const good = numPlayers - bad - specialGood;
+  return [
+    { roleId: AvalonRole.Bad, count: bad },
+    { roleId: AvalonRole.SpecialGood, count: specialGood },
+    { roleId: AvalonRole.Good, count: good },
+  ];
+}

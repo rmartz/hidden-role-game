@@ -4,7 +4,7 @@ import type {
   RoleDefinition,
 } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
-import { WEREWOLF_ROLES, WerewolfRole } from "@/lib/game-modes/werewolf-roles";
+import { WEREWOLF_ROLES, defaultRoleCount } from "@/lib/game-modes/werewolf";
 import { assignRoles } from "./assignRoles";
 
 export class WerewolfService {
@@ -22,12 +22,7 @@ export class WerewolfService {
   }
 
   defaultRoleCount(numPlayers: number): RoleSlot[] {
-    const bad = Math.floor(numPlayers / 3);
-    const good = numPlayers - bad;
-    return [
-      { roleId: WerewolfRole.Bad, count: bad },
-      { roleId: WerewolfRole.Good, count: good },
-    ];
+    return defaultRoleCount(numPlayers);
   }
 }
 

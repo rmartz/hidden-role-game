@@ -1,44 +1,24 @@
 import { GameMode } from "@/lib/models";
-import type { RoleDefinition, RoleSlot } from "@/lib/models";
-import {
-  SECRET_VILLAIN_ROLES,
-  SecretVillainRole,
-  SecretVillainTeam,
-} from "@/lib/game-modes/secret-villain-roles";
-import {
-  AVALON_ROLES,
-  AvalonRole,
-  AvalonTeam,
-} from "@/lib/game-modes/avalon-roles";
-import {
-  WEREWOLF_ROLES,
-  WerewolfRole,
-  WerewolfTeam,
-} from "@/lib/game-modes/werewolf-roles";
+import type { RoleSlot } from "@/lib/models";
+import * as secretVillain from "@/lib/game-modes/secret-villain";
+import * as avalon from "@/lib/game-modes/avalon";
+import * as werewolf from "@/lib/game-modes/werewolf";
 
 export {
   SecretVillainRole,
   SecretVillainTeam,
-  AvalonRole,
-  AvalonTeam,
-  WerewolfRole,
-  WerewolfTeam,
-};
+} from "@/lib/game-modes/secret-villain";
+export { AvalonRole, AvalonTeam } from "@/lib/game-modes/avalon";
+export { WerewolfRole, WerewolfTeam } from "@/lib/game-modes/werewolf";
 
 export const GAME_MODE_ROLES: {
-  [GameMode.SecretVillain]: Record<
-    SecretVillainRole,
-    RoleDefinition<SecretVillainRole, SecretVillainTeam>
-  >;
-  [GameMode.Avalon]: Record<AvalonRole, RoleDefinition<AvalonRole, AvalonTeam>>;
-  [GameMode.Werewolf]: Record<
-    WerewolfRole,
-    RoleDefinition<WerewolfRole, WerewolfTeam>
-  >;
+  [GameMode.SecretVillain]: typeof secretVillain.SECRET_VILLAIN_ROLES;
+  [GameMode.Avalon]: typeof avalon.AVALON_ROLES;
+  [GameMode.Werewolf]: typeof werewolf.WEREWOLF_ROLES;
 } = {
-  [GameMode.SecretVillain]: SECRET_VILLAIN_ROLES,
-  [GameMode.Avalon]: AVALON_ROLES,
-  [GameMode.Werewolf]: WEREWOLF_ROLES,
+  [GameMode.SecretVillain]: secretVillain.SECRET_VILLAIN_ROLES,
+  [GameMode.Avalon]: avalon.AVALON_ROLES,
+  [GameMode.Werewolf]: werewolf.WEREWOLF_ROLES,
 };
 
 export const GAME_MODE_NAMES: Record<GameMode, string> = {
@@ -47,36 +27,28 @@ export const GAME_MODE_NAMES: Record<GameMode, string> = {
   [GameMode.Werewolf]: "Werewolf",
 };
 
+const GAME_MODE_CONFIG: Record<
+  GameMode,
+  { minPlayers: number; defaultRoleCount: (n: number) => RoleSlot[] }
+> = {
+  [GameMode.SecretVillain]: {
+    minPlayers: secretVillain.MIN_PLAYERS,
+    defaultRoleCount: secretVillain.defaultRoleCount,
+  },
+  [GameMode.Avalon]: {
+    minPlayers: avalon.MIN_PLAYERS,
+    defaultRoleCount: avalon.defaultRoleCount,
+  },
+  [GameMode.Werewolf]: {
+    minPlayers: werewolf.MIN_PLAYERS,
+    defaultRoleCount: werewolf.defaultRoleCount,
+  },
+};
+
 export function getDefaultRoleSlots(
   gameMode: GameMode,
   playerCount: number,
 ): RoleSlot[] {
-  const defaults = GAME_MODE_DEFAULT_ROLE_SLOTS[gameMode];
-  const slots = defaults.map((s) => ({ ...s }));
-  const minimumCount = slots.reduce((sum, s) => sum + s.count, 0);
-  for (let i = minimumCount; i < playerCount; i++) {
-    const maxIdx = slots.reduce(
-      (best, s, j) => (s.count > (slots[best]?.count ?? 0) ? j : best),
-      0,
-    );
-    const slot = slots[maxIdx];
-    if (slot) slots[maxIdx] = { ...slot, count: slot.count + 1 };
-  }
-  return slots;
+  const { minPlayers, defaultRoleCount } = GAME_MODE_CONFIG[gameMode];
+  return defaultRoleCount(Math.max(playerCount, minPlayers));
 }
-
-export const GAME_MODE_DEFAULT_ROLE_SLOTS: Record<GameMode, RoleSlot[]> = {
-  [GameMode.SecretVillain]: [
-    { roleId: SecretVillainRole.Good, count: 3 },
-    { roleId: SecretVillainRole.Bad, count: 1 },
-  ],
-  [GameMode.Avalon]: [
-    { roleId: AvalonRole.Good, count: 3 },
-    { roleId: AvalonRole.SpecialGood, count: 1 },
-    { roleId: AvalonRole.Bad, count: 1 },
-  ],
-  [GameMode.Werewolf]: [
-    { roleId: WerewolfRole.Good, count: 3 },
-    { roleId: WerewolfRole.Bad, count: 1 },
-  ],
-};

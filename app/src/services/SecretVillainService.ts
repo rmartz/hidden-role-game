@@ -6,8 +6,8 @@ import type {
 import type { RoleSlot } from "@/server/models";
 import {
   SECRET_VILLAIN_ROLES,
-  SecretVillainRole,
-} from "@/lib/game-modes/secret-villain-roles";
+  defaultRoleCount,
+} from "@/lib/game-modes/secret-villain";
 import { assignRoles } from "./assignRoles";
 
 export class SecretVillainService {
@@ -25,14 +25,7 @@ export class SecretVillainService {
   }
 
   defaultRoleCount(numPlayers: number): RoleSlot[] {
-    const specialBad = 1;
-    const bad = Math.floor((numPlayers - 1) / 2) - 1;
-    const good = numPlayers - specialBad - bad;
-    return [
-      { roleId: SecretVillainRole.SpecialBad, count: specialBad },
-      { roleId: SecretVillainRole.Bad, count: bad },
-      { roleId: SecretVillainRole.Good, count: good },
-    ];
+    return defaultRoleCount(numPlayers);
   }
 }
 

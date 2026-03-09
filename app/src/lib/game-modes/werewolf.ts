@@ -1,4 +1,4 @@
-import type { RoleDefinition } from "@/lib/models";
+import type { RoleDefinition, RoleSlot } from "@/lib/models";
 
 export enum WerewolfRole {
   Good = "werewolf-good",
@@ -25,3 +25,14 @@ export const WEREWOLF_ROLES: Record<
     team: WerewolfTeam.Bad,
   },
 };
+
+export const MIN_PLAYERS = 5;
+
+export function defaultRoleCount(numPlayers: number): RoleSlot[] {
+  const bad = Math.floor(numPlayers / 3);
+  const good = numPlayers - bad;
+  return [
+    { roleId: WerewolfRole.Bad, count: bad },
+    { roleId: WerewolfRole.Good, count: good },
+  ];
+}
