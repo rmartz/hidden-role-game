@@ -61,8 +61,17 @@ void app.prepare().then(() => {
       }),
     );
 
-    ws.on("close", () => {
+    ws.on("error", (err) => {
+      console.error(`[LobbyWebSocket] Error on lobby ${lobbyId}:`, err);
+    });
+
+    ws.on("close", (code, reason) => {
       lobbySocketManager.unsubscribe(lobbyId, ws);
+      if (code !== 1000 && code !== 1001) {
+        console.error(
+          `[LobbyWebSocket] Client disconnected from lobby ${lobbyId} (code ${String(code)}: ${reason.toString()})`,
+        );
+      }
     });
   });
 
