@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { GameStatus } from "@/lib/models";
-import { useGameStateQuery, useAdvanceGame } from "@/hooks";
+import { useGameStateQuery, useAdvanceGame, useAdvancePhase } from "@/hooks";
 import OwnerStartingScreen from "../OwnerStartingScreen";
+import OwnerNightScreen from "../OwnerNightScreen";
+import OwnerDayScreen from "../OwnerDayScreen";
 import OwnerGameScreen from "../OwnerGameScreen";
 
 const STARTING_DURATION_SECONDS = 10;
@@ -25,6 +27,7 @@ export default function GameOwnerPage() {
   } = useGameStateQuery(gameId, refetchInterval);
 
   const advanceMutation = useAdvanceGame(gameId);
+  const advancePhaseMutation = useAdvancePhase(gameId);
 
   const gameStatus = gameState?.status.type;
   const isGameOwner =
@@ -64,6 +67,34 @@ export default function GameOwnerPage() {
     }
 
     if (gameState.status.type === GameStatus.Playing) {
+      const { turnState } = gameState.status;
+
+      if (turnState?.phase.type === "nighttime") {
+        return (
+          <OwnerNightScreen
+            gameState={gameState}
+            turnState={turnState}
+            onAdvancePhase={() => {
+              advancePhaseMutation.mutate();
+            }}
+            isAdvancePending={advancePhaseMutation.isPending}
+          />
+        );
+      }
+
+      if (turnState?.phase.type === "daytime") {
+        return (
+          <OwnerDayScreen
+            gameState={gameState}
+            turnState={turnState}
+            onAdvancePhase={() => {
+              advancePhaseMutation.mutate();
+            }}
+            isAdvancePending={advancePhaseMutation.isPending}
+          />
+        );
+      }
+
       return <OwnerGameScreen gameState={gameState} />;
     }
   }

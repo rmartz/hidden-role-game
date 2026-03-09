@@ -5,9 +5,11 @@ import type {
   GameModeConfig,
   GamePlayer,
   LobbyPlayer,
+  NighttimePhase,
   PlayerRoleAssignment,
   RoleDefinition,
   Team,
+  TurnState,
 } from "@/lib/models";
 import type {
   RoleSlot,
@@ -15,6 +17,7 @@ import type {
   PlayerGameState,
 } from "@/server/models";
 import { GAME_MODES } from "@/lib/game-modes";
+import { buildNightPhaseOrder } from "@/lib/game-modes/werewolf";
 import { assignRoles } from "./assignRoles";
 import { adjustRoleSlots } from "@/server/role-slots";
 
@@ -96,10 +99,78 @@ export class GameService {
     return this.games[gameId];
   }
 
+  private buildInitialTurnState(
+    gameMode: GameMode,
+    roleAssignments: PlayerRoleAssignment[],
+  ): TurnState | undefined {
+    if (gameMode !== GameMode.Werewolf) return undefined;
+    const nightPhaseOrder = buildNightPhaseOrder(1, roleAssignments);
+    const phase: NighttimePhase = {
+      type: "nighttime",
+      nightPhaseOrder,
+      currentPhaseIndex: 0,
+    };
+    return { turn: 1, phase };
+  }
+
   public advanceToPlaying(gameId: string): Game | null {
     const game = this.games[gameId];
     if (game?.status.type !== GameStatus.Starting) return null;
-    game.status = { type: GameStatus.Playing };
+    game.status = {
+      type: GameStatus.Playing,
+      turnState: this.buildInitialTurnState(
+        game.gameMode,
+        game.roleAssignments,
+      ),
+    };
+    return game;
+  }
+
+  public advancePhase(gameId: string): Game | null {
+    const game = this.games[gameId];
+    if (game?.status.type !== GameStatus.Playing) return null;
+    const { turnState } = game.status;
+    if (!turnState) return null;
+
+    const { turn, phase } = turnState;
+
+    if (phase.type === "nighttime") {
+      const nextIndex = phase.currentPhaseIndex + 1;
+      if (nextIndex < phase.nightPhaseOrder.length) {
+        // Advance to the next night phase.
+        game.status = {
+          type: GameStatus.Playing,
+          turnState: {
+            turn,
+            phase: { ...phase, currentPhaseIndex: nextIndex },
+          },
+        };
+      } else {
+        // Last night phase — transition to daytime.
+        game.status = {
+          type: GameStatus.Playing,
+          turnState: {
+            turn,
+            phase: { type: "daytime", startedAt: Date.now() },
+          },
+        };
+      }
+    } else {
+      // Daytime — start the next turn's nighttime.
+      const nextTurn = turn + 1;
+      const nightPhaseOrder = buildNightPhaseOrder(
+        nextTurn,
+        game.roleAssignments,
+      );
+      game.status = {
+        type: GameStatus.Playing,
+        turnState: {
+          turn: nextTurn,
+          phase: { type: "nighttime", nightPhaseOrder, currentPhaseIndex: 0 },
+        },
+      };
+    }
+
     return game;
   }
 

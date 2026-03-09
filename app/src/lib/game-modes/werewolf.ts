@@ -1,6 +1,11 @@
 import { sum } from "lodash";
 import { Team } from "@/lib/models";
-import type { GameModeConfig, RoleDefinition, RoleSlot } from "@/lib/models";
+import type {
+  GameModeConfig,
+  PlayerRoleAssignment,
+  RoleDefinition,
+  RoleSlot,
+} from "@/lib/models";
 
 export enum WakesAtNight {
   Never = "Never",
@@ -98,6 +103,28 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.EveryNight,
   },
 };
+
+/**
+ * Returns the ordered list of role IDs that wake during a Werewolf night phase.
+ * On turn 1, includes first-night-only roles; subsequent turns exclude them.
+ * Only includes roles that are actually assigned in the current game.
+ */
+export function buildNightPhaseOrder(
+  turn: number,
+  roleAssignments: PlayerRoleAssignment[],
+): string[] {
+  const assignedRoleIds = new Set(
+    roleAssignments.map((a) => a.roleDefinitionId),
+  );
+  return Object.values(WEREWOLF_ROLES)
+    .filter((role) => {
+      if (!assignedRoleIds.has(role.id)) return false;
+      if (role.wakesAtNight === WakesAtNight.EveryNight) return true;
+      if (role.wakesAtNight === WakesAtNight.FirstNightOnly) return turn === 1;
+      return false;
+    })
+    .map((role) => role.id);
+}
 
 export const WEREWOLF_CONFIG = {
   name: "Werewolf",
