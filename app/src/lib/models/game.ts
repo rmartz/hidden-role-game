@@ -53,6 +53,7 @@ export interface RoleDefinition<
   name: string;
   team: T;
   canSeeTeam?: T[];
+  canSeeRole?: Role[];
 }
 
 export interface GameModeConfig {
