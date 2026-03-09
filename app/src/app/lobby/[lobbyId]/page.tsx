@@ -6,6 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { getPlayerId, getLobbyId } from "@/lib/api";
 import {
   useLobbyQuery,
+  useLobbyWebSocket,
   useRemovePlayer,
   useStartGame,
   useTransferOwner,
@@ -33,8 +34,11 @@ export default function LobbyPage() {
     storedLobbyId !== null &&
     storedLobbyId !== lobbyId;
 
+  const { isConnected: wsConnected } = useLobbyWebSocket(lobbyId);
+
   const fetchLobby = useLobbyQuery(lobbyId, {
     enabled: storedLobbyId !== undefined && !hasDifferentLobby,
+    disablePolling: wsConnected,
   });
 
   const myPlayerId = getPlayerId();

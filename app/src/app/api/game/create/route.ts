@@ -4,6 +4,7 @@ import type { CreateGameRequest } from "@/server/models";
 import { lobbyService } from "@/services/LobbyService";
 import { gameService } from "@/services/GameService";
 import { toPublicLobby } from "@/server/lobby-helpers";
+import { lobbySocketManager } from "@/server/lobby-socket-manager";
 import { authenticateLobby, errorResponse } from "@/server/api-helpers";
 
 export async function POST(request: Request): Promise<Response> {
@@ -52,6 +53,8 @@ export async function POST(request: Request): Promise<Response> {
   if (!updated) {
     return errorResponse("Failed to start game", 500);
   }
+
+  lobbySocketManager.broadcast(lobbyId, updated);
 
   return Response.json({
     status: ServerResponseStatus.Success,

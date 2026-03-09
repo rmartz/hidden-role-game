@@ -122,6 +122,11 @@ const gameConfigSlice = createSlice({
       state.showRolesInPlay = action.payload;
       state.syncVersion++;
     },
+
+    /** Increments syncVersion to trigger a config sync without changing any other state. */
+    requestSync(state) {
+      state.syncVersion++;
+    },
   },
 });
 
@@ -136,6 +141,7 @@ export const {
   setPlayerCount,
   setShowConfigToPlayers,
   setShowRolesInPlay,
+  requestSync,
 } = gameConfigSlice.actions;
 
 export default gameConfigSlice.reducer;

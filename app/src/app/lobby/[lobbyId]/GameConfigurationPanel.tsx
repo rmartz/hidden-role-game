@@ -7,6 +7,7 @@ import type { GameConfig, RoleSlot } from "@/server/models";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   initFromServer,
+  requestSync,
   setGameMode,
   setShowConfigToPlayers,
   setShowRolesInPlay,
@@ -43,12 +44,20 @@ export default function GameConfigurationPanel(props: Props) {
 
   // Sync Redux state from server when server config changes (e.g. player joins/leaves).
   const lastServerConfigRef = useRef<string | null>(null);
+  const prevPlayerCountRef = useRef<number | null>(null);
   useEffect(() => {
     if (readOnly) return;
     const incoming = JSON.stringify({ config, playerCount });
     if (incoming === lastServerConfigRef.current) return;
     lastServerConfigRef.current = incoming;
+    const playerCountChanged =
+      prevPlayerCountRef.current !== null &&
+      prevPlayerCountRef.current !== playerCount;
+    prevPlayerCountRef.current = playerCount;
     dispatch(initFromServer({ config, playerCount }));
+    if (playerCountChanged) {
+      dispatch(requestSync());
+    }
   }, [config, playerCount, readOnly, dispatch]);
 
   const roleDefinitions =

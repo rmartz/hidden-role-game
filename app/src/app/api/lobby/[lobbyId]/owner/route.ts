@@ -2,6 +2,7 @@ import { ServerResponseStatus } from "@/server/models";
 import { authenticateLobby, errorResponse } from "@/server/api-helpers";
 import { toPublicLobby } from "@/server/lobby-helpers";
 import { lobbyService } from "@/services/LobbyService";
+import { lobbySocketManager } from "@/server/lobby-socket-manager";
 
 export async function PUT(
   request: Request,
@@ -22,6 +23,8 @@ export async function PUT(
   if (!updated) {
     return errorResponse("Player not found", 404);
   }
+
+  lobbySocketManager.broadcast(lobbyId, updated);
 
   return Response.json({
     status: ServerResponseStatus.Success,

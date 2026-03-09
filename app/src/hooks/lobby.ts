@@ -109,7 +109,7 @@ export function useStoredLobbyQuery(storedLobbyId: string | null) {
  */
 export function useLobbyQuery(
   lobbyId: string,
-  { enabled }: { enabled: boolean },
+  { enabled, disablePolling }: { enabled: boolean; disablePolling?: boolean },
 ) {
   return useQuery({
     queryKey: ["lobby", lobbyId],
@@ -121,6 +121,7 @@ export function useLobbyQuery(
       return data.data;
     },
     refetchInterval: (query) => {
+      if (disablePolling) return false;
       if (!query.state.data) return false;
       if (query.state.data.gameId) return false;
       return 3_000;
