@@ -7,10 +7,13 @@ export enum AvalonRole {
   Bad = "avalon-bad",
 }
 
+const MIN_PLAYERS = 5;
+
 function defaultRoleCount(numPlayers: number): RoleSlot[] {
-  const bad = Math.floor((numPlayers - 1) / 2);
+  const n = Math.max(numPlayers, MIN_PLAYERS);
+  const bad = Math.floor((n - 1) / 2);
   const specialGood = 1;
-  const good = numPlayers - bad - specialGood;
+  const good = n - bad - specialGood;
   return [
     { roleId: AvalonRole.Bad, count: bad },
     { roleId: AvalonRole.SpecialGood, count: specialGood },
@@ -20,7 +23,7 @@ function defaultRoleCount(numPlayers: number): RoleSlot[] {
 
 export const AVALON_CONFIG = {
   name: "Avalon",
-  minPlayers: 5,
+  minPlayers: MIN_PLAYERS,
   ownerTitle: null,
   teamLabels: {
     [Team.Good]: "Good",

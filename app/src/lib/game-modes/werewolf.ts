@@ -6,9 +6,12 @@ export enum WerewolfRole {
   Bad = "werewolf-bad",
 }
 
+const MIN_PLAYERS = 5;
+
 function defaultRoleCount(numPlayers: number): RoleSlot[] {
-  const bad = Math.floor(numPlayers / 3);
-  const good = numPlayers - bad;
+  const n = Math.max(numPlayers, MIN_PLAYERS);
+  const bad = Math.floor(n / 3);
+  const good = n - bad;
   return [
     { roleId: WerewolfRole.Bad, count: bad },
     { roleId: WerewolfRole.Good, count: good },
@@ -17,7 +20,7 @@ function defaultRoleCount(numPlayers: number): RoleSlot[] {
 
 export const WEREWOLF_CONFIG = {
   name: "Werewolf",
-  minPlayers: 5,
+  minPlayers: MIN_PLAYERS,
   ownerTitle: "Narrator",
   teamLabels: {
     [Team.Good]: "Villagers",

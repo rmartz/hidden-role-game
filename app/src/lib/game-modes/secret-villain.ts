@@ -7,10 +7,13 @@ export enum SecretVillainRole {
   SpecialBad = "special-bad",
 }
 
+const MIN_PLAYERS = 5;
+
 function defaultRoleCount(numPlayers: number): RoleSlot[] {
+  const n = Math.max(numPlayers, MIN_PLAYERS);
   const specialBad = 1;
-  const bad = Math.floor((numPlayers - 1) / 2) - 1;
-  const good = numPlayers - specialBad - bad;
+  const bad = Math.floor((n - 1) / 2) - 1;
+  const good = n - specialBad - bad;
   return [
     { roleId: SecretVillainRole.SpecialBad, count: specialBad },
     { roleId: SecretVillainRole.Bad, count: bad },
@@ -20,7 +23,7 @@ function defaultRoleCount(numPlayers: number): RoleSlot[] {
 
 export const SECRET_VILLAIN_CONFIG = {
   name: "Secret Villain",
-  minPlayers: 5,
+  minPlayers: MIN_PLAYERS,
   ownerTitle: null,
   teamLabels: {
     [Team.Good]: "Liberal",

@@ -89,7 +89,7 @@ export class GameService {
     const config = this.getModeDefinition(gameMode);
     return adjustRoleSlots(
       current,
-      config.defaultRoleCount(Math.max(numPlayers, config.minPlayers)),
+      config.defaultRoleCount(numPlayers),
       operation,
     );
   }
