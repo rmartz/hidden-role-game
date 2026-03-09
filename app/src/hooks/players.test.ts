@@ -32,7 +32,9 @@ describe("useRemovePlayer", () => {
       result.current.mutate("player-2");
     });
 
-    await waitFor(() => { expect(result.current.isSuccess).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
 
     expect(api.removePlayer).toHaveBeenCalledWith("lobby-1", "player-2");
     expect(onSuccess).toHaveBeenCalledWith("player-2");
@@ -54,7 +56,9 @@ describe("useRemovePlayer", () => {
       result.current.mutate("player-2");
     });
 
-    await waitFor(() => { expect(result.current.isSuccess).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
 
     expect(onSuccess).not.toHaveBeenCalled();
   });
@@ -78,7 +82,9 @@ describe("useTransferOwner", () => {
       result.current.mutate("player-2");
     });
 
-    await waitFor(() => { expect(result.current.isSuccess).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
 
     expect(api.transferOwner).toHaveBeenCalledWith("lobby-1", "player-2");
     expect(invalidateSpy).toHaveBeenCalledWith({
@@ -103,7 +109,9 @@ describe("useTransferOwner", () => {
       result.current.mutate("player-2");
     });
 
-    await waitFor(() => { expect(result.current.isSuccess).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
 
     expect(invalidateSpy).not.toHaveBeenCalled();
   });

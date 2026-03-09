@@ -40,7 +40,9 @@ describe("useStartGame", () => {
       result.current.mutate({ roleSlots: [], gameMode: "werewolf" });
     });
 
-    await waitFor(() => { expect(result.current.isSuccess).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
 
     expect(api.startGame).toHaveBeenCalledWith("lobby-1", [], "werewolf");
     expect(invalidateSpy).toHaveBeenCalledWith({
@@ -63,7 +65,9 @@ describe("useStartGame", () => {
       result.current.mutate({ roleSlots: [], gameMode: "werewolf" });
     });
 
-    await waitFor(() => { expect(result.current.isSuccess).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
 
     expect(invalidateSpy).not.toHaveBeenCalled();
   });
@@ -81,7 +85,9 @@ describe("useGameStateQuery", () => {
       wrapper,
     });
 
-    await waitFor(() => { expect(result.current.isSuccess).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
 
     expect(result.current.data).toEqual(mockGameState);
   });
@@ -97,7 +103,9 @@ describe("useGameStateQuery", () => {
       wrapper,
     });
 
-    await waitFor(() => { expect(result.current.isError).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true);
+    });
     expect(result.current.error?.message).toBe("401");
   });
 
@@ -112,7 +120,9 @@ describe("useGameStateQuery", () => {
       wrapper,
     });
 
-    await waitFor(() => { expect(result.current.isError).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true);
+    });
     expect(result.current.error?.message).toBe("403");
   });
 
@@ -127,7 +137,9 @@ describe("useGameStateQuery", () => {
       wrapper,
     });
 
-    await waitFor(() => { expect(result.current.isError).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true);
+    });
     expect(result.current.error?.message).toBe("Game not found");
   });
 });

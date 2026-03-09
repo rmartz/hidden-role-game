@@ -66,7 +66,9 @@ describe("useCreateLobby", () => {
       result.current.mutate("Alice");
     });
 
-    await waitFor(() => { expect(result.current.isSuccess).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
 
     expect(api.createLobby).toHaveBeenCalledWith("Alice");
     expect(mockPush).toHaveBeenCalledWith("/lobby/lobby-1");
@@ -85,7 +87,9 @@ describe("useCreateLobby", () => {
       result.current.mutate("Alice");
     });
 
-    await waitFor(() => { expect(result.current.isError).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true);
+    });
     expect(result.current.error?.message).toBe("Failed");
   });
 });
@@ -105,7 +109,9 @@ describe("useJoinLobby", () => {
       result.current.mutate({ lobbyId: "lobby-1", playerName: "Alice" });
     });
 
-    await waitFor(() => { expect(result.current.isSuccess).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
 
     expect(api.joinLobby).toHaveBeenCalledWith("lobby-1", "Alice");
     expect(onSuccess).toHaveBeenCalledOnce();
@@ -125,7 +131,9 @@ describe("useJoinLobby", () => {
       result.current.mutate({ lobbyId: "lobby-1", playerName: "Alice" });
     });
 
-    await waitFor(() => { expect(result.current.isError).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true);
+    });
     expect(result.current.error?.message).toBe("Lobby full");
   });
 });
@@ -156,7 +164,9 @@ describe("useLeaveAndJoinLobby", () => {
       });
     });
 
-    await waitFor(() => { expect(result.current.isSuccess).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
 
     expect(api.removePlayer).toHaveBeenCalledWith("lobby-old", "player-1");
     expect(api.clearSession).toHaveBeenCalled();
@@ -187,7 +197,9 @@ describe("useUpdateLobbyConfig", () => {
       result.current.mutate({ showConfigToPlayers: true });
     });
 
-    await waitFor(() => { expect(result.current.isSuccess).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
 
     expect(api.updateLobbyConfig).toHaveBeenCalledWith("lobby-1", {
       showConfigToPlayers: true,
@@ -210,7 +222,9 @@ describe("useStoredLobbyQuery", () => {
       wrapper,
     });
 
-    await waitFor(() => { expect(result.current.isSuccess).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
 
     expect(result.current.data).toEqual(mockLobby);
   });
@@ -226,7 +240,9 @@ describe("useStoredLobbyQuery", () => {
       wrapper,
     });
 
-    await waitFor(() => { expect(result.current.isSuccess).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
 
     expect(api.clearSession).toHaveBeenCalled();
     expect(result.current.data).toBeNull();
@@ -243,7 +259,9 @@ describe("useStoredLobbyQuery", () => {
       wrapper,
     });
 
-    await waitFor(() => { expect(result.current.isSuccess).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
 
     expect(api.clearSession).toHaveBeenCalled();
     expect(result.current.data).toBeNull();
@@ -272,7 +290,9 @@ describe("useLobbyQuery", () => {
       { wrapper },
     );
 
-    await waitFor(() => { expect(result.current.isSuccess).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
 
     expect(result.current.data).toEqual(mockLobby);
   });
@@ -289,7 +309,9 @@ describe("useLobbyQuery", () => {
       { wrapper },
     );
 
-    await waitFor(() => { expect(result.current.isError).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true);
+    });
     expect(result.current.error?.message).toBe("404");
   });
 
@@ -313,7 +335,9 @@ describe("useLobbyExistsQuery", () => {
       wrapper,
     });
 
-    await waitFor(() => { expect(result.current.isSuccess).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
     expect(result.current.data).toBe(true);
   });
 
@@ -328,7 +352,9 @@ describe("useLobbyExistsQuery", () => {
       wrapper,
     });
 
-    await waitFor(() => { expect(result.current.isSuccess).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
     expect(result.current.data).toBe(true);
   });
 
@@ -343,7 +369,9 @@ describe("useLobbyExistsQuery", () => {
       wrapper,
     });
 
-    await waitFor(() => { expect(result.current.isSuccess).toBe(true); });
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
     expect(result.current.data).toBe(false);
   });
 });
