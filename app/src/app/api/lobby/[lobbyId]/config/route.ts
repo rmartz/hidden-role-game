@@ -29,11 +29,9 @@ export async function PUT(
   }
 
   if (body.roleSlots !== undefined && body.gameMode !== undefined) {
-    const validRoleIds = new Set(
-      Object.keys(gameService.getModeDefinition(body.gameMode).roles),
-    );
+    const { roles } = gameService.getModeDefinition(body.gameMode);
     for (const slot of body.roleSlots) {
-      if (!validRoleIds.has(slot.roleId)) {
+      if (!(slot.roleId in roles)) {
         return errorResponse(`Unknown role: ${slot.roleId}`, 400);
       }
     }

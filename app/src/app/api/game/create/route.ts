@@ -27,11 +27,9 @@ export async function POST(request: Request): Promise<Response> {
     return errorResponse("Role slot count must match player count", 400);
   }
 
-  const validRoleIds = new Set(
-    Object.keys(gameService.getModeDefinition(gameMode).roles),
-  );
+  const { roles } = gameService.getModeDefinition(gameMode);
   for (const slot of roleSlots) {
-    if (!validRoleIds.has(slot.roleId)) {
+    if (!(slot.roleId in roles)) {
       return errorResponse(`Unknown role: ${slot.roleId}`, 400);
     }
   }
