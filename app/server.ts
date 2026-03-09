@@ -34,12 +34,12 @@ void app.prepare().then(() => {
 
   wss.on("connection", (ws, req) => {
     const { query } = parse(req.url ?? "", true);
-    const lobbyId = Array.isArray(query.lobbyId)
-      ? query.lobbyId[0]
-      : query.lobbyId;
-    const sessionId = Array.isArray(query.sessionId)
-      ? query.sessionId[0]
-      : query.sessionId;
+    const lobbyId = Array.isArray(query["lobbyId"])
+      ? query["lobbyId"][0]
+      : query["lobbyId"];
+    const sessionId = Array.isArray(query["sessionId"])
+      ? query["sessionId"][0]
+      : query["sessionId"];
 
     if (!lobbyId || !sessionId) {
       ws.close(4000, "Missing lobbyId or sessionId");
