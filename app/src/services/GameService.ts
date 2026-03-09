@@ -58,18 +58,31 @@ export class GameService {
     roleSlots: RoleSlot[],
     gameMode: GameMode,
     showRolesInPlay: boolean,
+    ownerPlayerId: string | null,
   ): Game {
     const { roles } = this.getModeDefinition(gameMode);
-    const roleAssignments = assignRoles(players, roleSlots);
+    const rolePlayers = ownerPlayerId
+      ? players.filter((p) => p.id !== ownerPlayerId)
+      : players;
+    const roleAssignments = assignRoles(rolePlayers, roleSlots);
+
+    const ownerPlayer = ownerPlayerId
+      ? players.find((p) => p.id === ownerPlayerId)
+      : null;
+    const gamePlayers: GamePlayer[] = [
+      ...this.buildGamePlayers(rolePlayers, roleAssignments, roles),
+      ...(ownerPlayer ? [{ ...ownerPlayer, visibleRoles: [] }] : []),
+    ];
 
     const game: Game = {
       id: randomUUID(),
       lobbyId,
       gameMode,
       status: { type: GameStatus.Playing },
-      players: this.buildGamePlayers(players, roleAssignments, roles),
+      players: gamePlayers,
       roleAssignments,
       showRolesInPlay,
+      ownerPlayerId,
     };
 
     this.games[game.id] = game;
@@ -87,9 +100,10 @@ export class GameService {
     operation: "add" | "remove",
   ): RoleSlot[] {
     const config = this.getModeDefinition(gameMode);
+    const rolePlayers = numPlayers - (config.ownerTitle ? 1 : 0);
     return adjustRoleSlots(
       current,
-      config.defaultRoleCount(numPlayers),
+      config.defaultRoleCount(rolePlayers),
       operation,
     );
   }
@@ -112,6 +126,34 @@ export class GameService {
     const caller = game.players.find((p) => p.id === callerId);
     if (!caller) return null;
 
+    const playerById = new Map(game.players.map((p) => [p.id, p]));
+    const publicPlayers = game.players.map((p) => ({ id: p.id, name: p.name }));
+
+    if (callerId === game.ownerPlayerId) {
+      const visibleRoleAssignments = game.roleAssignments.flatMap(
+        (assignment) => {
+          const player = playerById.get(assignment.playerId);
+          const role = roles[assignment.roleDefinitionId];
+          if (!player || !role) return [];
+          return [
+            {
+              player: { id: player.id, name: player.name },
+              role: { id: role.id, name: role.name, team: role.team },
+            },
+          ];
+        },
+      );
+      return {
+        status: game.status,
+        gameMode: game.gameMode,
+        players: publicPlayers,
+        gameOwner: { id: caller.id, name: caller.name },
+        myRole: null,
+        visibleRoleAssignments,
+        rolesInPlay: this.getRolesInPlay(game),
+      };
+    }
+
     const myAssignment = game.roleAssignments.find(
       (r) => r.playerId === callerId,
     );
@@ -120,8 +162,7 @@ export class GameService {
     const myRole = roles[myAssignment.roleDefinitionId];
     if (!myRole) return null;
 
-    const playerById = new Map(game.players.map((p) => [p.id, p]));
-    const visibleTeammates = caller.visibleRoles.flatMap((assignment) => {
+    const visibleRoleAssignments = caller.visibleRoles.flatMap((assignment) => {
       const player = playerById.get(assignment.playerId);
       const role = roles[assignment.roleDefinitionId];
       if (!player || !role) return [];
@@ -135,9 +176,11 @@ export class GameService {
 
     return {
       status: game.status,
-      players: game.players.map((p) => ({ id: p.id, name: p.name })),
+      gameMode: game.gameMode,
+      players: publicPlayers,
+      gameOwner: null,
       myRole: { id: myRole.id, name: myRole.name, team: myRole.team },
-      visibleTeammates,
+      visibleRoleAssignments,
       rolesInPlay: game.showRolesInPlay ? this.getRolesInPlay(game) : null,
     };
   }

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
+import { GameMode } from "@/lib/models";
 import { ServerResponseStatus } from "@/server/models";
 import type { PublicLobby, LobbyJoinResponse } from "@/server/models";
 import { createWrapper } from "./test-utils";
@@ -36,7 +37,7 @@ const mockLobby: PublicLobby = {
   ownerPlayerId: "player-1",
   players: [{ id: "player-1", name: "Alice" }],
   config: {
-    gameMode: "werewolf",
+    gameMode: GameMode.Werewolf,
     showConfigToPlayers: false,
     showRolesInPlay: false,
   },
@@ -115,7 +116,7 @@ describe("useJoinLobby", () => {
 
     expect(api.joinLobby).toHaveBeenCalledWith("lobby-1", "Alice");
     expect(onSuccess).toHaveBeenCalledOnce();
-    expect(onSuccess.mock.calls[0][0]).toEqual(mockJoinResponse);
+    expect(onSuccess.mock.calls[0]![0]).toEqual(mockJoinResponse);
   });
 
   it("throws on server error", async () => {
@@ -142,7 +143,7 @@ describe("useLeaveAndJoinLobby", () => {
   it("removes player, clears session, joins new lobby, calls onSuccess", async () => {
     vi.mocked(api.removePlayer).mockResolvedValue({
       status: ServerResponseStatus.Success,
-      data: undefined,
+      data: { lobby: null },
     });
     vi.mocked(api.joinLobby).mockResolvedValue({
       status: ServerResponseStatus.Success,

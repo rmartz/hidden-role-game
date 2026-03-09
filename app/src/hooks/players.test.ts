@@ -1,7 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
+import { GameMode } from "@/lib/models";
 import { ServerResponseStatus } from "@/server/models";
+import type { PublicLobby } from "@/server/models";
 import { createWrapper } from "./test-utils";
+
+const mockLobby: PublicLobby = {
+  id: "lobby-1",
+  ownerPlayerId: "player-2",
+  players: [],
+  config: {
+    gameMode: GameMode.Werewolf,
+    showConfigToPlayers: false,
+    showRolesInPlay: false,
+  },
+};
 
 vi.mock("@/lib/api", () => ({
   removePlayer: vi.fn(),
@@ -19,7 +32,7 @@ describe("useRemovePlayer", () => {
   it("calls removePlayer and invokes onSuccess with targetPlayerId", async () => {
     vi.mocked(api.removePlayer).mockResolvedValue({
       status: ServerResponseStatus.Success,
-      data: undefined,
+      data: { lobby: null },
     });
 
     const onSuccess = vi.fn();
@@ -68,7 +81,7 @@ describe("useTransferOwner", () => {
   it("calls transferOwner and invalidates lobby query on success", async () => {
     vi.mocked(api.transferOwner).mockResolvedValue({
       status: ServerResponseStatus.Success,
-      data: undefined,
+      data: { lobby: mockLobby },
     });
 
     const { queryClient, wrapper } = createWrapper();
