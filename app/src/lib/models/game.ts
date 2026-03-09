@@ -44,11 +44,14 @@ export enum Team {
   Bad = "Bad",
 }
 
-export interface RoleDefinition {
-  id: string;
+export interface RoleDefinition<
+  Role extends string = string,
+  T extends string = string,
+> {
+  id: Role;
   name: string;
-  team: Team;
-  canSeeTeam: Team[];
+  team: T;
+  canSeeTeam?: T[];
 }
 
 export interface PlayerRoleAssignment {

@@ -1,23 +1,34 @@
-import { Team } from "@/lib/models";
 import type { RoleDefinition } from "@/lib/models";
 
-export const AVALON_ROLES: RoleDefinition[] = [
-  {
-    id: "avalon-good",
+export enum AvalonRole {
+  Good = "avalon-good",
+  SpecialGood = "avalon-special-good",
+  Bad = "avalon-bad",
+}
+
+export enum AvalonTeam {
+  Good = "Good",
+  Bad = "Bad",
+}
+
+export const AVALON_ROLES: Record<
+  AvalonRole,
+  RoleDefinition<AvalonRole, AvalonTeam>
+> = {
+  [AvalonRole.Good]: {
+    id: AvalonRole.Good,
     name: "Good Role",
-    team: Team.Good,
-    canSeeTeam: [],
+    team: AvalonTeam.Good,
   },
-  {
-    id: "avalon-special-good",
+  [AvalonRole.SpecialGood]: {
+    id: AvalonRole.SpecialGood,
     name: "Special Good Role",
-    team: Team.Good,
-    canSeeTeam: [Team.Bad],
+    team: AvalonTeam.Good,
+    canSeeTeam: [AvalonTeam.Bad],
   },
-  {
-    id: "avalon-bad",
+  [AvalonRole.Bad]: {
+    id: AvalonRole.Bad,
     name: "Bad Role",
-    team: Team.Bad,
-    canSeeTeam: [],
+    team: AvalonTeam.Bad,
   },
-];
+};

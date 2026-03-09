@@ -1,17 +1,27 @@
-import { Team } from "@/lib/models";
 import type { RoleDefinition } from "@/lib/models";
 
-export const WEREWOLF_ROLES: RoleDefinition[] = [
-  {
-    id: "werewolf-good",
+export enum WerewolfRole {
+  Good = "werewolf-good",
+  Bad = "werewolf-bad",
+}
+
+export enum WerewolfTeam {
+  Good = "Good",
+  Bad = "Bad",
+}
+
+export const WEREWOLF_ROLES: Record<
+  WerewolfRole,
+  RoleDefinition<WerewolfRole, WerewolfTeam>
+> = {
+  [WerewolfRole.Good]: {
+    id: WerewolfRole.Good,
     name: "Good Role",
-    team: Team.Good,
-    canSeeTeam: [],
+    team: WerewolfTeam.Good,
   },
-  {
-    id: "werewolf-bad",
+  [WerewolfRole.Bad]: {
+    id: WerewolfRole.Bad,
     name: "Bad Role",
-    team: Team.Bad,
-    canSeeTeam: [],
+    team: WerewolfTeam.Bad,
   },
-];
+};

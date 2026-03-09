@@ -1,18 +1,17 @@
-import { GameMode } from "@/lib/models";
 import type {
   LobbyPlayer,
   PlayerRoleAssignment,
   RoleDefinition,
 } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
-import { GAME_MODE_ROLES } from "@/lib/game-modes";
+import { WEREWOLF_ROLES, WerewolfRole } from "@/lib/game-modes/werewolf-roles";
 import { assignRoles } from "./assignRoles";
 
 export class WerewolfService {
   readonly minPlayers = 5;
 
   getRoleDefinitions(): RoleDefinition[] {
-    return GAME_MODE_ROLES[GameMode.Werewolf];
+    return Object.values(WEREWOLF_ROLES);
   }
 
   createRoleAssignments(
@@ -26,8 +25,8 @@ export class WerewolfService {
     const bad = Math.floor(numPlayers / 3);
     const good = numPlayers - bad;
     return [
-      { roleId: "werewolf-bad", count: bad },
-      { roleId: "werewolf-good", count: good },
+      { roleId: WerewolfRole.Bad, count: bad },
+      { roleId: WerewolfRole.Good, count: good },
     ];
   }
 }

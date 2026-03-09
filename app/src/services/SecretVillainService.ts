@@ -1,18 +1,20 @@
-import { GameMode } from "@/lib/models";
 import type {
   LobbyPlayer,
   PlayerRoleAssignment,
   RoleDefinition,
 } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
-import { GAME_MODE_ROLES } from "@/lib/game-modes";
+import {
+  SECRET_VILLAIN_ROLES,
+  SecretVillainRole,
+} from "@/lib/game-modes/secret-villain-roles";
 import { assignRoles } from "./assignRoles";
 
 export class SecretVillainService {
   readonly minPlayers = 5;
 
   getRoleDefinitions(): RoleDefinition[] {
-    return GAME_MODE_ROLES[GameMode.SecretVillain];
+    return Object.values(SECRET_VILLAIN_ROLES);
   }
 
   createRoleAssignments(
@@ -27,9 +29,9 @@ export class SecretVillainService {
     const bad = Math.floor((numPlayers - 1) / 2) - 1;
     const good = numPlayers - specialBad - bad;
     return [
-      { roleId: "special-bad", count: specialBad },
-      { roleId: "bad", count: bad },
-      { roleId: "good", count: good },
+      { roleId: SecretVillainRole.SpecialBad, count: specialBad },
+      { roleId: SecretVillainRole.Bad, count: bad },
+      { roleId: SecretVillainRole.Good, count: good },
     ];
   }
 }

@@ -1,18 +1,17 @@
-import { GameMode } from "@/lib/models";
 import type {
   LobbyPlayer,
   PlayerRoleAssignment,
   RoleDefinition,
 } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
-import { GAME_MODE_ROLES } from "@/lib/game-modes";
+import { AVALON_ROLES, AvalonRole } from "@/lib/game-modes/avalon-roles";
 import { assignRoles } from "./assignRoles";
 
 export class AvalonService {
   readonly minPlayers = 5;
 
   getRoleDefinitions(): RoleDefinition[] {
-    return GAME_MODE_ROLES[GameMode.Avalon];
+    return Object.values(AVALON_ROLES);
   }
 
   createRoleAssignments(
@@ -27,9 +26,9 @@ export class AvalonService {
     const specialGood = 1;
     const good = numPlayers - bad - specialGood;
     return [
-      { roleId: "avalon-bad", count: bad },
-      { roleId: "avalon-special-good", count: specialGood },
-      { roleId: "avalon-good", count: good },
+      { roleId: AvalonRole.Bad, count: bad },
+      { roleId: AvalonRole.SpecialGood, count: specialGood },
+      { roleId: AvalonRole.Good, count: good },
     ];
   }
 }

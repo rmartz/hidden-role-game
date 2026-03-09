@@ -50,7 +50,7 @@ export class GameService {
       const myRoleDef = roleDefById.get(assignment.roleDefinitionId);
 
       const visibleRoles: PlayerRoleAssignment[] = [];
-      if (myRoleDef && myRoleDef.canSeeTeam.length > 0) {
+      if (myRoleDef?.canSeeTeam && myRoleDef.canSeeTeam.length > 0) {
         const visibleTeams = new Set(myRoleDef.canSeeTeam);
         for (const other of roleAssignments) {
           if (other.playerId === assignment.playerId) continue;

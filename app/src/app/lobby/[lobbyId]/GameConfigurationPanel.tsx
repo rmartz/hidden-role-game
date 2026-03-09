@@ -89,8 +89,9 @@ export default function GameConfigurationPanel(props: Props) {
     currentRoleSlots,
   ]);
 
-  const roleDefinitions =
-    GAME_MODE_ROLES[readOnly ? config.gameMode : selectedGameMode];
+  const roleDefinitions = Object.values(
+    GAME_MODE_ROLES[readOnly ? config.gameMode : selectedGameMode],
+  );
   const totalSlots = currentRoleSlots.reduce((sum, s) => sum + s.count, 0);
   const isValid = totalSlots === playerCount;
 

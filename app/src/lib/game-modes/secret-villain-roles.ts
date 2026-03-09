@@ -1,23 +1,34 @@
-import { Team } from "@/lib/models";
 import type { RoleDefinition } from "@/lib/models";
 
-export const SECRET_VILLAIN_ROLES: RoleDefinition[] = [
-  {
-    id: "good",
+export enum SecretVillainRole {
+  Good = "good",
+  Bad = "bad",
+  SpecialBad = "special-bad",
+}
+
+export enum SecretVillainTeam {
+  Good = "Good",
+  Bad = "Bad",
+}
+
+export const SECRET_VILLAIN_ROLES: Record<
+  SecretVillainRole,
+  RoleDefinition<SecretVillainRole, SecretVillainTeam>
+> = {
+  [SecretVillainRole.Good]: {
+    id: SecretVillainRole.Good,
     name: "Good Role",
-    team: Team.Good,
-    canSeeTeam: [],
+    team: SecretVillainTeam.Good,
   },
-  {
-    id: "bad",
+  [SecretVillainRole.Bad]: {
+    id: SecretVillainRole.Bad,
     name: "Bad Role",
-    team: Team.Bad,
-    canSeeTeam: [Team.Bad],
+    team: SecretVillainTeam.Bad,
+    canSeeTeam: [SecretVillainTeam.Bad],
   },
-  {
-    id: "special-bad",
+  [SecretVillainRole.SpecialBad]: {
+    id: SecretVillainRole.SpecialBad,
     name: "Special Bad Role",
-    team: Team.Bad,
-    canSeeTeam: [],
+    team: SecretVillainTeam.Bad,
   },
-];
+};

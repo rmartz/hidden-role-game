@@ -1,10 +1,41 @@
 import { GameMode } from "@/lib/models";
 import type { RoleDefinition, RoleSlot } from "@/lib/models";
-import { SECRET_VILLAIN_ROLES } from "@/lib/game-modes/secret-villain-roles";
-import { AVALON_ROLES } from "@/lib/game-modes/avalon-roles";
-import { WEREWOLF_ROLES } from "@/lib/game-modes/werewolf-roles";
+import {
+  SECRET_VILLAIN_ROLES,
+  SecretVillainRole,
+  SecretVillainTeam,
+} from "@/lib/game-modes/secret-villain-roles";
+import {
+  AVALON_ROLES,
+  AvalonRole,
+  AvalonTeam,
+} from "@/lib/game-modes/avalon-roles";
+import {
+  WEREWOLF_ROLES,
+  WerewolfRole,
+  WerewolfTeam,
+} from "@/lib/game-modes/werewolf-roles";
 
-export const GAME_MODE_ROLES: Record<GameMode, RoleDefinition[]> = {
+export {
+  SecretVillainRole,
+  SecretVillainTeam,
+  AvalonRole,
+  AvalonTeam,
+  WerewolfRole,
+  WerewolfTeam,
+};
+
+export const GAME_MODE_ROLES: {
+  [GameMode.SecretVillain]: Record<
+    SecretVillainRole,
+    RoleDefinition<SecretVillainRole, SecretVillainTeam>
+  >;
+  [GameMode.Avalon]: Record<AvalonRole, RoleDefinition<AvalonRole, AvalonTeam>>;
+  [GameMode.Werewolf]: Record<
+    WerewolfRole,
+    RoleDefinition<WerewolfRole, WerewolfTeam>
+  >;
+} = {
   [GameMode.SecretVillain]: SECRET_VILLAIN_ROLES,
   [GameMode.Avalon]: AVALON_ROLES,
   [GameMode.Werewolf]: WEREWOLF_ROLES,
@@ -36,16 +67,16 @@ export function getDefaultRoleSlots(
 
 export const GAME_MODE_DEFAULT_ROLE_SLOTS: Record<GameMode, RoleSlot[]> = {
   [GameMode.SecretVillain]: [
-    { roleId: "good", count: 3 },
-    { roleId: "bad", count: 1 },
+    { roleId: SecretVillainRole.Good, count: 3 },
+    { roleId: SecretVillainRole.Bad, count: 1 },
   ],
   [GameMode.Avalon]: [
-    { roleId: "avalon-good", count: 3 },
-    { roleId: "avalon-special-good", count: 1 },
-    { roleId: "avalon-bad", count: 1 },
+    { roleId: AvalonRole.Good, count: 3 },
+    { roleId: AvalonRole.SpecialGood, count: 1 },
+    { roleId: AvalonRole.Bad, count: 1 },
   ],
   [GameMode.Werewolf]: [
-    { roleId: "werewolf-good", count: 3 },
-    { roleId: "werewolf-bad", count: 1 },
+    { roleId: WerewolfRole.Good, count: 3 },
+    { roleId: WerewolfRole.Bad, count: 1 },
   ],
 };
