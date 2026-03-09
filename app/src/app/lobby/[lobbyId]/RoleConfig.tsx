@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { keyBy, map, mapValues, pickBy, sum, values } from "lodash";
+import { keyBy, mapValues, pickBy, sum } from "lodash";
 import type { RoleDefinition, Team } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
 
@@ -29,15 +29,14 @@ export default function RoleConfig(props: Props) {
     mapValues(roleDefinitions, (_, roleId) => slotCounts[roleId]?.count ?? 0),
   );
 
-  const total = sum(values(counts));
+  const total = sum(Object.values(counts));
 
   function handleChange(roleId: string, value: number) {
     const newCounts = { ...counts, [roleId]: Math.max(0, value) };
     setCounts(newCounts);
     if (!readOnly) {
-      const roleSlots = map(
-        pickBy(newCounts, (v) => v > 0),
-        (count, roleId) => ({ roleId, count }),
+      const roleSlots = Object.entries(pickBy(newCounts, (v) => v > 0)).map(
+        ([roleId, count]) => ({ roleId, count }),
       );
       props.onRoleSlotsChange(roleSlots);
     }
@@ -57,7 +56,7 @@ export default function RoleConfig(props: Props) {
         </p>
       )}
       <ul style={{ listStyle: "none", padding: 0 }}>
-        {map(roleDefinitions, (role) => (
+        {Object.values(roleDefinitions).map((role) => (
           <li
             key={role.id}
             style={{
