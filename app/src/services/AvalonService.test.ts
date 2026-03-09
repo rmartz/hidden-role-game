@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { avalonService } from "./AvalonService";
+import { AVALON_CONFIG } from "@/lib/game-modes/avalon";
 
-describe("AvalonService.defaultRoleCount", () => {
+describe("AVALON_CONFIG.defaultRoleCount", () => {
   it("returns correct counts for minimum player count (5)", () => {
-    const slots = avalonService.defaultRoleCount(5);
+    const slots = AVALON_CONFIG.defaultRoleCount(5);
     const counts = Object.fromEntries(slots.map((s) => [s.roleId, s.count]));
 
     expect(counts["avalon-bad"]).toBe(2);
@@ -13,7 +13,7 @@ describe("AvalonService.defaultRoleCount", () => {
   });
 
   it("returns correct counts for 10 players", () => {
-    const slots = avalonService.defaultRoleCount(10);
+    const slots = AVALON_CONFIG.defaultRoleCount(10);
     const counts = Object.fromEntries(slots.map((s) => [s.roleId, s.count]));
 
     expect(counts["avalon-bad"]).toBe(4);
@@ -24,14 +24,14 @@ describe("AvalonService.defaultRoleCount", () => {
 
   it("total slot count always equals numPlayers", () => {
     for (let n = 5; n <= 12; n++) {
-      const slots = avalonService.defaultRoleCount(n);
+      const slots = AVALON_CONFIG.defaultRoleCount(n);
       expect(slots.reduce((sum, s) => sum + s.count, 0)).toBe(n);
     }
   });
 
   it("always has exactly 1 special-good role", () => {
     for (let n = 5; n <= 12; n++) {
-      const slots = avalonService.defaultRoleCount(n);
+      const slots = AVALON_CONFIG.defaultRoleCount(n);
       const specialGood = slots.find((s) => s.roleId === "avalon-special-good");
       expect(specialGood?.count).toBe(1);
     }

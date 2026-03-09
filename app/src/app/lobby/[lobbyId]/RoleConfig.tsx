@@ -1,16 +1,17 @@
 import { useState } from "react";
-import type { RoleDefinition } from "@/lib/models";
+import { map, mapValues, pickBy, sum } from "lodash";
+import type { RoleDefinition, Team } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
 
 interface ReadOnlyProps {
-  roleDefinitions: RoleDefinition[];
+  roleDefinitions: Record<string, RoleDefinition<string, Team>>;
   roleSlots?: RoleSlot[];
   playerCount: number;
   readOnly: true;
 }
 
 interface EditableProps {
-  roleDefinitions: RoleDefinition[];
+  roleDefinitions: Record<string, RoleDefinition<string, Team>>;
   roleSlots?: RoleSlot[];
   playerCount: number;
   readOnly: false;
@@ -27,20 +28,19 @@ export default function RoleConfig(props: Props) {
     (!readOnly ? props.roleSlots : undefined)?.map((s) => [s.roleId, s.count]),
   );
   const [counts, setCounts] = useState<Record<string, number>>(
-    Object.fromEntries(
-      roleDefinitions.map((r) => [r.id, slotMap.get(r.id) ?? 0]),
-    ),
+    mapValues(roleDefinitions, (r) => slotMap.get(r.id) ?? 0),
   );
 
-  const total = Object.values(counts).reduce((sum, c) => sum + c, 0);
+  const total = sum(Object.values(counts));
 
   function handleChange(roleId: string, value: number) {
     const newCounts = { ...counts, [roleId]: Math.max(0, value) };
     setCounts(newCounts);
     if (!readOnly) {
-      const roleSlots = roleDefinitions
-        .filter((r) => (newCounts[r.id] ?? 0) > 0)
-        .map((r) => ({ roleId: r.id, count: newCounts[r.id] ?? 0 }));
+      const roleSlots = map(
+        pickBy(newCounts, (v) => v > 0),
+        (count, roleId) => ({ roleId, count }),
+      );
       props.onRoleSlotsChange(roleSlots);
     }
   }
@@ -61,7 +61,7 @@ export default function RoleConfig(props: Props) {
         </p>
       )}
       <ul style={{ listStyle: "none", padding: 0 }}>
-        {roleDefinitions.map((role) => (
+        {map(roleDefinitions, (role) => (
           <li
             key={role.id}
             style={{

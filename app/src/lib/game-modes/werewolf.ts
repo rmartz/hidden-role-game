@@ -1,13 +1,9 @@
+import { Team } from "@/lib/models";
 import type { GameModeConfig, RoleSlot } from "@/lib/models";
 
 export enum WerewolfRole {
   Good = "werewolf-good",
   Bad = "werewolf-bad",
-}
-
-export enum WerewolfTeam {
-  Good = "Good",
-  Bad = "Bad",
 }
 
 function defaultRoleCount(numPlayers: number): RoleSlot[] {
@@ -23,16 +19,20 @@ export const WEREWOLF_CONFIG = {
   name: "Werewolf",
   minPlayers: 5,
   ownerTitle: "Narrator",
+  teamLabels: {
+    [Team.Good]: "Villagers",
+    [Team.Bad]: "Werewolves",
+  },
   roles: {
     [WerewolfRole.Good]: {
       id: WerewolfRole.Good,
       name: "Good Role",
-      team: WerewolfTeam.Good,
+      team: Team.Good,
     },
     [WerewolfRole.Bad]: {
       id: WerewolfRole.Bad,
       name: "Bad Role",
-      team: WerewolfTeam.Bad,
+      team: Team.Bad,
     },
   },
   defaultRoleCount,

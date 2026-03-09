@@ -1,14 +1,10 @@
+import { Team } from "@/lib/models";
 import type { GameModeConfig, RoleSlot } from "@/lib/models";
 
 export enum AvalonRole {
   Good = "avalon-good",
   SpecialGood = "avalon-special-good",
   Bad = "avalon-bad",
-}
-
-export enum AvalonTeam {
-  Good = "Good",
-  Bad = "Bad",
 }
 
 function defaultRoleCount(numPlayers: number): RoleSlot[] {
@@ -26,22 +22,26 @@ export const AVALON_CONFIG = {
   name: "Avalon",
   minPlayers: 5,
   ownerTitle: null,
+  teamLabels: {
+    [Team.Good]: "Good",
+    [Team.Bad]: "Evil",
+  },
   roles: {
     [AvalonRole.Good]: {
       id: AvalonRole.Good,
       name: "Good Role",
-      team: AvalonTeam.Good,
+      team: Team.Good,
     },
     [AvalonRole.SpecialGood]: {
       id: AvalonRole.SpecialGood,
       name: "Special Good Role",
-      team: AvalonTeam.Good,
-      canSeeTeam: [AvalonTeam.Bad],
+      team: Team.Good,
+      canSeeTeam: [Team.Bad],
     },
     [AvalonRole.Bad]: {
       id: AvalonRole.Bad,
       name: "Bad Role",
-      team: AvalonTeam.Bad,
+      team: Team.Bad,
     },
   },
   defaultRoleCount,

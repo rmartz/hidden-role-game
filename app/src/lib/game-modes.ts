@@ -4,12 +4,9 @@ import { SECRET_VILLAIN_CONFIG } from "@/lib/game-modes/secret-villain";
 import { AVALON_CONFIG } from "@/lib/game-modes/avalon";
 import { WEREWOLF_CONFIG } from "@/lib/game-modes/werewolf";
 
-export {
-  SecretVillainRole,
-  SecretVillainTeam,
-} from "@/lib/game-modes/secret-villain";
-export { AvalonRole, AvalonTeam } from "@/lib/game-modes/avalon";
-export { WerewolfRole, WerewolfTeam } from "@/lib/game-modes/werewolf";
+export { SecretVillainRole } from "@/lib/game-modes/secret-villain";
+export { AvalonRole } from "@/lib/game-modes/avalon";
+export { WerewolfRole } from "@/lib/game-modes/werewolf";
 
 export const GAME_MODES: Record<GameMode, GameModeConfig> = {
   [GameMode.SecretVillain]: SECRET_VILLAIN_CONFIG,

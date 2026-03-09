@@ -2,44 +2,33 @@ import { randomUUID } from "crypto";
 import { GameStatus, GameMode } from "@/lib/models";
 import type {
   Game,
+  GameModeConfig,
   GamePlayer,
   LobbyPlayer,
   PlayerRoleAssignment,
   RoleDefinition,
+  Team,
 } from "@/lib/models";
 import type {
   RoleSlot,
   PublicRoleInfo,
   PlayerGameState,
 } from "@/server/models";
-import { secretVillainService } from "./SecretVillainService";
-import { avalonService } from "./AvalonService";
-import { werewolfService } from "./WerewolfService";
+import { GAME_MODES } from "@/lib/game-modes";
+import { assignRoles } from "./assignRoles";
 import { adjustRoleSlots } from "@/server/role-slots";
-
-interface GameModeService {
-  readonly minPlayers: number;
-  getRoleDefinitions(): Record<string, RoleDefinition>;
-  createRoleAssignments(
-    players: LobbyPlayer[],
-    roleSlots: RoleSlot[],
-  ): PlayerRoleAssignment[];
-  defaultRoleCount(numPlayers: number): RoleSlot[];
-}
 
 export class GameService {
   private games: Record<string, Game> = {};
 
-  private readonly modeServices: Record<GameMode, GameModeService> = {
-    [GameMode.SecretVillain]: secretVillainService,
-    [GameMode.Avalon]: avalonService,
-    [GameMode.Werewolf]: werewolfService,
-  };
+  public getModeDefinition(gameMode: GameMode): GameModeConfig {
+    return GAME_MODES[gameMode];
+  }
 
   private buildGamePlayers(
     players: LobbyPlayer[],
     roleAssignments: PlayerRoleAssignment[],
-    roleDefs: Record<string, RoleDefinition>,
+    roleDefs: Record<string, RoleDefinition<string, Team>>,
   ): GamePlayer[] {
     const playerById = new Map(players.map((p) => [p.id, p]));
 
@@ -70,16 +59,15 @@ export class GameService {
     gameMode: GameMode,
     showRolesInPlay: boolean,
   ): Game {
-    const service = this.modeServices[gameMode];
-    const roleDefs = service.getRoleDefinitions();
-    const roleAssignments = service.createRoleAssignments(players, roleSlots);
+    const { roles } = this.getModeDefinition(gameMode);
+    const roleAssignments = assignRoles(players, roleSlots);
 
     const game: Game = {
       id: randomUUID(),
       lobbyId,
       gameMode,
       status: { type: GameStatus.Playing },
-      players: this.buildGamePlayers(players, roleAssignments, roleDefs),
+      players: this.buildGamePlayers(players, roleAssignments, roles),
       roleAssignments,
       showRolesInPlay,
     };
@@ -92,29 +80,21 @@ export class GameService {
     return this.games[gameId];
   }
 
-  public getRoleDefinitions(
-    gameMode: GameMode,
-  ): Record<string, RoleDefinition> {
-    return this.modeServices[gameMode].getRoleDefinitions();
-  }
-
-  public defaultRoleCount(gameMode: GameMode, numPlayers: number): RoleSlot[] {
-    const service = this.modeServices[gameMode];
-    return service.defaultRoleCount(Math.max(numPlayers, service.minPlayers));
-  }
-
   public adjustRoleSlotsForPlayer(
     current: RoleSlot[],
     gameMode: GameMode,
     numPlayers: number,
     operation: "add" | "remove",
   ): RoleSlot[] {
-    const target = this.defaultRoleCount(gameMode, numPlayers);
+    const config = this.getModeDefinition(gameMode);
+    const target = config.defaultRoleCount(
+      Math.max(numPlayers, config.minPlayers),
+    );
     return adjustRoleSlots(current, target, operation);
   }
 
   public getRolesInPlay(game: Game): PublicRoleInfo[] {
-    const roleDefs = this.getRoleDefinitions(game.gameMode);
+    const roleDefs = this.getModeDefinition(game.gameMode).roles;
     return game.roleAssignments.reduce<PublicRoleInfo[]>((acc, assignment) => {
       const def = roleDefs[assignment.roleDefinitionId];
       if (!def || acc.some((r) => r.id === def.id)) return acc;
@@ -126,7 +106,7 @@ export class GameService {
     game: Game,
     callerId: string,
   ): PlayerGameState | null {
-    const roleDefs = this.getRoleDefinitions(game.gameMode);
+    const roleDefs = this.getModeDefinition(game.gameMode).roles;
 
     const caller = game.players.find((p) => p.id === callerId);
     if (!caller) return null;

@@ -30,7 +30,7 @@ export async function PUT(
 
   if (body.roleSlots !== undefined && body.gameMode !== undefined) {
     const validRoleIds = new Set(
-      Object.keys(gameService.getRoleDefinitions(body.gameMode)),
+      Object.keys(gameService.getModeDefinition(body.gameMode).roles),
     );
     for (const slot of body.roleSlots) {
       if (!validRoleIds.has(slot.roleId)) {

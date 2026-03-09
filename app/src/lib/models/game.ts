@@ -42,6 +42,7 @@ export enum GameMode {
 export enum Team {
   Good = "Good",
   Bad = "Bad",
+  Neutral = "Neutral",
 }
 
 export interface RoleDefinition<
@@ -58,7 +59,8 @@ export interface GameModeConfig {
   readonly name: string;
   readonly minPlayers: number;
   readonly ownerTitle: string | null;
-  readonly roles: Record<string, RoleDefinition>;
+  readonly roles: Record<string, RoleDefinition<string, Team>>;
+  readonly teamLabels: Partial<Record<Team, string>>;
   defaultRoleCount(numPlayers: number): RoleSlot[];
 }
 
