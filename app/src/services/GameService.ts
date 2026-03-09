@@ -121,7 +121,7 @@ export class GameService {
     game: Game,
     callerId: string,
   ): PlayerGameState | null {
-    const { roles, teamLabels } = this.getModeDefinition(game.gameMode);
+    const { roles } = this.getModeDefinition(game.gameMode);
 
     const caller = game.players.find((p) => p.id === callerId);
     if (!caller) return null;
@@ -130,26 +130,27 @@ export class GameService {
     const publicPlayers = game.players.map((p) => ({ id: p.id, name: p.name }));
 
     if (callerId === game.ownerPlayerId) {
-      const allRoleAssignments = game.roleAssignments.flatMap((assignment) => {
-        const player = playerById.get(assignment.playerId);
-        const role = roles[assignment.roleDefinitionId];
-        if (!player || !role) return [];
-        return [
-          {
-            player: { id: player.id, name: player.name },
-            role: { id: role.id, name: role.name, team: role.team },
-          },
-        ];
-      });
+      const visibleRoleAssignments = game.roleAssignments.flatMap(
+        (assignment) => {
+          const player = playerById.get(assignment.playerId);
+          const role = roles[assignment.roleDefinitionId];
+          if (!player || !role) return [];
+          return [
+            {
+              player: { id: player.id, name: player.name },
+              role: { id: role.id, name: role.name, team: role.team },
+            },
+          ];
+        },
+      );
       return {
         status: game.status,
+        gameMode: game.gameMode,
         players: publicPlayers,
-        isGameOwner: true,
+        gameOwner: { id: caller.id, name: caller.name },
         myRole: null,
-        visibleTeammates: [],
+        visibleRoleAssignments,
         rolesInPlay: this.getRolesInPlay(game),
-        allRoleAssignments,
-        teamLabels,
       };
     }
 
@@ -161,7 +162,7 @@ export class GameService {
     const myRole = roles[myAssignment.roleDefinitionId];
     if (!myRole) return null;
 
-    const visibleTeammates = caller.visibleRoles.flatMap((assignment) => {
+    const visibleRoleAssignments = caller.visibleRoles.flatMap((assignment) => {
       const player = playerById.get(assignment.playerId);
       const role = roles[assignment.roleDefinitionId];
       if (!player || !role) return [];
@@ -175,13 +176,12 @@ export class GameService {
 
     return {
       status: game.status,
+      gameMode: game.gameMode,
       players: publicPlayers,
-      isGameOwner: false,
+      gameOwner: null,
       myRole: { id: myRole.id, name: myRole.name, team: myRole.team },
-      visibleTeammates,
+      visibleRoleAssignments,
       rolesInPlay: game.showRolesInPlay ? this.getRolesInPlay(game) : null,
-      allRoleAssignments: null,
-      teamLabels,
     };
   }
 }

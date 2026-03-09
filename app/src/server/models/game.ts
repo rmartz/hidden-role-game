@@ -22,11 +22,10 @@ export interface VisibleTeammate {
 
 export interface PlayerGameState {
   status: GameStatusState;
+  gameMode: GameMode;
   players: PublicLobbyPlayer[];
-  isGameOwner: boolean;
+  gameOwner: PublicLobbyPlayer | null;
   myRole: PublicRoleInfo | null;
-  visibleTeammates: VisibleTeammate[];
+  visibleRoleAssignments: VisibleTeammate[];
   rolesInPlay: PublicRoleInfo[] | null;
-  allRoleAssignments: VisibleTeammate[] | null;
-  teamLabels: Partial<Record<Team, string>>;
 }

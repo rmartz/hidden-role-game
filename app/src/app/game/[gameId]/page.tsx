@@ -18,10 +18,10 @@ export default function GamePage() {
 
   // Game owners have a dedicated view with all player roles.
   useEffect(() => {
-    if (gameState?.isGameOwner) {
+    if (gameState?.gameOwner) {
       router.replace(`/game/${gameId}/owner`);
     }
-  }, [gameState?.isGameOwner, gameId, router]);
+  }, [gameState?.gameOwner, gameId, router]);
 
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
@@ -35,7 +35,7 @@ export default function GamePage() {
         </div>
       )}
 
-      {gameState && !gameState.isGameOwner && (
+      {gameState && !gameState.gameOwner && (
         <>
           <div style={{ marginBottom: "20px" }}>
             <h2>Your Role</h2>
@@ -45,11 +45,11 @@ export default function GamePage() {
             </p>
           </div>
 
-          {gameState.visibleTeammates.length > 0 && (
+          {gameState.visibleRoleAssignments.length > 0 && (
             <div style={{ marginBottom: "20px" }}>
               <h2>Your Teammates</h2>
               <ul>
-                {gameState.visibleTeammates.map((t) => (
+                {gameState.visibleRoleAssignments.map((t) => (
                   <li key={t.player.id}>
                     {t.player.name} — {t.role.name}
                   </li>

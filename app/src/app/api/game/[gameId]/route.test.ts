@@ -66,7 +66,7 @@ describe("GET /api/game/[gameId]", () => {
     expect(body.data.myRole).toBeDefined();
     expect(body.data.myRole.id).toMatch(/good|bad|special-bad/);
     expect(body.data.players).toHaveLength(2);
-    expect(Array.isArray(body.data.visibleTeammates)).toBe(true);
+    expect(Array.isArray(body.data.visibleRoleAssignments)).toBe(true);
   });
 
   it("should return 401 with no session header", async () => {
@@ -124,8 +124,8 @@ describe("GET /api/game/[gameId]", () => {
     const goodPlayer =
       aliceBody.data.myRole.id === "good" ? aliceBody.data : bobBody.data;
 
-    expect(badPlayer.visibleTeammates).toHaveLength(0); // no other bad players
-    expect(goodPlayer.visibleTeammates).toHaveLength(0); // good cannot see anyone
+    expect(badPlayer.visibleRoleAssignments).toHaveLength(0); // no other bad players
+    expect(goodPlayer.visibleRoleAssignments).toHaveLength(0); // good cannot see anyone
   });
 
   it("should show Avalon special good role player all bad role players", async () => {
@@ -187,8 +187,10 @@ describe("GET /api/game/[gameId]", () => {
     const badPlayer =
       aliceBody.data.myRole.id === "avalon-bad" ? aliceBody.data : bobBody.data;
 
-    expect(specialGoodPlayer.visibleTeammates).toHaveLength(1);
-    expect(specialGoodPlayer.visibleTeammates[0].role.id).toBe("avalon-bad");
-    expect(badPlayer.visibleTeammates).toHaveLength(0);
+    expect(specialGoodPlayer.visibleRoleAssignments).toHaveLength(1);
+    expect(specialGoodPlayer.visibleRoleAssignments[0].role.id).toBe(
+      "avalon-bad",
+    );
+    expect(badPlayer.visibleRoleAssignments).toHaveLength(0);
   });
 });

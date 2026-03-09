@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useGameStateQuery } from "@/hooks";
+import { GAME_MODES } from "@/lib/game-modes";
 
 export default function GameOwnerPage() {
   const { gameId } = useParams<{ gameId: string }>();
@@ -18,10 +19,14 @@ export default function GameOwnerPage() {
 
   // Regular players don't belong on this route.
   useEffect(() => {
-    if (gameState && !gameState.isGameOwner) {
+    if (gameState && !gameState.gameOwner) {
       router.replace(`/game/${gameId}`);
     }
   }, [gameState, gameId, router]);
+
+  const teamLabels = gameState
+    ? GAME_MODES[gameState.gameMode].teamLabels
+    : undefined;
 
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
@@ -35,27 +40,26 @@ export default function GameOwnerPage() {
         </div>
       )}
 
-      {gameState?.isGameOwner && (
+      {gameState?.gameOwner && (
         <>
           <div style={{ marginBottom: "20px" }}>
             <h2>Game Owner View</h2>
             <p>You can see all player roles.</p>
           </div>
 
-          {gameState.allRoleAssignments &&
-            gameState.allRoleAssignments.length > 0 && (
-              <div style={{ marginBottom: "20px" }}>
-                <h2>Player Roles</h2>
-                <ul>
-                  {gameState.allRoleAssignments.map((t) => (
-                    <li key={t.player.id}>
-                      {t.player.name} — {t.role.name} (
-                      {gameState.teamLabels[t.role.team] ?? t.role.team})
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+          {gameState.visibleRoleAssignments.length > 0 && (
+            <div style={{ marginBottom: "20px" }}>
+              <h2>Player Roles</h2>
+              <ul>
+                {gameState.visibleRoleAssignments.map((t) => (
+                  <li key={t.player.id}>
+                    {t.player.name} — {t.role.name} (
+                    {teamLabels?.[t.role.team] ?? t.role.team})
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {gameState.rolesInPlay && gameState.rolesInPlay.length > 0 && (
             <div style={{ marginBottom: "20px" }}>
