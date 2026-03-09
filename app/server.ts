@@ -58,7 +58,7 @@ void app.prepare().then(() => {
     ws.send(
       JSON.stringify({
         type: "lobby_updated",
-        reason: LobbyChangeReason.PlayerJoined,
+        reason: LobbyChangeReason.Connected,
         lobby: toPublicLobby(lobby, sessionId),
       }),
     );

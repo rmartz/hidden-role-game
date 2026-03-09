@@ -1,6 +1,7 @@
 import type { PublicLobby } from "./lobby";
 
 export enum LobbyChangeReason {
+  Connected = "connected",
   PlayerJoined = "player_joined",
   PlayerLeft = "player_left",
   ConfigChanged = "config_changed",

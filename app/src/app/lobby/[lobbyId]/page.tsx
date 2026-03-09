@@ -76,7 +76,11 @@ export default function LobbyPage() {
 
   const startGameMutation = useStartGame(lobbyId);
   const transferOwnerMutation = useTransferOwner(lobbyId);
-  const { flush: flushConfigSync } = useConfigSync(lobbyId, isOwner);
+  const { flush: flushConfigSync } = useConfigSync(
+    lobbyId,
+    isOwner,
+    wsConnected,
+  );
 
   function handleRefetch() {
     void fetchLobby.refetch();
