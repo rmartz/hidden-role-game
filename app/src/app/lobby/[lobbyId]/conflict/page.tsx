@@ -61,6 +61,11 @@ export default function LobbyConflictPage() {
     router.replace(`/lobby/${lobbyId}`);
   });
 
+  function handleJoin() {
+    if (!storedLobbyId || !myPlayerId) return;
+    joinMutation.mutate({ storedLobbyId, myPlayerId, lobbyId, playerName });
+  }
+
   if (
     targetLobbyQuery.isLoading ||
     conflictLobbyQuery.isLoading ||
@@ -79,15 +84,7 @@ export default function LobbyConflictPage() {
         playerName={playerName}
         onPlayerNameChange={setPlayerName}
         isJoining={joinMutation.isPending}
-        onJoin={() => {
-          if (!storedLobbyId || !myPlayerId) return;
-          joinMutation.mutate({
-            storedLobbyId,
-            myPlayerId,
-            lobbyId,
-            playerName,
-          });
-        }}
+        onJoin={handleJoin}
       />
     </div>
   );
