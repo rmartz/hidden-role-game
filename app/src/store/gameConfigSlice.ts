@@ -83,27 +83,6 @@ const gameConfigSlice = createSlice({
       state.syncVersion++;
     },
 
-    setRoleCount(
-      state,
-      action: PayloadAction<{ roleId: string; count: number }>,
-    ) {
-      const { roleId, count } = action.payload;
-      state.roleCounts[roleId] = Math.max(0, count);
-      state.isValid = computeIsValid(state.playerCount, state.roleCounts);
-      state.syncVersion++;
-    },
-
-    incrementPlayerCount(state) {
-      state.playerCount++;
-      state.isValid = computeIsValid(state.playerCount, state.roleCounts);
-    },
-
-    decrementPlayerCount(state) {
-      const { minPlayers } = GAME_MODES[state.gameMode];
-      state.playerCount = Math.max(minPlayers, state.playerCount - 1);
-      state.isValid = computeIsValid(state.playerCount, state.roleCounts);
-    },
-
     setPlayerCount(state, action: PayloadAction<number>) {
       const { minPlayers } = GAME_MODES[state.gameMode];
       state.playerCount = Math.max(minPlayers, action.payload);
@@ -127,9 +106,6 @@ export const {
   setGameMode,
   incrementRoleCount,
   decrementRoleCount,
-  setRoleCount,
-  incrementPlayerCount,
-  decrementPlayerCount,
   setPlayerCount,
   setShowConfigToPlayers,
   setShowRolesInPlay,
