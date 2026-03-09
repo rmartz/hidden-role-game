@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { getPlayerId, getSessionId } from "@/lib/api";
+import { LobbyChangeReason } from "@/server/models/websocket";
 import type { LobbySocketEvent } from "@/server/models/websocket";
 
 const RECONNECT_DELAY_MS = 3000;
@@ -68,7 +69,7 @@ export function useLobbyWebSocket(lobbyId: string): { isConnected: boolean } {
 
         // The owner is the source of truth for config — ignore echoed config
         // changes so local edits aren't overwritten by the server's echo.
-        if (message.reason === "config_changed") {
+        if (message.reason === LobbyChangeReason.ConfigChanged) {
           const myPlayerId = getPlayerId();
           const isOwner = message.lobby.ownerPlayerId === myPlayerId;
           if (isOwner) return;

@@ -5,6 +5,7 @@ import { WebSocketServer } from "ws";
 import { lobbySocketManager } from "./src/server/lobby-socket-manager";
 import { lobbyService } from "./src/services/LobbyService";
 import { toPublicLobby } from "./src/server/lobby-helpers";
+import { LobbyChangeReason } from "./src/server/models/websocket";
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = process.env["HOSTNAME"] ?? "localhost";
@@ -57,7 +58,7 @@ void app.prepare().then(() => {
     ws.send(
       JSON.stringify({
         type: "lobby_updated",
-        reason: "player_joined",
+        reason: LobbyChangeReason.PlayerJoined,
         lobby: toPublicLobby(lobby, sessionId),
       }),
     );

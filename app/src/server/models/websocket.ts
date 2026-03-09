@@ -1,11 +1,12 @@
 import type { PublicLobby } from "./lobby";
 
-export type LobbyChangeReason =
-  | "player_joined"
-  | "player_left"
-  | "config_changed"
-  | "owner_changed"
-  | "game_started";
+export enum LobbyChangeReason {
+  PlayerJoined = "player_joined",
+  PlayerLeft = "player_left",
+  ConfigChanged = "config_changed",
+  OwnerChanged = "owner_changed",
+  GameStarted = "game_started",
+}
 
 export interface LobbySocketEvent {
   type: "lobby_updated";

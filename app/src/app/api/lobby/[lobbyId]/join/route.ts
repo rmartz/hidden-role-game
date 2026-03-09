@@ -4,6 +4,7 @@ import { ServerResponseStatus, type JoinLobbyRequest } from "@/server/models";
 import { lobbyService } from "@/services/LobbyService";
 import { toPublicLobby } from "@/server/lobby-helpers";
 import { lobbySocketManager } from "@/server/lobby-socket-manager";
+import { LobbyChangeReason } from "@/server/models/websocket";
 import { errorResponse } from "@/server/api-helpers";
 
 export async function POST(
@@ -26,7 +27,7 @@ export async function POST(
   };
   lobby.players.push(newPlayer);
 
-  lobbySocketManager.broadcast(lobbyId, lobby, "player_joined");
+  lobbySocketManager.broadcast(lobbyId, lobby, LobbyChangeReason.PlayerJoined);
 
   return Response.json(
     {
