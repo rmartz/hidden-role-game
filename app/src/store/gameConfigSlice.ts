@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
+import { keyBy, mapValues, sum } from "lodash";
 import { GameMode } from "@/lib/models";
 import type { RoleSlot } from "@/lib/models";
 import type { GameConfig } from "@/server/models";
@@ -9,12 +10,11 @@ function computeIsValid(
   playerCount: number,
   roleCounts: Record<string, number>,
 ): boolean {
-  const total = Object.values(roleCounts).reduce((sum, n) => sum + n, 0);
-  return total === playerCount;
+  return sum(Object.values(roleCounts)) === playerCount;
 }
 
 function roleCountsFromSlots(slots: RoleSlot[]): Record<string, number> {
-  return Object.fromEntries(slots.map((s) => [s.roleId, s.count]));
+  return mapValues(keyBy(slots, "roleId"), "count");
 }
 
 export interface GameConfigState {
