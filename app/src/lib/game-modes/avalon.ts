@@ -1,4 +1,4 @@
-import type { GameModeConfig, RoleDefinition, RoleSlot } from "@/lib/models";
+import type { GameModeConfig, RoleSlot } from "@/lib/models";
 
 export enum AvalonRole {
   Good = "avalon-good",
@@ -11,31 +11,7 @@ export enum AvalonTeam {
   Bad = "Bad",
 }
 
-export const AVALON_ROLES: Record<
-  AvalonRole,
-  RoleDefinition<AvalonRole, AvalonTeam>
-> = {
-  [AvalonRole.Good]: {
-    id: AvalonRole.Good,
-    name: "Good Role",
-    team: AvalonTeam.Good,
-  },
-  [AvalonRole.SpecialGood]: {
-    id: AvalonRole.SpecialGood,
-    name: "Special Good Role",
-    team: AvalonTeam.Good,
-    canSeeTeam: [AvalonTeam.Bad],
-  },
-  [AvalonRole.Bad]: {
-    id: AvalonRole.Bad,
-    name: "Bad Role",
-    team: AvalonTeam.Bad,
-  },
-};
-
-export const MIN_PLAYERS = 5;
-
-export function defaultRoleCount(numPlayers: number): RoleSlot[] {
+function defaultRoleCount(numPlayers: number): RoleSlot[] {
   const bad = Math.floor((numPlayers - 1) / 2);
   const specialGood = 1;
   const good = numPlayers - bad - specialGood;
@@ -46,10 +22,27 @@ export function defaultRoleCount(numPlayers: number): RoleSlot[] {
   ];
 }
 
-export const AVALON_CONFIG: GameModeConfig = {
+export const AVALON_CONFIG = {
   name: "Avalon",
-  minPlayers: MIN_PLAYERS,
+  minPlayers: 5,
   ownerTitle: null,
-  roles: Object.values(AVALON_ROLES),
+  roles: {
+    [AvalonRole.Good]: {
+      id: AvalonRole.Good,
+      name: "Good Role",
+      team: AvalonTeam.Good,
+    },
+    [AvalonRole.SpecialGood]: {
+      id: AvalonRole.SpecialGood,
+      name: "Special Good Role",
+      team: AvalonTeam.Good,
+      canSeeTeam: [AvalonTeam.Bad],
+    },
+    [AvalonRole.Bad]: {
+      id: AvalonRole.Bad,
+      name: "Bad Role",
+      team: AvalonTeam.Bad,
+    },
+  },
   defaultRoleCount,
-};
+} satisfies GameModeConfig;

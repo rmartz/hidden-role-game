@@ -4,14 +4,14 @@ import type {
   RoleDefinition,
 } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
-import { AVALON_ROLES, defaultRoleCount } from "@/lib/game-modes/avalon";
+import { AVALON_CONFIG } from "@/lib/game-modes/avalon";
 import { assignRoles } from "./assignRoles";
 
 export class AvalonService {
-  readonly minPlayers = 5;
+  readonly minPlayers = AVALON_CONFIG.minPlayers;
 
   getRoleDefinitions(): RoleDefinition[] {
-    return Object.values(AVALON_ROLES);
+    return Object.values(AVALON_CONFIG.roles);
   }
 
   createRoleAssignments(
@@ -22,7 +22,7 @@ export class AvalonService {
   }
 
   defaultRoleCount(numPlayers: number): RoleSlot[] {
-    return defaultRoleCount(numPlayers);
+    return AVALON_CONFIG.defaultRoleCount(numPlayers);
   }
 }
 

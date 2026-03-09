@@ -4,17 +4,14 @@ import type {
   RoleDefinition,
 } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
-import {
-  SECRET_VILLAIN_ROLES,
-  defaultRoleCount,
-} from "@/lib/game-modes/secret-villain";
+import { SECRET_VILLAIN_CONFIG } from "@/lib/game-modes/secret-villain";
 import { assignRoles } from "./assignRoles";
 
 export class SecretVillainService {
-  readonly minPlayers = 5;
+  readonly minPlayers = SECRET_VILLAIN_CONFIG.minPlayers;
 
   getRoleDefinitions(): RoleDefinition[] {
-    return Object.values(SECRET_VILLAIN_ROLES);
+    return Object.values(SECRET_VILLAIN_CONFIG.roles);
   }
 
   createRoleAssignments(
@@ -25,7 +22,7 @@ export class SecretVillainService {
   }
 
   defaultRoleCount(numPlayers: number): RoleSlot[] {
-    return defaultRoleCount(numPlayers);
+    return SECRET_VILLAIN_CONFIG.defaultRoleCount(numPlayers);
   }
 }
 

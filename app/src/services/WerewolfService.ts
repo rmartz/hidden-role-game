@@ -4,14 +4,14 @@ import type {
   RoleDefinition,
 } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
-import { WEREWOLF_ROLES, defaultRoleCount } from "@/lib/game-modes/werewolf";
+import { WEREWOLF_CONFIG } from "@/lib/game-modes/werewolf";
 import { assignRoles } from "./assignRoles";
 
 export class WerewolfService {
-  readonly minPlayers = 5;
+  readonly minPlayers = WEREWOLF_CONFIG.minPlayers;
 
   getRoleDefinitions(): RoleDefinition[] {
-    return Object.values(WEREWOLF_ROLES);
+    return Object.values(WEREWOLF_CONFIG.roles);
   }
 
   createRoleAssignments(
@@ -22,7 +22,7 @@ export class WerewolfService {
   }
 
   defaultRoleCount(numPlayers: number): RoleSlot[] {
-    return defaultRoleCount(numPlayers);
+    return WEREWOLF_CONFIG.defaultRoleCount(numPlayers);
   }
 }
 

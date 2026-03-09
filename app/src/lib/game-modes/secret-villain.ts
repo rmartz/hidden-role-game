@@ -1,4 +1,4 @@
-import type { GameModeConfig, RoleDefinition, RoleSlot } from "@/lib/models";
+import type { GameModeConfig, RoleSlot } from "@/lib/models";
 
 export enum SecretVillainRole {
   Good = "good",
@@ -11,31 +11,7 @@ export enum SecretVillainTeam {
   Bad = "Bad",
 }
 
-export const SECRET_VILLAIN_ROLES: Record<
-  SecretVillainRole,
-  RoleDefinition<SecretVillainRole, SecretVillainTeam>
-> = {
-  [SecretVillainRole.Good]: {
-    id: SecretVillainRole.Good,
-    name: "Good Role",
-    team: SecretVillainTeam.Good,
-  },
-  [SecretVillainRole.Bad]: {
-    id: SecretVillainRole.Bad,
-    name: "Bad Role",
-    team: SecretVillainTeam.Bad,
-    canSeeTeam: [SecretVillainTeam.Bad],
-  },
-  [SecretVillainRole.SpecialBad]: {
-    id: SecretVillainRole.SpecialBad,
-    name: "Special Bad Role",
-    team: SecretVillainTeam.Bad,
-  },
-};
-
-export const MIN_PLAYERS = 5;
-
-export function defaultRoleCount(numPlayers: number): RoleSlot[] {
+function defaultRoleCount(numPlayers: number): RoleSlot[] {
   const specialBad = 1;
   const bad = Math.floor((numPlayers - 1) / 2) - 1;
   const good = numPlayers - specialBad - bad;
@@ -46,10 +22,27 @@ export function defaultRoleCount(numPlayers: number): RoleSlot[] {
   ];
 }
 
-export const SECRET_VILLAIN_CONFIG: GameModeConfig = {
+export const SECRET_VILLAIN_CONFIG = {
   name: "Secret Villain",
-  minPlayers: MIN_PLAYERS,
+  minPlayers: 5,
   ownerTitle: null,
-  roles: Object.values(SECRET_VILLAIN_ROLES),
+  roles: {
+    [SecretVillainRole.Good]: {
+      id: SecretVillainRole.Good,
+      name: "Good Role",
+      team: SecretVillainTeam.Good,
+    },
+    [SecretVillainRole.Bad]: {
+      id: SecretVillainRole.Bad,
+      name: "Bad Role",
+      team: SecretVillainTeam.Bad,
+      canSeeTeam: [SecretVillainTeam.Bad],
+    },
+    [SecretVillainRole.SpecialBad]: {
+      id: SecretVillainRole.SpecialBad,
+      name: "Special Bad Role",
+      team: SecretVillainTeam.Bad,
+    },
+  },
   defaultRoleCount,
-};
+} satisfies GameModeConfig;

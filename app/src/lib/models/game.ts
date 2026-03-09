@@ -58,7 +58,7 @@ export interface GameModeConfig {
   readonly name: string;
   readonly minPlayers: number;
   readonly ownerTitle: string | null;
-  readonly roles: RoleDefinition[];
+  readonly roles: Record<string, RoleDefinition>;
   defaultRoleCount(numPlayers: number): RoleSlot[];
 }
 

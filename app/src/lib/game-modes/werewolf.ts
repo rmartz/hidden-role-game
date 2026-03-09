@@ -1,4 +1,4 @@
-import type { GameModeConfig, RoleDefinition, RoleSlot } from "@/lib/models";
+import type { GameModeConfig, RoleSlot } from "@/lib/models";
 
 export enum WerewolfRole {
   Good = "werewolf-good",
@@ -10,25 +10,7 @@ export enum WerewolfTeam {
   Bad = "Bad",
 }
 
-export const WEREWOLF_ROLES: Record<
-  WerewolfRole,
-  RoleDefinition<WerewolfRole, WerewolfTeam>
-> = {
-  [WerewolfRole.Good]: {
-    id: WerewolfRole.Good,
-    name: "Good Role",
-    team: WerewolfTeam.Good,
-  },
-  [WerewolfRole.Bad]: {
-    id: WerewolfRole.Bad,
-    name: "Bad Role",
-    team: WerewolfTeam.Bad,
-  },
-};
-
-export const MIN_PLAYERS = 5;
-
-export function defaultRoleCount(numPlayers: number): RoleSlot[] {
+function defaultRoleCount(numPlayers: number): RoleSlot[] {
   const bad = Math.floor(numPlayers / 3);
   const good = numPlayers - bad;
   return [
@@ -37,10 +19,21 @@ export function defaultRoleCount(numPlayers: number): RoleSlot[] {
   ];
 }
 
-export const WEREWOLF_CONFIG: GameModeConfig = {
+export const WEREWOLF_CONFIG = {
   name: "Werewolf",
-  minPlayers: MIN_PLAYERS,
+  minPlayers: 5,
   ownerTitle: "Narrator",
-  roles: Object.values(WEREWOLF_ROLES),
+  roles: {
+    [WerewolfRole.Good]: {
+      id: WerewolfRole.Good,
+      name: "Good Role",
+      team: WerewolfTeam.Good,
+    },
+    [WerewolfRole.Bad]: {
+      id: WerewolfRole.Bad,
+      name: "Bad Role",
+      team: WerewolfTeam.Bad,
+    },
+  },
   defaultRoleCount,
-};
+} satisfies GameModeConfig;
