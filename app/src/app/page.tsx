@@ -3,9 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getLobbyId, getPlayerId } from "@/lib/api";
-import { useCreateLobby } from "@/hooks/create-lobby";
-import { useJoinLobby } from "@/hooks/join-lobby";
-import { useStoredLobbyQuery } from "@/hooks/lobby-query";
+import { useCreateLobby, useJoinLobby, useStoredLobbyQuery } from "@/hooks";
 
 export default function Home() {
   const router = useRouter();

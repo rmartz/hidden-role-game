@@ -3,8 +3,11 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getPlayerId, getLobbyId } from "@/lib/api";
-import { useLeaveAndJoinLobby } from "@/hooks/leave-and-join-lobby";
-import { useStoredLobbyQuery, useLobbyExistsQuery } from "@/hooks/lobby-query";
+import {
+  useLeaveAndJoinLobby,
+  useStoredLobbyQuery,
+  useLobbyExistsQuery,
+} from "@/hooks";
 import LobbyConflictResolution from "../LobbyConflictResolution";
 
 export default function LobbyConflictPage() {

@@ -1,8 +1,86 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { getLobby, clearSession } from "@/lib/api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import {
+  createLobby,
+  joinLobby,
+  removePlayer,
+  updateLobbyConfig,
+  getLobby,
+  clearSession,
+} from "@/lib/api";
 import { ServerResponseStatus } from "@/server/models";
+import type {
+  LobbyJoinResponse,
+  UpdateLobbyConfigRequest,
+} from "@/server/models";
+
+export function useCreateLobby() {
+  const router = useRouter();
+  return useMutation({
+    mutationFn: async (playerName: string) => {
+      const response = await createLobby(playerName);
+      if (response.status === ServerResponseStatus.Error)
+        throw new Error(response.error);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      router.push(`/lobby/${data.lobby.id}`);
+    },
+  });
+}
+
+export function useJoinLobby(onSuccess: (data: LobbyJoinResponse) => void) {
+  return useMutation({
+    mutationFn: async ({
+      lobbyId,
+      playerName,
+    }: {
+      lobbyId: string;
+      playerName: string;
+    }) => {
+      const response = await joinLobby(lobbyId, playerName);
+      if (response.status === ServerResponseStatus.Error)
+        throw new Error(response.error);
+      return response.data;
+    },
+    onSuccess,
+  });
+}
+
+export function useLeaveAndJoinLobby(onSuccess: () => void) {
+  return useMutation({
+    mutationFn: async ({
+      storedLobbyId,
+      myPlayerId,
+      lobbyId,
+      playerName,
+    }: {
+      storedLobbyId: string;
+      myPlayerId: string;
+      lobbyId: string;
+      playerName: string;
+    }) => {
+      await removePlayer(storedLobbyId, myPlayerId);
+      clearSession();
+      await joinLobby(lobbyId, playerName);
+    },
+    onSuccess,
+  });
+}
+
+export function useUpdateLobbyConfig(lobbyId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (config: UpdateLobbyConfigRequest) =>
+      updateLobbyConfig(lobbyId, config),
+    onSuccess: (response) => {
+      if (response.status === ServerResponseStatus.Error) return;
+      queryClient.setQueryData(["lobby", lobbyId], response.data.lobby);
+    },
+  });
+}
 
 /**
  * Fetches the lobby the user currently belongs to. Clears the local session

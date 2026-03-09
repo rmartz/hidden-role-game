@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useJoinLobby } from "@/hooks/join-lobby";
+import { useJoinLobby } from "@/hooks";
 
 interface Props {
   lobbyId: string;

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useGameStateQuery } from "@/hooks/game-state-query";
+import { useGameStateQuery } from "@/hooks";
 
 export default function GamePage() {
   const { gameId } = useParams<{ gameId: string }>();

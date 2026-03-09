@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { getPlayerId, getLobbyId } from "@/lib/api";
-import { useLobbyQuery } from "@/hooks/lobby-query";
-import { useRemovePlayer } from "@/hooks/remove-player";
-import { useStartGame } from "@/hooks/start-game";
-import { useTransferOwner } from "@/hooks/transfer-owner";
-import { useUpdateLobbyConfig } from "@/hooks/update-lobby-config";
+import {
+  useLobbyQuery,
+  useRemovePlayer,
+  useStartGame,
+  useTransferOwner,
+  useUpdateLobbyConfig,
+} from "@/hooks";
 import JoinPrompt from "./JoinPrompt";
 import PlayerList from "./PlayerList";
 import GameConfigurationPanel from "./GameConfigurationPanel";
