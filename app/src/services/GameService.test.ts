@@ -12,6 +12,7 @@ function makeGame(roleAssignments: Game["roleAssignments"]): Game {
     players: [],
     roleAssignments,
     showRolesInPlay: true,
+    ownerPlayerId: null,
   };
 }
 
@@ -35,6 +36,7 @@ function makeGameWithPlayers(
     players,
     roleAssignments,
     showRolesInPlay,
+    ownerPlayerId: null,
   };
 }
 
@@ -167,7 +169,7 @@ describe("GameService.getPlayerGameState", () => {
     });
   });
 
-  it("visibleTeammates is empty when caller has no visible roles", () => {
+  it("visibleRoleAssignments is empty when caller has no visible roles", () => {
     const game = makeGameWithPlayers(
       [makePlayer("p1", [])],
       [{ playerId: "p1", roleDefinitionId: "good" }],
@@ -175,10 +177,10 @@ describe("GameService.getPlayerGameState", () => {
 
     const result = service.getPlayerGameState(game, "p1");
 
-    expect(result?.visibleTeammates).toEqual([]);
+    expect(result?.visibleRoleAssignments).toEqual([]);
   });
 
-  it("visibleTeammates lists teammates from caller's visibleRoles", () => {
+  it("visibleRoleAssignments lists teammates from caller's visibleRoles", () => {
     const p2 = makePlayer("p2");
     const p1 = makePlayer("p1", [{ playerId: "p2", roleDefinitionId: "bad" }]);
     const game = makeGameWithPlayers(
@@ -191,7 +193,7 @@ describe("GameService.getPlayerGameState", () => {
 
     const result = service.getPlayerGameState(game, "p1");
 
-    expect(result?.visibleTeammates).toEqual([
+    expect(result?.visibleRoleAssignments).toEqual([
       {
         player: { id: "p2", name: "Player p2" },
         role: { id: "bad", name: "Bad Role", team: Team.Bad },

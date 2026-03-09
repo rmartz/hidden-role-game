@@ -88,6 +88,7 @@ export interface Game {
   players: GamePlayer[];
   roleAssignments: PlayerRoleAssignment[];
   showRolesInPlay: boolean;
+  ownerPlayerId: string | null;
 }
 
 // --- Lobby (top-level entity; game is absent until started) ---

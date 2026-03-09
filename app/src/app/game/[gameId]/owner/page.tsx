@@ -3,8 +3,9 @@
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useGameStateQuery } from "@/hooks";
+import { GAME_MODES } from "@/lib/game-modes";
 
-export default function GamePage() {
+export default function GameOwnerPage() {
   const { gameId } = useParams<{ gameId: string }>();
   const router = useRouter();
 
@@ -16,12 +17,16 @@ export default function GamePage() {
     }
   }, [error, router]);
 
-  // Game owners have a dedicated view with all player roles.
+  // Regular players don't belong on this route.
   useEffect(() => {
-    if (gameState?.gameOwner) {
-      router.replace(`/game/${gameId}/owner`);
+    if (gameState && !gameState.gameOwner) {
+      router.replace(`/game/${gameId}`);
     }
-  }, [gameState?.gameOwner, gameId, router]);
+  }, [gameState, gameId, router]);
+
+  const teamLabels = gameState
+    ? GAME_MODES[gameState.gameMode].teamLabels
+    : undefined;
 
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
@@ -35,23 +40,21 @@ export default function GamePage() {
         </div>
       )}
 
-      {gameState && !gameState.gameOwner && (
+      {gameState?.gameOwner && (
         <>
           <div style={{ marginBottom: "20px" }}>
-            <h2>Your Role</h2>
-            <p>
-              <strong>{gameState.myRole?.name}</strong> — Team:{" "}
-              {gameState.myRole?.team}
-            </p>
+            <h2>Game Owner View</h2>
+            <p>You can see all player roles.</p>
           </div>
 
           {gameState.visibleRoleAssignments.length > 0 && (
             <div style={{ marginBottom: "20px" }}>
-              <h2>Your Teammates</h2>
+              <h2>Player Roles</h2>
               <ul>
                 {gameState.visibleRoleAssignments.map((t) => (
                   <li key={t.player.id}>
-                    {t.player.name} — {t.role.name}
+                    {t.player.name} — {t.role.name} (
+                    {teamLabels?.[t.role.team] ?? t.role.team})
                   </li>
                 ))}
               </ul>
@@ -70,15 +73,6 @@ export default function GamePage() {
               </ul>
             </div>
           )}
-
-          <div>
-            <h2>All Players</h2>
-            <ul>
-              {gameState.players.map((p) => (
-                <li key={p.id}>{p.name}</li>
-              ))}
-            </ul>
-          </div>
         </>
       )}
     </div>

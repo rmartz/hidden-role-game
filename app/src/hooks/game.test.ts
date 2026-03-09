@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
+import { GameMode, GameStatus, Team } from "@/lib/models";
 import { ServerResponseStatus } from "@/server/models";
-import type { PlayerGameState } from "@/server/models";
+import type { PlayerGameState, PublicLobby } from "@/server/models";
 import { createWrapper } from "./test-utils";
 
 vi.mock("@/lib/api", () => ({
@@ -13,11 +14,25 @@ import * as api from "@/lib/api";
 import { useStartGame, useGameStateQuery } from "./game";
 
 const mockGameState: PlayerGameState = {
-  status: "in_progress",
+  status: { type: GameStatus.Playing },
+  gameMode: GameMode.SecretVillain,
   players: [{ id: "player-1", name: "Alice" }],
-  myRole: { id: "villager", name: "Villager", team: "good" },
-  visibleTeammates: [],
+  gameOwner: null,
+  myRole: { id: "villager", name: "Villager", team: Team.Good },
+  visibleRoleAssignments: [],
   rolesInPlay: null,
+};
+
+const mockOwnerGameState: PlayerGameState = {
+  ...mockGameState,
+  gameOwner: { id: "player-1", name: "Alice" },
+  myRole: null,
+  visibleRoleAssignments: [
+    {
+      player: { id: "player-1", name: "Alice" },
+      role: { id: "villager", name: "Villager", team: Team.Good },
+    },
+  ],
 };
 
 beforeEach(() => {
@@ -28,7 +43,19 @@ describe("useStartGame", () => {
   it("calls startGame and invalidates lobby query on success", async () => {
     vi.mocked(api.startGame).mockResolvedValue({
       status: ServerResponseStatus.Success,
-      data: { gameId: "game-1" },
+      data: {
+        lobby: {
+          id: "lobby-1",
+          ownerPlayerId: "player-1",
+          players: [],
+          config: {
+            gameMode: GameMode.SecretVillain,
+            showConfigToPlayers: false,
+            showRolesInPlay: false,
+          },
+          gameId: "game-1",
+        } satisfies PublicLobby,
+      },
     });
 
     const { queryClient, wrapper } = createWrapper();
@@ -37,7 +64,7 @@ describe("useStartGame", () => {
     const { result } = renderHook(() => useStartGame("lobby-1"), { wrapper });
 
     act(() => {
-      result.current.mutate({ roleSlots: [], gameMode: "werewolf" });
+      result.current.mutate({ roleSlots: [], gameMode: GameMode.Werewolf });
     });
 
     await waitFor(() => {
@@ -62,7 +89,7 @@ describe("useStartGame", () => {
     const { result } = renderHook(() => useStartGame("lobby-1"), { wrapper });
 
     act(() => {
-      result.current.mutate({ roleSlots: [], gameMode: "werewolf" });
+      result.current.mutate({ roleSlots: [], gameMode: GameMode.Werewolf });
     });
 
     await waitFor(() => {
@@ -141,5 +168,24 @@ describe("useGameStateQuery", () => {
       expect(result.current.isError).toBe(true);
     });
     expect(result.current.error?.message).toBe("Game not found");
+  });
+
+  it("returns owner state with visibleRoleAssignments when gameOwner is set", async () => {
+    vi.mocked(api.getGameState).mockResolvedValue({
+      data: { status: ServerResponseStatus.Success, data: mockOwnerGameState },
+      httpStatus: 200,
+    });
+
+    const { wrapper } = createWrapper();
+    const { result } = renderHook(() => useGameStateQuery("game-1"), {
+      wrapper,
+    });
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
+
+    expect(result.current.data?.gameOwner).toBeDefined();
+    expect(result.current.data?.visibleRoleAssignments).toHaveLength(1);
   });
 });

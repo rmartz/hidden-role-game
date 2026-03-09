@@ -88,7 +88,10 @@ export default function GameConfigurationPanel(props: Props) {
   const roleDefinitions =
     GAME_MODES[readOnly ? config.gameMode : selectedGameMode].roles;
   const totalSlots = currentRoleSlots.reduce((sum, s) => sum + s.count, 0);
-  const isValid = totalSlots === playerCount;
+  const ownerTitle =
+    GAME_MODES[readOnly ? config.gameMode : selectedGameMode].ownerTitle;
+  const roleSlotsRequired = playerCount - (ownerTitle ? 1 : 0);
+  const isValid = totalSlots === roleSlotsRequired;
 
   return (
     <div style={{ marginTop: "20px" }}>
@@ -155,6 +158,14 @@ export default function GameConfigurationPanel(props: Props) {
         </label>
       </div>
 
+      {ownerTitle && (
+        <p style={{ marginTop: "10px" }}>
+          {readOnly
+            ? `This game has a ${ownerTitle} who can see all roles.`
+            : `You will be the ${ownerTitle} and will see all player roles. Role slots are for the remaining ${String(roleSlotsRequired)} players.`}
+        </p>
+      )}
+
       {readOnly ? (
         <RoleConfig
           roleDefinitions={roleDefinitions}
@@ -168,7 +179,7 @@ export default function GameConfigurationPanel(props: Props) {
             key={roleConfigKey}
             roleDefinitions={roleDefinitions}
             roleSlots={currentRoleSlots}
-            playerCount={playerCount}
+            playerCount={roleSlotsRequired}
             readOnly={false}
             disabled={props.isPending}
             onRoleSlotsChange={setCurrentRoleSlots}
