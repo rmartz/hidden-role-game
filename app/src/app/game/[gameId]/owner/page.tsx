@@ -2,30 +2,13 @@
 
 import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
-import { getGameState } from "@/lib/api";
-import { ServerResponseStatus } from "@/server/models";
+import { useGameStateQuery } from "@/hooks";
 
 export default function GameOwnerPage() {
   const { gameId } = useParams<{ gameId: string }>();
   const router = useRouter();
 
-  const {
-    data: gameState,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["game", gameId],
-    queryFn: async () => {
-      const { data, httpStatus } = await getGameState(gameId);
-      if (httpStatus === 401 || httpStatus === 403)
-        throw new Error(String(httpStatus));
-      if (data.status === ServerResponseStatus.Error)
-        throw new Error(data.error);
-      return data.data;
-    },
-    retry: false,
-  });
+  const { data: gameState, isLoading, error } = useGameStateQuery(gameId);
 
   useEffect(() => {
     if (error?.message === "401" || error?.message === "403") {

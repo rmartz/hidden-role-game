@@ -18,6 +18,19 @@ const mockGameState: PlayerGameState = {
   myRole: { id: "villager", name: "Villager", team: "good" },
   visibleTeammates: [],
   rolesInPlay: null,
+  isGameOwner: false,
+  allRoleAssignments: null,
+};
+
+const mockOwnerGameState: PlayerGameState = {
+  ...mockGameState,
+  isGameOwner: true,
+  allRoleAssignments: [
+    {
+      player: { id: "player-1", name: "Alice" },
+      role: { id: "villager", name: "Villager", team: "good" },
+    },
+  ],
 };
 
 beforeEach(() => {
@@ -141,5 +154,24 @@ describe("useGameStateQuery", () => {
       expect(result.current.isError).toBe(true);
     });
     expect(result.current.error?.message).toBe("Game not found");
+  });
+
+  it("returns owner state with allRoleAssignments when isGameOwner is true", async () => {
+    vi.mocked(api.getGameState).mockResolvedValue({
+      data: { status: ServerResponseStatus.Success, data: mockOwnerGameState },
+      httpStatus: 200,
+    });
+
+    const { wrapper } = createWrapper();
+    const { result } = renderHook(() => useGameStateQuery("game-1"), {
+      wrapper,
+    });
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
+
+    expect(result.current.data?.isGameOwner).toBe(true);
+    expect(result.current.data?.allRoleAssignments).toHaveLength(1);
   });
 });
