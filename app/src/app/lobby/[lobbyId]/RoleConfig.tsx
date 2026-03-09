@@ -1,16 +1,17 @@
 import { useState } from "react";
-import type { RoleDefinition } from "@/lib/models";
+import { keyBy, mapValues, pickBy, sum } from "lodash";
+import type { RoleDefinition, Team } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
 
 interface ReadOnlyProps {
-  roleDefinitions: RoleDefinition[];
+  roleDefinitions: Record<string, RoleDefinition<string, Team>>;
   roleSlots?: RoleSlot[];
   playerCount: number;
   readOnly: true;
 }
 
 interface EditableProps {
-  roleDefinitions: RoleDefinition[];
+  roleDefinitions: Record<string, RoleDefinition<string, Team>>;
   roleSlots?: RoleSlot[];
   playerCount: number;
   readOnly: false;
@@ -23,32 +24,26 @@ type Props = ReadOnlyProps | EditableProps;
 export default function RoleConfig(props: Props) {
   const { roleDefinitions, playerCount, readOnly } = props;
 
-  const slotMap = new Map(
-    (!readOnly ? props.roleSlots : undefined)?.map((s) => [s.roleId, s.count]),
-  );
+  const slotCounts = keyBy(!readOnly ? props.roleSlots : [], "roleId");
   const [counts, setCounts] = useState<Record<string, number>>(
-    Object.fromEntries(
-      roleDefinitions.map((r) => [r.id, slotMap.get(r.id) ?? 0]),
-    ),
+    mapValues(roleDefinitions, (_, roleId) => slotCounts[roleId]?.count ?? 0),
   );
 
-  const total = Object.values(counts).reduce((sum, c) => sum + c, 0);
+  const total = sum(Object.values(counts));
 
   function handleChange(roleId: string, value: number) {
     const newCounts = { ...counts, [roleId]: Math.max(0, value) };
     setCounts(newCounts);
     if (!readOnly) {
-      const roleSlots = roleDefinitions
-        .filter((r) => (newCounts[r.id] ?? 0) > 0)
-        .map((r) => ({ roleId: r.id, count: newCounts[r.id] ?? 0 }));
+      const roleSlots = Object.entries(pickBy(newCounts, (v) => v > 0)).map(
+        ([roleId, count]) => ({ roleId, count }),
+      );
       props.onRoleSlotsChange(roleSlots);
     }
   }
 
   const displayCounts = readOnly
-    ? Object.fromEntries(
-        (props.roleSlots ?? []).map((s) => [s.roleId, s.count]),
-      )
+    ? mapValues(keyBy(props.roleSlots ?? [], "roleId"), (s) => s.count)
     : counts;
 
   return (
@@ -61,7 +56,7 @@ export default function RoleConfig(props: Props) {
         </p>
       )}
       <ul style={{ listStyle: "none", padding: 0 }}>
-        {roleDefinitions.map((role) => (
+        {Object.values(roleDefinitions).map((role) => (
           <li
             key={role.id}
             style={{

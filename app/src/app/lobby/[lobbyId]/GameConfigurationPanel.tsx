@@ -2,11 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { GameMode } from "@/lib/models";
-import {
-  GAME_MODE_NAMES,
-  GAME_MODE_ROLES,
-  getDefaultRoleSlots,
-} from "@/lib/game-modes";
+import { GAME_MODES, getDefaultRoleSlots } from "@/lib/game-modes";
 import type {
   GameConfig,
   RoleSlot,
@@ -90,14 +86,14 @@ export default function GameConfigurationPanel(props: Props) {
   ]);
 
   const roleDefinitions =
-    GAME_MODE_ROLES[readOnly ? config.gameMode : selectedGameMode];
+    GAME_MODES[readOnly ? config.gameMode : selectedGameMode].roles;
   const totalSlots = currentRoleSlots.reduce((sum, s) => sum + s.count, 0);
   const isValid = totalSlots === playerCount;
 
   return (
     <div style={{ marginTop: "20px" }}>
       {readOnly ? (
-        <p>Game Mode: {GAME_MODE_NAMES[config.gameMode]}</p>
+        <p>Game Mode: {GAME_MODES[config.gameMode].name}</p>
       ) : (
         <label>
           Game Mode:{" "}
@@ -112,7 +108,7 @@ export default function GameConfigurationPanel(props: Props) {
           >
             {Object.values(GameMode).map((mode) => (
               <option key={mode} value={mode}>
-                {GAME_MODE_NAMES[mode]}
+                {GAME_MODES[mode].name}
               </option>
             ))}
           </select>
