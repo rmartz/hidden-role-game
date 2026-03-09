@@ -54,7 +54,7 @@ export async function POST(request: Request): Promise<Response> {
     return errorResponse("Failed to start game", 500);
   }
 
-  lobbySocketManager.broadcast(lobbyId, updated);
+  lobbySocketManager.broadcast(lobbyId, updated, "game_started");
 
   return Response.json({
     status: ServerResponseStatus.Success,

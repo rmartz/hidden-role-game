@@ -30,7 +30,7 @@ export async function DELETE(
 
   const updated = lobbyService.removePlayer(lobbyId, playerId);
   if (updated) {
-    lobbySocketManager.broadcast(lobbyId, updated);
+    lobbySocketManager.broadcast(lobbyId, updated, "player_left");
   }
 
   return Response.json({

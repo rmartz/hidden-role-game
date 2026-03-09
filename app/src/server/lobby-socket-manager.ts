@@ -19,13 +19,18 @@ class LobbySocketManager {
     this.connections.get(lobbyId)?.delete(ws);
   }
 
-  broadcast(lobbyId: string, lobby: Lobby): void {
+  broadcast(
+    lobbyId: string,
+    lobby: Lobby,
+    reason: LobbySocketEvent["reason"],
+  ): void {
     const subs = this.connections.get(lobbyId);
     if (!subs) return;
     subs.forEach((sessionId, ws) => {
       if (ws.readyState === WebSocket.OPEN) {
         const event: LobbySocketEvent = {
           type: "lobby_updated",
+          reason,
           lobby: toPublicLobby(lobby, sessionId),
         };
         ws.send(JSON.stringify(event));
