@@ -28,7 +28,7 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const validRoleIds = new Set(
-    gameService.getRoleDefinitions(gameMode).map((r) => r.id),
+    Object.keys(gameService.getRoleDefinitions(gameMode)),
   );
   for (const slot of roleSlots) {
     if (!validRoleIds.has(slot.roleId)) {

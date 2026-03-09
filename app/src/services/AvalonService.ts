@@ -10,8 +10,8 @@ import { assignRoles } from "./assignRoles";
 export class AvalonService {
   readonly minPlayers = AVALON_CONFIG.minPlayers;
 
-  getRoleDefinitions(): RoleDefinition[] {
-    return Object.values(AVALON_CONFIG.roles);
+  getRoleDefinitions(): Record<string, RoleDefinition> {
+    return AVALON_CONFIG.roles;
   }
 
   createRoleAssignments(

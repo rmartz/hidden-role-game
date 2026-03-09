@@ -19,7 +19,7 @@ import { adjustRoleSlots } from "@/server/role-slots";
 
 interface GameModeService {
   readonly minPlayers: number;
-  getRoleDefinitions(): RoleDefinition[];
+  getRoleDefinitions(): Record<string, RoleDefinition>;
   createRoleAssignments(
     players: LobbyPlayer[],
     roleSlots: RoleSlot[],
@@ -39,22 +39,21 @@ export class GameService {
   private buildGamePlayers(
     players: LobbyPlayer[],
     roleAssignments: PlayerRoleAssignment[],
-    roleDefs: RoleDefinition[],
+    roleDefs: Record<string, RoleDefinition>,
   ): GamePlayer[] {
-    const roleDefById = new Map(roleDefs.map((r) => [r.id, r]));
     const playerById = new Map(players.map((p) => [p.id, p]));
 
     return roleAssignments.map((assignment) => {
       const player = playerById.get(assignment.playerId);
       if (!player) throw new Error(`Player not found: ${assignment.playerId}`);
-      const myRoleDef = roleDefById.get(assignment.roleDefinitionId);
+      const myRoleDef = roleDefs[assignment.roleDefinitionId];
 
       const visibleRoles: PlayerRoleAssignment[] = [];
       if (myRoleDef?.canSeeTeam && myRoleDef.canSeeTeam.length > 0) {
         const visibleTeams = new Set(myRoleDef.canSeeTeam);
         for (const other of roleAssignments) {
           if (other.playerId === assignment.playerId) continue;
-          const roleDef = roleDefById.get(other.roleDefinitionId);
+          const roleDef = roleDefs[other.roleDefinitionId];
           if (!roleDef || !visibleTeams.has(roleDef.team)) continue;
           visibleRoles.push(other);
         }
@@ -93,7 +92,9 @@ export class GameService {
     return this.games[gameId];
   }
 
-  public getRoleDefinitions(gameMode: GameMode): RoleDefinition[] {
+  public getRoleDefinitions(
+    gameMode: GameMode,
+  ): Record<string, RoleDefinition> {
     return this.modeServices[gameMode].getRoleDefinitions();
   }
 
@@ -114,9 +115,8 @@ export class GameService {
 
   public getRolesInPlay(game: Game): PublicRoleInfo[] {
     const roleDefs = this.getRoleDefinitions(game.gameMode);
-    const roleDefById = new Map(roleDefs.map((r) => [r.id, r]));
     return game.roleAssignments.reduce<PublicRoleInfo[]>((acc, assignment) => {
-      const def = roleDefById.get(assignment.roleDefinitionId);
+      const def = roleDefs[assignment.roleDefinitionId];
       if (!def || acc.some((r) => r.id === def.id)) return acc;
       return [...acc, { id: def.id, name: def.name, team: def.team }];
     }, []);
@@ -127,7 +127,6 @@ export class GameService {
     callerId: string,
   ): PlayerGameState | null {
     const roleDefs = this.getRoleDefinitions(game.gameMode);
-    const roleDefById = new Map(roleDefs.map((r) => [r.id, r]));
 
     const caller = game.players.find((p) => p.id === callerId);
     if (!caller) return null;
@@ -137,13 +136,13 @@ export class GameService {
     );
     if (!myAssignment) return null;
 
-    const myRoleDef = roleDefById.get(myAssignment.roleDefinitionId);
+    const myRoleDef = roleDefs[myAssignment.roleDefinitionId];
     if (!myRoleDef) return null;
 
     const playerById = new Map(game.players.map((p) => [p.id, p]));
     const visibleTeammates = caller.visibleRoles.flatMap((assignment) => {
       const player = playerById.get(assignment.playerId);
-      const roleDef = roleDefById.get(assignment.roleDefinitionId);
+      const roleDef = roleDefs[assignment.roleDefinitionId];
       if (!player || !roleDef) return [];
       return [
         {

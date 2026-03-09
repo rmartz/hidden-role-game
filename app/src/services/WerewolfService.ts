@@ -10,8 +10,8 @@ import { assignRoles } from "./assignRoles";
 export class WerewolfService {
   readonly minPlayers = WEREWOLF_CONFIG.minPlayers;
 
-  getRoleDefinitions(): RoleDefinition[] {
-    return Object.values(WEREWOLF_CONFIG.roles);
+  getRoleDefinitions(): Record<string, RoleDefinition> {
+    return WEREWOLF_CONFIG.roles;
   }
 
   createRoleAssignments(

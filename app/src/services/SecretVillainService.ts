@@ -10,8 +10,8 @@ import { assignRoles } from "./assignRoles";
 export class SecretVillainService {
   readonly minPlayers = SECRET_VILLAIN_CONFIG.minPlayers;
 
-  getRoleDefinitions(): RoleDefinition[] {
-    return Object.values(SECRET_VILLAIN_CONFIG.roles);
+  getRoleDefinitions(): Record<string, RoleDefinition> {
+    return SECRET_VILLAIN_CONFIG.roles;
   }
 
   createRoleAssignments(
