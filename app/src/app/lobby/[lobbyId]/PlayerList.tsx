@@ -7,6 +7,7 @@ interface Props {
   showLeave: boolean;
   showRemovePlayer: boolean;
   showMakeOwner: boolean;
+  showRefresh: boolean;
   isFetching: boolean;
   disabled: boolean;
   onRefetch: () => void;
@@ -20,6 +21,7 @@ export default function PlayerList({
   showLeave,
   showRemovePlayer,
   showMakeOwner,
+  showRefresh,
   isFetching,
   disabled,
   onRefetch,
@@ -30,9 +32,11 @@ export default function PlayerList({
     <>
       <p>
         Players: {lobby.players.length}{" "}
-        <button onClick={onRefetch} disabled={isFetching}>
-          {isFetching ? "Refreshing..." : "Refresh"}
-        </button>
+        {showRefresh && (
+          <button onClick={onRefetch} disabled={isFetching}>
+            {isFetching ? "Refreshing..." : "Refresh"}
+          </button>
+        )}
       </p>
       <ul>
         {lobby.players.map((player) => (

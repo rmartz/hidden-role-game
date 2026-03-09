@@ -6,14 +6,16 @@ import { useJoinLobby } from "@/hooks";
 
 interface Props {
   lobbyId: string;
+  onJoined?: () => void;
 }
 
-export default function JoinPrompt({ lobbyId }: Props) {
+export default function JoinPrompt({ lobbyId, onJoined }: Props) {
   const queryClient = useQueryClient();
   const [playerName, setPlayerName] = useState("");
 
   const joinMutation = useJoinLobby(() => {
     void queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
+    onJoined?.();
   });
 
   function handleJoin() {

@@ -42,8 +42,8 @@ const gameConfigSlice = createSlice({
   name: "gameConfig",
   initialState,
   reducers: {
-    /** Initialise (or re-sync) state from the server. Does NOT increment syncVersion. */
-    initFromServer(
+    /** One-time initialisation from server config on mount. Does NOT increment syncVersion. */
+    loadConfig(
       state,
       action: PayloadAction<{ config: GameConfig; playerCount: number }>,
     ) {
@@ -83,34 +83,10 @@ const gameConfigSlice = createSlice({
       state.syncVersion++;
     },
 
-    setRoleCount(
-      state,
-      action: PayloadAction<{ roleId: string; count: number }>,
-    ) {
-      const { roleId, count } = action.payload;
-      state.roleCounts[roleId] = Math.max(0, count);
-      state.isValid = computeIsValid(state.playerCount, state.roleCounts);
-      state.syncVersion++;
-    },
-
-    incrementPlayerCount(state) {
-      state.playerCount++;
-      state.isValid = computeIsValid(state.playerCount, state.roleCounts);
-      state.syncVersion++;
-    },
-
-    decrementPlayerCount(state) {
-      const { minPlayers } = GAME_MODES[state.gameMode];
-      state.playerCount = Math.max(minPlayers, state.playerCount - 1);
-      state.isValid = computeIsValid(state.playerCount, state.roleCounts);
-      state.syncVersion++;
-    },
-
     setPlayerCount(state, action: PayloadAction<number>) {
       const { minPlayers } = GAME_MODES[state.gameMode];
       state.playerCount = Math.max(minPlayers, action.payload);
       state.isValid = computeIsValid(state.playerCount, state.roleCounts);
-      state.syncVersion++;
     },
 
     setShowConfigToPlayers(state, action: PayloadAction<boolean>) {
@@ -126,13 +102,10 @@ const gameConfigSlice = createSlice({
 });
 
 export const {
-  initFromServer,
+  loadConfig,
   setGameMode,
   incrementRoleCount,
   decrementRoleCount,
-  setRoleCount,
-  incrementPlayerCount,
-  decrementPlayerCount,
   setPlayerCount,
   setShowConfigToPlayers,
   setShowRolesInPlay,
