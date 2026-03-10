@@ -6,11 +6,12 @@ import type { RoleSlot } from "@/lib/models";
 import type { GameConfig } from "@/server/models";
 import { GAME_MODES } from "@/lib/game-modes";
 
-function computeIsValid(
-  gameMode: GameMode,
-  playerCount: number,
-  roleCounts: Record<string, number>,
-): boolean {
+function computeIsValid(state: {
+  gameMode: GameMode;
+  playerCount: number;
+  roleCounts: Record<string, number>;
+}): boolean {
+  const { gameMode, playerCount, roleCounts } = state;
   const config = GAME_MODES[gameMode];
   if (config.isValidRoleCount) {
     return config.isValidRoleCount(playerCount, roleCounts);
@@ -58,11 +59,7 @@ const gameConfigSlice = createSlice({
       state.roleCounts = roleCountsFromSlots(config.roleSlots ?? []);
       state.showConfigToPlayers = config.showConfigToPlayers;
       state.showRolesInPlay = config.showRolesInPlay;
-      state.isValid = computeIsValid(
-        config.gameMode,
-        playerCount,
-        state.roleCounts,
-      );
+      state.isValid = computeIsValid(state);
     },
 
     setGameMode(state, action: PayloadAction<GameMode>) {
@@ -71,22 +68,14 @@ const gameConfigSlice = createSlice({
         state.playerCount,
       );
       state.roleCounts = roleCountsFromSlots(slots);
-      state.isValid = computeIsValid(
-        state.gameMode,
-        state.playerCount,
-        state.roleCounts,
-      );
+      state.isValid = computeIsValid(state);
       state.syncVersion++;
     },
 
     incrementRoleCount(state, action: PayloadAction<string>) {
       const roleId = action.payload;
       state.roleCounts[roleId] = (state.roleCounts[roleId] ?? 0) + 1;
-      state.isValid = computeIsValid(
-        state.gameMode,
-        state.playerCount,
-        state.roleCounts,
-      );
+      state.isValid = computeIsValid(state);
       state.syncVersion++;
     },
 
@@ -96,22 +85,14 @@ const gameConfigSlice = createSlice({
         0,
         (state.roleCounts[roleId] ?? 0) - 1,
       );
-      state.isValid = computeIsValid(
-        state.gameMode,
-        state.playerCount,
-        state.roleCounts,
-      );
+      state.isValid = computeIsValid(state);
       state.syncVersion++;
     },
 
     setPlayerCount(state, action: PayloadAction<number>) {
       const { minPlayers } = GAME_MODES[state.gameMode];
       state.playerCount = Math.max(minPlayers, action.payload);
-      state.isValid = computeIsValid(
-        state.gameMode,
-        state.playerCount,
-        state.roleCounts,
-      );
+      state.isValid = computeIsValid(state);
     },
 
     setShowConfigToPlayers(state, action: PayloadAction<boolean>) {
