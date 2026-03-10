@@ -1,13 +1,14 @@
 "use client";
 
 import { GAME_MODES } from "@/lib/game-modes";
-import type { TurnState } from "@/lib/models";
+import { WerewolfPhase } from "@/lib/game-modes/werewolf";
+import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/models";
 import { GameRolesList, PlayersRoleList } from "..";
 
 interface Props {
   gameState: PlayerGameState;
-  turnState: TurnState;
+  turnState: WerewolfTurnState;
   onAdvancePhase: () => void;
   isAdvancePending: boolean;
 }
@@ -19,7 +20,7 @@ export function OwnerGameNightScreen({
   isAdvancePending,
 }: Props) {
   const { phase } = turnState;
-  if (phase.type !== "nighttime") return null;
+  if (phase.type !== WerewolfPhase.Nighttime) return null;
 
   const { nightPhaseOrder, currentPhaseIndex } = phase;
   const activeRoleId = nightPhaseOrder[currentPhaseIndex] ?? "";

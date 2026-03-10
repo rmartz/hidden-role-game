@@ -5,11 +5,9 @@ import type {
   GameModeConfig,
   GamePlayer,
   LobbyPlayer,
-  NighttimePhase,
   PlayerRoleAssignment,
   RoleDefinition,
   Team,
-  TurnState,
 } from "@/lib/models";
 import type {
   RoleSlot,
@@ -17,7 +15,11 @@ import type {
   PlayerGameState,
 } from "@/server/models";
 import { GAME_MODES } from "@/lib/game-modes";
-import { buildNightPhaseOrder } from "@/lib/game-modes/werewolf";
+import { WerewolfPhase, buildNightPhaseOrder } from "@/lib/game-modes/werewolf";
+import type {
+  WerewolfNighttimePhase,
+  WerewolfTurnState,
+} from "@/lib/game-modes/werewolf";
 import { assignRoles } from "./assignRoles";
 import { adjustRoleSlots } from "@/server/role-slots";
 
@@ -102,11 +104,11 @@ export class GameService {
   private buildInitialTurnState(
     gameMode: GameMode,
     roleAssignments: PlayerRoleAssignment[],
-  ): TurnState | undefined {
+  ): WerewolfTurnState | undefined {
     if (gameMode !== GameMode.Werewolf) return undefined;
     const nightPhaseOrder = buildNightPhaseOrder(1, roleAssignments);
-    const phase: NighttimePhase = {
-      type: "nighttime",
+    const phase: WerewolfNighttimePhase = {
+      type: WerewolfPhase.Nighttime,
       nightPhaseOrder,
       currentPhaseIndex: 0,
     };
@@ -132,9 +134,10 @@ export class GameService {
     const { turnState } = game.status;
     if (!turnState) return null;
 
-    const { turn, phase } = turnState;
+    const werewolfTurnState = turnState as WerewolfTurnState;
+    const { turn, phase } = werewolfTurnState;
 
-    if (phase.type === "nighttime") {
+    if (phase.type === WerewolfPhase.Nighttime) {
       const nextIndex = phase.currentPhaseIndex + 1;
       if (nextIndex < phase.nightPhaseOrder.length) {
         // Advance to the next night phase.
@@ -151,7 +154,7 @@ export class GameService {
           type: GameStatus.Playing,
           turnState: {
             turn,
-            phase: { type: "daytime", startedAt: Date.now() },
+            phase: { type: WerewolfPhase.Daytime, startedAt: Date.now() },
           },
         };
       }
@@ -166,7 +169,11 @@ export class GameService {
         type: GameStatus.Playing,
         turnState: {
           turn: nextTurn,
-          phase: { type: "nighttime", nightPhaseOrder, currentPhaseIndex: 0 },
+          phase: {
+            type: WerewolfPhase.Nighttime,
+            nightPhaseOrder,
+            currentPhaseIndex: 0,
+          },
         },
       };
     }

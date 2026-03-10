@@ -1,11 +1,11 @@
 "use client";
 
-import type { NighttimePhase } from "@/lib/models";
+import type { WerewolfNighttimePhase } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/models";
 
 interface Props {
   gameState: PlayerGameState;
-  phase: NighttimePhase;
+  phase: WerewolfNighttimePhase;
 }
 
 export function PlayerGameNightScreen({ gameState, phase }: Props) {

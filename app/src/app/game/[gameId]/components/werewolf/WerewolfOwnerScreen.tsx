@@ -1,6 +1,8 @@
 "use client";
 
 import { GameStatus } from "@/lib/models";
+import { WerewolfPhase } from "@/lib/game-modes/werewolf";
+import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/models";
 import { useAdvanceGame, useAdvancePhase } from "@/hooks";
 import { OwnerStartingScreen } from "./OwnerStartingScreen";
@@ -32,9 +34,11 @@ export function WerewolfOwnerScreen({ gameId, gameState }: Props) {
   }
 
   if (gameState.status.type === GameStatus.Playing) {
-    const { turnState } = gameState.status;
+    const turnState = gameState.status.turnState as
+      | WerewolfTurnState
+      | undefined;
 
-    if (turnState?.phase.type === "nighttime") {
+    if (turnState?.phase.type === WerewolfPhase.Nighttime) {
       return (
         <OwnerGameNightScreen
           gameState={gameState}
@@ -47,7 +51,7 @@ export function WerewolfOwnerScreen({ gameId, gameState }: Props) {
       );
     }
 
-    if (turnState?.phase.type === "daytime") {
+    if (turnState?.phase.type === WerewolfPhase.Daytime) {
       return (
         <OwnerGameDayScreen
           gameState={gameState}

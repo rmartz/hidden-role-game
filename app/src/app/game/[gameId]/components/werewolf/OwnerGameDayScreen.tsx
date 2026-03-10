@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { TurnState } from "@/lib/models";
+import { WerewolfPhase } from "@/lib/game-modes/werewolf";
+import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/models";
 import { GameRolesList, PlayersRoleList } from "..";
 
 interface Props {
   gameState: PlayerGameState;
-  turnState: TurnState;
+  turnState: WerewolfTurnState;
   onAdvancePhase: () => void;
   isAdvancePending: boolean;
 }
@@ -19,7 +20,8 @@ export function OwnerGameDayScreen({
   isAdvancePending,
 }: Props) {
   const { phase } = turnState;
-  const startedAt = phase.type === "daytime" ? phase.startedAt : null;
+  const startedAt =
+    phase.type === WerewolfPhase.Daytime ? phase.startedAt : null;
 
   const [elapsedSeconds, setElapsedSeconds] = useState(
     startedAt !== null ? Math.floor((Date.now() - startedAt) / 1000) : 0,
@@ -43,7 +45,7 @@ export function OwnerGameDayScreen({
     };
   }, [startedAt]);
 
-  if (phase.type !== "daytime") return null;
+  if (phase.type !== WerewolfPhase.Daytime) return null;
 
   const minutes = Math.floor(elapsedSeconds / 60);
   const secs = elapsedSeconds % 60;

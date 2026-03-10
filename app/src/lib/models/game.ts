@@ -16,31 +16,10 @@ export interface StartingGameStatus {
   type: GameStatus.Starting;
 }
 
-export interface NighttimePhase {
-  type: "nighttime";
-  /** Role IDs in the order they wake, determined at phase start. */
-  nightPhaseOrder: string[];
-  /** Index into nightPhaseOrder for the currently active role. */
-  currentPhaseIndex: number;
-}
-
-export interface DaytimePhase {
-  type: "daytime";
-  /** Unix epoch ms when the day phase began (for elapsed-time display). */
-  startedAt: number;
-}
-
-export type TurnPhase = NighttimePhase | DaytimePhase;
-
-export interface TurnState {
-  turn: number;
-  phase: TurnPhase;
-}
-
 export interface PlayingGameStatus {
   type: GameStatus.Playing;
-  /** Present for game modes with structured turns (e.g. Werewolf). */
-  turnState?: TurnState;
+  /** Present for game modes with structured turns (e.g. Werewolf). Typed per game mode. */
+  turnState?: unknown;
 }
 
 export interface FinishedGameStatus {
