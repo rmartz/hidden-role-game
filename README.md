@@ -65,12 +65,12 @@ Lobby state changes are pushed to all connected clients via PartyKit WebSockets.
 # Install dependencies
 pnpm install
 
-# Start Next.js dev server (http://localhost:3000)
-pnpm dev
+# Start both Next.js and PartyKit together (recommended)
+pnpm dev:all
 
-# In a separate terminal: start PartyKit dev server (ws://localhost:1999)
-# Required for real-time lobby updates during local development
-pnpm dev:party
+# Or run them separately:
+pnpm dev        # Next.js only  (http://localhost:3000)
+pnpm dev:party  # PartyKit only (ws://localhost:1999)
 ```
 
 ## API

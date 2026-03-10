@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "dev:party": "partykit dev",
+    "dev:all": "concurrently -n next,party -c cyan,magenta \"next dev\" \"partykit dev\"",
     "build": "next build",
     "start": "next start",
     "party:deploy": "partykit deploy",
@@ -37,6 +38,7 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^4.0.0",
+    "concurrently": "^9.2.1",
     "happy-dom": "^20.8.3",
     "partykit": "^0.0.115",
     "postcss": "^8.5.8",
