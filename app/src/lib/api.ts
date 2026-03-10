@@ -144,6 +144,22 @@ export async function advanceGame(
   return (await response.json()) as ServerResponse<Record<string, never>>;
 }
 
+export async function applyGameAction(
+  gameId: string,
+  actionId: string,
+  payload?: unknown,
+): Promise<ServerResponse<Record<string, never>>> {
+  const sessionId = getSessionId();
+  const headers: HeadersInit = { "Content-Type": "application/json" };
+  if (sessionId) headers["x-session-id"] = sessionId;
+  const response = await fetch(`/api/game/${gameId}/action`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ actionId, payload }),
+  });
+  return (await response.json()) as ServerResponse<Record<string, never>>;
+}
+
 export async function getGameState(
   gameId: string,
 ): Promise<{ data: ServerResponse<PlayerGameState>; httpStatus: number }> {

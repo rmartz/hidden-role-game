@@ -15,6 +15,11 @@ import type {
   PlayerGameState,
 } from "@/server/models";
 import { GAME_MODES } from "@/lib/game-modes";
+import { WerewolfPhase, buildNightPhaseOrder } from "@/lib/game-modes/werewolf";
+import type {
+  WerewolfTurnState,
+  WerewolfNighttimePhase,
+} from "@/lib/game-modes/werewolf";
 import { assignRoles } from "./assignRoles";
 import { adjustRoleSlots } from "@/server/role-slots";
 
@@ -96,11 +101,52 @@ export class GameService {
     return this.games[gameId];
   }
 
+  private buildInitialTurnState(
+    gameMode: GameMode,
+    roleAssignments: PlayerRoleAssignment[],
+  ): WerewolfTurnState | undefined {
+    if (gameMode !== GameMode.Werewolf) return undefined;
+    const nightPhaseOrder = buildNightPhaseOrder(1, roleAssignments);
+    const phase: WerewolfNighttimePhase = {
+      type: WerewolfPhase.Nighttime,
+      nightPhaseOrder,
+      currentPhaseIndex: 0,
+    };
+    return { turn: 1, phase };
+  }
+
   public advanceToPlaying(gameId: string): Game | null {
     const game = this.games[gameId];
     if (game?.status.type !== GameStatus.Starting) return null;
-    game.status = { type: GameStatus.Playing };
+    game.status = {
+      type: GameStatus.Playing,
+      turnState: this.buildInitialTurnState(
+        game.gameMode,
+        game.roleAssignments,
+      ),
+    };
     return game;
+  }
+
+  public applyAction(
+    gameId: string,
+    actionId: string,
+    callerId: string,
+    payload: unknown,
+  ): { game: Game } | { error: string } {
+    const game = this.games[gameId];
+    if (!game) return { error: "Game not found" };
+
+    const config = this.getModeDefinition(game.gameMode);
+    const action = config.actions[actionId];
+    if (!action) return { error: "Unknown action" };
+
+    if (!action.isValid(game, callerId, payload)) {
+      return { error: "Action not valid for current game state" };
+    }
+
+    action.apply(game, payload);
+    return { game };
   }
 
   public adjustRoleSlotsForPlayer(

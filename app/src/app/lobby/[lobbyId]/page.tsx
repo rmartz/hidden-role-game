@@ -12,9 +12,7 @@ import {
   useTransferOwner,
   useConfigSync,
 } from "@/hooks";
-import JoinPrompt from "./JoinPrompt";
-import PlayerList from "./PlayerList";
-import GameConfigurationPanel from "./GameConfigurationPanel";
+import { GameConfigurationPanel, JoinPrompt, PlayerList } from "./components";
 
 export default function LobbyPage() {
   const { lobbyId } = useParams<{ lobbyId: string }>();

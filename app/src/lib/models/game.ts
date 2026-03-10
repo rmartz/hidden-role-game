@@ -18,6 +18,8 @@ export interface StartingGameStatus {
 
 export interface PlayingGameStatus {
   type: GameStatus.Playing;
+  /** Present for game modes with structured turns (e.g. Werewolf). Typed per game mode. */
+  turnState?: unknown;
 }
 
 export interface FinishedGameStatus {
@@ -75,6 +77,7 @@ export interface GameModeConfig {
     numPlayers: number,
     roleCounts: Record<string, number>,
   ): boolean;
+  readonly actions: Record<string, GameAction>;
 }
 
 export interface PlayerRoleAssignment {
@@ -102,6 +105,15 @@ export interface Game {
   roleAssignments: PlayerRoleAssignment[];
   showRolesInPlay: boolean;
   ownerPlayerId: string | null;
+}
+
+/**
+ * A game-mode-defined action that can be applied to a game. Actions are
+ * validated before application; isValid must return true for apply to be called.
+ */
+export interface GameAction {
+  isValid(game: Game, callerId: string, payload: unknown): boolean;
+  apply(game: Game, payload: unknown): void;
 }
 
 // --- Lobby (top-level entity; game is absent until started) ---
