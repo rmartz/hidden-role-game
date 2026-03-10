@@ -128,6 +128,28 @@ export class GameService {
     return game;
   }
 
+  public setNightPhaseIndex(gameId: string, phaseIndex: number): Game | null {
+    const game = this.games[gameId];
+    if (game?.status.type !== GameStatus.Playing) return null;
+    const { turnState } = game.status;
+    if (!turnState) return null;
+
+    const werewolfTurnState = turnState as WerewolfTurnState;
+    const { phase } = werewolfTurnState;
+    if (phase.type !== WerewolfPhase.Nighttime) return null;
+    if (phaseIndex < 0 || phaseIndex >= phase.nightPhaseOrder.length)
+      return null;
+
+    game.status = {
+      type: GameStatus.Playing,
+      turnState: {
+        ...werewolfTurnState,
+        phase: { ...phase, currentPhaseIndex: phaseIndex },
+      },
+    };
+    return game;
+  }
+
   public advancePhase(gameId: string): Game | null {
     const game = this.games[gameId];
     if (game?.status.type !== GameStatus.Playing) return null;

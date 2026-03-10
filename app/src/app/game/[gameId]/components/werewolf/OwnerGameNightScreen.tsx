@@ -4,9 +4,11 @@ import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/models";
+import { useSetPhaseIndex } from "@/hooks";
 import { GameRolesList, PlayersRoleList } from "..";
 
 interface Props {
+  gameId: string;
   gameState: PlayerGameState;
   turnState: WerewolfTurnState;
   onAdvancePhase: () => void;
@@ -14,11 +16,14 @@ interface Props {
 }
 
 export function OwnerGameNightScreen({
+  gameId,
   gameState,
   turnState,
   onAdvancePhase,
   isAdvancePending,
 }: Props) {
+  const setPhaseIndexMutation = useSetPhaseIndex(gameId);
+
   const { phase } = turnState;
   if (phase.type !== WerewolfPhase.Nighttime) return null;
 
@@ -49,6 +54,11 @@ export function OwnerGameNightScreen({
       <GameRolesList
         roles={gameState.rolesInPlay ?? []}
         gameMode={gameState.gameMode}
+        selectedRoleId={activeRoleId}
+        onSelectedIdChange={(roleId) => {
+          const newIndex = nightPhaseOrder.indexOf(roleId);
+          if (newIndex !== -1) setPhaseIndexMutation.mutate(newIndex);
+        }}
       />
     </div>
   );

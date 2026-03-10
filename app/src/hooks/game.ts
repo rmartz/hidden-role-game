@@ -1,7 +1,13 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { startGame, getGameState, advanceGame, advancePhase } from "@/lib/api";
+import {
+  startGame,
+  getGameState,
+  advanceGame,
+  advancePhase,
+  setPhaseIndex,
+} from "@/lib/api";
 import { ServerResponseStatus } from "@/server/models";
 import type { GameMode } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
@@ -54,6 +60,17 @@ export function useAdvancePhase(gameId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () => advancePhase(gameId),
+    onSuccess: (response) => {
+      if (response.status === ServerResponseStatus.Error) return;
+      void queryClient.invalidateQueries({ queryKey: ["game", gameId] });
+    },
+  });
+}
+
+export function useSetPhaseIndex(gameId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (phaseIndex: number) => setPhaseIndex(gameId, phaseIndex),
     onSuccess: (response) => {
       if (response.status === ServerResponseStatus.Error) return;
       void queryClient.invalidateQueries({ queryKey: ["game", gameId] });

@@ -41,6 +41,7 @@ export function WerewolfOwnerScreen({ gameId, gameState }: Props) {
     if (turnState?.phase.type === WerewolfPhase.Nighttime) {
       return (
         <OwnerGameNightScreen
+          gameId={gameId}
           gameState={gameState}
           turnState={turnState}
           onAdvancePhase={() => {

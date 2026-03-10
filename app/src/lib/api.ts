@@ -157,6 +157,21 @@ export async function advancePhase(
   return (await response.json()) as ServerResponse<Record<string, never>>;
 }
 
+export async function setPhaseIndex(
+  gameId: string,
+  phaseIndex: number,
+): Promise<ServerResponse<Record<string, never>>> {
+  const sessionId = getSessionId();
+  const headers: HeadersInit = { "Content-Type": "application/json" };
+  if (sessionId) headers["x-session-id"] = sessionId;
+  const response = await fetch(`/api/game/${gameId}/phase`, {
+    method: "PATCH",
+    headers,
+    body: JSON.stringify({ phaseIndex }),
+  });
+  return (await response.json()) as ServerResponse<Record<string, never>>;
+}
+
 export async function getGameState(
   gameId: string,
 ): Promise<{ data: ServerResponse<PlayerGameState>; httpStatus: number }> {
