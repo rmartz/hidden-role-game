@@ -1,3 +1,4 @@
+import { sum } from "lodash";
 import { Team } from "@/lib/models";
 import type { GameModeConfig, RoleDefinition, RoleSlot } from "@/lib/models";
 
@@ -109,4 +110,8 @@ export const WEREWOLF_CONFIG = {
   },
   roles: WEREWOLF_ROLES,
   defaultRoleCount,
+  // The Narrator is a player but doesn't receive a role.
+  isValidRoleCount(numPlayers: number, roleCounts: Record<string, number>) {
+    return sum(Object.values(roleCounts)) === numPlayers - 1;
+  },
 } satisfies GameModeConfig;
