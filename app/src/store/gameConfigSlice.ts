@@ -14,7 +14,9 @@ function computeIsValid(
   roleMins: Record<string, number>,
   roleMaxes: Record<string, number>,
 ): boolean {
-  if (roleConfigMode === RoleConfigMode.Default) return true;
+  if (roleConfigMode === RoleConfigMode.Default) {
+    return playerCount >= GAME_MODES[gameMode].minPlayers;
+  }
   if (roleConfigMode === RoleConfigMode.Advanced) {
     const totalMin = sum(Object.values(roleMins));
     const totalMax = sum(Object.values(roleMaxes));

@@ -1,4 +1,5 @@
 import type { GameMode, RoleDefinition, Team } from "@/lib/models";
+import { RoleConfigMode } from "@/lib/models";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   incrementRoleCount,
@@ -7,12 +8,12 @@ import {
   setRoleMax,
 } from "@/store/gameConfigSlice";
 import { RoleLabel } from "@/components/RoleLabel";
-import { Button } from "@/components/ui/button";
+import { Incrementer } from "./Incrementer";
 
 interface ReadOnlyProps {
   role: RoleDefinition<string, Team>;
   gameMode: GameMode;
-  isAdvanced: boolean;
+  roleConfigMode: RoleConfigMode;
   min: number;
   max: number;
   readOnly: true;
@@ -21,7 +22,7 @@ interface ReadOnlyProps {
 interface EditableProps {
   role: RoleDefinition<string, Team>;
   gameMode: GameMode;
-  isAdvanced: boolean;
+  roleConfigMode: RoleConfigMode;
   readOnly: false;
   disabled: boolean;
 }
@@ -29,7 +30,7 @@ interface EditableProps {
 type Props = ReadOnlyProps | EditableProps;
 
 export function RoleConfigEntry(props: Props) {
-  const { role, gameMode, isAdvanced, readOnly } = props;
+  const { role, gameMode, roleConfigMode, readOnly } = props;
 
   const dispatch = useAppDispatch();
   const count = useAppSelector((s) => s.gameConfig.roleCounts[role.id] ?? 0);
@@ -42,84 +43,54 @@ export function RoleConfigEntry(props: Props) {
         <RoleLabel role={role} gameMode={gameMode} />
       </span>
       {readOnly ? (
-        isAdvanced ? (
+        roleConfigMode === RoleConfigMode.Advanced ? (
           <span className="text-sm">
             {props.min}–{props.max}
           </span>
         ) : (
           <span className="text-sm">{props.min}</span>
         )
-      ) : isAdvanced ? (
+      ) : roleConfigMode === RoleConfigMode.Advanced ? (
         <>
           <span className="text-sm text-muted-foreground">Min:</span>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => {
+          <Incrementer
+            value={min}
+            onDecrement={() => {
               dispatch(setRoleMin({ roleId: role.id, min: min - 1 }));
             }}
-            disabled={props.disabled || min === 0}
-          >
-            −
-          </Button>
-          <span className="w-6 text-center text-sm">{min}</span>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => {
+            onIncrement={() => {
               dispatch(setRoleMin({ roleId: role.id, min: min + 1 }));
             }}
-            disabled={props.disabled}
-          >
-            +
-          </Button>
+            decrementDisabled={props.disabled || min === 0}
+            incrementDisabled={props.disabled}
+          />
           <span className="text-sm text-muted-foreground ml-2">Max:</span>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => {
+          <Incrementer
+            value={max}
+            onDecrement={() => {
               dispatch(setRoleMax({ roleId: role.id, max: max - 1 }));
             }}
-            disabled={props.disabled || max === 0}
-          >
-            −
-          </Button>
-          <span className="w-6 text-center text-sm">{max}</span>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => {
+            onIncrement={() => {
               dispatch(setRoleMax({ roleId: role.id, max: max + 1 }));
             }}
-            disabled={props.disabled}
-          >
-            +
-          </Button>
+            decrementDisabled={props.disabled || max === 0}
+            incrementDisabled={props.disabled}
+          />
         </>
+      ) : roleConfigMode === RoleConfigMode.Custom ? (
+        <Incrementer
+          value={count}
+          onDecrement={() => {
+            dispatch(decrementRoleCount(role.id));
+          }}
+          onIncrement={() => {
+            dispatch(incrementRoleCount(role.id));
+          }}
+          decrementDisabled={props.disabled || count === 0}
+          incrementDisabled={props.disabled}
+        />
       ) : (
-        <>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => {
-              dispatch(decrementRoleCount(role.id));
-            }}
-            disabled={props.disabled || count === 0}
-          >
-            −
-          </Button>
-          <span className="w-6 text-center text-sm">{count}</span>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => {
-              dispatch(incrementRoleCount(role.id));
-            }}
-            disabled={props.disabled}
-          >
-            +
-          </Button>
-        </>
+        <span className="text-sm text-muted-foreground">{count}</span>
       )}
     </li>
   );
