@@ -146,6 +146,7 @@ export default function GameConfigurationPanel(props: Props) {
           roleDefinitions={roleDefinitions}
           roleSlots={config.roleSlots}
           playerCount={playerCount}
+          gameMode={selectedGameMode}
           readOnly={true}
         />
       ) : (
@@ -153,6 +154,7 @@ export default function GameConfigurationPanel(props: Props) {
           <RoleConfig
             roleDefinitions={roleDefinitions}
             playerCount={roleSlotsRequired}
+            gameMode={selectedGameMode}
             readOnly={false}
             disabled={props.isPending}
           />

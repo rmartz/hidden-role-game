@@ -90,8 +90,7 @@ const gameConfigSlice = createSlice({
     },
 
     setPlayerCount(state, action: PayloadAction<number>) {
-      const { minPlayers } = GAME_MODES[state.gameMode];
-      state.playerCount = Math.max(minPlayers, action.payload);
+      state.playerCount = action.payload;
       state.isValid = computeIsValid(state);
     },
 

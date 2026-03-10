@@ -131,6 +131,19 @@ export async function startGame(
   return (await response.json()) as ServerResponse<{ lobby: PublicLobby }>;
 }
 
+export async function advanceGame(
+  gameId: string,
+): Promise<ServerResponse<Record<string, never>>> {
+  const sessionId = getSessionId();
+  const headers: HeadersInit = { "Content-Type": "application/json" };
+  if (sessionId) headers["x-session-id"] = sessionId;
+  const response = await fetch(`/api/game/${gameId}/advance`, {
+    method: "POST",
+    headers,
+  });
+  return (await response.json()) as ServerResponse<Record<string, never>>;
+}
+
 export async function getGameState(
   gameId: string,
 ): Promise<{ data: ServerResponse<PlayerGameState>; httpStatus: number }> {

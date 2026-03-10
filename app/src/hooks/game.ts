@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { startGame, getGameState } from "@/lib/api";
+import { startGame, getGameState, advanceGame } from "@/lib/api";
 import { ServerResponseStatus } from "@/server/models";
 import type { GameMode } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
@@ -23,7 +23,7 @@ export function useStartGame(lobbyId: string) {
   });
 }
 
-export function useGameStateQuery(gameId: string) {
+export function useGameStateQuery(gameId: string, refetchInterval?: number) {
   return useQuery({
     queryKey: ["game", gameId],
     queryFn: async () => {
@@ -35,5 +35,17 @@ export function useGameStateQuery(gameId: string) {
       return data.data;
     },
     retry: false,
+    refetchInterval,
+  });
+}
+
+export function useAdvanceGame(gameId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => advanceGame(gameId),
+    onSuccess: (response) => {
+      if (response.status === ServerResponseStatus.Error) return;
+      void queryClient.invalidateQueries({ queryKey: ["game", gameId] });
+    },
   });
 }

@@ -1,15 +1,41 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useGameStateQuery } from "@/hooks";
-import { GAME_MODES } from "@/lib/game-modes";
+import { GameStatus } from "@/lib/models";
+import { useGameStateQuery, useAdvanceGame } from "@/hooks";
+import OwnerStartingScreen from "../OwnerStartingScreen";
+import OwnerGameScreen from "../OwnerGameScreen";
+
+const STARTING_DURATION_SECONDS = 10;
+const POLL_INTERVAL_MS = 2000;
 
 export default function GameOwnerPage() {
   const { gameId } = useParams<{ gameId: string }>();
   const router = useRouter();
 
-  const { data: gameState, isLoading, error } = useGameStateQuery(gameId);
+  const [refetchInterval, setRefetchInterval] = useState<number | undefined>(
+    POLL_INTERVAL_MS,
+  );
+
+  const {
+    data: gameState,
+    isLoading,
+    error,
+  } = useGameStateQuery(gameId, refetchInterval);
+
+  const advanceMutation = useAdvanceGame(gameId);
+
+  const gameStatus = gameState?.status.type;
+  const isGameOwner =
+    gameState !== undefined ? !!gameState.gameOwner : undefined;
+
+  // Stop polling once out of Starting.
+  useEffect(() => {
+    if (gameStatus && gameStatus !== GameStatus.Starting) {
+      setRefetchInterval(undefined);
+    }
+  }, [gameStatus]);
 
   useEffect(() => {
     if (error?.message === "401" || error?.message === "403") {
@@ -19,61 +45,39 @@ export default function GameOwnerPage() {
 
   // Regular players don't belong on this route.
   useEffect(() => {
-    if (gameState && !gameState.gameOwner) {
+    if (isGameOwner === false) {
       router.replace(`/game/${gameId}`);
     }
-  }, [gameState, gameId, router]);
+  }, [isGameOwner, gameId, router]);
 
-  const teamLabels = gameState
-    ? GAME_MODES[gameState.gameMode].teamLabels
-    : undefined;
+  if (gameState?.gameOwner) {
+    if (gameState.status.type === GameStatus.Starting) {
+      return (
+        <OwnerStartingScreen
+          gameState={gameState}
+          durationSeconds={STARTING_DURATION_SECONDS}
+          onStart={() => {
+            advanceMutation.mutate();
+          }}
+        />
+      );
+    }
+
+    if (gameState.status.type === GameStatus.Playing) {
+      return <OwnerGameScreen gameState={gameState} />;
+    }
+  }
 
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
       <h1>Hidden Role Game</h1>
 
-      {isLoading && <p>Loading...</p>}
+      {isLoading && <p>Loading…</p>}
 
       {error && error.message !== "401" && error.message !== "403" && (
         <div style={{ color: "red", marginBottom: "10px" }}>
           Error: {error.message}
         </div>
-      )}
-
-      {gameState?.gameOwner && (
-        <>
-          <div style={{ marginBottom: "20px" }}>
-            <h2>Game Owner View</h2>
-            <p>You can see all player roles.</p>
-          </div>
-
-          {gameState.visibleRoleAssignments.length > 0 && (
-            <div style={{ marginBottom: "20px" }}>
-              <h2>Player Roles</h2>
-              <ul>
-                {gameState.visibleRoleAssignments.map((t) => (
-                  <li key={t.player.id}>
-                    {t.player.name} — {t.role.name} (
-                    {teamLabels?.[t.role.team] ?? t.role.team})
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {gameState.rolesInPlay && gameState.rolesInPlay.length > 0 && (
-            <div style={{ marginBottom: "20px" }}>
-              <h2>Roles In Play</h2>
-              <ul>
-                {gameState.rolesInPlay.map((r) => (
-                  <li key={r.id}>
-                    {r.name} — {r.team}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </>
       )}
     </div>
   );

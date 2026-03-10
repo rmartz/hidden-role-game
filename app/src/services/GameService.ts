@@ -81,7 +81,7 @@ export class GameService {
       id: randomUUID(),
       lobbyId,
       gameMode,
-      status: { type: GameStatus.Playing },
+      status: { type: GameStatus.Starting },
       players: gamePlayers,
       roleAssignments,
       showRolesInPlay,
@@ -94,6 +94,13 @@ export class GameService {
 
   public getGame(gameId: string): Game | undefined {
     return this.games[gameId];
+  }
+
+  public advanceToPlaying(gameId: string): Game | null {
+    const game = this.games[gameId];
+    if (game?.status.type !== GameStatus.Starting) return null;
+    game.status = { type: GameStatus.Playing };
+    return game;
   }
 
   public adjustRoleSlotsForPlayer(
