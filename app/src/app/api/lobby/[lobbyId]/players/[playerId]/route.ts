@@ -5,7 +5,7 @@ import {
   toPublicLobby,
 } from "@/server/utils";
 import { lobbyService } from "@/services/LobbyService";
-import { lobbySocketManager } from "@/server/lobby-socket-manager";
+import { lobbyBroadcastService } from "@/services/LobbyBroadcastService";
 import { LobbyChangeReason } from "@/server/models/websocket";
 
 export async function DELETE(
@@ -34,11 +34,7 @@ export async function DELETE(
 
   const updated = lobbyService.removePlayer(lobbyId, playerId);
   if (updated) {
-    lobbySocketManager.broadcast(
-      lobbyId,
-      updated,
-      LobbyChangeReason.PlayerLeft,
-    );
+    lobbyBroadcastService.broadcast(lobbyId, LobbyChangeReason.PlayerLeft);
   }
 
   return Response.json({

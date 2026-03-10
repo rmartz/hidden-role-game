@@ -8,7 +8,7 @@ import {
   errorResponse,
   toPublicLobby,
 } from "@/server/utils";
-import { lobbySocketManager } from "@/server/lobby-socket-manager";
+import { lobbyBroadcastService } from "@/services/LobbyBroadcastService";
 import { LobbyChangeReason } from "@/server/models/websocket";
 
 export async function PUT(
@@ -47,11 +47,7 @@ export async function PUT(
     return errorResponse("Failed to update config", 500);
   }
 
-  lobbySocketManager.broadcast(
-    lobbyId,
-    updated,
-    LobbyChangeReason.ConfigChanged,
-  );
+  lobbyBroadcastService.broadcast(lobbyId, LobbyChangeReason.ConfigChanged);
 
   return Response.json({
     status: ServerResponseStatus.Success,

@@ -3,7 +3,7 @@ import type { LobbyPlayer } from "@/lib/models";
 import { ServerResponseStatus, type JoinLobbyRequest } from "@/server/models";
 import { lobbyService } from "@/services/LobbyService";
 import { errorResponse, toPublicLobby } from "@/server/utils";
-import { lobbySocketManager } from "@/server/lobby-socket-manager";
+import { lobbyBroadcastService } from "@/services/LobbyBroadcastService";
 import { LobbyChangeReason } from "@/server/models/websocket";
 
 export async function POST(
@@ -26,7 +26,7 @@ export async function POST(
   };
   lobby.players.push(newPlayer);
 
-  lobbySocketManager.broadcast(lobbyId, lobby, LobbyChangeReason.PlayerJoined);
+  lobbyBroadcastService.broadcast(lobbyId, LobbyChangeReason.PlayerJoined);
 
   return Response.json(
     {

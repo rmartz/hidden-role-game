@@ -8,7 +8,7 @@ import {
   errorResponse,
   toPublicLobby,
 } from "@/server/utils";
-import { lobbySocketManager } from "@/server/lobby-socket-manager";
+import { lobbyBroadcastService } from "@/services/LobbyBroadcastService";
 import { LobbyChangeReason } from "@/server/models/websocket";
 
 export async function POST(request: Request): Promise<Response> {
@@ -58,7 +58,7 @@ export async function POST(request: Request): Promise<Response> {
     return errorResponse("Failed to start game", 500);
   }
 
-  lobbySocketManager.broadcast(lobbyId, updated, LobbyChangeReason.GameStarted);
+  lobbyBroadcastService.broadcast(lobbyId, LobbyChangeReason.GameStarted);
 
   return Response.json({
     status: ServerResponseStatus.Success,
