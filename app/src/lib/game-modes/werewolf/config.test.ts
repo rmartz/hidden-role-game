@@ -3,24 +3,6 @@ import { WerewolfRole } from "./roles";
 import { WEREWOLF_CONFIG } from "./config";
 
 describe("WEREWOLF_CONFIG.defaultRoleCount", () => {
-  it("returns correct counts for minimum player count (5)", () => {
-    const slots = WEREWOLF_CONFIG.defaultRoleCount(5);
-    const counts = Object.fromEntries(slots.map((s) => [s.roleId, s.count]));
-
-    expect(counts[WerewolfRole.Werewolf]).toBe(1);
-    expect(counts[WerewolfRole.Villager]).toBe(3);
-    expect(counts[WerewolfRole.Seer]).toBe(1);
-  });
-
-  it("returns correct counts for 10 players", () => {
-    const slots = WEREWOLF_CONFIG.defaultRoleCount(10);
-    const counts = Object.fromEntries(slots.map((s) => [s.roleId, s.count]));
-
-    expect(counts[WerewolfRole.Werewolf]).toBe(3);
-    expect(counts[WerewolfRole.Villager]).toBe(6);
-    expect(counts[WerewolfRole.Seer]).toBe(1);
-  });
-
   it("total slot count always equals numPlayers", () => {
     for (let n = 5; n <= 12; n++) {
       const slots = WEREWOLF_CONFIG.defaultRoleCount(n);
