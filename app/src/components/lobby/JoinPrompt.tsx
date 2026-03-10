@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useJoinLobby } from "@/hooks";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface Props {
   lobbyId: string;
@@ -23,32 +26,33 @@ export function JoinPrompt({ lobbyId, onJoined }: Props) {
   }
 
   return (
-    <div>
-      <p>Enter your name to join this lobby.</p>
+    <div className="space-y-4">
+      <p className="text-muted-foreground">
+        Enter your name to join this lobby.
+      </p>
       {joinMutation.error && (
-        <div style={{ color: "red", marginBottom: "10px" }}>
+        <p className="text-destructive text-sm">
           Error: {joinMutation.error.message}
-        </div>
+        </p>
       )}
-      <div style={{ marginBottom: "10px" }}>
-        <label>
-          Your name:{" "}
-          <input
-            type="text"
-            value={playerName}
-            onChange={(e) => {
-              setPlayerName(e.target.value);
-            }}
-            placeholder="Enter your name"
-          />
-        </label>
+      <div className="space-y-1">
+        <Label htmlFor="join-name">Your name</Label>
+        <Input
+          id="join-name"
+          type="text"
+          value={playerName}
+          onChange={(e) => {
+            setPlayerName(e.target.value);
+          }}
+          placeholder="Enter your name"
+        />
       </div>
-      <button
+      <Button
         onClick={handleJoin}
         disabled={joinMutation.isPending || playerName.trim() === ""}
       >
         {joinMutation.isPending ? "Joining..." : "Join Lobby"}
-      </button>
+      </Button>
     </div>
   );
 }

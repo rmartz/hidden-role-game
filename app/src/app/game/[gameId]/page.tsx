@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { GameStatus } from "@/lib/models";
 import { useGameStateQuery } from "@/hooks";
-import { WerewolfGameScreen } from "./components";
+import { WerewolfGameScreen } from "@/components/game";
 
 const POLL_INTERVAL_MS = 2000;
 
@@ -42,15 +42,13 @@ export default function GamePage() {
   }
 
   return (
-    <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
-      <h1>Hidden Role Game</h1>
+    <div className="p-5">
+      <h1 className="text-2xl font-bold mb-4">Hidden Role Game</h1>
 
-      {isLoading && <p>Loading…</p>}
+      {isLoading && <p className="text-muted-foreground">Loading…</p>}
 
       {error && error.message !== "401" && error.message !== "403" && (
-        <div style={{ color: "red", marginBottom: "10px" }}>
-          Error: {error.message}
-        </div>
+        <p className="text-destructive text-sm">Error: {error.message}</p>
       )}
     </div>
   );

@@ -4,7 +4,8 @@ import {
   incrementRoleCount,
   decrementRoleCount,
 } from "@/store/gameConfigSlice";
-import { RoleLabel } from "@/app/game/[gameId]/components";
+import { RoleLabel } from "@/components/game";
+import { Button } from "@/components/ui/button";
 
 interface ReadOnlyProps {
   role: RoleDefinition<string, Team>;
@@ -29,38 +30,35 @@ export function RoleConfigEntry(props: Props) {
   const count = useAppSelector((s) => s.gameConfig.roleCounts[role.id] ?? 0);
 
   return (
-    <li
-      style={{
-        display: "flex",
-        gap: "8px",
-        alignItems: "center",
-        marginBottom: "4px",
-      }}
-    >
-      <span style={{ minWidth: "160px" }}>
+    <li className="flex items-center gap-2 py-1">
+      <span className="min-w-40">
         <RoleLabel role={role} gameMode={gameMode} />
       </span>
       {readOnly ? (
-        <span>{props.count}</span>
+        <span className="text-sm">{props.count}</span>
       ) : (
         <>
-          <button
+          <Button
+            variant="outline"
+            size="icon"
             onClick={() => {
               dispatch(decrementRoleCount(role.id));
             }}
             disabled={props.disabled || count === 0}
           >
-            -
-          </button>
-          <span>{count}</span>
-          <button
+            −
+          </Button>
+          <span className="w-6 text-center text-sm">{count}</span>
+          <Button
+            variant="outline"
+            size="icon"
             onClick={() => {
               dispatch(incrementRoleCount(role.id));
             }}
             disabled={props.disabled}
           >
             +
-          </button>
+          </Button>
         </>
       )}
     </li>

@@ -1,5 +1,6 @@
 import type { GameMode } from "@/lib/models";
 import type { PublicRoleInfo } from "@/server/models";
+import { Item, ItemContent, ItemGroup, ItemTitle } from "@/components/ui/item";
 import { RoleLabel } from "./RoleLabel";
 
 interface Props {
@@ -18,28 +19,28 @@ export function GameRolesList({
   if (roles.length === 0) return null;
 
   return (
-    <div style={{ marginBottom: "20px" }}>
-      <h2>Roles In Play</h2>
-      <ul>
+    <div className="mb-5">
+      <h2 className="text-lg font-semibold mb-2">Roles In Play</h2>
+      <ItemGroup>
         {roles.map((r) => {
           const isSelected = r.id === selectedRoleId;
           return (
-            <li
+            <Item
               key={r.id}
+              size="sm"
+              variant={isSelected ? "muted" : "default"}
               onClick={() => onSelectedIdChange?.(r.id)}
-              style={{
-                cursor: onSelectedIdChange ? "pointer" : undefined,
-                fontWeight: isSelected ? "bold" : undefined,
-                outline: isSelected ? "2px solid currentColor" : undefined,
-                padding: "2px 4px",
-                borderRadius: "4px",
-              }}
+              className={onSelectedIdChange ? "cursor-pointer" : undefined}
             >
-              <RoleLabel role={r} gameMode={gameMode} />
-            </li>
+              <ItemContent>
+                <ItemTitle>
+                  <RoleLabel role={r} gameMode={gameMode} />
+                </ItemTitle>
+              </ItemContent>
+            </Item>
           );
         })}
-      </ul>
+      </ItemGroup>
     </div>
   );
 }

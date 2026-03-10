@@ -5,7 +5,8 @@ import { WerewolfPhase, WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/models";
 import { useGameAction } from "@/hooks";
-import { GameRolesList, PlayersRoleList } from "..";
+import { GameRolesList, PlayersRoleList } from "@/components/game";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   gameId: string;
@@ -49,19 +50,20 @@ export function OwnerGameDayScreen({ gameId, gameState, turnState }: Props) {
   const elapsed = `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 
   return (
-    <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
-      <h1>Day — Turn {turnState.turn}</h1>
-      <p>
-        Day in progress: <strong>{elapsed}</strong>
+    <div className="p-5">
+      <h1 className="text-2xl font-bold mb-4">Day — Turn {turnState.turn}</h1>
+      <p className="mb-4 text-muted-foreground">
+        Day in progress: <strong className="text-foreground">{elapsed}</strong>
       </p>
-      <button
+      <Button
         onClick={() => {
           action.mutate({ actionId: WerewolfAction.StartNight });
         }}
         disabled={action.isPending}
+        className="mb-5"
       >
         Start Next Night
-      </button>
+      </Button>
       <PlayersRoleList
         assignments={gameState.visibleRoleAssignments}
         gameMode={gameState.gameMode}

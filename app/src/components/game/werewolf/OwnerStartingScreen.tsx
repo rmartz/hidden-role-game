@@ -1,7 +1,11 @@
 "use client";
 
 import type { PlayerGameState } from "@/server/models";
-import { GameRolesList, GameStartCountdown, PlayersRoleList } from "..";
+import {
+  GameRolesList,
+  GameStartCountdown,
+  PlayersRoleList,
+} from "@/components/game";
 
 interface Props {
   gameState: PlayerGameState;
@@ -15,8 +19,8 @@ export function OwnerStartingScreen({
   onStart,
 }: Props) {
   return (
-    <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
-      <h1>Game Starting</h1>
+    <div className="p-5">
+      <h1 className="text-2xl font-bold mb-4">Game Starting</h1>
       <GameStartCountdown
         durationSeconds={durationSeconds}
         onComplete={onStart}

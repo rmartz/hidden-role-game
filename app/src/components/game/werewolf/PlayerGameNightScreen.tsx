@@ -15,11 +15,11 @@ export function PlayerGameNightScreen({ gameState, phase }: Props) {
   if (!isMyTurn) return <div />;
 
   return (
-    <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
-      <h1>It&apos;s Your Turn</h1>
-      <p>
-        <strong>{gameState.myRole?.name}</strong> — wake up and take your
-        action.
+    <div className="p-5">
+      <h1 className="text-2xl font-bold mb-2">It&apos;s Your Turn</h1>
+      <p className="text-muted-foreground">
+        <strong className="text-foreground">{gameState.myRole?.name}</strong> —
+        wake up and take your action.
       </p>
     </div>
   );

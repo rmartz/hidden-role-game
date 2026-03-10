@@ -1,12 +1,12 @@
 "use client";
 
 import { GAME_MODES } from "@/lib/game-modes";
-import { WerewolfPhase } from "@/lib/game-modes/werewolf";
+import { WerewolfPhase, WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/models";
 import { useGameAction } from "@/hooks";
-import { WerewolfAction } from "@/lib/game-modes/werewolf";
-import { GameRolesList, PlayersRoleList } from "..";
+import { GameRolesList, PlayersRoleList } from "@/components/game";
+import { Button } from "@/components/ui/button";
 
 interface Props {
   gameId: string;
@@ -29,25 +29,27 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
   const isLastPhase = currentPhaseIndex === nightPhaseOrder.length - 1;
 
   return (
-    <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
-      <h1>
+    <div className="p-5">
+      <h1 className="text-2xl font-bold mb-4">
         Night — Turn {turnState.turn} ({currentPhaseIndex + 1}/
         {nightPhaseOrder.length})
       </h1>
-      <p>
-        Currently awake: <strong>{activeRoleName}</strong>
+      <p className="mb-4 text-muted-foreground">
+        Currently awake:{" "}
+        <strong className="text-foreground">{activeRoleName}</strong>
       </p>
       {isLastPhase ? (
-        <button
+        <Button
           onClick={() => {
             action.mutate({ actionId: WerewolfAction.StartDay });
           }}
           disabled={action.isPending}
+          className="mb-5"
         >
           Start the Day
-        </button>
+        </Button>
       ) : (
-        <button
+        <Button
           onClick={() => {
             action.mutate({
               actionId: WerewolfAction.SetNightPhase,
@@ -55,9 +57,10 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
             });
           }}
           disabled={action.isPending}
+          className="mb-5"
         >
           Next Role
-        </button>
+        </Button>
       )}
       <PlayersRoleList
         assignments={gameState.visibleRoleAssignments}

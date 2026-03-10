@@ -1,4 +1,6 @@
 import type { PublicLobbyPlayer } from "@/server/models";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 interface Props {
   player: PublicLobbyPlayer;
@@ -38,23 +40,40 @@ export function PlayerRow({
   }
 
   return (
-    <li style={{ display: "flex", gap: "8px", alignItems: "center" }}>
-      {player.name}
-      {player.id === ownerPlayerId && "(Lobby owner)"}
+    <li className="flex items-center gap-2 py-1">
+      <span>{player.name}</span>
+      {player.id === ownerPlayerId && (
+        <Badge variant="secondary">Lobby owner</Badge>
+      )}
       {isCurrentUser && showLeave && (
-        <button onClick={handleLeave} disabled={disabled}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleLeave}
+          disabled={disabled}
+        >
           Leave
-        </button>
+        </Button>
       )}
       {!isCurrentUser && showRemovePlayer && (
-        <button onClick={handleRemove} disabled={disabled}>
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={handleRemove}
+          disabled={disabled}
+        >
           Remove
-        </button>
+        </Button>
       )}
       {!isCurrentUser && showMakeOwner && (
-        <button onClick={handleTransferOwner} disabled={disabled}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleTransferOwner}
+          disabled={disabled}
+        >
           Make Owner
-        </button>
+        </Button>
       )}
     </li>
   );

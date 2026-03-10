@@ -11,6 +11,7 @@ export default tseslint.config(
       "**/.next/**",
       "**/next-env.d.ts",
       "app/vitest.config.ts",
+      "app/src/components/ui/**",
     ],
   },
   js.configs.recommended,

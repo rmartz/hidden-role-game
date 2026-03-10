@@ -32,10 +32,11 @@ export function GameStartCountdown({ durationSeconds, onComplete }: Props) {
   }, [secondsLeft]);
 
   return (
-    <p>
+    <p className="text-muted-foreground">
       {secondsLeft > 0 ? (
         <>
-          Starting in <strong>{secondsLeft}</strong> second
+          Starting in <strong className="text-foreground">{secondsLeft}</strong>{" "}
+          second
           {secondsLeft !== 1 ? "s" : ""}…
         </>
       ) : (

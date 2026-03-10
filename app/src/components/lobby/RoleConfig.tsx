@@ -34,15 +34,15 @@ export function RoleConfig(props: Props) {
   const total = readOnly ? 0 : sum(Object.values(roleCounts));
 
   return (
-    <div style={{ marginTop: "20px" }}>
-      <h2>Configure Roles</h2>
+    <div className="mt-5">
+      <h2 className="text-lg font-semibold mb-2">Configure Roles</h2>
       {!readOnly && (
-        <p>
+        <p className="text-sm text-muted-foreground mb-3">
           Assign {playerCount} role{playerCount !== 1 ? "s" : ""} ({total}/
           {playerCount} assigned)
         </p>
       )}
-      <ul style={{ listStyle: "none", padding: 0 }}>
+      <ul className="space-y-1 list-none p-0">
         {Object.values(roleDefinitions).map((role) =>
           readOnly ? (
             <RoleConfigEntry

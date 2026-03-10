@@ -1,4 +1,5 @@
 import type { PublicLobby } from "@/server/models";
+import { Button } from "@/components/ui/button";
 import { PlayerRow } from "./PlayerRow";
 
 interface Props {
@@ -30,15 +31,22 @@ export function PlayerList({
 }: Props) {
   return (
     <>
-      <p>
-        Players: {lobby.players.length}{" "}
+      <div className="flex items-center gap-3 mb-2">
+        <p className="text-sm text-muted-foreground">
+          Players: {lobby.players.length}
+        </p>
         {showRefresh && (
-          <button onClick={onRefetch} disabled={isFetching}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onRefetch}
+            disabled={isFetching}
+          >
             {isFetching ? "Refreshing..." : "Refresh"}
-          </button>
+          </Button>
         )}
-      </p>
-      <ul>
+      </div>
+      <ul className="space-y-1">
         {lobby.players.map((player) => (
           <PlayerRow
             key={player.id}

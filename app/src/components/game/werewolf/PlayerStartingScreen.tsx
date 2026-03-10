@@ -6,7 +6,7 @@ import {
   GameStartCountdown,
   PlayersRoleList,
   RoleLabel,
-} from "..";
+} from "@/components/game";
 
 const STARTING_DURATION_SECONDS = 10;
 
@@ -16,16 +16,14 @@ interface Props {
 
 export function PlayerStartingScreen({ gameState }: Props) {
   return (
-    <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
-      <h1>Game Starting</h1>
+    <div className="p-5">
+      <h1 className="text-2xl font-bold mb-4">Game Starting</h1>
       <GameStartCountdown durationSeconds={STARTING_DURATION_SECONDS} />
 
       {gameState.myRole && (
-        <div style={{ marginBottom: "20px" }}>
-          <h2>Your Role</h2>
-          <p>
-            <RoleLabel role={gameState.myRole} gameMode={gameState.gameMode} />
-          </p>
+        <div className="mb-5">
+          <h2 className="text-lg font-semibold mb-2">Your Role</h2>
+          <RoleLabel role={gameState.myRole} gameMode={gameState.gameMode} />
         </div>
       )}
 
