@@ -48,4 +48,5 @@ export const AVALON_CONFIG = {
     },
   },
   defaultRoleCount,
+  actions: {},
 } satisfies GameModeConfig;

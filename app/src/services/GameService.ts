@@ -17,8 +17,8 @@ import type {
 import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase, buildNightPhaseOrder } from "@/lib/game-modes/werewolf";
 import type {
-  WerewolfNighttimePhase,
   WerewolfTurnState,
+  WerewolfNighttimePhase,
 } from "@/lib/game-modes/werewolf";
 import { assignRoles } from "./assignRoles";
 import { adjustRoleSlots } from "@/server/role-slots";
@@ -128,79 +128,25 @@ export class GameService {
     return game;
   }
 
-  public setNightPhaseIndex(gameId: string, phaseIndex: number): Game | null {
+  public applyAction(
+    gameId: string,
+    actionId: string,
+    callerId: string,
+    payload: unknown,
+  ): { game: Game } | { error: string } {
     const game = this.games[gameId];
-    if (game?.status.type !== GameStatus.Playing) return null;
-    const { turnState } = game.status;
-    if (!turnState) return null;
+    if (!game) return { error: "Game not found" };
 
-    const werewolfTurnState = turnState as WerewolfTurnState;
-    const { phase } = werewolfTurnState;
-    if (phase.type !== WerewolfPhase.Nighttime) return null;
-    if (phaseIndex < 0 || phaseIndex >= phase.nightPhaseOrder.length)
-      return null;
+    const config = this.getModeDefinition(game.gameMode);
+    const action = config.actions[actionId];
+    if (!action) return { error: "Unknown action" };
 
-    game.status = {
-      type: GameStatus.Playing,
-      turnState: {
-        ...werewolfTurnState,
-        phase: { ...phase, currentPhaseIndex: phaseIndex },
-      },
-    };
-    return game;
-  }
-
-  public advancePhase(gameId: string): Game | null {
-    const game = this.games[gameId];
-    if (game?.status.type !== GameStatus.Playing) return null;
-    const { turnState } = game.status;
-    if (!turnState) return null;
-
-    const werewolfTurnState = turnState as WerewolfTurnState;
-    const { turn, phase } = werewolfTurnState;
-
-    if (phase.type === WerewolfPhase.Nighttime) {
-      const nextIndex = phase.currentPhaseIndex + 1;
-      if (nextIndex < phase.nightPhaseOrder.length) {
-        // Advance to the next night phase.
-        game.status = {
-          type: GameStatus.Playing,
-          turnState: {
-            turn,
-            phase: { ...phase, currentPhaseIndex: nextIndex },
-          },
-        };
-      } else {
-        // Last night phase — transition to daytime.
-        game.status = {
-          type: GameStatus.Playing,
-          turnState: {
-            turn,
-            phase: { type: WerewolfPhase.Daytime, startedAt: Date.now() },
-          },
-        };
-      }
-    } else {
-      // Daytime — start the next turn's nighttime.
-      const nextTurn = turn + 1;
-      const nightPhaseOrder = buildNightPhaseOrder(
-        nextTurn,
-        game.roleAssignments,
-      );
-      game.status = {
-        type: GameStatus.Playing,
-        turnState: {
-          turn: nextTurn,
-          phase: {
-            type: WerewolfPhase.Nighttime,
-            nightPhaseOrder,
-            currentPhaseIndex: 0,
-          },
-        },
-      };
+    if (!action.isValid(game, callerId, payload)) {
+      return { error: "Action not valid for current game state" };
     }
 
-    return game;
+    action.apply(game, payload);
+    return { game };
   }
 
   public adjustRoleSlotsForPlayer(

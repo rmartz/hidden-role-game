@@ -1,24 +1,21 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { WerewolfPhase } from "@/lib/game-modes/werewolf";
+import { WerewolfPhase, WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/models";
+import { useGameAction } from "@/hooks";
 import { GameRolesList, PlayersRoleList } from "..";
 
 interface Props {
+  gameId: string;
   gameState: PlayerGameState;
   turnState: WerewolfTurnState;
-  onAdvancePhase: () => void;
-  isAdvancePending: boolean;
 }
 
-export function OwnerGameDayScreen({
-  gameState,
-  turnState,
-  onAdvancePhase,
-  isAdvancePending,
-}: Props) {
+export function OwnerGameDayScreen({ gameId, gameState, turnState }: Props) {
+  const action = useGameAction(gameId);
+
   const { phase } = turnState;
   const startedAt =
     phase.type === WerewolfPhase.Daytime ? phase.startedAt : null;
@@ -57,7 +54,10 @@ export function OwnerGameDayScreen({
       <p>
         Day in progress: <strong>{elapsed}</strong>
       </p>
-      <button onClick={onAdvancePhase} disabled={isAdvancePending}>
+      <button
+        onClick={() => { action.mutate({ actionId: WerewolfAction.StartNight }); }}
+        disabled={action.isPending}
+      >
         Start Next Night
       </button>
       <PlayersRoleList

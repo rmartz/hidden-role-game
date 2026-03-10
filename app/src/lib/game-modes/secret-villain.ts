@@ -48,4 +48,5 @@ export const SECRET_VILLAIN_CONFIG = {
     },
   },
   defaultRoleCount,
+  actions: {},
 } satisfies GameModeConfig;

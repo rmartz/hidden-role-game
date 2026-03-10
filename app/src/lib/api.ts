@@ -144,30 +144,18 @@ export async function advanceGame(
   return (await response.json()) as ServerResponse<Record<string, never>>;
 }
 
-export async function advancePhase(
+export async function applyGameAction(
   gameId: string,
+  actionId: string,
+  payload?: unknown,
 ): Promise<ServerResponse<Record<string, never>>> {
   const sessionId = getSessionId();
   const headers: HeadersInit = { "Content-Type": "application/json" };
   if (sessionId) headers["x-session-id"] = sessionId;
-  const response = await fetch(`/api/game/${gameId}/phase`, {
+  const response = await fetch(`/api/game/${gameId}/action`, {
     method: "POST",
     headers,
-  });
-  return (await response.json()) as ServerResponse<Record<string, never>>;
-}
-
-export async function setPhaseIndex(
-  gameId: string,
-  phaseIndex: number,
-): Promise<ServerResponse<Record<string, never>>> {
-  const sessionId = getSessionId();
-  const headers: HeadersInit = { "Content-Type": "application/json" };
-  if (sessionId) headers["x-session-id"] = sessionId;
-  const response = await fetch(`/api/game/${gameId}/phase`, {
-    method: "PATCH",
-    headers,
-    body: JSON.stringify({ phaseIndex }),
+    body: JSON.stringify({ actionId, payload }),
   });
   return (await response.json()) as ServerResponse<Record<string, never>>;
 }

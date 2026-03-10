@@ -4,25 +4,18 @@ import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/models";
-import { useSetPhaseIndex } from "@/hooks";
+import { useGameAction } from "@/hooks";
+import { WerewolfAction } from "@/lib/game-modes/werewolf";
 import { GameRolesList, PlayersRoleList } from "..";
 
 interface Props {
   gameId: string;
   gameState: PlayerGameState;
   turnState: WerewolfTurnState;
-  onAdvancePhase: () => void;
-  isAdvancePending: boolean;
 }
 
-export function OwnerGameNightScreen({
-  gameId,
-  gameState,
-  turnState,
-  onAdvancePhase,
-  isAdvancePending,
-}: Props) {
-  const setPhaseIndexMutation = useSetPhaseIndex(gameId);
+export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
+  const action = useGameAction(gameId);
 
   const { phase } = turnState;
   if (phase.type !== WerewolfPhase.Nighttime) return null;
@@ -44,9 +37,26 @@ export function OwnerGameNightScreen({
       <p>
         Currently awake: <strong>{activeRoleName}</strong>
       </p>
-      <button onClick={onAdvancePhase} disabled={isAdvancePending}>
-        {isLastPhase ? "Start the Day" : "Next Role"}
-      </button>
+      {isLastPhase ? (
+        <button
+          onClick={() => { action.mutate({ actionId: WerewolfAction.StartDay }); }}
+          disabled={action.isPending}
+        >
+          Start the Day
+        </button>
+      ) : (
+        <button
+          onClick={() =>
+            { action.mutate({
+              actionId: WerewolfAction.SetNightPhase,
+              payload: { phaseIndex: currentPhaseIndex + 1 },
+            }); }
+          }
+          disabled={action.isPending}
+        >
+          Next Role
+        </button>
+      )}
       <PlayersRoleList
         assignments={gameState.visibleRoleAssignments}
         gameMode={gameState.gameMode}
@@ -57,7 +67,11 @@ export function OwnerGameNightScreen({
         selectedRoleId={activeRoleId}
         onSelectedIdChange={(roleId) => {
           const newIndex = nightPhaseOrder.indexOf(roleId);
-          if (newIndex !== -1) setPhaseIndexMutation.mutate(newIndex);
+          if (newIndex !== -1)
+            action.mutate({
+              actionId: WerewolfAction.SetNightPhase,
+              payload: { phaseIndex: newIndex },
+            });
         }}
       />
     </div>

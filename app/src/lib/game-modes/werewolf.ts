@@ -1,6 +1,8 @@
 import { sum } from "lodash";
-import { Team } from "@/lib/models";
+import { GameStatus, Team } from "@/lib/models";
 import type {
+  Game,
+  GameAction,
   GameModeConfig,
   PlayerRoleAssignment,
   RoleDefinition,
@@ -152,6 +154,95 @@ export function buildNightPhaseOrder(
     .map((role) => role.id);
 }
 
+export enum WerewolfAction {
+  StartNight = "start-night",
+  StartDay = "start-day",
+  SetNightPhase = "set-night-phase",
+}
+
+function isOwnerPlaying(game: Game, callerId: string): boolean {
+  return (
+    callerId === game.ownerPlayerId && game.status.type === GameStatus.Playing
+  );
+}
+
+function currentTurnState(game: Game): WerewolfTurnState | undefined {
+  if (game.status.type !== GameStatus.Playing) return undefined;
+  return game.status.turnState as WerewolfTurnState | undefined;
+}
+
+const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
+  [WerewolfAction.StartNight]: {
+    isValid(game, callerId) {
+      if (!isOwnerPlaying(game, callerId)) return false;
+      return currentTurnState(game)?.phase.type === WerewolfPhase.Daytime;
+    },
+    apply(game) {
+      const ts = currentTurnState(game);
+      if (!ts) return;
+      const nextTurn = ts.turn + 1;
+      const nightPhaseOrder = buildNightPhaseOrder(
+        nextTurn,
+        game.roleAssignments,
+      );
+      game.status = {
+        type: GameStatus.Playing,
+        turnState: {
+          turn: nextTurn,
+          phase: {
+            type: WerewolfPhase.Nighttime,
+            nightPhaseOrder,
+            currentPhaseIndex: 0,
+          },
+        },
+      };
+    },
+  },
+  [WerewolfAction.StartDay]: {
+    isValid(game, callerId) {
+      if (!isOwnerPlaying(game, callerId)) return false;
+      return currentTurnState(game)?.phase.type === WerewolfPhase.Nighttime;
+    },
+    apply(game) {
+      const ts = currentTurnState(game);
+      if (!ts) return;
+      game.status = {
+        type: GameStatus.Playing,
+        turnState: {
+          turn: ts.turn,
+          phase: { type: WerewolfPhase.Daytime, startedAt: Date.now() },
+        },
+      };
+    },
+  },
+  [WerewolfAction.SetNightPhase]: {
+    isValid(game, callerId, payload) {
+      if (!isOwnerPlaying(game, callerId)) return false;
+      const ts = currentTurnState(game);
+      if (ts?.phase.type !== WerewolfPhase.Nighttime) return false;
+      const { phaseIndex } = payload as { phaseIndex?: unknown };
+      return (
+        typeof phaseIndex === "number" &&
+        phaseIndex >= 0 &&
+        phaseIndex < ts.phase.nightPhaseOrder.length
+      );
+    },
+    apply(game, payload) {
+      const ts = currentTurnState(game);
+      if (!ts) return;
+      const { phaseIndex } = payload as { phaseIndex: number };
+      const phase = ts.phase as WerewolfNighttimePhase;
+      game.status = {
+        type: GameStatus.Playing,
+        turnState: {
+          ...ts,
+          phase: { ...phase, currentPhaseIndex: phaseIndex },
+        },
+      };
+    },
+  },
+};
+
 export const WEREWOLF_CONFIG = {
   name: "Werewolf",
   minPlayers: MIN_PLAYERS,
@@ -163,6 +254,7 @@ export const WEREWOLF_CONFIG = {
   },
   roles: WEREWOLF_ROLES,
   defaultRoleCount,
+  actions: WEREWOLF_ACTIONS,
   // The Narrator is a player but doesn't receive a role.
   isValidRoleCount(numPlayers: number, roleCounts: Record<string, number>) {
     return sum(Object.values(roleCounts)) === numPlayers - 1;

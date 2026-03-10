@@ -5,8 +5,7 @@ import {
   startGame,
   getGameState,
   advanceGame,
-  advancePhase,
-  setPhaseIndex,
+  applyGameAction,
 } from "@/lib/api";
 import { ServerResponseStatus } from "@/server/models";
 import type { GameMode } from "@/lib/models";
@@ -56,21 +55,16 @@ export function useAdvanceGame(gameId: string) {
   });
 }
 
-export function useAdvancePhase(gameId: string) {
+export function useGameAction(gameId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: () => advancePhase(gameId),
-    onSuccess: (response) => {
-      if (response.status === ServerResponseStatus.Error) return;
-      void queryClient.invalidateQueries({ queryKey: ["game", gameId] });
-    },
-  });
-}
-
-export function useSetPhaseIndex(gameId: string) {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (phaseIndex: number) => setPhaseIndex(gameId, phaseIndex),
+    mutationFn: ({
+      actionId,
+      payload,
+    }: {
+      actionId: string;
+      payload?: unknown;
+    }) => applyGameAction(gameId, actionId, payload),
     onSuccess: (response) => {
       if (response.status === ServerResponseStatus.Error) return;
       void queryClient.invalidateQueries({ queryKey: ["game", gameId] });

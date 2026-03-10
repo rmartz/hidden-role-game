@@ -4,7 +4,7 @@ import { GameStatus } from "@/lib/models";
 import { WerewolfPhase } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/models";
-import { useAdvanceGame, useAdvancePhase } from "@/hooks";
+import { useAdvanceGame } from "@/hooks";
 import { OwnerStartingScreen } from "./OwnerStartingScreen";
 import { OwnerGameNightScreen } from "./OwnerGameNightScreen";
 import { OwnerGameDayScreen } from "./OwnerGameDayScreen";
@@ -19,7 +19,6 @@ interface Props {
 
 export function WerewolfOwnerScreen({ gameId, gameState }: Props) {
   const advanceMutation = useAdvanceGame(gameId);
-  const advancePhaseMutation = useAdvancePhase(gameId);
 
   if (gameState.status.type === GameStatus.Starting) {
     return (
@@ -44,10 +43,6 @@ export function WerewolfOwnerScreen({ gameId, gameState }: Props) {
           gameId={gameId}
           gameState={gameState}
           turnState={turnState}
-          onAdvancePhase={() => {
-            advancePhaseMutation.mutate();
-          }}
-          isAdvancePending={advancePhaseMutation.isPending}
         />
       );
     }
@@ -55,12 +50,9 @@ export function WerewolfOwnerScreen({ gameId, gameState }: Props) {
     if (turnState?.phase.type === WerewolfPhase.Daytime) {
       return (
         <OwnerGameDayScreen
+          gameId={gameId}
           gameState={gameState}
           turnState={turnState}
-          onAdvancePhase={() => {
-            advancePhaseMutation.mutate();
-          }}
-          isAdvancePending={advancePhaseMutation.isPending}
         />
       );
     }
