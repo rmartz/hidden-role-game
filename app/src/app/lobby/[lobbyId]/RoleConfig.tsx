@@ -1,22 +1,21 @@
 import { keyBy, mapValues, sum } from "lodash";
-import type { RoleDefinition, Team } from "@/lib/models";
+import type { GameMode, RoleDefinition, Team } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
-import { useAppDispatch, useAppSelector } from "@/store";
-import {
-  incrementRoleCount,
-  decrementRoleCount,
-} from "@/store/gameConfigSlice";
+import { useAppSelector } from "@/store";
+import RoleConfigEntry from "./RoleConfigEntry";
 
 interface ReadOnlyProps {
   roleDefinitions: Record<string, RoleDefinition<string, Team>>;
   roleSlots?: RoleSlot[];
   playerCount: number;
+  gameMode: GameMode;
   readOnly: true;
 }
 
 interface EditableProps {
   roleDefinitions: Record<string, RoleDefinition<string, Team>>;
   playerCount: number;
+  gameMode: GameMode;
   readOnly: false;
   disabled: boolean;
 }
@@ -24,9 +23,8 @@ interface EditableProps {
 type Props = ReadOnlyProps | EditableProps;
 
 export default function RoleConfig(props: Props) {
-  const { roleDefinitions, playerCount, readOnly } = props;
+  const { roleDefinitions, playerCount, gameMode, readOnly } = props;
 
-  const dispatch = useAppDispatch();
   const roleCounts = useAppSelector((s) => s.gameConfig.roleCounts);
 
   const displayCounts = readOnly
@@ -45,44 +43,25 @@ export default function RoleConfig(props: Props) {
         </p>
       )}
       <ul style={{ listStyle: "none", padding: 0 }}>
-        {Object.values(roleDefinitions).map((role) => (
-          <li
-            key={role.id}
-            style={{
-              display: "flex",
-              gap: "8px",
-              alignItems: "center",
-              marginBottom: "4px",
-            }}
-          >
-            <span style={{ minWidth: "160px" }}>
-              {role.name} ({role.team})
-            </span>
-            {readOnly ? (
-              <span>{displayCounts[role.id] ?? 0}</span>
-            ) : (
-              <>
-                <button
-                  onClick={() => {
-                    dispatch(decrementRoleCount(role.id));
-                  }}
-                  disabled={props.disabled || (roleCounts[role.id] ?? 0) === 0}
-                >
-                  -
-                </button>
-                <span>{roleCounts[role.id] ?? 0}</span>
-                <button
-                  onClick={() => {
-                    dispatch(incrementRoleCount(role.id));
-                  }}
-                  disabled={props.disabled}
-                >
-                  +
-                </button>
-              </>
-            )}
-          </li>
-        ))}
+        {Object.values(roleDefinitions).map((role) =>
+          readOnly ? (
+            <RoleConfigEntry
+              key={role.id}
+              role={role}
+              gameMode={gameMode}
+              count={displayCounts[role.id] ?? 0}
+              readOnly={true}
+            />
+          ) : (
+            <RoleConfigEntry
+              key={role.id}
+              role={role}
+              gameMode={gameMode}
+              readOnly={false}
+              disabled={props.disabled}
+            />
+          ),
+        )}
       </ul>
     </div>
   );

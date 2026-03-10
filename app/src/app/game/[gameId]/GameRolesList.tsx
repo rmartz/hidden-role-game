@@ -1,10 +1,13 @@
+import type { GameMode } from "@/lib/models";
 import type { PublicRoleInfo } from "@/server/models";
+import RoleLabel from "./RoleLabel";
 
 interface Props {
   roles: PublicRoleInfo[];
+  gameMode?: GameMode;
 }
 
-export default function GameRolesList({ roles }: Props) {
+export default function GameRolesList({ roles, gameMode }: Props) {
   if (roles.length === 0) return null;
 
   return (
@@ -13,7 +16,7 @@ export default function GameRolesList({ roles }: Props) {
       <ul>
         {roles.map((r) => (
           <li key={r.id}>
-            {r.name} — {r.team}
+            <RoleLabel role={r} gameMode={gameMode} />
           </li>
         ))}
       </ul>

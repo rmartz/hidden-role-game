@@ -16,7 +16,10 @@ export default function OwnerGameScreen({ gameState }: Props) {
         assignments={gameState.visibleRoleAssignments}
         gameMode={gameState.gameMode}
       />
-      <GameRolesList roles={gameState.rolesInPlay ?? []} />
+      <GameRolesList
+        roles={gameState.rolesInPlay ?? []}
+        gameMode={gameState.gameMode}
+      />
     </div>
   );
 }

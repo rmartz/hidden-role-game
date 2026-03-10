@@ -47,7 +47,10 @@ export default function PlayerStartingScreen({ gameState }: Props) {
         gameMode={gameState.gameMode}
       />
 
-      <GameRolesList roles={gameState.rolesInPlay ?? []} />
+      <GameRolesList
+        roles={gameState.rolesInPlay ?? []}
+        gameMode={gameState.gameMode}
+      />
     </div>
   );
 }
