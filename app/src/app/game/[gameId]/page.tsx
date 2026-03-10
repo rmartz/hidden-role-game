@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { GameStatus } from "@/lib/models";
 import { useGameStateQuery } from "@/hooks";
-import StartingScreen from "./StartingScreen";
+import PlayerStartingScreen from "./PlayerStartingScreen";
+import PlayerGameScreen from "./PlayerGameScreen";
 
 const POLL_INTERVAL_MS = 2000;
 
@@ -24,10 +25,10 @@ export default function GamePage() {
 
   // Stop polling once the game leaves the Starting status.
   useEffect(() => {
-    if (gameState?.status.type !== GameStatus.Starting) {
+    if (gameState && gameState.status.type !== GameStatus.Starting) {
       setRefetchInterval(undefined);
     }
-  }, [gameState?.status.type]);
+  }, [gameState]);
 
   useEffect(() => {
     if (error?.message === "401" || error?.message === "403") {
@@ -44,16 +45,11 @@ export default function GamePage() {
 
   if (gameState && !gameState.gameOwner) {
     if (gameState.status.type === GameStatus.Starting) {
-      return <StartingScreen gameState={gameState} />;
+      return <PlayerStartingScreen gameState={gameState} />;
     }
 
     if (gameState.status.type === GameStatus.Playing) {
-      return (
-        <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
-          <h1>Hidden Role Game</h1>
-          <p>The game is underway.</p>
-        </div>
-      );
+      return <PlayerGameScreen gameState={gameState} />;
     }
   }
 

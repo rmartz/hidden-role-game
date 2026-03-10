@@ -1,0 +1,30 @@
+"use client";
+
+import type { PlayerGameState } from "@/server/models";
+import PlayersRoleList from "./PlayersRoleList";
+import GameRolesList from "./GameRolesList";
+import PlayerRole from "./PlayerRole";
+
+interface Props {
+  gameState: PlayerGameState;
+}
+
+export default function PlayerGameScreen({ gameState }: Props) {
+  return (
+    <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
+      <h1>Hidden Role Game</h1>
+      <p>The game is underway.</p>
+
+      {gameState.myRole && (
+        <div style={{ marginBottom: "20px" }}>
+          <h2>Your Role</h2>
+          <PlayerRole role={gameState.myRole} />
+        </div>
+      )}
+
+      <PlayersRoleList assignments={gameState.visibleRoleAssignments} />
+
+      <GameRolesList roles={gameState.rolesInPlay ?? []} />
+    </div>
+  );
+}

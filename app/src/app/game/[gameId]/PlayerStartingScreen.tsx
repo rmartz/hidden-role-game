@@ -12,7 +12,7 @@ interface Props {
   gameState: PlayerGameState;
 }
 
-export default function StartingScreen({ gameState }: Props) {
+export default function PlayerStartingScreen({ gameState }: Props) {
   const [secondsLeft, setSecondsLeft] = useState(STARTING_DURATION_SECONDS);
 
   useEffect(() => {
