@@ -3,6 +3,24 @@ import { SecretVillainRole } from "./roles";
 import { SECRET_VILLAIN_CONFIG } from "./config";
 
 describe("SECRET_VILLAIN_CONFIG.defaultRoleCount", () => {
+  it("returns correct counts for minimum player count (5)", () => {
+    const slots = SECRET_VILLAIN_CONFIG.defaultRoleCount(5);
+    const counts = Object.fromEntries(slots.map((s) => [s.roleId, s.count]));
+
+    expect(counts[SecretVillainRole.SpecialBad]).toBe(1);
+    expect(counts[SecretVillainRole.Bad]).toBe(1);
+    expect(counts[SecretVillainRole.Good]).toBe(3);
+  });
+
+  it("returns correct counts for 10 players", () => {
+    const slots = SECRET_VILLAIN_CONFIG.defaultRoleCount(10);
+    const counts = Object.fromEntries(slots.map((s) => [s.roleId, s.count]));
+
+    expect(counts[SecretVillainRole.SpecialBad]).toBe(1);
+    expect(counts[SecretVillainRole.Bad]).toBe(3);
+    expect(counts[SecretVillainRole.Good]).toBe(6);
+  });
+
   it("total slot count always equals numPlayers", () => {
     for (let n = 5; n <= 12; n++) {
       const slots = SECRET_VILLAIN_CONFIG.defaultRoleCount(n);
