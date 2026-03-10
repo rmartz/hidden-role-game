@@ -13,7 +13,7 @@ const SESSION_KEY = "x-session-id";
 const PLAYER_ID_KEY = "player-id";
 const LOBBY_ID_KEY = "lobby-id";
 
-function getSessionId(): string | null {
+export function getSessionId(): string | null {
   if (typeof window === "undefined") return null;
   return localStorage.getItem(SESSION_KEY);
 }
@@ -129,6 +129,35 @@ export async function startGame(
     body: JSON.stringify({ lobbyId, roleSlots, gameMode }),
   });
   return (await response.json()) as ServerResponse<{ lobby: PublicLobby }>;
+}
+
+export async function advanceGame(
+  gameId: string,
+): Promise<ServerResponse<Record<string, never>>> {
+  const sessionId = getSessionId();
+  const headers: HeadersInit = { "Content-Type": "application/json" };
+  if (sessionId) headers["x-session-id"] = sessionId;
+  const response = await fetch(`/api/game/${gameId}/advance`, {
+    method: "POST",
+    headers,
+  });
+  return (await response.json()) as ServerResponse<Record<string, never>>;
+}
+
+export async function applyGameAction(
+  gameId: string,
+  actionId: string,
+  payload?: unknown,
+): Promise<ServerResponse<Record<string, never>>> {
+  const sessionId = getSessionId();
+  const headers: HeadersInit = { "Content-Type": "application/json" };
+  if (sessionId) headers["x-session-id"] = sessionId;
+  const response = await fetch(`/api/game/${gameId}/action`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ actionId, payload }),
+  });
+  return (await response.json()) as ServerResponse<Record<string, never>>;
 }
 
 export async function getGameState(

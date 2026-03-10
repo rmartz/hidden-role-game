@@ -1,14 +1,35 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { GameStatus } from "@/lib/models";
 import { useGameStateQuery } from "@/hooks";
+import { WerewolfGameScreen } from "@/components/game";
+
+const POLL_INTERVAL_MS = 2000;
 
 export default function GamePage() {
   const { gameId } = useParams<{ gameId: string }>();
   const router = useRouter();
 
-  const { data: gameState, isLoading, error } = useGameStateQuery(gameId);
+  const [refetchInterval, setRefetchInterval] = useState<number | undefined>(
+    POLL_INTERVAL_MS,
+  );
+
+  const {
+    data: gameState,
+    isLoading,
+    error,
+  } = useGameStateQuery(gameId, refetchInterval);
+
+  const gameStatus = gameState?.status.type;
+
+  // Stop polling once the game leaves the Starting status.
+  useEffect(() => {
+    if (gameStatus && gameStatus !== GameStatus.Starting) {
+      setRefetchInterval(undefined);
+    }
+  }, [gameStatus]);
 
   useEffect(() => {
     if (error?.message === "401" || error?.message === "403") {
@@ -16,75 +37,18 @@ export default function GamePage() {
     }
   }, [error, router]);
 
-  // Game owners have a dedicated view with all player roles.
-  useEffect(() => {
-    if (gameState?.gameOwner) {
-      router.replace(`/game/${gameId}/owner`);
-    }
-  }, [gameState?.gameOwner, gameId, router]);
+  if (gameState) {
+    return <WerewolfGameScreen gameId={gameId} gameState={gameState} />;
+  }
 
   return (
-    <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
-      <h1>Hidden Role Game</h1>
+    <div className="p-5">
+      <h1 className="text-2xl font-bold mb-4">Hidden Role Game</h1>
 
-      {isLoading && <p>Loading...</p>}
+      {isLoading && <p className="text-muted-foreground">Loading…</p>}
 
       {error && error.message !== "401" && error.message !== "403" && (
-        <div style={{ color: "red", marginBottom: "10px" }}>
-          Error: {error.message}
-        </div>
-      )}
-
-      {gameState && !gameState.gameOwner && (
-        <>
-          <div style={{ marginBottom: "20px" }}>
-            <h2>Your Role</h2>
-            <p>
-              <strong>{gameState.myRole?.name}</strong> — Team:{" "}
-              {gameState.myRole?.team}
-            </p>
-          </div>
-
-          {gameState.visibleRoleAssignments.length > 0 && (
-            <div style={{ marginBottom: "20px" }}>
-              <h2>Your Teammates</h2>
-              <ul>
-                {gameState.visibleRoleAssignments.map((t) => (
-                  <li key={t.player.id}>
-                    {t.player.name} — {t.role.name}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {gameState.rolesInPlay && gameState.rolesInPlay.length > 0 && (
-            <div style={{ marginBottom: "20px" }}>
-              <h2>Roles In Play</h2>
-              <ul>
-                {gameState.rolesInPlay.map((r) => (
-                  <li key={r.id}>
-                    {r.count !== undefined
-                      ? `${String(r.count)}× `
-                      : r.min !== r.max
-                        ? `${String(r.min)}–${String(r.max)} `
-                        : ""}
-                    {r.name} — {r.team}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          <div>
-            <h2>All Players</h2>
-            <ul>
-              {gameState.players.map((p) => (
-                <li key={p.id}>{p.name}</li>
-              ))}
-            </ul>
-          </div>
-        </>
+        <p className="text-destructive text-sm">Error: {error.message}</p>
       )}
     </div>
   );

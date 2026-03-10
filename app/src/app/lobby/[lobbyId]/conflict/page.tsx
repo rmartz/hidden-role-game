@@ -8,7 +8,7 @@ import {
   useStoredLobbyQuery,
   useLobbyExistsQuery,
 } from "@/hooks";
-import LobbyConflictResolution from "../LobbyConflictResolution";
+import { LobbyConflictResolution } from "@/components/lobby";
 
 export default function LobbyConflictPage() {
   const { lobbyId } = useParams<{ lobbyId: string }>();
@@ -72,12 +72,12 @@ export default function LobbyConflictPage() {
     !conflictLobbyQuery.data ||
     !storedLobbyId
   ) {
-    return <p>Loading...</p>;
+    return <p className="p-5 text-muted-foreground">Loading...</p>;
   }
 
   return (
-    <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
-      <h1>Hidden Role Game</h1>
+    <div className="p-5">
+      <h1 className="text-2xl font-bold mb-4">Hidden Role Game</h1>
       <LobbyConflictResolution
         conflictLobby={conflictLobbyQuery.data}
         conflictLobbyId={storedLobbyId}

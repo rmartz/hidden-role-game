@@ -18,6 +18,8 @@ export interface StartingGameStatus {
 
 export interface PlayingGameStatus {
   type: GameStatus.Playing;
+  /** Present for game modes with structured turns (e.g. Werewolf). Typed per game mode. */
+  turnState?: unknown;
 }
 
 export interface FinishedGameStatus {
@@ -70,6 +72,7 @@ export interface RoleDefinition<
   name: string;
   team: T;
   canSeeTeam?: T[];
+  canSeeRole?: Role[];
 }
 
 export interface GameModeConfig {
@@ -79,6 +82,19 @@ export interface GameModeConfig {
   readonly roles: Record<string, RoleDefinition<string, Team>>;
   readonly teamLabels: Partial<Record<Team, string>>;
   defaultRoleCount(numPlayers: number): RoleSlot[];
+  /**
+   * Returns whether the current role counts form a valid assignment for the
+   * given number of players. Game modes that reserve one player as a non-role
+   * owner (e.g. Werewolf's Narrator) should override this to subtract that
+   * player from the required slot count.
+   *
+   * Default: total assigned roles must equal numPlayers.
+   */
+  isValidRoleCount?(
+    numPlayers: number,
+    roleCounts: Record<string, number>,
+  ): boolean;
+  readonly actions: Record<string, GameAction>;
 }
 
 export interface PlayerRoleAssignment {
@@ -108,6 +124,15 @@ export interface Game {
   configuredRoleSlots: RoleSlot[];
   showRolesInPlay: ShowRolesInPlay;
   ownerPlayerId: string | null;
+}
+
+/**
+ * A game-mode-defined action that can be applied to a game. Actions are
+ * validated before application; isValid must return true for apply to be called.
+ */
+export interface GameAction {
+  isValid(game: Game, callerId: string, payload: unknown): boolean;
+  apply(game: Game, payload: unknown): void;
 }
 
 // --- Lobby (top-level entity; game is absent until started) ---

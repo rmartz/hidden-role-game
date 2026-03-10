@@ -3,17 +3,20 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { getPlayerId, getLobbyId } from "@/lib/api";
+import { getPlayerId, getLobbyId, getSessionId } from "@/lib/api";
 import {
   useLobbyQuery,
+  useLobbyWebSocket,
   useRemovePlayer,
   useStartGame,
   useTransferOwner,
   useConfigSync,
 } from "@/hooks";
-import JoinPrompt from "./JoinPrompt";
-import PlayerList from "./PlayerList";
-import GameConfigurationPanel from "./GameConfigurationPanel";
+import {
+  GameConfigurationPanel,
+  JoinPrompt,
+  PlayerList,
+} from "@/components/lobby";
 
 export default function LobbyPage() {
   const { lobbyId } = useParams<{ lobbyId: string }>();
@@ -24,8 +27,10 @@ export default function LobbyPage() {
   const [storedLobbyId, setStoredLobbyId] = useState<string | null | undefined>(
     undefined,
   );
+  const [sessionId, setSessionId] = useState<string | null>(null);
   useEffect(() => {
     setStoredLobbyId(getLobbyId());
+    setSessionId(getSessionId());
   }, []);
 
   const hasDifferentLobby =
@@ -33,8 +38,11 @@ export default function LobbyPage() {
     storedLobbyId !== null &&
     storedLobbyId !== lobbyId;
 
+  const { isConnected: wsConnected } = useLobbyWebSocket(lobbyId, sessionId);
+
   const fetchLobby = useLobbyQuery(lobbyId, {
     enabled: storedLobbyId !== undefined && !hasDifferentLobby,
+    disablePolling: wsConnected,
   });
 
   const myPlayerId = getPlayerId();
@@ -72,7 +80,11 @@ export default function LobbyPage() {
 
   const startGameMutation = useStartGame(lobbyId);
   const transferOwnerMutation = useTransferOwner(lobbyId);
-  const { flush: flushConfigSync } = useConfigSync(lobbyId, isOwner);
+  const { flush: flushConfigSync } = useConfigSync(
+    lobbyId,
+    isOwner,
+    wsConnected,
+  );
 
   function handleRefetch() {
     void fetchLobby.refetch();
@@ -81,30 +93,40 @@ export default function LobbyPage() {
   if (storedLobbyId === undefined || hasDifferentLobby) return null;
 
   return (
-    <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
-      <h1>Hidden Role Game</h1>
-      <p>
-        Lobby: <a href={`/lobby/${lobbyId}`}>{lobbyId}</a>
+    <div className="p-5">
+      <h1 className="text-2xl font-bold mb-2">Hidden Role Game</h1>
+      <p className="mb-4 text-muted-foreground">
+        Lobby:{" "}
+        <a href={`/lobby/${lobbyId}`} className="underline">
+          {lobbyId}
+        </a>
       </p>
 
-      {fetchLobby.isLoading && <p>Loading...</p>}
+      {fetchLobby.isLoading && (
+        <p className="text-muted-foreground">Loading...</p>
+      )}
 
       {fetchLobby.error &&
         fetchLobby.error.message !== "404" &&
         fetchLobby.error.message !== "403" && (
-          <div style={{ color: "red", marginBottom: "10px" }}>
+          <p className="text-destructive text-sm mb-3">
             Error: {fetchLobby.error.message}
-          </div>
+          </p>
         )}
 
       {!fetchLobby.isLoading && fetchLobby.data === null && (
-        <JoinPrompt lobbyId={lobbyId} />
+        <JoinPrompt
+          lobbyId={lobbyId}
+          onJoined={() => {
+            setSessionId(getSessionId());
+          }}
+        />
       )}
 
       {removeMutation.error && (
-        <div style={{ color: "red", marginBottom: "10px" }}>
+        <p className="text-destructive text-sm mb-3">
           Error: {removeMutation.error.message}
-        </div>
+        </p>
       )}
 
       {fetchLobby.data &&
@@ -135,6 +157,7 @@ export default function LobbyPage() {
           showLeave={!isOwner}
           showRemovePlayer={isOwner}
           showMakeOwner={isOwner}
+          showRefresh={!wsConnected}
           isFetching={fetchLobby.isFetching}
           disabled={startGameMutation.isPending || gameId !== undefined}
           onRefetch={handleRefetch}

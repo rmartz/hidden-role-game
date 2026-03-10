@@ -7,6 +7,7 @@ import type { GameConfig } from "@/server/models";
 import { GAME_MODES } from "@/lib/game-modes";
 
 function computeIsValid(
+  gameMode: GameMode,
   playerCount: number,
   roleConfigMode: RoleConfigMode,
   roleCounts: Record<string, number>,
@@ -14,13 +15,17 @@ function computeIsValid(
   roleMaxes: Record<string, number>,
 ): boolean {
   if (roleConfigMode === RoleConfigMode.Default) return true;
-  if (roleConfigMode === RoleConfigMode.Custom) {
-    return sum(Object.values(roleCounts)) === playerCount;
+  if (roleConfigMode === RoleConfigMode.Advanced) {
+    const totalMin = sum(Object.values(roleMins));
+    const totalMax = sum(Object.values(roleMaxes));
+    return totalMin <= playerCount && totalMax >= playerCount;
   }
-  // Advanced
-  const totalMin = sum(Object.values(roleMins));
-  const totalMax = sum(Object.values(roleMaxes));
-  return totalMin <= playerCount && totalMax >= playerCount;
+  // Custom mode
+  const config = GAME_MODES[gameMode];
+  if (config.isValidRoleCount) {
+    return config.isValidRoleCount(playerCount, roleCounts);
+  }
+  return sum(Object.values(roleCounts)) === playerCount;
 }
 
 function roleCountsFromSlots(slots: RoleSlot[]): Record<string, number> {
@@ -67,6 +72,7 @@ const initialState: GameConfigState = {
 
 function recomputeIsValid(state: GameConfigState): boolean {
   return computeIsValid(
+    state.gameMode,
     state.playerCount,
     state.roleConfigMode,
     state.roleCounts,
@@ -79,8 +85,8 @@ const gameConfigSlice = createSlice({
   name: "gameConfig",
   initialState,
   reducers: {
-    /** Initialise (or re-sync) state from the server. Does NOT increment syncVersion. */
-    initFromServer(
+    /** One-time initialisation from server config on mount. Does NOT increment syncVersion. */
+    loadConfig(
       state,
       action: PayloadAction<{ config: GameConfig; playerCount: number }>,
     ) {
@@ -231,7 +237,7 @@ const gameConfigSlice = createSlice({
 });
 
 export const {
-  initFromServer,
+  loadConfig,
   setGameMode,
   setRoleConfigMode,
   incrementRoleCount,

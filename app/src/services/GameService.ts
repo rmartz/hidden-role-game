@@ -16,6 +16,11 @@ import type {
   PlayerGameState,
 } from "@/server/models";
 import { GAME_MODES } from "@/lib/game-modes";
+import { WerewolfPhase, buildNightPhaseOrder } from "@/lib/game-modes/werewolf";
+import type {
+  WerewolfTurnState,
+  WerewolfNighttimePhase,
+} from "@/lib/game-modes/werewolf";
 import { assignRoles } from "./assignRoles";
 import { adjustRoleSlots } from "@/server/role-slots";
 
@@ -39,13 +44,16 @@ export class GameService {
       const myRole = roles[assignment.roleDefinitionId];
 
       const visibleRoles: PlayerRoleAssignment[] = [];
-      if (myRole?.canSeeTeam && myRole.canSeeTeam.length > 0) {
-        const visibleTeams = new Set(myRole.canSeeTeam);
+      const visibleTeams = new Set(myRole?.canSeeTeam ?? []);
+      const visibleRoleIds = new Set(myRole?.canSeeRole ?? []);
+      if (visibleTeams.size > 0 || visibleRoleIds.size > 0) {
         for (const other of roleAssignments) {
           if (other.playerId === assignment.playerId) continue;
           const role = roles[other.roleDefinitionId];
-          if (!role || !visibleTeams.has(role.team)) continue;
-          visibleRoles.push(other);
+          if (!role) continue;
+          if (visibleTeams.has(role.team) || visibleRoleIds.has(role.id)) {
+            visibleRoles.push(other);
+          }
         }
       }
 
@@ -79,7 +87,7 @@ export class GameService {
       id: randomUUID(),
       lobbyId,
       gameMode,
-      status: { type: GameStatus.Playing },
+      status: { type: GameStatus.Starting },
       players: gamePlayers,
       roleAssignments,
       configuredRoleSlots: roleSlots,
@@ -93,6 +101,54 @@ export class GameService {
 
   public getGame(gameId: string): Game | undefined {
     return this.games[gameId];
+  }
+
+  private buildInitialTurnState(
+    gameMode: GameMode,
+    roleAssignments: PlayerRoleAssignment[],
+  ): WerewolfTurnState | undefined {
+    if (gameMode !== GameMode.Werewolf) return undefined;
+    const nightPhaseOrder = buildNightPhaseOrder(1, roleAssignments);
+    const phase: WerewolfNighttimePhase = {
+      type: WerewolfPhase.Nighttime,
+      nightPhaseOrder,
+      currentPhaseIndex: 0,
+    };
+    return { turn: 1, phase };
+  }
+
+  public advanceToPlaying(gameId: string): Game | null {
+    const game = this.games[gameId];
+    if (game?.status.type !== GameStatus.Starting) return null;
+    game.status = {
+      type: GameStatus.Playing,
+      turnState: this.buildInitialTurnState(
+        game.gameMode,
+        game.roleAssignments,
+      ),
+    };
+    return game;
+  }
+
+  public applyAction(
+    gameId: string,
+    actionId: string,
+    callerId: string,
+    payload: unknown,
+  ): { game: Game } | { error: string } {
+    const game = this.games[gameId];
+    if (!game) return { error: "Game not found" };
+
+    const config = this.getModeDefinition(game.gameMode);
+    const action = config.actions[actionId];
+    if (!action) return { error: "Unknown action" };
+
+    if (!action.isValid(game, callerId, payload)) {
+      return { error: "Action not valid for current game state" };
+    }
+
+    action.apply(game, payload);
+    return { game };
   }
 
   public adjustRoleSlotsForPlayer(

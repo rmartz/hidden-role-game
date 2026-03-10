@@ -5,7 +5,6 @@ import type {
   RoleConfigMode,
   ShowRolesInPlay,
 } from "@/lib/models";
-import { getDefaultRoleSlots } from "@/lib/game-modes";
 
 export class LobbyService {
   private lobbies: Record<string, Lobby> = {};
@@ -72,11 +71,8 @@ export class LobbyService {
       config.gameMode !== lobby.config.gameMode
     ) {
       lobby.config.gameMode = config.gameMode;
-      lobby.config.roleSlots = getDefaultRoleSlots(
-        config.gameMode,
-        lobby.players.length,
-      );
-    } else if (config.roleSlots !== undefined) {
+    }
+    if (config.roleSlots !== undefined) {
       lobby.config.roleSlots = config.roleSlots;
     }
 
