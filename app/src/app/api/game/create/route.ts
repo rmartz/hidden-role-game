@@ -24,9 +24,10 @@ export async function POST(request: Request): Promise<Response> {
 
   const { ownerTitle } = gameService.getModeDefinition(gameMode);
   const roleSlotsRequired = lobby.players.length - (ownerTitle ? 1 : 0);
-  const totalSlots = roleSlots.reduce((sum, s) => sum + s.count, 0);
-  if (totalSlots !== roleSlotsRequired) {
-    return errorResponse("Role slot count must match player count", 400);
+  const totalMin = roleSlots.reduce((sum, s) => sum + s.min, 0);
+  const totalMax = roleSlots.reduce((sum, s) => sum + s.max, 0);
+  if (totalMin > roleSlotsRequired || totalMax < roleSlotsRequired) {
+    return errorResponse("Role slot ranges must cover the player count", 400);
   }
 
   const { roles } = gameService.getModeDefinition(gameMode);

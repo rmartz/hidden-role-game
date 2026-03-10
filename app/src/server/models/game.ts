@@ -15,6 +15,18 @@ export interface PublicRoleInfo {
   team: Team;
 }
 
+export interface RoleInPlay {
+  id: string;
+  name: string;
+  team: Team;
+  /** Configured minimum count for this role. */
+  min: number;
+  /** Configured maximum count for this role. */
+  max: number;
+  /** Actual assigned count. Only present for RoleAndCount mode. */
+  count?: number;
+}
+
 export interface VisibleTeammate {
   player: PublicLobbyPlayer;
   role: PublicRoleInfo;
@@ -27,5 +39,5 @@ export interface PlayerGameState {
   gameOwner: PublicLobbyPlayer | null;
   myRole: PublicRoleInfo | null;
   visibleRoleAssignments: VisibleTeammate[];
-  rolesInPlay: PublicRoleInfo[] | null;
+  rolesInPlay: RoleInPlay[] | null;
 }

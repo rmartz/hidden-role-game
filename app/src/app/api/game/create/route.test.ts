@@ -41,8 +41,8 @@ describe("POST /api/game/create", () => {
           lobbyId,
           gameMode: "secret-villain",
           roleSlots: [
-            { roleId: "good", count: 1 },
-            { roleId: "bad", count: 1 },
+            { roleId: "good", min: 1, max: 1 },
+            { roleId: "bad", min: 1, max: 1 },
           ],
         }),
       }),
@@ -66,7 +66,7 @@ describe("POST /api/game/create", () => {
         body: JSON.stringify({
           lobbyId,
           gameMode: "secret-villain",
-          roleSlots: [{ roleId: "good", count: 1 }],
+          roleSlots: [{ roleId: "good", min: 1, max: 1 }],
         }),
       }),
     );
@@ -87,8 +87,8 @@ describe("POST /api/game/create", () => {
           lobbyId,
           gameMode: "secret-villain",
           roleSlots: [
-            { roleId: "good", count: 1 },
-            { roleId: "bad", count: 1 },
+            { roleId: "good", min: 1, max: 1 },
+            { roleId: "bad", min: 1, max: 1 },
           ],
         }),
       }),
@@ -110,8 +110,8 @@ describe("POST /api/game/create", () => {
           lobbyId,
           gameMode: "avalon",
           roleSlots: [
-            { roleId: "avalon-good", count: 1 },
-            { roleId: "avalon-bad", count: 1 },
+            { roleId: "avalon-good", min: 1, max: 1 },
+            { roleId: "avalon-bad", min: 1, max: 1 },
           ],
         }),
       }),
@@ -136,8 +136,8 @@ describe("POST /api/game/create", () => {
           lobbyId,
           gameMode: "avalon",
           roleSlots: [
-            { roleId: "good", count: 1 },
-            { roleId: "bad", count: 1 },
+            { roleId: "good", min: 1, max: 1 },
+            { roleId: "bad", min: 1, max: 1 },
           ],
         }),
       }),
@@ -159,8 +159,8 @@ describe("POST /api/game/create", () => {
           lobbyId,
           gameMode: "not-a-real-mode",
           roleSlots: [
-            { roleId: "good", count: 1 },
-            { roleId: "bad", count: 1 },
+            { roleId: "good", min: 1, max: 1 },
+            { roleId: "bad", min: 1, max: 1 },
           ],
         }),
       }),
@@ -171,8 +171,8 @@ describe("POST /api/game/create", () => {
   it("should return 409 when the game has already started", async () => {
     const { lobbyId, aliceSession } = await setupLobbyWithPlayers();
     const slots = [
-      { roleId: "good", count: 1 },
-      { roleId: "bad", count: 1 },
+      { roleId: "good", min: 1, max: 1 },
+      { roleId: "bad", min: 1, max: 1 },
     ];
 
     await startGame(
@@ -221,7 +221,7 @@ describe("POST /api/game/create", () => {
           lobbyId,
           gameMode: "werewolf",
           // Alice (owner) is the Narrator; Bob gets the only role slot.
-          roleSlots: [{ roleId: "werewolf-good", count: 1 }],
+          roleSlots: [{ roleId: "werewolf-good", min: 1, max: 1 }],
         }),
       }),
     );

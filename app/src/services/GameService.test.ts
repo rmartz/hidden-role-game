@@ -1,20 +1,12 @@
 import { describe, it, expect } from "vitest";
 import { GameService } from "./GameService";
-import { GameMode, GameStatus, Team } from "@/lib/models";
-import type { Game, GamePlayer } from "@/lib/models";
+import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/models";
+import type { Game, GamePlayer, RoleSlot } from "@/lib/models";
 
-function makeGame(roleAssignments: Game["roleAssignments"]): Game {
-  return {
-    id: "game-1",
-    lobbyId: "lobby-1",
-    gameMode: GameMode.SecretVillain,
-    status: { type: GameStatus.Playing },
-    players: [],
-    roleAssignments,
-    showRolesInPlay: true,
-    ownerPlayerId: null,
-  };
-}
+const DEFAULT_SLOTS: RoleSlot[] = [
+  { roleId: "good", min: 1, max: 1 },
+  { roleId: "bad", min: 1, max: 1 },
+];
 
 function makePlayer(
   id: string,
@@ -26,7 +18,8 @@ function makePlayer(
 function makeGameWithPlayers(
   players: GamePlayer[],
   roleAssignments: Game["roleAssignments"],
-  showRolesInPlay = true,
+  showRolesInPlay: ShowRolesInPlay = ShowRolesInPlay.RoleAndCount,
+  configuredRoleSlots: RoleSlot[] = DEFAULT_SLOTS,
 ): Game {
   return {
     id: "game-1",
@@ -35,89 +28,11 @@ function makeGameWithPlayers(
     status: { type: GameStatus.Playing },
     players,
     roleAssignments,
+    configuredRoleSlots,
     showRolesInPlay,
     ownerPlayerId: null,
   };
 }
-
-describe("GameService.getRolesInPlay", () => {
-  const service = new GameService();
-
-  it("returns an empty array when there are no assignments", () => {
-    const result = service.getRolesInPlay(makeGame([]));
-    expect(result).toEqual([]);
-  });
-
-  it("returns one entry per unique role", () => {
-    const game = makeGame([
-      { playerId: "p1", roleDefinitionId: "good" },
-      { playerId: "p2", roleDefinitionId: "good" },
-      { playerId: "p3", roleDefinitionId: "bad" },
-    ]);
-
-    const result = service.getRolesInPlay(game);
-
-    expect(result).toHaveLength(2);
-    expect(result.map((r) => r.id)).toContain("good");
-    expect(result.map((r) => r.id)).toContain("bad");
-  });
-
-  it("includes the correct name and team for each role", () => {
-    const game = makeGame([
-      { playerId: "p1", roleDefinitionId: "good" },
-      { playerId: "p2", roleDefinitionId: "bad" },
-    ]);
-
-    const result = service.getRolesInPlay(game);
-    const byId = Object.fromEntries(result.map((r) => [r.id, r]));
-
-    expect(byId["good"]).toEqual({
-      id: "good",
-      name: "Good Role",
-      team: Team.Good,
-    });
-    expect(byId["bad"]).toEqual({
-      id: "bad",
-      name: "Bad Role",
-      team: Team.Bad,
-    });
-  });
-
-  it("only includes roles that are actually assigned", () => {
-    // special-bad exists in SecretVillain definitions but is not assigned here
-    const game = makeGame([{ playerId: "p1", roleDefinitionId: "good" }]);
-
-    const result = service.getRolesInPlay(game);
-
-    expect(result).toHaveLength(1);
-    expect(result[0]!.id).toBe("good");
-  });
-
-  it("deduplicates even when all players share the same role", () => {
-    const game = makeGame([
-      { playerId: "p1", roleDefinitionId: "good" },
-      { playerId: "p2", roleDefinitionId: "good" },
-      { playerId: "p3", roleDefinitionId: "good" },
-    ]);
-
-    const result = service.getRolesInPlay(game);
-
-    expect(result).toHaveLength(1);
-    expect(result[0]!.id).toBe("good");
-  });
-
-  it("skips assignments whose role definition id is not found", () => {
-    const game = makeGame([
-      { playerId: "p1", roleDefinitionId: "good" },
-      { playerId: "p2", roleDefinitionId: "unknown-role" },
-    ]);
-
-    const result = service.getRolesInPlay(game);
-
-    expect(result).toHaveLength(1);
-    expect(result[0]!.id).toBe("good");
-  });
-});
 
 describe("GameService.getPlayerGameState", () => {
   const service = new GameService();
@@ -201,32 +116,83 @@ describe("GameService.getPlayerGameState", () => {
     ]);
   });
 
-  it("rolesInPlay is populated when showRolesInPlay is true", () => {
+  it("rolesInPlay includes count when showRolesInPlay is RoleAndCount", () => {
     const game = makeGameWithPlayers(
       [makePlayer("p1")],
       [{ playerId: "p1", roleDefinitionId: "good" }],
-      true,
+      ShowRolesInPlay.RoleAndCount,
     );
 
     const result = service.getPlayerGameState(game, "p1");
 
     expect(result?.rolesInPlay).not.toBeNull();
-    expect(result?.rolesInPlay).toContainEqual({
-      id: "good",
-      name: "Good Role",
-      team: Team.Good,
-    });
+    expect(result?.rolesInPlay).toContainEqual(
+      expect.objectContaining({
+        id: "good",
+        name: "Good Role",
+        team: Team.Good,
+        count: 1,
+      }),
+    );
   });
 
-  it("rolesInPlay is null when showRolesInPlay is false", () => {
+  it("rolesInPlay is null when showRolesInPlay is None", () => {
     const game = makeGameWithPlayers(
       [makePlayer("p1")],
       [{ playerId: "p1", roleDefinitionId: "good" }],
-      false,
+      ShowRolesInPlay.None,
     );
 
     const result = service.getPlayerGameState(game, "p1");
 
     expect(result?.rolesInPlay).toBeNull();
+  });
+
+  it("rolesInPlay shows assigned roles without count for AssignedRolesOnly", () => {
+    const slots: RoleSlot[] = [{ roleId: "good", min: 1, max: 3 }];
+    const game = makeGameWithPlayers(
+      [makePlayer("p1"), makePlayer("p2")],
+      [
+        { playerId: "p1", roleDefinitionId: "good" },
+        { playerId: "p2", roleDefinitionId: "good" },
+      ],
+      ShowRolesInPlay.AssignedRolesOnly,
+      slots,
+    );
+
+    const result = service.getPlayerGameState(game, "p1");
+
+    expect(result?.rolesInPlay).toHaveLength(1);
+    expect(result?.rolesInPlay?.[0]).toEqual({
+      id: "good",
+      name: "Good Role",
+      team: Team.Good,
+      min: 1,
+      max: 3,
+    });
+  });
+
+  it("rolesInPlay shows configured slots for ConfiguredOnly", () => {
+    const slots: RoleSlot[] = [
+      { roleId: "good", min: 2, max: 4 },
+      { roleId: "bad", min: 0, max: 2 },
+    ];
+    // Only "good" is assigned, but both are configured
+    const game = makeGameWithPlayers(
+      [makePlayer("p1")],
+      [{ playerId: "p1", roleDefinitionId: "good" }],
+      ShowRolesInPlay.ConfiguredOnly,
+      slots,
+    );
+
+    const result = service.getPlayerGameState(game, "p1");
+
+    expect(result?.rolesInPlay).toHaveLength(2);
+    expect(result?.rolesInPlay).toContainEqual(
+      expect.objectContaining({ id: "good", min: 2, max: 4 }),
+    );
+    expect(result?.rolesInPlay).toContainEqual(
+      expect.objectContaining({ id: "bad", min: 0, max: 2 }),
+    );
   });
 });

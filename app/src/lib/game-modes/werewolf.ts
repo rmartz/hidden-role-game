@@ -13,8 +13,8 @@ function defaultRoleCount(numPlayers: number): RoleSlot[] {
   const bad = Math.floor(n / 3);
   const good = n - bad;
   return [
-    { roleId: WerewolfRole.Bad, count: bad },
-    { roleId: WerewolfRole.Good, count: good },
+    { roleId: WerewolfRole.Bad, min: bad, max: bad },
+    { roleId: WerewolfRole.Good, min: good, max: good },
   ];
 }
 

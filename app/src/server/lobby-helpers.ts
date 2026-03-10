@@ -18,6 +18,7 @@ export function toPublicLobby(
     players: lobby.players.map((p) => ({ id: p.id, name: p.name })),
     config: {
       gameMode: lobby.config.gameMode,
+      roleConfigMode: lobby.config.roleConfigMode,
       showConfigToPlayers: lobby.config.showConfigToPlayers,
       showRolesInPlay: lobby.config.showRolesInPlay,
       ...(showRoleSlots && { roleSlots: lobby.config.roleSlots }),

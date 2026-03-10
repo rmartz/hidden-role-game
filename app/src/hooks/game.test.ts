@@ -1,6 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
-import { GameMode, GameStatus, Team } from "@/lib/models";
+import {
+  GameMode,
+  GameStatus,
+  RoleConfigMode,
+  ShowRolesInPlay,
+  Team,
+} from "@/lib/models";
 import { ServerResponseStatus } from "@/server/models";
 import type { PlayerGameState, PublicLobby } from "@/server/models";
 import { createWrapper } from "./test-utils";
@@ -50,8 +56,9 @@ describe("useStartGame", () => {
           players: [],
           config: {
             gameMode: GameMode.SecretVillain,
+            roleConfigMode: RoleConfigMode.Default,
             showConfigToPlayers: false,
-            showRolesInPlay: false,
+            showRolesInPlay: ShowRolesInPlay.RoleAndCount,
           },
           gameId: "game-1",
         } satisfies PublicLobby,

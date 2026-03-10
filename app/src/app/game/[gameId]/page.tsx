@@ -64,6 +64,11 @@ export default function GamePage() {
               <ul>
                 {gameState.rolesInPlay.map((r) => (
                   <li key={r.id}>
+                    {r.count !== undefined
+                      ? `${String(r.count)}× `
+                      : r.min !== r.max
+                        ? `${String(r.min)}–${String(r.max)} `
+                        : ""}
                     {r.name} — {r.team}
                   </li>
                 ))}

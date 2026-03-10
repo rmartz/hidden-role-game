@@ -1,15 +1,18 @@
-import { keyBy, mapValues, sum } from "lodash";
-import type { RoleDefinition, Team } from "@/lib/models";
-import type { RoleSlot } from "@/server/models";
+import { sum } from "lodash";
+import type { RoleDefinition, RoleSlot, Team } from "@/lib/models";
+import { RoleConfigMode } from "@/lib/models";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   incrementRoleCount,
   decrementRoleCount,
+  setRoleMin,
+  setRoleMax,
 } from "@/store/gameConfigSlice";
 
 interface ReadOnlyProps {
   roleDefinitions: Record<string, RoleDefinition<string, Team>>;
   roleSlots?: RoleSlot[];
+  roleConfigMode: RoleConfigMode;
   playerCount: number;
   readOnly: true;
 }
@@ -28,10 +31,21 @@ export default function RoleConfig(props: Props) {
 
   const dispatch = useAppDispatch();
   const roleCounts = useAppSelector((s) => s.gameConfig.roleCounts);
+  const roleMins = useAppSelector((s) => s.gameConfig.roleMins);
+  const roleMaxes = useAppSelector((s) => s.gameConfig.roleMaxes);
+  const roleConfigMode = useAppSelector((s) => s.gameConfig.roleConfigMode);
 
-  const displayCounts = readOnly
-    ? mapValues(keyBy(props.roleSlots ?? [], "roleId"), (s) => s.count)
-    : roleCounts;
+  const isAdvanced = readOnly
+    ? props.roleConfigMode === RoleConfigMode.Advanced
+    : roleConfigMode === RoleConfigMode.Advanced;
+
+  // For readonly display, build counts/ranges from roleSlots prop.
+  const readOnlyMin = readOnly
+    ? Object.fromEntries((props.roleSlots ?? []).map((s) => [s.roleId, s.min]))
+    : {};
+  const readOnlyMax = readOnly
+    ? Object.fromEntries((props.roleSlots ?? []).map((s) => [s.roleId, s.max]))
+    : {};
 
   const total = readOnly ? 0 : sum(Object.values(roleCounts));
 
@@ -40,8 +54,9 @@ export default function RoleConfig(props: Props) {
       <h2>Configure Roles</h2>
       {!readOnly && (
         <p>
-          Assign {playerCount} role{playerCount !== 1 ? "s" : ""} ({total}/
-          {playerCount} assigned)
+          {roleConfigMode === RoleConfigMode.Advanced
+            ? `Assign ${String(playerCount)} role${playerCount !== 1 ? "s" : ""} (min total: ${String(sum(Object.values(roleMins)))}, max total: ${String(sum(Object.values(roleMaxes)))})`
+            : `Assign ${String(playerCount)} role${playerCount !== 1 ? "s" : ""} (${String(total)}/${String(playerCount)} assigned)`}
         </p>
       )}
       <ul style={{ listStyle: "none", padding: 0 }}>
@@ -59,7 +74,80 @@ export default function RoleConfig(props: Props) {
               {role.name} ({role.team})
             </span>
             {readOnly ? (
-              <span>{displayCounts[role.id] ?? 0}</span>
+              isAdvanced ? (
+                <span>
+                  {readOnlyMin[role.id] ?? 0}–{readOnlyMax[role.id] ?? 0}
+                </span>
+              ) : (
+                <span>{readOnlyMin[role.id] ?? 0}</span>
+              )
+            ) : isAdvanced ? (
+              <>
+                <label
+                  style={{ display: "flex", gap: "4px", alignItems: "center" }}
+                >
+                  Min:
+                  <button
+                    onClick={() =>
+                      dispatch(
+                        setRoleMin({
+                          roleId: role.id,
+                          min: (roleMins[role.id] ?? 0) - 1,
+                        }),
+                      )
+                    }
+                    disabled={props.disabled || (roleMins[role.id] ?? 0) === 0}
+                  >
+                    -
+                  </button>
+                  <span>{roleMins[role.id] ?? 0}</span>
+                  <button
+                    onClick={() =>
+                      dispatch(
+                        setRoleMin({
+                          roleId: role.id,
+                          min: (roleMins[role.id] ?? 0) + 1,
+                        }),
+                      )
+                    }
+                    disabled={props.disabled}
+                  >
+                    +
+                  </button>
+                </label>
+                <label
+                  style={{ display: "flex", gap: "4px", alignItems: "center" }}
+                >
+                  Max:
+                  <button
+                    onClick={() =>
+                      dispatch(
+                        setRoleMax({
+                          roleId: role.id,
+                          max: (roleMaxes[role.id] ?? 0) - 1,
+                        }),
+                      )
+                    }
+                    disabled={props.disabled || (roleMaxes[role.id] ?? 0) === 0}
+                  >
+                    -
+                  </button>
+                  <span>{roleMaxes[role.id] ?? 0}</span>
+                  <button
+                    onClick={() =>
+                      dispatch(
+                        setRoleMax({
+                          roleId: role.id,
+                          max: (roleMaxes[role.id] ?? 0) + 1,
+                        }),
+                      )
+                    }
+                    disabled={props.disabled}
+                  >
+                    +
+                  </button>
+                </label>
+              </>
             ) : (
               <>
                 <button

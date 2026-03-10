@@ -14,8 +14,8 @@ describe("assignRoles", () => {
   it("assigns exactly one role per player", () => {
     const players = makePlayers(3);
     const roleSlots = [
-      { roleId: "good", count: 2 },
-      { roleId: "bad", count: 1 },
+      { roleId: "good", min: 2, max: 2 },
+      { roleId: "bad", min: 1, max: 1 },
     ];
 
     const assignments = assignRoles(players, roleSlots);
@@ -29,8 +29,8 @@ describe("assignRoles", () => {
   it("uses all roles from the expanded slots exactly once", () => {
     const players = makePlayers(4);
     const roleSlots = [
-      { roleId: "good", count: 3 },
-      { roleId: "bad", count: 1 },
+      { roleId: "good", min: 3, max: 3 },
+      { roleId: "bad", min: 1, max: 1 },
     ];
 
     const assignments = assignRoles(players, roleSlots);
@@ -42,8 +42,8 @@ describe("assignRoles", () => {
   it("shuffles roles across repeated calls", () => {
     const players = makePlayers(6);
     const roleSlots = [
-      { roleId: "good", count: 3 },
-      { roleId: "bad", count: 3 },
+      { roleId: "good", min: 3, max: 3 },
+      { roleId: "bad", min: 3, max: 3 },
     ];
 
     const results = new Set<string>();
@@ -59,7 +59,7 @@ describe("assignRoles", () => {
 
   it("works with a single role type", () => {
     const players = makePlayers(2);
-    const roleSlots = [{ roleId: "good", count: 2 }];
+    const roleSlots = [{ roleId: "good", min: 2, max: 2 }];
 
     const assignments = assignRoles(players, roleSlots);
 

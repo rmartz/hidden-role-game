@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { throttle } from "lodash";
+import { RoleConfigMode } from "@/lib/models";
 import { useAppSelector } from "@/store";
 import { useUpdateLobbyConfig } from "./lobby";
 
@@ -36,15 +37,37 @@ export function useConfigSync(
     () =>
       throttle(
         () => {
-          const { gameMode, roleCounts, showConfigToPlayers, showRolesInPlay } =
-            gameConfigRef.current;
-          mutateRef.current({
+          const {
             gameMode,
+            roleConfigMode,
+            roleCounts,
+            roleMins,
+            roleMaxes,
             showConfigToPlayers,
             showRolesInPlay,
-            roleSlots: Object.entries(roleCounts)
-              .filter(([, count]) => count > 0)
-              .map(([roleId, count]) => ({ roleId, count })),
+          } = gameConfigRef.current;
+          const roleSlots =
+            roleConfigMode === RoleConfigMode.Advanced
+              ? Object.keys(roleMins)
+                  .filter((id) => (roleMaxes[id] ?? 0) > 0)
+                  .map((id) => ({
+                    roleId: id,
+                    min: roleMins[id] ?? 0,
+                    max: roleMaxes[id] ?? 0,
+                  }))
+              : Object.entries(roleCounts)
+                  .filter(([, count]) => count > 0)
+                  .map(([roleId, count]) => ({
+                    roleId,
+                    min: count,
+                    max: count,
+                  }));
+          mutateRef.current({
+            gameMode,
+            roleConfigMode,
+            showConfigToPlayers,
+            showRolesInPlay,
+            roleSlots,
           });
         },
         SYNC_INTERVAL_MS,

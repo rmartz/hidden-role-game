@@ -37,6 +37,23 @@ export enum GameMode {
   Werewolf = "werewolf",
 }
 
+// --- Role Config Modes ---
+
+export enum RoleConfigMode {
+  Default = "Default",
+  Custom = "Custom",
+  Advanced = "Advanced",
+}
+
+// --- Show Roles In Play Options ---
+
+export enum ShowRolesInPlay {
+  None = "None",
+  ConfiguredOnly = "ConfiguredOnly",
+  AssignedRolesOnly = "AssignedRolesOnly",
+  RoleAndCount = "RoleAndCount",
+}
+
 // --- Roles ---
 
 export enum Team {
@@ -71,7 +88,8 @@ export interface PlayerRoleAssignment {
 
 export interface RoleSlot {
   roleId: string;
-  count: number;
+  min: number;
+  max: number;
 }
 
 export interface GamePlayer extends LobbyPlayer {
@@ -87,7 +105,8 @@ export interface Game {
   status: GameStatusState;
   players: GamePlayer[];
   roleAssignments: PlayerRoleAssignment[];
-  showRolesInPlay: boolean;
+  configuredRoleSlots: RoleSlot[];
+  showRolesInPlay: ShowRolesInPlay;
   ownerPlayerId: string | null;
 }
 
@@ -95,9 +114,10 @@ export interface Game {
 
 export interface LobbyConfig {
   gameMode: GameMode;
+  roleConfigMode: RoleConfigMode;
   roleSlots: RoleSlot[];
   showConfigToPlayers: boolean;
-  showRolesInPlay: boolean;
+  showRolesInPlay: ShowRolesInPlay;
 }
 
 export interface Lobby {

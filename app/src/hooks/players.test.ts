@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
-import { GameMode } from "@/lib/models";
+import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/models";
 import { ServerResponseStatus } from "@/server/models";
 import type { PublicLobby } from "@/server/models";
 import { createWrapper } from "./test-utils";
@@ -11,8 +11,9 @@ const mockLobby: PublicLobby = {
   players: [],
   config: {
     gameMode: GameMode.Werewolf,
+    roleConfigMode: RoleConfigMode.Default,
     showConfigToPlayers: false,
-    showRolesInPlay: false,
+    showRolesInPlay: ShowRolesInPlay.RoleAndCount,
   },
 };
 

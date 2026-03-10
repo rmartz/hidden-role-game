@@ -1,4 +1,9 @@
-import type { GameMode, RoleSlot } from "@/lib/models";
+import type {
+  GameMode,
+  RoleSlot,
+  RoleConfigMode,
+  ShowRolesInPlay,
+} from "@/lib/models";
 
 export interface PublicLobbyPlayer {
   id: string;
@@ -7,8 +12,9 @@ export interface PublicLobbyPlayer {
 
 export interface GameConfig {
   gameMode: GameMode;
+  roleConfigMode: RoleConfigMode;
   showConfigToPlayers: boolean;
-  showRolesInPlay: boolean;
+  showRolesInPlay: ShowRolesInPlay;
   roleSlots?: RoleSlot[];
 }
 
@@ -30,7 +36,8 @@ export interface JoinLobbyRequest {
 
 export interface UpdateLobbyConfigRequest {
   showConfigToPlayers?: boolean;
-  showRolesInPlay?: boolean;
+  showRolesInPlay?: ShowRolesInPlay;
+  roleConfigMode?: RoleConfigMode;
   gameMode?: GameMode;
   roleSlots?: RoleSlot[];
 }
