@@ -55,7 +55,9 @@ export function OwnerGameDayScreen({ gameId, gameState, turnState }: Props) {
         Day in progress: <strong>{elapsed}</strong>
       </p>
       <button
-        onClick={() => { action.mutate({ actionId: WerewolfAction.StartNight }); }}
+        onClick={() => {
+          action.mutate({ actionId: WerewolfAction.StartNight });
+        }}
         disabled={action.isPending}
       >
         Start Next Night

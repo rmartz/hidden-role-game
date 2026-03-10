@@ -39,19 +39,21 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
       </p>
       {isLastPhase ? (
         <button
-          onClick={() => { action.mutate({ actionId: WerewolfAction.StartDay }); }}
+          onClick={() => {
+            action.mutate({ actionId: WerewolfAction.StartDay });
+          }}
           disabled={action.isPending}
         >
           Start the Day
         </button>
       ) : (
         <button
-          onClick={() =>
-            { action.mutate({
+          onClick={() => {
+            action.mutate({
               actionId: WerewolfAction.SetNightPhase,
               payload: { phaseIndex: currentPhaseIndex + 1 },
-            }); }
-          }
+            });
+          }}
           disabled={action.isPending}
         >
           Next Role
