@@ -44,11 +44,7 @@ export async function PUT(
     return errorResponse("Failed to update config", 500);
   }
 
-  lobbySocketManager.broadcast(
-    lobbyId,
-    updated,
-    LobbyChangeReason.ConfigChanged,
-  );
+  lobbySocketManager.broadcast(lobbyId, LobbyChangeReason.ConfigChanged);
 
   return Response.json({
     status: ServerResponseStatus.Success,

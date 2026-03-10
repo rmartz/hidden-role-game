@@ -31,11 +31,7 @@ export async function DELETE(
 
   const updated = lobbyService.removePlayer(lobbyId, playerId);
   if (updated) {
-    lobbySocketManager.broadcast(
-      lobbyId,
-      updated,
-      LobbyChangeReason.PlayerLeft,
-    );
+    lobbySocketManager.broadcast(lobbyId, LobbyChangeReason.PlayerLeft);
   }
 
   return Response.json({

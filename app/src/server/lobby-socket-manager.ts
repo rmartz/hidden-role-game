@@ -1,40 +1,30 @@
-import { WebSocket } from "ws";
-import type { Lobby } from "../lib/models";
-import { toPublicLobby } from "./lobby-helpers";
 import type { LobbySocketEvent } from "./models/websocket";
 
+const PARTYKIT_HOST =
+  process.env["NEXT_PUBLIC_PARTYKIT_HOST"] ?? "localhost:1999";
+
+function getPartyUrl(lobbyId: string): string {
+  const protocol = PARTYKIT_HOST.startsWith("localhost") ? "http" : "https";
+  return `${protocol}://${PARTYKIT_HOST}/parties/lobby/${lobbyId}`;
+}
+
 class LobbySocketManager {
-  private connections = new Map<string, Map<WebSocket, string>>();
+  broadcast(lobbyId: string, reason: LobbySocketEvent["reason"]): void {
+    const url = getPartyUrl(lobbyId);
+    const secret = process.env["PARTYKIT_SECRET"];
 
-  subscribe(lobbyId: string, sessionId: string, ws: WebSocket): void {
-    let subs = this.connections.get(lobbyId);
-    if (!subs) {
-      subs = new Map();
-      this.connections.set(lobbyId, subs);
-    }
-    subs.set(ws, sessionId);
-  }
+    const headers: HeadersInit = { "Content-Type": "application/json" };
+    if (secret) headers["Authorization"] = `Bearer ${secret}`;
 
-  unsubscribe(lobbyId: string, ws: WebSocket): void {
-    this.connections.get(lobbyId)?.delete(ws);
-  }
-
-  broadcast(
-    lobbyId: string,
-    lobby: Lobby,
-    reason: LobbySocketEvent["reason"],
-  ): void {
-    const subs = this.connections.get(lobbyId);
-    if (!subs) return;
-    subs.forEach((sessionId, ws) => {
-      if (ws.readyState === WebSocket.OPEN) {
-        const event: LobbySocketEvent = {
-          type: "lobby_updated",
-          reason,
-          lobby: toPublicLobby(lobby, sessionId),
-        };
-        ws.send(JSON.stringify(event));
-      }
+    void fetch(url, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ reason }),
+    }).catch((err: unknown) => {
+      console.error(
+        `[LobbySocketManager] Failed to notify party room ${lobbyId}:`,
+        err,
+      );
     });
   }
 }

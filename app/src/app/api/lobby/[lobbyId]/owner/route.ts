@@ -25,11 +25,7 @@ export async function PUT(
     return errorResponse("Player not found", 404);
   }
 
-  lobbySocketManager.broadcast(
-    lobbyId,
-    updated,
-    LobbyChangeReason.OwnerChanged,
-  );
+  lobbySocketManager.broadcast(lobbyId, LobbyChangeReason.OwnerChanged);
 
   return Response.json({
     status: ServerResponseStatus.Success,

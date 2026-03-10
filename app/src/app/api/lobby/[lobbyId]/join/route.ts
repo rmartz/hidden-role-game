@@ -27,7 +27,7 @@ export async function POST(
   };
   lobby.players.push(newPlayer);
 
-  lobbySocketManager.broadcast(lobbyId, lobby, LobbyChangeReason.PlayerJoined);
+  lobbySocketManager.broadcast(lobbyId, LobbyChangeReason.PlayerJoined);
 
   return Response.json(
     {

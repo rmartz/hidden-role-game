@@ -1,0 +1,7 @@
+{
+  "name": "hidden-role-game",
+  "parties": {
+    "lobby": "party/server.ts"
+  },
+  "compatibilityDate": "2024-11-13"
+}
