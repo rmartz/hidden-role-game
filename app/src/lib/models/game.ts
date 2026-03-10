@@ -63,6 +63,18 @@ export interface GameModeConfig {
   readonly roles: Record<string, RoleDefinition<string, Team>>;
   readonly teamLabels: Partial<Record<Team, string>>;
   defaultRoleCount(numPlayers: number): RoleSlot[];
+  /**
+   * Returns whether the current role counts form a valid assignment for the
+   * given number of players. Game modes that reserve one player as a non-role
+   * owner (e.g. Werewolf's Narrator) should override this to subtract that
+   * player from the required slot count.
+   *
+   * Default: total assigned roles must equal numPlayers.
+   */
+  isValidRoleCount?(
+    numPlayers: number,
+    roleCounts: Record<string, number>,
+  ): boolean;
 }
 
 export interface PlayerRoleAssignment {
