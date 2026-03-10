@@ -1,17 +1,24 @@
 "use client";
 
 import type { PlayerGameState } from "@/server/models";
-import { GameRolesList, PlayersRoleList, RoleLabel } from "../components";
+import {
+  GameRolesList,
+  GameStartCountdown,
+  PlayersRoleList,
+  RoleLabel,
+} from "..";
+
+const STARTING_DURATION_SECONDS = 10;
 
 interface Props {
   gameState: PlayerGameState;
 }
 
-export function PlayerGameDayScreen({ gameState }: Props) {
+export function PlayerStartingScreen({ gameState }: Props) {
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
-      <h1>Hidden Role Game</h1>
-      <p>The game is underway.</p>
+      <h1>Game Starting</h1>
+      <GameStartCountdown durationSeconds={STARTING_DURATION_SECONDS} />
 
       {gameState.myRole && (
         <div style={{ marginBottom: "20px" }}>

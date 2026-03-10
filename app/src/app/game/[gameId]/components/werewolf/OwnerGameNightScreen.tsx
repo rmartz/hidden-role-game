@@ -3,7 +3,7 @@
 import { GAME_MODES } from "@/lib/game-modes";
 import type { TurnState } from "@/lib/models";
 import type { PlayerGameState } from "@/server/models";
-import { GameRolesList, PlayersRoleList } from "../components";
+import { GameRolesList, PlayersRoleList } from "..";
 
 interface Props {
   gameState: PlayerGameState;
