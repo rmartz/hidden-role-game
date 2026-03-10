@@ -12,7 +12,11 @@ import {
   useTransferOwner,
   useConfigSync,
 } from "@/hooks";
-import { GameConfigurationPanel, JoinPrompt, PlayerList } from "./components";
+import {
+  GameConfigurationPanel,
+  JoinPrompt,
+  PlayerList,
+} from "@/components/lobby";
 
 export default function LobbyPage() {
   const { lobbyId } = useParams<{ lobbyId: string }>();
@@ -89,20 +93,25 @@ export default function LobbyPage() {
   if (storedLobbyId === undefined || hasDifferentLobby) return null;
 
   return (
-    <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
-      <h1>Hidden Role Game</h1>
-      <p>
-        Lobby: <a href={`/lobby/${lobbyId}`}>{lobbyId}</a>
+    <div className="p-5">
+      <h1 className="text-2xl font-bold mb-2">Hidden Role Game</h1>
+      <p className="mb-4 text-muted-foreground">
+        Lobby:{" "}
+        <a href={`/lobby/${lobbyId}`} className="underline">
+          {lobbyId}
+        </a>
       </p>
 
-      {fetchLobby.isLoading && <p>Loading...</p>}
+      {fetchLobby.isLoading && (
+        <p className="text-muted-foreground">Loading...</p>
+      )}
 
       {fetchLobby.error &&
         fetchLobby.error.message !== "404" &&
         fetchLobby.error.message !== "403" && (
-          <div style={{ color: "red", marginBottom: "10px" }}>
+          <p className="text-destructive text-sm mb-3">
             Error: {fetchLobby.error.message}
-          </div>
+          </p>
         )}
 
       {!fetchLobby.isLoading && fetchLobby.data === null && (
@@ -115,9 +124,9 @@ export default function LobbyPage() {
       )}
 
       {removeMutation.error && (
-        <div style={{ color: "red", marginBottom: "10px" }}>
+        <p className="text-destructive text-sm mb-3">
           Error: {removeMutation.error.message}
-        </div>
+        </p>
       )}
 
       {fetchLobby.data &&

@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getLobbyId, getPlayerId } from "@/lib/api";
 import { useCreateLobby, useJoinLobby, useStoredLobbyQuery } from "@/hooks";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function Home() {
   const router = useRouter();
@@ -39,84 +43,82 @@ export default function Home() {
       : storedLobbyQuery.data;
 
   return (
-    <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
-      <h1>Hidden Role Game</h1>
+    <div className="p-5">
+      <h1 className="text-2xl font-bold mb-4">Hidden Role Game</h1>
 
       {activeLobby && (
-        <div
-          style={{
-            marginBottom: "20px",
-            padding: "10px",
-            border: "1px solid #ccc",
-          }}
-        >
-          {activeLobby.gameId ? (
-            <>
-              <p>You have an active game in progress.</p>
-              <button
-                onClick={() => {
-                  const { gameId } = activeLobby;
-                  if (gameId) router.push(`/game/${gameId}`);
-                }}
-              >
-                Rejoin Game
-              </button>
-            </>
-          ) : (
-            <>
-              <p>You are already in lobby: {storedLobbyId}</p>
-              <button
-                onClick={() => {
-                  if (storedLobbyId) router.push(`/lobby/${storedLobbyId}`);
-                }}
-              >
-                Rejoin Lobby
-              </button>
-            </>
-          )}
-        </div>
+        <Card className="mb-5">
+          <CardContent className="pt-6 space-y-3">
+            {activeLobby.gameId ? (
+              <>
+                <p>You have an active game in progress.</p>
+                <Button
+                  onClick={() => {
+                    const { gameId } = activeLobby;
+                    if (gameId) router.push(`/game/${gameId}`);
+                  }}
+                >
+                  Rejoin Game
+                </Button>
+              </>
+            ) : (
+              <>
+                <p>You are already in lobby: {storedLobbyId}</p>
+                <Button
+                  onClick={() => {
+                    if (storedLobbyId) router.push(`/lobby/${storedLobbyId}`);
+                  }}
+                >
+                  Rejoin Lobby
+                </Button>
+              </>
+            )}
+          </CardContent>
+        </Card>
       )}
 
-      {error && (
-        <div style={{ color: "red", marginBottom: "10px" }}>Error: {error}</div>
-      )}
+      {error && <p className="text-destructive text-sm mb-3">Error: {error}</p>}
 
-      <div style={{ marginBottom: "10px" }}>
-        <label>
-          Your name:{" "}
-          <input
+      <div className="space-y-3 mb-4">
+        <div className="space-y-1">
+          <Label htmlFor="player-name">Your name</Label>
+          <Input
+            id="player-name"
             type="text"
             value={playerName}
             onChange={(e) => {
               setPlayerName(e.target.value);
             }}
             placeholder="Enter your name"
+            className="max-w-xs"
           />
-        </label>
-      </div>
-      <div style={{ marginBottom: "10px" }}>
-        <label>
-          Lobby ID:{" "}
-          <input
+        </div>
+        <div className="space-y-1">
+          <Label htmlFor="lobby-id">Lobby ID</Label>
+          <Input
+            id="lobby-id"
             type="text"
             value={lobbyIdInput}
             onChange={(e) => {
               setLobbyIdInput(e.target.value);
             }}
             placeholder="Leave blank to create a new lobby"
+            className="max-w-xs"
           />
-        </label>
+        </div>
       </div>
-      <div style={{ display: "flex", gap: "10px" }}>
-        <button
+
+      <div className="flex gap-2">
+        <Button
           onClick={() => {
             createMutation.mutate(playerName);
           }}
           disabled={loading || playerName.trim() === ""}
         >
           {createMutation.isPending ? "Creating..." : "Create Lobby"}
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="outline"
           onClick={() => {
             joinMutation.mutate({ lobbyId: lobbyIdInput, playerName });
           }}
@@ -125,7 +127,7 @@ export default function Home() {
           }
         >
           {joinMutation.isPending ? "Joining..." : "Join Lobby"}
-        </button>
+        </Button>
       </div>
     </div>
   );
