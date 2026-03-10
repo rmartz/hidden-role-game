@@ -6,8 +6,9 @@ import { GAME_MODES } from "@/lib/game-modes";
 import type { GameConfig, RoleSlot } from "@/server/models";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
-  initFromServer,
+  loadConfig,
   setGameMode,
+  setPlayerCount,
   setShowConfigToPlayers,
   setShowRolesInPlay,
 } from "@/store/gameConfigSlice";
@@ -41,14 +42,21 @@ export default function GameConfigurationPanel(props: Props) {
   const roleCounts = useAppSelector((s) => s.gameConfig.roleCounts);
   const isValid = useAppSelector((s) => s.gameConfig.isValid);
 
-  // Sync Redux state from server when server config changes (e.g. player joins/leaves).
-  const lastServerConfigRef = useRef<string | null>(null);
+  // On first mount, load the server config into Redux state.
+  const hasLoadedRef = useRef(false);
+  const prevPlayerCountRef = useRef(playerCount);
   useEffect(() => {
     if (readOnly) return;
-    const incoming = JSON.stringify({ config, playerCount });
-    if (incoming === lastServerConfigRef.current) return;
-    lastServerConfigRef.current = incoming;
-    dispatch(initFromServer({ config, playerCount }));
+    if (!hasLoadedRef.current) {
+      hasLoadedRef.current = true;
+      prevPlayerCountRef.current = playerCount;
+      dispatch(loadConfig({ config, playerCount }));
+      return;
+    }
+    if (prevPlayerCountRef.current !== playerCount) {
+      prevPlayerCountRef.current = playerCount;
+      dispatch(setPlayerCount(playerCount));
+    }
   }, [config, playerCount, readOnly, dispatch]);
 
   const roleDefinitions =

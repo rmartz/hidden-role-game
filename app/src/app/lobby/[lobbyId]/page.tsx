@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { getPlayerId, getLobbyId } from "@/lib/api";
+import { getPlayerId, getLobbyId, getSessionId } from "@/lib/api";
 import {
   useLobbyQuery,
+  useLobbyWebSocket,
   useRemovePlayer,
   useStartGame,
   useTransferOwner,
@@ -24,8 +25,10 @@ export default function LobbyPage() {
   const [storedLobbyId, setStoredLobbyId] = useState<string | null | undefined>(
     undefined,
   );
+  const [sessionId, setSessionId] = useState<string | null>(null);
   useEffect(() => {
     setStoredLobbyId(getLobbyId());
+    setSessionId(getSessionId());
   }, []);
 
   const hasDifferentLobby =
@@ -33,8 +36,11 @@ export default function LobbyPage() {
     storedLobbyId !== null &&
     storedLobbyId !== lobbyId;
 
+  const { isConnected: wsConnected } = useLobbyWebSocket(lobbyId, sessionId);
+
   const fetchLobby = useLobbyQuery(lobbyId, {
     enabled: storedLobbyId !== undefined && !hasDifferentLobby,
+    disablePolling: wsConnected,
   });
 
   const myPlayerId = getPlayerId();
@@ -72,7 +78,11 @@ export default function LobbyPage() {
 
   const startGameMutation = useStartGame(lobbyId);
   const transferOwnerMutation = useTransferOwner(lobbyId);
-  const { flush: flushConfigSync } = useConfigSync(lobbyId, isOwner);
+  const { flush: flushConfigSync } = useConfigSync(
+    lobbyId,
+    isOwner,
+    wsConnected,
+  );
 
   function handleRefetch() {
     void fetchLobby.refetch();
@@ -98,7 +108,12 @@ export default function LobbyPage() {
         )}
 
       {!fetchLobby.isLoading && fetchLobby.data === null && (
-        <JoinPrompt lobbyId={lobbyId} />
+        <JoinPrompt
+          lobbyId={lobbyId}
+          onJoined={() => {
+            setSessionId(getSessionId());
+          }}
+        />
       )}
 
       {removeMutation.error && (
@@ -135,6 +150,7 @@ export default function LobbyPage() {
           showLeave={!isOwner}
           showRemovePlayer={isOwner}
           showMakeOwner={isOwner}
+          showRefresh={!wsConnected}
           isFetching={fetchLobby.isFetching}
           disabled={startGameMutation.isPending || gameId !== undefined}
           onRefetch={handleRefetch}

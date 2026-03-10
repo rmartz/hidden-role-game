@@ -2,8 +2,9 @@ import { randomUUID } from "crypto";
 import type { LobbyPlayer } from "@/lib/models";
 import { ServerResponseStatus, type JoinLobbyRequest } from "@/server/models";
 import { lobbyService } from "@/services/LobbyService";
-import { gameService } from "@/services/GameService";
 import { toPublicLobby } from "@/server/lobby-helpers";
+import { lobbySocketManager } from "@/server/lobby-socket-manager";
+import { LobbyChangeReason } from "@/server/models/websocket";
 import { errorResponse } from "@/server/api-helpers";
 
 export async function POST(
@@ -25,12 +26,8 @@ export async function POST(
     sessionId,
   };
   lobby.players.push(newPlayer);
-  lobby.config.roleSlots = gameService.adjustRoleSlotsForPlayer(
-    lobby.config.roleSlots,
-    lobby.config.gameMode,
-    lobby.players.length,
-    "add",
-  );
+
+  lobbySocketManager.broadcast(lobbyId, lobby, LobbyChangeReason.PlayerJoined);
 
   return Response.json(
     {

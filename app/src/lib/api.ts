@@ -13,7 +13,7 @@ const SESSION_KEY = "x-session-id";
 const PLAYER_ID_KEY = "player-id";
 const LOBBY_ID_KEY = "lobby-id";
 
-function getSessionId(): string | null {
+export function getSessionId(): string | null {
   if (typeof window === "undefined") return null;
   return localStorage.getItem(SESSION_KEY);
 }
