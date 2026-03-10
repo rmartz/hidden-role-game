@@ -24,6 +24,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldGroup,
+  FieldTitle,
+} from "@/components/ui/field";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { RoleConfig } from "./RoleConfig";
 
 const GAME_MODE_VALUES = new Set<string>(Object.values(GameMode));
@@ -31,17 +40,32 @@ function isGameMode(value: string | null): value is GameMode {
   return value !== null && GAME_MODE_VALUES.has(value);
 }
 
-const SHOW_ROLES_VALUES = new Set<string>(Object.values(ShowRolesInPlay));
-function isShowRolesInPlay(value: string | null): value is ShowRolesInPlay {
-  return value !== null && SHOW_ROLES_VALUES.has(value);
-}
-
-const SHOW_ROLES_LABELS: Record<ShowRolesInPlay, string> = {
-  [ShowRolesInPlay.None]: "None",
-  [ShowRolesInPlay.ConfiguredOnly]: "Configured roles only",
-  [ShowRolesInPlay.AssignedRolesOnly]: "Assigned roles only",
-  [ShowRolesInPlay.RoleAndCount]: "Role and count",
-};
+const SHOW_ROLES_OPTIONS: {
+  value: ShowRolesInPlay;
+  title: string;
+  description: string;
+}[] = [
+  {
+    value: ShowRolesInPlay.None,
+    title: "None",
+    description: "Players cannot see which roles are in the game.",
+  },
+  {
+    value: ShowRolesInPlay.ConfiguredOnly,
+    title: "Configured only",
+    description: "Players see the roles the owner configured, without counts.",
+  },
+  {
+    value: ShowRolesInPlay.AssignedRolesOnly,
+    title: "Assigned roles",
+    description: "Players see only the roles that were actually assigned.",
+  },
+  {
+    value: ShowRolesInPlay.RoleAndCount,
+    title: "Role and count",
+    description: "Players see each role and how many copies are in play.",
+  },
+];
 
 interface ReadOnlyProps {
   config: GameConfig;
@@ -167,29 +191,28 @@ export function GameConfigurationPanel(props: Props) {
             </div>
             <div className="space-y-1">
               <Label>Show roles in play</Label>
-              <Select
+              <RadioGroup
                 value={readOnly ? config.showRolesInPlay : showRolesInPlay}
                 disabled={readOnly ? true : props.isPending}
-                onValueChange={
-                  readOnly
-                    ? undefined
-                    : (value) => {
-                        if (isShowRolesInPlay(value))
-                          dispatch(setShowRolesInPlay(value));
-                      }
-                }
+                onValueChange={(value) => {
+                  if (value !== null)
+                    dispatch(setShowRolesInPlay(value as ShowRolesInPlay));
+                }}
               >
-                <SelectTrigger className="w-56">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {Object.values(ShowRolesInPlay).map((opt) => (
-                    <SelectItem key={opt} value={opt}>
-                      {SHOW_ROLES_LABELS[opt]}
-                    </SelectItem>
+                <FieldGroup>
+                  {SHOW_ROLES_OPTIONS.map((opt) => (
+                    <Label key={opt.value} htmlFor={opt.value}>
+                      <Field orientation="horizontal">
+                        <FieldContent>
+                          <FieldTitle>{opt.title}</FieldTitle>
+                          <FieldDescription>{opt.description}</FieldDescription>
+                        </FieldContent>
+                        <RadioGroupItem value={opt.value} id={opt.value} />
+                      </Field>
+                    </Label>
                   ))}
-                </SelectContent>
-              </Select>
+                </FieldGroup>
+              </RadioGroup>
             </div>
           </div>
 
@@ -202,23 +225,26 @@ export function GameConfigurationPanel(props: Props) {
           )}
 
           {!readOnly && (
-            <div className="flex items-center gap-4">
-              <Label>Role configuration:</Label>
-              {Object.values(RoleConfigMode).map((mode) => (
-                <label key={mode} className="flex items-center gap-1 text-sm">
-                  <input
-                    type="radio"
-                    name="roleConfigMode"
-                    value={mode}
-                    checked={roleConfigMode === mode}
-                    disabled={props.isPending}
-                    onChange={() => {
-                      dispatch(setRoleConfigMode(mode));
-                    }}
-                  />
-                  {mode}
-                </label>
-              ))}
+            <div className="space-y-1">
+              <Label>Role configuration</Label>
+              <Tabs
+                value={roleConfigMode}
+                onValueChange={(value) => {
+                  dispatch(setRoleConfigMode(value as RoleConfigMode));
+                }}
+              >
+                <TabsList>
+                  {Object.values(RoleConfigMode).map((mode) => (
+                    <TabsTrigger
+                      key={mode}
+                      value={mode}
+                      disabled={props.isPending}
+                    >
+                      {mode}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </Tabs>
             </div>
           )}
 
