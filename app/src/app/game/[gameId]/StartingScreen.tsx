@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import type { PlayerGameState } from "@/server/models";
+import PlayerRole from "./PlayerRole";
+import PlayersRoleList from "./PlayersRoleList";
+import GameRolesList from "./GameRolesList";
 
 const STARTING_DURATION_SECONDS = 10;
 
@@ -30,39 +33,16 @@ export default function StartingScreen({ gameState }: Props) {
         {secondsLeft !== 1 ? "s" : ""}…
       </p>
 
-      <div style={{ marginBottom: "20px" }}>
-        <h2>Your Role</h2>
-        <p>
-          <strong>{gameState.myRole?.name}</strong> — Team:{" "}
-          {gameState.myRole?.team}
-        </p>
-      </div>
-
-      {gameState.visibleRoleAssignments.length > 0 && (
+      {gameState.myRole && (
         <div style={{ marginBottom: "20px" }}>
-          <h2>Your Teammates</h2>
-          <ul>
-            {gameState.visibleRoleAssignments.map((t) => (
-              <li key={t.player.id}>
-                {t.player.name} — {t.role.name}
-              </li>
-            ))}
-          </ul>
+          <h2>Your Role</h2>
+          <PlayerRole role={gameState.myRole} />
         </div>
       )}
 
-      {gameState.rolesInPlay && gameState.rolesInPlay.length > 0 && (
-        <div style={{ marginBottom: "20px" }}>
-          <h2>Roles In Play</h2>
-          <ul>
-            {gameState.rolesInPlay.map((r) => (
-              <li key={r.id}>
-                {r.name} — {r.team}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <PlayersRoleList assignments={gameState.visibleRoleAssignments} />
+
+      <GameRolesList roles={gameState.rolesInPlay ?? []} />
     </div>
   );
 }
