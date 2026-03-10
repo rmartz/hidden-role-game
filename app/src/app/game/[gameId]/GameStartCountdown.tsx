@@ -4,25 +4,25 @@ import { useEffect, useRef, useState } from "react";
 
 interface Props {
   durationSeconds: number;
-  onStart: () => void;
+  onComplete?: () => void;
 }
 
-export default function OwnerStartCountdown({
+export default function GameStartCountdown({
   durationSeconds,
-  onStart,
+  onComplete,
 }: Props) {
   const [secondsLeft, setSecondsLeft] = useState(durationSeconds);
-  const hasStartedRef = useRef(false);
-  const onStartRef = useRef(onStart);
+  const hasCompletedRef = useRef(false);
+  const onCompleteRef = useRef(onComplete);
   useEffect(() => {
-    onStartRef.current = onStart;
+    onCompleteRef.current = onComplete;
   });
 
   useEffect(() => {
     if (secondsLeft <= 0) {
-      if (!hasStartedRef.current) {
-        hasStartedRef.current = true;
-        onStartRef.current();
+      if (!hasCompletedRef.current) {
+        hasCompletedRef.current = true;
+        onCompleteRef.current?.();
       }
       return;
     }
@@ -36,14 +36,13 @@ export default function OwnerStartCountdown({
 
   return (
     <p>
-      Players are reading their roles.{" "}
       {secondsLeft > 0 ? (
         <>
           Starting in <strong>{secondsLeft}</strong> second
           {secondsLeft !== 1 ? "s" : ""}…
         </>
       ) : (
-        "Advancing…"
+        "Starting…"
       )}
     </p>
   );

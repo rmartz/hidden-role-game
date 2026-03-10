@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { GameStatus } from "@/lib/models";
 import { useGameStateQuery } from "@/hooks";
-import PlayerStartingScreen from "./PlayerStartingScreen";
-import PlayerGameScreen from "./PlayerGameScreen";
+import { WerewolfPlayerScreen } from "./werewolf";
 
 const POLL_INTERVAL_MS = 2000;
 
@@ -48,13 +47,7 @@ export default function GamePage() {
   }, [isGameOwner, gameId, router]);
 
   if (gameState && !isGameOwner) {
-    if (gameState.status.type === GameStatus.Starting) {
-      return <PlayerStartingScreen gameState={gameState} />;
-    }
-
-    if (gameState.status.type === GameStatus.Playing) {
-      return <PlayerGameScreen gameId={gameId} gameState={gameState} />;
-    }
+    return <WerewolfPlayerScreen gameId={gameId} gameState={gameState} />;
   }
 
   return (

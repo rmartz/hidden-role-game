@@ -8,7 +8,7 @@ interface Props {
   phase: NighttimePhase;
 }
 
-export default function PlayerNightScreen({ gameState, phase }: Props) {
+export default function PlayerGameNightScreen({ gameState, phase }: Props) {
   const isMyTurn =
     gameState.myRole?.id === phase.nightPhaseOrder[phase.currentPhaseIndex];
 

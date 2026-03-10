@@ -3,8 +3,8 @@
 import { GameStatus } from "@/lib/models";
 import type { PlayerGameState } from "@/server/models";
 import { useGameStateQuery } from "@/hooks";
-import PlayerNightScreen from "./PlayerNightScreen";
-import PlayerDayScreen from "./PlayerDayScreen";
+import PlayerGameNightScreen from "./PlayerGameNightScreen";
+import PlayerGameDayScreen from "./PlayerGameDayScreen";
 
 const POLL_INTERVAL_MS = 2000;
 
@@ -28,8 +28,10 @@ export default function PlayerGameScreen({ gameId, gameState }: Props) {
   const { turnState } = status;
 
   if (turnState?.phase.type === "nighttime") {
-    return <PlayerNightScreen gameState={gameState} phase={turnState.phase} />;
+    return (
+      <PlayerGameNightScreen gameState={gameState} phase={turnState.phase} />
+    );
   }
 
-  return <PlayerDayScreen gameState={gameState} />;
+  return <PlayerGameDayScreen gameState={gameState} />;
 }

@@ -1,17 +1,28 @@
 "use client";
 
 import type { PlayerGameState } from "@/server/models";
-import PlayersRoleList from "./PlayersRoleList";
-import GameRolesList from "./GameRolesList";
+import GameStartCountdown from "../GameStartCountdown";
+import PlayersRoleList from "../PlayersRoleList";
+import GameRolesList from "../GameRolesList";
 
 interface Props {
   gameState: PlayerGameState;
+  durationSeconds: number;
+  onStart: () => void;
 }
 
-export default function OwnerGameScreen({ gameState }: Props) {
+export default function OwnerStartingScreen({
+  gameState,
+  durationSeconds,
+  onStart,
+}: Props) {
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
-      <h1>Game In Progress</h1>
+      <h1>Game Starting</h1>
+      <GameStartCountdown
+        durationSeconds={durationSeconds}
+        onComplete={onStart}
+      />
       <PlayersRoleList
         assignments={gameState.visibleRoleAssignments}
         gameMode={gameState.gameMode}
