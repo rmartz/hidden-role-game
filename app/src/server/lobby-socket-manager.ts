@@ -1,6 +1,6 @@
 import { WebSocket } from "ws";
 import type { Lobby } from "../lib/models";
-import { toPublicLobby } from "./lobby-helpers";
+import { toPublicLobby } from "@/server/utils";
 import type { LobbySocketEvent } from "./models/websocket";
 
 class LobbySocketManager {

@@ -2,10 +2,9 @@ import { randomUUID } from "crypto";
 import type { LobbyPlayer } from "@/lib/models";
 import { ServerResponseStatus, type JoinLobbyRequest } from "@/server/models";
 import { lobbyService } from "@/services/LobbyService";
-import { toPublicLobby } from "@/server/lobby-helpers";
+import { errorResponse, toPublicLobby } from "@/server/utils";
 import { lobbySocketManager } from "@/server/lobby-socket-manager";
 import { LobbyChangeReason } from "@/server/models/websocket";
-import { errorResponse } from "@/server/api-helpers";
 
 export async function POST(
   request: Request,

@@ -1,6 +1,9 @@
 import { ServerResponseStatus } from "@/server/models";
-import { authenticateLobby, errorResponse } from "@/server/api-helpers";
-import { toPublicLobby } from "@/server/lobby-helpers";
+import {
+  authenticateLobby,
+  errorResponse,
+  toPublicLobby,
+} from "@/server/utils";
 import { lobbyService } from "@/services/LobbyService";
 import { lobbySocketManager } from "@/server/lobby-socket-manager";
 import { LobbyChangeReason } from "@/server/models/websocket";

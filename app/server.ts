@@ -4,7 +4,7 @@ import next from "next";
 import { WebSocketServer } from "ws";
 import { lobbySocketManager } from "./src/server/lobby-socket-manager";
 import { lobbyService } from "./src/services/LobbyService";
-import { toPublicLobby } from "./src/server/lobby-helpers";
+import { toPublicLobby } from "./src/server/utils";
 import { LobbyChangeReason } from "./src/server/models/websocket";
 
 const dev = process.env.NODE_ENV !== "production";
