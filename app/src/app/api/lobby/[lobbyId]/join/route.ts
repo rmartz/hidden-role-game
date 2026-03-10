@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import type { LobbyPlayer } from "@/lib/models";
 import { ServerResponseStatus, type JoinLobbyRequest } from "@/server/models";
 import { lobbyService } from "@/services/LobbyService";
-import { errorResponse, toPublicLobby } from "@/utils";
+import { errorResponse, toPublicLobby } from "@/server/utils";
 import { lobbySocketManager } from "@/server/lobby-socket-manager";
 import { LobbyChangeReason } from "@/server/models/websocket";
 

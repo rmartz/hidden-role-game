@@ -20,7 +20,7 @@ import type {
   WerewolfTurnState,
   WerewolfNighttimePhase,
 } from "@/lib/game-modes/werewolf";
-import { assignRoles, adjustRoleSlots } from "@/utils";
+import { assignRoles, adjustRoleSlots } from "@/server/utils";
 
 export class GameService {
   private games: Record<string, Game> = {};

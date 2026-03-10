@@ -1,6 +1,6 @@
 import { ServerResponseStatus } from "@/server/models";
 import { gameService } from "@/services/GameService";
-import { authenticateGame, errorResponse } from "@/utils";
+import { authenticateGame, errorResponse } from "@/server/utils";
 
 export async function GET(
   request: Request,

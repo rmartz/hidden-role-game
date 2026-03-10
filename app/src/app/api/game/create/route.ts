@@ -3,7 +3,11 @@ import { ServerResponseStatus } from "@/server/models";
 import type { CreateGameRequest } from "@/server/models";
 import { lobbyService } from "@/services/LobbyService";
 import { gameService } from "@/services/GameService";
-import { authenticateLobby, errorResponse, toPublicLobby } from "@/utils";
+import {
+  authenticateLobby,
+  errorResponse,
+  toPublicLobby,
+} from "@/server/utils";
 import { lobbySocketManager } from "@/server/lobby-socket-manager";
 import { LobbyChangeReason } from "@/server/models/websocket";
 
