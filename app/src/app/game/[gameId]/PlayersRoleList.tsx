@@ -1,6 +1,6 @@
 import type { GameMode } from "@/lib/models";
 import type { VisibleTeammate } from "@/server/models";
-import PlayerRole from "./PlayerRole";
+import RoleLabel from "./RoleLabel";
 
 interface Props {
   assignments: VisibleTeammate[];
@@ -16,7 +16,7 @@ export default function PlayersRoleList({ assignments, gameMode }: Props) {
       <ul>
         {assignments.map((t) => (
           <li key={t.player.id}>
-            {t.player.name} — <PlayerRole player={t.role} gameMode={gameMode} />
+            {t.player.name} — <RoleLabel role={t.role} gameMode={gameMode} />
           </li>
         ))}
       </ul>

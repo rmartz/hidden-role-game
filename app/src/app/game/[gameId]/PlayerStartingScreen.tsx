@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { PlayerGameState } from "@/server/models";
-import PlayerRole from "./PlayerRole";
+import RoleLabel from "./RoleLabel";
 import PlayersRoleList from "./PlayersRoleList";
 import GameRolesList from "./GameRolesList";
 
@@ -37,10 +37,7 @@ export default function PlayerStartingScreen({ gameState }: Props) {
         <div style={{ marginBottom: "20px" }}>
           <h2>Your Role</h2>
           <p>
-            <PlayerRole
-              player={gameState.myRole}
-              gameMode={gameState.gameMode}
-            />
+            <RoleLabel role={gameState.myRole} gameMode={gameState.gameMode} />
           </p>
         </div>
       )}

@@ -3,7 +3,7 @@
 import type { PlayerGameState } from "@/server/models";
 import PlayersRoleList from "./PlayersRoleList";
 import GameRolesList from "./GameRolesList";
-import PlayerRole from "./PlayerRole";
+import RoleLabel from "./RoleLabel";
 
 interface Props {
   gameState: PlayerGameState;
@@ -19,10 +19,7 @@ export default function PlayerGameScreen({ gameState }: Props) {
         <div style={{ marginBottom: "20px" }}>
           <h2>Your Role</h2>
           <p>
-            <PlayerRole
-              player={gameState.myRole}
-              gameMode={gameState.gameMode}
-            />
+            <RoleLabel role={gameState.myRole} gameMode={gameState.gameMode} />
           </p>
         </div>
       )}

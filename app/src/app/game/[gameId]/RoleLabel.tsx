@@ -3,16 +3,16 @@ import type { GameMode } from "@/lib/models";
 import type { PublicRoleInfo } from "@/server/models";
 
 interface Props {
-  player: PublicRoleInfo;
+  role: PublicRoleInfo;
   gameMode?: GameMode;
 }
 
-export default function PlayerRole({ player, gameMode }: Props) {
+export default function RoleLabel({ role, gameMode }: Props) {
   const teamLabels = gameMode ? GAME_MODES[gameMode].teamLabels : undefined;
-  const teamLabel = teamLabels?.[player.team] ?? player.team;
+  const teamLabel = teamLabels?.[role.team] ?? role.team;
   return (
     <>
-      {player.name} ({teamLabel})
+      <strong>{role.name}</strong> ({teamLabel})
     </>
   );
 }
