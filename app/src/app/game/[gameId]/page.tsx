@@ -23,12 +23,16 @@ export default function GamePage() {
     error,
   } = useGameStateQuery(gameId, refetchInterval);
 
+  const gameStatus = gameState?.status.type;
+  const isGameOwner =
+    gameState !== undefined ? !!gameState.gameOwner : undefined;
+
   // Stop polling once the game leaves the Starting status.
   useEffect(() => {
-    if (gameState && gameState.status.type !== GameStatus.Starting) {
+    if (gameStatus && gameStatus !== GameStatus.Starting) {
       setRefetchInterval(undefined);
     }
-  }, [gameState]);
+  }, [gameStatus]);
 
   useEffect(() => {
     if (error?.message === "401" || error?.message === "403") {
@@ -38,12 +42,12 @@ export default function GamePage() {
 
   // Game owners have a dedicated view with all player roles.
   useEffect(() => {
-    if (gameState?.gameOwner) {
+    if (isGameOwner) {
       router.replace(`/game/${gameId}/owner`);
     }
-  }, [gameState?.gameOwner, gameId, router]);
+  }, [isGameOwner, gameId, router]);
 
-  if (gameState && !gameState.gameOwner) {
+  if (gameState && !isGameOwner) {
     if (gameState.status.type === GameStatus.Starting) {
       return <PlayerStartingScreen gameState={gameState} />;
     }

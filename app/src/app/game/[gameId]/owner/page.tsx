@@ -27,12 +27,16 @@ export default function GameOwnerPage() {
 
   const advanceMutation = useAdvanceGame(gameId);
 
+  const gameStatus = gameState?.status.type;
+  const isGameOwner =
+    gameState !== undefined ? !!gameState.gameOwner : undefined;
+
   // Stop polling once out of Starting.
   useEffect(() => {
-    if (gameState && gameState.status.type !== GameStatus.Starting) {
+    if (gameStatus && gameStatus !== GameStatus.Starting) {
       setRefetchInterval(undefined);
     }
-  }, [gameState]);
+  }, [gameStatus]);
 
   useEffect(() => {
     if (error?.message === "401" || error?.message === "403") {
@@ -42,10 +46,10 @@ export default function GameOwnerPage() {
 
   // Regular players don't belong on this route.
   useEffect(() => {
-    if (gameState && !gameState.gameOwner) {
+    if (isGameOwner === false) {
       router.replace(`/game/${gameId}`);
     }
-  }, [gameState, gameId, router]);
+  }, [isGameOwner, gameId, router]);
 
   const teamLabels = gameState
     ? GAME_MODES[gameState.gameMode].teamLabels
