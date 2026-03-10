@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { AVALON_CONFIG, AvalonRole } from "./avalon";
+import { AvalonRole } from "./roles";
+import { AVALON_CONFIG } from "./config";
 
 describe("AVALON_CONFIG.defaultRoleCount", () => {
   it("returns correct counts for minimum player count (5)", () => {

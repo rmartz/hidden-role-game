@@ -1,0 +1,23 @@
+import { sum } from "lodash";
+import { Team } from "@/lib/models";
+import type { GameModeConfig } from "@/lib/models";
+import { MIN_PLAYERS, defaultRoleCount, WEREWOLF_ROLES } from "./roles";
+import { WEREWOLF_ACTIONS } from "./actions";
+
+export const WEREWOLF_CONFIG = {
+  name: "Werewolf",
+  minPlayers: MIN_PLAYERS,
+  ownerTitle: "Narrator",
+  teamLabels: {
+    [Team.Good]: "Villagers",
+    [Team.Bad]: "Werewolves",
+    [Team.Neutral]: "Neutral",
+  },
+  roles: WEREWOLF_ROLES,
+  defaultRoleCount,
+  actions: WEREWOLF_ACTIONS,
+  // The Narrator is a player but doesn't receive a role.
+  isValidRoleCount(numPlayers: number, roleCounts: Record<string, number>) {
+    return sum(Object.values(roleCounts)) === numPlayers - 1;
+  },
+} satisfies GameModeConfig;

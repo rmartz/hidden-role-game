@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { SECRET_VILLAIN_CONFIG, SecretVillainRole } from "./secret-villain";
+import { SecretVillainRole } from "./roles";
+import { SECRET_VILLAIN_CONFIG } from "./config";
 
 describe("SECRET_VILLAIN_CONFIG.defaultRoleCount", () => {
   it("returns correct counts for minimum player count (5)", () => {
