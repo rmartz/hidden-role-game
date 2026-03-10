@@ -201,15 +201,19 @@ export function GameConfigurationPanel(props: Props) {
               >
                 <FieldGroup>
                   {SHOW_ROLES_OPTIONS.map((opt) => (
-                    <Label key={opt.value} htmlFor={opt.value}>
-                      <Field orientation="horizontal">
-                        <FieldContent>
-                          <FieldTitle>{opt.title}</FieldTitle>
-                          <FieldDescription>{opt.description}</FieldDescription>
-                        </FieldContent>
-                        <RadioGroupItem value={opt.value} id={opt.value} />
-                      </Field>
-                    </Label>
+                    <Card className="mb-5">
+                      <Label key={opt.value} htmlFor={opt.value}>
+                        <Field orientation="horizontal">
+                          <FieldContent>
+                            <FieldTitle>{opt.title}</FieldTitle>
+                            <FieldDescription>
+                              {opt.description}
+                            </FieldDescription>
+                          </FieldContent>
+                          <RadioGroupItem value={opt.value} id={opt.value} />
+                        </Field>
+                      </Label>
+                    </Card>
                   ))}
                 </FieldGroup>
               </RadioGroup>

@@ -12,8 +12,8 @@ export function RoleLabel({ role, gameMode }: Props) {
   const teamLabels = gameMode ? GAME_MODES[gameMode].teamLabels : undefined;
   const teamLabel = teamLabels?.[role.team] ?? role.team;
   return (
-    <Badge variant="outline">
-      <strong>{role.name}</strong>&nbsp;({teamLabel})
+    <Badge variant="secondary">
+      {role.name}&nbsp;({teamLabel})
     </Badge>
   );
 }
