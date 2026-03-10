@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { GameMode, GameStatus } from "@/lib/models";
+import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/models";
 import type { Game } from "@/lib/models";
 import { WerewolfPhase } from "./types";
 import type { WerewolfTurnState } from "./types";
@@ -21,7 +21,8 @@ function makePlayingGame(
     status: { type: GameStatus.Playing, turnState },
     players: [],
     roleAssignments: [],
-    showRolesInPlay: false,
+    configuredRoleSlots: [],
+    showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner-1",
     ...overrides,
   };
@@ -94,7 +95,8 @@ describe("isOwnerPlaying", () => {
       status: { type: GameStatus.Starting },
       players: [],
       roleAssignments: [],
-      showRolesInPlay: false,
+      configuredRoleSlots: [],
+      showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner-1",
     };
     expect(isOwnerPlaying(game, "owner-1")).toBe(false);
@@ -120,7 +122,8 @@ describe("currentTurnState", () => {
       status: { type: GameStatus.Starting },
       players: [],
       roleAssignments: [],
-      showRolesInPlay: false,
+      configuredRoleSlots: [],
+      showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner-1",
     };
     expect(currentTurnState(game)).toBeUndefined();
@@ -134,7 +137,8 @@ describe("currentTurnState", () => {
       status: { type: GameStatus.Playing },
       players: [],
       roleAssignments: [],
-      showRolesInPlay: false,
+      configuredRoleSlots: [],
+      showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner-1",
     };
     expect(currentTurnState(game)).toBeUndefined();

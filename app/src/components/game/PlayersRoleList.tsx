@@ -8,7 +8,7 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RoleLabel } from "./RoleLabel";
+import { RoleLabel } from "@/components/RoleLabel";
 
 interface Props {
   assignments: VisibleTeammate[];

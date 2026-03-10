@@ -6,7 +6,7 @@ import {
   setRoleMin,
   setRoleMax,
 } from "@/store/gameConfigSlice";
-import { RoleLabel } from "@/components/game";
+import { RoleLabel } from "@/components/RoleLabel";
 import { Button } from "@/components/ui/button";
 
 interface ReadOnlyProps {
