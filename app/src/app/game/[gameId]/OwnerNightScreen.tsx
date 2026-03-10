@@ -25,7 +25,9 @@ export default function OwnerNightScreen({
   const { nightPhaseOrder, currentPhaseIndex } = phase;
   const activeRoleId = nightPhaseOrder[currentPhaseIndex] ?? "";
   const modeConfig = GAME_MODES[gameState.gameMode];
-  const activeRoleName = (activeRoleId ? modeConfig.roles[activeRoleId]?.name : undefined) ?? activeRoleId;
+  const activeRoleName =
+    (activeRoleId ? modeConfig.roles[activeRoleId]?.name : undefined) ??
+    activeRoleId;
   const isLastPhase = currentPhaseIndex === nightPhaseOrder.length - 1;
 
   return (
