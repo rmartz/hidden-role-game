@@ -3,8 +3,7 @@
 import { GAME_MODES } from "@/lib/game-modes";
 import type { TurnState } from "@/lib/models";
 import type { PlayerGameState } from "@/server/models";
-import PlayersRoleList from "../PlayersRoleList";
-import GameRolesList from "../GameRolesList";
+import { GameRolesList, PlayersRoleList } from "../components";
 
 interface Props {
   gameState: PlayerGameState;
@@ -13,7 +12,7 @@ interface Props {
   isAdvancePending: boolean;
 }
 
-export default function OwnerGameNightScreen({
+export function OwnerGameNightScreen({
   gameState,
   turnState,
   onAdvancePhase,

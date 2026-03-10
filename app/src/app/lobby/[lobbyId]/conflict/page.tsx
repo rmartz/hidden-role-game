@@ -8,7 +8,7 @@ import {
   useStoredLobbyQuery,
   useLobbyExistsQuery,
 } from "@/hooks";
-import LobbyConflictResolution from "../LobbyConflictResolution";
+import { LobbyConflictResolution } from "../components";
 
 export default function LobbyConflictPage() {
   const { lobbyId } = useParams<{ lobbyId: string }>();

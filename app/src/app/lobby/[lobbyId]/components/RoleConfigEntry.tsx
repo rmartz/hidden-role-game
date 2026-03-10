@@ -4,7 +4,7 @@ import {
   incrementRoleCount,
   decrementRoleCount,
 } from "@/store/gameConfigSlice";
-import RoleLabel from "@/app/game/[gameId]/RoleLabel";
+import { RoleLabel } from "@/app/game/[gameId]/components";
 
 interface ReadOnlyProps {
   role: RoleDefinition<string, Team>;
@@ -22,7 +22,7 @@ interface EditableProps {
 
 type Props = ReadOnlyProps | EditableProps;
 
-export default function RoleConfigEntry(props: Props) {
+export function RoleConfigEntry(props: Props) {
   const { role, gameMode, readOnly } = props;
 
   const dispatch = useAppDispatch();

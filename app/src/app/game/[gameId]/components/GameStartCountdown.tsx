@@ -7,10 +7,7 @@ interface Props {
   onComplete?: () => void;
 }
 
-export default function GameStartCountdown({
-  durationSeconds,
-  onComplete,
-}: Props) {
+export function GameStartCountdown({ durationSeconds, onComplete }: Props) {
   const [secondsLeft, setSecondsLeft] = useState(durationSeconds);
   const hasCompletedRef = useRef(false);
   const onCompleteRef = useRef(onComplete);

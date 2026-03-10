@@ -1,15 +1,13 @@
 "use client";
 
 import type { PlayerGameState } from "@/server/models";
-import PlayersRoleList from "../PlayersRoleList";
-import GameRolesList from "../GameRolesList";
-import RoleLabel from "../RoleLabel";
+import { GameRolesList, PlayersRoleList, RoleLabel } from "../components";
 
 interface Props {
   gameState: PlayerGameState;
 }
 
-export default function PlayerGameDayScreen({ gameState }: Props) {
+export function PlayerGameDayScreen({ gameState }: Props) {
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
       <h1>Hidden Role Game</h1>

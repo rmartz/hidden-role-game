@@ -9,7 +9,7 @@ interface Props {
   onJoined?: () => void;
 }
 
-export default function JoinPrompt({ lobbyId, onJoined }: Props) {
+export function JoinPrompt({ lobbyId, onJoined }: Props) {
   const queryClient = useQueryClient();
   const [playerName, setPlayerName] = useState("");
 

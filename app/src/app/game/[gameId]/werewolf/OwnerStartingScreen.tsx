@@ -1,9 +1,11 @@
 "use client";
 
 import type { PlayerGameState } from "@/server/models";
-import GameStartCountdown from "../GameStartCountdown";
-import PlayersRoleList from "../PlayersRoleList";
-import GameRolesList from "../GameRolesList";
+import {
+  GameRolesList,
+  GameStartCountdown,
+  PlayersRoleList,
+} from "../components";
 
 interface Props {
   gameState: PlayerGameState;
@@ -11,7 +13,7 @@ interface Props {
   onStart: () => void;
 }
 
-export default function OwnerStartingScreen({
+export function OwnerStartingScreen({
   gameState,
   durationSeconds,
   onStart,

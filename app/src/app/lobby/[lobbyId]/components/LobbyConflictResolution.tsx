@@ -12,7 +12,7 @@ interface LobbyConflictResolutionProps {
   onJoin: () => void;
 }
 
-export default function LobbyConflictResolution({
+export function LobbyConflictResolution({
   conflictLobby,
   conflictLobbyId,
   playerName,

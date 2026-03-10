@@ -12,7 +12,7 @@ interface Props {
   onTransferOwner: (playerId: string) => void;
 }
 
-export default function PlayerRow({
+export function PlayerRow({
   player,
   ownerPlayerId,
   isCurrentUser,

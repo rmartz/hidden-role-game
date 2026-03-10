@@ -3,10 +3,10 @@
 import { GameStatus } from "@/lib/models";
 import type { PlayerGameState } from "@/server/models";
 import { useAdvanceGame, useAdvancePhase } from "@/hooks";
-import OwnerStartingScreen from "./OwnerStartingScreen";
-import OwnerGameNightScreen from "./OwnerGameNightScreen";
-import OwnerGameDayScreen from "./OwnerGameDayScreen";
-import OwnerGameScreen from "./OwnerGameScreen";
+import { OwnerStartingScreen } from "./OwnerStartingScreen";
+import { OwnerGameNightScreen } from "./OwnerGameNightScreen";
+import { OwnerGameDayScreen } from "./OwnerGameDayScreen";
+import { OwnerGameScreen } from "./OwnerGameScreen";
 
 const STARTING_DURATION_SECONDS = 10;
 
@@ -15,7 +15,7 @@ interface Props {
   gameState: PlayerGameState;
 }
 
-export default function WerewolfOwnerScreen({ gameId, gameState }: Props) {
+export function WerewolfOwnerScreen({ gameId, gameState }: Props) {
   const advanceMutation = useAdvanceGame(gameId);
   const advancePhaseMutation = useAdvancePhase(gameId);
 

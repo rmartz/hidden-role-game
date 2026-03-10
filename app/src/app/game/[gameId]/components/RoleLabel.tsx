@@ -7,7 +7,7 @@ interface Props {
   gameMode?: GameMode;
 }
 
-export default function RoleLabel({ role, gameMode }: Props) {
+export function RoleLabel({ role, gameMode }: Props) {
   const teamLabels = gameMode ? GAME_MODES[gameMode].teamLabels : undefined;
   const teamLabel = teamLabels?.[role.team] ?? role.team;
   return (

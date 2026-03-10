@@ -2,7 +2,7 @@ import { keyBy, mapValues, sum } from "lodash";
 import type { GameMode, RoleDefinition, Team } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
 import { useAppSelector } from "@/store";
-import RoleConfigEntry from "./RoleConfigEntry";
+import { RoleConfigEntry } from "./RoleConfigEntry";
 
 interface ReadOnlyProps {
   roleDefinitions: Record<string, RoleDefinition<string, Team>>;
@@ -22,7 +22,7 @@ interface EditableProps {
 
 type Props = ReadOnlyProps | EditableProps;
 
-export default function RoleConfig(props: Props) {
+export function RoleConfig(props: Props) {
   const { roleDefinitions, playerCount, gameMode, readOnly } = props;
 
   const roleCounts = useAppSelector((s) => s.gameConfig.roleCounts);

@@ -1,14 +1,13 @@
 "use client";
 
 import type { PlayerGameState } from "@/server/models";
-import PlayersRoleList from "../PlayersRoleList";
-import GameRolesList from "../GameRolesList";
+import { GameRolesList, PlayersRoleList } from "../components";
 
 interface Props {
   gameState: PlayerGameState;
 }
 
-export default function OwnerGameScreen({ gameState }: Props) {
+export function OwnerGameScreen({ gameState }: Props) {
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
       <h1>Game In Progress</h1>

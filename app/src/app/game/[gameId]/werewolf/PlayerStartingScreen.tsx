@@ -1,10 +1,12 @@
 "use client";
 
 import type { PlayerGameState } from "@/server/models";
-import GameStartCountdown from "../GameStartCountdown";
-import RoleLabel from "../RoleLabel";
-import PlayersRoleList from "../PlayersRoleList";
-import GameRolesList from "../GameRolesList";
+import {
+  GameRolesList,
+  GameStartCountdown,
+  PlayersRoleList,
+  RoleLabel,
+} from "../components";
 
 const STARTING_DURATION_SECONDS = 10;
 
@@ -12,7 +14,7 @@ interface Props {
   gameState: PlayerGameState;
 }
 
-export default function PlayerStartingScreen({ gameState }: Props) {
+export function PlayerStartingScreen({ gameState }: Props) {
   return (
     <div style={{ padding: "20px", fontFamily: "sans-serif" }}>
       <h1>Game Starting</h1>

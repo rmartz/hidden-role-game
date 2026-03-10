@@ -12,7 +12,7 @@ import {
   setShowConfigToPlayers,
   setShowRolesInPlay,
 } from "@/store/gameConfigSlice";
-import RoleConfig from "./RoleConfig";
+import { RoleConfig } from "./RoleConfig";
 
 interface ReadOnlyProps {
   config: GameConfig;
@@ -30,7 +30,7 @@ interface EditableProps {
 
 type Props = ReadOnlyProps | EditableProps;
 
-export default function GameConfigurationPanel(props: Props) {
+export function GameConfigurationPanel(props: Props) {
   const { config, playerCount, readOnly } = props;
 
   const dispatch = useAppDispatch();

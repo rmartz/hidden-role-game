@@ -1,5 +1,5 @@
 import type { PublicLobby } from "@/server/models";
-import PlayerRow from "./PlayerRow";
+import { PlayerRow } from "./PlayerRow";
 
 interface Props {
   lobby: PublicLobby;
@@ -15,7 +15,7 @@ interface Props {
   onTransferOwner: (playerId: string) => void;
 }
 
-export default function PlayerList({
+export function PlayerList({
   lobby,
   userPlayerId,
   showLeave,

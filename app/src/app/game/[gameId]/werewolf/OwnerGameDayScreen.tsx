@@ -3,8 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { TurnState } from "@/lib/models";
 import type { PlayerGameState } from "@/server/models";
-import PlayersRoleList from "../PlayersRoleList";
-import GameRolesList from "../GameRolesList";
+import { GameRolesList, PlayersRoleList } from "../components";
 
 interface Props {
   gameState: PlayerGameState;
@@ -13,7 +12,7 @@ interface Props {
   isAdvancePending: boolean;
 }
 
-export default function OwnerGameDayScreen({
+export function OwnerGameDayScreen({
   gameState,
   turnState,
   onAdvancePhase,

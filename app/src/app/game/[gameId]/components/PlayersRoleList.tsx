@@ -1,13 +1,13 @@
 import type { GameMode } from "@/lib/models";
 import type { VisibleTeammate } from "@/server/models";
-import RoleLabel from "./RoleLabel";
+import { RoleLabel } from "./RoleLabel";
 
 interface Props {
   assignments: VisibleTeammate[];
   gameMode?: GameMode;
 }
 
-export default function PlayersRoleList({ assignments, gameMode }: Props) {
+export function PlayersRoleList({ assignments, gameMode }: Props) {
   if (assignments.length === 0) return null;
 
   return (
