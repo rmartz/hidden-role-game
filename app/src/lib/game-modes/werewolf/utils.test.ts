@@ -1,8 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { GameMode, GameStatus } from "@/lib/models";
 import type { Game } from "@/lib/models";
-import { WerewolfPhase, WerewolfRole } from "./roles";
-import type { WerewolfTurnState } from "./roles";
+import { WerewolfPhase } from "./types";
+import type { WerewolfTurnState } from "./types";
+import { WerewolfRole } from "./roles";
 import {
   buildNightPhaseOrder,
   isOwnerPlaying,

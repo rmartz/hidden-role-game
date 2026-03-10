@@ -1,7 +1,8 @@
 import { GameStatus } from "@/lib/models";
 import type { Game, PlayerRoleAssignment } from "@/lib/models";
-import { WakesAtNight, WEREWOLF_ROLES } from "./roles";
-import type { WerewolfTurnState } from "./roles";
+import { WakesAtNight } from "./types";
+import type { WerewolfTurnState } from "./types";
+import { WEREWOLF_ROLES } from "./roles";
 
 /**
  * Returns the ordered list of role IDs that wake during a Werewolf night phase.

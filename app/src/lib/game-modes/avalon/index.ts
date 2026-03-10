@@ -1,2 +1,2 @@
-export { AvalonRole } from "./roles";
-export { AVALON_CONFIG } from "./config";
+export * from "./roles";
+export * from "./config";

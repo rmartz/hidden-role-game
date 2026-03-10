@@ -1,8 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { GameMode, GameStatus } from "@/lib/models";
 import type { Game } from "@/lib/models";
-import { WerewolfPhase, WerewolfRole } from "./roles";
-import type { WerewolfTurnState, WerewolfNighttimePhase } from "./roles";
+import { WerewolfPhase } from "./types";
+import type { WerewolfTurnState, WerewolfNighttimePhase } from "./types";
+import { WerewolfRole } from "./roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./actions";
 
 function makePlayingGame(

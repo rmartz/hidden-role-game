@@ -1,7 +1,7 @@
 import { GameStatus } from "@/lib/models";
 import type { Game, GameAction } from "@/lib/models";
-import { WerewolfPhase } from "./roles";
-import type { WerewolfNighttimePhase } from "./roles";
+import { WerewolfPhase } from "./types";
+import type { WerewolfNighttimePhase } from "./types";
 import {
   buildNightPhaseOrder,
   isOwnerPlaying,

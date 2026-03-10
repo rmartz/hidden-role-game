@@ -1,2 +1,2 @@
-export { SecretVillainRole } from "./roles";
-export { SECRET_VILLAIN_CONFIG } from "./config";
+export * from "./roles";
+export * from "./config";

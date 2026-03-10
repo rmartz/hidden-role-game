@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { Team } from "@/lib/models";
-import { WEREWOLF_ROLES, WerewolfRole, WakesAtNight } from "./roles";
+import { WakesAtNight } from "./types";
+import { WEREWOLF_ROLES, WerewolfRole } from "./roles";
 
 describe("WEREWOLF_ROLES", () => {
   it("all roles have correct team assignments", () => {
