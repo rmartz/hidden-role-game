@@ -3,10 +3,13 @@ import { ServerResponseStatus } from "@/server/models";
 import type { UpdateLobbyConfigRequest } from "@/server/models";
 import { lobbyService } from "@/services/LobbyService";
 import { gameService } from "@/services/GameService";
-import { toPublicLobby } from "@/server/lobby-helpers";
+import {
+  authenticateLobby,
+  errorResponse,
+  toPublicLobby,
+} from "@/server/utils";
 import { lobbyBroadcastService } from "@/services/LobbyBroadcastService";
 import { LobbyChangeReason } from "@/server/models/websocket";
-import { authenticateLobby, errorResponse } from "@/server/api-helpers";
 
 export async function PUT(
   request: Request,
