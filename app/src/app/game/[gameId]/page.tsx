@@ -53,7 +53,7 @@ export default function GamePage() {
     }
 
     if (gameState.status.type === GameStatus.Playing) {
-      return <PlayerGameScreen gameState={gameState} />;
+      return <PlayerGameScreen gameId={gameId} gameState={gameState} />;
     }
   }
 
