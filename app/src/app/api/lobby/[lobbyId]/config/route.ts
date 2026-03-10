@@ -4,7 +4,7 @@ import type { UpdateLobbyConfigRequest } from "@/server/models";
 import { lobbyService } from "@/services/LobbyService";
 import { gameService } from "@/services/GameService";
 import { toPublicLobby } from "@/server/lobby-helpers";
-import { lobbySocketManager } from "@/server/lobby-socket-manager";
+import { lobbyBroadcastService } from "@/services/LobbyBroadcastService";
 import { LobbyChangeReason } from "@/server/models/websocket";
 import { authenticateLobby, errorResponse } from "@/server/api-helpers";
 
@@ -44,7 +44,7 @@ export async function PUT(
     return errorResponse("Failed to update config", 500);
   }
 
-  lobbySocketManager.broadcast(lobbyId, LobbyChangeReason.ConfigChanged);
+  lobbyBroadcastService.broadcast(lobbyId, LobbyChangeReason.ConfigChanged);
 
   return Response.json({
     status: ServerResponseStatus.Success,

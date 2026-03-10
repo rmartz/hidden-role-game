@@ -1,4 +1,4 @@
-import type { LobbySocketEvent } from "./models/websocket";
+import type { LobbySocketEvent } from "@/server/models/websocket";
 
 const PARTYKIT_HOST =
   process.env["NEXT_PUBLIC_PARTYKIT_HOST"] ?? "localhost:1999";
@@ -8,7 +8,7 @@ function getPartyUrl(lobbyId: string): string {
   return `${protocol}://${PARTYKIT_HOST}/parties/lobby/${lobbyId}`;
 }
 
-class LobbySocketManager {
+class LobbyBroadcastService {
   broadcast(lobbyId: string, reason: LobbySocketEvent["reason"]): void {
     const url = getPartyUrl(lobbyId);
     const secret = process.env["PARTYKIT_SECRET"];
@@ -22,7 +22,7 @@ class LobbySocketManager {
       body: JSON.stringify({ reason }),
     }).catch((err: unknown) => {
       console.error(
-        `[LobbySocketManager] Failed to notify party room ${lobbyId}:`,
+        `[LobbyBroadcastService] Failed to notify party room ${lobbyId}:`,
         err,
       );
     });
@@ -30,9 +30,9 @@ class LobbySocketManager {
 }
 
 declare global {
-  var lobbySocketManagerInstance: LobbySocketManager | undefined;
+  var lobbyBroadcastServiceInstance: LobbyBroadcastService | undefined;
 }
 
-export const lobbySocketManager: LobbySocketManager =
-  globalThis.lobbySocketManagerInstance ??
-  (globalThis.lobbySocketManagerInstance = new LobbySocketManager());
+export const lobbyBroadcastService: LobbyBroadcastService =
+  globalThis.lobbyBroadcastServiceInstance ??
+  (globalThis.lobbyBroadcastServiceInstance = new LobbyBroadcastService());
