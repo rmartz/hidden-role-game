@@ -1,27 +1,37 @@
 import { Button } from "@/components/ui/button";
 
+export type IncrementDirection = "increment" | "decrement";
+
 interface Props {
   value: number;
-  onDecrement: () => void;
-  onIncrement: () => void;
-  decrementDisabled?: boolean;
-  incrementDisabled?: boolean;
+  onChange: (direction: IncrementDirection) => void;
+  disabled?: boolean;
+  minValue?: number;
+  maxValue?: number;
 }
 
 export function Incrementer({
   value,
-  onDecrement,
-  onIncrement,
-  decrementDisabled,
-  incrementDisabled,
+  onChange,
+  disabled,
+  minValue,
+  maxValue,
 }: Props) {
+  function handleDecrement() {
+    onChange("decrement");
+  }
+
+  function handleIncrement() {
+    onChange("increment");
+  }
+
   return (
     <>
       <Button
         variant="outline"
         size="icon"
-        onClick={onDecrement}
-        disabled={decrementDisabled}
+        onClick={handleDecrement}
+        disabled={disabled ?? (minValue !== undefined && value <= minValue)}
       >
         −
       </Button>
@@ -29,8 +39,8 @@ export function Incrementer({
       <Button
         variant="outline"
         size="icon"
-        onClick={onIncrement}
-        disabled={incrementDisabled}
+        onClick={handleIncrement}
+        disabled={disabled ?? (maxValue !== undefined && value >= maxValue)}
       >
         +
       </Button>

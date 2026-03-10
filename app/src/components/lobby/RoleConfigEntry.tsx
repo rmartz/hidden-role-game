@@ -8,6 +8,7 @@ import {
   setRoleMax,
 } from "@/store/gameConfigSlice";
 import { RoleLabel } from "@/components/RoleLabel";
+import type { IncrementDirection } from "./Incrementer";
 import { Incrementer } from "./Incrementer";
 
 interface ReadOnlyProps {
@@ -37,6 +38,32 @@ export function RoleConfigEntry(props: Props) {
   const min = useAppSelector((s) => s.gameConfig.roleMins[role.id] ?? 0);
   const max = useAppSelector((s) => s.gameConfig.roleMaxes[role.id] ?? 0);
 
+  function handleCountChange(direction: IncrementDirection) {
+    if (direction === "increment") {
+      dispatch(incrementRoleCount(role.id));
+    } else {
+      dispatch(decrementRoleCount(role.id));
+    }
+  }
+
+  function handleMinChange(direction: IncrementDirection) {
+    dispatch(
+      setRoleMin({
+        roleId: role.id,
+        min: direction === "increment" ? min + 1 : min - 1,
+      }),
+    );
+  }
+
+  function handleMaxChange(direction: IncrementDirection) {
+    dispatch(
+      setRoleMax({
+        roleId: role.id,
+        max: direction === "increment" ? max + 1 : max - 1,
+      }),
+    );
+  }
+
   return (
     <li className="flex items-center gap-2 py-1">
       <span className="min-w-40">
@@ -55,39 +82,24 @@ export function RoleConfigEntry(props: Props) {
           <span className="text-sm text-muted-foreground">Min:</span>
           <Incrementer
             value={min}
-            onDecrement={() => {
-              dispatch(setRoleMin({ roleId: role.id, min: min - 1 }));
-            }}
-            onIncrement={() => {
-              dispatch(setRoleMin({ roleId: role.id, min: min + 1 }));
-            }}
-            decrementDisabled={props.disabled || min === 0}
-            incrementDisabled={props.disabled}
+            onChange={handleMinChange}
+            disabled={props.disabled}
+            minValue={0}
           />
           <span className="text-sm text-muted-foreground ml-2">Max:</span>
           <Incrementer
             value={max}
-            onDecrement={() => {
-              dispatch(setRoleMax({ roleId: role.id, max: max - 1 }));
-            }}
-            onIncrement={() => {
-              dispatch(setRoleMax({ roleId: role.id, max: max + 1 }));
-            }}
-            decrementDisabled={props.disabled || max === 0}
-            incrementDisabled={props.disabled}
+            onChange={handleMaxChange}
+            disabled={props.disabled}
+            minValue={0}
           />
         </>
       ) : roleConfigMode === RoleConfigMode.Custom ? (
         <Incrementer
           value={count}
-          onDecrement={() => {
-            dispatch(decrementRoleCount(role.id));
-          }}
-          onIncrement={() => {
-            dispatch(incrementRoleCount(role.id));
-          }}
-          decrementDisabled={props.disabled || count === 0}
-          incrementDisabled={props.disabled}
+          onChange={handleCountChange}
+          disabled={props.disabled}
+          minValue={0}
         />
       ) : (
         <span className="text-sm text-muted-foreground">{count}</span>
