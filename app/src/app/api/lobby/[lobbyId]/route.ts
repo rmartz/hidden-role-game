@@ -1,6 +1,5 @@
 import { ServerResponseStatus } from "@/server/models";
-import { authenticateLobby } from "@/server/api-helpers";
-import { toPublicLobby } from "@/server/lobby-helpers";
+import { authenticateLobby, toPublicLobby } from "@/utils";
 
 export async function GET(
   request: Request,

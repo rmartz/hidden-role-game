@@ -2,7 +2,7 @@ import type { Lobby, Game, GamePlayer } from "@/lib/models";
 import { ServerResponseStatus } from "@/server/models";
 import { lobbyService } from "@/services/LobbyService";
 import { gameService } from "@/services/GameService";
-import { isValidSession } from "@/server/lobby-helpers";
+import { isValidSession } from "./lobby-helpers";
 
 export function errorResponse(error: string, status: number): Response {
   return Response.json(
