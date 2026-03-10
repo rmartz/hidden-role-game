@@ -1,12 +1,13 @@
-import type { Team } from "@/lib/models";
+import type { GameMode } from "@/lib/models";
 import type { VisibleTeammate } from "@/server/models";
+import PlayerRole from "./PlayerRole";
 
 interface Props {
   assignments: VisibleTeammate[];
-  teamLabels?: Partial<Record<Team, string>>;
+  gameMode?: GameMode;
 }
 
-export default function PlayersRoleList({ assignments, teamLabels }: Props) {
+export default function PlayersRoleList({ assignments, gameMode }: Props) {
   if (assignments.length === 0) return null;
 
   return (
@@ -15,8 +16,7 @@ export default function PlayersRoleList({ assignments, teamLabels }: Props) {
       <ul>
         {assignments.map((t) => (
           <li key={t.player.id}>
-            {t.player.name} — {t.role.name} (
-            {teamLabels?.[t.role.team] ?? t.role.team})
+            {t.player.name} — <PlayerRole player={t.role} gameMode={gameMode} />
           </li>
         ))}
       </ul>

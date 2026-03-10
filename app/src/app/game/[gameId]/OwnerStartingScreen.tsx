@@ -1,21 +1,18 @@
 "use client";
 
 import type { PlayerGameState } from "@/server/models";
-import type { Team } from "@/lib/models";
 import OwnerStartCountdown from "./OwnerStartCountdown";
 import PlayersRoleList from "./PlayersRoleList";
 import GameRolesList from "./GameRolesList";
 
 interface Props {
   gameState: PlayerGameState;
-  teamLabels: Partial<Record<Team, string>> | undefined;
   durationSeconds: number;
   onStart: () => void;
 }
 
 export default function OwnerStartingScreen({
   gameState,
-  teamLabels,
   durationSeconds,
   onStart,
 }: Props) {
@@ -28,7 +25,7 @@ export default function OwnerStartingScreen({
       />
       <PlayersRoleList
         assignments={gameState.visibleRoleAssignments}
-        teamLabels={teamLabels}
+        gameMode={gameState.gameMode}
       />
       <GameRolesList roles={gameState.rolesInPlay ?? []} />
     </div>

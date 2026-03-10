@@ -36,11 +36,19 @@ export default function PlayerStartingScreen({ gameState }: Props) {
       {gameState.myRole && (
         <div style={{ marginBottom: "20px" }}>
           <h2>Your Role</h2>
-          <PlayerRole role={gameState.myRole} />
+          <p>
+            <PlayerRole
+              player={gameState.myRole}
+              gameMode={gameState.gameMode}
+            />
+          </p>
         </div>
       )}
 
-      <PlayersRoleList assignments={gameState.visibleRoleAssignments} />
+      <PlayersRoleList
+        assignments={gameState.visibleRoleAssignments}
+        gameMode={gameState.gameMode}
+      />
 
       <GameRolesList roles={gameState.rolesInPlay ?? []} />
     </div>
