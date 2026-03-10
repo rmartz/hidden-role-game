@@ -1,5 +1,6 @@
 import type { PublicLobby } from "@/server/models";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlayerRow } from "./PlayerRow";
 
 interface Props {
@@ -30,11 +31,9 @@ export function PlayerList({
   onTransferOwner,
 }: Props) {
   return (
-    <>
-      <div className="flex items-center gap-3 mb-2">
-        <p className="text-sm text-muted-foreground">
-          Players: {lobby.players.length}
-        </p>
+    <Card className="mb-5">
+      <CardHeader className="flex flex-row items-center gap-3 space-y-0">
+        <CardTitle>Players ({lobby.players.length})</CardTitle>
         {showRefresh && (
           <Button
             variant="outline"
@@ -45,23 +44,25 @@ export function PlayerList({
             {isFetching ? "Refreshing..." : "Refresh"}
           </Button>
         )}
-      </div>
-      <ul className="space-y-1">
-        {lobby.players.map((player) => (
-          <PlayerRow
-            key={player.id}
-            player={player}
-            ownerPlayerId={lobby.ownerPlayerId}
-            isCurrentUser={player.id === userPlayerId}
-            showLeave={showLeave}
-            showRemovePlayer={showRemovePlayer}
-            showMakeOwner={showMakeOwner}
-            disabled={disabled}
-            onRemovePlayer={onRemovePlayer}
-            onTransferOwner={onTransferOwner}
-          />
-        ))}
-      </ul>
-    </>
+      </CardHeader>
+      <CardContent>
+        <ul className="space-y-1">
+          {lobby.players.map((player) => (
+            <PlayerRow
+              key={player.id}
+              player={player}
+              ownerPlayerId={lobby.ownerPlayerId}
+              isCurrentUser={player.id === userPlayerId}
+              showLeave={showLeave}
+              showRemovePlayer={showRemovePlayer}
+              showMakeOwner={showMakeOwner}
+              disabled={disabled}
+              onRemovePlayer={onRemovePlayer}
+              onTransferOwner={onTransferOwner}
+            />
+          ))}
+        </ul>
+      </CardContent>
+    </Card>
   );
 }

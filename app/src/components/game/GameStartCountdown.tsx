@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface Props {
   durationSeconds: number;
@@ -32,16 +33,20 @@ export function GameStartCountdown({ durationSeconds, onComplete }: Props) {
   }, [secondsLeft]);
 
   return (
-    <p className="text-muted-foreground">
-      {secondsLeft > 0 ? (
-        <>
-          Starting in <strong className="text-foreground">{secondsLeft}</strong>{" "}
-          second
-          {secondsLeft !== 1 ? "s" : ""}…
-        </>
-      ) : (
-        "Starting…"
-      )}
-    </p>
+    <Card className="mb-5">
+      <CardContent className="pt-6">
+        <p className="text-muted-foreground">
+          {secondsLeft > 0 ? (
+            <>
+              Starting in{" "}
+              <strong className="text-foreground">{secondsLeft}</strong> second
+              {secondsLeft !== 1 ? "s" : ""}…
+            </>
+          ) : (
+            "Starting…"
+          )}
+        </p>
+      </CardContent>
+    </Card>
   );
 }

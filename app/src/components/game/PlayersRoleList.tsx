@@ -7,6 +7,7 @@ import {
   ItemGroup,
   ItemTitle,
 } from "@/components/ui/item";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RoleLabel } from "./RoleLabel";
 
 interface Props {
@@ -18,20 +19,24 @@ export function PlayersRoleList({ assignments, gameMode }: Props) {
   if (assignments.length === 0) return null;
 
   return (
-    <div className="mb-5">
-      <h2 className="text-lg font-semibold mb-2">Player Roles</h2>
-      <ItemGroup>
-        {assignments.map((t) => (
-          <Item key={t.player.id} size="sm">
-            <ItemContent>
-              <ItemTitle>{t.player.name}</ItemTitle>
-            </ItemContent>
-            <ItemActions>
-              <RoleLabel role={t.role} gameMode={gameMode} />
-            </ItemActions>
-          </Item>
-        ))}
-      </ItemGroup>
-    </div>
+    <Card className="mb-5">
+      <CardHeader>
+        <CardTitle>Player Roles</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ItemGroup>
+          {assignments.map((t) => (
+            <Item key={t.player.id} size="sm">
+              <ItemContent>
+                <ItemTitle>{t.player.name}</ItemTitle>
+              </ItemContent>
+              <ItemActions>
+                <RoleLabel role={t.role} gameMode={gameMode} />
+              </ItemActions>
+            </Item>
+          ))}
+        </ItemGroup>
+      </CardContent>
+    </Card>
   );
 }

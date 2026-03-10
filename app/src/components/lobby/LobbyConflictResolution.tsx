@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import type { PublicLobby } from "@/server/models";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface LobbyConflictResolutionProps {
   conflictLobby: PublicLobby;
@@ -26,8 +26,11 @@ export function LobbyConflictResolution({
   const router = useRouter();
 
   return (
-    <Card>
-      <CardContent className="pt-6 space-y-4">
+    <Card className="mb-5">
+      <CardHeader>
+        <CardTitle>Lobby Conflict</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
         {conflictLobby.gameId ? (
           <p>You have an active game in lobby {conflictLobbyId}.</p>
         ) : (
@@ -47,7 +50,13 @@ export function LobbyConflictResolution({
           >
             {conflictLobby.gameId ? "Rejoin Game" : "Stay In Previous Lobby"}
           </Button>
-          <div className="flex gap-2 items-center">
+          <form
+            className="flex gap-2 items-center"
+            onSubmit={(e) => {
+              e.preventDefault();
+              onJoin();
+            }}
+          >
             <Input
               type="text"
               value={playerName}
@@ -59,12 +68,12 @@ export function LobbyConflictResolution({
               className="w-48"
             />
             <Button
-              onClick={onJoin}
+              type="submit"
               disabled={isJoining || playerName.trim() === ""}
             >
               {isJoining ? "Joining..." : "Leave and Join This Lobby"}
             </Button>
-          </div>
+          </form>
         </div>
       </CardContent>
     </Card>
