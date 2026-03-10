@@ -20,25 +20,31 @@ export default function OwnerDayScreen({
   isAdvancePending,
 }: Props) {
   const { phase } = turnState;
-  if (phase.type !== "daytime") return null;
+  const startedAt = phase.type === "daytime" ? phase.startedAt : null;
 
-  const startedAt = phase.startedAt;
   const [elapsedSeconds, setElapsedSeconds] = useState(
-    Math.floor((Date.now() - startedAt) / 1000),
+    startedAt !== null ? Math.floor((Date.now() - startedAt) / 1000) : 0,
   );
   const startedAtRef = useRef(startedAt);
 
   useEffect(() => {
     startedAtRef.current = startedAt;
+    if (startedAt === null) return;
     setElapsedSeconds(Math.floor((Date.now() - startedAt) / 1000));
 
     const interval = setInterval(() => {
-      setElapsedSeconds(Math.floor((Date.now() - startedAtRef.current) / 1000));
+      if (startedAtRef.current !== null) {
+        setElapsedSeconds(
+          Math.floor((Date.now() - startedAtRef.current) / 1000),
+        );
+      }
     }, 1000);
     return () => {
       clearInterval(interval);
     };
   }, [startedAt]);
+
+  if (phase.type !== "daytime") return null;
 
   const minutes = Math.floor(elapsedSeconds / 60);
   const secs = elapsedSeconds % 60;
