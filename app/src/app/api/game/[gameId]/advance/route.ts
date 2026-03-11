@@ -9,7 +9,7 @@ export async function POST(
   const { gameId } = await params;
   const sessionId = request.headers.get("x-session-id") ?? undefined;
 
-  const auth = authenticateGame(gameId, sessionId);
+  const auth = await authenticateGame(gameId, sessionId);
   if (auth instanceof Response) return auth;
   const { game, caller } = auth;
 
@@ -17,7 +17,7 @@ export async function POST(
     return errorResponse("Unauthorized", 403);
   }
 
-  const updated = gameService.advanceToPlaying(gameId);
+  const updated = await gameService.advanceToPlaying(gameId);
   if (!updated) {
     return errorResponse("Game cannot be advanced", 409);
   }

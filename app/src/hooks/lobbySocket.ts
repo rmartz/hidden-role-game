@@ -1,70 +1,69 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import PartySocket from "partysocket";
-import { getPlayerId } from "@/lib/api";
-import { LobbyChangeReason } from "@/server/types/websocket";
-import type { LobbySocketEvent } from "@/server/types/websocket";
+import { ref, onValue } from "firebase/database";
+import { getClientDatabase } from "@/lib/firebase/client";
 import type { PublicLobby } from "@/server/types";
-
-const PARTYKIT_HOST =
-  process.env["NEXT_PUBLIC_PARTYKIT_HOST"] ?? "localhost:1999";
+import type { FirebaseLobbyPublic } from "@/lib/firebase/schema";
+import { firebaseToPublicLobby } from "@/lib/firebase/schema";
+import { getPlayerId } from "@/lib/api";
 
 /**
- * Connects to the PartyKit lobby room and invalidates the React Query cache
- * when the server notifies us of lobby changes. PartySocket handles
- * reconnection automatically. Returns whether the connection is active.
+ * Subscribes to the lobby's public Firebase RTDB node and updates the
+ * TanStack Query cache directly, replacing both the PartyKit WebSocket and
+ * HTTP polling for lobby updates.
  */
 export function useLobbyWebSocket(
   lobbyId: string,
   sessionId: string | null,
 ): { isConnected: boolean } {
   const queryClient = useQueryClient();
-  const [isConnected, setIsConnected] = useState(false);
+  const isActive = useRef(false);
 
   useEffect(() => {
     if (!sessionId) return;
 
-    const socket = new PartySocket({
-      host: PARTYKIT_HOST,
-      party: "lobby",
-      room: lobbyId,
-    });
+    const db = getClientDatabase();
+    const lobbyPublicRef = ref(db, `lobbies/${lobbyId}/public`);
+    isActive.current = true;
 
-    socket.onopen = () => {
-      setIsConnected(true);
-    };
+    const unsubscribe = onValue(
+      lobbyPublicRef,
+      (snapshot) => {
+        if (!snapshot.exists()) return;
 
-    socket.onclose = () => {
-      setIsConnected(false);
-    };
+        const raw = snapshot.val() as FirebaseLobbyPublic;
+        const lobby = firebaseToPublicLobby(lobbyId, raw);
 
-    socket.onerror = (event) => {
-      console.error("[LobbySocket] Connection error", event);
-    };
+        const myPlayerId = getPlayerId();
+        const isOwner = lobby.ownerPlayerId === myPlayerId;
 
-    socket.onmessage = (event) => {
-      const message = JSON.parse(event.data as string) as LobbySocketEvent;
-
-      // The owner is the source of truth for config — skip re-fetching so
-      // local edits aren't overwritten by the server's echo.
-      if (message.reason === LobbyChangeReason.ConfigChanged) {
-        const cachedLobby = queryClient.getQueryData<PublicLobby>([
+        // The owner is the source of truth for config — skip updates that
+        // only reflect config changes so local edits aren't overwritten.
+        const cached = queryClient.getQueryData<PublicLobby>([
           "lobby",
           lobbyId,
         ]);
-        const myPlayerId = getPlayerId();
-        if (cachedLobby?.ownerPlayerId === myPlayerId) return;
-      }
+        if (isOwner && cached) {
+          const sameStructure =
+            JSON.stringify(cached.players) === JSON.stringify(lobby.players) &&
+            cached.gameId === lobby.gameId;
+          if (sameStructure) return;
+        }
 
-      void queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
-    };
+        queryClient.setQueryData(["lobby", lobbyId], lobby);
+      },
+      (error) => {
+        console.error("[FirebaseLobbySocket] Subscription error", error);
+      },
+    );
 
     return () => {
-      socket.close();
+      isActive.current = false;
+      unsubscribe();
     };
   }, [lobbyId, sessionId, queryClient]);
 
-  return { isConnected };
+  return { isConnected: !!sessionId };
 }

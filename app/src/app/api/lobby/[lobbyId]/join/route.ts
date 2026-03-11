@@ -1,5 +1,4 @@
 import { randomUUID } from "crypto";
-import type { LobbyPlayer } from "@/lib/types";
 import { ServerResponseStatus, type JoinLobbyRequest } from "@/server/types";
 import { lobbyService } from "@/services/LobbyService";
 import {
@@ -7,8 +6,6 @@ import {
   toPublicLobby,
   validatePlayerName,
 } from "@/server/utils";
-import { lobbyBroadcastService } from "@/services/LobbyBroadcastService";
-import { LobbyChangeReason } from "@/server/types/websocket";
 
 const MAX_LOBBY_PLAYERS = 100;
 
@@ -24,7 +21,7 @@ export async function POST(
     return errorResponse(nameError, 400);
   }
 
-  const lobby = lobbyService.getLobby(lobbyId);
+  const lobby = await lobbyService.getLobby(lobbyId);
 
   if (!lobby) {
     return errorResponse("Lobby not found", 404);
@@ -35,20 +32,22 @@ export async function POST(
   }
 
   const sessionId = randomUUID();
-  const newPlayer: LobbyPlayer = {
+  const newPlayer = {
     id: randomUUID(),
     name: body.playerName,
     sessionId,
   };
-  lobby.players.push(newPlayer);
 
-  lobbyBroadcastService.broadcast(lobbyId, LobbyChangeReason.PlayerJoined);
+  const updated = await lobbyService.addPlayer(lobbyId, newPlayer);
+  if (!updated) {
+    return errorResponse("Failed to join lobby", 500);
+  }
 
   return Response.json(
     {
       status: ServerResponseStatus.Success,
       data: {
-        lobby: toPublicLobby(lobby, sessionId),
+        lobby: toPublicLobby(updated, sessionId),
         sessionId,
         playerId: newPlayer.id,
       },

@@ -16,18 +16,18 @@ interface LobbyAuthOptions {
   requireNoGame?: boolean;
 }
 
-export function authenticateLobby(
+export async function authenticateLobby(
   lobbyId: string,
   sessionId: string | undefined,
   options: LobbyAuthOptions = {},
-): Response | { lobby: Lobby; sessionId: string } {
+): Promise<Response | { lobby: Lobby; sessionId: string }> {
   const { requireOwner = false, requireNoGame = false } = options;
 
   if (!sessionId) {
     return errorResponse("No session", 401);
   }
 
-  const lobby = lobbyService.getLobby(lobbyId);
+  const lobby = await lobbyService.getLobby(lobbyId);
   if (!lobby) {
     return errorResponse("Lobby not found", 404);
   }
@@ -47,15 +47,15 @@ export function authenticateLobby(
   return { lobby, sessionId };
 }
 
-export function authenticateGame(
+export async function authenticateGame(
   gameId: string,
   sessionId: string | undefined,
-): Response | { game: Game; caller: GamePlayer } {
+): Promise<Response | { game: Game; caller: GamePlayer }> {
   if (!sessionId) {
     return errorResponse("No session", 401);
   }
 
-  const game = gameService.getGame(gameId);
+  const game = await gameService.getGame(gameId);
   const caller = game?.players.find((p) => p.sessionId === sessionId);
 
   if (!game || !caller) {

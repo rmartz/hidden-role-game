@@ -1,10 +1,5 @@
 import { randomUUID } from "crypto";
-import {
-  GameMode,
-  RoleConfigMode,
-  ShowRolesInPlay,
-  type LobbyPlayer,
-} from "@/lib/types";
+import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
 import { getDefaultRoleSlots } from "@/lib/game-modes";
 import { ServerResponseStatus, type CreateLobbyRequest } from "@/server/types";
 import { lobbyService } from "@/services/LobbyService";
@@ -22,20 +17,8 @@ export async function POST(request: Request): Promise<Response> {
     return errorResponse(nameError, 400);
   }
 
-  const lobbyId = randomUUID();
-
-  if (lobbyService.getLobby(lobbyId)) {
-    return Response.json(
-      {
-        status: ServerResponseStatus.Error,
-        error: "An unknown error occurred",
-      },
-      { status: 500 },
-    );
-  }
-
   const sessionId = randomUUID();
-  const owner: LobbyPlayer = {
+  const owner = {
     id: randomUUID(),
     name: body.playerName,
     sessionId,
@@ -43,7 +26,7 @@ export async function POST(request: Request): Promise<Response> {
 
   const defaultGameMode = GameMode.SecretVillain;
   const lobby = {
-    id: lobbyId,
+    id: randomUUID(),
     ownerSessionId: sessionId,
     players: [owner],
     config: {
@@ -55,7 +38,8 @@ export async function POST(request: Request): Promise<Response> {
     },
   };
 
-  lobbyService.addLobby(lobby);
+  await lobbyService.addLobby(lobby);
+
   return Response.json({
     status: ServerResponseStatus.Success,
     data: {

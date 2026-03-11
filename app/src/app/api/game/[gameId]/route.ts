@@ -9,13 +9,15 @@ export async function GET(
   const { gameId } = await params;
   const sessionId = request.headers.get("x-session-id") ?? undefined;
 
-  const auth = authenticateGame(gameId, sessionId);
+  const auth = await authenticateGame(gameId, sessionId);
   if (auth instanceof Response) return auth;
-  const { game, caller } = auth;
 
-  const gameState = gameService.getPlayerGameState(game, caller.id);
+  const gameState = await gameService.getPlayerGameStateBySession(
+    gameId,
+    auth.caller.sessionId,
+  );
   if (!gameState) {
-    return errorResponse("Role not assigned", 500);
+    return errorResponse("Game state not found", 500);
   }
 
   return Response.json({

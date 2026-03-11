@@ -10,6 +10,7 @@ export default defineConfig({
           environment: "node",
           include: ["src/**/*.test.ts"],
           exclude: ["src/hooks/**/*.test.ts"],
+          setupFiles: ["src/test-setup/firebase-admin-mock.ts"],
         },
         resolve: { alias: { "@": path.resolve(__dirname, "./src") } },
       },

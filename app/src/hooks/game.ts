@@ -1,15 +1,24 @@
 "use client";
 
+import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ref, onValue } from "firebase/database";
+import { getClientDatabase } from "@/lib/firebase/client";
 import {
   startGame,
-  getGameState,
   advanceGame,
   applyGameAction,
+  getGameState,
 } from "@/lib/api";
 import { ServerResponseStatus } from "@/server/types";
+import type { PlayerGameState } from "@/server/types";
 import type { GameMode } from "@/lib/types";
 import type { RoleSlot } from "@/server/types";
+import {
+  firebaseToPlayerState,
+  type FirebasePlayerState,
+} from "@/lib/firebase/schema";
+import { getSessionId } from "@/lib/api";
 
 export function useStartGame(lobbyId: string) {
   const queryClient = useQueryClient();
@@ -28,7 +37,40 @@ export function useStartGame(lobbyId: string) {
   });
 }
 
+/**
+ * Subscribes to the player's own pre-computed game state in Firebase RTDB,
+ * updating the TanStack Query cache directly for real-time updates without polling.
+ * Falls back to HTTP fetch for the initial load while Firebase connects.
+ */
 export function useGameStateQuery(gameId: string, refetchInterval?: number) {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const sessionId = getSessionId();
+    if (!sessionId) return;
+
+    const db = getClientDatabase();
+    const stateRef = ref(db, `games/${gameId}/playerState/${sessionId}`);
+
+    const unsubscribe = onValue(
+      stateRef,
+      (snapshot) => {
+        if (!snapshot.exists()) return;
+        const state = firebaseToPlayerState(
+          snapshot.val() as FirebasePlayerState,
+        );
+        queryClient.setQueryData<PlayerGameState>(["game", gameId], state);
+      },
+      (error) => {
+        console.error("[FirebaseGameState] Subscription error", error);
+      },
+    );
+
+    return () => {
+      unsubscribe();
+    };
+  }, [gameId, queryClient]);
+
   return useQuery({
     queryKey: ["game", gameId],
     queryFn: async () => {

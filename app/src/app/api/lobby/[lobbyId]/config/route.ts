@@ -8,8 +8,6 @@ import {
   errorResponse,
   toPublicLobby,
 } from "@/server/utils";
-import { lobbyBroadcastService } from "@/services/LobbyBroadcastService";
-import { LobbyChangeReason } from "@/server/types/websocket";
 
 export async function PUT(
   request: Request,
@@ -18,7 +16,7 @@ export async function PUT(
   const { lobbyId } = await params;
   const sessionId = request.headers.get("x-session-id") ?? undefined;
 
-  const auth = authenticateLobby(lobbyId, sessionId, {
+  const auth = await authenticateLobby(lobbyId, sessionId, {
     requireOwner: true,
     requireNoGame: true,
   });
@@ -42,12 +40,10 @@ export async function PUT(
     }
   }
 
-  const updated = lobbyService.updateConfig(lobbyId, body);
+  const updated = await lobbyService.updateConfig(lobbyId, body);
   if (!updated) {
     return errorResponse("Failed to update config", 500);
   }
-
-  lobbyBroadcastService.broadcast(lobbyId, LobbyChangeReason.ConfigChanged);
 
   return Response.json({
     status: ServerResponseStatus.Success,

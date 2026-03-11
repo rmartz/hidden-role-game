@@ -14,6 +14,17 @@ import { createWrapper } from "./test-utils";
 vi.mock("@/lib/api", () => ({
   startGame: vi.fn(),
   getGameState: vi.fn(),
+  getSessionId: vi.fn().mockReturnValue("session-1"),
+}));
+
+vi.mock("firebase/database", () => ({
+  ref: vi.fn(),
+  onValue: vi.fn(() => () => undefined),
+  off: vi.fn(),
+}));
+
+vi.mock("@/lib/firebase/client", () => ({
+  getClientDatabase: vi.fn(() => ({})),
 }));
 
 import * as api from "@/lib/api";

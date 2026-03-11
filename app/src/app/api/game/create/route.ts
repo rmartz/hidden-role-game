@@ -9,8 +9,6 @@ import {
   toPublicLobby,
 } from "@/server/utils";
 import { getRoleSlotsRequired } from "@/lib/game-modes";
-import { lobbyBroadcastService } from "@/services/LobbyBroadcastService";
-import { LobbyChangeReason } from "@/server/types/websocket";
 
 export async function POST(request: Request): Promise<Response> {
   const sessionId = request.headers.get("x-session-id") ?? undefined;
@@ -21,7 +19,7 @@ export async function POST(request: Request): Promise<Response> {
     return errorResponse("Unknown game mode", 400);
   }
 
-  const auth = authenticateLobby(lobbyId, sessionId, {
+  const auth = await authenticateLobby(lobbyId, sessionId, {
     requireOwner: true,
     requireNoGame: true,
   });
@@ -49,7 +47,7 @@ export async function POST(request: Request): Promise<Response> {
     ? (lobby.players.find((p) => p.sessionId === lobby.ownerSessionId) ?? null)
     : null;
 
-  const game = gameService.createGame(
+  const game = await gameService.createGame(
     lobbyId,
     lobby.players,
     roleSlots,
@@ -57,12 +55,11 @@ export async function POST(request: Request): Promise<Response> {
     lobby.config.showRolesInPlay,
     ownerPlayer?.id ?? null,
   );
-  const updated = lobbyService.setGameId(lobbyId, game.id);
+
+  const updated = await lobbyService.setGameId(lobbyId, game.id);
   if (!updated) {
     return errorResponse("Failed to start game", 500);
   }
-
-  lobbyBroadcastService.broadcast(lobbyId, LobbyChangeReason.GameStarted);
 
   return Response.json({
     status: ServerResponseStatus.Success,
