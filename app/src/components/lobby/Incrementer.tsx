@@ -29,16 +29,16 @@ export function Incrementer({
     <>
       <Button
         variant="outline"
-        size="icon"
+        size="icon-xs"
         onClick={handleDecrement}
         disabled={disabled ?? (minValue !== undefined && value <= minValue)}
       >
         −
       </Button>
-      <span className="w-6 text-center text-sm">{value}</span>
+      <span className="w-4 text-center text-xs">{value}</span>
       <Button
         variant="outline"
-        size="icon"
+        size="icon-xs"
         onClick={handleIncrement}
         disabled={disabled ?? (maxValue !== undefined && value >= maxValue)}
       >

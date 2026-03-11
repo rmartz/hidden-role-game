@@ -7,6 +7,7 @@ import {
   FieldContent,
   FieldDescription,
   FieldGroup,
+  FieldLabel,
   FieldTitle,
 } from "@/components/ui/field";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -24,7 +25,8 @@ const SHOW_ROLES_OPTIONS: {
   {
     value: ShowRolesInPlay.ConfiguredOnly,
     title: "Configured only",
-    description: "Players see the roles the owner configured, without counts.",
+    description:
+      "Players see what roles that could be in the game, without counts.",
   },
   {
     value: ShowRolesInPlay.AssignedRolesOnly,
@@ -57,7 +59,7 @@ export function ShowRolesInPlayPicker({ value, disabled, onChange }: Props) {
       >
         <FieldGroup>
           {SHOW_ROLES_OPTIONS.map((opt) => (
-            <Label key={opt.value} htmlFor={opt.value}>
+            <FieldLabel key={opt.value} htmlFor={opt.value}>
               <Field orientation="horizontal">
                 <FieldContent>
                   <FieldTitle>{opt.title}</FieldTitle>
@@ -65,7 +67,7 @@ export function ShowRolesInPlayPicker({ value, disabled, onChange }: Props) {
                 </FieldContent>
                 <RadioGroupItem value={opt.value} id={opt.value} />
               </Field>
-            </Label>
+            </FieldLabel>
           ))}
         </FieldGroup>
       </RadioGroup>

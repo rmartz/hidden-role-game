@@ -64,8 +64,12 @@ export function RoleConfigEntry(props: Props) {
     );
   }
 
+  const isAdvanced = !readOnly && roleConfigMode === RoleConfigMode.Advanced;
+
   return (
-    <li className="flex items-center gap-2 py-1">
+    <li
+      className={`py-1 ${isAdvanced ? "flex flex-col gap-1" : "flex items-start gap-2"}`}
+    >
       <span className="min-w-40">
         <RoleLabel role={role} gameMode={gameMode} />
       </span>
@@ -78,22 +82,26 @@ export function RoleConfigEntry(props: Props) {
           <span className="text-sm">{props.min}</span>
         )
       ) : roleConfigMode === RoleConfigMode.Advanced ? (
-        <>
-          <span className="text-sm text-muted-foreground">Min:</span>
-          <Incrementer
-            value={min}
-            onChange={handleMinChange}
-            disabled={props.disabled}
-            minValue={0}
-          />
-          <span className="text-sm text-muted-foreground ml-2">Max:</span>
-          <Incrementer
-            value={max}
-            onChange={handleMaxChange}
-            disabled={props.disabled}
-            minValue={0}
-          />
-        </>
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm text-muted-foreground">Min:</span>
+            <Incrementer
+              value={min}
+              onChange={handleMinChange}
+              disabled={props.disabled}
+              minValue={0}
+            />
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm text-muted-foreground">Max:</span>
+            <Incrementer
+              value={max}
+              onChange={handleMaxChange}
+              disabled={props.disabled}
+              minValue={0}
+            />
+          </div>
+        </div>
       ) : roleConfigMode === RoleConfigMode.Custom ? (
         <Incrementer
           value={count}
