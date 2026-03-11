@@ -20,23 +20,26 @@ const SHOW_ROLES_OPTIONS: {
   {
     value: ShowRolesInPlay.None,
     title: "None",
-    description: "Players cannot see which roles are in the game.",
+    description:
+      "Players cannot see which roles were configured for this game.",
   },
   {
     value: ShowRolesInPlay.ConfiguredOnly,
     title: "Configured only",
-    description: "Players see what roles could be in the game, without counts.",
+    description:
+      "Players see which roles were configured, but not if they were assigned or how many are in play.",
   },
   {
     value: ShowRolesInPlay.AssignedRolesOnly,
     title: "Assigned roles",
     description:
-      "Players see what roles were assigned, but not how many of each.",
+      "Players see which roles were assigned, but not how many are in play.",
   },
   {
     value: ShowRolesInPlay.RoleAndCount,
     title: "Role and count",
-    description: "Players see each role and how many copies are in play.",
+    description:
+      "Players see how many of each roles were assigned for the game.",
   },
 ];
 
