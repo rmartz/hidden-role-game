@@ -1,7 +1,7 @@
 import { sum } from "lodash";
-import type { GameMode, RoleDefinition, Team } from "@/lib/models";
-import { RoleConfigMode } from "@/lib/models";
-import type { RoleSlot } from "@/server/models";
+import type { GameMode, RoleDefinition, Team } from "@/lib/types";
+import { RoleConfigMode } from "@/lib/types";
+import type { RoleSlot } from "@/server/types";
 import { useAppSelector } from "@/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RoleConfigEntry } from "./RoleConfigEntry";

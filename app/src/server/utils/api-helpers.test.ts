@@ -4,14 +4,14 @@ import {
   authenticateLobby,
   authenticateGame,
 } from "./api-helpers";
-import { ServerResponseStatus } from "@/server/models";
+import { ServerResponseStatus } from "@/server/types";
 import {
   GameMode,
   GameStatus,
   RoleConfigMode,
   ShowRolesInPlay,
-} from "@/lib/models";
-import type { Lobby, Game, GamePlayer } from "@/lib/models";
+} from "@/lib/types";
+import type { Lobby, Game, GamePlayer } from "@/lib/types";
 
 const { mockGetLobby, mockGetGame } = vi.hoisted(() => ({
   mockGetLobby: vi.fn(),

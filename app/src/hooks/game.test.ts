@@ -6,9 +6,9 @@ import {
   RoleConfigMode,
   ShowRolesInPlay,
   Team,
-} from "@/lib/models";
-import { ServerResponseStatus } from "@/server/models";
-import type { PlayerGameState, PublicLobby } from "@/server/models";
+} from "@/lib/types";
+import { ServerResponseStatus } from "@/server/types";
+import type { PlayerGameState, PublicLobby } from "@/server/types";
 import { createWrapper } from "./test-utils";
 
 vi.mock("@/lib/api", () => ({

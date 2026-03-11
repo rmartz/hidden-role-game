@@ -1,5 +1,5 @@
-import type { GameMode } from "@/lib/models";
-import type { RoleInPlay } from "@/server/models";
+import type { GameMode } from "@/lib/types";
+import type { RoleInPlay } from "@/server/types";
 import { Item, ItemContent, ItemGroup, ItemTitle } from "@/components/ui/item";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RoleLabel } from "@/components/RoleLabel";

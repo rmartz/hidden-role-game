@@ -1,6 +1,6 @@
 "use client";
 
-import type { PlayerGameState } from "@/server/models";
+import type { PlayerGameState } from "@/server/types";
 import { WerewolfOwnerScreen } from "./WerewolfOwnerScreen";
 import { WerewolfPlayerScreen } from "./WerewolfPlayerScreen";
 

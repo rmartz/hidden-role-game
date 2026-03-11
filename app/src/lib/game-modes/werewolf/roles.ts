@@ -1,5 +1,5 @@
-import { Team } from "@/lib/models";
-import type { RoleDefinition, RoleSlot } from "@/lib/models";
+import { Team } from "@/lib/types";
+import type { RoleDefinition, RoleSlot } from "@/lib/types";
 import { WakesAtNight } from "./types";
 
 export enum WerewolfRole {

@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef } from "react";
 import { throttle } from "lodash";
-import { RoleConfigMode } from "@/lib/models";
+import { RoleConfigMode } from "@/lib/types";
 import { useAppSelector } from "@/store";
 import { useUpdateLobbyConfig } from "./lobby";
 

@@ -1,8 +1,8 @@
 import { randomUUID } from "crypto";
-import { GameMode, ShowRolesInPlay } from "@/lib/models";
-import type { LobbyPlayer } from "@/lib/models";
-import type { RoleSlot } from "@/server/models";
-import { ServerResponseStatus } from "@/server/models";
+import { GameMode, ShowRolesInPlay } from "@/lib/types";
+import type { LobbyPlayer } from "@/lib/types";
+import type { RoleSlot } from "@/server/types";
+import { ServerResponseStatus } from "@/server/types";
 import { gameService } from "@/services/GameService";
 import { errorResponse } from "@/server/utils";
 import { getRoleSlotsRequired } from "@/lib/game-modes";

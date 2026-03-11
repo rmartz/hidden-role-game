@@ -1,5 +1,5 @@
 import type * as Party from "partykit/server";
-import type { LobbySocketEvent } from "../src/server/models/websocket";
+import type { LobbySocketEvent } from "../src/server/types/websocket";
 
 /**
  * PartyKit room server for lobby real-time notifications.

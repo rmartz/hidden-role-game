@@ -1,6 +1,6 @@
 "use client";
 
-import { RoleConfigMode } from "@/lib/models";
+import { RoleConfigMode } from "@/lib/types";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { setRoleConfigMode } from "@/store/gameConfigSlice";
 import { Label } from "@/components/ui/label";

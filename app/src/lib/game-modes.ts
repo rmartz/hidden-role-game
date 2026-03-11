@@ -1,5 +1,5 @@
-import { GameMode } from "@/lib/models";
-import type { GameModeConfig, RoleSlot } from "@/lib/models";
+import { GameMode } from "@/lib/types";
+import type { GameModeConfig, RoleSlot } from "@/lib/types";
 import { SECRET_VILLAIN_CONFIG } from "@/lib/game-modes/secret-villain";
 import { AVALON_CONFIG } from "@/lib/game-modes/avalon";
 import { WEREWOLF_CONFIG } from "@/lib/game-modes/werewolf";

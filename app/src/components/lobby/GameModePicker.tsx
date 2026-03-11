@@ -1,6 +1,6 @@
 "use client";
 
-import { GameMode } from "@/lib/models";
+import { GameMode } from "@/lib/types";
 import { GAME_MODES } from "@/lib/game-modes";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { setGameMode } from "@/store/gameConfigSlice";

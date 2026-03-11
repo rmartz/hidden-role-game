@@ -1,4 +1,4 @@
-import type { GameMode } from "@/lib/models";
+import type { GameMode } from "@/lib/types";
 import type {
   ServerResponse,
   PublicLobby,
@@ -6,8 +6,8 @@ import type {
   RoleSlot,
   PlayerGameState,
   UpdateLobbyConfigRequest,
-} from "@/server/models";
-import { ServerResponseStatus } from "@/server/models";
+} from "@/server/types";
+import { ServerResponseStatus } from "@/server/types";
 
 const SESSION_KEY = "x-session-id";
 const PLAYER_ID_KEY = "player-id";
@@ -56,7 +56,7 @@ function saveJoinData(
   saveLobbyId(lobbyId);
 }
 
-export type { PublicLobbyPlayer } from "@/server/models";
+export type { PublicLobbyPlayer } from "@/server/types";
 
 export async function createLobby(
   playerName: string,

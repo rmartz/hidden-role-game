@@ -1,5 +1,5 @@
-import type { LobbyPlayer, PlayerRoleAssignment } from "@/lib/models";
-import type { RoleSlot } from "@/server/models";
+import type { LobbyPlayer, PlayerRoleAssignment } from "@/lib/types";
+import type { RoleSlot } from "@/server/types";
 
 /**
  * Assigns roles to players using required + possible slot logic.

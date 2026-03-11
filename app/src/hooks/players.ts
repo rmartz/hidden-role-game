@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { removePlayer, transferOwner } from "@/lib/api";
-import { ServerResponseStatus } from "@/server/models";
+import { ServerResponseStatus } from "@/server/types";
 
 export function useRemovePlayer(
   lobbyId: string,

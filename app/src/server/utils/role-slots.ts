@@ -1,4 +1,4 @@
-import type { RoleSlot } from "@/lib/models";
+import type { RoleSlot } from "@/lib/types";
 
 /**
  * Adjusts role slots by one step toward the target distribution.

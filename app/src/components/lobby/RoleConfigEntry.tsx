@@ -1,5 +1,5 @@
-import type { GameMode, RoleDefinition, Team } from "@/lib/models";
-import { RoleConfigMode } from "@/lib/models";
+import type { GameMode, RoleDefinition, Team } from "@/lib/types";
+import { RoleConfigMode } from "@/lib/types";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   incrementRoleCount,

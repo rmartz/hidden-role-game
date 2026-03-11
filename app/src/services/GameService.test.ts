@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { GameService } from "./GameService";
-import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/models";
-import type { Game, GamePlayer, RoleSlot } from "@/lib/models";
+import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
+import type { Game, GamePlayer, RoleSlot } from "@/lib/types";
 
 const DEFAULT_SLOTS: RoleSlot[] = [
   { roleId: "good", min: 1, max: 1 },

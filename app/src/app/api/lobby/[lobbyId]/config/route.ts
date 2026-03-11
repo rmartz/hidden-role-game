@@ -1,6 +1,6 @@
-import { GameMode } from "@/lib/models";
-import { ServerResponseStatus } from "@/server/models";
-import type { UpdateLobbyConfigRequest } from "@/server/models";
+import { GameMode } from "@/lib/types";
+import { ServerResponseStatus } from "@/server/types";
+import type { UpdateLobbyConfigRequest } from "@/server/types";
 import { lobbyService } from "@/services/LobbyService";
 import { gameService } from "@/services/GameService";
 import {
@@ -9,7 +9,7 @@ import {
   toPublicLobby,
 } from "@/server/utils";
 import { lobbyBroadcastService } from "@/services/LobbyBroadcastService";
-import { LobbyChangeReason } from "@/server/models/websocket";
+import { LobbyChangeReason } from "@/server/types/websocket";
 
 export async function PUT(
   request: Request,

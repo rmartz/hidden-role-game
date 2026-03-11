@@ -1,4 +1,4 @@
-import type { PublicLobby } from "@/server/models";
+import type { PublicLobby } from "@/server/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlayerRow } from "./PlayerRow";

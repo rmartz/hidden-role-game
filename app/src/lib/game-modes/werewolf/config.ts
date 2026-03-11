@@ -1,6 +1,6 @@
 import { sum } from "lodash";
-import { Team } from "@/lib/models";
-import type { GameModeConfig } from "@/lib/models";
+import { Team } from "@/lib/types";
+import type { GameModeConfig } from "@/lib/types";
 import { MIN_PLAYERS, defaultRoleCount, WEREWOLF_ROLES } from "./roles";
 import { WEREWOLF_ACTIONS } from "./actions";
 

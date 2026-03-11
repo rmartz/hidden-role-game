@@ -1,6 +1,6 @@
 import { GAME_MODES } from "@/lib/game-modes";
-import type { GameMode } from "@/lib/models";
-import type { PublicRoleInfo } from "@/server/models";
+import type { GameMode } from "@/lib/types";
+import type { PublicRoleInfo } from "@/server/types";
 import { Badge } from "@/components/ui/badge";
 
 interface Props {

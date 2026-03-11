@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { isValidSession, toPublicLobby } from "./lobby-helpers";
-import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/models";
-import type { Lobby } from "@/lib/models";
+import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
+import type { Lobby } from "@/lib/types";
 
 function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
   return {

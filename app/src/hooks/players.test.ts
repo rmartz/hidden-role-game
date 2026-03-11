@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
-import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/models";
-import { ServerResponseStatus } from "@/server/models";
-import type { PublicLobby } from "@/server/models";
+import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
+import { ServerResponseStatus } from "@/server/types";
+import type { PublicLobby } from "@/server/types";
 import { createWrapper } from "./test-utils";
 
 const mockLobby: PublicLobby = {

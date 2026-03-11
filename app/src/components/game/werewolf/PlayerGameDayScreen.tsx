@@ -1,6 +1,6 @@
 "use client";
 
-import type { PlayerGameState } from "@/server/models";
+import type { PlayerGameState } from "@/server/types";
 import { GameRolesList, PlayersRoleList, RoleLabel } from "@/components/game";
 
 interface Props {

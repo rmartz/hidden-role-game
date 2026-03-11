@@ -1,5 +1,5 @@
-import { Team } from "@/lib/models";
-import type { GameModeConfig } from "@/lib/models";
+import { Team } from "@/lib/types";
+import type { GameModeConfig } from "@/lib/types";
 import { MIN_PLAYERS, defaultRoleCount, SECRET_VILLAIN_ROLES } from "./roles";
 
 export const SECRET_VILLAIN_CONFIG = {

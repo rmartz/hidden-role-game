@@ -3,7 +3,7 @@ import type {
   RoleSlot,
   RoleConfigMode,
   ShowRolesInPlay,
-} from "@/lib/models";
+} from "@/lib/types";
 
 export interface PublicLobbyPlayer {
   id: string;

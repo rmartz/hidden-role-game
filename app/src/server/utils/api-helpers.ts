@@ -1,5 +1,5 @@
-import type { Lobby, Game, GamePlayer } from "@/lib/models";
-import { ServerResponseStatus } from "@/server/models";
+import type { Lobby, Game, GamePlayer } from "@/lib/types";
+import { ServerResponseStatus } from "@/server/types";
 import { lobbyService } from "@/services/LobbyService";
 import { gameService } from "@/services/GameService";
 import { isValidSession } from "./lobby-helpers";

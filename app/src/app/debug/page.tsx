@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/models";
-import type { GameConfig, RoleSlot } from "@/server/models";
+import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
+import type { GameConfig, RoleSlot } from "@/server/types";
 import { GameConfigurationPanel } from "@/components/lobby";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";

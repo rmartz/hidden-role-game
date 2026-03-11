@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { GameMode, RoleConfigMode } from "@/lib/models";
+import { GameMode, RoleConfigMode } from "@/lib/types";
 import { GAME_MODES, getRoleSlotsRequired } from "@/lib/game-modes";
-import type { GameConfig, RoleSlot } from "@/server/models";
+import type { GameConfig, RoleSlot } from "@/server/types";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   loadConfig,

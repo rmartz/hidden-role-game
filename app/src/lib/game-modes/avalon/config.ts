@@ -1,5 +1,5 @@
-import { Team } from "@/lib/models";
-import type { GameModeConfig } from "@/lib/models";
+import { Team } from "@/lib/types";
+import type { GameModeConfig } from "@/lib/types";
 import { MIN_PLAYERS, defaultRoleCount, AVALON_ROLES } from "./roles";
 
 export const AVALON_CONFIG = {

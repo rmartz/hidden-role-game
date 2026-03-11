@@ -1,4 +1,4 @@
-import type { PublicLobbyPlayer } from "@/server/models";
+import type { PublicLobbyPlayer } from "@/server/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 

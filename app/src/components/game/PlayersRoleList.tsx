@@ -1,5 +1,5 @@
-import type { GameMode } from "@/lib/models";
-import type { VisibleTeammate } from "@/server/models";
+import type { GameMode } from "@/lib/types";
+import type { VisibleTeammate } from "@/server/types";
 import {
   Item,
   ItemActions,

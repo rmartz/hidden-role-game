@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { GameStatus, GameMode, ShowRolesInPlay } from "@/lib/models";
+import { GameStatus, GameMode, ShowRolesInPlay } from "@/lib/types";
 import type {
   Game,
   GameModeConfig,
@@ -9,12 +9,12 @@ import type {
   RoleDefinition,
   RoleSlot,
   Team,
-} from "@/lib/models";
+} from "@/lib/types";
 import type {
   RoleInPlay,
   PublicRoleInfo,
   PlayerGameState,
-} from "@/server/models";
+} from "@/server/types";
 import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase, buildNightPhaseOrder } from "@/lib/game-modes/werewolf";
 import type {

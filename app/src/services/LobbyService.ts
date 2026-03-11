@@ -4,7 +4,7 @@ import type {
   RoleSlot,
   RoleConfigMode,
   ShowRolesInPlay,
-} from "@/lib/models";
+} from "@/lib/types";
 
 export class LobbyService {
   private lobbies: Record<string, Lobby> = {};

@@ -1,4 +1,4 @@
-import { ServerResponseStatus } from "@/server/models";
+import { ServerResponseStatus } from "@/server/types";
 import { gameService } from "@/services/GameService";
 import { authenticateGame, errorResponse } from "@/server/utils";
 

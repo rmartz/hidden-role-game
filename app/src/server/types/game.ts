@@ -1,4 +1,4 @@
-import type { GameStatusState, GameMode, RoleSlot, Team } from "@/lib/models";
+import type { GameStatusState, GameMode, RoleSlot, Team } from "@/lib/types";
 import type { PublicLobbyPlayer } from "./lobby";
 
 export type { RoleSlot };

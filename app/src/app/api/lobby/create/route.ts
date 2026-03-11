@@ -4,9 +4,9 @@ import {
   RoleConfigMode,
   ShowRolesInPlay,
   type LobbyPlayer,
-} from "@/lib/models";
+} from "@/lib/types";
 import { getDefaultRoleSlots } from "@/lib/game-modes";
-import { ServerResponseStatus, type CreateLobbyRequest } from "@/server/models";
+import { ServerResponseStatus, type CreateLobbyRequest } from "@/server/types";
 import { lobbyService } from "@/services/LobbyService";
 import { toPublicLobby } from "@/server/utils";
 

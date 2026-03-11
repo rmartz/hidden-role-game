@@ -1,6 +1,6 @@
 "use client";
 
-import { ShowRolesInPlay } from "@/lib/models";
+import { ShowRolesInPlay } from "@/lib/types";
 import { Label } from "@/components/ui/label";
 import {
   Field,

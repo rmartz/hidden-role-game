@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/models";
-import type { Game } from "@/lib/models";
+import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
+import type { Game } from "@/lib/types";
 import { WerewolfPhase } from "./types";
 import type { WerewolfTurnState } from "./types";
 import { WerewolfRole } from "./roles";

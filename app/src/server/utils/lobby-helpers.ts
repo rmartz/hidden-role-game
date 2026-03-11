@@ -1,5 +1,5 @@
-import type { Lobby } from "@/lib/models";
-import type { PublicLobby } from "@/server/models";
+import type { Lobby } from "@/lib/types";
+import type { PublicLobby } from "@/server/types";
 
 export function isValidSession(lobby: Lobby, sessionId: string): boolean {
   return lobby.players.some((p) => p.sessionId === sessionId);

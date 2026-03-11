@@ -1,9 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { sum } from "lodash";
-import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/models";
-import type { RoleSlot } from "@/lib/models";
-import type { GameConfig } from "@/server/models";
+import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
+import type { RoleSlot } from "@/lib/types";
+import type { GameConfig } from "@/server/types";
 import { GAME_MODES } from "@/lib/game-modes";
 
 function computeIsValid(

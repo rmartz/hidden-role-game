@@ -1,4 +1,4 @@
-import { ServerResponseStatus } from "@/server/models";
+import { ServerResponseStatus } from "@/server/types";
 import {
   authenticateLobby,
   errorResponse,
@@ -6,7 +6,7 @@ import {
 } from "@/server/utils";
 import { lobbyService } from "@/services/LobbyService";
 import { lobbyBroadcastService } from "@/services/LobbyBroadcastService";
-import { LobbyChangeReason } from "@/server/models/websocket";
+import { LobbyChangeReason } from "@/server/types/websocket";
 
 export async function PUT(
   request: Request,

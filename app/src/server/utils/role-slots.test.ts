@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { adjustRoleSlots } from "./role-slots";
-import type { RoleSlot } from "@/lib/models";
+import type { RoleSlot } from "@/lib/types";
 
 describe("adjustRoleSlots", () => {
   describe("add", () => {

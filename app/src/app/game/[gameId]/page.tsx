@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { GameStatus } from "@/lib/models";
+import { GameStatus } from "@/lib/types";
 import { useGameStateQuery } from "@/hooks";
 import { WerewolfGameScreen } from "@/components/game";
 
