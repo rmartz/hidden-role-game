@@ -1,15 +1,13 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/models";
+import { GameMode, RoleConfigMode } from "@/lib/models";
 import { GAME_MODES } from "@/lib/game-modes";
 import type { GameConfig, RoleSlot } from "@/server/models";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   loadConfig,
-  setGameMode,
   setPlayerCount,
-  setRoleConfigMode,
   setShowConfigToPlayers,
   setShowRolesInPlay,
 } from "@/store/gameConfigSlice";
@@ -17,55 +15,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldGroup,
-  FieldTitle,
-} from "@/components/ui/field";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { RoleConfig } from "./RoleConfig";
-
-const GAME_MODE_VALUES = new Set<string>(Object.values(GameMode));
-function isGameMode(value: string | null): value is GameMode {
-  return value !== null && GAME_MODE_VALUES.has(value);
-}
-
-const SHOW_ROLES_OPTIONS: {
-  value: ShowRolesInPlay;
-  title: string;
-  description: string;
-}[] = [
-  {
-    value: ShowRolesInPlay.None,
-    title: "None",
-    description: "Players cannot see which roles are in the game.",
-  },
-  {
-    value: ShowRolesInPlay.ConfiguredOnly,
-    title: "Configured only",
-    description: "Players see the roles the owner configured, without counts.",
-  },
-  {
-    value: ShowRolesInPlay.AssignedRolesOnly,
-    title: "Assigned roles",
-    description: "Players see only the roles that were actually assigned.",
-  },
-  {
-    value: ShowRolesInPlay.RoleAndCount,
-    title: "Role and count",
-    description: "Players see each role and how many copies are in play.",
-  },
-];
+import { GameModePicker } from "./GameModePicker";
+import { ShowRolesInPlayPicker } from "./ShowRolesInPlayPicker";
 
 interface ReadOnlyProps {
   config: GameConfig;
@@ -143,26 +95,7 @@ export function GameConfigurationPanel(props: Props) {
           Game Mode: <strong>{GAME_MODES[config.gameMode].name}</strong>
         </p>
       ) : (
-        <div className="space-y-1">
-          <Label>Game Mode</Label>
-          <Select
-            value={selectedGameMode}
-            onValueChange={(value) => {
-              if (isGameMode(value)) dispatch(setGameMode(value));
-            }}
-          >
-            <SelectTrigger className="w-48">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.values(GameMode).map((mode) => (
-                <SelectItem key={mode} value={mode}>
-                  {GAME_MODES[mode].name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <GameModePicker />
       )}
       <Card className="mb-5">
         <CardHeader>
@@ -189,35 +122,17 @@ export function GameConfigurationPanel(props: Props) {
                 Show game configuration to all players
               </Label>
             </div>
-            <div className="space-y-1">
-              <Label>Show roles in play</Label>
-              <RadioGroup
-                value={readOnly ? config.showRolesInPlay : showRolesInPlay}
-                disabled={readOnly ? true : props.isPending}
-                onValueChange={(value) => {
-                  if (value !== null)
-                    dispatch(setShowRolesInPlay(value as ShowRolesInPlay));
-                }}
-              >
-                <FieldGroup>
-                  {SHOW_ROLES_OPTIONS.map((opt) => (
-                    <Card className="mb-5">
-                      <Label key={opt.value} htmlFor={opt.value}>
-                        <Field orientation="horizontal">
-                          <FieldContent>
-                            <FieldTitle>{opt.title}</FieldTitle>
-                            <FieldDescription>
-                              {opt.description}
-                            </FieldDescription>
-                          </FieldContent>
-                          <RadioGroupItem value={opt.value} id={opt.value} />
-                        </Field>
-                      </Label>
-                    </Card>
-                  ))}
-                </FieldGroup>
-              </RadioGroup>
-            </div>
+            <ShowRolesInPlayPicker
+              value={readOnly ? config.showRolesInPlay : showRolesInPlay}
+              disabled={readOnly ? true : props.isPending}
+              onChange={
+                readOnly
+                  ? undefined
+                  : (value) => {
+                      dispatch(setShowRolesInPlay(value));
+                    }
+              }
+            />
           </div>
 
           {ownerTitle && (
@@ -226,30 +141,6 @@ export function GameConfigurationPanel(props: Props) {
                 ? `This game has a ${ownerTitle} who can see all roles.`
                 : `You will be the ${ownerTitle} and will see all player roles. Role slots are for the remaining ${String(roleSlotsRequired)} players.`}
             </p>
-          )}
-
-          {!readOnly && (
-            <div className="space-y-1">
-              <Label>Role configuration</Label>
-              <Tabs
-                value={roleConfigMode}
-                onValueChange={(value) => {
-                  dispatch(setRoleConfigMode(value as RoleConfigMode));
-                }}
-              >
-                <TabsList>
-                  {Object.values(RoleConfigMode).map((mode) => (
-                    <TabsTrigger
-                      key={mode}
-                      value={mode}
-                      disabled={props.isPending}
-                    >
-                      {mode}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </Tabs>
-            </div>
           )}
 
           {readOnly ? (

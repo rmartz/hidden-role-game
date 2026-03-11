@@ -5,6 +5,7 @@ import type { RoleSlot } from "@/server/models";
 import { useAppSelector } from "@/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RoleConfigEntry } from "./RoleConfigEntry";
+import { RoleConfigModePicker } from "./RoleConfigModePicker";
 
 interface ReadOnlyProps {
   roleDefinitions: Record<string, RoleDefinition<string, Team>>;
@@ -45,43 +46,46 @@ export function RoleConfig(props: Props) {
   const total = readOnly ? 0 : sum(Object.values(roleCounts));
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Configure Roles</CardTitle>
-        {!readOnly && (
-          <p className="text-sm text-muted-foreground">
-            {isAdvanced
-              ? `Assign ${String(playerCount)} role${playerCount !== 1 ? "s" : ""} (min total: ${String(sum(Object.values(roleMins)))}, max total: ${String(sum(Object.values(roleMaxes)))})`
-              : `Assign ${String(playerCount)} role${playerCount !== 1 ? "s" : ""} (${String(total)}/${String(playerCount)} assigned)`}
-          </p>
-        )}
-      </CardHeader>
-      <CardContent>
-        <ul className="space-y-1 list-none p-0">
-          {Object.values(roleDefinitions).map((role) =>
-            readOnly ? (
-              <RoleConfigEntry
-                key={role.id}
-                role={role}
-                gameMode={gameMode}
-                roleConfigMode={roleConfigMode}
-                min={readOnlyMin[role.id] ?? 0}
-                max={readOnlyMax[role.id] ?? 0}
-                readOnly={true}
-              />
-            ) : (
-              <RoleConfigEntry
-                key={role.id}
-                role={role}
-                gameMode={gameMode}
-                roleConfigMode={roleConfigMode}
-                readOnly={false}
-                disabled={props.disabled}
-              />
-            ),
+    <>
+      {!readOnly && <RoleConfigModePicker disabled={props.disabled} />}
+      <Card>
+        <CardHeader>
+          <CardTitle>Configure Roles</CardTitle>
+          {!readOnly && (
+            <p className="text-sm text-muted-foreground">
+              {isAdvanced
+                ? `Assign ${String(playerCount)} role${playerCount !== 1 ? "s" : ""} (min total: ${String(sum(Object.values(roleMins)))}, max total: ${String(sum(Object.values(roleMaxes)))})`
+                : `Assign ${String(playerCount)} role${playerCount !== 1 ? "s" : ""} (${String(total)}/${String(playerCount)} assigned)`}
+            </p>
           )}
-        </ul>
-      </CardContent>
-    </Card>
+        </CardHeader>
+        <CardContent>
+          <ul className="space-y-1 list-none p-0">
+            {Object.values(roleDefinitions).map((role) =>
+              readOnly ? (
+                <RoleConfigEntry
+                  key={role.id}
+                  role={role}
+                  gameMode={gameMode}
+                  roleConfigMode={roleConfigMode}
+                  min={readOnlyMin[role.id] ?? 0}
+                  max={readOnlyMax[role.id] ?? 0}
+                  readOnly={true}
+                />
+              ) : (
+                <RoleConfigEntry
+                  key={role.id}
+                  role={role}
+                  gameMode={gameMode}
+                  roleConfigMode={roleConfigMode}
+                  readOnly={false}
+                  disabled={props.disabled}
+                />
+              ),
+            )}
+          </ul>
+        </CardContent>
+      </Card>
+    </>
   );
 }
