@@ -20,23 +20,26 @@ const SHOW_ROLES_OPTIONS: {
   {
     value: ShowRolesInPlay.None,
     title: "None",
-    description: "Players cannot see which roles are in the game.",
+    description:
+      "Players cannot see which roles were configured for this game.",
   },
   {
     value: ShowRolesInPlay.ConfiguredOnly,
     title: "Configured only",
     description:
-      "Players see what roles that could be in the game, without counts.",
+      "Players see which roles were configured, but not if they were assigned or how many are in play.",
   },
   {
     value: ShowRolesInPlay.AssignedRolesOnly,
     title: "Assigned roles",
-    description: "Players see only the roles that were actually assigned.",
+    description:
+      "Players see which roles were assigned, but not how many are in play.",
   },
   {
     value: ShowRolesInPlay.RoleAndCount,
     title: "Role and count",
-    description: "Players see each role and how many copies are in play.",
+    description:
+      "Players see how many of each roles were assigned for the game.",
   },
 ];
 
@@ -57,13 +60,15 @@ export function ShowRolesInPlayPicker({ value, disabled, onChange }: Props) {
           onChange?.(v as ShowRolesInPlay);
         }}
       >
-        <FieldGroup>
+        <FieldGroup className="gap-1.5">
           {SHOW_ROLES_OPTIONS.map((opt) => (
             <FieldLabel key={opt.value} htmlFor={opt.value}>
               <Field orientation="horizontal">
                 <FieldContent>
                   <FieldTitle>{opt.title}</FieldTitle>
-                  <FieldDescription>{opt.description}</FieldDescription>
+                  {opt.value === value && (
+                    <FieldDescription>{opt.description}</FieldDescription>
+                  )}
                 </FieldContent>
                 <RadioGroupItem value={opt.value} id={opt.value} />
               </Field>

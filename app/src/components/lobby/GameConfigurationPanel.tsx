@@ -14,8 +14,7 @@ import {
 } from "@/store/game-config-slice";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
+import { ConfigurationToggles } from "./ConfigurationToggles";
 import { RoleConfig } from "./RoleConfig";
 import { GameModePicker } from "./GameModePicker";
 import { ShowRolesInPlayPicker } from "./ShowRolesInPlayPicker";
@@ -121,25 +120,19 @@ export function GameConfigurationPanel(props: Props) {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Checkbox
-              id="show-config"
-              checked={
-                readOnly ? config.showConfigToPlayers : showConfigToPlayers
-              }
-              disabled={readOnly ? true : props.isPending}
-              onCheckedChange={
-                readOnly
-                  ? undefined
-                  : (checked) => {
-                      dispatch(setShowConfigToPlayers(checked));
-                    }
-              }
-            />
-            <Label htmlFor="show-config">
-              Show game configuration to all players
-            </Label>
-          </div>
+          <ConfigurationToggles
+            showConfigToPlayers={
+              readOnly ? config.showConfigToPlayers : showConfigToPlayers
+            }
+            disabled={readOnly ? true : props.isPending}
+            onShowConfigToPlayersChange={
+              readOnly
+                ? undefined
+                : (value) => {
+                    dispatch(setShowConfigToPlayers(value));
+                  }
+            }
+          />
 
           {ownerTitle && (
             <p className="text-sm text-muted-foreground">

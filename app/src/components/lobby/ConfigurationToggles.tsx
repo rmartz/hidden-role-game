@@ -1,0 +1,30 @@
+"use client";
+
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+
+interface Props {
+  showConfigToPlayers: boolean;
+  disabled?: boolean;
+  onShowConfigToPlayersChange?: (value: boolean) => void;
+}
+
+export function ConfigurationToggles({
+  showConfigToPlayers,
+  disabled,
+  onShowConfigToPlayersChange,
+}: Props) {
+  return (
+    <div className="flex items-center gap-2">
+      <Switch
+        id="show-config"
+        checked={showConfigToPlayers}
+        disabled={disabled}
+        onCheckedChange={onShowConfigToPlayersChange}
+      />
+      <Label htmlFor="show-config">
+        Show game configuration to all players
+      </Label>
+    </div>
+  );
+}
