@@ -1,3 +1,4 @@
+export * from "./ConfigurationToggles";
 export * from "./GameConfigurationPanel";
 export * from "./GameModePicker";
 export * from "./JoinPrompt";
