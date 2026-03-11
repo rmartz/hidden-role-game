@@ -96,7 +96,10 @@ const gameConfigSlice = createSlice({
       state.gameMode = config.gameMode;
       state.playerCount = playerCount;
       state.roleConfigMode = config.roleConfigMode;
-      const slots = config.roleSlots ?? [];
+      const slots =
+        config.roleSlots && config.roleSlots.length > 0
+          ? config.roleSlots
+          : GAME_MODES[config.gameMode].defaultRoleCount(playerCount);
       state.roleCounts = roleCountsFromSlots(slots);
       state.roleMins = roleMinsFromSlots(slots);
       state.roleMaxes = roleMaxesFromSlots(slots);
@@ -206,22 +209,17 @@ const gameConfigSlice = createSlice({
       state.syncVersion++;
     },
 
-    incrementPlayerCount(state) {
-      state.playerCount++;
-      state.isValid = recomputeIsValid(state);
-      state.syncVersion++;
-    },
-
-    decrementPlayerCount(state) {
-      const { minPlayers } = GAME_MODES[state.gameMode];
-      state.playerCount = Math.max(minPlayers, state.playerCount - 1);
-      state.isValid = recomputeIsValid(state);
-      state.syncVersion++;
-    },
-
     setPlayerCount(state, action: PayloadAction<number>) {
       const { minPlayers } = GAME_MODES[state.gameMode];
       state.playerCount = Math.max(minPlayers, action.payload);
+      if (state.roleConfigMode === RoleConfigMode.Default) {
+        const slots = GAME_MODES[state.gameMode].defaultRoleCount(
+          state.playerCount,
+        );
+        state.roleCounts = roleCountsFromSlots(slots);
+        state.roleMins = roleMinsFromSlots(slots);
+        state.roleMaxes = roleMaxesFromSlots(slots);
+      }
       state.isValid = recomputeIsValid(state);
       state.syncVersion++;
     },
@@ -247,8 +245,6 @@ export const {
   setRoleCount,
   setRoleMin,
   setRoleMax,
-  incrementPlayerCount,
-  decrementPlayerCount,
   setPlayerCount,
   setShowConfigToPlayers,
   setShowRolesInPlay,

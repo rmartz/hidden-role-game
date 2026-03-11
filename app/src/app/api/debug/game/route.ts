@@ -5,6 +5,7 @@ import type { RoleSlot } from "@/server/models";
 import { ServerResponseStatus } from "@/server/models";
 import { gameService } from "@/services/GameService";
 import { errorResponse } from "@/server/utils";
+import { getRoleSlotsRequired } from "@/lib/game-modes";
 
 interface CreateDebugGameRequest {
   playerCount: number;
@@ -44,7 +45,7 @@ export async function POST(request: Request): Promise<Response> {
   );
 
   const ownerPlayer = ownerTitle ? players[0] : null;
-  const roleSlotsRequired = playerCount - (ownerPlayer ? 1 : 0);
+  const roleSlotsRequired = getRoleSlotsRequired(gameMode, playerCount);
   const totalMin = roleSlots.reduce((sum, s) => sum + s.min, 0);
   const totalMax = roleSlots.reduce((sum, s) => sum + s.max, 0);
 

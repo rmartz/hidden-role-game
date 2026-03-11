@@ -157,10 +157,9 @@ export class GameService {
     operation: "add" | "remove",
   ): RoleSlot[] {
     const config = this.getModeDefinition(gameMode);
-    const rolePlayers = numPlayers - (config.ownerTitle ? 1 : 0);
     return adjustRoleSlots(
       current,
-      config.defaultRoleCount(rolePlayers),
+      config.defaultRoleCount(numPlayers),
       operation,
     );
   }

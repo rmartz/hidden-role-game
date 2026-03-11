@@ -8,6 +8,7 @@ import {
   errorResponse,
   toPublicLobby,
 } from "@/server/utils";
+import { getRoleSlotsRequired } from "@/lib/game-modes";
 import { lobbyBroadcastService } from "@/services/LobbyBroadcastService";
 import { LobbyChangeReason } from "@/server/models/websocket";
 
@@ -27,15 +28,17 @@ export async function POST(request: Request): Promise<Response> {
   if (auth instanceof Response) return auth;
   const { lobby } = auth;
 
-  const { ownerTitle } = gameService.getModeDefinition(gameMode);
-  const roleSlotsRequired = lobby.players.length - (ownerTitle ? 1 : 0);
+  const roleSlotsRequired = getRoleSlotsRequired(
+    gameMode,
+    lobby.players.length,
+  );
   const totalMin = roleSlots.reduce((sum, s) => sum + s.min, 0);
   const totalMax = roleSlots.reduce((sum, s) => sum + s.max, 0);
   if (totalMin > roleSlotsRequired || totalMax < roleSlotsRequired) {
     return errorResponse("Role slot ranges must cover the player count", 400);
   }
 
-  const { roles } = gameService.getModeDefinition(gameMode);
+  const { ownerTitle, roles } = gameService.getModeDefinition(gameMode);
   for (const slot of roleSlots) {
     if (!(slot.roleId in roles)) {
       return errorResponse(`Unknown role: ${slot.roleId}`, 400);

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { GameMode, RoleConfigMode } from "@/lib/models";
-import { GAME_MODES } from "@/lib/game-modes";
+import { GAME_MODES, getRoleSlotsRequired } from "@/lib/game-modes";
 import type { GameConfig, RoleSlot } from "@/server/models";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
@@ -69,7 +69,7 @@ export function GameConfigurationPanel(props: Props) {
   const activeGameMode = readOnly ? config.gameMode : selectedGameMode;
   const roleDefinitions = GAME_MODES[activeGameMode].roles;
   const ownerTitle = GAME_MODES[activeGameMode].ownerTitle;
-  const roleSlotsRequired = playerCount - (ownerTitle ? 1 : 0);
+  const roleSlotsRequired = getRoleSlotsRequired(activeGameMode, playerCount);
 
   const activeRoleConfigMode = readOnly
     ? config.roleConfigMode

@@ -17,6 +17,9 @@ export const WEREWOLF_CONFIG = {
   defaultRoleCount,
   actions: WEREWOLF_ACTIONS,
   // The Narrator is a player but doesn't receive a role.
+  roleSlotsRequired(numPlayers: number) {
+    return numPlayers - 1;
+  },
   isValidRoleCount(numPlayers: number, roleCounts: Record<string, number>) {
     return sum(Object.values(roleCounts)) === numPlayers - 1;
   },

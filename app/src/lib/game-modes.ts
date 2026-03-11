@@ -21,3 +21,11 @@ export function getDefaultRoleSlots(
   const config = GAME_MODES[gameMode];
   return config.defaultRoleCount(Math.max(playerCount, config.minPlayers));
 }
+
+export function getRoleSlotsRequired(
+  gameMode: GameMode,
+  numPlayers: number,
+): number {
+  const config = GAME_MODES[gameMode];
+  return config.roleSlotsRequired?.(numPlayers) ?? numPlayers;
+}

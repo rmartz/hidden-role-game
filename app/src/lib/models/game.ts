@@ -83,6 +83,14 @@ export interface GameModeConfig {
   readonly teamLabels: Partial<Record<Team, string>>;
   defaultRoleCount(numPlayers: number): RoleSlot[];
   /**
+   * Returns the number of role slots that must be filled for a game with
+   * numPlayers total players. Game modes that reserve one player as a non-role
+   * owner (e.g. Werewolf's Narrator) should override this.
+   *
+   * Default: numPlayers.
+   */
+  roleSlotsRequired?(numPlayers: number): number;
+  /**
    * Returns whether the current role counts form a valid assignment for the
    * given number of players. Game modes that reserve one player as a non-role
    * owner (e.g. Werewolf's Narrator) should override this to subtract that
