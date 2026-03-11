@@ -58,6 +58,70 @@ describe("POST /api/lobby/[lobbyId]/join", () => {
     expect(body.data.lobby.players[2].name).toBe("Carol");
   });
 
+  it("should reject an empty player name", async () => {
+    const createRes = await createLobby(
+      postRequest("http://localhost/api/lobby/create", { playerName: "Alice" }),
+    );
+    const { data } = await createRes.json();
+    const lobbyId = data.lobby.id;
+
+    const res = await joinLobby(
+      postRequest(`http://localhost/api/lobby/${lobbyId}/join`, {
+        playerName: "",
+      }),
+      makeParams(lobbyId),
+    );
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.status).toBe("error");
+  });
+
+  it("should reject a player name exceeding 32 characters", async () => {
+    const createRes = await createLobby(
+      postRequest("http://localhost/api/lobby/create", { playerName: "Alice" }),
+    );
+    const { data } = await createRes.json();
+    const lobbyId = data.lobby.id;
+
+    const res = await joinLobby(
+      postRequest(`http://localhost/api/lobby/${lobbyId}/join`, {
+        playerName: "A".repeat(33),
+      }),
+      makeParams(lobbyId),
+    );
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.status).toBe("error");
+  });
+
+  it("should reject joining a full lobby", async () => {
+    const createRes = await createLobby(
+      postRequest("http://localhost/api/lobby/create", { playerName: "Alice" }),
+    );
+    const { data } = await createRes.json();
+    const lobbyId = data.lobby.id;
+
+    for (let i = 1; i < 100; i++) {
+      await joinLobby(
+        postRequest(`http://localhost/api/lobby/${lobbyId}/join`, {
+          playerName: `Player${String(i)}`,
+        }),
+        makeParams(lobbyId),
+      );
+    }
+
+    const res = await joinLobby(
+      postRequest(`http://localhost/api/lobby/${lobbyId}/join`, {
+        playerName: "Overflow",
+      }),
+      makeParams(lobbyId),
+    );
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.status).toBe("error");
+    expect(body.error).toBe("Lobby is full");
+  });
+
   it("should return 404 when joining a lobby that does not exist", async () => {
     const res = await joinLobby(
       postRequest("http://localhost/api/lobby/nonexistent-id/join", {
