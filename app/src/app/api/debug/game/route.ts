@@ -4,7 +4,7 @@ import type { LobbyPlayer } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
 import { ServerResponseStatus } from "@/server/models";
 import { gameService } from "@/services/GameService";
-import { errorResponse } from "@/server/api-helpers";
+import { errorResponse } from "@/server/utils";
 
 interface CreateDebugGameRequest {
   playerCount: number;
