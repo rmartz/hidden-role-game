@@ -1,4 +1,10 @@
-import type { GameMode, Lobby, RoleSlot } from "@/lib/models";
+import type {
+  GameMode,
+  Lobby,
+  RoleSlot,
+  RoleConfigMode,
+  ShowRolesInPlay,
+} from "@/lib/types";
 
 export class LobbyService {
   private lobbies: Record<string, Lobby> = {};
@@ -45,7 +51,8 @@ export class LobbyService {
     lobbyId: string,
     config: {
       showConfigToPlayers?: boolean;
-      showRolesInPlay?: boolean;
+      showRolesInPlay?: ShowRolesInPlay;
+      roleConfigMode?: RoleConfigMode;
       gameMode?: GameMode;
       roleSlots?: RoleSlot[];
     },
@@ -57,7 +64,12 @@ export class LobbyService {
       lobby.config.showConfigToPlayers = config.showConfigToPlayers;
     if (config.showRolesInPlay !== undefined)
       lobby.config.showRolesInPlay = config.showRolesInPlay;
-    if (config.gameMode !== undefined) {
+    if (config.roleConfigMode !== undefined)
+      lobby.config.roleConfigMode = config.roleConfigMode;
+    if (
+      config.gameMode !== undefined &&
+      config.gameMode !== lobby.config.gameMode
+    ) {
       lobby.config.gameMode = config.gameMode;
     }
     if (config.roleSlots !== undefined) {

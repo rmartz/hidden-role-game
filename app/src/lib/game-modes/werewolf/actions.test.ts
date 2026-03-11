@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { GameMode, GameStatus } from "@/lib/models";
-import type { Game } from "@/lib/models";
+import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
+import type { Game } from "@/lib/types";
 import { WerewolfPhase } from "./types";
 import type { WerewolfTurnState, WerewolfNighttimePhase } from "./types";
 import { WerewolfRole } from "./roles";
@@ -21,7 +21,8 @@ function makePlayingGame(
       { playerId: "p2", roleDefinitionId: WerewolfRole.Seer },
       { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
     ],
-    showRolesInPlay: false,
+    configuredRoleSlots: [],
+    showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner-1",
     ...overrides,
   };
@@ -68,7 +69,8 @@ describe("WerewolfAction.StartNight", () => {
         status: { type: GameStatus.Starting },
         players: [],
         roleAssignments: [],
-        showRolesInPlay: false,
+        configuredRoleSlots: [],
+        showRolesInPlay: ShowRolesInPlay.None,
         ownerPlayerId: "owner-1",
       };
       expect(action.isValid(game, "owner-1", null)).toBe(false);

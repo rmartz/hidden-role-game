@@ -7,9 +7,9 @@ import {
   advanceGame,
   applyGameAction,
 } from "@/lib/api";
-import { ServerResponseStatus } from "@/server/models";
-import type { GameMode } from "@/lib/models";
-import type { RoleSlot } from "@/server/models";
+import { ServerResponseStatus } from "@/server/types";
+import type { GameMode } from "@/lib/types";
+import type { RoleSlot } from "@/server/types";
 
 export function useStartGame(lobbyId: string) {
   const queryClient = useQueryClient();

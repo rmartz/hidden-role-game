@@ -35,8 +35,8 @@ async function setupStartedGame() {
         lobbyId: lobby.id,
         gameMode: "secret-villain",
         roleSlots: [
-          { roleId: "good", count: 1 },
-          { roleId: "bad", count: 1 },
+          { roleId: "good", min: 1, max: 1 },
+          { roleId: "bad", min: 1, max: 1 },
         ],
       }),
     }),
@@ -155,8 +155,8 @@ describe("GET /api/game/[gameId]", () => {
           lobbyId: lobby.id,
           gameMode: "avalon",
           roleSlots: [
-            { roleId: "avalon-special-good", count: 1 },
-            { roleId: "avalon-bad", count: 1 },
+            { roleId: "avalon-special-good", min: 1, max: 1 },
+            { roleId: "avalon-bad", min: 1, max: 1 },
           ],
         }),
       }),

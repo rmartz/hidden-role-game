@@ -1,9 +1,9 @@
 "use client";
 
-import { GameStatus } from "@/lib/models";
+import { GameStatus } from "@/lib/types";
 import { WerewolfPhase } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
-import type { PlayerGameState } from "@/server/models";
+import type { PlayerGameState } from "@/server/types";
 import { useGameStateQuery } from "@/hooks";
 import { PlayerGameNightScreen } from "./PlayerGameNightScreen";
 import { PlayerGameDayScreen } from "./PlayerGameDayScreen";

@@ -1,16 +1,17 @@
 import { randomUUID } from "crypto";
-import { GameMode } from "@/lib/models";
-import type { LobbyPlayer } from "@/lib/models";
-import type { RoleSlot } from "@/server/models";
-import { ServerResponseStatus } from "@/server/models";
+import { GameMode, ShowRolesInPlay } from "@/lib/types";
+import type { LobbyPlayer } from "@/lib/types";
+import type { RoleSlot } from "@/server/types";
+import { ServerResponseStatus } from "@/server/types";
 import { gameService } from "@/services/GameService";
 import { errorResponse } from "@/server/utils";
+import { getRoleSlotsRequired } from "@/lib/game-modes";
 
 interface CreateDebugGameRequest {
   playerCount: number;
   gameMode: GameMode;
   roleSlots: RoleSlot[];
-  showRolesInPlay: boolean;
+  showRolesInPlay: ShowRolesInPlay;
 }
 
 export interface DebugPlayer {
@@ -44,14 +45,12 @@ export async function POST(request: Request): Promise<Response> {
   );
 
   const ownerPlayer = ownerTitle ? players[0] : null;
-  const roleSlotsRequired = playerCount - (ownerPlayer ? 1 : 0);
-  const totalSlots = roleSlots.reduce((sum, s) => sum + s.count, 0);
+  const roleSlotsRequired = getRoleSlotsRequired(gameMode, playerCount);
+  const totalMin = roleSlots.reduce((sum, s) => sum + s.min, 0);
+  const totalMax = roleSlots.reduce((sum, s) => sum + s.max, 0);
 
-  if (totalSlots !== roleSlotsRequired) {
-    return errorResponse(
-      `Role slot count (${String(totalSlots)}) must match player count (${String(roleSlotsRequired)})`,
-      400,
-    );
+  if (totalMin > roleSlotsRequired || totalMax < roleSlotsRequired) {
+    return errorResponse("Role slot ranges must cover the player count", 400);
   }
 
   for (const slot of roleSlots) {

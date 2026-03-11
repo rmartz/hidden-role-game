@@ -1,11 +1,11 @@
-import type { GameMode } from "@/lib/models";
-import type { PublicRoleInfo } from "@/server/models";
+import type { GameMode } from "@/lib/types";
+import type { RoleInPlay } from "@/server/types";
 import { Item, ItemContent, ItemGroup, ItemTitle } from "@/components/ui/item";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RoleLabel } from "./RoleLabel";
+import { RoleLabel } from "@/components/RoleLabel";
 
 interface Props {
-  roles: PublicRoleInfo[];
+  roles: RoleInPlay[];
   gameMode?: GameMode;
   selectedRoleId?: string;
   onSelectedIdChange?: (id: string) => void;
@@ -28,6 +28,12 @@ export function GameRolesList({
         <ItemGroup>
           {roles.map((r) => {
             const isSelected = r.id === selectedRoleId;
+            const prefix =
+              r.count !== undefined
+                ? `${String(r.count)}× `
+                : r.min !== r.max
+                  ? `${String(r.min)}–${String(r.max)} `
+                  : "";
             return (
               <Item
                 key={r.id}
@@ -38,6 +44,7 @@ export function GameRolesList({
               >
                 <ItemContent>
                   <ItemTitle>
+                    {prefix}
                     <RoleLabel role={r} gameMode={gameMode} />
                   </ItemTitle>
                 </ItemContent>

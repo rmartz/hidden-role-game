@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { GameStatus } from "@/lib/models";
+import { GameStatus } from "@/lib/types";
 import { useGameStateQuery } from "@/hooks";
 import { WerewolfGameScreen } from "@/components/game";
 

@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import PartySocket from "partysocket";
 import { getPlayerId } from "@/lib/api";
-import { LobbyChangeReason } from "@/server/models/websocket";
-import type { LobbySocketEvent } from "@/server/models/websocket";
-import type { PublicLobby } from "@/server/models";
+import { LobbyChangeReason } from "@/server/types/websocket";
+import type { LobbySocketEvent } from "@/server/types/websocket";
+import type { PublicLobby } from "@/server/types";
 
 const PARTYKIT_HOST =
   process.env["NEXT_PUBLIC_PARTYKIT_HOST"] ?? "localhost:1999";

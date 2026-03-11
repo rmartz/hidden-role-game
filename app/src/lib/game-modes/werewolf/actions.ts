@@ -1,5 +1,5 @@
-import { GameStatus } from "@/lib/models";
-import type { Game, GameAction } from "@/lib/models";
+import { GameStatus } from "@/lib/types";
+import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase } from "./types";
 import type { WerewolfNighttimePhase } from "./types";
 import {

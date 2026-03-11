@@ -1,7 +1,12 @@
 import { randomUUID } from "crypto";
-import { GameMode, type LobbyPlayer } from "@/lib/models";
+import {
+  GameMode,
+  RoleConfigMode,
+  ShowRolesInPlay,
+  type LobbyPlayer,
+} from "@/lib/types";
 import { getDefaultRoleSlots } from "@/lib/game-modes";
-import { ServerResponseStatus, type CreateLobbyRequest } from "@/server/models";
+import { ServerResponseStatus, type CreateLobbyRequest } from "@/server/types";
 import { lobbyService } from "@/services/LobbyService";
 import { toPublicLobby } from "@/server/utils";
 
@@ -33,9 +38,10 @@ export async function POST(request: Request): Promise<Response> {
     players: [owner],
     config: {
       gameMode: defaultGameMode,
+      roleConfigMode: RoleConfigMode.Default,
       roleSlots: getDefaultRoleSlots(defaultGameMode, 1),
       showConfigToPlayers: false,
-      showRolesInPlay: false,
+      showRolesInPlay: ShowRolesInPlay.None,
     },
   };
 

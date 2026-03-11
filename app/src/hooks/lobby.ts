@@ -10,11 +10,11 @@ import {
   getLobby,
   clearSession,
 } from "@/lib/api";
-import { ServerResponseStatus } from "@/server/models";
+import { ServerResponseStatus } from "@/server/types";
 import type {
   LobbyJoinResponse,
   UpdateLobbyConfigRequest,
-} from "@/server/models";
+} from "@/server/types";
 
 export function useCreateLobby() {
   const router = useRouter();

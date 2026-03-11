@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
-import gameConfigReducer from "./gameConfigSlice";
+import gameConfigReducer from "./game-config-slice";
 
 export const store = configureStore({
   reducer: {

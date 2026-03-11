@@ -1,5 +1,5 @@
-import { GameStatus } from "@/lib/models";
-import type { Game, PlayerRoleAssignment } from "@/lib/models";
+import { GameStatus } from "@/lib/types";
+import type { Game, PlayerRoleAssignment } from "@/lib/types";
 import { WakesAtNight } from "./types";
 import type { WerewolfTurnState } from "./types";
 import { WEREWOLF_ROLES } from "./roles";

@@ -1,5 +1,5 @@
-import { Team } from "@/lib/models";
-import type { RoleDefinition, RoleSlot } from "@/lib/models";
+import { Team } from "@/lib/types";
+import type { RoleDefinition, RoleSlot } from "@/lib/types";
 import { WakesAtNight } from "./types";
 
 export enum WerewolfRole {
@@ -24,13 +24,14 @@ export interface WerewolfRoleDefinition extends RoleDefinition<
 export const MIN_PLAYERS = 5;
 
 export function defaultRoleCount(numPlayers: number): RoleSlot[] {
-  const n = Math.max(numPlayers, MIN_PLAYERS);
+  // Subtract 1 for the Narrator, who is a player but receives no role.
+  const n = Math.max(numPlayers, MIN_PLAYERS) - 1;
   const werewolves = Math.floor(n / 3);
   const villagers = n - werewolves - 1;
   return [
-    { roleId: WerewolfRole.Werewolf, count: werewolves },
-    { roleId: WerewolfRole.Villager, count: villagers },
-    { roleId: WerewolfRole.Seer, count: 1 },
+    { roleId: WerewolfRole.Werewolf, min: werewolves, max: werewolves },
+    { roleId: WerewolfRole.Villager, min: villagers, max: villagers },
+    { roleId: WerewolfRole.Seer, min: 1, max: 1 },
   ];
 }
 

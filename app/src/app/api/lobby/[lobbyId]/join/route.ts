@@ -1,10 +1,10 @@
 import { randomUUID } from "crypto";
-import type { LobbyPlayer } from "@/lib/models";
-import { ServerResponseStatus, type JoinLobbyRequest } from "@/server/models";
+import type { LobbyPlayer } from "@/lib/types";
+import { ServerResponseStatus, type JoinLobbyRequest } from "@/server/types";
 import { lobbyService } from "@/services/LobbyService";
 import { errorResponse, toPublicLobby } from "@/server/utils";
 import { lobbyBroadcastService } from "@/services/LobbyBroadcastService";
-import { LobbyChangeReason } from "@/server/models/websocket";
+import { LobbyChangeReason } from "@/server/types/websocket";
 
 export async function POST(
   request: Request,

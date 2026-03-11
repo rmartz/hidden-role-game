@@ -1,7 +1,7 @@
 "use client";
 
-import { GameStatus } from "@/lib/models";
-import type { PlayerGameState } from "@/server/models";
+import { GameStatus } from "@/lib/types";
+import type { PlayerGameState } from "@/server/types";
 import { PlayerStartingScreen } from "./PlayerStartingScreen";
 import { PlayerGameScreen } from "./PlayerGameScreen";
 

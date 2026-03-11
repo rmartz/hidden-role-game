@@ -1,5 +1,5 @@
-import type { Lobby } from "@/lib/models";
-import type { PublicLobby } from "@/server/models";
+import type { Lobby } from "@/lib/types";
+import type { PublicLobby } from "@/server/types";
 
 export function isValidSession(lobby: Lobby, sessionId: string): boolean {
   return lobby.players.some((p) => p.sessionId === sessionId);
@@ -18,6 +18,7 @@ export function toPublicLobby(
     players: lobby.players.map((p) => ({ id: p.id, name: p.name })),
     config: {
       gameMode: lobby.config.gameMode,
+      roleConfigMode: lobby.config.roleConfigMode,
       showConfigToPlayers: lobby.config.showConfigToPlayers,
       showRolesInPlay: lobby.config.showRolesInPlay,
       ...(showRoleSlots && { roleSlots: lobby.config.roleSlots }),

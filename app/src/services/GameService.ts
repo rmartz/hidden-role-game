@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { GameStatus, GameMode } from "@/lib/models";
+import { GameStatus, GameMode, ShowRolesInPlay } from "@/lib/types";
 import type {
   Game,
   GameModeConfig,
@@ -7,13 +7,14 @@ import type {
   LobbyPlayer,
   PlayerRoleAssignment,
   RoleDefinition,
-  Team,
-} from "@/lib/models";
-import type {
   RoleSlot,
+  Team,
+} from "@/lib/types";
+import type {
+  RoleInPlay,
   PublicRoleInfo,
   PlayerGameState,
-} from "@/server/models";
+} from "@/server/types";
 import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase, buildNightPhaseOrder } from "@/lib/game-modes/werewolf";
 import type {
@@ -64,7 +65,7 @@ export class GameService {
     players: LobbyPlayer[],
     roleSlots: RoleSlot[],
     gameMode: GameMode,
-    showRolesInPlay: boolean,
+    showRolesInPlay: ShowRolesInPlay,
     ownerPlayerId: string | null,
   ): Game {
     const { roles } = this.getModeDefinition(gameMode);
@@ -88,6 +89,7 @@ export class GameService {
       status: { type: GameStatus.Starting },
       players: gamePlayers,
       roleAssignments,
+      configuredRoleSlots: roleSlots,
       showRolesInPlay,
       ownerPlayerId,
     };
@@ -155,21 +157,82 @@ export class GameService {
     operation: "add" | "remove",
   ): RoleSlot[] {
     const config = this.getModeDefinition(gameMode);
-    const rolePlayers = numPlayers - (config.ownerTitle ? 1 : 0);
     return adjustRoleSlots(
       current,
-      config.defaultRoleCount(rolePlayers),
+      config.defaultRoleCount(numPlayers),
       operation,
     );
   }
 
-  public getRolesInPlay(game: Game): PublicRoleInfo[] {
+  private buildRolesInPlay(game: Game): RoleInPlay[] | null {
     const { roles } = this.getModeDefinition(game.gameMode);
-    return game.roleAssignments.reduce<PublicRoleInfo[]>((acc, assignment) => {
-      const role = roles[assignment.roleDefinitionId];
-      if (!role || acc.some((r) => r.id === role.id)) return acc;
-      return [...acc, { id: role.id, name: role.name, team: role.team }];
-    }, []);
+    const slotMap = new Map(game.configuredRoleSlots.map((s) => [s.roleId, s]));
+
+    switch (game.showRolesInPlay) {
+      case ShowRolesInPlay.None:
+        return null;
+
+      case ShowRolesInPlay.ConfiguredOnly:
+        return game.configuredRoleSlots.flatMap((slot) => {
+          if (slot.max === 0) return [];
+          const role = roles[slot.roleId];
+          if (!role) return [];
+          return [
+            {
+              id: role.id,
+              name: role.name,
+              team: role.team,
+              min: slot.min,
+              max: slot.max,
+            },
+          ];
+        });
+
+      case ShowRolesInPlay.AssignedRolesOnly: {
+        const seen = new Set<string>();
+        return game.roleAssignments.flatMap((a) => {
+          if (seen.has(a.roleDefinitionId)) return [];
+          seen.add(a.roleDefinitionId);
+          const role = roles[a.roleDefinitionId];
+          const slot = slotMap.get(a.roleDefinitionId);
+          if (!role) return [];
+          return [
+            {
+              id: role.id,
+              name: role.name,
+              team: role.team,
+              min: slot?.min ?? 0,
+              max: slot?.max ?? 0,
+            },
+          ];
+        });
+      }
+
+      case ShowRolesInPlay.RoleAndCount: {
+        const counts = new Map<string, number>();
+        for (const a of game.roleAssignments) {
+          counts.set(
+            a.roleDefinitionId,
+            (counts.get(a.roleDefinitionId) ?? 0) + 1,
+          );
+        }
+        return [...counts.entries()].flatMap(([roleId, count]) => {
+          const role = roles[roleId];
+          const slot = slotMap.get(roleId);
+          if (!role) return [];
+          return [
+            {
+              id: role.id,
+              name: role.name,
+              team: role.team,
+              min: slot?.min ?? 0,
+              max: slot?.max ?? 0,
+              count,
+            },
+          ];
+        });
+      }
+    }
   }
 
   public getPlayerGameState(
@@ -205,7 +268,7 @@ export class GameService {
         gameOwner: { id: caller.id, name: caller.name },
         myRole: null,
         visibleRoleAssignments,
-        rolesInPlay: this.getRolesInPlay(game),
+        rolesInPlay: this.buildRolesInPlay(game),
       };
     }
 
@@ -224,7 +287,11 @@ export class GameService {
       return [
         {
           player: { id: player.id, name: player.name },
-          role: { id: role.id, name: role.name, team: role.team },
+          role: {
+            id: role.id,
+            name: role.name,
+            team: role.team,
+          } as PublicRoleInfo,
         },
       ];
     });
@@ -236,7 +303,7 @@ export class GameService {
       gameOwner: null,
       myRole: { id: myRole.id, name: myRole.name, team: myRole.team },
       visibleRoleAssignments,
-      rolesInPlay: game.showRolesInPlay ? this.getRolesInPlay(game) : null,
+      rolesInPlay: this.buildRolesInPlay(game),
     };
   }
 }

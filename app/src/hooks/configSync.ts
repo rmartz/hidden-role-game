@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { throttle } from "lodash";
 import { useAppSelector } from "@/store";
+import { selectRoleSlots } from "@/store/game-config-slice";
 import { useUpdateLobbyConfig } from "./lobby";
 
 const SYNC_INTERVAL_MS = 1000;
@@ -41,16 +42,20 @@ export function useConfigSync(
     () =>
       throttle(
         () => {
-          const { gameMode, roleCounts, showConfigToPlayers, showRolesInPlay } =
-            gameConfigRef.current;
+          const {
+            gameMode,
+            roleConfigMode,
+            showConfigToPlayers,
+            showRolesInPlay,
+          } = gameConfigRef.current;
+          const roleSlots = selectRoleSlots(gameConfigRef.current);
           mutateRef.current(
             {
               gameMode,
+              roleConfigMode,
               showConfigToPlayers,
               showRolesInPlay,
-              roleSlots: Object.entries(roleCounts)
-                .filter(([, count]) => count > 0)
-                .map(([roleId, count]) => ({ roleId, count })),
+              roleSlots,
             },
             {
               onSuccess: () => {

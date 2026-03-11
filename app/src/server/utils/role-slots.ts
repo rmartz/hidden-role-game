@@ -1,4 +1,4 @@
-import type { RoleSlot } from "@/lib/models";
+import type { RoleSlot } from "@/lib/types";
 
 /**
  * Adjusts role slots by one step toward the target distribution.
@@ -8,14 +8,17 @@ import type { RoleSlot } from "@/lib/models";
  *
  * Only roles present in the target are candidates for addition.
  * Only roles with count > 0 are candidates for removal.
+ *
+ * Target slots are expected to be exact (min === max). Current slots are
+ * treated as exact as well (uses min for comparison).
  */
 export function adjustRoleSlots(
   current: RoleSlot[],
   target: RoleSlot[],
   operation: "add" | "remove",
 ): RoleSlot[] {
-  const currentMap = new Map(current.map((s) => [s.roleId, s.count]));
-  const targetMap = new Map(target.map((s) => [s.roleId, s.count]));
+  const currentMap = new Map(current.map((s) => [s.roleId, s.min]));
+  const targetMap = new Map(target.map((s) => [s.roleId, s.min]));
 
   const isAdd = operation === "add";
   const candidates = isAdd
@@ -38,13 +41,15 @@ export function adjustRoleSlots(
   if (isAdd) {
     if (currentMap.has(bestRole)) {
       return current.map((s) =>
-        s.roleId === bestRole ? { ...s, count: s.count + 1 } : s,
+        s.roleId === bestRole ? { ...s, min: s.min + 1, max: s.max + 1 } : s,
       );
     }
-    return [...current, { roleId: bestRole, count: 1 }];
+    return [...current, { roleId: bestRole, min: 1, max: 1 }];
   } else {
     return current
-      .map((s) => (s.roleId === bestRole ? { ...s, count: s.count - 1 } : s))
-      .filter((s) => s.count > 0);
+      .map((s) =>
+        s.roleId === bestRole ? { ...s, min: s.min - 1, max: s.max - 1 } : s,
+      )
+      .filter((s) => s.min > 0);
   }
 }

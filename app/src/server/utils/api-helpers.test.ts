@@ -4,9 +4,14 @@ import {
   authenticateLobby,
   authenticateGame,
 } from "./api-helpers";
-import { ServerResponseStatus } from "@/server/models";
-import { GameMode, GameStatus } from "@/lib/models";
-import type { Lobby, Game, GamePlayer } from "@/lib/models";
+import { ServerResponseStatus } from "@/server/types";
+import {
+  GameMode,
+  GameStatus,
+  RoleConfigMode,
+  ShowRolesInPlay,
+} from "@/lib/types";
+import type { Lobby, Game, GamePlayer } from "@/lib/types";
 
 const { mockGetLobby, mockGetGame } = vi.hoisted(() => ({
   mockGetLobby: vi.fn(),
@@ -31,9 +36,10 @@ function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
     ],
     config: {
       gameMode: GameMode.SecretVillain,
+      roleConfigMode: RoleConfigMode.Default,
       roleSlots: [],
       showConfigToPlayers: false,
-      showRolesInPlay: false,
+      showRolesInPlay: ShowRolesInPlay.None,
     },
     ...overrides,
   };
@@ -55,7 +61,8 @@ function makeGame(overrides: Partial<Game> = {}): Game {
     status: { type: GameStatus.Playing },
     players,
     roleAssignments: [],
-    showRolesInPlay: false,
+    configuredRoleSlots: [],
+    showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: null,
     ...overrides,
   };

@@ -1,5 +1,5 @@
-import type { GameMode } from "@/lib/models";
-import type { VisibleTeammate } from "@/server/models";
+import type { GameMode } from "@/lib/types";
+import type { VisibleTeammate } from "@/server/types";
 import {
   Item,
   ItemActions,
@@ -8,7 +8,7 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RoleLabel } from "./RoleLabel";
+import { RoleLabel } from "@/components/RoleLabel";
 
 interface Props {
   assignments: VisibleTeammate[];

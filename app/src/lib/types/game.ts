@@ -39,6 +39,23 @@ export enum GameMode {
   Werewolf = "werewolf",
 }
 
+// --- Role Config Modes ---
+
+export enum RoleConfigMode {
+  Default = "Default",
+  Custom = "Custom",
+  Advanced = "Advanced",
+}
+
+// --- Show Roles In Play Options ---
+
+export enum ShowRolesInPlay {
+  None = "None",
+  ConfiguredOnly = "ConfiguredOnly",
+  AssignedRolesOnly = "AssignedRolesOnly",
+  RoleAndCount = "RoleAndCount",
+}
+
 // --- Roles ---
 
 export enum Team {
@@ -66,6 +83,14 @@ export interface GameModeConfig {
   readonly teamLabels: Partial<Record<Team, string>>;
   defaultRoleCount(numPlayers: number): RoleSlot[];
   /**
+   * Returns the number of role slots that must be filled for a game with
+   * numPlayers total players. Game modes that reserve one player as a non-role
+   * owner (e.g. Werewolf's Narrator) should override this.
+   *
+   * Default: numPlayers.
+   */
+  roleSlotsRequired?(numPlayers: number): number;
+  /**
    * Returns whether the current role counts form a valid assignment for the
    * given number of players. Game modes that reserve one player as a non-role
    * owner (e.g. Werewolf's Narrator) should override this to subtract that
@@ -87,7 +112,8 @@ export interface PlayerRoleAssignment {
 
 export interface RoleSlot {
   roleId: string;
-  count: number;
+  min: number;
+  max: number;
 }
 
 export interface GamePlayer extends LobbyPlayer {
@@ -103,7 +129,8 @@ export interface Game {
   status: GameStatusState;
   players: GamePlayer[];
   roleAssignments: PlayerRoleAssignment[];
-  showRolesInPlay: boolean;
+  configuredRoleSlots: RoleSlot[];
+  showRolesInPlay: ShowRolesInPlay;
   ownerPlayerId: string | null;
 }
 
@@ -120,9 +147,10 @@ export interface GameAction {
 
 export interface LobbyConfig {
   gameMode: GameMode;
+  roleConfigMode: RoleConfigMode;
   roleSlots: RoleSlot[];
   showConfigToPlayers: boolean;
-  showRolesInPlay: boolean;
+  showRolesInPlay: ShowRolesInPlay;
 }
 
 export interface Lobby {

@@ -1,4 +1,4 @@
-import type { LobbySocketEvent } from "@/server/models/websocket";
+import type { LobbySocketEvent } from "@/server/types/websocket";
 
 const PARTYKIT_HOST =
   process.env["NEXT_PUBLIC_PARTYKIT_HOST"] ?? "localhost:1999";

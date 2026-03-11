@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { WerewolfPhase, WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
-import type { PlayerGameState } from "@/server/models";
+import type { PlayerGameState } from "@/server/types";
 import { useGameAction } from "@/hooks";
 import { GameRolesList, PlayersRoleList } from "@/components/game";
 import { Button } from "@/components/ui/button";

@@ -1,5 +1,5 @@
-import { GameMode } from "@/lib/models";
-import type { GameModeConfig, RoleSlot } from "@/lib/models";
+import { GameMode } from "@/lib/types";
+import type { GameModeConfig, RoleSlot } from "@/lib/types";
 import { SECRET_VILLAIN_CONFIG } from "@/lib/game-modes/secret-villain";
 import { AVALON_CONFIG } from "@/lib/game-modes/avalon";
 import { WEREWOLF_CONFIG } from "@/lib/game-modes/werewolf";
@@ -20,4 +20,12 @@ export function getDefaultRoleSlots(
 ): RoleSlot[] {
   const config = GAME_MODES[gameMode];
   return config.defaultRoleCount(Math.max(playerCount, config.minPlayers));
+}
+
+export function getRoleSlotsRequired(
+  gameMode: GameMode,
+  numPlayers: number,
+): number {
+  const config = GAME_MODES[gameMode];
+  return config.roleSlotsRequired?.(numPlayers) ?? numPlayers;
 }
