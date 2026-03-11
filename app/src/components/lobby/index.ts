@@ -8,4 +8,5 @@ export * from "./PlayerRow";
 export * from "./RoleConfig";
 export * from "./RoleConfigEntry";
 export * from "./RoleConfigModePicker";
+export * from "./ShareLobby";
 export * from "./ShowRolesInPlayPicker";

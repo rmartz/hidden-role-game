@@ -23,6 +23,7 @@
     "lucide-react": "^0.577.0",
     "next": "^15.0.0",
     "partysocket": "^1.1.16",
+    "qrcode.react": "^4.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-redux": "^9.2.0",

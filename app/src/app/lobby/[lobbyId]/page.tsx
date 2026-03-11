@@ -16,6 +16,7 @@ import {
   GameConfigurationPanel,
   JoinPrompt,
   PlayerList,
+  ShareLobby,
 } from "@/components/lobby";
 
 export default function LobbyPage() {
@@ -94,13 +95,10 @@ export default function LobbyPage() {
 
   return (
     <div className="p-5">
-      <h1 className="text-2xl font-bold mb-2">Hidden Role Game</h1>
-      <p className="mb-4 text-muted-foreground">
-        Lobby:{" "}
-        <a href={`/lobby/${lobbyId}`} className="underline">
-          {lobbyId}
-        </a>
-      </p>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-bold">Hidden Role Game</h1>
+        <ShareLobby lobbyId={lobbyId} />
+      </div>
 
       {fetchLobby.isLoading && (
         <p className="text-muted-foreground">Loading...</p>
