@@ -8,22 +8,18 @@ import {
 import { getDefaultRoleSlots } from "@/lib/game-modes";
 import { ServerResponseStatus, type CreateLobbyRequest } from "@/server/types";
 import { lobbyService } from "@/services/LobbyService";
-import { errorResponse, toPublicLobby } from "@/server/utils";
-
-const MAX_PLAYER_NAME_LENGTH = 32;
+import {
+  errorResponse,
+  toPublicLobby,
+  validatePlayerName,
+} from "@/server/utils";
 
 export async function POST(request: Request): Promise<Response> {
   const body = (await request.json()) as CreateLobbyRequest;
 
-  if (
-    !body.playerName ||
-    body.playerName.length === 0 ||
-    body.playerName.length > MAX_PLAYER_NAME_LENGTH
-  ) {
-    return errorResponse(
-      `Player name must be between 1 and ${String(MAX_PLAYER_NAME_LENGTH)} characters`,
-      400,
-    );
+  const nameError = validatePlayerName(body.playerName);
+  if (nameError) {
+    return errorResponse(nameError, 400);
   }
 
   const lobbyId = randomUUID();

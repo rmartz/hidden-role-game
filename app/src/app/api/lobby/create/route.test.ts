@@ -23,6 +23,17 @@ describe("POST /api/lobby/create", () => {
     expect(body.status).toBe("error");
   });
 
+  it("should reject a player name with HTML or JSON characters", async () => {
+    const res = await createLobby(
+      postRequest("http://localhost/api/lobby/create", {
+        playerName: "<script>",
+      }),
+    );
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.status).toBe("error");
+  });
+
   it("should accept a player name at the 32 character limit", async () => {
     const res = await createLobby(
       postRequest("http://localhost/api/lobby/create", {

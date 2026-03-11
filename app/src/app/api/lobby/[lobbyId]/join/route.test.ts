@@ -94,6 +94,24 @@ describe("POST /api/lobby/[lobbyId]/join", () => {
     expect(body.status).toBe("error");
   });
 
+  it("should reject a player name with HTML or JSON characters", async () => {
+    const createRes = await createLobby(
+      postRequest("http://localhost/api/lobby/create", { playerName: "Alice" }),
+    );
+    const { data } = await createRes.json();
+    const lobbyId = data.lobby.id;
+
+    const res = await joinLobby(
+      postRequest(`http://localhost/api/lobby/${lobbyId}/join`, {
+        playerName: "<script>",
+      }),
+      makeParams(lobbyId),
+    );
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.status).toBe("error");
+  });
+
   it("should reject joining a full lobby", async () => {
     const createRes = await createLobby(
       postRequest("http://localhost/api/lobby/create", { playerName: "Alice" }),

@@ -2,11 +2,14 @@ import { randomUUID } from "crypto";
 import type { LobbyPlayer } from "@/lib/types";
 import { ServerResponseStatus, type JoinLobbyRequest } from "@/server/types";
 import { lobbyService } from "@/services/LobbyService";
-import { errorResponse, toPublicLobby } from "@/server/utils";
+import {
+  errorResponse,
+  toPublicLobby,
+  validatePlayerName,
+} from "@/server/utils";
 import { lobbyBroadcastService } from "@/services/LobbyBroadcastService";
 import { LobbyChangeReason } from "@/server/types/websocket";
 
-const MAX_PLAYER_NAME_LENGTH = 32;
 const MAX_LOBBY_PLAYERS = 100;
 
 export async function POST(
@@ -16,15 +19,9 @@ export async function POST(
   const { lobbyId } = await params;
   const body = (await request.json()) as JoinLobbyRequest;
 
-  if (
-    !body.playerName ||
-    body.playerName.length === 0 ||
-    body.playerName.length > MAX_PLAYER_NAME_LENGTH
-  ) {
-    return errorResponse(
-      `Player name must be between 1 and ${String(MAX_PLAYER_NAME_LENGTH)} characters`,
-      400,
-    );
+  const nameError = validatePlayerName(body.playerName);
+  if (nameError) {
+    return errorResponse(nameError, 400);
   }
 
   const lobby = lobbyService.getLobby(lobbyId);
