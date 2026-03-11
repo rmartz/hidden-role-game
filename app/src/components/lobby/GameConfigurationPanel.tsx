@@ -160,9 +160,7 @@ export function GameConfigurationPanel(props: Props) {
                 roleConfigMode={roleConfigMode}
                 gameMode={selectedGameMode}
                 readOnly={false}
-                disabled={
-                  props.isPending || roleConfigMode === RoleConfigMode.Default
-                }
+                disabled={props.isPending}
               />
               <Button
                 onClick={() => {
