@@ -8,10 +8,20 @@ import {
 import { getDefaultRoleSlots } from "@/lib/game-modes";
 import { ServerResponseStatus, type CreateLobbyRequest } from "@/server/types";
 import { lobbyService } from "@/services/LobbyService";
-import { toPublicLobby } from "@/server/utils";
+import {
+  errorResponse,
+  toPublicLobby,
+  validatePlayerName,
+} from "@/server/utils";
 
 export async function POST(request: Request): Promise<Response> {
   const body = (await request.json()) as CreateLobbyRequest;
+
+  const nameError = validatePlayerName(body.playerName);
+  if (nameError) {
+    return errorResponse(nameError, 400);
+  }
+
   const lobbyId = randomUUID();
 
   if (lobbyService.getLobby(lobbyId)) {

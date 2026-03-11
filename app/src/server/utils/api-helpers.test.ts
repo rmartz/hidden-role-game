@@ -3,6 +3,7 @@ import {
   errorResponse,
   authenticateLobby,
   authenticateGame,
+  validatePlayerName,
 } from "./api-helpers";
 import { ServerResponseStatus } from "@/server/types";
 import {
@@ -194,4 +195,48 @@ describe("authenticateGame", () => {
     expect(resultGame).toBe(game);
     expect(caller.sessionId).toBe("session-alice");
   });
+});
+
+describe("validatePlayerName", () => {
+  it("returns null for a valid name", () => {
+    expect(validatePlayerName("Alice")).toBeNull();
+  });
+
+  it("returns null for a name with international characters", () => {
+    expect(validatePlayerName("Ångström")).toBeNull();
+    expect(validatePlayerName("张伟")).toBeNull();
+    expect(validatePlayerName("Müller")).toBeNull();
+  });
+
+  it("returns null for a name with allowed punctuation", () => {
+    expect(validatePlayerName("O'Brien")).toBeNull();
+    expect(validatePlayerName("Mary-Jane")).toBeNull();
+  });
+
+  it("returns an error for an empty name", () => {
+    expect(validatePlayerName("")).not.toBeNull();
+  });
+
+  it("returns an error for a name exceeding 32 characters", () => {
+    expect(validatePlayerName("A".repeat(33))).not.toBeNull();
+  });
+
+  it("returns null for a name at the 32 character limit", () => {
+    expect(validatePlayerName("A".repeat(32))).toBeNull();
+  });
+
+  it.each([
+    "<script>",
+    '{"key":"val"}',
+    "[1,2]",
+    "a\\b",
+    "a`b",
+    "a&b",
+    'say "hi"',
+  ])(
+    "returns an error for name containing HTML/JSON characters: %s",
+    (name) => {
+      expect(validatePlayerName(name)).not.toBeNull();
+    },
+  );
 });

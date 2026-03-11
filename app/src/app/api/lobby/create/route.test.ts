@@ -3,6 +3,46 @@ import { POST as createLobby } from "./route";
 import { postRequest } from "@/app/api/test-utils";
 
 describe("POST /api/lobby/create", () => {
+  it("should reject an empty player name", async () => {
+    const res = await createLobby(
+      postRequest("http://localhost/api/lobby/create", { playerName: "" }),
+    );
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.status).toBe("error");
+  });
+
+  it("should reject a player name exceeding 32 characters", async () => {
+    const res = await createLobby(
+      postRequest("http://localhost/api/lobby/create", {
+        playerName: "A".repeat(33),
+      }),
+    );
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.status).toBe("error");
+  });
+
+  it("should reject a player name with HTML or JSON characters", async () => {
+    const res = await createLobby(
+      postRequest("http://localhost/api/lobby/create", {
+        playerName: "<script>",
+      }),
+    );
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.status).toBe("error");
+  });
+
+  it("should accept a player name at the 32 character limit", async () => {
+    const res = await createLobby(
+      postRequest("http://localhost/api/lobby/create", {
+        playerName: "A".repeat(32),
+      }),
+    );
+    expect(res.status).toBe(200);
+  });
+
   it("should create a lobby with a player name and return sessionId", async () => {
     const res = await createLobby(
       postRequest("http://localhost/api/lobby/create", { playerName: "Alice" }),

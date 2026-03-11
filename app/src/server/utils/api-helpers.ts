@@ -64,3 +64,20 @@ export function authenticateGame(
 
   return { game, caller };
 }
+
+const MAX_PLAYER_NAME_LENGTH = 32;
+// Block HTML and JSON structural characters while allowing international scripts
+const INVALID_NAME_CHARS = /[<>&"{}[\]\\`]/;
+
+export function validatePlayerName(name: string): string | null {
+  if (!name || name.length === 0) {
+    return "Player name must not be empty";
+  }
+  if (name.length > MAX_PLAYER_NAME_LENGTH) {
+    return `Player name must be ${String(MAX_PLAYER_NAME_LENGTH)} characters or fewer`;
+  }
+  if (INVALID_NAME_CHARS.test(name)) {
+    return "Player name contains invalid characters";
+  }
+  return null;
+}
