@@ -3,10 +3,13 @@ import { ServerResponseStatus } from "@/server/models";
 import type { CreateGameRequest } from "@/server/models";
 import { lobbyService } from "@/services/LobbyService";
 import { gameService } from "@/services/GameService";
-import { toPublicLobby } from "@/server/lobby-helpers";
-import { lobbySocketManager } from "@/server/lobby-socket-manager";
+import {
+  authenticateLobby,
+  errorResponse,
+  toPublicLobby,
+} from "@/server/utils";
+import { lobbyBroadcastService } from "@/services/LobbyBroadcastService";
 import { LobbyChangeReason } from "@/server/models/websocket";
-import { authenticateLobby, errorResponse } from "@/server/api-helpers";
 
 export async function POST(request: Request): Promise<Response> {
   const sessionId = request.headers.get("x-session-id") ?? undefined;
@@ -55,7 +58,7 @@ export async function POST(request: Request): Promise<Response> {
     return errorResponse("Failed to start game", 500);
   }
 
-  lobbySocketManager.broadcast(lobbyId, updated, LobbyChangeReason.GameStarted);
+  lobbyBroadcastService.broadcast(lobbyId, LobbyChangeReason.GameStarted);
 
   return Response.json({
     status: ServerResponseStatus.Success,

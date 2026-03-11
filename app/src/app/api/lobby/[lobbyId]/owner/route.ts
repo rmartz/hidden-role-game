@@ -1,8 +1,11 @@
 import { ServerResponseStatus } from "@/server/models";
-import { authenticateLobby, errorResponse } from "@/server/api-helpers";
-import { toPublicLobby } from "@/server/lobby-helpers";
+import {
+  authenticateLobby,
+  errorResponse,
+  toPublicLobby,
+} from "@/server/utils";
 import { lobbyService } from "@/services/LobbyService";
-import { lobbySocketManager } from "@/server/lobby-socket-manager";
+import { lobbyBroadcastService } from "@/services/LobbyBroadcastService";
 import { LobbyChangeReason } from "@/server/models/websocket";
 
 export async function PUT(
@@ -25,11 +28,7 @@ export async function PUT(
     return errorResponse("Player not found", 404);
   }
 
-  lobbySocketManager.broadcast(
-    lobbyId,
-    updated,
-    LobbyChangeReason.OwnerChanged,
-  );
+  lobbyBroadcastService.broadcast(lobbyId, LobbyChangeReason.OwnerChanged);
 
   return Response.json({
     status: ServerResponseStatus.Success,
