@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { GameMode } from "@/lib/models";
-import type { RoleSlot } from "@/server/models";
+import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/models";
+import type { GameConfig, RoleSlot } from "@/server/models";
 import { GameConfigurationPanel } from "@/components/lobby";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -10,10 +10,11 @@ import type { DebugPlayer } from "@/app/api/debug/game/route";
 import { DebugGameView } from "./DebugGameView";
 import type { GameInfo } from "./DebugGameView";
 
-const DEFAULT_CONFIG = {
+const DEFAULT_CONFIG: GameConfig = {
   gameMode: GameMode.Werewolf,
+  roleConfigMode: RoleConfigMode.Default,
   showConfigToPlayers: false,
-  showRolesInPlay: true,
+  showRolesInPlay: ShowRolesInPlay.RoleAndCount,
 };
 
 export default function DebugPage() {
