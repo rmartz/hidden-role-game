@@ -1,28 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { GameMode, GameStatus } from "@/lib/models";
+import { useState } from "react";
+import { GameMode } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
-import { useGameStateQuery } from "@/hooks";
-import { WerewolfGameScreen } from "@/components/game";
 import { GameConfigurationPanel } from "@/components/lobby";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import type { DebugPlayer } from "@/app/api/debug/game/route";
-
-const POLL_INTERVAL_MS = 2000;
+import { DebugGameView } from "./DebugGameView";
+import type { GameInfo } from "./DebugGameView";
 
 const DEFAULT_CONFIG = {
   gameMode: GameMode.Werewolf,
   showConfigToPlayers: false,
   showRolesInPlay: true,
 };
-
-interface GameInfo {
-  gameId: string;
-  players: DebugPlayer[];
-}
 
 export default function DebugPage() {
   const [playerCount, setPlayerCount] = useState(5);
@@ -46,7 +38,7 @@ export default function DebugPage() {
       });
       const body = (await res.json()) as {
         status: string;
-        data?: GameInfo;
+        data?: { gameId: string; players: DebugPlayer[] };
         error?: string;
       };
       if (!res.ok) {
@@ -131,95 +123,4 @@ export default function DebugPage() {
       />
     </div>
   );
-}
-
-function DebugGameView({
-  gameInfo,
-  onReset,
-}: {
-  gameInfo: GameInfo;
-  onReset: () => void;
-}) {
-  const queryClient = useQueryClient();
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const { gameId, players } = gameInfo;
-
-  function handleSelectPlayer(index: number) {
-    const player = players[index];
-    if (!player) return;
-    localStorage.setItem("x-session-id", player.sessionId);
-    localStorage.setItem("player-id", player.id);
-    queryClient.removeQueries({ queryKey: ["game", gameId] });
-    setSelectedIndex(index);
-  }
-
-  const selectedPlayer = players[selectedIndex];
-
-  return (
-    <div className="flex flex-col min-h-screen">
-      <div className="flex items-center gap-3 px-4 py-2 border-b bg-background sticky top-0 z-10 flex-wrap">
-        <Button variant="ghost" size="sm" onClick={onReset}>
-          ← New game
-        </Button>
-        <div className="h-4 w-px bg-border" />
-        <div className="flex gap-1.5 flex-wrap">
-          {players.map((player, i) => (
-            <Button
-              key={player.id}
-              variant={i === selectedIndex ? "default" : "outline"}
-              size="sm"
-              onClick={() => {
-                handleSelectPlayer(i);
-              }}
-            >
-              {player.name}
-              {player.isOwner ? " (Owner)" : ""}
-            </Button>
-          ))}
-        </div>
-      </div>
-
-      {selectedPlayer && (
-        <div className="flex-1">
-          <GameScreenForPlayer
-            key={`${gameId}-${selectedPlayer.id}`}
-            gameId={gameId}
-          />
-        </div>
-      )}
-    </div>
-  );
-}
-
-function GameScreenForPlayer({ gameId }: { gameId: string }) {
-  const [refetchInterval, setRefetchInterval] = useState<number | undefined>(
-    POLL_INTERVAL_MS,
-  );
-
-  const {
-    data: gameState,
-    isLoading,
-    error,
-  } = useGameStateQuery(gameId, refetchInterval);
-
-  const gameStatus = gameState?.status.type;
-
-  useEffect(() => {
-    if (gameStatus !== undefined && gameStatus !== GameStatus.Starting) {
-      setRefetchInterval(undefined);
-    }
-  }, [gameStatus]);
-
-  if (!gameState) {
-    return (
-      <div className="p-5">
-        {isLoading && <p className="text-muted-foreground">Loading…</p>}
-        {error && (
-          <p className="text-destructive text-sm">Error: {error.message}</p>
-        )}
-      </div>
-    );
-  }
-
-  return <WerewolfGameScreen gameId={gameId} gameState={gameState} />;
 }
