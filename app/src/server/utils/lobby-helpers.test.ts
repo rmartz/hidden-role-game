@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { isValidSession, toPublicLobby } from "./lobby-helpers";
-import { GameMode } from "@/lib/models";
+import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/models";
 import type { Lobby } from "@/lib/models";
 
 function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
@@ -13,9 +13,10 @@ function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
     ],
     config: {
       gameMode: GameMode.SecretVillain,
-      roleSlots: [{ roleId: "good", count: 2 }],
+      roleConfigMode: RoleConfigMode.Default,
+      roleSlots: [{ roleId: "good", min: 2, max: 2 }],
       showConfigToPlayers: false,
-      showRolesInPlay: false,
+      showRolesInPlay: ShowRolesInPlay.None,
     },
     ...overrides,
   };
@@ -83,9 +84,10 @@ describe("toPublicLobby", () => {
       const lobby = makeLobby({
         config: {
           gameMode: GameMode.SecretVillain,
-          roleSlots: [{ roleId: "good", count: 2 }],
+          roleConfigMode: RoleConfigMode.Default,
+          roleSlots: [{ roleId: "good", min: 2, max: 2 }],
           showConfigToPlayers: true,
-          showRolesInPlay: false,
+          showRolesInPlay: ShowRolesInPlay.None,
         },
       });
       const result = toPublicLobby(lobby, "session-bob");

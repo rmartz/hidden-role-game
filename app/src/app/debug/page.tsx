@@ -34,7 +34,7 @@ export default function DebugPage() {
           playerCount,
           gameMode,
           roleSlots,
-          showRolesInPlay: true,
+          showRolesInPlay: ShowRolesInPlay.RoleAndCount,
         }),
       });
       const body = (await res.json()) as {

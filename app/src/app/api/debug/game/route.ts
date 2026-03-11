@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import { GameMode } from "@/lib/models";
+import { GameMode, ShowRolesInPlay } from "@/lib/models";
 import type { LobbyPlayer } from "@/lib/models";
 import type { RoleSlot } from "@/server/models";
 import { ServerResponseStatus } from "@/server/models";
@@ -11,7 +11,7 @@ interface CreateDebugGameRequest {
   playerCount: number;
   gameMode: GameMode;
   roleSlots: RoleSlot[];
-  showRolesInPlay: boolean;
+  showRolesInPlay: ShowRolesInPlay;
 }
 
 export interface DebugPlayer {
