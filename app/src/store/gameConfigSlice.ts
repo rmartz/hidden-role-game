@@ -67,7 +67,7 @@ const initialState: GameConfigState = {
   roleMins: {},
   roleMaxes: {},
   showConfigToPlayers: false,
-  showRolesInPlay: ShowRolesInPlay.RoleAndCount,
+  showRolesInPlay: ShowRolesInPlay.None,
   isValid: true,
   syncVersion: 0,
 };

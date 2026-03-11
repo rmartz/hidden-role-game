@@ -41,7 +41,7 @@ export async function POST(request: Request): Promise<Response> {
       roleConfigMode: RoleConfigMode.Default,
       roleSlots: getDefaultRoleSlots(defaultGameMode, 1),
       showConfigToPlayers: false,
-      showRolesInPlay: ShowRolesInPlay.RoleAndCount,
+      showRolesInPlay: ShowRolesInPlay.None,
     },
   };
 

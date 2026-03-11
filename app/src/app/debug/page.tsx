@@ -14,7 +14,7 @@ const DEFAULT_CONFIG: GameConfig = {
   gameMode: GameMode.Werewolf,
   roleConfigMode: RoleConfigMode.Default,
   showConfigToPlayers: false,
-  showRolesInPlay: ShowRolesInPlay.RoleAndCount,
+  showRolesInPlay: ShowRolesInPlay.None,
 };
 
 export default function DebugPage() {
@@ -34,7 +34,7 @@ export default function DebugPage() {
           playerCount,
           gameMode,
           roleSlots,
-          showRolesInPlay: ShowRolesInPlay.RoleAndCount,
+          showRolesInPlay: DEFAULT_CONFIG.showRolesInPlay,
         }),
       });
       const body = (await res.json()) as {
