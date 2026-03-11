@@ -24,7 +24,9 @@ export function ShareLobby({ lobbyId }: Props) {
   async function handleCopy() {
     await navigator.clipboard.writeText(lobbyUrl);
     setCopied(true);
-    setTimeout(() => { setCopied(false); }, 2000);
+    setTimeout(() => {
+      setCopied(false);
+    }, 2000);
   }
 
   async function handleShare() {
