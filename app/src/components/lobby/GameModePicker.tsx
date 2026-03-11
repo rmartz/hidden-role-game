@@ -32,7 +32,7 @@ export function GameModePicker() {
         }}
       >
         <SelectTrigger className="w-48">
-          <SelectValue />
+          <SelectValue>{GAME_MODES[selectedGameMode].name}</SelectValue>
         </SelectTrigger>
         <SelectContent>
           {Object.values(GameMode).map((mode) => (
