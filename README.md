@@ -8,6 +8,7 @@ A multiplayer social deduction game platform. Players join a lobby, are secretly
 - **TypeScript** — strict mode throughout
 - **pnpm** — package manager with workspaces
 - **TanStack Query** — server state and polling
+- **[PartyKit](https://www.partykit.io/)** — real-time WebSocket notifications
 - **Vitest** — test runner
 
 ## Project Structure
@@ -15,6 +16,8 @@ A multiplayer social deduction game platform. Players join a lobby, are secretly
 ```
 hidden-role-game/
 ├── app/                        # Next.js app (frontend + backend in one)
+│   ├── party/
+│   │   └── server.ts           # PartyKit room server (lobby real-time notifications)
 │   └── src/
 │       ├── app/
 │       │   ├── page.tsx               # Home — create or join a lobby
@@ -29,10 +32,14 @@ hidden-role-game/
 │       │   ├── models/         # Core domain models
 │       │   └── game-modes/     # Per-mode role definitions (Werewolf, Avalon, …)
 │       ├── server/
-│       │   └── models/         # API response types (public-facing)
-│       └── services/
-│           ├── LobbyService.ts # In-memory lobby store
-│           └── GameService.ts  # In-memory game store
+│       │   ├── models/         # API response types (public-facing)
+│       │   └── utils/          # Server-only helpers (auth, role slots, role assignment)
+│       ├── services/
+│       │   ├── LobbyService.ts          # In-memory lobby store
+│       │   ├── GameService.ts           # In-memory game store
+│       │   └── LobbyBroadcastService.ts # Notifies PartyKit on lobby state changes
+│       └── hooks/
+│           └── lobbySocket.ts  # Client-side PartyKit WebSocket hook
 ├── package.json                # Workspace root (tooling: ESLint, Prettier, Husky)
 └── pnpm-workspace.yaml
 ```
@@ -48,20 +55,22 @@ hidden-role-game/
 
 The lobby owner has a dedicated `/owner` view with full role visibility and controls to advance phases.
 
+## Real-Time Updates
+
+Lobby state changes are pushed to all connected clients via PartyKit WebSockets. The Next.js API routes POST a lightweight notification to PartyKit after each mutation; clients re-fetch the full lobby state from Next.js directly. This keeps all authorization and sensitive data server-side.
+
 ## Getting Started
 
 ```bash
 # Install dependencies
 pnpm install
 
-# Start development server (http://localhost:3000)
-pnpm dev
+# Start both Next.js and PartyKit together (recommended)
+pnpm dev:all
 
-# Run tests
-pnpm test
-
-# Build for production
-pnpm build
+# Or run them separately:
+pnpm dev        # Next.js only  (http://localhost:3000)
+pnpm dev:party  # PartyKit only (ws://localhost:1999)
 ```
 
 ## API
@@ -76,28 +85,37 @@ All API routes are served by the same Next.js process — no separate server nee
 | `GET`    | `/api/lobby/:id`              | Get lobby state                            |
 | `POST`   | `/api/lobby/:id/join`         | Join a lobby; returns lobby + session ID   |
 | `PUT`    | `/api/lobby/:id/config`       | Update role configuration (owner only)     |
-| `GET`    | `/api/lobby/:id/owner`        | Get full lobby state (owner only)          |
-| `DELETE` | `/api/lobby/:id/players/:pid` | Remove a player (owner only)               |
+| `PUT`    | `/api/lobby/:id/owner`        | Transfer ownership (owner only)            |
+| `DELETE` | `/api/lobby/:id/players/:pid` | Remove a player (owner or self)            |
 
 ### Game
 
-| Method | Path                    | Description                                       |
-| ------ | ----------------------- | ------------------------------------------------- |
-| `POST` | `/api/game/create`      | Start a game from a lobby; returns game ID        |
-| `GET`  | `/api/game/:id`         | Get game state for the current player             |
-| `POST` | `/api/game/:id/advance` | Advance game status (owner only)                  |
-| `POST` | `/api/game/:id/phase`   | Advance night phase to the next role (owner only) |
+| Method | Path                    | Description                                |
+| ------ | ----------------------- | ------------------------------------------ |
+| `POST` | `/api/game/create`      | Start a game from a lobby; returns game ID |
+| `GET`  | `/api/game/:id`         | Get game state for the current player      |
+| `POST` | `/api/game/:id/advance` | Advance game status (owner only)           |
+| `POST` | `/api/game/:id/action`  | Submit a role action                       |
 
 Session IDs are stored in `localStorage` and sent as the `x-session-id` header.
 
 ## Development
 
 ```bash
+# Run tests
+pnpm test
+
 # Lint
 pnpm lint
 
 # Format
 pnpm format
+
+# Type check
+pnpm --filter @hidden-role/app exec tsc --noEmit
+
+# Deploy PartyKit to production
+pnpm --filter @hidden-role/app party:deploy
 ```
 
-CI runs on every PR: **Tests**, **Lint**, and **Build**.
+CI runs on every PR: **Tests**, **Lint**, **Format**, and **Build**.

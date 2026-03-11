@@ -8,7 +8,7 @@ import {
 import { getDefaultRoleSlots } from "@/lib/game-modes";
 import { ServerResponseStatus, type CreateLobbyRequest } from "@/server/models";
 import { lobbyService } from "@/services/LobbyService";
-import { toPublicLobby } from "@/server/lobby-helpers";
+import { toPublicLobby } from "@/server/utils";
 
 export async function POST(request: Request): Promise<Response> {
   const body = (await request.json()) as CreateLobbyRequest;

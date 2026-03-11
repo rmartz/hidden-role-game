@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { assignRoles } from "./assignRoles";
+import { assignRoles } from "./assign-roles";
 import type { LobbyPlayer } from "@/lib/models";
 
 function makePlayers(count: number): LobbyPlayer[] {
