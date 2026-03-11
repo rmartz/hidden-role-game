@@ -6,7 +6,7 @@ import {
   decrementRoleCount,
   setRoleMin,
   setRoleMax,
-} from "@/store/gameConfigSlice";
+} from "@/store/game-config-slice";
 import { RoleLabel } from "@/components/RoleLabel";
 import type { IncrementDirection } from "./Incrementer";
 import { Incrementer } from "./Incrementer";

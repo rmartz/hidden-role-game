@@ -1,16 +1,17 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { GameMode, RoleConfigMode } from "@/lib/types";
+import { GameMode } from "@/lib/types";
 import { GAME_MODES, getRoleSlotsRequired } from "@/lib/game-modes";
 import type { GameConfig, RoleSlot } from "@/server/types";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   loadConfig,
+  selectRoleSlots,
   setPlayerCount,
   setShowConfigToPlayers,
   setShowRolesInPlay,
-} from "@/store/gameConfigSlice";
+} from "@/store/game-config-slice";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -45,9 +46,7 @@ export function GameConfigurationPanel(props: Props) {
   );
   const showRolesInPlay = useAppSelector((s) => s.gameConfig.showRolesInPlay);
   const roleConfigMode = useAppSelector((s) => s.gameConfig.roleConfigMode);
-  const roleCounts = useAppSelector((s) => s.gameConfig.roleCounts);
-  const roleMins = useAppSelector((s) => s.gameConfig.roleMins);
-  const roleMaxes = useAppSelector((s) => s.gameConfig.roleMaxes);
+  const roleSlots = useAppSelector((s) => selectRoleSlots(s.gameConfig));
   const isValid = useAppSelector((s) => s.gameConfig.isValid);
 
   const hasLoadedRef = useRef(false);
@@ -70,23 +69,6 @@ export function GameConfigurationPanel(props: Props) {
   const roleDefinitions = GAME_MODES[activeGameMode].roles;
   const ownerTitle = GAME_MODES[activeGameMode].ownerTitle;
   const roleSlotsRequired = getRoleSlotsRequired(activeGameMode, playerCount);
-
-  const activeRoleConfigMode = readOnly
-    ? config.roleConfigMode
-    : roleConfigMode;
-
-  const roleSlots: RoleSlot[] =
-    activeRoleConfigMode === RoleConfigMode.Advanced
-      ? Object.keys(roleDefinitions)
-          .filter((id) => (roleMaxes[id] ?? 0) > 0)
-          .map((id) => ({
-            roleId: id,
-            min: roleMins[id] ?? 0,
-            max: roleMaxes[id] ?? 0,
-          }))
-      : Object.entries(roleCounts)
-          .filter(([, count]) => count > 0)
-          .map(([roleId, count]) => ({ roleId, min: count, max: count }));
 
   return (
     <>

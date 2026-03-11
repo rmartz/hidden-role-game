@@ -2,7 +2,7 @@
 
 import { RoleConfigMode } from "@/lib/types";
 import { useAppDispatch, useAppSelector } from "@/store";
-import { setRoleConfigMode } from "@/store/gameConfigSlice";
+import { setRoleConfigMode } from "@/store/game-config-slice";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 

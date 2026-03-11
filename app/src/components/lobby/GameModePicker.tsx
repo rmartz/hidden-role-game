@@ -3,7 +3,7 @@
 import { GameMode } from "@/lib/types";
 import { GAME_MODES } from "@/lib/game-modes";
 import { useAppDispatch, useAppSelector } from "@/store";
-import { setGameMode } from "@/store/gameConfigSlice";
+import { setGameMode } from "@/store/game-config-slice";
 import { Label } from "@/components/ui/label";
 import {
   Select,
