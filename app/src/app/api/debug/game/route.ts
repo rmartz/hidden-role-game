@@ -45,13 +45,11 @@ export async function POST(request: Request): Promise<Response> {
 
   const ownerPlayer = ownerTitle ? players[0] : null;
   const roleSlotsRequired = playerCount - (ownerPlayer ? 1 : 0);
-  const totalSlots = roleSlots.reduce((sum, s) => sum + s.count, 0);
+  const totalMin = roleSlots.reduce((sum, s) => sum + s.min, 0);
+  const totalMax = roleSlots.reduce((sum, s) => sum + s.max, 0);
 
-  if (totalSlots !== roleSlotsRequired) {
-    return errorResponse(
-      `Role slot count (${String(totalSlots)}) must match player count (${String(roleSlotsRequired)})`,
-      400,
-    );
+  if (totalMin > roleSlotsRequired || totalMax < roleSlotsRequired) {
+    return errorResponse("Role slot ranges must cover the player count", 400);
   }
 
   for (const slot of roleSlots) {
