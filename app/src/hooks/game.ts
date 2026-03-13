@@ -19,6 +19,7 @@ import {
   type FirebasePlayerState,
 } from "@/lib/firebase/schema";
 import { getSessionId } from "@/lib/api";
+import { useFirebaseAuth } from "@/hooks/firebaseAuth";
 
 export function useStartGame(lobbyId: string) {
   const queryClient = useQueryClient();
@@ -44,10 +45,11 @@ export function useStartGame(lobbyId: string) {
  */
 export function useGameStateQuery(gameId: string, refetchInterval?: number) {
   const queryClient = useQueryClient();
+  const { isReady } = useFirebaseAuth();
 
   useEffect(() => {
     const sessionId = getSessionId();
-    if (!sessionId) return;
+    if (!sessionId || !isReady) return;
 
     const db = getClientDatabase();
     const stateRef = ref(db, `games/${gameId}/playerState/${sessionId}`);
@@ -69,7 +71,7 @@ export function useGameStateQuery(gameId: string, refetchInterval?: number) {
     return () => {
       unsubscribe();
     };
-  }, [gameId, queryClient]);
+  }, [gameId, isReady, queryClient]);
 
   return useQuery({
     queryKey: ["game", gameId],

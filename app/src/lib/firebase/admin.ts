@@ -1,5 +1,6 @@
 import { initializeApp, getApps, cert } from "firebase-admin/app";
 import { getDatabase } from "firebase-admin/database";
+import { getAuth } from "firebase-admin/auth";
 
 function initAdminApp() {
   const existing = getApps().find((a) => a.name === "[DEFAULT]");
@@ -18,4 +19,9 @@ function initAdminApp() {
 export function getAdminDatabase() {
   initAdminApp();
   return getDatabase();
+}
+
+export function getAdminAuth() {
+  initAdminApp();
+  return getAuth();
 }

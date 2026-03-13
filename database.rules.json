@@ -1,0 +1,38 @@
+{
+  "rules": {
+    "lobbies": {
+      "$lobbyId": {
+        "public": {
+          ".read": true,
+          ".write": false
+        },
+        "private": {
+          ".read": false,
+          ".write": false
+        }
+      }
+    },
+    "games": {
+      "$gameId": {
+        "public": {
+          ".read": false,
+          ".write": false
+        },
+        "playerState": {
+          "$sessionId": {
+            ".read": "auth != null && auth.token.sessionId == $sessionId",
+            ".write": false
+          }
+        },
+        "sessionIndex": {
+          ".read": false,
+          ".write": false
+        }
+      }
+    },
+    "$other": {
+      ".read": false,
+      ".write": false
+    }
+  }
+}

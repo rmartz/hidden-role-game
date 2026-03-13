@@ -8,6 +8,7 @@ import type { PublicLobby } from "@/server/types";
 import type { FirebaseLobbyPublic } from "@/lib/firebase/schema";
 import { firebaseToPublicLobby } from "@/lib/firebase/schema";
 import { getPlayerId } from "@/lib/api";
+import { useFirebaseAuth } from "@/hooks/firebaseAuth";
 
 /**
  * Subscribes to the lobby's public Firebase RTDB node and updates the
@@ -20,9 +21,10 @@ export function useLobbyWebSocket(
 ): { isConnected: boolean } {
   const queryClient = useQueryClient();
   const isActive = useRef(false);
+  const { isReady } = useFirebaseAuth();
 
   useEffect(() => {
-    if (!sessionId) return;
+    if (!sessionId || !isReady) return;
 
     const db = getClientDatabase();
     const lobbyPublicRef = ref(db, `lobbies/${lobbyId}/public`);
@@ -64,7 +66,7 @@ export function useLobbyWebSocket(
       isActive.current = false;
       unsubscribe();
     };
-  }, [lobbyId, sessionId, queryClient]);
+  }, [lobbyId, sessionId, isReady, queryClient]);
 
   return { isConnected: !!sessionId };
 }
