@@ -5,8 +5,6 @@ import {
   toPublicLobby,
 } from "@/server/utils";
 import { lobbyService } from "@/services/LobbyService";
-import { lobbyBroadcastService } from "@/services/LobbyBroadcastService";
-import { LobbyChangeReason } from "@/server/types/websocket";
 
 export async function PUT(
   request: Request,
@@ -15,20 +13,18 @@ export async function PUT(
   const { lobbyId } = await params;
   const sessionId = request.headers.get("x-session-id") ?? undefined;
 
-  const auth = authenticateLobby(lobbyId, sessionId, {
+  const auth = await authenticateLobby(lobbyId, sessionId, {
     requireOwner: true,
     requireNoGame: true,
   });
   if (auth instanceof Response) return auth;
 
   const { playerId } = (await request.json()) as { playerId: string };
-  const updated = lobbyService.transferOwner(lobbyId, playerId);
+  const updated = await lobbyService.transferOwner(lobbyId, playerId);
 
   if (!updated) {
     return errorResponse("Player not found", 404);
   }
-
-  lobbyBroadcastService.broadcast(lobbyId, LobbyChangeReason.OwnerChanged);
 
   return Response.json({
     status: ServerResponseStatus.Success,

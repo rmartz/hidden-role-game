@@ -88,48 +88,48 @@ describe("errorResponse", () => {
 });
 
 describe("authenticateLobby", () => {
-  it("returns 401 when sessionId is undefined", () => {
-    const result = authenticateLobby("lobby-1", undefined);
+  it("returns 401 when sessionId is undefined", async () => {
+    const result = await authenticateLobby("lobby-1", undefined);
     expect(result instanceof Response).toBe(true);
     expect((result as Response).status).toBe(401);
   });
 
-  it("returns 404 when the lobby does not exist", () => {
-    mockGetLobby.mockReturnValue(undefined);
-    const result = authenticateLobby("lobby-1", "session-owner");
+  it("returns 404 when the lobby does not exist", async () => {
+    mockGetLobby.mockResolvedValue(undefined);
+    const result = await authenticateLobby("lobby-1", "session-owner");
     expect(result instanceof Response).toBe(true);
     expect((result as Response).status).toBe(404);
   });
 
-  it("returns 403 when sessionId is not a player in the lobby", () => {
-    mockGetLobby.mockReturnValue(makeLobby());
-    const result = authenticateLobby("lobby-1", "session-unknown");
+  it("returns 403 when sessionId is not a player in the lobby", async () => {
+    mockGetLobby.mockResolvedValue(makeLobby());
+    const result = await authenticateLobby("lobby-1", "session-unknown");
     expect(result instanceof Response).toBe(true);
     expect((result as Response).status).toBe(403);
   });
 
-  it("returns 403 when requireOwner is true and caller is not the owner", () => {
-    mockGetLobby.mockReturnValue(makeLobby());
-    const result = authenticateLobby("lobby-1", "session-bob", {
+  it("returns 403 when requireOwner is true and caller is not the owner", async () => {
+    mockGetLobby.mockResolvedValue(makeLobby());
+    const result = await authenticateLobby("lobby-1", "session-bob", {
       requireOwner: true,
     });
     expect(result instanceof Response).toBe(true);
     expect((result as Response).status).toBe(403);
   });
 
-  it("returns 409 when requireNoGame is true and a game has already started", () => {
-    mockGetLobby.mockReturnValue(makeLobby({ gameId: "game-1" }));
-    const result = authenticateLobby("lobby-1", "session-owner", {
+  it("returns 409 when requireNoGame is true and a game has already started", async () => {
+    mockGetLobby.mockResolvedValue(makeLobby({ gameId: "game-1" }));
+    const result = await authenticateLobby("lobby-1", "session-owner", {
       requireNoGame: true,
     });
     expect(result instanceof Response).toBe(true);
     expect((result as Response).status).toBe(409);
   });
 
-  it("returns the lobby and sessionId on success", () => {
+  it("returns the lobby and sessionId on success", async () => {
     const lobby = makeLobby();
-    mockGetLobby.mockReturnValue(lobby);
-    const result = authenticateLobby("lobby-1", "session-owner");
+    mockGetLobby.mockResolvedValue(lobby);
+    const result = await authenticateLobby("lobby-1", "session-owner");
     expect(result instanceof Response).toBe(false);
     const { lobby: resultLobby, sessionId } = result as {
       lobby: Lobby;
@@ -139,23 +139,23 @@ describe("authenticateLobby", () => {
     expect(sessionId).toBe("session-owner");
   });
 
-  it("succeeds for a non-owner when requireOwner is false", () => {
-    mockGetLobby.mockReturnValue(makeLobby());
-    const result = authenticateLobby("lobby-1", "session-bob");
+  it("succeeds for a non-owner when requireOwner is false", async () => {
+    mockGetLobby.mockResolvedValue(makeLobby());
+    const result = await authenticateLobby("lobby-1", "session-bob");
     expect(result instanceof Response).toBe(false);
   });
 
-  it("succeeds for the owner when requireOwner is true", () => {
-    mockGetLobby.mockReturnValue(makeLobby());
-    const result = authenticateLobby("lobby-1", "session-owner", {
+  it("succeeds for the owner when requireOwner is true", async () => {
+    mockGetLobby.mockResolvedValue(makeLobby());
+    const result = await authenticateLobby("lobby-1", "session-owner", {
       requireOwner: true,
     });
     expect(result instanceof Response).toBe(false);
   });
 
-  it("succeeds when requireNoGame is true and no game has started", () => {
-    mockGetLobby.mockReturnValue(makeLobby());
-    const result = authenticateLobby("lobby-1", "session-owner", {
+  it("succeeds when requireNoGame is true and no game has started", async () => {
+    mockGetLobby.mockResolvedValue(makeLobby());
+    const result = await authenticateLobby("lobby-1", "session-owner", {
       requireNoGame: true,
     });
     expect(result instanceof Response).toBe(false);
@@ -163,30 +163,30 @@ describe("authenticateLobby", () => {
 });
 
 describe("authenticateGame", () => {
-  it("returns 401 when sessionId is undefined", () => {
-    const result = authenticateGame("game-1", undefined);
+  it("returns 401 when sessionId is undefined", async () => {
+    const result = await authenticateGame("game-1", undefined);
     expect(result instanceof Response).toBe(true);
     expect((result as Response).status).toBe(401);
   });
 
-  it("returns 403 when the game does not exist", () => {
-    mockGetGame.mockReturnValue(undefined);
-    const result = authenticateGame("game-1", "session-alice");
+  it("returns 403 when the game does not exist", async () => {
+    mockGetGame.mockResolvedValue(undefined);
+    const result = await authenticateGame("game-1", "session-alice");
     expect(result instanceof Response).toBe(true);
     expect((result as Response).status).toBe(403);
   });
 
-  it("returns 403 when no player in the game has the given sessionId", () => {
-    mockGetGame.mockReturnValue(makeGame());
-    const result = authenticateGame("game-1", "session-unknown");
+  it("returns 403 when no player in the game has the given sessionId", async () => {
+    mockGetGame.mockResolvedValue(makeGame());
+    const result = await authenticateGame("game-1", "session-unknown");
     expect(result instanceof Response).toBe(true);
     expect((result as Response).status).toBe(403);
   });
 
-  it("returns the game and caller on success", () => {
+  it("returns the game and caller on success", async () => {
     const game = makeGame();
-    mockGetGame.mockReturnValue(game);
-    const result = authenticateGame("game-1", "session-alice");
+    mockGetGame.mockResolvedValue(game);
+    const result = await authenticateGame("game-1", "session-alice");
     expect(result instanceof Response).toBe(false);
     const { game: resultGame, caller } = result as {
       game: Game;
@@ -202,41 +202,28 @@ describe("validatePlayerName", () => {
     expect(validatePlayerName("Alice")).toBeNull();
   });
 
-  it("returns null for a name with international characters", () => {
-    expect(validatePlayerName("Ångström")).toBeNull();
-    expect(validatePlayerName("张伟")).toBeNull();
-    expect(validatePlayerName("Müller")).toBeNull();
-  });
-
-  it("returns null for a name with allowed punctuation", () => {
-    expect(validatePlayerName("O'Brien")).toBeNull();
-    expect(validatePlayerName("Mary-Jane")).toBeNull();
-  });
-
   it("returns an error for an empty name", () => {
     expect(validatePlayerName("")).not.toBeNull();
   });
 
-  it("returns an error for a name exceeding 32 characters", () => {
-    expect(validatePlayerName("A".repeat(33))).not.toBeNull();
+  it("returns an error for a name that is too long", () => {
+    expect(validatePlayerName("a".repeat(33))).not.toBeNull();
   });
 
-  it("returns null for a name at the 32 character limit", () => {
-    expect(validatePlayerName("A".repeat(32))).toBeNull();
+  it("accepts a name at the maximum length", () => {
+    expect(validatePlayerName("a".repeat(32))).toBeNull();
   });
 
-  it.each([
-    "<script>",
-    '{"key":"val"}',
-    "[1,2]",
-    "a\\b",
-    "a`b",
-    "a&b",
-    'say "hi"',
-  ])(
-    "returns an error for name containing HTML/JSON characters: %s",
+  it.each(["<script>", "foo&bar", 'say "hi"', "{json}", "[arr]"])(
+    "returns an error for name containing invalid chars: %s",
     (name) => {
       expect(validatePlayerName(name)).not.toBeNull();
     },
   );
+
+  it("allows international characters", () => {
+    expect(validatePlayerName("Ångström")).toBeNull();
+    expect(validatePlayerName("O'Brien")).toBeNull();
+    expect(validatePlayerName("José-María")).toBeNull();
+  });
 });

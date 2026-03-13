@@ -5,8 +5,6 @@ import {
   toPublicLobby,
 } from "@/server/utils";
 import { lobbyService } from "@/services/LobbyService";
-import { lobbyBroadcastService } from "@/services/LobbyBroadcastService";
-import { LobbyChangeReason } from "@/server/types/websocket";
 
 export async function DELETE(
   request: Request,
@@ -15,7 +13,9 @@ export async function DELETE(
   const { lobbyId, playerId } = await params;
   const sessionId = request.headers.get("x-session-id") ?? undefined;
 
-  const auth = authenticateLobby(lobbyId, sessionId, { requireNoGame: true });
+  const auth = await authenticateLobby(lobbyId, sessionId, {
+    requireNoGame: true,
+  });
   if (auth instanceof Response) return auth;
   const { lobby } = auth;
 
@@ -32,10 +32,7 @@ export async function DELETE(
     return errorResponse("Owner cannot leave the lobby", 403);
   }
 
-  const updated = lobbyService.removePlayer(lobbyId, playerId);
-  if (updated) {
-    lobbyBroadcastService.broadcast(lobbyId, LobbyChangeReason.PlayerLeft);
-  }
+  const updated = await lobbyService.removePlayer(lobbyId, playerId);
 
   return Response.json({
     status: ServerResponseStatus.Success,

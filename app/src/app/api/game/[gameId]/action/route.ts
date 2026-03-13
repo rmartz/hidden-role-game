@@ -9,7 +9,7 @@ export async function POST(
   const { gameId } = await params;
   const sessionId = request.headers.get("x-session-id") ?? undefined;
 
-  const auth = authenticateGame(gameId, sessionId);
+  const auth = await authenticateGame(gameId, sessionId);
   if (auth instanceof Response) return auth;
   const { caller } = auth;
 
@@ -21,7 +21,7 @@ export async function POST(
     return errorResponse("actionId must be a string", 400);
   }
 
-  const result = gameService.applyAction(
+  const result = await gameService.applyAction(
     gameId,
     body.actionId,
     caller.id,

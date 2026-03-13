@@ -68,7 +68,7 @@ const initialState: GameConfigState = {
   roleMaxes: {},
   showConfigToPlayers: false,
   showRolesInPlay: ShowRolesInPlay.None,
-  isValid: true,
+  isValid: false,
   syncVersion: 0,
 };
 
@@ -210,8 +210,7 @@ const gameConfigSlice = createSlice({
     },
 
     setPlayerCount(state, action: PayloadAction<number>) {
-      const { minPlayers } = GAME_MODES[state.gameMode];
-      state.playerCount = Math.max(minPlayers, action.payload);
+      state.playerCount = Math.max(1, action.payload);
       if (state.roleConfigMode === RoleConfigMode.Default) {
         const slots = GAME_MODES[state.gameMode].defaultRoleCount(
           state.playerCount,

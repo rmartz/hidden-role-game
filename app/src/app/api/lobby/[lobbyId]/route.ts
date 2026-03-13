@@ -8,7 +8,7 @@ export async function GET(
   const { lobbyId } = await params;
   const sessionId = request.headers.get("x-session-id") ?? undefined;
 
-  const auth = authenticateLobby(lobbyId, sessionId);
+  const auth = await authenticateLobby(lobbyId, sessionId);
   if (auth instanceof Response) return auth;
 
   return Response.json({

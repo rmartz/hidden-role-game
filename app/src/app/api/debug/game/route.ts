@@ -59,7 +59,7 @@ export async function POST(request: Request): Promise<Response> {
     }
   }
 
-  const game = gameService.createGame(
+  const game = await gameService.createGame(
     `debug-${randomUUID()}`,
     players,
     roleSlots,
