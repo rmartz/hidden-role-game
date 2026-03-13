@@ -23,6 +23,7 @@ import type {
 } from "@/lib/game-modes/werewolf";
 import { assignRoles, adjustRoleSlots } from "@/server/utils";
 import { getAdminDatabase } from "@/lib/firebase/admin";
+import { ServerValue } from "firebase-admin/database";
 import {
   gameToFirebase,
   firebaseToGame,
@@ -284,7 +285,7 @@ export class FirebaseGameService {
     }
 
     await gameRef(game.id).set({
-      public: gameToFirebase(game),
+      public: { ...gameToFirebase(game), createdAt: ServerValue.TIMESTAMP },
       sessionIndex,
     });
     await this.writeAllPlayerStates(game);

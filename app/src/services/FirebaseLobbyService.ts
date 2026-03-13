@@ -6,6 +6,7 @@ import type {
   ShowRolesInPlay,
 } from "@/lib/types";
 import { getAdminDatabase } from "@/lib/firebase/admin";
+import { ServerValue } from "firebase-admin/database";
 import {
   lobbyToFirebase,
   firebaseToLobby,
@@ -20,7 +21,10 @@ function lobbyRef(lobbyId: string) {
 export class FirebaseLobbyService {
   async addLobby(lobby: Lobby): Promise<void> {
     const { public: pub, private: priv } = lobbyToFirebase(lobby);
-    await lobbyRef(lobby.id).set({ public: pub, private: priv });
+    await lobbyRef(lobby.id).set({
+      public: { ...pub, createdAt: ServerValue.TIMESTAMP },
+      private: priv,
+    });
   }
 
   async getLobby(lobbyId: string): Promise<Lobby | undefined> {

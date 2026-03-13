@@ -36,6 +36,8 @@ export interface FirebaseLobbyPublic {
   players?: Record<string, FirebaseLobbyPlayer>;
   config: FirebaseLobbyConfig;
   gameId: string | null;
+  /** Unix ms timestamp set server-side at lobby creation. Used for TTL cleanup. */
+  createdAt?: number;
 }
 
 export interface FirebaseLobbyPlayer {
@@ -79,6 +81,8 @@ export interface FirebaseGamePublic {
   configuredRoleSlots?: FirebaseRoleSlot[];
   showRolesInPlay: string;
   ownerPlayerId: string | null;
+  /** Unix ms timestamp set server-side at game creation. Used for TTL cleanup. */
+  createdAt?: number;
 }
 
 // ---------------------------------------------------------------------------
