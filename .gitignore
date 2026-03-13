@@ -4,3 +4,6 @@ dist/
 package-lock.json
 tsconfig.tsbuildinfo
 .partykit/
+.env
+.env.local
+.env*.local
