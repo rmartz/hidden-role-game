@@ -19,6 +19,7 @@ import type {
   PlayerRoleAssignment,
   RoleSlot,
 } from "@/lib/types";
+import type { NightAction } from "@/lib/game-modes/werewolf";
 import type {
   PublicLobby,
   PlayerGameState,
@@ -264,6 +265,8 @@ export interface FirebasePlayerState {
     role: { id: string; name: string; team: string };
   }[];
   rolesInPlay?: RoleInPlay[] | null;
+  nightActions?: Record<string, NightAction>;
+  myNightTarget?: string | null;
 }
 
 export function playerStateToFirebase(
@@ -277,6 +280,10 @@ export function playerStateToFirebase(
     myRole: state.myRole,
     visibleRoleAssignments: state.visibleRoleAssignments,
     rolesInPlay: state.rolesInPlay,
+    ...(state.nightActions ? { nightActions: state.nightActions } : {}),
+    ...(state.myNightTarget !== undefined
+      ? { myNightTarget: state.myNightTarget }
+      : {}),
   };
 }
 
@@ -306,5 +313,9 @@ export function firebaseToPlayerState(
       }),
     ),
     rolesInPlay: raw.rolesInPlay ?? null,
+    ...(raw.nightActions ? { nightActions: raw.nightActions } : {}),
+    ...(raw.myNightTarget !== undefined
+      ? { myNightTarget: raw.myNightTarget }
+      : {}),
   };
 }

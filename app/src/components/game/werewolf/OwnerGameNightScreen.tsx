@@ -20,13 +20,25 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
   const { phase } = turnState;
   if (phase.type !== WerewolfPhase.Nighttime) return null;
 
-  const { nightPhaseOrder, currentPhaseIndex } = phase;
+  const { nightPhaseOrder, currentPhaseIndex, nightActions } = phase;
   const activeRoleId = nightPhaseOrder[currentPhaseIndex] ?? "";
   const modeConfig = GAME_MODES[gameState.gameMode];
   const activeRoleName =
     (activeRoleId ? modeConfig.roles[activeRoleId]?.name : undefined) ??
     activeRoleId;
   const isLastPhase = currentPhaseIndex === nightPhaseOrder.length - 1;
+
+  const activeTarget = nightActions[activeRoleId]?.targetPlayerId ?? null;
+  const activeTargetName = activeTarget
+    ? gameState.players.find((p) => p.id === activeTarget)?.name
+    : null;
+
+  const canTarget = turnState.turn > 1;
+
+  // Non-owner players eligible to be targeted.
+  const targetablePlayers = gameState.players.filter(
+    (p) => p.id !== gameState.gameOwner?.id,
+  );
 
   return (
     <div className="p-5">
@@ -38,6 +50,48 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
         Currently awake:{" "}
         <strong className="text-foreground">{activeRoleName}</strong>
       </p>
+
+      {canTarget && (
+        <div className="mb-4 rounded-md border p-3">
+          <p className="text-sm font-medium mb-2">
+            Target:{" "}
+            {activeTargetName ? (
+              <strong className="text-foreground">{activeTargetName}</strong>
+            ) : (
+              <span className="text-muted-foreground italic">none</span>
+            )}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {targetablePlayers.map((player) => (
+              <Button
+                key={player.id}
+                size="sm"
+                variant={activeTarget === player.id ? "default" : "outline"}
+                onClick={() => {
+                  if (activeTarget === player.id) {
+                    action.mutate({
+                      actionId: WerewolfAction.ClearNightTarget,
+                      payload: { roleId: activeRoleId },
+                    });
+                  } else {
+                    action.mutate({
+                      actionId: WerewolfAction.SetNightTarget,
+                      payload: {
+                        roleId: activeRoleId,
+                        targetPlayerId: player.id,
+                      },
+                    });
+                  }
+                }}
+                disabled={action.isPending}
+              >
+                {player.name}
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {isLastPhase ? (
         <Button
           onClick={() => {

@@ -18,6 +18,7 @@ import type {
 import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase, buildNightPhaseOrder } from "@/lib/game-modes/werewolf";
 import type {
+  NightAction,
   WerewolfTurnState,
   WerewolfNighttimePhase,
 } from "@/lib/game-modes/werewolf";
@@ -82,6 +83,7 @@ export class FirebaseGameService {
       type: WerewolfPhase.Nighttime,
       nightPhaseOrder,
       currentPhaseIndex: 0,
+      nightActions: {},
     };
     return { turn: 1, phase };
   }
@@ -169,6 +171,9 @@ export class FirebaseGameService {
     const playerById = new Map(game.players.map((p) => [p.id, p]));
     const publicPlayers = game.players.map((p) => ({ id: p.id, name: p.name }));
 
+    // Extract nightActions from turnState for the current phase.
+    const nightActions = this.extractNightActions(game);
+
     if (callerId === game.ownerPlayerId) {
       const visibleRoleAssignments = game.roleAssignments.flatMap(
         (assignment) => {
@@ -191,6 +196,7 @@ export class FirebaseGameService {
         myRole: null,
         visibleRoleAssignments,
         rolesInPlay: this.buildRolesInPlay(game),
+        ...(nightActions ? { nightActions } : {}),
       };
     }
 
@@ -218,6 +224,10 @@ export class FirebaseGameService {
       ];
     });
 
+    // Include myNightTarget during nighttime (after first night).
+    const myNightTarget =
+      nightActions?.[myAssignment.roleDefinitionId]?.targetPlayerId ?? null;
+
     return {
       status: game.status,
       gameMode: game.gameMode,
@@ -226,7 +236,19 @@ export class FirebaseGameService {
       myRole: { id: myRole.id, name: myRole.name, team: myRole.team },
       visibleRoleAssignments,
       rolesInPlay: this.buildRolesInPlay(game),
+      ...(nightActions ? { myNightTarget } : {}),
     };
+  }
+
+  /** Extracts nightActions from the current turnState, if present. */
+  private extractNightActions(
+    game: Game,
+  ): Record<string, NightAction> | undefined {
+    if (game.status.type !== GameStatus.Playing) return undefined;
+    const ts = game.status.turnState as WerewolfTurnState | undefined;
+    if (!ts) return undefined;
+    const { nightActions } = ts.phase;
+    return Object.keys(nightActions).length > 0 ? nightActions : undefined;
   }
 
   /** Writes pre-computed PlayerGameState for every player in the game. */

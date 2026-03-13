@@ -32,7 +32,11 @@ export function PlayerGameScreen({ gameId, gameState }: Props) {
 
   if (turnState?.phase.type === WerewolfPhase.Nighttime) {
     return (
-      <PlayerGameNightScreen gameState={gameState} phase={turnState.phase} />
+      <PlayerGameNightScreen
+        gameId={gameId}
+        gameState={gameState}
+        turnState={turnState}
+      />
     );
   }
 

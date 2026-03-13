@@ -1,4 +1,5 @@
 import type { GameStatusState, GameMode, RoleSlot, Team } from "@/lib/types";
+import type { NightAction } from "@/lib/game-modes/werewolf";
 import type { PublicLobbyPlayer } from "./lobby";
 
 export type { RoleSlot };
@@ -40,4 +41,8 @@ export interface PlayerGameState {
   myRole: PublicRoleInfo | null;
   visibleRoleAssignments: VisibleTeammate[];
   rolesInPlay: RoleInPlay[] | null;
+  /** All night targets keyed by roleId. Only populated for the narrator/owner. */
+  nightActions?: Record<string, NightAction>;
+  /** The current player's role's night target (playerId), or null if none set. Only populated for non-owner players during nighttime. */
+  myNightTarget?: string | null;
 }
