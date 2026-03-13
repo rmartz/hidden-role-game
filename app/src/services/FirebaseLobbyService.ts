@@ -60,7 +60,7 @@ export class FirebaseLobbyService {
       private: FirebaseLobbyPrivate;
     };
 
-    const newSessionId = data.private.playerSessions[targetPlayerId];
+    const newSessionId = data.private.playerSessions?.[targetPlayerId];
     if (!newSessionId) return undefined;
 
     await lobbyRef(lobbyId).update({
@@ -120,8 +120,11 @@ export class FirebaseLobbyService {
       [`private/playerSessions/${player.id}`]: player.sessionId,
     });
 
-    data.public.players[player.id] = { id: player.id, name: player.name };
-    data.private.playerSessions[player.id] = player.sessionId;
+    (data.public.players ??= {})[player.id] = {
+      id: player.id,
+      name: player.name,
+    };
+    (data.private.playerSessions ??= {})[player.id] = player.sessionId;
     return firebaseToLobby(lobbyId, data.public, data.private);
   }
 
