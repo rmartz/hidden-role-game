@@ -83,7 +83,7 @@ export class FirebaseGameService {
       nightPhaseOrder,
       currentPhaseIndex: 0,
     };
-    return { turn: 1, phase };
+    return { turn: 1, phase, deadPlayerIds: [] };
   }
 
   private buildRolesInPlay(game: Game): RoleInPlay[] | null {
@@ -169,6 +169,9 @@ export class FirebaseGameService {
     const playerById = new Map(game.players.map((p) => [p.id, p]));
     const publicPlayers = game.players.map((p) => ({ id: p.id, name: p.name }));
 
+    // Extract deadPlayerIds from Werewolf turn state.
+    const deadPlayerIds = this.extractDeadPlayerIds(game);
+
     if (callerId === game.ownerPlayerId) {
       const visibleRoleAssignments = game.roleAssignments.flatMap(
         (assignment) => {
@@ -191,6 +194,7 @@ export class FirebaseGameService {
         myRole: null,
         visibleRoleAssignments,
         rolesInPlay: this.buildRolesInPlay(game),
+        ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
       };
     }
 
@@ -202,6 +206,7 @@ export class FirebaseGameService {
     const myRole = roles[myAssignment.roleDefinitionId];
     if (!myRole) return null;
 
+    // Start with teammate visibility.
     const visibleRoleAssignments = caller.visibleRoles.flatMap((assignment) => {
       const player = playerById.get(assignment.playerId);
       const role = roles[assignment.roleDefinitionId];
@@ -218,6 +223,27 @@ export class FirebaseGameService {
       ];
     });
 
+    // Reveal dead players' roles to all players.
+    const visiblePlayerIds = new Set(
+      visibleRoleAssignments.map((v) => v.player.id),
+    );
+    for (const deadId of deadPlayerIds) {
+      if (deadId === callerId || visiblePlayerIds.has(deadId)) continue;
+      const deadAssignment = game.roleAssignments.find(
+        (a) => a.playerId === deadId,
+      );
+      if (!deadAssignment) continue;
+      const deadPlayer = playerById.get(deadId);
+      const deadRole = roles[deadAssignment.roleDefinitionId];
+      if (!deadPlayer || !deadRole) continue;
+      visibleRoleAssignments.push({
+        player: { id: deadPlayer.id, name: deadPlayer.name },
+        role: { id: deadRole.id, name: deadRole.name, team: deadRole.team },
+      });
+    }
+
+    const amDead = deadPlayerIds.includes(callerId);
+
     return {
       status: game.status,
       gameMode: game.gameMode,
@@ -226,7 +252,16 @@ export class FirebaseGameService {
       myRole: { id: myRole.id, name: myRole.name, team: myRole.team },
       visibleRoleAssignments,
       rolesInPlay: this.buildRolesInPlay(game),
+      ...(amDead ? { amDead: true } : {}),
+      ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
     };
+  }
+
+  /** Extracts deadPlayerIds from the Werewolf turn state. */
+  private extractDeadPlayerIds(game: Game): string[] {
+    if (game.status.type !== GameStatus.Playing) return [];
+    const ts = game.status.turnState as WerewolfTurnState | undefined;
+    return ts?.deadPlayerIds ?? [];
   }
 
   /** Writes pre-computed PlayerGameState for every player in the game. */

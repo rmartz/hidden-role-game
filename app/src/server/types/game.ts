@@ -40,4 +40,8 @@ export interface PlayerGameState {
   myRole: PublicRoleInfo | null;
   visibleRoleAssignments: VisibleTeammate[];
   rolesInPlay: RoleInPlay[] | null;
+  /** Whether this player has been marked as dead by the narrator. */
+  amDead?: boolean;
+  /** Player IDs marked as dead by the narrator. */
+  deadPlayerIds?: string[];
 }

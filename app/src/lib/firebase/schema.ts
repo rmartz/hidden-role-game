@@ -264,6 +264,8 @@ export interface FirebasePlayerState {
     role: { id: string; name: string; team: string };
   }[];
   rolesInPlay?: RoleInPlay[] | null;
+  amDead?: boolean;
+  deadPlayerIds?: string[];
 }
 
 export function playerStateToFirebase(
@@ -277,6 +279,10 @@ export function playerStateToFirebase(
     myRole: state.myRole,
     visibleRoleAssignments: state.visibleRoleAssignments,
     rolesInPlay: state.rolesInPlay,
+    ...(state.amDead ? { amDead: true } : {}),
+    ...(state.deadPlayerIds?.length
+      ? { deadPlayerIds: state.deadPlayerIds }
+      : {}),
   };
 }
 
@@ -306,5 +312,7 @@ export function firebaseToPlayerState(
       }),
     ),
     rolesInPlay: raw.rolesInPlay ?? null,
+    ...(raw.amDead ? { amDead: true } : {}),
+    ...(raw.deadPlayerIds?.length ? { deadPlayerIds: raw.deadPlayerIds } : {}),
   };
 }
