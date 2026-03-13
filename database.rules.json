@@ -1,6 +1,7 @@
 {
   "rules": {
     "lobbies": {
+      ".indexOn": ["public/createdAt"],
       "$lobbyId": {
         "public": {
           ".read": true,
@@ -13,6 +14,7 @@
       }
     },
     "games": {
+      ".indexOn": ["public/createdAt"],
       "$gameId": {
         "public": {
           ".read": false,
