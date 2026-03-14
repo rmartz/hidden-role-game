@@ -219,7 +219,12 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
           }
         }
 
-        teamAction.suggestedTargetId = computeSuggestedTarget(teamAction.votes);
+        const suggested = computeSuggestedTarget(teamAction.votes);
+        if (suggested !== undefined) {
+          teamAction.suggestedTargetId = suggested;
+        } else {
+          delete teamAction.suggestedTargetId;
+        }
         phase.nightActions[phaseKey] = teamAction;
       } else {
         // Solo phase: existing behavior.
