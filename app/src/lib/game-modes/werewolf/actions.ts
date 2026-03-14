@@ -12,6 +12,7 @@ export enum WerewolfAction {
   StartNight = "start-night",
   StartDay = "start-day",
   SetNightPhase = "set-night-phase",
+  SetNightTarget = "set-night-target",
   MarkPlayerDead = "mark-player-dead",
   MarkPlayerAlive = "mark-player-alive",
 }
@@ -38,6 +39,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
             type: WerewolfPhase.Nighttime,
             nightPhaseOrder,
             currentPhaseIndex: 0,
+            nightActions: {},
           },
           deadPlayerIds: ts.deadPlayerIds,
         },
@@ -52,11 +54,16 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
     apply(game: Game) {
       const ts = currentTurnState(game);
       if (!ts) return;
+      const nightPhase = ts.phase as WerewolfNighttimePhase;
       game.status = {
         type: GameStatus.Playing,
         turnState: {
           turn: ts.turn,
-          phase: { type: WerewolfPhase.Daytime, startedAt: Date.now() },
+          phase: {
+            type: WerewolfPhase.Daytime,
+            startedAt: Date.now(),
+            nightActions: nightPhase.nightActions,
+          },
           deadPlayerIds: ts.deadPlayerIds,
         },
       };
@@ -86,6 +93,65 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
           phase: { ...phase, currentPhaseIndex: phaseIndex },
         },
       };
+    },
+  },
+  [WerewolfAction.SetNightTarget]: {
+    isValid(game: Game, callerId: string, payload: unknown) {
+      const ts = currentTurnState(game);
+      if (ts?.phase.type !== WerewolfPhase.Nighttime) return false;
+      if (ts.turn <= 1) return false;
+
+      const phase = ts.phase;
+      const { roleId: explicitRoleId, targetPlayerId } = payload as {
+        roleId?: unknown;
+        targetPlayerId?: unknown;
+      };
+
+      // Determine the role being targeted for.
+      // Owner provides an explicit roleId; players use their own role.
+      const isOwner = callerId === game.ownerPlayerId;
+      if (isOwner) {
+        if (typeof explicitRoleId !== "string") return false;
+        if (!phase.nightPhaseOrder.includes(explicitRoleId)) return false;
+      } else {
+        const callerAssignment = game.roleAssignments.find(
+          (a) => a.playerId === callerId,
+        );
+        if (!callerAssignment) return false;
+        const activeRoleId = phase.nightPhaseOrder[phase.currentPhaseIndex];
+        if (callerAssignment.roleDefinitionId !== activeRoleId) return false;
+      }
+
+      // targetPlayerId undefined = clear; string = set target.
+      if (targetPlayerId === undefined) return true;
+      if (typeof targetPlayerId !== "string") return false;
+      if (targetPlayerId === game.ownerPlayerId) return false;
+      if (!game.players.some((p) => p.id === targetPlayerId)) return false;
+      if (ts.deadPlayerIds.includes(targetPlayerId)) return false;
+      return true;
+    },
+    apply(game: Game, payload: unknown) {
+      const ts = currentTurnState(game);
+      if (ts?.phase.type !== WerewolfPhase.Nighttime) return;
+
+      const phase = ts.phase;
+      const { roleId: explicitRoleId, targetPlayerId } = payload as {
+        roleId?: string;
+        targetPlayerId?: string;
+      };
+
+      // If roleId provided, use it; otherwise use the currently active role.
+      const roleId =
+        explicitRoleId ?? phase.nightPhaseOrder[phase.currentPhaseIndex];
+      if (!roleId) return;
+
+      if (targetPlayerId === undefined) {
+        phase.nightActions = Object.fromEntries(
+          Object.entries(phase.nightActions).filter(([k]) => k !== roleId),
+        );
+      } else {
+        phase.nightActions[roleId] = { targetPlayerId };
+      }
     },
   },
   [WerewolfAction.MarkPlayerDead]: {

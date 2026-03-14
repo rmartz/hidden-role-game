@@ -22,7 +22,7 @@
         },
         "playerState": {
           "$sessionId": {
-            ".read": "auth != null && auth.token.sessionId == $sessionId",
+            ".read": "auth != null && auth.uid == $sessionId",
             ".write": false
           }
         },

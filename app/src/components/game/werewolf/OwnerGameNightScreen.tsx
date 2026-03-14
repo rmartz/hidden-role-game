@@ -2,6 +2,7 @@
 
 import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase, WerewolfAction } from "@/lib/game-modes/werewolf";
+import { getTargetablePlayers } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
 import { useGameAction } from "@/hooks";
@@ -20,13 +21,36 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
   const { phase } = turnState;
   if (phase.type !== WerewolfPhase.Nighttime) return null;
 
-  const { nightPhaseOrder, currentPhaseIndex } = phase;
+  const { nightPhaseOrder, currentPhaseIndex, nightActions } = phase;
   const activeRoleId = nightPhaseOrder[currentPhaseIndex] ?? "";
   const modeConfig = GAME_MODES[gameState.gameMode];
   const activeRoleName =
     (activeRoleId ? modeConfig.roles[activeRoleId]?.name : undefined) ??
     activeRoleId;
   const isLastPhase = currentPhaseIndex === nightPhaseOrder.length - 1;
+
+  const activeTarget = nightActions[activeRoleId]?.targetPlayerId;
+  const activeTargetName = activeTarget
+    ? gameState.players.find((p) => p.id === activeTarget)?.name
+    : undefined;
+
+  const isFirstTurn = turnState.turn === 1;
+
+  const targetablePlayers = getTargetablePlayers(
+    gameState.players,
+    gameState.gameOwner?.id,
+    turnState.deadPlayerIds,
+  );
+
+  function handleTargetClick(playerId: string) {
+    action.mutate({
+      actionId: WerewolfAction.SetNightTarget,
+      payload: {
+        roleId: activeRoleId,
+        targetPlayerId: activeTarget === playerId ? undefined : playerId,
+      },
+    });
+  }
 
   return (
     <div className="p-5">
@@ -38,6 +62,35 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
         Currently awake:{" "}
         <strong className="text-foreground">{activeRoleName}</strong>
       </p>
+
+      {!isFirstTurn && (
+        <div className="mb-4 rounded-md border p-3">
+          <p className="text-sm font-medium mb-2">
+            Target:{" "}
+            {activeTargetName ? (
+              <strong className="text-foreground">{activeTargetName}</strong>
+            ) : (
+              <span className="text-muted-foreground italic">none</span>
+            )}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {targetablePlayers.map((player) => (
+              <Button
+                key={player.id}
+                size="sm"
+                variant={activeTarget === player.id ? "default" : "outline"}
+                onClick={() => {
+                  handleTargetClick(player.id);
+                }}
+                disabled={action.isPending}
+              >
+                {player.name}
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {isLastPhase ? (
         <Button
           onClick={() => {
