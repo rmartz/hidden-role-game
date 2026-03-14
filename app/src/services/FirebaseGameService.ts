@@ -202,6 +202,7 @@ export class FirebaseGameService {
         gameMode: game.gameMode,
         players: publicPlayers,
         gameOwner: { id: caller.id, name: caller.name },
+        myPlayerId: null,
         myRole: null,
         visibleRoleAssignments,
         rolesInPlay: this.buildRolesInPlay(game),
@@ -279,6 +280,7 @@ export class FirebaseGameService {
               playerById.get(game.ownerPlayerId)?.name ?? game.ownerPlayerId,
           }
         : null,
+      myPlayerId: callerId,
       myRole: { id: myRole.id, name: myRole.name, team: myRole.team },
       visibleRoleAssignments,
       rolesInPlay: this.buildRolesInPlay(game),
@@ -462,7 +464,7 @@ export class FirebaseGameService {
         id: p.id,
         name: p.name,
         sessionId: playerIdToSession.get(p.id) ?? "",
-        visibleRoles: [],
+        visibleRoles: p.visibleRoles ?? [],
       }),
     );
 

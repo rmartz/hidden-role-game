@@ -82,17 +82,11 @@ export function PlayerGameNightScreen({
   const suggestedTargetId = gameState.suggestedTargetId;
   const allAgreed = gameState.allAgreed ?? false;
 
-  // For team phases, exclude same-team players from targets.
+  // For team phases, exclude visible teammates and self from targets.
   const teamExcludeIds = isTeamPhase
     ? [
         ...gameState.visibleRoleAssignments.map((a) => a.player.id),
-        // Include self — werewolves can't target themselves.
-        ...(gameState.myRole
-          ? ([
-              gameState.players.find((p) => p.name === gameState.myRole?.name)
-                ?.id,
-            ].filter(Boolean) as string[])
-          : []),
+        ...(gameState.myPlayerId ? [gameState.myPlayerId] : []),
       ]
     : undefined;
 

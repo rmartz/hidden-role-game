@@ -45,6 +45,8 @@ export interface FirebaseLobbyPublic {
 export interface FirebaseLobbyPlayer {
   id: string;
   name: string;
+  /** Role assignments visible to this player (teammates they can see). Absent for the game owner. */
+  visibleRoles?: { playerId: string; roleDefinitionId: string }[];
 }
 
 export interface FirebaseLobbyConfig {
@@ -212,7 +214,11 @@ export function firebaseToPublicLobby(
 export function gameToFirebase(game: Game): FirebaseGamePublic {
   const players: Record<string, FirebaseLobbyPlayer> = {};
   for (const p of game.players) {
-    players[p.id] = { id: p.id, name: p.name };
+    players[p.id] = {
+      id: p.id,
+      name: p.name,
+      ...(p.visibleRoles.length > 0 ? { visibleRoles: p.visibleRoles } : {}),
+    };
   }
 
   const roleAssignments: Record<string, string> = {};
@@ -271,6 +277,7 @@ export interface FirebasePlayerState {
   gameMode: string;
   players?: FirebaseLobbyPlayer[];
   gameOwner: FirebaseLobbyPlayer | null;
+  myPlayerId: string | null;
   myRole: { id: string; name: string; team: string } | null;
   visibleRoleAssignments?: {
     player: FirebaseLobbyPlayer;
@@ -296,6 +303,7 @@ export function playerStateToFirebase(
     gameMode: state.gameMode,
     players: state.players,
     gameOwner: state.gameOwner,
+    myPlayerId: state.myPlayerId,
     myRole: state.myRole,
     visibleRoleAssignments: state.visibleRoleAssignments,
     rolesInPlay: state.rolesInPlay,
@@ -327,6 +335,7 @@ export function firebaseToPlayerState(
     gameMode: raw.gameMode as PlayerGameState["gameMode"],
     players: raw.players ?? [],
     gameOwner: raw.gameOwner,
+    myPlayerId: raw.myPlayerId,
     myRole: raw.myRole
       ? {
           id: raw.myRole.id,

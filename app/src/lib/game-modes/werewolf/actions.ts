@@ -147,8 +147,18 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       if (!game.players.some((p) => p.id === targetPlayerId)) return false;
       if (ts.deadPlayerIds.includes(targetPlayerId)) return false;
 
-      // Team targeting: cannot target players on the same team.
-      if (team) {
+      // Cannot target self.
+      if (targetPlayerId === callerId) return false;
+
+      // Team targeting: cannot target players the caller knows are teammates.
+      if (team && !isOwner) {
+        const caller = game.players.find((p) => p.id === callerId);
+        const visibleTeammateIds = (caller?.visibleRoles ?? []).map(
+          (vr) => vr.playerId,
+        );
+        if (visibleTeammateIds.includes(targetPlayerId)) return false;
+      }
+      if (team && isOwner) {
         const teamMembers = getTeamMemberPlayerIds(game.roleAssignments, team);
         if (teamMembers.includes(targetPlayerId)) return false;
       }

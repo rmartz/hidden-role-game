@@ -653,8 +653,22 @@ function makeTeamGame(
     gameMode: GameMode.Werewolf,
     status: { type: GameStatus.Playing, turnState },
     players: [
-      { id: "w1", name: "Wolf1", sessionId: "sw1", visibleRoles: [] },
-      { id: "w2", name: "Wolf2", sessionId: "sw2", visibleRoles: [] },
+      {
+        id: "w1",
+        name: "Wolf1",
+        sessionId: "sw1",
+        visibleRoles: [
+          { playerId: "w2", roleDefinitionId: WerewolfRole.Werewolf },
+        ],
+      },
+      {
+        id: "w2",
+        name: "Wolf2",
+        sessionId: "sw2",
+        visibleRoles: [
+          { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+        ],
+      },
       { id: "p3", name: "Seer", sessionId: "s3", visibleRoles: [] },
       { id: "p4", name: "Villager", sessionId: "s4", visibleRoles: [] },
     ],

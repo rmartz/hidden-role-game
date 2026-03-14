@@ -35,6 +35,7 @@ const mockGameState: PlayerGameState = {
   gameMode: GameMode.SecretVillain,
   players: [{ id: "player-1", name: "Alice" }],
   gameOwner: null,
+  myPlayerId: "player-1",
   myRole: { id: "villager", name: "Villager", team: Team.Good },
   visibleRoleAssignments: [],
   rolesInPlay: null,

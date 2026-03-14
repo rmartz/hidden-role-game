@@ -44,6 +44,8 @@ export interface PlayerGameState {
   gameMode: GameMode;
   players: PublicLobbyPlayer[];
   gameOwner: PublicLobbyPlayer | null;
+  /** The current player's own player ID. Null for the narrator/owner. */
+  myPlayerId: string | null;
   myRole: PublicRoleInfo | null;
   visibleRoleAssignments: VisibleTeammate[];
   rolesInPlay: RoleInPlay[] | null;
