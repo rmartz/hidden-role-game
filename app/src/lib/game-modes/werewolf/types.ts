@@ -34,6 +34,11 @@ export interface WerewolfTurnState {
   deadPlayerIds: string[];
 }
 
+export interface TargetablePlayer {
+  id: string;
+  name: string;
+}
+
 export enum WakesAtNight {
   Never = "Never",
   FirstNightOnly = "FirstNightOnly",

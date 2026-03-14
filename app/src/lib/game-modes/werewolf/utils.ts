@@ -1,13 +1,8 @@
 import { GameStatus } from "@/lib/types";
 import type { Game, PlayerRoleAssignment } from "@/lib/types";
 import { WakesAtNight } from "./types";
-import type { WerewolfTurnState } from "./types";
+import type { TargetablePlayer, WerewolfTurnState } from "./types";
 import { WEREWOLF_ROLES } from "./roles";
-
-interface TargetablePlayer {
-  id: string;
-  name: string;
-}
 
 /**
  * Returns the list of players eligible to be targeted during a night phase.
