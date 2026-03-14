@@ -45,4 +45,8 @@ export interface PlayerGameState {
   nightActions?: Record<string, NightAction>;
   /** The current player's role's night target (playerId), or null if none set. Only populated for non-owner players during nighttime. */
   myNightTarget?: string | null;
+  /** Whether this player has been marked as dead by the narrator. */
+  amDead?: boolean;
+  /** Player IDs marked as dead by the narrator. */
+  deadPlayerIds?: string[];
 }

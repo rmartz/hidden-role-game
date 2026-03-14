@@ -119,6 +119,41 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
       <PlayersRoleList
         assignments={gameState.visibleRoleAssignments}
         gameMode={gameState.gameMode}
+        deadPlayerIds={gameState.deadPlayerIds}
+        renderActions={(playerId, isDead) =>
+          playerId !== gameState.gameOwner?.id &&
+          (isDead ? (
+            <Button
+              variant="outline"
+              size="xs"
+              onClick={() => {
+                action.mutate({
+                  actionId: WerewolfAction.MarkPlayerAlive,
+                  payload: { playerId },
+                });
+              }}
+              disabled={action.isPending}
+            >
+              Revive
+            </Button>
+          ) : (
+            <Button
+              variant="destructive"
+              size="xs"
+              onClick={() => {
+                if (window.confirm("Mark this player as dead?")) {
+                  action.mutate({
+                    actionId: WerewolfAction.MarkPlayerDead,
+                    payload: { playerId },
+                  });
+                }
+              }}
+              disabled={action.isPending}
+            >
+              Kill
+            </Button>
+          ))
+        }
       />
       <GameRolesList
         roles={gameState.rolesInPlay ?? []}

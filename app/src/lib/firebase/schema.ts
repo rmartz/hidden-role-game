@@ -267,6 +267,8 @@ export interface FirebasePlayerState {
   rolesInPlay?: RoleInPlay[] | null;
   nightActions?: Record<string, NightAction>;
   myNightTarget?: string | null;
+  amDead?: boolean;
+  deadPlayerIds?: string[];
 }
 
 export function playerStateToFirebase(
@@ -283,6 +285,10 @@ export function playerStateToFirebase(
     ...(state.nightActions ? { nightActions: state.nightActions } : {}),
     ...(state.myNightTarget !== undefined
       ? { myNightTarget: state.myNightTarget }
+      : {}),
+    ...(state.amDead ? { amDead: true } : {}),
+    ...(state.deadPlayerIds?.length
+      ? { deadPlayerIds: state.deadPlayerIds }
       : {}),
   };
 }
@@ -317,5 +323,7 @@ export function firebaseToPlayerState(
     ...(raw.myNightTarget !== undefined
       ? { myNightTarget: raw.myNightTarget }
       : {}),
+    ...(raw.amDead ? { amDead: true } : {}),
+    ...(raw.deadPlayerIds?.length ? { deadPlayerIds: raw.deadPlayerIds } : {}),
   };
 }

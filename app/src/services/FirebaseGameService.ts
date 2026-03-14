@@ -15,10 +15,10 @@ import type {
   PublicRoleInfo,
   PlayerGameState,
 } from "@/server/types";
+import type { NightAction } from "@/lib/game-modes/werewolf";
 import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase, buildNightPhaseOrder } from "@/lib/game-modes/werewolf";
 import type {
-  NightAction,
   WerewolfTurnState,
   WerewolfNighttimePhase,
 } from "@/lib/game-modes/werewolf";
@@ -85,7 +85,7 @@ export class FirebaseGameService {
       currentPhaseIndex: 0,
       nightActions: {},
     };
-    return { turn: 1, phase };
+    return { turn: 1, phase, deadPlayerIds: [] };
   }
 
   private buildRolesInPlay(game: Game): RoleInPlay[] | null {
@@ -174,6 +174,9 @@ export class FirebaseGameService {
     // Extract nightActions from turnState for the current phase.
     const nightActions = this.extractNightActions(game);
 
+    // Extract deadPlayerIds from Werewolf turn state.
+    const deadPlayerIds = this.extractDeadPlayerIds(game);
+
     if (callerId === game.ownerPlayerId) {
       const visibleRoleAssignments = game.roleAssignments.flatMap(
         (assignment) => {
@@ -197,6 +200,7 @@ export class FirebaseGameService {
         visibleRoleAssignments,
         rolesInPlay: this.buildRolesInPlay(game),
         ...(nightActions ? { nightActions } : {}),
+        ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
       };
     }
 
@@ -208,6 +212,7 @@ export class FirebaseGameService {
     const myRole = roles[myAssignment.roleDefinitionId];
     if (!myRole) return null;
 
+    // Start with teammate visibility.
     const visibleRoleAssignments = caller.visibleRoles.flatMap((assignment) => {
       const player = playerById.get(assignment.playerId);
       const role = roles[assignment.roleDefinitionId];
@@ -224,9 +229,30 @@ export class FirebaseGameService {
       ];
     });
 
+    // Reveal dead players' roles to all players.
+    const visiblePlayerIds = new Set(
+      visibleRoleAssignments.map((v) => v.player.id),
+    );
+    for (const deadId of deadPlayerIds) {
+      if (deadId === callerId || visiblePlayerIds.has(deadId)) continue;
+      const deadAssignment = game.roleAssignments.find(
+        (a) => a.playerId === deadId,
+      );
+      if (!deadAssignment) continue;
+      const deadPlayer = playerById.get(deadId);
+      const deadRole = roles[deadAssignment.roleDefinitionId];
+      if (!deadPlayer || !deadRole) continue;
+      visibleRoleAssignments.push({
+        player: { id: deadPlayer.id, name: deadPlayer.name },
+        role: { id: deadRole.id, name: deadRole.name, team: deadRole.team },
+      });
+    }
+
     // Include myNightTarget during nighttime (after first night).
     const myNightTarget =
       nightActions?.[myAssignment.roleDefinitionId]?.targetPlayerId ?? null;
+
+    const amDead = deadPlayerIds.includes(callerId);
 
     return {
       status: game.status,
@@ -237,6 +263,8 @@ export class FirebaseGameService {
       visibleRoleAssignments,
       rolesInPlay: this.buildRolesInPlay(game),
       ...(nightActions ? { myNightTarget } : {}),
+      ...(amDead ? { amDead: true } : {}),
+      ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
     };
   }
 
@@ -249,6 +277,13 @@ export class FirebaseGameService {
     if (!ts) return undefined;
     const { nightActions } = ts.phase;
     return Object.keys(nightActions).length > 0 ? nightActions : undefined;
+  }
+
+  /** Extracts deadPlayerIds from the Werewolf turn state. */
+  private extractDeadPlayerIds(game: Game): string[] {
+    if (game.status.type !== GameStatus.Playing) return [];
+    const ts = game.status.turnState as WerewolfTurnState | undefined;
+    return ts?.deadPlayerIds ?? [];
   }
 
   /** Writes pre-computed PlayerGameState for every player in the game. */

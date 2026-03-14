@@ -30,6 +30,8 @@ export type WerewolfTurnPhase = WerewolfNighttimePhase | WerewolfDaytimePhase;
 export interface WerewolfTurnState {
   turn: number;
   phase: WerewolfTurnPhase;
+  /** Player IDs that have been marked as dead by the narrator. */
+  deadPlayerIds: string[];
 }
 
 export enum WakesAtNight {

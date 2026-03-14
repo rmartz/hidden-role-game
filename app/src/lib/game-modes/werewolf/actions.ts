@@ -15,6 +15,8 @@ export enum WerewolfAction {
   SubmitNightTarget = "submit-night-target",
   SetNightTarget = "set-night-target",
   ClearNightTarget = "clear-night-target",
+  MarkPlayerDead = "mark-player-dead",
+  MarkPlayerAlive = "mark-player-alive",
 }
 
 export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
@@ -41,6 +43,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
             currentPhaseIndex: 0,
             nightActions: {},
           },
+          deadPlayerIds: ts.deadPlayerIds,
         },
       };
     },
@@ -63,6 +66,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
             startedAt: Date.now(),
             nightActions: nightPhase.nightActions,
           },
+          deadPlayerIds: ts.deadPlayerIds,
         },
       };
     },
@@ -166,6 +170,40 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       ts.phase.nightActions = Object.fromEntries(
         Object.entries(ts.phase.nightActions).filter(([id]) => id !== roleId),
       );
+    },
+  },
+  [WerewolfAction.MarkPlayerDead]: {
+    isValid(game: Game, callerId: string, payload: unknown) {
+      if (!isOwnerPlaying(game, callerId)) return false;
+      const ts = currentTurnState(game);
+      if (!ts) return false;
+      const { playerId } = payload as { playerId?: unknown };
+      if (typeof playerId !== "string") return false;
+      if (playerId === game.ownerPlayerId) return false;
+      if (ts.deadPlayerIds.includes(playerId)) return false;
+      return game.players.some((p) => p.id === playerId);
+    },
+    apply(game: Game, payload: unknown) {
+      const ts = currentTurnState(game);
+      if (!ts) return;
+      const { playerId } = payload as { playerId: string };
+      ts.deadPlayerIds = [...ts.deadPlayerIds, playerId];
+    },
+  },
+  [WerewolfAction.MarkPlayerAlive]: {
+    isValid(game: Game, callerId: string, payload: unknown) {
+      if (!isOwnerPlaying(game, callerId)) return false;
+      const ts = currentTurnState(game);
+      if (!ts) return false;
+      const { playerId } = payload as { playerId?: unknown };
+      if (typeof playerId !== "string") return false;
+      return ts.deadPlayerIds.includes(playerId);
+    },
+    apply(game: Game, payload: unknown) {
+      const ts = currentTurnState(game);
+      if (!ts) return;
+      const { playerId } = payload as { playerId: string };
+      ts.deadPlayerIds = ts.deadPlayerIds.filter((id) => id !== playerId);
     },
   },
 };
