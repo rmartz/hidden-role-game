@@ -1,5 +1,6 @@
 "use client";
 
+import { GameStatus } from "@/lib/types";
 import type { PlayerGameState } from "@/server/types";
 import {
   GameRolesList,
@@ -8,17 +9,28 @@ import {
   RoleLabel,
 } from "@/components/game";
 
-const STARTING_DURATION_SECONDS = 10;
+const DEFAULT_START_COUNTDOWN_SECONDS = 10;
 
 interface Props {
   gameState: PlayerGameState;
 }
 
 export function PlayerStartingScreen({ gameState }: Props) {
+  const durationSeconds =
+    gameState.timerConfig?.startCountdownSeconds ??
+    DEFAULT_START_COUNTDOWN_SECONDS;
+  const startedAtMs =
+    gameState.status.type === GameStatus.Starting
+      ? gameState.status.startedAt
+      : undefined;
+
   return (
     <div className="p-5">
       <h1 className="text-2xl font-bold mb-4">Game Starting</h1>
-      <GameStartCountdown durationSeconds={STARTING_DURATION_SECONDS} />
+      <GameStartCountdown
+        durationSeconds={durationSeconds}
+        startedAtMs={startedAtMs}
+      />
 
       {gameState.myRole && (
         <div className="mb-5">
