@@ -16,9 +16,9 @@ interface Props {
 }
 
 export function PlayerStartingScreen({ gameState }: Props) {
-  const durationSeconds =
-    gameState.timerConfig?.startCountdownSeconds ??
-    DEFAULT_START_COUNTDOWN_SECONDS;
+  const durationSeconds = gameState.timerConfig
+    ? gameState.timerConfig.startCountdownSeconds
+    : DEFAULT_START_COUNTDOWN_SECONDS;
   const startedAtMs =
     gameState.status.type === GameStatus.Starting
       ? gameState.status.startedAt
