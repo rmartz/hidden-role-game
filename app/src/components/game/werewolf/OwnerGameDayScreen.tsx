@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase, WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
@@ -19,7 +19,6 @@ interface Props {
 export function OwnerGameDayScreen({ gameId, gameState, turnState }: Props) {
   const dayPhaseSeconds = gameState.timerConfig?.dayPhaseSeconds ?? null;
   const action = useGameAction(gameId);
-  const [isPaused, setIsPaused] = useState(false);
 
   const handleAdvance = useCallback(() => {
     action.mutate({ actionId: WerewolfAction.StartNight });
@@ -54,9 +53,7 @@ export function OwnerGameDayScreen({ gameId, gameState, turnState }: Props) {
       ? {
           durationSeconds: dayPhaseSeconds,
           startedAt: phaseStartedAt,
-          isPaused,
           onTimerTrigger: handleAdvance,
-          onTogglePause: setIsPaused,
           resetKey: turnState.turn,
         }
       : { startedAt: phaseStartedAt, resetKey: turnState.turn };

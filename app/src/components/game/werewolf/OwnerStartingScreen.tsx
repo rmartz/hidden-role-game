@@ -28,8 +28,6 @@ export function OwnerStartingScreen({ gameState, onStart }: Props) {
           durationSeconds,
           startedAt,
           onTimerTrigger: onStart,
-          isPaused: false as const,
-          onTogglePause: noop,
         }
       : { startedAt };
 
@@ -51,8 +49,4 @@ export function OwnerStartingScreen({ gameState, onStart }: Props) {
       />
     </div>
   );
-}
-
-function noop() {
-  // no-op: starting screen timer is not pausable
 }

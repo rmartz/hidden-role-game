@@ -57,6 +57,6 @@ export interface PlayerGameState {
   amDead?: boolean;
   /** Player IDs marked as dead by the narrator. */
   deadPlayerIds?: string[];
-  /** Phase timer configuration. Only populated for the game owner. */
+  /** Phase timer configuration. Present when the lobby has timers enabled. */
   timerConfig?: TimerConfig;
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
 
 function formatTime(totalSeconds: number): string {
   const minutes = Math.floor(totalSeconds / 60);
@@ -21,8 +20,6 @@ interface ManualProps {
 
 type Props = (TimedProps | ManualProps) & {
   startedAt: Date;
-  isPaused?: boolean;
-  onTogglePause?: (paused: boolean) => void;
   /** Timer resets whenever this value changes. */
   resetKey?: string | number;
 };
@@ -30,9 +27,7 @@ type Props = (TimedProps | ManualProps) & {
 export function GameTimer({
   durationSeconds,
   startedAt,
-  isPaused = false,
   onTimerTrigger,
-  onTogglePause,
   resetKey,
 }: Props) {
   const isTimed = durationSeconds !== undefined;
@@ -42,7 +37,6 @@ export function GameTimer({
     Math.max(0, Math.floor((Date.now() - startedAtMs) / 1000)),
   );
   const startTimeRef = useRef(startedAtMs);
-  const pausedElapsedRef = useRef(0);
   const hasTriggeredRef = useRef(false);
   const onTriggerRef = useRef(onTimerTrigger);
 
@@ -54,7 +48,6 @@ export function GameTimer({
   const reset = useCallback(() => {
     const now = Date.now();
     startTimeRef.current = startedAtMs;
-    pausedElapsedRef.current = 0;
     hasTriggeredRef.current = false;
     setElapsedSeconds(Math.max(0, Math.floor((now - startedAtMs) / 1000)));
   }, [startedAtMs]);
@@ -63,23 +56,8 @@ export function GameTimer({
     reset();
   }, [resetKey, durationSeconds, reset]);
 
-  // Handle pause transitions.
-  const wasPausedRef = useRef(isPaused);
-  useEffect(() => {
-    if (isPaused && !wasPausedRef.current) {
-      pausedElapsedRef.current = Math.floor(
-        (Date.now() - startTimeRef.current) / 1000,
-      );
-    } else if (!isPaused && wasPausedRef.current) {
-      startTimeRef.current = Date.now() - pausedElapsedRef.current * 1000;
-    }
-    wasPausedRef.current = isPaused;
-  }, [isPaused]);
-
   // Tick every second.
   useEffect(() => {
-    if (isPaused) return;
-
     const tick = () => {
       const elapsed = Math.max(
         0,
@@ -98,7 +76,7 @@ export function GameTimer({
     return () => {
       clearInterval(interval);
     };
-  }, [isPaused, durationSeconds, isTimed]);
+  }, [durationSeconds, isTimed]);
 
   const secondsRemaining = isTimed
     ? Math.max(0, durationSeconds - elapsedSeconds)
@@ -112,7 +90,7 @@ export function GameTimer({
           "Advancing\u2026"
         ) : isTimed ? (
           <>
-            {isPaused ? "Paused" : "Time remaining"}:{" "}
+            Time remaining:{" "}
             <strong className="text-foreground">
               {formatTime(secondsRemaining ?? 0)}
             </strong>
@@ -126,17 +104,6 @@ export function GameTimer({
           </>
         )}
       </p>
-      {isTimed && !hasExpired && onTogglePause && (
-        <Button
-          size="xs"
-          variant="outline"
-          onClick={() => {
-            onTogglePause(!isPaused);
-          }}
-        >
-          {isPaused ? "Resume" : "Pause"}
-        </Button>
-      )}
     </div>
   );
 }

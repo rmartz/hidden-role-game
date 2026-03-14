@@ -7,8 +7,6 @@ import { Button } from "@/components/ui/button";
 interface TimedTimer {
   durationSeconds: number;
   onTimerTrigger: () => void;
-  isPaused: boolean;
-  onTogglePause: (paused: boolean) => void;
 }
 
 interface ManualTimer {
@@ -44,9 +42,7 @@ export function OwnerHeader({
         <GameTimer
           durationSeconds={timer.durationSeconds}
           startedAt={timer.startedAt}
-          isPaused={timer.isPaused}
           onTimerTrigger={timer.onTimerTrigger}
-          onTogglePause={timer.onTogglePause}
           resetKey={timer.resetKey}
         />
       ) : (

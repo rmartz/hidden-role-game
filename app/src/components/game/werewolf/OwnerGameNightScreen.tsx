@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase, WerewolfAction } from "@/lib/game-modes/werewolf";
 import { getTargetablePlayers } from "@/lib/game-modes/werewolf";
@@ -20,20 +20,12 @@ interface Props {
 export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
   const nightPhaseSeconds = gameState.timerConfig?.nightPhaseSeconds ?? null;
   const action = useGameAction(gameId);
-  const [isPaused, setIsPaused] = useState(false);
 
   const { phase } = turnState;
   const isNighttime = phase.type === WerewolfPhase.Nighttime;
   const currentPhaseIndex = isNighttime ? phase.currentPhaseIndex : 0;
   const nightPhaseOrder = isNighttime ? phase.nightPhaseOrder : [];
   const isLastPhase = currentPhaseIndex === nightPhaseOrder.length - 1;
-
-  // Reset pause when phase index changes.
-  const [prevPhaseIndex, setPrevPhaseIndex] = useState(currentPhaseIndex);
-  if (currentPhaseIndex !== prevPhaseIndex) {
-    setPrevPhaseIndex(currentPhaseIndex);
-    setIsPaused(false);
-  }
 
   const handleAdvance = useCallback(() => {
     if (isLastPhase) {
@@ -91,9 +83,7 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
       ? {
           durationSeconds: nightPhaseSeconds,
           startedAt: phaseStartedAt,
-          isPaused,
           onTimerTrigger: handleAdvance,
-          onTogglePause: setIsPaused,
           resetKey: currentPhaseIndex,
         }
       : { startedAt: phaseStartedAt, resetKey: currentPhaseIndex };

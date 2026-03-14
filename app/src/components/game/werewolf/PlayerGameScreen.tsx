@@ -42,5 +42,6 @@ export function PlayerGameScreen({ gameId, gameState }: Props) {
     );
   }
 
-  return <PlayerGameDayScreen gameState={gameState} />;
+  if (!turnState) return null;
+  return <PlayerGameDayScreen gameState={gameState} turnState={turnState} />;
 }

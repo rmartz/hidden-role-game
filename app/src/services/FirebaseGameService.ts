@@ -268,6 +268,7 @@ export class FirebaseGameService {
       ...(nightActions ? { myNightTarget, myNightTargetConfirmed } : {}),
       ...(amDead ? { amDead: true } : {}),
       ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
+      ...(game.timerConfig ? { timerConfig: game.timerConfig } : {}),
     };
   }
 
