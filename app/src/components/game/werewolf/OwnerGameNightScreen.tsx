@@ -43,20 +43,13 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
   );
 
   function handleTargetClick(playerId: string) {
-    if (activeTarget === playerId) {
-      action.mutate({
-        actionId: WerewolfAction.ClearNightTarget,
-        payload: { roleId: activeRoleId },
-      });
-    } else {
-      action.mutate({
-        actionId: WerewolfAction.SetNightTarget,
-        payload: {
-          roleId: activeRoleId,
-          targetPlayerId: playerId,
-        },
-      });
-    }
+    action.mutate({
+      actionId: WerewolfAction.SetNightTarget,
+      payload: {
+        roleId: activeRoleId,
+        targetPlayerId: activeTarget === playerId ? undefined : playerId,
+      },
+    });
   }
 
   return (

@@ -76,8 +76,10 @@ export function PlayerGameNightScreen({
                   variant={isSelected ? "default" : "outline"}
                   onClick={() => {
                     action.mutate({
-                      actionId: WerewolfAction.SubmitNightTarget,
-                      payload: { targetPlayerId: player.id },
+                      actionId: WerewolfAction.SetNightTarget,
+                      payload: {
+                        targetPlayerId: isSelected ? undefined : player.id,
+                      },
                     });
                   }}
                   disabled={action.isPending}
