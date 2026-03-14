@@ -522,9 +522,12 @@ export class FirebaseGameService {
     const result = await gameRef(gameId)
       .child("public/status")
       .transaction((currentStatusJson: string | null) => {
-        if (!currentStatusJson) return undefined; // abort: no status
+        // Firebase may call the callback with null before it has the cached
+        // value. Fall back to the pre-fetched status so Firebase can compare
+        // and retry with the real server value if it differs.
+        const statusJson = currentStatusJson ?? JSON.stringify(baseGame.status);
         const currentStatus = JSON.parse(
-          currentStatusJson,
+          statusJson,
         ) as import("@/lib/types").GameStatusState;
         const game: Game = { ...baseGame, status: currentStatus };
         if (!action.isValid(game, callerId, payload)) return undefined; // abort
