@@ -55,7 +55,9 @@ export function GameStartCountdown({
     const interval = setInterval(() => {
       setElapsedSeconds(Math.floor((Date.now() - startTimeRef.current) / 1000));
     }, 1000);
-    return () => { clearInterval(interval); };
+    return () => {
+      clearInterval(interval);
+    };
   }, [durationSeconds]);
 
   const isManual = durationSeconds === null;

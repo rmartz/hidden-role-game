@@ -46,7 +46,9 @@ export function OwnerGameDayScreen({
         secondsRemaining={secondsRemaining}
         elapsedSeconds={elapsedSeconds}
         isPaused={isPaused}
-        onTogglePause={() => { setIsPaused((p) => !p); }}
+        onTogglePause={() => {
+          setIsPaused((p) => !p);
+        }}
       />
       <Button
         onClick={() => {

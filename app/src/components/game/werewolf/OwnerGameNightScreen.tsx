@@ -81,7 +81,9 @@ export function OwnerGameNightScreen({
         secondsRemaining={secondsRemaining}
         elapsedSeconds={elapsedSeconds}
         isPaused={isPaused}
-        onTogglePause={() => { setIsPaused((p) => !p); }}
+        onTogglePause={() => {
+          setIsPaused((p) => !p);
+        }}
       />
       {isLastPhase ? (
         <Button

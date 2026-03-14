@@ -93,7 +93,9 @@ export function usePhaseTimer({
 
     tick();
     const interval = setInterval(tick, 1000);
-    return () => { clearInterval(interval); };
+    return () => {
+      clearInterval(interval);
+    };
   }, [isPaused, durationSeconds]);
 
   const secondsRemaining =

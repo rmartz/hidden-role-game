@@ -97,7 +97,9 @@ export function TimerConfigPanel({ timerConfig, disabled, onChange }: Props) {
               id={`timer-${row.field}`}
               checked={isEnabled}
               disabled={disabled ?? readOnly}
-              onCheckedChange={(checked) => { handleToggle(row, checked); }}
+              onCheckedChange={(checked) => {
+                handleToggle(row, checked);
+              }}
             />
             <Label
               htmlFor={`timer-${row.field}`}
@@ -115,7 +117,9 @@ export function TimerConfigPanel({ timerConfig, disabled, onChange }: Props) {
                   <>
                     <Incrementer
                       value={value}
-                      onChange={(dir) => { handleIncrement(row, dir); }}
+                      onChange={(dir) => {
+                        handleIncrement(row, dir);
+                      }}
                       minValue={row.min}
                       maxValue={row.max}
                     />
