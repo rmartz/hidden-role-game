@@ -6,6 +6,7 @@ import {
   buildNightPhaseOrder,
   isOwnerPlaying,
   currentTurnState,
+  validateActiveNightPlayer,
 } from "./utils";
 
 export enum WerewolfAction {
@@ -13,6 +14,7 @@ export enum WerewolfAction {
   StartDay = "start-day",
   SetNightPhase = "set-night-phase",
   SetNightTarget = "set-night-target",
+  ConfirmNightTarget = "confirm-night-target",
   MarkPlayerDead = "mark-player-dead",
   MarkPlayerAlive = "mark-player-alive",
 }
@@ -119,12 +121,10 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
         if (typeof explicitRoleId !== "string") return false;
         if (!phase.nightPhaseOrder.includes(explicitRoleId)) return false;
       } else {
-        const callerAssignment = game.roleAssignments.find(
-          (a) => a.playerId === callerId,
-        );
-        if (!callerAssignment) return false;
-        const activeRoleId = phase.nightPhaseOrder[phase.currentPhaseIndex];
-        if (callerAssignment.roleDefinitionId !== activeRoleId) return false;
+        const result = validateActiveNightPlayer(game, callerId);
+        if (!result) return false;
+        // Players cannot change a confirmed target.
+        if (phase.nightActions[result.activeRoleId]?.confirmed) return false;
       }
 
       // targetPlayerId undefined = clear; string = set target.
@@ -156,6 +156,31 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
         );
       } else {
         phase.nightActions[roleId] = { targetPlayerId };
+      }
+    },
+  },
+  [WerewolfAction.ConfirmNightTarget]: {
+    isValid(game: Game, callerId: string) {
+      const result = validateActiveNightPlayer(game, callerId);
+      if (!result) return false;
+
+      // Must have a target set and not already confirmed.
+      const action = result.phase.nightActions[result.activeRoleId];
+      if (!action) return false;
+      if (action.confirmed) return false;
+      return true;
+    },
+    apply(game: Game) {
+      const ts = currentTurnState(game);
+      if (ts?.phase.type !== WerewolfPhase.Nighttime) return;
+
+      const phase = ts.phase;
+      const activeRoleId = phase.nightPhaseOrder[phase.currentPhaseIndex];
+      if (!activeRoleId) return;
+
+      const action = phase.nightActions[activeRoleId];
+      if (action) {
+        phase.nightActions[activeRoleId] = { ...action, confirmed: true };
       }
     },
   },

@@ -68,7 +68,9 @@ export function OwnerGameNightScreen({
     (activeRoleId ? modeConfig.roles[activeRoleId]?.name : undefined) ??
     activeRoleId;
 
-  const activeTarget = nightActions[activeRoleId]?.targetPlayerId;
+  const activeAction = nightActions[activeRoleId];
+  const activeTarget = activeAction?.targetPlayerId;
+  const activeTargetConfirmed = activeAction?.confirmed ?? false;
   const activeTargetName = activeTarget
     ? gameState.players.find((p) => p.id === activeTarget)?.name
     : undefined;
@@ -115,7 +117,14 @@ export function OwnerGameNightScreen({
           <p className="text-sm font-medium mb-2">
             Target:{" "}
             {activeTargetName ? (
-              <strong className="text-foreground">{activeTargetName}</strong>
+              <>
+                <strong className="text-foreground">{activeTargetName}</strong>
+                {activeTargetConfirmed && (
+                  <span className="ml-1 text-xs text-green-600">
+                    (confirmed)
+                  </span>
+                )}
+              </>
             ) : (
               <span className="text-muted-foreground italic">none</span>
             )}

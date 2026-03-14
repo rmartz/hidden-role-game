@@ -7,12 +7,16 @@ import { getSessionId } from "@/lib/api";
 
 // Module-level deduplication: only one sign-in attempt at a time.
 let signInPromise: Promise<void> | null = null;
+let signedInSessionId: string | null = null;
 
 async function doSignIn(): Promise<void> {
   const auth = getClientAuth();
-  if (auth.currentUser) return;
   const sessionId = getSessionId();
   if (!sessionId) return;
+
+  // Already authenticated as this session.
+  if (auth.currentUser && signedInSessionId === sessionId) return;
+
   const res = await fetch("/api/auth/firebase-token", {
     method: "POST",
     headers: { "x-session-id": sessionId },
@@ -20,11 +24,16 @@ async function doSignIn(): Promise<void> {
   if (!res.ok) throw new Error(`Token fetch failed: ${String(res.status)}`);
   const { token } = (await res.json()) as { token: string };
   await signInWithCustomToken(auth, token);
+  signedInSessionId = sessionId;
 }
 
 function ensureSignedIn(): Promise<void> {
+  const sessionId = getSessionId();
+  // Invalidate cached promise if the session changed.
+  if (signedInSessionId !== sessionId) {
+    signInPromise = null;
+  }
   signInPromise ??= doSignIn().catch((err: unknown) => {
-    // Reset so the next caller can retry.
     signInPromise = null;
     throw err;
   });
@@ -40,6 +49,7 @@ export function useFirebaseAuth(): { isReady: boolean } {
 
   useEffect(() => {
     let cancelled = false;
+    setIsReady(false);
     ensureSignedIn()
       .then(() => {
         if (!cancelled) setIsReady(true);

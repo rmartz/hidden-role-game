@@ -251,8 +251,9 @@ export class FirebaseGameService {
     }
 
     // Include myNightTarget during nighttime (after first night).
-    const myNightTarget =
-      nightActions?.[myAssignment.roleDefinitionId]?.targetPlayerId;
+    const myAction = nightActions?.[myAssignment.roleDefinitionId];
+    const myNightTarget = myAction?.targetPlayerId;
+    const myNightTargetConfirmed = myAction?.confirmed ?? false;
 
     const amDead = deadPlayerIds.includes(callerId);
 
@@ -264,7 +265,7 @@ export class FirebaseGameService {
       myRole: { id: myRole.id, name: myRole.name, team: myRole.team },
       visibleRoleAssignments,
       rolesInPlay: this.buildRolesInPlay(game),
-      ...(nightActions ? { myNightTarget } : {}),
+      ...(nightActions ? { myNightTarget, myNightTargetConfirmed } : {}),
       ...(amDead ? { amDead: true } : {}),
       ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
     };

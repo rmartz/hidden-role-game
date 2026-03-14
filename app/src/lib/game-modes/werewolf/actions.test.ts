@@ -2,7 +2,11 @@ import { describe, it, expect } from "vitest";
 import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 import type { Game } from "@/lib/types";
 import { WerewolfPhase } from "./types";
-import type { WerewolfTurnState, WerewolfNighttimePhase } from "./types";
+import type {
+  WerewolfTurnState,
+  WerewolfNighttimePhase,
+  NightAction,
+} from "./types";
 import { WerewolfRole } from "./roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./actions";
 
@@ -35,7 +39,7 @@ function makePlayingGame(
 function makeNightState(
   overrides: Partial<{
     turn: number;
-    nightActions: Record<string, { targetPlayerId: string }>;
+    nightActions: Record<string, NightAction>;
     deadPlayerIds: string[];
     currentPhaseIndex: number;
   }> = {},
@@ -344,6 +348,41 @@ describe("WerewolfAction.SetNightTarget", () => {
       const game = makePlayingGame(nightTurn2State, { roleAssignments: [] });
       expect(action.isValid(game, "p1", { targetPlayerId: "p2" })).toBe(false);
     });
+
+    it("returns false when player's target is already confirmed", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightActions: {
+            [WerewolfRole.Werewolf]: {
+              targetPlayerId: "p2",
+              confirmed: true,
+            },
+          },
+        }),
+      );
+      expect(action.isValid(game, "p1", { targetPlayerId: "p3" })).toBe(false);
+    });
+
+    it("allows owner to override a confirmed target", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightActions: {
+            [WerewolfRole.Werewolf]: {
+              targetPlayerId: "p2",
+              confirmed: true,
+            },
+          },
+        }),
+      );
+      expect(
+        action.isValid(game, "owner-1", {
+          roleId: WerewolfRole.Werewolf,
+          targetPlayerId: "p3",
+        }),
+      ).toBe(true);
+    });
   });
 
   describe("apply — owner (explicit roleId)", () => {
@@ -441,6 +480,125 @@ describe("WerewolfAction.SetNightTarget", () => {
       const phase = ts.phase as WerewolfNighttimePhase;
       expect(phase.nightActions[WerewolfRole.Werewolf]).toEqual({
         targetPlayerId: "p2",
+      });
+    });
+  });
+});
+
+describe("WerewolfAction.ConfirmNightTarget", () => {
+  const action = WEREWOLF_ACTIONS[WerewolfAction.ConfirmNightTarget];
+
+  describe("isValid", () => {
+    it("returns true when active player has an unconfirmed target on turn 2+", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightActions: {
+            [WerewolfRole.Werewolf]: { targetPlayerId: "p2" },
+          },
+        }),
+      );
+      expect(action.isValid(game, "p1", null)).toBe(true);
+    });
+
+    it("returns false when no target is set", () => {
+      const game = makePlayingGame(makeNightState({ turn: 2 }));
+      expect(action.isValid(game, "p1", null)).toBe(false);
+    });
+
+    it("returns false when target is already confirmed", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightActions: {
+            [WerewolfRole.Werewolf]: {
+              targetPlayerId: "p2",
+              confirmed: true,
+            },
+          },
+        }),
+      );
+      expect(action.isValid(game, "p1", null)).toBe(false);
+    });
+
+    it("returns false on first turn", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 1,
+          nightActions: {
+            [WerewolfRole.Werewolf]: { targetPlayerId: "p2" },
+          },
+        }),
+      );
+      expect(action.isValid(game, "p1", null)).toBe(false);
+    });
+
+    it("returns false when caller is not the active role", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightActions: {
+            [WerewolfRole.Werewolf]: { targetPlayerId: "p1" },
+          },
+        }),
+      );
+      // p2 is Seer, but Werewolf (p1) is active at index 0
+      expect(action.isValid(game, "p2", null)).toBe(false);
+    });
+
+    it("returns false when caller has no role assignment", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightActions: {
+            [WerewolfRole.Werewolf]: { targetPlayerId: "p2" },
+          },
+        }),
+        { roleAssignments: [] },
+      );
+      expect(action.isValid(game, "p1", null)).toBe(false);
+    });
+
+    it("returns false during daytime", () => {
+      const game = makePlayingGame(dayTurnState);
+      expect(action.isValid(game, "p1", null)).toBe(false);
+    });
+  });
+
+  describe("apply", () => {
+    it("sets confirmed to true on the active role's night action", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightActions: {
+            [WerewolfRole.Werewolf]: { targetPlayerId: "p2" },
+          },
+        }),
+      );
+      action.apply(game, null);
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      const phase = ts.phase as WerewolfNighttimePhase;
+      expect(phase.nightActions[WerewolfRole.Werewolf]).toEqual({
+        targetPlayerId: "p2",
+        confirmed: true,
+      });
+    });
+
+    it("does not affect other roles", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightActions: {
+            [WerewolfRole.Werewolf]: { targetPlayerId: "p2" },
+            [WerewolfRole.Seer]: { targetPlayerId: "p3" },
+          },
+        }),
+      );
+      action.apply(game, null);
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      const phase = ts.phase as WerewolfNighttimePhase;
+      expect(phase.nightActions[WerewolfRole.Seer]).toEqual({
+        targetPlayerId: "p3",
       });
     });
   });
