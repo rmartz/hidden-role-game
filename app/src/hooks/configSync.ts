@@ -47,6 +47,7 @@ export function useConfigSync(
             roleConfigMode,
             showConfigToPlayers,
             showRolesInPlay,
+            timerConfig,
           } = gameConfigRef.current;
           const roleSlots = selectRoleSlots(gameConfigRef.current);
           mutateRef.current(
@@ -56,6 +57,7 @@ export function useConfigSync(
               showConfigToPlayers,
               showRolesInPlay,
               roleSlots,
+              timerConfig,
             },
             {
               onSuccess: () => {

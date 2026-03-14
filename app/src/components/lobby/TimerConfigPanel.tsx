@@ -1,0 +1,137 @@
+"use client";
+
+import type { TimerConfig } from "@/lib/types";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Incrementer } from "./Incrementer";
+
+interface TimerRow {
+  label: string;
+  field: keyof TimerConfig;
+  defaultSeconds: number;
+  min: number;
+  max: number;
+  step: number;
+}
+
+const TIMER_ROWS: TimerRow[] = [
+  {
+    label: "Start countdown",
+    field: "startCountdownSeconds",
+    defaultSeconds: 10,
+    min: 5,
+    max: 60,
+    step: 5,
+  },
+  {
+    label: "Night phase (per role)",
+    field: "nightPhaseSeconds",
+    defaultSeconds: 30,
+    min: 10,
+    max: 120,
+    step: 5,
+  },
+  {
+    label: "Day discussion",
+    field: "dayPhaseSeconds",
+    defaultSeconds: 300,
+    min: 30,
+    max: 900,
+    step: 30,
+  },
+];
+
+function formatDuration(seconds: number): string {
+  if (seconds < 60) return `${String(seconds)}s`;
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return s > 0 ? `${String(m)}m ${String(s)}s` : `${String(m)}m`;
+}
+
+interface Props {
+  timerConfig: TimerConfig | undefined;
+  disabled?: boolean;
+  onChange?: (config: TimerConfig | undefined) => void;
+}
+
+export function TimerConfigPanel({ timerConfig, disabled, onChange }: Props) {
+  const readOnly = !onChange;
+
+  function handleToggle(row: TimerRow, enabled: boolean) {
+    if (!onChange) return;
+    const current = timerConfig ?? {
+      startCountdownSeconds: null,
+      nightPhaseSeconds: null,
+      dayPhaseSeconds: null,
+    };
+    onChange({
+      ...current,
+      [row.field]: enabled ? row.defaultSeconds : null,
+    });
+  }
+
+  function handleIncrement(
+    row: TimerRow,
+    direction: "increment" | "decrement",
+  ) {
+    if (!onChange || !timerConfig) return;
+    const currentValue = timerConfig[row.field];
+    if (currentValue === null) return;
+    const newValue =
+      direction === "increment"
+        ? Math.min(row.max, currentValue + row.step)
+        : Math.max(row.min, currentValue - row.step);
+    onChange({ ...timerConfig, [row.field]: newValue });
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-sm font-medium">Phase Timers</p>
+      {TIMER_ROWS.map((row) => {
+        const value = timerConfig?.[row.field] ?? null;
+        const isEnabled = value !== null;
+
+        return (
+          <div key={row.field} className="flex items-center gap-3">
+            <Switch
+              id={`timer-${row.field}`}
+              checked={isEnabled}
+              disabled={disabled ?? readOnly}
+              onCheckedChange={(checked) => { handleToggle(row, checked); }}
+            />
+            <Label
+              htmlFor={`timer-${row.field}`}
+              className="text-sm min-w-[140px]"
+            >
+              {row.label}
+            </Label>
+            {isEnabled && (
+              <div className="flex items-center gap-1">
+                {readOnly || disabled ? (
+                  <span className="text-sm text-muted-foreground">
+                    {formatDuration(value)}
+                  </span>
+                ) : (
+                  <>
+                    <Incrementer
+                      value={value}
+                      onChange={(dir) => { handleIncrement(row, dir); }}
+                      minValue={row.min}
+                      maxValue={row.max}
+                    />
+                    <span className="text-xs text-muted-foreground ml-1">
+                      {formatDuration(value)}
+                    </span>
+                  </>
+                )}
+              </div>
+            )}
+            {!isEnabled && (
+              <span className="text-xs text-muted-foreground">Manual</span>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}

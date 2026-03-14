@@ -132,6 +132,7 @@ export interface Game {
   configuredRoleSlots: RoleSlot[];
   showRolesInPlay: ShowRolesInPlay;
   ownerPlayerId: string | null;
+  timerConfig?: TimerConfig;
 }
 
 /**
@@ -143,6 +144,17 @@ export interface GameAction {
   apply(game: Game, payload: unknown): void;
 }
 
+// --- Phase Timer Configuration ---
+
+export interface TimerConfig {
+  /** Seconds for game-start countdown. null = no auto-advance (manual skip only). */
+  startCountdownSeconds: number | null;
+  /** Seconds per night role phase. null = manual only. */
+  nightPhaseSeconds: number | null;
+  /** Seconds for day discussion. null = manual only. */
+  dayPhaseSeconds: number | null;
+}
+
 // --- Lobby (top-level entity; game is absent until started) ---
 
 export interface LobbyConfig {
@@ -151,6 +163,7 @@ export interface LobbyConfig {
   roleSlots: RoleSlot[];
   showConfigToPlayers: boolean;
   showRolesInPlay: ShowRolesInPlay;
+  timerConfig?: TimerConfig;
 }
 
 export interface Lobby {

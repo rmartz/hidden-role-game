@@ -3,6 +3,7 @@ import type {
   RoleSlot,
   RoleConfigMode,
   ShowRolesInPlay,
+  TimerConfig,
 } from "@/lib/types";
 
 export interface PublicLobbyPlayer {
@@ -16,6 +17,7 @@ export interface GameConfig {
   showConfigToPlayers: boolean;
   showRolesInPlay: ShowRolesInPlay;
   roleSlots?: RoleSlot[];
+  timerConfig?: TimerConfig;
 }
 
 export interface PublicLobby {
@@ -40,6 +42,7 @@ export interface UpdateLobbyConfigRequest {
   roleConfigMode?: RoleConfigMode;
   gameMode?: GameMode;
   roleSlots?: RoleSlot[];
+  timerConfig?: TimerConfig;
 }
 
 export interface LobbyJoinResponse {

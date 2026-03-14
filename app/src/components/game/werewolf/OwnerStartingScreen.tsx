@@ -9,7 +9,7 @@ import {
 
 interface Props {
   gameState: PlayerGameState;
-  durationSeconds: number;
+  durationSeconds: number | null;
   onStart: () => void;
 }
 
@@ -24,6 +24,7 @@ export function OwnerStartingScreen({
       <GameStartCountdown
         durationSeconds={durationSeconds}
         onComplete={onStart}
+        allowSkip
       />
       <PlayersRoleList
         assignments={gameState.visibleRoleAssignments}

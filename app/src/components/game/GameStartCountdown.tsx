@@ -2,26 +2,43 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 interface Props {
-  durationSeconds: number;
+  /** Countdown duration in seconds. null = no auto-start (manual only). */
+  durationSeconds: number | null;
   onComplete?: () => void;
+  /** When true, shows a "Start Now" button to skip the countdown. */
+  allowSkip?: boolean;
 }
 
-export function GameStartCountdown({ durationSeconds, onComplete }: Props) {
-  const [secondsLeft, setSecondsLeft] = useState(durationSeconds);
+export function GameStartCountdown({
+  durationSeconds,
+  onComplete,
+  allowSkip,
+}: Props) {
+  const [secondsLeft, setSecondsLeft] = useState(durationSeconds ?? 0);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const hasCompletedRef = useRef(false);
   const onCompleteRef = useRef(onComplete);
+  const startTimeRef = useRef(Date.now());
+
   useEffect(() => {
     onCompleteRef.current = onComplete;
   });
 
+  const triggerComplete = () => {
+    if (!hasCompletedRef.current) {
+      hasCompletedRef.current = true;
+      onCompleteRef.current?.();
+    }
+  };
+
+  // Countdown mode.
   useEffect(() => {
+    if (durationSeconds === null) return;
     if (secondsLeft <= 0) {
-      if (!hasCompletedRef.current) {
-        hasCompletedRef.current = true;
-        onCompleteRef.current?.();
-      }
+      triggerComplete();
       return;
     }
     const timer = setTimeout(() => {
@@ -30,22 +47,54 @@ export function GameStartCountdown({ durationSeconds, onComplete }: Props) {
     return () => {
       clearTimeout(timer);
     };
-  }, [secondsLeft]);
+  }, [secondsLeft, durationSeconds]);
+
+  // Elapsed mode (manual only).
+  useEffect(() => {
+    if (durationSeconds !== null) return;
+    const interval = setInterval(() => {
+      setElapsedSeconds(Math.floor((Date.now() - startTimeRef.current) / 1000));
+    }, 1000);
+    return () => { clearInterval(interval); };
+  }, [durationSeconds]);
+
+  const isManual = durationSeconds === null;
+
+  const formatTime = (secs: number) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  };
 
   return (
     <Card className="mb-5">
       <CardContent className="pt-6">
-        <p className="text-muted-foreground">
-          {secondsLeft > 0 ? (
-            <>
-              Starting in{" "}
-              <strong className="text-foreground">{secondsLeft}</strong> second
-              {secondsLeft !== 1 ? "s" : ""}…
-            </>
-          ) : (
-            "Starting…"
+        <div className="flex items-center justify-between">
+          <p className="text-muted-foreground">
+            {isManual ? (
+              <>
+                Waiting to start…{" "}
+                <strong className="text-foreground">
+                  {formatTime(elapsedSeconds)}
+                </strong>
+              </>
+            ) : secondsLeft > 0 ? (
+              <>
+                Starting in{" "}
+                <strong className="text-foreground">{secondsLeft}</strong>{" "}
+                second
+                {secondsLeft !== 1 ? "s" : ""}…
+              </>
+            ) : (
+              "Starting…"
+            )}
+          </p>
+          {allowSkip && (isManual || secondsLeft > 0) && (
+            <Button size="sm" variant="outline" onClick={triggerComplete}>
+              Start Now
+            </Button>
           )}
-        </p>
+        </div>
       </CardContent>
     </Card>
   );

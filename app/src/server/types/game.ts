@@ -1,4 +1,10 @@
-import type { GameStatusState, GameMode, RoleSlot, Team } from "@/lib/types";
+import type {
+  GameStatusState,
+  GameMode,
+  RoleSlot,
+  Team,
+  TimerConfig,
+} from "@/lib/types";
 import type { PublicLobbyPlayer } from "./lobby";
 
 export type { RoleSlot };
@@ -44,4 +50,6 @@ export interface PlayerGameState {
   amDead?: boolean;
   /** Player IDs marked as dead by the narrator. */
   deadPlayerIds?: string[];
+  /** Phase timer configuration. Only populated for the game owner. */
+  timerConfig?: TimerConfig;
 }

@@ -195,6 +195,7 @@ export class FirebaseGameService {
         visibleRoleAssignments,
         rolesInPlay: this.buildRolesInPlay(game),
         ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
+        ...(game.timerConfig ? { timerConfig: game.timerConfig } : {}),
       };
     }
 
@@ -286,6 +287,7 @@ export class FirebaseGameService {
     gameMode: GameMode,
     showRolesInPlay: ShowRolesInPlay,
     ownerPlayerId: string | null,
+    timerConfig?: import("@/lib/types").TimerConfig,
   ): Promise<Game> {
     const { roles } = this.getModeDefinition(gameMode);
     const rolePlayers = ownerPlayerId
@@ -311,6 +313,7 @@ export class FirebaseGameService {
       configuredRoleSlots: roleSlots,
       showRolesInPlay,
       ownerPlayerId,
+      ...(timerConfig ? { timerConfig } : {}),
     };
 
     // sessionIndex: { [sessionId]: playerId } — needed to reconstruct Game from Firebase

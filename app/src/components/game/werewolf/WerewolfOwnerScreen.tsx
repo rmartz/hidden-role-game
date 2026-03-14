@@ -1,6 +1,8 @@
 "use client";
 
+import { useMemo } from "react";
 import { GameStatus } from "@/lib/types";
+import type { TimerConfig } from "@/lib/types";
 import { WerewolfPhase } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
@@ -10,7 +12,11 @@ import { OwnerGameNightScreen } from "./OwnerGameNightScreen";
 import { OwnerGameDayScreen } from "./OwnerGameDayScreen";
 import { OwnerGameScreen } from "./OwnerGameScreen";
 
-const STARTING_DURATION_SECONDS = 10;
+const DEFAULT_TIMER_CONFIG: TimerConfig = {
+  startCountdownSeconds: 10,
+  nightPhaseSeconds: null,
+  dayPhaseSeconds: null,
+};
 
 interface Props {
   gameId: string;
@@ -19,12 +25,16 @@ interface Props {
 
 export function WerewolfOwnerScreen({ gameId, gameState }: Props) {
   const advanceMutation = useAdvanceGame(gameId);
+  const timerConfig = useMemo(
+    () => gameState.timerConfig ?? DEFAULT_TIMER_CONFIG,
+    [gameState.timerConfig],
+  );
 
   if (gameState.status.type === GameStatus.Starting) {
     return (
       <OwnerStartingScreen
         gameState={gameState}
-        durationSeconds={STARTING_DURATION_SECONDS}
+        durationSeconds={timerConfig.startCountdownSeconds}
         onStart={() => {
           advanceMutation.mutate();
         }}
@@ -43,6 +53,7 @@ export function WerewolfOwnerScreen({ gameId, gameState }: Props) {
           gameId={gameId}
           gameState={gameState}
           turnState={turnState}
+          nightPhaseSeconds={timerConfig.nightPhaseSeconds}
         />
       );
     }
@@ -53,6 +64,7 @@ export function WerewolfOwnerScreen({ gameId, gameState }: Props) {
           gameId={gameId}
           gameState={gameState}
           turnState={turnState}
+          dayPhaseSeconds={timerConfig.dayPhaseSeconds}
         />
       );
     }

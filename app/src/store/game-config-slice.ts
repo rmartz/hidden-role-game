@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { sum } from "lodash";
 import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
-import type { RoleSlot } from "@/lib/types";
+import type { RoleSlot, TimerConfig } from "@/lib/types";
 import type { GameConfig } from "@/server/types";
 import { GAME_MODES } from "@/lib/game-modes";
 
@@ -54,6 +54,7 @@ export interface GameConfigState {
   roleMaxes: Record<string, number>;
   showConfigToPlayers: boolean;
   showRolesInPlay: ShowRolesInPlay;
+  timerConfig: TimerConfig | undefined;
   isValid: boolean;
   /** Increments on every user-initiated action. Used to detect when a sync is needed. */
   syncVersion: number;
@@ -68,6 +69,7 @@ const initialState: GameConfigState = {
   roleMaxes: {},
   showConfigToPlayers: false,
   showRolesInPlay: ShowRolesInPlay.None,
+  timerConfig: undefined,
   isValid: false,
   syncVersion: 0,
 };
@@ -105,6 +107,7 @@ const gameConfigSlice = createSlice({
       state.roleMaxes = roleMaxesFromSlots(slots);
       state.showConfigToPlayers = config.showConfigToPlayers;
       state.showRolesInPlay = config.showRolesInPlay;
+      state.timerConfig = config.timerConfig;
       state.isValid = recomputeIsValid(state);
     },
 
@@ -232,6 +235,11 @@ const gameConfigSlice = createSlice({
       state.showRolesInPlay = action.payload;
       state.syncVersion++;
     },
+
+    setTimerConfig(state, action: PayloadAction<TimerConfig | undefined>) {
+      state.timerConfig = action.payload;
+      state.syncVersion++;
+    },
   },
 });
 
@@ -263,6 +271,7 @@ export const {
   setPlayerCount,
   setShowConfigToPlayers,
   setShowRolesInPlay,
+  setTimerConfig,
 } = gameConfigSlice.actions;
 
 export default gameConfigSlice.reducer;
