@@ -267,6 +267,7 @@ export interface FirebasePlayerState {
   rolesInPlay?: RoleInPlay[] | null;
   nightActions?: Record<string, NightAction>;
   myNightTarget?: string;
+  myNightTargetConfirmed?: boolean;
   amDead?: boolean;
   deadPlayerIds?: string[];
 }
@@ -285,6 +286,9 @@ export function playerStateToFirebase(
     ...(state.nightActions ? { nightActions: state.nightActions } : {}),
     ...(state.myNightTarget !== undefined
       ? { myNightTarget: state.myNightTarget }
+      : {}),
+    ...(state.myNightTargetConfirmed !== undefined
+      ? { myNightTargetConfirmed: state.myNightTargetConfirmed }
       : {}),
     ...(state.amDead ? { amDead: true } : {}),
     ...(state.deadPlayerIds?.length
@@ -322,6 +326,9 @@ export function firebaseToPlayerState(
     ...(raw.nightActions ? { nightActions: raw.nightActions } : {}),
     ...(raw.myNightTarget !== undefined
       ? { myNightTarget: raw.myNightTarget }
+      : {}),
+    ...(raw.myNightTargetConfirmed !== undefined
+      ? { myNightTargetConfirmed: raw.myNightTargetConfirmed }
       : {}),
     ...(raw.amDead ? { amDead: true } : {}),
     ...(raw.deadPlayerIds?.length ? { deadPlayerIds: raw.deadPlayerIds } : {}),
