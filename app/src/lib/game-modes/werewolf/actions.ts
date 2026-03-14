@@ -6,6 +6,7 @@ import {
   buildNightPhaseOrder,
   isOwnerPlaying,
   currentTurnState,
+  validateActiveNightPlayer,
 } from "./utils";
 
 export enum WerewolfAction {
@@ -115,12 +116,8 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
         if (typeof explicitRoleId !== "string") return false;
         if (!phase.nightPhaseOrder.includes(explicitRoleId)) return false;
       } else {
-        const callerAssignment = game.roleAssignments.find(
-          (a) => a.playerId === callerId,
-        );
-        if (!callerAssignment) return false;
-        const activeRoleId = phase.nightPhaseOrder[phase.currentPhaseIndex];
-        if (callerAssignment.roleDefinitionId !== activeRoleId) return false;
+        const activeRoleId = validateActiveNightPlayer(game, callerId);
+        if (!activeRoleId) return false;
         // Players cannot change a confirmed target.
         if (phase.nightActions[activeRoleId]?.confirmed) return false;
       }
@@ -159,20 +156,14 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   },
   [WerewolfAction.ConfirmNightTarget]: {
     isValid(game: Game, callerId: string) {
+      const activeRoleId = validateActiveNightPlayer(game, callerId);
+      if (!activeRoleId) return false;
+
       const ts = currentTurnState(game);
       if (ts?.phase.type !== WerewolfPhase.Nighttime) return false;
-      if (ts.turn <= 1) return false;
-
-      const phase = ts.phase;
-      const callerAssignment = game.roleAssignments.find(
-        (a) => a.playerId === callerId,
-      );
-      if (!callerAssignment) return false;
-      const activeRoleId = phase.nightPhaseOrder[phase.currentPhaseIndex];
-      if (callerAssignment.roleDefinitionId !== activeRoleId) return false;
 
       // Must have a target set and not already confirmed.
-      const action = phase.nightActions[activeRoleId];
+      const action = ts.phase.nightActions[activeRoleId];
       if (!action) return false;
       if (action.confirmed) return false;
       return true;

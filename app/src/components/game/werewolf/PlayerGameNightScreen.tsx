@@ -2,17 +2,13 @@
 
 import {
   WerewolfAction,
-  TargetCategory,
-  WEREWOLF_ROLES,
   getTargetablePlayers,
 } from "@/lib/game-modes/werewolf";
-import type {
-  WerewolfNighttimePhase,
-  WerewolfRoleDefinition,
-} from "@/lib/game-modes/werewolf";
+import type { WerewolfNighttimePhase } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
 import { useGameAction } from "@/hooks";
 import { Button } from "@/components/ui/button";
+import { ConfirmTargetButton } from "./ConfirmTargetButton";
 
 interface Props {
   gameId: string;
@@ -55,13 +51,6 @@ export function PlayerGameNightScreen({
     gameState.visibleRoleAssignments.length === 1 ? "teammate" : "teammates";
 
   const isConfirmed = gameState.myNightTargetConfirmed ?? false;
-  const roleId = gameState.myRole?.id;
-  const roleDef = roleId
-    ? (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[roleId]
-    : undefined;
-  const targetCategory = roleDef?.targetCategory ?? TargetCategory.None;
-  const confirmLabel =
-    targetCategory !== TargetCategory.None ? targetCategory : "Confirm";
 
   const allTargets = getTargetablePlayers(
     gameState.players,
@@ -110,24 +99,12 @@ export function PlayerGameNightScreen({
               </Button>
             ))}
           </div>
-          {gameState.myNightTarget && !isConfirmed && (
-            <Button
-              className="mt-3"
-              onClick={() => {
-                action.mutate({
-                  actionId: WerewolfAction.ConfirmNightTarget,
-                });
-              }}
-              disabled={action.isPending}
-            >
-              {confirmLabel}
-            </Button>
-          )}
-          {isConfirmed && (
-            <p className="mt-3 text-sm text-green-600 font-medium">
-              Target confirmed. Wait for the Narrator to continue.
-            </p>
-          )}
+          <ConfirmTargetButton
+            gameId={gameId}
+            roleId={gameState.myRole?.id}
+            hasTarget={!!gameState.myNightTarget}
+            isConfirmed={isConfirmed}
+          />
         </div>
       )}
     </div>

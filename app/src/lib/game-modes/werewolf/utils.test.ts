@@ -9,6 +9,7 @@ import {
   getTargetablePlayers,
   isOwnerPlaying,
   currentTurnState,
+  getConfirmLabel,
 } from "./utils";
 
 function makePlayingGame(
@@ -190,5 +191,39 @@ describe("currentTurnState", () => {
   it("returns correct turnState for day phase", () => {
     const game = makePlayingGame(dayTurnState);
     expect(currentTurnState(game)).toEqual(dayTurnState);
+  });
+});
+
+describe("getConfirmLabel", () => {
+  it("returns 'Attack' for Werewolf", () => {
+    expect(getConfirmLabel(WerewolfRole.Werewolf)).toBe("Attack");
+  });
+
+  it("returns 'Attack' for Chupacabra", () => {
+    expect(getConfirmLabel(WerewolfRole.Chupacabra)).toBe("Attack");
+  });
+
+  it("returns 'Protect' for Bodyguard", () => {
+    expect(getConfirmLabel(WerewolfRole.Bodyguard)).toBe("Protect");
+  });
+
+  it("returns 'Investigate' for Seer", () => {
+    expect(getConfirmLabel(WerewolfRole.Seer)).toBe("Investigate");
+  });
+
+  it("returns 'Confirm' for Special roles like Witch", () => {
+    expect(getConfirmLabel(WerewolfRole.Witch)).toBe("Confirm");
+  });
+
+  it("returns 'Confirm' for None roles like Villager", () => {
+    expect(getConfirmLabel(WerewolfRole.Villager)).toBe("Confirm");
+  });
+
+  it("returns 'Confirm' for undefined roleId", () => {
+    expect(getConfirmLabel(undefined)).toBe("Confirm");
+  });
+
+  it("returns 'Confirm' for unknown roleId", () => {
+    expect(getConfirmLabel("unknown-role")).toBe("Confirm");
   });
 });

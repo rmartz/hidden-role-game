@@ -1,8 +1,9 @@
 import { GameStatus } from "@/lib/types";
 import type { Game, PlayerRoleAssignment } from "@/lib/types";
-import { WakesAtNight } from "./types";
+import { WakesAtNight, TargetCategory, WerewolfPhase } from "./types";
 import type { TargetablePlayer, WerewolfTurnState } from "./types";
 import { WEREWOLF_ROLES } from "./roles";
+import type { WerewolfRoleDefinition } from "./roles";
 
 /**
  * Returns the list of players eligible to be targeted during a night phase.
@@ -51,4 +52,52 @@ export function isOwnerPlaying(game: Game, callerId: string): boolean {
 export function currentTurnState(game: Game): WerewolfTurnState | undefined {
   if (game.status.type !== GameStatus.Playing) return undefined;
   return game.status.turnState as WerewolfTurnState | undefined;
+}
+
+/**
+ * Validates that the game is in a nighttime phase (after turn 1) and that the
+ * caller is the player assigned to the currently active night role.
+ * Returns the active role ID on success, or undefined if validation fails.
+ */
+export function validateActiveNightPlayer(
+  game: Game,
+  callerId: string,
+): string | undefined {
+  const ts = currentTurnState(game);
+  if (ts?.phase.type !== WerewolfPhase.Nighttime) return undefined;
+  if (ts.turn <= 1) return undefined;
+
+  const phase = ts.phase;
+  const callerAssignment = game.roleAssignments.find(
+    (a) => a.playerId === callerId,
+  );
+  if (!callerAssignment) return undefined;
+
+  const activeRoleId = phase.nightPhaseOrder[phase.currentPhaseIndex];
+  if (callerAssignment.roleDefinitionId !== activeRoleId) return undefined;
+
+  return activeRoleId;
+}
+
+/**
+ * Returns the confirm button label for a given role ID based on its target category.
+ * Attack → "Attack", Protect → "Protect", Investigate → "Investigate".
+ * Special and None fall back to "Confirm".
+ */
+export function getConfirmLabel(roleId: string | undefined): string {
+  if (!roleId) return "Confirm";
+  const roleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
+    roleId
+  ];
+  if (!roleDef) return "Confirm";
+  switch (roleDef.targetCategory) {
+    case TargetCategory.Attack:
+      return "Attack";
+    case TargetCategory.Protect:
+      return "Protect";
+    case TargetCategory.Investigate:
+      return "Investigate";
+    default:
+      return "Confirm";
+  }
 }
