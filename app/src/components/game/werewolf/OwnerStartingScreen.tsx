@@ -1,5 +1,6 @@
 "use client";
 
+import { GameStatus } from "@/lib/types";
 import type { PlayerGameState } from "@/server/types";
 import {
   GameRolesList,
@@ -9,17 +10,16 @@ import {
 
 interface Props {
   gameState: PlayerGameState;
-  durationSeconds: number | null;
-  startedAtMs?: number;
   onStart: () => void;
 }
 
-export function OwnerStartingScreen({
-  gameState,
-  durationSeconds,
-  startedAtMs,
-  onStart,
-}: Props) {
+export function OwnerStartingScreen({ gameState, onStart }: Props) {
+  const durationSeconds = gameState.timerConfig?.startCountdownSeconds ?? null;
+  const startedAtMs =
+    gameState.status.type === GameStatus.Starting
+      ? gameState.status.startedAt
+      : undefined;
+
   return (
     <div className="p-5">
       <h1 className="text-2xl font-bold mb-4">Game Starting</h1>
