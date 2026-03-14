@@ -115,7 +115,17 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       const { targetPlayerId } = payload as { targetPlayerId?: unknown };
       if (typeof targetPlayerId !== "string") return false;
       if (targetPlayerId === callerId) return false;
-      return game.players.some((p) => p.id === targetPlayerId);
+      if (targetPlayerId === game.ownerPlayerId) return false;
+      if (!game.players.some((p) => p.id === targetPlayerId)) return false;
+
+      // Cannot target visible same-team teammates.
+      const callerPlayer = game.players.find((p) => p.id === callerId);
+      if (callerPlayer) {
+        for (const vr of callerPlayer.visibleRoles) {
+          if (vr.playerId === targetPlayerId) return false;
+        }
+      }
+      return true;
     },
     apply(game: Game, payload: unknown) {
       const ts = currentTurnState(game);

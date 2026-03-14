@@ -51,7 +51,17 @@ export function PlayerGameNightScreen({ gameId, gameState, turnState }: Props) {
           <h2 className="text-lg font-semibold mb-2">Choose a target</h2>
           <div className="flex flex-col gap-2">
             {gameState.players
-              .filter((p) => p.id !== gameState.gameOwner?.id)
+              .filter((p) => {
+                // Exclude owner (narrator), self, and visible same-team teammates.
+                if (p.id === gameState.gameOwner?.id) return false;
+                const myTeam = gameState.myRole?.team;
+                const visible = gameState.visibleRoleAssignments.find(
+                  (v) => v.player.id === p.id,
+                );
+                if (visible && myTeam && visible.role.team === myTeam)
+                  return false;
+                return true;
+              })
               .map((player) => {
                 const isSelected = gameState.myNightTarget === player.id;
                 return (
