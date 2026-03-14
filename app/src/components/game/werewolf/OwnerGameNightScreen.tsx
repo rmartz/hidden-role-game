@@ -103,8 +103,9 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
 
   const isFirstTurn = turnState.turn === 1;
 
-  // For team phases, exclude same-team players from target list.
-  const teamExcludeIds = isTeamPhase
+  // Build the exclude list: team members for team phases, active role's
+  // player for solo phases (so the list matches what the player sees).
+  const excludeIds: string[] = isTeamPhase
     ? getTeamMemberPlayerIds(
         gameState.visibleRoleAssignments.map((a) => ({
           playerId: a.player.id,
@@ -112,13 +113,15 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
         })),
         activePhaseKey.slice("team:".length) as import("@/lib/types").Team,
       )
-    : undefined;
+    : gameState.visibleRoleAssignments
+        .filter((a) => a.role.id === activePhaseKey)
+        .map((a) => a.player.id);
 
   const targetablePlayers = getTargetablePlayers(
     gameState.players,
     gameState.gameOwner?.id,
     turnState.deadPlayerIds,
-    teamExcludeIds,
+    excludeIds.length > 0 ? excludeIds : undefined,
   );
 
   function handleTargetClick(playerId: string) {
