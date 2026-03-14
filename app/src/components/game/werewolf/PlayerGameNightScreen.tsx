@@ -82,19 +82,13 @@ export function PlayerGameNightScreen({
   const suggestedTargetId = gameState.suggestedTargetId;
   const allAgreed = gameState.allAgreed ?? false;
 
-  // Always exclude self; for team phases also exclude visible teammates.
-  const excludeIds = [
-    ...(gameState.myPlayerId ? [gameState.myPlayerId] : []),
-    ...(isTeamPhase
-      ? gameState.visibleRoleAssignments.map((a) => a.player.id)
-      : []),
-  ];
-
   const allTargets = getTargetablePlayers(
     gameState.players,
     gameState.gameOwner?.id,
     deadPlayerIds,
-    excludeIds.length > 0 ? excludeIds : undefined,
+    activePhaseKey ?? "",
+    gameState.myPlayerId,
+    gameState.visibleRoleAssignments,
   ).map((player) => [player, gameState.myNightTarget === player.id] as const);
 
   const targets = isConfirmed

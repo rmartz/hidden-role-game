@@ -37,19 +37,48 @@ export function getTeamPhaseKey(team: Team): string {
 
 /**
  * Returns the list of players eligible to be targeted during a night phase.
- * Excludes the game owner (narrator), dead players, and optionally any
- * additional player IDs (e.g. same-team players for team targeting).
+ * Excludes the game owner (narrator), dead players, the acting player
+ * (`myPlayerId`), and phase-specific exclusions derived from
+ * `visibleRoleAssignments`:
+ *   - Team phase: all players on the active team are excluded.
+ *   - Solo phase: the player(s) assigned to the active role are excluded.
+ *
+ * Pass `myPlayerId = null` for the narrator view (the narrator is already
+ * absent from the players list).
+ * Pass `activePhaseKey = ""` and `visibleRoleAssignments = []` when no
+ * phase-aware exclusion is needed (e.g. in tests).
  */
 export function getTargetablePlayers(
   players: TargetablePlayer[],
   ownerPlayerId: string | undefined,
   deadPlayerIds: string[],
-  excludePlayerIds?: string[],
+  activePhaseKey: string,
+  myPlayerId: string | null,
+  visibleRoleAssignments: {
+    player: { id: string };
+    role: { id: string; team: string };
+  }[],
 ): TargetablePlayer[] {
+  const excludeIds: string[] = [];
+  if (myPlayerId) excludeIds.push(myPlayerId);
+
+  if (isTeamPhaseKey(activePhaseKey)) {
+    const team = parseTeamPhaseKey(activePhaseKey);
+    if (team) {
+      for (const a of visibleRoleAssignments) {
+        if ((a.role.team as Team) === team) excludeIds.push(a.player.id);
+      }
+    }
+  } else {
+    for (const a of visibleRoleAssignments) {
+      if (a.role.id === activePhaseKey) excludeIds.push(a.player.id);
+    }
+  }
+
   return players.filter((p) => {
     if (p.id === ownerPlayerId) return false;
     if (deadPlayerIds.includes(p.id)) return false;
-    if (excludePlayerIds?.includes(p.id)) return false;
+    if (excludeIds.includes(p.id)) return false;
     return true;
   });
 }
