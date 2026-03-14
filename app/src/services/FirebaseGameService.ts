@@ -540,8 +540,23 @@ export class FirebaseGameService {
       return { error: "Action not valid for current game state" };
     }
 
-    await this.writeAllPlayerStates(finalGame);
-    return { game: finalGame };
+    // Use the committed status from the transaction snapshot rather than
+    // re-fetching via getGame(). The snapshot is guaranteed to reflect exactly
+    // what was written — avoids potential SDK cache staleness and removes the
+    // concurrent-write window where a stale writeAllPlayerStates could
+    // overwrite a more-recent commit.
+    const committedStatusJson = result.snapshot.val() as string | null;
+    const committedGame =
+      committedStatusJson !== null
+        ? ({
+            ...baseGame,
+            status: JSON.parse(
+              committedStatusJson,
+            ) as import("@/lib/types").GameStatusState,
+          } as Game)
+        : finalGame;
+    await this.writeAllPlayerStates(committedGame);
+    return { game: committedGame };
   }
 
   public adjustRoleSlotsForPlayer(
