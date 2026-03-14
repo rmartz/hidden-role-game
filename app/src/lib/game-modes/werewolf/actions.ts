@@ -159,11 +159,13 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       const activeRoleId = validateActiveNightPlayer(game, callerId);
       if (!activeRoleId) return false;
 
+      // validateActiveNightPlayer guarantees nighttime phase.
       const ts = currentTurnState(game);
-      if (ts?.phase.type !== WerewolfPhase.Nighttime) return false;
+      const phase = ts?.phase as WerewolfNighttimePhase | undefined;
+      if (!phase) return false;
 
       // Must have a target set and not already confirmed.
-      const action = ts.phase.nightActions[activeRoleId];
+      const action = phase.nightActions[activeRoleId];
       if (!action) return false;
       if (action.confirmed) return false;
       return true;
