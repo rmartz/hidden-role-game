@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { CheckIcon, CopyIcon, ShareIcon } from "lucide-react";
+import { CheckIcon, ClipboardIcon, ShareIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -51,23 +51,35 @@ export function ShareLobby({ lobbyId }: Props) {
 
         <div className="flex flex-col items-center gap-4">
           <QRCodeSVG value={lobbyUrl} size={200} />
-          <p className="text-sm text-muted-foreground text-center break-all">
-            {lobbyUrl}
-          </p>
+          <div className="relative">
+            {copied && (
+              <span className="absolute -top-7 left-1/2 -translate-x-1/2 rounded bg-foreground px-2 py-0.5 text-xs text-background animate-in fade-in slide-in-from-bottom-1 duration-150">
+                Copied!
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={() => void handleCopy()}
+              className="inline-flex items-center gap-1.5 text-sm text-muted-foreground text-center break-all hover:text-foreground transition-colors cursor-pointer"
+            >
+              {copied ? (
+                <CheckIcon className="size-3.5 shrink-0" />
+              ) : (
+                <ClipboardIcon className="size-3.5 shrink-0" />
+              )}
+              {lobbyUrl}
+            </button>
+          </div>
         </div>
 
-        <DialogFooter>
-          {canShare && (
-            <Button variant="outline" onClick={() => void handleShare()}>
+        {canShare && (
+          <DialogFooter>
+            <Button onClick={() => void handleShare()}>
               <ShareIcon />
               Share
             </Button>
-          )}
-          <Button onClick={() => void handleCopy()}>
-            {copied ? <CheckIcon /> : <CopyIcon />}
-            {copied ? "Copied!" : "Copy Link"}
-          </Button>
-        </DialogFooter>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );
