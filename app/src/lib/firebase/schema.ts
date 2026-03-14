@@ -20,7 +20,7 @@ import type {
   RoleSlot,
   TimerConfig,
 } from "@/lib/types";
-import type { NightAction } from "@/lib/game-modes/werewolf";
+import type { AnyNightAction } from "@/lib/game-modes/werewolf";
 import type {
   PublicLobby,
   PlayerGameState,
@@ -277,9 +277,12 @@ export interface FirebasePlayerState {
     role: { id: string; name: string; team: string };
   }[];
   rolesInPlay?: RoleInPlay[] | null;
-  nightActions?: Record<string, NightAction>;
+  nightActions?: Record<string, AnyNightAction>;
   myNightTarget?: string;
   myNightTargetConfirmed?: boolean;
+  teamVotes?: { playerName: string; targetPlayerId: string }[];
+  suggestedTargetId?: string;
+  allAgreed?: boolean;
   amDead?: boolean;
   deadPlayerIds?: string[];
   timerConfig?: TimerConfig;
@@ -303,6 +306,11 @@ export function playerStateToFirebase(
     ...(state.myNightTargetConfirmed !== undefined
       ? { myNightTargetConfirmed: state.myNightTargetConfirmed }
       : {}),
+    ...(state.teamVotes?.length ? { teamVotes: state.teamVotes } : {}),
+    ...(state.suggestedTargetId !== undefined
+      ? { suggestedTargetId: state.suggestedTargetId }
+      : {}),
+    ...(state.allAgreed !== undefined ? { allAgreed: state.allAgreed } : {}),
     ...(state.amDead ? { amDead: true } : {}),
     ...(state.deadPlayerIds?.length
       ? { deadPlayerIds: state.deadPlayerIds }
@@ -344,6 +352,11 @@ export function firebaseToPlayerState(
     ...(raw.myNightTargetConfirmed !== undefined
       ? { myNightTargetConfirmed: raw.myNightTargetConfirmed }
       : {}),
+    ...(raw.teamVotes?.length ? { teamVotes: raw.teamVotes } : {}),
+    ...(raw.suggestedTargetId !== undefined
+      ? { suggestedTargetId: raw.suggestedTargetId }
+      : {}),
+    ...(raw.allAgreed !== undefined ? { allAgreed: raw.allAgreed } : {}),
     ...(raw.amDead ? { amDead: true } : {}),
     ...(raw.deadPlayerIds?.length ? { deadPlayerIds: raw.deadPlayerIds } : {}),
     ...(raw.timerConfig ? { timerConfig: raw.timerConfig } : {}),

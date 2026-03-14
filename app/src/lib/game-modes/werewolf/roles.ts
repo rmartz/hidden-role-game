@@ -20,6 +20,8 @@ export interface WerewolfRoleDefinition extends RoleDefinition<
 > {
   wakesAtNight: WakesAtNight;
   targetCategory: TargetCategory;
+  /** When true, all players with this role on the same team wake and target together. */
+  teamTargeting?: boolean;
 }
 
 export const MIN_PLAYERS = 5;
@@ -51,6 +53,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     canSeeTeam: [Team.Bad],
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Attack,
+    teamTargeting: true,
   },
   [WerewolfRole.Seer]: {
     id: WerewolfRole.Seer,

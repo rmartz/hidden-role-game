@@ -15,7 +15,12 @@ import type {
   PublicRoleInfo,
   PlayerGameState,
 } from "@/server/types";
-import type { NightAction } from "@/lib/game-modes/werewolf";
+import {
+  isTeamNightAction,
+  getTeamPhaseKey,
+  getTeamPlayerIds,
+} from "@/lib/game-modes/werewolf";
+import type { AnyNightAction } from "@/lib/game-modes/werewolf";
 import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase, buildNightPhaseOrder } from "@/lib/game-modes/werewolf";
 import type {
@@ -250,10 +255,16 @@ export class FirebaseGameService {
       });
     }
 
-    // Include myNightTarget during nighttime (after first night).
-    const myAction = nightActions?.[myAssignment.roleDefinitionId];
-    const myNightTarget = myAction?.targetPlayerId;
-    const myNightTargetConfirmed = myAction?.confirmed ?? false;
+    // Include night targeting state.
+    const nightTargetState = nightActions
+      ? this.extractPlayerNightState(
+          nightActions,
+          game,
+          callerId,
+          myRole,
+          deadPlayerIds,
+        )
+      : {};
 
     const amDead = deadPlayerIds.includes(callerId);
 
@@ -265,7 +276,7 @@ export class FirebaseGameService {
       myRole: { id: myRole.id, name: myRole.name, team: myRole.team },
       visibleRoleAssignments,
       rolesInPlay: this.buildRolesInPlay(game),
-      ...(nightActions ? { myNightTarget, myNightTargetConfirmed } : {}),
+      ...nightTargetState,
       ...(amDead ? { amDead: true } : {}),
       ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
       ...(game.timerConfig ? { timerConfig: game.timerConfig } : {}),
@@ -275,7 +286,7 @@ export class FirebaseGameService {
   /** Extracts nightActions from the current turnState, if present. */
   private extractNightActions(
     game: Game,
-  ): Record<string, NightAction> | undefined {
+  ): Record<string, AnyNightAction> | undefined {
     if (game.status.type !== GameStatus.Playing) return undefined;
     const ts = game.status.turnState as WerewolfTurnState | undefined;
     if (!ts) return undefined;
@@ -288,6 +299,74 @@ export class FirebaseGameService {
     if (game.status.type !== GameStatus.Playing) return [];
     const ts = game.status.turnState as WerewolfTurnState | undefined;
     return ts?.deadPlayerIds ?? [];
+  }
+
+  /**
+   * Extracts the night targeting state for a non-owner player.
+   * For solo roles: returns myNightTarget/myNightTargetConfirmed.
+   * For team phases: also returns teamVotes, suggestedTargetId, allAgreed.
+   */
+  private extractPlayerNightState(
+    nightActions: Record<string, AnyNightAction>,
+    game: Game,
+    callerId: string,
+    myRole: RoleDefinition,
+    deadPlayerIds: string[],
+  ): Partial<PlayerGameState> {
+    // Check if the player's role belongs to a team phase.
+    const roleDef = GAME_MODES[game.gameMode].roles[myRole.id] as
+      | { teamTargeting?: boolean; team?: string }
+      | undefined;
+
+    if (roleDef?.teamTargeting && roleDef.team) {
+      const phaseKey = getTeamPhaseKey(roleDef.team as Team);
+      const action = nightActions[phaseKey];
+      if (!action || !isTeamNightAction(action)) {
+        return { myNightTarget: undefined, myNightTargetConfirmed: false };
+      }
+
+      const myVote = action.votes.find((v) => v.playerId === callerId);
+      const playerById = new Map(game.players.map((p) => [p.id, p]));
+
+      const aliveTeamIds = getTeamPlayerIds(
+        game.roleAssignments,
+        roleDef.team as Team,
+        deadPlayerIds,
+      );
+
+      const teamVotes = action.votes
+        .filter((v) => aliveTeamIds.includes(v.playerId))
+        .map((v) => ({
+          playerName: playerById.get(v.playerId)?.name ?? "Unknown",
+          targetPlayerId: v.targetPlayerId,
+        }));
+
+      // All alive team members agree if they all voted for the same target.
+      const aliveVotes = action.votes.filter((v) =>
+        aliveTeamIds.includes(v.playerId),
+      );
+      const uniqueTargets = new Set(aliveVotes.map((v) => v.targetPlayerId));
+      const allAgreed =
+        aliveVotes.length === aliveTeamIds.length && uniqueTargets.size === 1;
+
+      return {
+        myNightTarget: myVote?.targetPlayerId,
+        myNightTargetConfirmed: action.confirmed ?? false,
+        teamVotes,
+        suggestedTargetId: action.suggestedTargetId,
+        allAgreed,
+      };
+    }
+
+    // Solo role: look up by role ID.
+    const myAction = nightActions[myRole.id];
+    if (!myAction || isTeamNightAction(myAction)) {
+      return { myNightTarget: undefined, myNightTargetConfirmed: false };
+    }
+    return {
+      myNightTarget: myAction.targetPlayerId,
+      myNightTargetConfirmed: myAction.confirmed ?? false,
+    };
   }
 
   /** Writes pre-computed PlayerGameState for every player in the game. */
@@ -432,7 +511,7 @@ export class FirebaseGameService {
       return { error: "Action not valid for current game state" };
     }
 
-    action.apply(game, payload);
+    action.apply(game, payload, callerId);
 
     await gameRef(gameId)
       .child("public/status")

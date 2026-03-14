@@ -9,6 +9,8 @@ interface Props {
   roleId: string | undefined;
   hasTarget: boolean;
   isConfirmed: boolean;
+  isTeamPhase?: boolean;
+  allAgreed?: boolean;
 }
 
 export function ConfirmTargetButton({
@@ -16,6 +18,8 @@ export function ConfirmTargetButton({
   roleId,
   hasTarget,
   isConfirmed,
+  isTeamPhase,
+  allAgreed,
 }: Props) {
   const action = useGameAction(gameId);
 
@@ -29,17 +33,26 @@ export function ConfirmTargetButton({
 
   if (!hasTarget) return null;
 
+  // Team phases require all members to agree before confirming.
+  const disabled = action.isPending || (isTeamPhase && !allAgreed);
+
   return (
-    <Button
-      className="mt-3"
-      onClick={() => {
-        action.mutate({
-          actionId: WerewolfAction.ConfirmNightTarget,
-        });
-      }}
-      disabled={action.isPending}
-    >
-      {getConfirmLabel(roleId)}
-    </Button>
+    <div className="mt-3">
+      <Button
+        onClick={() => {
+          action.mutate({
+            actionId: WerewolfAction.ConfirmNightTarget,
+          });
+        }}
+        disabled={disabled}
+      >
+        {getConfirmLabel(roleId)}
+      </Button>
+      {isTeamPhase && !allAgreed && (
+        <p className="mt-1 text-xs text-muted-foreground">
+          All team members must agree on the same target.
+        </p>
+      )}
+    </div>
   );
 }

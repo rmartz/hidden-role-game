@@ -1,34 +1,67 @@
-import { GameStatus } from "@/lib/types";
+import { GameStatus, Team } from "@/lib/types";
 import type { Game, PlayerRoleAssignment } from "@/lib/types";
 import { WakesAtNight, TargetCategory, WerewolfPhase } from "./types";
 import type {
   TargetablePlayer,
+  TeamNightVote,
   WerewolfNighttimePhase,
   WerewolfTurnState,
 } from "./types";
 import { WEREWOLF_ROLES } from "./roles";
 import type { WerewolfRoleDefinition } from "./roles";
 
+const TEAM_PHASE_PREFIX = "team:";
+
+// ---------------------------------------------------------------------------
+// Team phase key helpers
+// ---------------------------------------------------------------------------
+
+export function isTeamPhaseKey(key: string): boolean {
+  return key.startsWith(TEAM_PHASE_PREFIX);
+}
+
+export function parseTeamPhaseKey(key: string): Team | null {
+  if (!isTeamPhaseKey(key)) return null;
+  const teamStr = key.slice(TEAM_PHASE_PREFIX.length);
+  if (Object.values(Team).includes(teamStr as Team)) return teamStr as Team;
+  return null;
+}
+
+export function getTeamPhaseKey(team: Team): string {
+  return `${TEAM_PHASE_PREFIX}${team}`;
+}
+
+// ---------------------------------------------------------------------------
+// Targetable players
+// ---------------------------------------------------------------------------
+
 /**
  * Returns the list of players eligible to be targeted during a night phase.
- * Excludes the game owner (narrator) and dead players.
+ * Excludes the game owner (narrator), dead players, and optionally any
+ * additional player IDs (e.g. same-team players for team targeting).
  */
 export function getTargetablePlayers(
   players: TargetablePlayer[],
   ownerPlayerId: string | undefined,
   deadPlayerIds: string[],
+  excludePlayerIds?: string[],
 ): TargetablePlayer[] {
   return players.filter((p) => {
     if (p.id === ownerPlayerId) return false;
     if (deadPlayerIds.includes(p.id)) return false;
+    if (excludePlayerIds?.includes(p.id)) return false;
     return true;
   });
 }
 
+// ---------------------------------------------------------------------------
+// Night phase order
+// ---------------------------------------------------------------------------
+
 /**
- * Returns the ordered list of role IDs that wake during a Werewolf night phase.
- * On turn 1, includes first-night-only roles; subsequent turns exclude them.
- * Only includes roles that are actually assigned in the current game.
+ * Returns the ordered list of phase keys that wake during a Werewolf night.
+ * Roles with `teamTargeting` on the same team are grouped into a single
+ * team phase key (e.g. "team:Bad"). Solo roles use their role ID.
  */
 export function buildNightPhaseOrder(
   turn: number,
@@ -37,15 +70,109 @@ export function buildNightPhaseOrder(
   const assignedRoleIds = new Set(
     roleAssignments.map((a) => a.roleDefinitionId),
   );
-  return Object.values(WEREWOLF_ROLES)
-    .filter((role) => {
-      if (!assignedRoleIds.has(role.id)) return false;
-      if (role.wakesAtNight === WakesAtNight.EveryNight) return true;
-      if (role.wakesAtNight === WakesAtNight.FirstNightOnly) return turn === 1;
-      return false;
-    })
-    .map((role) => role.id);
+
+  const phaseKeys: string[] = [];
+  const emittedTeams = new Set<Team>();
+
+  for (const role of Object.values(WEREWOLF_ROLES)) {
+    if (!assignedRoleIds.has(role.id)) continue;
+    if (role.wakesAtNight === WakesAtNight.Never) continue;
+    if (role.wakesAtNight === WakesAtNight.FirstNightOnly && turn !== 1)
+      continue;
+
+    if (role.teamTargeting) {
+      if (!emittedTeams.has(role.team)) {
+        emittedTeams.add(role.team);
+        phaseKeys.push(getTeamPhaseKey(role.team));
+      }
+    } else {
+      phaseKeys.push(role.id);
+    }
+  }
+
+  return phaseKeys;
 }
+
+// ---------------------------------------------------------------------------
+// Team player helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Returns the alive player IDs that belong to a team phase
+ * (have `teamTargeting` and matching team).
+ */
+export function getTeamPlayerIds(
+  roleAssignments: PlayerRoleAssignment[],
+  team: Team,
+  deadPlayerIds: string[],
+): string[] {
+  return roleAssignments
+    .filter((a) => {
+      const role = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
+        a.roleDefinitionId
+      ];
+      return (
+        role?.teamTargeting &&
+        role.team === team &&
+        !deadPlayerIds.includes(a.playerId)
+      );
+    })
+    .map((a) => a.playerId);
+}
+
+/**
+ * Returns all player IDs on the given team (alive or dead) so they can be
+ * excluded from targeting. Includes any role on the team, not just
+ * teamTargeting roles.
+ */
+export function getTeamMemberPlayerIds(
+  roleAssignments: PlayerRoleAssignment[],
+  team: Team,
+): string[] {
+  return roleAssignments
+    .filter((a) => {
+      const role = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
+        a.roleDefinitionId
+      ];
+      return role?.team === team;
+    })
+    .map((a) => a.playerId);
+}
+
+/**
+ * Returns the most-voted target from a list of team votes.
+ * Returns undefined if there are no votes or a tie for the top spot.
+ */
+export function computeSuggestedTarget(
+  votes: TeamNightVote[],
+): string | undefined {
+  if (votes.length === 0) return undefined;
+
+  const counts = new Map<string, number>();
+  for (const v of votes) {
+    counts.set(v.targetPlayerId, (counts.get(v.targetPlayerId) ?? 0) + 1);
+  }
+
+  let maxCount = 0;
+  let maxTarget: string | undefined;
+  let tied = false;
+
+  for (const [target, count] of counts) {
+    if (count > maxCount) {
+      maxCount = count;
+      maxTarget = target;
+      tied = false;
+    } else if (count === maxCount) {
+      tied = true;
+    }
+  }
+
+  return tied ? undefined : maxTarget;
+}
+
+// ---------------------------------------------------------------------------
+// Game state helpers
+// ---------------------------------------------------------------------------
 
 export function isOwnerPlaying(game: Game, callerId: string): boolean {
   return (
@@ -60,14 +187,16 @@ export function currentTurnState(game: Game): WerewolfTurnState | undefined {
 
 export interface ActiveNightPlayer {
   phase: WerewolfNighttimePhase;
-  activeRoleId: string;
+  activePhaseKey: string;
+  isTeamPhase: boolean;
 }
 
 /**
  * Validates that the game is in a nighttime phase (after turn 1) and that the
- * caller is the player assigned to the currently active night role.
- * Returns the nighttime phase and active role ID on success, or undefined if
- * validation fails.
+ * caller belongs to the currently active night phase — either matching the
+ * active role ID (solo) or belonging to the active team (team phase).
+ * Returns the nighttime phase and active phase key on success, or undefined
+ * if validation fails.
  */
 export function validateActiveNightPlayer(
   game: Game,
@@ -83,21 +212,34 @@ export function validateActiveNightPlayer(
   );
   if (!callerAssignment) return undefined;
 
-  const activeRoleId = phase.nightPhaseOrder[phase.currentPhaseIndex];
-  if (callerAssignment.roleDefinitionId !== activeRoleId) return undefined;
+  const activePhaseKey = phase.nightPhaseOrder[phase.currentPhaseIndex];
+  if (!activePhaseKey) return undefined;
 
-  return { phase, activeRoleId };
+  const team = parseTeamPhaseKey(activePhaseKey);
+  if (team) {
+    // Team phase — check caller's role is on this team with teamTargeting.
+    const callerRole = (
+      WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
+    )[callerAssignment.roleDefinitionId];
+    if (!callerRole?.teamTargeting || callerRole.team !== team)
+      return undefined;
+    return { phase, activePhaseKey, isTeamPhase: true };
+  }
+
+  // Solo phase — exact role match.
+  if (callerAssignment.roleDefinitionId !== activePhaseKey) return undefined;
+  return { phase, activePhaseKey, isTeamPhase: false };
 }
 
 /**
- * Returns the confirm button label for a given role ID based on its target category.
- * Attack → "Attack", Protect → "Protect", Investigate → "Investigate".
- * Special and None fall back to "Confirm".
+ * Returns the confirm button label for a given phase key based on its target category.
+ * Team phase keys return "Attack". Solo roles: Attack, Protect, Investigate, or "Confirm".
  */
-export function getConfirmLabel(roleId: string | undefined): string {
-  if (!roleId) return "Confirm";
+export function getConfirmLabel(phaseKey: string | undefined): string {
+  if (!phaseKey) return "Confirm";
+  if (isTeamPhaseKey(phaseKey)) return "Attack";
   const roleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
-    roleId
+    phaseKey
   ];
   if (!roleDef) return "Confirm";
   switch (roleDef.targetCategory) {

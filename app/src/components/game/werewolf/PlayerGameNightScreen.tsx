@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import {
   WerewolfAction,
   getTargetablePlayers,
+  isTeamPhaseKey,
 } from "@/lib/game-modes/werewolf";
 import type { WerewolfNighttimePhase } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
@@ -18,6 +19,23 @@ interface Props {
   phase: WerewolfNighttimePhase;
   turn: number;
   deadPlayerIds: string[];
+}
+
+/**
+ * Check if the current phase is this player's turn.
+ * For solo roles: myRole.id matches the active phase key.
+ * For team phases: myRole.team matches the team in the phase key.
+ */
+function isPlayersTurn(
+  myRole: { id: string; team: string } | null,
+  activePhaseKey: string | undefined,
+): boolean {
+  if (!myRole || !activePhaseKey) return false;
+  if (isTeamPhaseKey(activePhaseKey)) {
+    const teamName = activePhaseKey.slice("team:".length);
+    return myRole.team === teamName;
+  }
+  return myRole.id === activePhaseKey;
 }
 
 export function PlayerGameNightScreen({
@@ -48,27 +66,49 @@ export function PlayerGameNightScreen({
     );
   }
 
-  const isMyTurn =
-    gameState.myRole?.id === phase.nightPhaseOrder[phase.currentPhaseIndex];
+  const activePhaseKey = phase.nightPhaseOrder[phase.currentPhaseIndex];
+  const isMyTurn = isPlayersTurn(gameState.myRole, activePhaseKey);
 
   if (!isMyTurn) return <div />;
 
   const isFirstTurn = turn === 1;
+  const isTeamPhase = activePhaseKey ? isTeamPhaseKey(activePhaseKey) : false;
   const hasVisibleTeammates = gameState.visibleRoleAssignments.length > 0;
   const teammateLabel =
     gameState.visibleRoleAssignments.length === 1 ? "teammate" : "teammates";
 
   const isConfirmed = gameState.myNightTargetConfirmed ?? false;
+  const teamVotes = gameState.teamVotes;
+  const suggestedTargetId = gameState.suggestedTargetId;
+  const allAgreed = gameState.allAgreed ?? false;
+
+  // For team phases, exclude same-team players from targets.
+  const teamExcludeIds = isTeamPhase
+    ? [
+        ...gameState.visibleRoleAssignments.map((a) => a.player.id),
+        // Include self — werewolves can't target themselves.
+        ...(gameState.myRole
+          ? ([
+              gameState.players.find((p) => p.name === gameState.myRole?.name)
+                ?.id,
+            ].filter(Boolean) as string[])
+          : []),
+      ]
+    : undefined;
 
   const allTargets = getTargetablePlayers(
     gameState.players,
     gameState.gameOwner?.id,
     deadPlayerIds,
+    teamExcludeIds,
   ).map((player) => [player, gameState.myNightTarget === player.id] as const);
 
   const targets = isConfirmed
     ? allTargets.filter(([, isSelected]) => isSelected)
     : allTargets;
+
+  // The phase key to pass for confirm label (team key or role ID).
+  const confirmPhaseKey = isTeamPhase ? activePhaseKey : gameState.myRole?.id;
 
   return (
     <div className="p-5">
@@ -96,35 +136,86 @@ export function PlayerGameNightScreen({
       </p>
       {!isFirstTurn && (
         <div>
+          {isTeamPhase && teamVotes && teamVotes.length > 0 && !isConfirmed && (
+            <div className="mb-3 rounded-md border p-2">
+              <p className="text-xs font-medium text-muted-foreground mb-1">
+                Team votes:
+              </p>
+              <ul className="text-xs space-y-0.5">
+                {teamVotes.map((vote, i) => {
+                  const targetName =
+                    gameState.players.find((p) => p.id === vote.targetPlayerId)
+                      ?.name ?? "Unknown";
+                  return (
+                    <li key={i}>
+                      {vote.playerName} → {targetName}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+
           <h2 className="text-lg font-semibold mb-2">
             {isConfirmed ? "Your target" : "Choose a target"}
           </h2>
           <div className="flex flex-col gap-2">
-            {targets.map(([player, isSelected]) => (
+            {targets.map(([player, isSelected]) => {
+              const isSuggested =
+                isTeamPhase && suggestedTargetId === player.id && !isSelected;
+              return (
+                <Button
+                  key={player.id}
+                  variant={isSelected ? "default" : "outline"}
+                  onClick={() => {
+                    action.mutate({
+                      actionId: WerewolfAction.SetNightTarget,
+                      payload: {
+                        targetPlayerId: isSelected ? undefined : player.id,
+                      },
+                    });
+                  }}
+                  disabled={action.isPending || isConfirmed}
+                  className="justify-start"
+                >
+                  {player.name}
+                  {isSelected && " (selected)"}
+                  {isSuggested && (
+                    <span className="ml-1 text-xs text-muted-foreground">
+                      (suggested)
+                    </span>
+                  )}
+                </Button>
+              );
+            })}
+          </div>
+
+          {isTeamPhase &&
+            suggestedTargetId &&
+            gameState.myNightTarget !== suggestedTargetId &&
+            !isConfirmed && (
               <Button
-                key={player.id}
-                variant={isSelected ? "default" : "outline"}
+                variant="secondary"
+                className="mt-2"
                 onClick={() => {
                   action.mutate({
                     actionId: WerewolfAction.SetNightTarget,
-                    payload: {
-                      targetPlayerId: isSelected ? undefined : player.id,
-                    },
+                    payload: { targetPlayerId: suggestedTargetId },
                   });
                 }}
-                disabled={action.isPending || isConfirmed}
-                className="justify-start"
+                disabled={action.isPending}
               >
-                {player.name}
-                {isSelected && " (selected)"}
+                Approve suggested target
               </Button>
-            ))}
-          </div>
+            )}
+
           <ConfirmTargetButton
             gameId={gameId}
-            roleId={gameState.myRole?.id}
+            roleId={confirmPhaseKey}
             hasTarget={!!gameState.myNightTarget}
             isConfirmed={isConfirmed}
+            isTeamPhase={isTeamPhase}
+            allAgreed={allAgreed}
           />
         </div>
       )}

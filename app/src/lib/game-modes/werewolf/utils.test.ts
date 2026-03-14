@@ -97,14 +97,14 @@ describe("buildNightPhaseOrder", () => {
 
   it("includes EveryNight and FirstNightOnly roles on turn 1", () => {
     const order = buildNightPhaseOrder(1, assignments);
-    expect(order).toContain(WerewolfRole.Werewolf);
+    expect(order).toContain("team:Bad");
     expect(order).toContain(WerewolfRole.Seer);
     expect(order).toContain(WerewolfRole.Mason);
   });
 
   it("excludes FirstNightOnly roles on turn 2+", () => {
     const order = buildNightPhaseOrder(2, assignments);
-    expect(order).toContain(WerewolfRole.Werewolf);
+    expect(order).toContain("team:Bad");
     expect(order).toContain(WerewolfRole.Seer);
     expect(order).not.toContain(WerewolfRole.Mason);
   });
