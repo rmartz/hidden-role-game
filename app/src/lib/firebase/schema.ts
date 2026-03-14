@@ -20,6 +20,7 @@ import type {
   RoleSlot,
   TimerConfig,
 } from "@/lib/types";
+import type { NightAction } from "@/lib/game-modes/werewolf";
 import type {
   PublicLobby,
   PlayerGameState,
@@ -276,6 +277,8 @@ export interface FirebasePlayerState {
     role: { id: string; name: string; team: string };
   }[];
   rolesInPlay?: RoleInPlay[] | null;
+  nightActions?: Record<string, NightAction>;
+  myNightTarget?: string;
   amDead?: boolean;
   deadPlayerIds?: string[];
   timerConfig?: TimerConfig;
@@ -292,6 +295,10 @@ export function playerStateToFirebase(
     myRole: state.myRole,
     visibleRoleAssignments: state.visibleRoleAssignments,
     rolesInPlay: state.rolesInPlay,
+    ...(state.nightActions ? { nightActions: state.nightActions } : {}),
+    ...(state.myNightTarget !== undefined
+      ? { myNightTarget: state.myNightTarget }
+      : {}),
     ...(state.amDead ? { amDead: true } : {}),
     ...(state.deadPlayerIds?.length
       ? { deadPlayerIds: state.deadPlayerIds }
@@ -326,6 +333,10 @@ export function firebaseToPlayerState(
       }),
     ),
     rolesInPlay: raw.rolesInPlay ?? null,
+    ...(raw.nightActions ? { nightActions: raw.nightActions } : {}),
+    ...(raw.myNightTarget !== undefined
+      ? { myNightTarget: raw.myNightTarget }
+      : {}),
     ...(raw.amDead ? { amDead: true } : {}),
     ...(raw.deadPlayerIds?.length ? { deadPlayerIds: raw.deadPlayerIds } : {}),
     ...(raw.timerConfig ? { timerConfig: raw.timerConfig } : {}),

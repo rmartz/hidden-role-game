@@ -15,6 +15,7 @@ import type {
   PublicRoleInfo,
   PlayerGameState,
 } from "@/server/types";
+import type { NightAction } from "@/lib/game-modes/werewolf";
 import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase, buildNightPhaseOrder } from "@/lib/game-modes/werewolf";
 import type {
@@ -82,6 +83,7 @@ export class FirebaseGameService {
       type: WerewolfPhase.Nighttime,
       nightPhaseOrder,
       currentPhaseIndex: 0,
+      nightActions: {},
     };
     return { turn: 1, phase, deadPlayerIds: [] };
   }
@@ -169,6 +171,9 @@ export class FirebaseGameService {
     const playerById = new Map(game.players.map((p) => [p.id, p]));
     const publicPlayers = game.players.map((p) => ({ id: p.id, name: p.name }));
 
+    // Extract nightActions from turnState for the current phase.
+    const nightActions = this.extractNightActions(game);
+
     // Extract deadPlayerIds from Werewolf turn state.
     const deadPlayerIds = this.extractDeadPlayerIds(game);
 
@@ -194,6 +199,7 @@ export class FirebaseGameService {
         myRole: null,
         visibleRoleAssignments,
         rolesInPlay: this.buildRolesInPlay(game),
+        ...(nightActions ? { nightActions } : {}),
         ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
         ...(game.timerConfig ? { timerConfig: game.timerConfig } : {}),
       };
@@ -243,6 +249,10 @@ export class FirebaseGameService {
       });
     }
 
+    // Include myNightTarget during nighttime (after first night).
+    const myNightTarget =
+      nightActions?.[myAssignment.roleDefinitionId]?.targetPlayerId;
+
     const amDead = deadPlayerIds.includes(callerId);
 
     return {
@@ -253,9 +263,21 @@ export class FirebaseGameService {
       myRole: { id: myRole.id, name: myRole.name, team: myRole.team },
       visibleRoleAssignments,
       rolesInPlay: this.buildRolesInPlay(game),
+      ...(nightActions ? { myNightTarget } : {}),
       ...(amDead ? { amDead: true } : {}),
       ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
     };
+  }
+
+  /** Extracts nightActions from the current turnState, if present. */
+  private extractNightActions(
+    game: Game,
+  ): Record<string, NightAction> | undefined {
+    if (game.status.type !== GameStatus.Playing) return undefined;
+    const ts = game.status.turnState as WerewolfTurnState | undefined;
+    if (!ts) return undefined;
+    const { nightActions } = ts.phase;
+    return Object.keys(nightActions).length > 0 ? nightActions : undefined;
   }
 
   /** Extracts deadPlayerIds from the Werewolf turn state. */

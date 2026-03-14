@@ -3,6 +3,7 @@
 import { useCallback, useState } from "react";
 import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase, WerewolfAction } from "@/lib/game-modes/werewolf";
+import { getTargetablePlayers } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
 import { useGameAction } from "@/hooks";
@@ -28,11 +29,8 @@ export function OwnerGameNightScreen({
 
   const { phase } = turnState;
   const isNighttime = phase.type === WerewolfPhase.Nighttime;
-  const currentPhaseIndex =
-    "currentPhaseIndex" in phase ? phase.currentPhaseIndex : 0;
-  const nightPhaseOrder =
-    "nightPhaseOrder" in phase ? phase.nightPhaseOrder : [];
-  const activeRoleId = nightPhaseOrder[currentPhaseIndex] ?? "";
+  const currentPhaseIndex = isNighttime ? phase.currentPhaseIndex : 0;
+  const nightPhaseOrder = isNighttime ? phase.nightPhaseOrder : [];
   const isLastPhase = currentPhaseIndex === nightPhaseOrder.length - 1;
 
   // Reset pause when phase index changes.
@@ -62,10 +60,35 @@ export function OwnerGameNightScreen({
 
   if (!isNighttime) return null;
 
+  const nightActions = phase.nightActions;
+  const activeRoleId = nightPhaseOrder[currentPhaseIndex] ?? "";
   const modeConfig = GAME_MODES[gameState.gameMode];
   const activeRoleName =
     (activeRoleId ? modeConfig.roles[activeRoleId]?.name : undefined) ??
     activeRoleId;
+
+  const activeTarget = nightActions[activeRoleId]?.targetPlayerId;
+  const activeTargetName = activeTarget
+    ? gameState.players.find((p) => p.id === activeTarget)?.name
+    : undefined;
+
+  const isFirstTurn = turnState.turn === 1;
+
+  const targetablePlayers = getTargetablePlayers(
+    gameState.players,
+    gameState.gameOwner?.id,
+    turnState.deadPlayerIds,
+  );
+
+  function handleTargetClick(playerId: string) {
+    action.mutate({
+      actionId: WerewolfAction.SetNightTarget,
+      payload: {
+        roleId: activeRoleId,
+        targetPlayerId: activeTarget === playerId ? undefined : playerId,
+      },
+    });
+  }
 
   return (
     <div className="p-5">
@@ -85,6 +108,35 @@ export function OwnerGameNightScreen({
           setIsPaused((p) => !p);
         }}
       />
+
+      {!isFirstTurn && (
+        <div className="mb-4 rounded-md border p-3">
+          <p className="text-sm font-medium mb-2">
+            Target:{" "}
+            {activeTargetName ? (
+              <strong className="text-foreground">{activeTargetName}</strong>
+            ) : (
+              <span className="text-muted-foreground italic">none</span>
+            )}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {targetablePlayers.map((player) => (
+              <Button
+                key={player.id}
+                size="sm"
+                variant={activeTarget === player.id ? "default" : "outline"}
+                onClick={() => {
+                  handleTargetClick(player.id);
+                }}
+                disabled={action.isPending}
+              >
+                {player.name}
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {isLastPhase ? (
         <Button
           onClick={() => {

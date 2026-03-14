@@ -1,8 +1,24 @@
 import { GameStatus } from "@/lib/types";
 import type { Game, PlayerRoleAssignment } from "@/lib/types";
 import { WakesAtNight } from "./types";
-import type { WerewolfTurnState } from "./types";
+import type { TargetablePlayer, WerewolfTurnState } from "./types";
 import { WEREWOLF_ROLES } from "./roles";
+
+/**
+ * Returns the list of players eligible to be targeted during a night phase.
+ * Excludes the game owner (narrator) and dead players.
+ */
+export function getTargetablePlayers(
+  players: TargetablePlayer[],
+  ownerPlayerId: string | undefined,
+  deadPlayerIds: string[],
+): TargetablePlayer[] {
+  return players.filter((p) => {
+    if (p.id === ownerPlayerId) return false;
+    if (deadPlayerIds.includes(p.id)) return false;
+    return true;
+  });
+}
 
 /**
  * Returns the ordered list of role IDs that wake during a Werewolf night phase.

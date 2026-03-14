@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase, WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
@@ -39,6 +40,18 @@ export function OwnerGameDayScreen({
   const { phase } = turnState;
   if (phase.type !== WerewolfPhase.Daytime) return null;
 
+  // Build night summary: group by targeted player → list of roles that targeted them.
+  const modeConfig = GAME_MODES[gameState.gameMode];
+  const nightActions = phase.nightActions;
+  const targetSummary = new Map<string, string[]>();
+  for (const [roleId, { targetPlayerId }] of Object.entries(nightActions)) {
+    const roleName = modeConfig.roles[roleId]?.name ?? roleId;
+    const existing = targetSummary.get(targetPlayerId) ?? [];
+    existing.push(roleName);
+    targetSummary.set(targetPlayerId, existing);
+  }
+  const hasTargets = targetSummary.size > 0;
+
   return (
     <div className="p-5">
       <h1 className="text-2xl font-bold mb-4">Day — Turn {turnState.turn}</h1>
@@ -50,6 +63,29 @@ export function OwnerGameDayScreen({
           setIsPaused((p) => !p);
         }}
       />
+
+      {hasTargets && (
+        <div className="mb-4 rounded-md border p-3">
+          <h2 className="text-sm font-semibold mb-2">Night Summary</h2>
+          <ul className="space-y-1 text-sm">
+            {[...targetSummary.entries()].map(([playerId, roleNames]) => {
+              const playerName =
+                gameState.players.find((p) => p.id === playerId)?.name ??
+                playerId;
+              return (
+                <li key={playerId}>
+                  <strong className="text-foreground">{playerName}</strong>
+                  <span className="text-muted-foreground">
+                    {" "}
+                    — targeted by {roleNames.join(", ")}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
       <Button
         onClick={() => {
           action.mutate({ actionId: WerewolfAction.StartNight });
