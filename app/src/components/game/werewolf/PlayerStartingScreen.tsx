@@ -9,16 +9,12 @@ import {
   RoleLabel,
 } from "@/components/game";
 
-const DEFAULT_START_COUNTDOWN_SECONDS = 10;
-
 interface Props {
   gameState: PlayerGameState;
 }
 
 export function PlayerStartingScreen({ gameState }: Props) {
-  const durationSeconds = gameState.timerConfig
-    ? gameState.timerConfig.startCountdownSeconds
-    : DEFAULT_START_COUNTDOWN_SECONDS;
+  const durationSeconds = gameState.timerConfig?.startCountdownSeconds ?? null;
   const startedAtMs =
     gameState.status.type === GameStatus.Starting
       ? gameState.status.startedAt

@@ -1,8 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
 import { GameStatus } from "@/lib/types";
-import type { TimerConfig } from "@/lib/types";
 import { WerewolfPhase } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
@@ -12,12 +10,6 @@ import { OwnerGameNightScreen } from "./OwnerGameNightScreen";
 import { OwnerGameDayScreen } from "./OwnerGameDayScreen";
 import { OwnerGameScreen } from "./OwnerGameScreen";
 
-const DEFAULT_TIMER_CONFIG: TimerConfig = {
-  startCountdownSeconds: 10,
-  nightPhaseSeconds: null,
-  dayPhaseSeconds: null,
-};
-
 interface Props {
   gameId: string;
   gameState: PlayerGameState;
@@ -25,16 +17,13 @@ interface Props {
 
 export function WerewolfOwnerScreen({ gameId, gameState }: Props) {
   const advanceMutation = useAdvanceGame(gameId);
-  const timerConfig = useMemo(
-    () => gameState.timerConfig ?? DEFAULT_TIMER_CONFIG,
-    [gameState.timerConfig],
-  );
+  const timerConfig = gameState.timerConfig;
 
   if (gameState.status.type === GameStatus.Starting) {
     return (
       <OwnerStartingScreen
         gameState={gameState}
-        durationSeconds={timerConfig.startCountdownSeconds}
+        durationSeconds={timerConfig?.startCountdownSeconds ?? null}
         startedAtMs={gameState.status.startedAt}
         onStart={() => {
           advanceMutation.mutate();
@@ -54,7 +43,7 @@ export function WerewolfOwnerScreen({ gameId, gameState }: Props) {
           gameId={gameId}
           gameState={gameState}
           turnState={turnState}
-          nightPhaseSeconds={timerConfig.nightPhaseSeconds}
+          nightPhaseSeconds={timerConfig?.nightPhaseSeconds ?? null}
         />
       );
     }
@@ -65,7 +54,7 @@ export function WerewolfOwnerScreen({ gameId, gameState }: Props) {
           gameId={gameId}
           gameState={gameState}
           turnState={turnState}
-          dayPhaseSeconds={timerConfig.dayPhaseSeconds}
+          dayPhaseSeconds={timerConfig?.dayPhaseSeconds ?? null}
         />
       );
     }
