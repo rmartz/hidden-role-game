@@ -44,6 +44,7 @@ function makeNightState(
     turn: overrides.turn ?? 1,
     phase: {
       type: WerewolfPhase.Nighttime,
+      startedAt: 1000,
       nightPhaseOrder: [WerewolfRole.Werewolf, WerewolfRole.Seer],
       currentPhaseIndex: overrides.currentPhaseIndex ?? 0,
       nightActions: overrides.nightActions ?? {},
@@ -56,6 +57,7 @@ const nightTurnState: WerewolfTurnState = {
   turn: 1,
   phase: {
     type: WerewolfPhase.Nighttime,
+    startedAt: 1000,
     nightPhaseOrder: [WerewolfRole.Werewolf, WerewolfRole.Seer],
     currentPhaseIndex: 0,
     nightActions: {},
@@ -67,6 +69,7 @@ const nightTurn2State: WerewolfTurnState = {
   turn: 2,
   phase: {
     type: WerewolfPhase.Nighttime,
+    startedAt: 1000,
     nightPhaseOrder: [WerewolfRole.Werewolf, WerewolfRole.Seer],
     currentPhaseIndex: 0,
     nightActions: {},
@@ -136,6 +139,17 @@ describe("WerewolfAction.StartNight", () => {
       expect(phase.nightPhaseOrder).toContain(WerewolfRole.Werewolf);
       expect(phase.nightPhaseOrder).toContain(WerewolfRole.Seer);
       expect(phase.currentPhaseIndex).toBe(0);
+    });
+
+    it("sets startedAt to a recent timestamp", () => {
+      const before = Date.now();
+      const game = makePlayingGame(dayTurnState);
+      action.apply(game, null);
+      const after = Date.now();
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      const phase = ts.phase as WerewolfNighttimePhase;
+      expect(phase.startedAt).toBeGreaterThanOrEqual(before);
+      expect(phase.startedAt).toBeLessThanOrEqual(after);
     });
   });
 });
@@ -241,6 +255,17 @@ describe("WerewolfAction.SetNightPhase", () => {
         WerewolfRole.Werewolf,
         WerewolfRole.Seer,
       ]);
+    });
+
+    it("resets startedAt to a recent timestamp", () => {
+      const before = Date.now();
+      const game = makePlayingGame(nightTurnState);
+      action.apply(game, { phaseIndex: 1 });
+      const after = Date.now();
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      const phase = ts.phase as WerewolfNighttimePhase;
+      expect(phase.startedAt).toBeGreaterThanOrEqual(before);
+      expect(phase.startedAt).toBeLessThanOrEqual(after);
     });
   });
 });

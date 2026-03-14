@@ -10,12 +10,14 @@ import {
 interface Props {
   gameState: PlayerGameState;
   durationSeconds: number | null;
+  startedAtMs?: number;
   onStart: () => void;
 }
 
 export function OwnerStartingScreen({
   gameState,
   durationSeconds,
+  startedAtMs,
   onStart,
 }: Props) {
   return (
@@ -23,6 +25,7 @@ export function OwnerStartingScreen({
       <h1 className="text-2xl font-bold mb-4">Game Starting</h1>
       <GameStartCountdown
         durationSeconds={durationSeconds}
+        startedAtMs={startedAtMs}
         onComplete={onStart}
         allowSkip
       />

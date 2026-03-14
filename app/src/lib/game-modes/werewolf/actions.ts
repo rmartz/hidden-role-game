@@ -37,6 +37,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
           turn: nextTurn,
           phase: {
             type: WerewolfPhase.Nighttime,
+            startedAt: Date.now(),
             nightPhaseOrder,
             currentPhaseIndex: 0,
             nightActions: {},
@@ -90,7 +91,11 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
         type: GameStatus.Playing,
         turnState: {
           ...ts,
-          phase: { ...phase, currentPhaseIndex: phaseIndex },
+          phase: {
+            ...phase,
+            currentPhaseIndex: phaseIndex,
+            startedAt: Date.now(),
+          },
         },
       };
     },

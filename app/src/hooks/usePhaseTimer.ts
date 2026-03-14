@@ -11,6 +11,8 @@ interface UsePhaseTimerOptions {
   onExpire?: () => void;
   /** Timer restarts whenever this value changes. */
   resetKey: string | number;
+  /** Server-set Unix epoch ms for the phase start. Falls back to Date.now() if omitted. */
+  startedAtMs?: number;
 }
 
 interface UsePhaseTimerResult {
@@ -25,6 +27,8 @@ interface UsePhaseTimerResult {
  *
  * - When `durationSeconds` is a number, counts down and calls `onExpire` at zero.
  * - When `durationSeconds` is null, counts up (elapsed time only).
+ * - When `startedAtMs` is provided, computes elapsed from that server timestamp
+ *   so timers survive page refreshes and component remounts.
  * - Uses absolute timestamps to avoid drift.
  * - Respects `isPaused` to freeze the timer.
  * - Resets when `resetKey` changes.
@@ -34,9 +38,14 @@ export function usePhaseTimer({
   isPaused,
   onExpire,
   resetKey,
+  startedAtMs,
 }: UsePhaseTimerOptions): UsePhaseTimerResult {
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  const startTimeRef = useRef(Date.now());
+  const [elapsedSeconds, setElapsedSeconds] = useState(() => {
+    if (startedAtMs)
+      return Math.max(0, Math.floor((Date.now() - startedAtMs) / 1000));
+    return 0;
+  });
+  const startTimeRef = useRef(startedAtMs ?? Date.now());
   const pausedElapsedRef = useRef(0);
   const hasExpiredRef = useRef(false);
   const onExpireRef = useRef(onExpire);
@@ -45,13 +54,17 @@ export function usePhaseTimer({
     onExpireRef.current = onExpire;
   });
 
-  // Reset on resetKey or durationSeconds change.
+  // Reset on resetKey, durationSeconds, or startedAtMs change.
   const reset = useCallback(() => {
-    startTimeRef.current = Date.now();
+    const now = Date.now();
+    startTimeRef.current = startedAtMs ?? now;
     pausedElapsedRef.current = 0;
     hasExpiredRef.current = false;
-    setElapsedSeconds(0);
-  }, []);
+    const initialElapsed = startedAtMs
+      ? Math.max(0, Math.floor((now - startedAtMs) / 1000))
+      : 0;
+    setElapsedSeconds(initialElapsed);
+  }, [startedAtMs]);
 
   useEffect(() => {
     reset();
@@ -77,7 +90,10 @@ export function usePhaseTimer({
     if (isPaused) return;
 
     const tick = () => {
-      const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
+      const elapsed = Math.max(
+        0,
+        Math.floor((Date.now() - startTimeRef.current) / 1000),
+      );
       setElapsedSeconds(elapsed);
 
       // Check for expiry in countdown mode.

@@ -10,18 +10,28 @@ interface Props {
   onComplete?: () => void;
   /** When true, shows a "Start Now" button to skip the countdown. */
   allowSkip?: boolean;
+  /** Server-set Unix epoch ms for when Starting status began. */
+  startedAtMs?: number;
 }
 
 export function GameStartCountdown({
   durationSeconds,
   onComplete,
   allowSkip,
+  startedAtMs,
 }: Props) {
-  const [secondsLeft, setSecondsLeft] = useState(durationSeconds ?? 0);
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const initialElapsed = startedAtMs
+    ? Math.max(0, Math.floor((Date.now() - startedAtMs) / 1000))
+    : 0;
+  const [secondsLeft, setSecondsLeft] = useState(
+    durationSeconds !== null
+      ? Math.max(0, durationSeconds - initialElapsed)
+      : 0,
+  );
+  const [elapsedSeconds, setElapsedSeconds] = useState(initialElapsed);
   const hasCompletedRef = useRef(false);
   const onCompleteRef = useRef(onComplete);
-  const startTimeRef = useRef(Date.now());
+  const startTimeRef = useRef(startedAtMs ?? Date.now());
 
   useEffect(() => {
     onCompleteRef.current = onComplete;
@@ -53,7 +63,9 @@ export function GameStartCountdown({
   useEffect(() => {
     if (durationSeconds !== null) return;
     const interval = setInterval(() => {
-      setElapsedSeconds(Math.floor((Date.now() - startTimeRef.current) / 1000));
+      setElapsedSeconds(
+        Math.max(0, Math.floor((Date.now() - startTimeRef.current) / 1000)),
+      );
     }, 1000);
     return () => {
       clearInterval(interval);

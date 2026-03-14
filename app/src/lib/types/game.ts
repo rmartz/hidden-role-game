@@ -14,6 +14,8 @@ export enum GameStatus {
 
 export interface StartingGameStatus {
   type: GameStatus.Starting;
+  /** Unix epoch ms when the game entered Starting status. */
+  startedAt?: number;
 }
 
 export interface PlayingGameStatus {

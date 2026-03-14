@@ -81,6 +81,7 @@ export class FirebaseGameService {
     const nightPhaseOrder = buildNightPhaseOrder(1, roleAssignments);
     const phase: WerewolfNighttimePhase = {
       type: WerewolfPhase.Nighttime,
+      startedAt: Date.now(),
       nightPhaseOrder,
       currentPhaseIndex: 0,
       nightActions: {},
@@ -329,7 +330,7 @@ export class FirebaseGameService {
       id: randomUUID(),
       lobbyId,
       gameMode,
-      status: { type: GameStatus.Starting },
+      status: { type: GameStatus.Starting, startedAt: Date.now() },
       players: gamePlayers,
       roleAssignments,
       configuredRoleSlots: roleSlots,

@@ -35,6 +35,7 @@ export function WerewolfOwnerScreen({ gameId, gameState }: Props) {
       <OwnerStartingScreen
         gameState={gameState}
         durationSeconds={timerConfig.startCountdownSeconds}
+        startedAtMs={gameState.status.startedAt}
         onStart={() => {
           advanceMutation.mutate();
         }}

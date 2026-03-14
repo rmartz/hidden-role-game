@@ -56,6 +56,7 @@ export function OwnerGameNightScreen({
     isPaused,
     onExpire: handleAutoAdvance,
     resetKey: currentPhaseIndex,
+    startedAtMs: isNighttime ? phase.startedAt : undefined,
   });
 
   if (!isNighttime) return null;

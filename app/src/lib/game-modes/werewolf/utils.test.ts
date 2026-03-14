@@ -33,14 +33,18 @@ const nightTurnState: WerewolfTurnState = {
   turn: 1,
   phase: {
     type: WerewolfPhase.Nighttime,
+    startedAt: 1000,
     nightPhaseOrder: [WerewolfRole.Werewolf, WerewolfRole.Seer],
     currentPhaseIndex: 0,
+    nightActions: {},
   },
+  deadPlayerIds: [],
 };
 
 const dayTurnState: WerewolfTurnState = {
   turn: 1,
-  phase: { type: WerewolfPhase.Daytime, startedAt: 1000 },
+  phase: { type: WerewolfPhase.Daytime, startedAt: 1000, nightActions: {} },
+  deadPlayerIds: [],
 };
 
 const players = [

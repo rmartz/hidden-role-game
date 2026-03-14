@@ -30,14 +30,17 @@ export function OwnerGameDayScreen({
     action.mutate({ actionId: WerewolfAction.StartNight });
   }, [action]);
 
+  const { phase } = turnState;
+  const phaseStartedAt =
+    phase.type === WerewolfPhase.Daytime ? phase.startedAt : undefined;
+
   const { secondsRemaining, elapsedSeconds } = usePhaseTimer({
     durationSeconds: dayPhaseSeconds,
     isPaused,
     onExpire: handleAutoAdvance,
     resetKey: turnState.turn,
+    startedAtMs: phaseStartedAt,
   });
-
-  const { phase } = turnState;
   if (phase.type !== WerewolfPhase.Daytime) return null;
 
   // Build night summary: group by targeted player → list of roles that targeted them.
