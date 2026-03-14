@@ -5,6 +5,7 @@ export enum WerewolfPhase {
 
 export interface NightAction {
   targetPlayerId: string;
+  confirmed?: boolean;
 }
 
 export interface WerewolfNighttimePhase {
@@ -43,4 +44,12 @@ export enum WakesAtNight {
   Never = "Never",
   FirstNightOnly = "FirstNightOnly",
   EveryNight = "EveryNight",
+}
+
+export enum TargetCategory {
+  Attack = "Attack",
+  Protect = "Protect",
+  Investigate = "Investigate",
+  Special = "Special",
+  None = "None",
 }

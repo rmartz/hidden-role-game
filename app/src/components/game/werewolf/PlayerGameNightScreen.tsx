@@ -1,11 +1,14 @@
 "use client";
 
-import { WerewolfAction } from "@/lib/game-modes/werewolf";
+import {
+  WerewolfAction,
+  getTargetablePlayers,
+} from "@/lib/game-modes/werewolf";
 import type { WerewolfNighttimePhase } from "@/lib/game-modes/werewolf";
-import { getTargetablePlayers } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
 import { useGameAction } from "@/hooks";
 import { Button } from "@/components/ui/button";
+import { ConfirmTargetButton } from "./ConfirmTargetButton";
 
 interface Props {
   gameId: string;
@@ -47,11 +50,17 @@ export function PlayerGameNightScreen({
   const teammateLabel =
     gameState.visibleRoleAssignments.length === 1 ? "teammate" : "teammates";
 
-  const targets = getTargetablePlayers(
+  const isConfirmed = gameState.myNightTargetConfirmed ?? false;
+
+  const allTargets = getTargetablePlayers(
     gameState.players,
     gameState.gameOwner?.id,
     deadPlayerIds,
   ).map((player) => [player, gameState.myNightTarget === player.id] as const);
+
+  const targets = isConfirmed
+    ? allTargets.filter(([, isSelected]) => isSelected)
+    : allTargets;
 
   return (
     <div className="p-5">
@@ -66,7 +75,9 @@ export function PlayerGameNightScreen({
       </p>
       {!isFirstTurn && (
         <div>
-          <h2 className="text-lg font-semibold mb-2">Choose a target</h2>
+          <h2 className="text-lg font-semibold mb-2">
+            {isConfirmed ? "Your target" : "Choose a target"}
+          </h2>
           <div className="flex flex-col gap-2">
             {targets.map(([player, isSelected]) => (
               <Button
@@ -80,7 +91,7 @@ export function PlayerGameNightScreen({
                     },
                   });
                 }}
-                disabled={action.isPending}
+                disabled={action.isPending || isConfirmed}
                 className="justify-start"
               >
                 {player.name}
@@ -88,6 +99,12 @@ export function PlayerGameNightScreen({
               </Button>
             ))}
           </div>
+          <ConfirmTargetButton
+            gameId={gameId}
+            roleId={gameState.myRole?.id}
+            hasTarget={!!gameState.myNightTarget}
+            isConfirmed={isConfirmed}
+          />
         </div>
       )}
     </div>
