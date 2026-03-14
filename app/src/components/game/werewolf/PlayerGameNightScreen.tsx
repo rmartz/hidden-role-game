@@ -38,13 +38,18 @@ export function PlayerGameNightScreen({ gameId, gameState, turnState }: Props) {
   if (!isMyTurn) return <div />;
 
   const canTarget = turnState.turn > 1;
+  const hasVisibleTeammates = gameState.visibleRoleAssignments.length > 0;
 
   return (
     <div className="p-5">
       <h1 className="text-2xl font-bold mb-2">It&apos;s Your Turn</h1>
       <p className="text-muted-foreground mb-4">
-        <strong className="text-foreground">{gameState.myRole?.name}</strong> —
-        wake up and take your action.
+        <strong className="text-foreground">{gameState.myRole?.name}</strong> —{" "}
+        {canTarget
+          ? "wake up and take your action."
+          : hasVisibleTeammates
+            ? "awake, find your teammate and make yourself known to the Narrator."
+            : "awake and make yourself known to the Narrator."}
       </p>
       {canTarget && (
         <div>
@@ -52,14 +57,9 @@ export function PlayerGameNightScreen({ gameId, gameState, turnState }: Props) {
           <div className="flex flex-col gap-2">
             {gameState.players
               .filter((p) => {
-                // Exclude owner (narrator), self, and visible same-team teammates.
+                // Exclude owner (narrator) and dead players.
                 if (p.id === gameState.gameOwner?.id) return false;
-                const myTeam = gameState.myRole?.team;
-                const visible = gameState.visibleRoleAssignments.find(
-                  (v) => v.player.id === p.id,
-                );
-                if (visible && myTeam && visible.role.team === myTeam)
-                  return false;
+                if (gameState.deadPlayerIds?.includes(p.id)) return false;
                 return true;
               })
               .map((player) => {
