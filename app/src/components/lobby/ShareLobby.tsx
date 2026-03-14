@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { CheckIcon, CopyIcon, ShareIcon } from "lucide-react";
+import { CheckIcon, ClipboardIcon, ShareIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -51,23 +51,28 @@ export function ShareLobby({ lobbyId }: Props) {
 
         <div className="flex flex-col items-center gap-4">
           <QRCodeSVG value={lobbyUrl} size={200} />
-          <p className="text-sm text-muted-foreground text-center break-all">
+          <button
+            type="button"
+            onClick={() => void handleCopy()}
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground text-center break-all hover:text-foreground transition-colors cursor-pointer"
+          >
+            {copied ? (
+              <CheckIcon className="size-3.5 shrink-0" />
+            ) : (
+              <ClipboardIcon className="size-3.5 shrink-0" />
+            )}
             {lobbyUrl}
-          </p>
+          </button>
         </div>
 
-        <DialogFooter>
-          {canShare && (
-            <Button variant="outline" onClick={() => void handleShare()}>
+        {canShare && (
+          <DialogFooter>
+            <Button onClick={() => void handleShare()}>
               <ShareIcon />
               Share
             </Button>
-          )}
-          <Button onClick={() => void handleCopy()}>
-            {copied ? <CheckIcon /> : <CopyIcon />}
-            {copied ? "Copied!" : "Copy Link"}
-          </Button>
-        </DialogFooter>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );
