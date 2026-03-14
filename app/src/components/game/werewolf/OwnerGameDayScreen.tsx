@@ -14,15 +14,10 @@ interface Props {
   gameId: string;
   gameState: PlayerGameState;
   turnState: WerewolfTurnState;
-  dayPhaseSeconds: number | null;
 }
 
-export function OwnerGameDayScreen({
-  gameId,
-  gameState,
-  turnState,
-  dayPhaseSeconds,
-}: Props) {
+export function OwnerGameDayScreen({ gameId, gameState, turnState }: Props) {
+  const dayPhaseSeconds = gameState.timerConfig?.dayPhaseSeconds ?? null;
   const action = useGameAction(gameId);
   const [isPaused, setIsPaused] = useState(false);
 

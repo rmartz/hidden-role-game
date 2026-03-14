@@ -17,7 +17,6 @@ interface Props {
 
 export function WerewolfOwnerScreen({ gameId, gameState }: Props) {
   const advanceMutation = useAdvanceGame(gameId);
-  const timerConfig = gameState.timerConfig;
 
   if (gameState.status.type === GameStatus.Starting) {
     return (
@@ -41,7 +40,6 @@ export function WerewolfOwnerScreen({ gameId, gameState }: Props) {
           gameId={gameId}
           gameState={gameState}
           turnState={turnState}
-          nightPhaseSeconds={timerConfig?.nightPhaseSeconds ?? null}
         />
       );
     }
@@ -52,7 +50,6 @@ export function WerewolfOwnerScreen({ gameId, gameState }: Props) {
           gameId={gameId}
           gameState={gameState}
           turnState={turnState}
-          dayPhaseSeconds={timerConfig?.dayPhaseSeconds ?? null}
         />
       );
     }
