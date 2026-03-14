@@ -63,11 +63,15 @@ export function PlayerGameNightScreen({
   const confirmLabel =
     targetCategory !== TargetCategory.None ? targetCategory : "Confirm";
 
-  const targets = getTargetablePlayers(
+  const allTargets = getTargetablePlayers(
     gameState.players,
     gameState.gameOwner?.id,
     deadPlayerIds,
   ).map((player) => [player, gameState.myNightTarget === player.id] as const);
+
+  const targets = isConfirmed
+    ? allTargets.filter(([, isSelected]) => isSelected)
+    : allTargets;
 
   return (
     <div className="p-5">
@@ -82,7 +86,9 @@ export function PlayerGameNightScreen({
       </p>
       {!isFirstTurn && (
         <div>
-          <h2 className="text-lg font-semibold mb-2">Choose a target</h2>
+          <h2 className="text-lg font-semibold mb-2">
+            {isConfirmed ? "Your target" : "Choose a target"}
+          </h2>
           <div className="flex flex-col gap-2">
             {targets.map(([player, isSelected]) => (
               <Button
