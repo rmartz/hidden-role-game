@@ -1,6 +1,6 @@
 import { Team } from "@/lib/types";
 import type { RoleDefinition, RoleSlot } from "@/lib/types";
-import { WakesAtNight } from "./types";
+import { WakesAtNight, TargetCategory } from "./types";
 
 export enum WerewolfRole {
   Villager = "werewolf-villager",
@@ -19,6 +19,7 @@ export interface WerewolfRoleDefinition extends RoleDefinition<
   Team
 > {
   wakesAtNight: WakesAtNight;
+  targetCategory: TargetCategory;
 }
 
 export const MIN_PLAYERS = 5;
@@ -41,6 +42,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     name: "Villager",
     team: Team.Good,
     wakesAtNight: WakesAtNight.Never,
+    targetCategory: TargetCategory.None,
   },
   [WerewolfRole.Werewolf]: {
     id: WerewolfRole.Werewolf,
@@ -48,24 +50,28 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Bad,
     canSeeTeam: [Team.Bad],
     wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Attack,
   },
   [WerewolfRole.Seer]: {
     id: WerewolfRole.Seer,
     name: "Seer",
     team: Team.Good,
     wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Investigate,
   },
   [WerewolfRole.Witch]: {
     id: WerewolfRole.Witch,
     name: "Witch",
     team: Team.Good,
     wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Special,
   },
   [WerewolfRole.Spellcaster]: {
     id: WerewolfRole.Spellcaster,
     name: "Spellcaster",
     team: Team.Good,
     wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Special,
   },
   [WerewolfRole.Mason]: {
     id: WerewolfRole.Mason,
@@ -73,23 +79,27 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Good,
     canSeeRole: [WerewolfRole.Mason],
     wakesAtNight: WakesAtNight.FirstNightOnly,
+    targetCategory: TargetCategory.None,
   },
   [WerewolfRole.Chupacabra]: {
     id: WerewolfRole.Chupacabra,
     name: "Chupacabra",
     team: Team.Neutral,
     wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Attack,
   },
   [WerewolfRole.VillageIdiot]: {
     id: WerewolfRole.VillageIdiot,
     name: "Village Idiot",
     team: Team.Good,
     wakesAtNight: WakesAtNight.Never,
+    targetCategory: TargetCategory.None,
   },
   [WerewolfRole.Bodyguard]: {
     id: WerewolfRole.Bodyguard,
     name: "Bodyguard",
     team: Team.Good,
     wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Protect,
   },
 };
