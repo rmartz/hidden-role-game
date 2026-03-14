@@ -1,8 +1,12 @@
 name: Claude Code Review
 
 on:
-  pull_request:
-    types: [opened, synchronize]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "PR number to review"
+        required: true
+        type: number
 
 jobs:
   review:
@@ -14,11 +18,13 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
-            Review this pull request for code quality, correctness, and security.
+            Review pull request #${{ inputs.pr_number }} for code quality, correctness, and security.
             Analyze the diff and post your findings as review comments.
             Focus on:
             - Bugs or logic errors
