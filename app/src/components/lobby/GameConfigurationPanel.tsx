@@ -11,6 +11,7 @@ import {
   setPlayerCount,
   setShowConfigToPlayers,
   setShowRolesInPlay,
+  setTimerConfig,
 } from "@/store/game-config-slice";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +19,7 @@ import { ConfigurationToggles } from "./ConfigurationToggles";
 import { RoleConfig } from "./RoleConfig";
 import { GameModePicker } from "./GameModePicker";
 import { ShowRolesInPlayPicker } from "./ShowRolesInPlayPicker";
+import { TimerConfigPanel } from "./TimerConfigPanel";
 
 interface ReadOnlyProps {
   config: GameConfig;
@@ -46,6 +48,7 @@ export function GameConfigurationPanel(props: Props) {
   const showRolesInPlay = useAppSelector((s) => s.gameConfig.showRolesInPlay);
   const roleConfigMode = useAppSelector((s) => s.gameConfig.roleConfigMode);
   const roleSlots = useAppSelector((s) => selectRoleSlots(s.gameConfig));
+  const timerConfig = useAppSelector((s) => s.gameConfig.timerConfig);
   const isValid = useAppSelector((s) => s.gameConfig.isValid);
 
   const hasLoadedRef = useRef(false);
@@ -130,6 +133,18 @@ export function GameConfigurationPanel(props: Props) {
                 ? undefined
                 : (value) => {
                     dispatch(setShowConfigToPlayers(value));
+                  }
+            }
+          />
+
+          <TimerConfigPanel
+            timerConfig={readOnly ? config.timerConfig : timerConfig}
+            disabled={readOnly ? true : props.isPending}
+            onChange={
+              readOnly
+                ? undefined
+                : (value) => {
+                    dispatch(setTimerConfig(value));
                   }
             }
           />

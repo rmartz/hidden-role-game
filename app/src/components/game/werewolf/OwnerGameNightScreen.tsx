@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useMemo } from "react";
 import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase, WerewolfAction } from "@/lib/game-modes/werewolf";
 import { getTargetablePlayers } from "@/lib/game-modes/werewolf";
@@ -8,6 +9,7 @@ import type { PlayerGameState } from "@/server/types";
 import { useGameAction } from "@/hooks";
 import { GameRolesList, PlayersRoleList } from "@/components/game";
 import { Button } from "@/components/ui/button";
+import { OwnerHeader } from "./OwnerHeader";
 
 interface Props {
   gameId: string;
@@ -16,18 +18,39 @@ interface Props {
 }
 
 export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
+  const nightPhaseSeconds = gameState.timerConfig?.nightPhaseSeconds ?? null;
   const action = useGameAction(gameId);
 
   const { phase } = turnState;
-  if (phase.type !== WerewolfPhase.Nighttime) return null;
+  const isNighttime = phase.type === WerewolfPhase.Nighttime;
+  const currentPhaseIndex = isNighttime ? phase.currentPhaseIndex : 0;
+  const nightPhaseOrder = isNighttime ? phase.nightPhaseOrder : [];
+  const isLastPhase = currentPhaseIndex === nightPhaseOrder.length - 1;
 
-  const { nightPhaseOrder, currentPhaseIndex, nightActions } = phase;
+  const handleAdvance = useCallback(() => {
+    if (isLastPhase) {
+      action.mutate({ actionId: WerewolfAction.StartDay });
+    } else {
+      action.mutate({
+        actionId: WerewolfAction.SetNightPhase,
+        payload: { phaseIndex: currentPhaseIndex + 1 },
+      });
+    }
+  }, [action, isLastPhase, currentPhaseIndex]);
+
+  const phaseStartedAt = useMemo(
+    () => new Date(isNighttime ? phase.startedAt : Date.now()),
+    [isNighttime, phase.startedAt],
+  );
+
+  if (!isNighttime) return null;
+
+  const nightActions = phase.nightActions;
   const activeRoleId = nightPhaseOrder[currentPhaseIndex] ?? "";
   const modeConfig = GAME_MODES[gameState.gameMode];
   const activeRoleName =
     (activeRoleId ? modeConfig.roles[activeRoleId]?.name : undefined) ??
     activeRoleId;
-  const isLastPhase = currentPhaseIndex === nightPhaseOrder.length - 1;
 
   const activeAction = nightActions[activeRoleId];
   const activeTarget = activeAction?.targetPlayerId;
@@ -54,76 +77,66 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
     });
   }
 
+  const timer =
+    nightPhaseSeconds !== null
+      ? {
+          durationSeconds: nightPhaseSeconds,
+          startedAt: phaseStartedAt,
+          onTimerTrigger: handleAdvance,
+          resetKey: currentPhaseIndex,
+        }
+      : { startedAt: phaseStartedAt, resetKey: currentPhaseIndex };
+
   return (
     <div className="p-5">
-      <h1 className="text-2xl font-bold mb-4">
-        Night — Turn {turnState.turn} ({currentPhaseIndex + 1}/
-        {nightPhaseOrder.length})
-      </h1>
-      <p className="mb-4 text-muted-foreground">
-        Currently awake:{" "}
-        <strong className="text-foreground">{activeRoleName}</strong>
-      </p>
-
-      {!isFirstTurn && (
-        <div className="mb-4 rounded-md border p-3">
-          <p className="text-sm font-medium mb-2">
-            Target:{" "}
-            {activeTargetName ? (
-              <>
-                <strong className="text-foreground">{activeTargetName}</strong>
-                {activeTargetConfirmed && (
-                  <span className="ml-1 text-xs text-green-600">
-                    (confirmed)
-                  </span>
-                )}
-              </>
-            ) : (
-              <span className="text-muted-foreground italic">none</span>
-            )}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {targetablePlayers.map((player) => (
-              <Button
-                key={player.id}
-                size="sm"
-                variant={activeTarget === player.id ? "default" : "outline"}
-                onClick={() => {
-                  handleTargetClick(player.id);
-                }}
-                disabled={action.isPending}
-              >
-                {player.name}
-              </Button>
-            ))}
+      <OwnerHeader
+        title={`Night — Turn ${String(turnState.turn)} (${String(currentPhaseIndex + 1)}/${String(nightPhaseOrder.length)})`}
+        advanceLabel={isLastPhase ? "Start the Day" : "Next Role"}
+        onAdvance={handleAdvance}
+        isAdvancing={action.isPending}
+        timer={timer}
+      >
+        <p className="mb-4 text-muted-foreground">
+          Currently awake:{" "}
+          <strong className="text-foreground">{activeRoleName}</strong>
+        </p>
+        {!isFirstTurn && (
+          <div className="mb-4 rounded-md border p-3">
+            <p className="text-sm font-medium mb-2">
+              Target:{" "}
+              {activeTargetName ? (
+                <>
+                  <strong className="text-foreground">
+                    {activeTargetName}
+                  </strong>
+                  {activeTargetConfirmed && (
+                    <span className="ml-1 text-xs text-green-600">
+                      (confirmed)
+                    </span>
+                  )}
+                </>
+              ) : (
+                <span className="text-muted-foreground italic">none</span>
+              )}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {targetablePlayers.map((player) => (
+                <Button
+                  key={player.id}
+                  size="sm"
+                  variant={activeTarget === player.id ? "default" : "outline"}
+                  onClick={() => {
+                    handleTargetClick(player.id);
+                  }}
+                  disabled={action.isPending}
+                >
+                  {player.name}
+                </Button>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
-
-      {isLastPhase ? (
-        <Button
-          onClick={() => {
-            action.mutate({ actionId: WerewolfAction.StartDay });
-          }}
-          disabled={action.isPending}
-          className="mb-5"
-        >
-          Start the Day
-        </Button>
-      ) : (
-        <Button
-          onClick={() => {
-            action.mutate({
-              actionId: WerewolfAction.SetNightPhase,
-              payload: { phaseIndex: currentPhaseIndex + 1 },
-            });
-          }}
-          disabled={action.isPending}
-          className="mb-5"
-        >
-          Next Role
-        </Button>
-      )}
+        )}
+      </OwnerHeader>
       <PlayersRoleList
         assignments={gameState.visibleRoleAssignments}
         gameMode={gameState.gameMode}

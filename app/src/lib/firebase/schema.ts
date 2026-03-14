@@ -18,6 +18,7 @@ import type {
   GameStatusState,
   PlayerRoleAssignment,
   RoleSlot,
+  TimerConfig,
 } from "@/lib/types";
 import type { NightAction } from "@/lib/game-modes/werewolf";
 import type {
@@ -53,6 +54,7 @@ export interface FirebaseLobbyConfig {
   roleSlots?: FirebaseRoleSlot[];
   showConfigToPlayers: boolean;
   showRolesInPlay: string;
+  timerConfig?: TimerConfig;
 }
 
 export interface FirebaseRoleSlot {
@@ -82,6 +84,7 @@ export interface FirebaseGamePublic {
   configuredRoleSlots?: FirebaseRoleSlot[];
   showRolesInPlay: string;
   ownerPlayerId: string | null;
+  timerConfig?: TimerConfig;
   /** Unix ms timestamp set server-side at game creation. Used for TTL cleanup. */
   createdAt?: number;
 }
@@ -130,6 +133,7 @@ function lobbyConfigToFirebase(config: LobbyConfig): FirebaseLobbyConfig {
     })),
     showConfigToPlayers: config.showConfigToPlayers,
     showRolesInPlay: config.showRolesInPlay,
+    ...(config.timerConfig ? { timerConfig: config.timerConfig } : {}),
   };
 }
 
@@ -157,6 +161,9 @@ export function firebaseToLobby(
       showConfigToPlayers: pub.config.showConfigToPlayers,
       showRolesInPlay: pub.config
         .showRolesInPlay as LobbyConfig["showRolesInPlay"],
+      ...(pub.config.timerConfig
+        ? { timerConfig: pub.config.timerConfig }
+        : {}),
     },
     ...(pub.gameId ? { gameId: pub.gameId } : {}),
   };
@@ -190,6 +197,9 @@ export function firebaseToPublicLobby(
       showConfigToPlayers: pub.config.showConfigToPlayers,
       showRolesInPlay: pub.config
         .showRolesInPlay as LobbyConfig["showRolesInPlay"],
+      ...(pub.config.timerConfig
+        ? { timerConfig: pub.config.timerConfig }
+        : {}),
     },
     ...(pub.gameId ? { gameId: pub.gameId } : {}),
   };
@@ -223,6 +233,7 @@ export function gameToFirebase(game: Game): FirebaseGamePublic {
     })),
     showRolesInPlay: game.showRolesInPlay,
     ownerPlayerId: game.ownerPlayerId,
+    ...(game.timerConfig ? { timerConfig: game.timerConfig } : {}),
   };
 }
 
@@ -247,6 +258,7 @@ export function firebaseToGame(
     ),
     showRolesInPlay: pub.showRolesInPlay as Game["showRolesInPlay"],
     ownerPlayerId: pub.ownerPlayerId,
+    ...(pub.timerConfig ? { timerConfig: pub.timerConfig } : {}),
   };
 }
 
@@ -270,6 +282,7 @@ export interface FirebasePlayerState {
   myNightTargetConfirmed?: boolean;
   amDead?: boolean;
   deadPlayerIds?: string[];
+  timerConfig?: TimerConfig;
 }
 
 export function playerStateToFirebase(
@@ -294,6 +307,7 @@ export function playerStateToFirebase(
     ...(state.deadPlayerIds?.length
       ? { deadPlayerIds: state.deadPlayerIds }
       : {}),
+    ...(state.timerConfig ? { timerConfig: state.timerConfig } : {}),
   };
 }
 
@@ -332,5 +346,6 @@ export function firebaseToPlayerState(
       : {}),
     ...(raw.amDead ? { amDead: true } : {}),
     ...(raw.deadPlayerIds?.length ? { deadPlayerIds: raw.deadPlayerIds } : {}),
+    ...(raw.timerConfig ? { timerConfig: raw.timerConfig } : {}),
   };
 }

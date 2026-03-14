@@ -34,6 +34,7 @@ const nightTurnState: WerewolfTurnState = {
   turn: 1,
   phase: {
     type: WerewolfPhase.Nighttime,
+    startedAt: 1000,
     nightPhaseOrder: [WerewolfRole.Werewolf, WerewolfRole.Seer],
     currentPhaseIndex: 0,
     nightActions: {},

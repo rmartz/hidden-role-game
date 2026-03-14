@@ -140,6 +140,7 @@ export class FirebaseLobbyService {
       roleConfigMode?: RoleConfigMode;
       gameMode?: GameMode;
       roleSlots?: RoleSlot[];
+      timerConfig?: import("@/lib/types").TimerConfig;
     },
   ): Promise<Lobby | undefined> {
     const snap = await lobbyRef(lobbyId).once("value");
@@ -178,6 +179,10 @@ export class FirebaseLobbyService {
       }));
       updates["public/config/roleSlots"] = slots;
       data.public.config.roleSlots = slots;
+    }
+    if (config.timerConfig !== undefined) {
+      updates["public/config/timerConfig"] = config.timerConfig;
+      data.public.config.timerConfig = config.timerConfig;
     }
 
     if (Object.keys(updates).length > 0) {

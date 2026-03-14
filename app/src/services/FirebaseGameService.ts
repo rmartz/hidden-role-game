@@ -81,6 +81,7 @@ export class FirebaseGameService {
     const nightPhaseOrder = buildNightPhaseOrder(1, roleAssignments);
     const phase: WerewolfNighttimePhase = {
       type: WerewolfPhase.Nighttime,
+      startedAt: Date.now(),
       nightPhaseOrder,
       currentPhaseIndex: 0,
       nightActions: {},
@@ -201,6 +202,7 @@ export class FirebaseGameService {
         rolesInPlay: this.buildRolesInPlay(game),
         ...(nightActions ? { nightActions } : {}),
         ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
+        ...(game.timerConfig ? { timerConfig: game.timerConfig } : {}),
       };
     }
 
@@ -266,6 +268,7 @@ export class FirebaseGameService {
       ...(nightActions ? { myNightTarget, myNightTargetConfirmed } : {}),
       ...(amDead ? { amDead: true } : {}),
       ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
+      ...(game.timerConfig ? { timerConfig: game.timerConfig } : {}),
     };
   }
 
@@ -309,6 +312,7 @@ export class FirebaseGameService {
     gameMode: GameMode,
     showRolesInPlay: ShowRolesInPlay,
     ownerPlayerId: string | null,
+    timerConfig?: import("@/lib/types").TimerConfig,
   ): Promise<Game> {
     const { roles } = this.getModeDefinition(gameMode);
     const rolePlayers = ownerPlayerId
@@ -328,12 +332,13 @@ export class FirebaseGameService {
       id: randomUUID(),
       lobbyId,
       gameMode,
-      status: { type: GameStatus.Starting },
+      status: { type: GameStatus.Starting, startedAt: Date.now() },
       players: gamePlayers,
       roleAssignments,
       configuredRoleSlots: roleSlots,
       showRolesInPlay,
       ownerPlayerId,
+      ...(timerConfig ? { timerConfig } : {}),
     };
 
     // sessionIndex: { [sessionId]: playerId } — needed to reconstruct Game from Firebase

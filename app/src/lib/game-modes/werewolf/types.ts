@@ -10,6 +10,8 @@ export interface NightAction {
 
 export interface WerewolfNighttimePhase {
   type: WerewolfPhase.Nighttime;
+  /** Unix epoch ms when this night role phase began (reset per role). */
+  startedAt: number;
   /** Role IDs in the order they wake, determined at phase start. */
   nightPhaseOrder: string[];
   /** Index into nightPhaseOrder for the currently active role. */

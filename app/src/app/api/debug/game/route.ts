@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { GameMode, ShowRolesInPlay } from "@/lib/types";
-import type { LobbyPlayer } from "@/lib/types";
+import type { LobbyPlayer, TimerConfig } from "@/lib/types";
 import type { RoleSlot } from "@/server/types";
 import { ServerResponseStatus } from "@/server/types";
 import { gameService } from "@/services/GameService";
@@ -12,6 +12,7 @@ interface CreateDebugGameRequest {
   gameMode: GameMode;
   roleSlots: RoleSlot[];
   showRolesInPlay: ShowRolesInPlay;
+  timerConfig?: TimerConfig;
 }
 
 export interface DebugPlayer {
@@ -22,7 +23,7 @@ export interface DebugPlayer {
 }
 
 export async function POST(request: Request): Promise<Response> {
-  const { playerCount, gameMode, roleSlots, showRolesInPlay } =
+  const { playerCount, gameMode, roleSlots, showRolesInPlay, timerConfig } =
     (await request.json()) as CreateDebugGameRequest;
 
   if (!Object.values(GameMode).includes(gameMode)) {
@@ -66,6 +67,7 @@ export async function POST(request: Request): Promise<Response> {
     gameMode,
     showRolesInPlay,
     ownerPlayer?.id ?? null,
+    timerConfig,
   );
 
   const debugPlayers: DebugPlayer[] = players.map((p) => ({

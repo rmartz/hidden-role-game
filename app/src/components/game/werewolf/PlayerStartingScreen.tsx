@@ -1,24 +1,42 @@
 "use client";
 
+import { useMemo } from "react";
+import { GameStatus } from "@/lib/types";
 import type { PlayerGameState } from "@/server/types";
 import {
   GameRolesList,
-  GameStartCountdown,
+  GameTimer,
   PlayersRoleList,
   RoleLabel,
 } from "@/components/game";
-
-const STARTING_DURATION_SECONDS = 10;
 
 interface Props {
   gameState: PlayerGameState;
 }
 
 export function PlayerStartingScreen({ gameState }: Props) {
+  const durationSeconds = gameState.timerConfig?.startCountdownSeconds ?? null;
+  const startedAtMs =
+    gameState.status.type === GameStatus.Starting
+      ? gameState.status.startedAt
+      : undefined;
+  const startedAt = useMemo(
+    () => new Date(startedAtMs ?? Date.now()),
+    [startedAtMs],
+  );
+
   return (
     <div className="p-5">
       <h1 className="text-2xl font-bold mb-4">Game Starting</h1>
-      <GameStartCountdown durationSeconds={STARTING_DURATION_SECONDS} />
+      {durationSeconds !== null ? (
+        <GameTimer
+          durationSeconds={durationSeconds}
+          startedAt={startedAt}
+          onTimerTrigger={noop}
+        />
+      ) : (
+        <GameTimer startedAt={startedAt} />
+      )}
 
       {gameState.myRole && (
         <div className="mb-5">
@@ -38,4 +56,8 @@ export function PlayerStartingScreen({ gameState }: Props) {
       />
     </div>
   );
+}
+
+function noop() {
+  // no-op: player starting screen has no timer action
 }

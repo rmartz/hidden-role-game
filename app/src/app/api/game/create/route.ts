@@ -54,6 +54,7 @@ export async function POST(request: Request): Promise<Response> {
     gameMode,
     lobby.config.showRolesInPlay,
     ownerPlayer?.id ?? null,
+    lobby.config.timerConfig,
   );
 
   const updated = await lobbyService.setGameId(lobbyId, game.id);

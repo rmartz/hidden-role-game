@@ -1,4 +1,10 @@
-import type { GameStatusState, GameMode, RoleSlot, Team } from "@/lib/types";
+import type {
+  GameStatusState,
+  GameMode,
+  RoleSlot,
+  Team,
+  TimerConfig,
+} from "@/lib/types";
 import type { NightAction } from "@/lib/game-modes/werewolf";
 import type { PublicLobbyPlayer } from "./lobby";
 
@@ -51,4 +57,6 @@ export interface PlayerGameState {
   amDead?: boolean;
   /** Player IDs marked as dead by the narrator. */
   deadPlayerIds?: string[];
+  /** Phase timer configuration. Present when the lobby has timers enabled. */
+  timerConfig?: TimerConfig;
 }

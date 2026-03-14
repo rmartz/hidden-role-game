@@ -10,8 +10,6 @@ import { OwnerGameNightScreen } from "./OwnerGameNightScreen";
 import { OwnerGameDayScreen } from "./OwnerGameDayScreen";
 import { OwnerGameScreen } from "./OwnerGameScreen";
 
-const STARTING_DURATION_SECONDS = 10;
-
 interface Props {
   gameId: string;
   gameState: PlayerGameState;
@@ -24,7 +22,6 @@ export function WerewolfOwnerScreen({ gameId, gameState }: Props) {
     return (
       <OwnerStartingScreen
         gameState={gameState}
-        durationSeconds={STARTING_DURATION_SECONDS}
         onStart={() => {
           advanceMutation.mutate();
         }}
