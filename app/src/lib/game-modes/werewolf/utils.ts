@@ -1,7 +1,11 @@
 import { GameStatus } from "@/lib/types";
 import type { Game, PlayerRoleAssignment } from "@/lib/types";
 import { WakesAtNight, TargetCategory, WerewolfPhase } from "./types";
-import type { TargetablePlayer, WerewolfTurnState } from "./types";
+import type {
+  TargetablePlayer,
+  WerewolfNighttimePhase,
+  WerewolfTurnState,
+} from "./types";
 import { WEREWOLF_ROLES } from "./roles";
 import type { WerewolfRoleDefinition } from "./roles";
 
@@ -54,15 +58,21 @@ export function currentTurnState(game: Game): WerewolfTurnState | undefined {
   return game.status.turnState as WerewolfTurnState | undefined;
 }
 
+export interface ActiveNightPlayer {
+  phase: WerewolfNighttimePhase;
+  activeRoleId: string;
+}
+
 /**
  * Validates that the game is in a nighttime phase (after turn 1) and that the
  * caller is the player assigned to the currently active night role.
- * Returns the active role ID on success, or undefined if validation fails.
+ * Returns the nighttime phase and active role ID on success, or undefined if
+ * validation fails.
  */
 export function validateActiveNightPlayer(
   game: Game,
   callerId: string,
-): string | undefined {
+): ActiveNightPlayer | undefined {
   const ts = currentTurnState(game);
   if (ts?.phase.type !== WerewolfPhase.Nighttime) return undefined;
   if (ts.turn <= 1) return undefined;
@@ -76,7 +86,7 @@ export function validateActiveNightPlayer(
   const activeRoleId = phase.nightPhaseOrder[phase.currentPhaseIndex];
   if (callerAssignment.roleDefinitionId !== activeRoleId) return undefined;
 
-  return activeRoleId;
+  return { phase, activeRoleId };
 }
 
 /**

@@ -116,10 +116,10 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
         if (typeof explicitRoleId !== "string") return false;
         if (!phase.nightPhaseOrder.includes(explicitRoleId)) return false;
       } else {
-        const activeRoleId = validateActiveNightPlayer(game, callerId);
-        if (!activeRoleId) return false;
+        const result = validateActiveNightPlayer(game, callerId);
+        if (!result) return false;
         // Players cannot change a confirmed target.
-        if (phase.nightActions[activeRoleId]?.confirmed) return false;
+        if (phase.nightActions[result.activeRoleId]?.confirmed) return false;
       }
 
       // targetPlayerId undefined = clear; string = set target.
@@ -156,16 +156,11 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   },
   [WerewolfAction.ConfirmNightTarget]: {
     isValid(game: Game, callerId: string) {
-      const activeRoleId = validateActiveNightPlayer(game, callerId);
-      if (!activeRoleId) return false;
-
-      // validateActiveNightPlayer guarantees nighttime phase.
-      const ts = currentTurnState(game);
-      const phase = ts?.phase as WerewolfNighttimePhase | undefined;
-      if (!phase) return false;
+      const result = validateActiveNightPlayer(game, callerId);
+      if (!result) return false;
 
       // Must have a target set and not already confirmed.
-      const action = phase.nightActions[activeRoleId];
+      const action = result.phase.nightActions[result.activeRoleId];
       if (!action) return false;
       if (action.confirmed) return false;
       return true;
