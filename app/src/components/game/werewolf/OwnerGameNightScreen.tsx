@@ -2,6 +2,7 @@
 
 import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase, WerewolfAction } from "@/lib/game-modes/werewolf";
+import { getTargetablePlayers } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
 import { useGameAction } from "@/hooks";
@@ -28,17 +29,35 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
     activeRoleId;
   const isLastPhase = currentPhaseIndex === nightPhaseOrder.length - 1;
 
-  const activeTarget = nightActions[activeRoleId]?.targetPlayerId ?? null;
+  const activeTarget = nightActions[activeRoleId]?.targetPlayerId;
   const activeTargetName = activeTarget
     ? gameState.players.find((p) => p.id === activeTarget)?.name
-    : null;
+    : undefined;
 
-  const canTarget = turnState.turn > 1;
+  const isFirstTurn = turnState.turn === 1;
 
-  // Non-owner players eligible to be targeted.
-  const targetablePlayers = gameState.players.filter(
-    (p) => p.id !== gameState.gameOwner?.id,
+  const targetablePlayers = getTargetablePlayers(
+    gameState.players,
+    gameState.gameOwner?.id,
+    turnState.deadPlayerIds,
   );
+
+  function handleTargetClick(playerId: string) {
+    if (activeTarget === playerId) {
+      action.mutate({
+        actionId: WerewolfAction.ClearNightTarget,
+        payload: { roleId: activeRoleId },
+      });
+    } else {
+      action.mutate({
+        actionId: WerewolfAction.SetNightTarget,
+        payload: {
+          roleId: activeRoleId,
+          targetPlayerId: playerId,
+        },
+      });
+    }
+  }
 
   return (
     <div className="p-5">
@@ -51,7 +70,7 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
         <strong className="text-foreground">{activeRoleName}</strong>
       </p>
 
-      {canTarget && (
+      {!isFirstTurn && (
         <div className="mb-4 rounded-md border p-3">
           <p className="text-sm font-medium mb-2">
             Target:{" "}
@@ -68,20 +87,7 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
                 size="sm"
                 variant={activeTarget === player.id ? "default" : "outline"}
                 onClick={() => {
-                  if (activeTarget === player.id) {
-                    action.mutate({
-                      actionId: WerewolfAction.ClearNightTarget,
-                      payload: { roleId: activeRoleId },
-                    });
-                  } else {
-                    action.mutate({
-                      actionId: WerewolfAction.SetNightTarget,
-                      payload: {
-                        roleId: activeRoleId,
-                        targetPlayerId: player.id,
-                      },
-                    });
-                  }
+                  handleTargetClick(player.id);
                 }}
                 disabled={action.isPending}
               >

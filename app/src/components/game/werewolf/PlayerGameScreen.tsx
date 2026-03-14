@@ -35,7 +35,9 @@ export function PlayerGameScreen({ gameId, gameState }: Props) {
       <PlayerGameNightScreen
         gameId={gameId}
         gameState={gameState}
-        turnState={turnState}
+        phase={turnState.phase}
+        turn={turnState.turn}
+        deadPlayerIds={turnState.deadPlayerIds}
       />
     );
   }

@@ -250,7 +250,7 @@ export class FirebaseGameService {
 
     // Include myNightTarget during nighttime (after first night).
     const myNightTarget =
-      nightActions?.[myAssignment.roleDefinitionId]?.targetPlayerId ?? null;
+      nightActions?.[myAssignment.roleDefinitionId]?.targetPlayerId;
 
     const amDead = deadPlayerIds.includes(callerId);
 

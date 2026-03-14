@@ -266,7 +266,7 @@ export interface FirebasePlayerState {
   }[];
   rolesInPlay?: RoleInPlay[] | null;
   nightActions?: Record<string, NightAction>;
-  myNightTarget?: string | null;
+  myNightTarget?: string;
   amDead?: boolean;
   deadPlayerIds?: string[];
 }
