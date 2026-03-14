@@ -82,19 +82,19 @@ export function PlayerGameNightScreen({
   const suggestedTargetId = gameState.suggestedTargetId;
   const allAgreed = gameState.allAgreed ?? false;
 
-  // For team phases, exclude visible teammates and self from targets.
-  const teamExcludeIds = isTeamPhase
-    ? [
-        ...gameState.visibleRoleAssignments.map((a) => a.player.id),
-        ...(gameState.myPlayerId ? [gameState.myPlayerId] : []),
-      ]
-    : undefined;
+  // Always exclude self; for team phases also exclude visible teammates.
+  const excludeIds = [
+    ...(gameState.myPlayerId ? [gameState.myPlayerId] : []),
+    ...(isTeamPhase
+      ? gameState.visibleRoleAssignments.map((a) => a.player.id)
+      : []),
+  ];
 
   const allTargets = getTargetablePlayers(
     gameState.players,
     gameState.gameOwner?.id,
     deadPlayerIds,
-    teamExcludeIds,
+    excludeIds.length > 0 ? excludeIds : undefined,
   ).map((player) => [player, gameState.myNightTarget === player.id] as const);
 
   const targets = isConfirmed
@@ -130,23 +130,28 @@ export function PlayerGameNightScreen({
       </p>
       {!isFirstTurn && (
         <div>
-          {isTeamPhase && teamVotes && teamVotes.length > 0 && !isConfirmed && (
+          {isTeamPhase && !isConfirmed && (
             <div className="mb-3 rounded-md border p-2">
               <p className="text-xs font-medium text-muted-foreground mb-1">
-                Team votes:
+                Teammate votes:
               </p>
-              <ul className="text-xs space-y-0.5">
-                {teamVotes.map((vote, i) => {
-                  const targetName =
-                    gameState.players.find((p) => p.id === vote.targetPlayerId)
-                      ?.name ?? "Unknown";
-                  return (
-                    <li key={i}>
-                      {vote.playerName} → {targetName}
-                    </li>
-                  );
-                })}
-              </ul>
+              {teamVotes && teamVotes.length > 0 ? (
+                <ul className="text-xs space-y-0.5">
+                  {teamVotes.map((vote, i) => {
+                    const targetName =
+                      gameState.players.find(
+                        (p) => p.id === vote.targetPlayerId,
+                      )?.name ?? "Unknown";
+                    return (
+                      <li key={i}>
+                        {vote.playerName} → {targetName}
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p className="text-xs text-muted-foreground">No votes yet.</p>
+              )}
             </div>
           )}
 
@@ -154,34 +159,25 @@ export function PlayerGameNightScreen({
             {isConfirmed ? "Your target" : "Choose a target"}
           </h2>
           <div className="flex flex-col gap-2">
-            {targets.map(([player, isSelected]) => {
-              const isSuggested =
-                isTeamPhase && suggestedTargetId === player.id && !isSelected;
-              return (
-                <Button
-                  key={player.id}
-                  variant={isSelected ? "default" : "outline"}
-                  onClick={() => {
-                    action.mutate({
-                      actionId: WerewolfAction.SetNightTarget,
-                      payload: {
-                        targetPlayerId: isSelected ? undefined : player.id,
-                      },
-                    });
-                  }}
-                  disabled={action.isPending || isConfirmed}
-                  className="justify-start"
-                >
-                  {player.name}
-                  {isSelected && " (selected)"}
-                  {isSuggested && (
-                    <span className="ml-1 text-xs text-muted-foreground">
-                      (suggested)
-                    </span>
-                  )}
-                </Button>
-              );
-            })}
+            {targets.map(([player, isSelected]) => (
+              <Button
+                key={player.id}
+                variant={isSelected ? "default" : "outline"}
+                onClick={() => {
+                  action.mutate({
+                    actionId: WerewolfAction.SetNightTarget,
+                    payload: {
+                      targetPlayerId: isSelected ? undefined : player.id,
+                    },
+                  });
+                }}
+                disabled={action.isPending || isConfirmed}
+                className="justify-start"
+              >
+                {player.name}
+                {isSelected && " (selected)"}
+              </Button>
+            ))}
           </div>
 
           {isTeamPhase &&

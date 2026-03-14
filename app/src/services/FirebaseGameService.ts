@@ -508,25 +508,37 @@ export class FirebaseGameService {
     callerId: string,
     payload: unknown,
   ): Promise<{ game: Game } | { error: string }> {
-    const game = await this.getGame(gameId);
-    if (!game) return { error: "Game not found" };
+    // Pre-fetch stable game data (players, roleAssignments don't change during play).
+    const baseGame = await this.getGame(gameId);
+    if (!baseGame) return { error: "Game not found" };
 
-    const config = this.getModeDefinition(game.gameMode);
+    const config = this.getModeDefinition(baseGame.gameMode);
     const action = config.actions[actionId];
     if (!action) return { error: "Unknown action" };
 
-    if (!action.isValid(game, callerId, payload)) {
+    // Use a Firebase transaction on `public/status` so concurrent actions are
+    // serialized and each sees the latest committed state, preventing lost updates.
+    let finalGame: Game | undefined;
+    const result = await gameRef(gameId)
+      .child("public/status")
+      .transaction((currentStatusJson: string | null) => {
+        if (!currentStatusJson) return undefined; // abort: no status
+        const currentStatus = JSON.parse(
+          currentStatusJson,
+        ) as import("@/lib/types").GameStatusState;
+        const game: Game = { ...baseGame, status: currentStatus };
+        if (!action.isValid(game, callerId, payload)) return undefined; // abort
+        action.apply(game, payload, callerId);
+        finalGame = game;
+        return JSON.stringify(game.status);
+      });
+
+    if (!result.committed || !finalGame) {
       return { error: "Action not valid for current game state" };
     }
 
-    action.apply(game, payload, callerId);
-
-    await gameRef(gameId)
-      .child("public/status")
-      .set(JSON.stringify(game.status));
-    await this.writeAllPlayerStates(game);
-
-    return { game };
+    await this.writeAllPlayerStates(finalGame);
+    return { game: finalGame };
   }
 
   public adjustRoleSlotsForPlayer(
