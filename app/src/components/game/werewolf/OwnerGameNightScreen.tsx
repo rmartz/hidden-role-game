@@ -40,8 +40,7 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
 
   const phaseStartedAt = useMemo(
     () => new Date(isNighttime ? phase.startedAt : Date.now()),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isNighttime ? phase.startedAt : 0],
+    [isNighttime, phase.startedAt],
   );
 
   if (!isNighttime) return null;

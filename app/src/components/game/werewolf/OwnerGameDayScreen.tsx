@@ -25,16 +25,14 @@ export function OwnerGameDayScreen({ gameId, gameState, turnState }: Props) {
   }, [action]);
 
   const { phase } = turnState;
+  const isDaytime = phase.type === WerewolfPhase.Daytime;
+
   const phaseStartedAt = useMemo(
-    () =>
-      new Date(
-        phase.type === WerewolfPhase.Daytime ? phase.startedAt : Date.now(),
-      ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [phase.type === WerewolfPhase.Daytime ? phase.startedAt : 0],
+    () => new Date(isDaytime ? phase.startedAt : Date.now()),
+    [isDaytime, phase.startedAt],
   );
 
-  if (phase.type !== WerewolfPhase.Daytime) return null;
+  if (!isDaytime) return null;
 
   // Build night summary: group by targeted player → list of roles that targeted them.
   const modeConfig = GAME_MODES[gameState.gameMode];

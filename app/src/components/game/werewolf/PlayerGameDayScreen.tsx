@@ -19,13 +19,10 @@ interface Props {
 export function PlayerGameDayScreen({ gameState, turnState }: Props) {
   const dayPhaseSeconds = gameState.timerConfig?.dayPhaseSeconds ?? null;
   const { phase } = turnState;
+  const isDaytime = phase.type === WerewolfPhase.Daytime;
   const phaseStartedAt = useMemo(
-    () =>
-      new Date(
-        phase.type === WerewolfPhase.Daytime ? phase.startedAt : Date.now(),
-      ),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [phase.type === WerewolfPhase.Daytime ? phase.startedAt : 0],
+    () => new Date(isDaytime ? phase.startedAt : Date.now()),
+    [isDaytime, phase.startedAt],
   );
 
   return (
