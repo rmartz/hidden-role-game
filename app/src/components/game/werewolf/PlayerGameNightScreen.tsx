@@ -47,11 +47,11 @@ export function PlayerGameNightScreen({
   const teammateLabel =
     gameState.visibleRoleAssignments.length === 1 ? "teammate" : "teammates";
 
-  const targetable = getTargetablePlayers(
+  const targets = getTargetablePlayers(
     gameState.players,
     gameState.gameOwner?.id,
     deadPlayerIds,
-  );
+  ).map((player) => [player, gameState.myNightTarget === player.id] as const);
 
   return (
     <div className="p-5">
@@ -68,28 +68,25 @@ export function PlayerGameNightScreen({
         <div>
           <h2 className="text-lg font-semibold mb-2">Choose a target</h2>
           <div className="flex flex-col gap-2">
-            {targetable.map((player) => {
-              const isSelected = gameState.myNightTarget === player.id;
-              return (
-                <Button
-                  key={player.id}
-                  variant={isSelected ? "default" : "outline"}
-                  onClick={() => {
-                    action.mutate({
-                      actionId: WerewolfAction.SetNightTarget,
-                      payload: {
-                        targetPlayerId: isSelected ? undefined : player.id,
-                      },
-                    });
-                  }}
-                  disabled={action.isPending}
-                  className="justify-start"
-                >
-                  {player.name}
-                  {isSelected && " (selected)"}
-                </Button>
-              );
-            })}
+            {targets.map(([player, isSelected]) => (
+              <Button
+                key={player.id}
+                variant={isSelected ? "default" : "outline"}
+                onClick={() => {
+                  action.mutate({
+                    actionId: WerewolfAction.SetNightTarget,
+                    payload: {
+                      targetPlayerId: isSelected ? undefined : player.id,
+                    },
+                  });
+                }}
+                disabled={action.isPending}
+                className="justify-start"
+              >
+                {player.name}
+                {isSelected && " (selected)"}
+              </Button>
+            ))}
           </div>
         </div>
       )}
