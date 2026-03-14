@@ -1,0 +1,28 @@
+name: Claude Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Review this pull request for code quality, correctness, and security.
+            Analyze the diff and post your findings as review comments.
+            Focus on:
+            - Bugs or logic errors
+            - Security vulnerabilities
+            - TypeScript type safety issues
+            - Missing edge cases
+            Do not comment on style or formatting — those are handled by CI linting.
+          claude_args: "--max-turns 5"
