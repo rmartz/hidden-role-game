@@ -20,23 +20,20 @@ export function OwnerPlayerActionsGrid({
   deadPlayerIds,
   gameOwnerId,
 }: Props) {
-  function renderActions(playerId: string, isDead: boolean) {
-    if (playerId === gameOwnerId) return null;
-    return (
-      <OwnerPlayerActionItem
-        gameId={gameId}
-        playerId={playerId}
-        isDead={isDead}
-      />
-    );
-  }
-
   return (
     <PlayersRoleList
       assignments={assignments}
       gameMode={gameMode}
       deadPlayerIds={deadPlayerIds}
-      renderActions={renderActions}
+      renderActions={(playerId, isDead) =>
+        playerId === gameOwnerId ? null : (
+          <OwnerPlayerActionItem
+            gameId={gameId}
+            playerId={playerId}
+            isDead={isDead}
+          />
+        )
+      }
     />
   );
 }
