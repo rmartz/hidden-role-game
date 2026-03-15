@@ -61,7 +61,10 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
   const { phase } = turnState;
   const isNighttime = phase.type === WerewolfPhase.Nighttime;
   const currentPhaseIndex = isNighttime ? phase.currentPhaseIndex : 0;
-  const nightPhaseOrder = isNighttime ? phase.nightPhaseOrder : [];
+  const nightPhaseOrder = useMemo(
+    () => (isNighttime ? phase.nightPhaseOrder : []),
+    [isNighttime, phase],
+  );
   const isLastPhase = currentPhaseIndex === nightPhaseOrder.length - 1;
 
   const handleAdvance = useCallback(() => {
@@ -80,17 +83,44 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
     [isNighttime, phase.startedAt],
   );
 
-  if (!isNighttime) return null;
-
   const nightActions = phase.nightActions;
   const activePhaseKey = nightPhaseOrder[currentPhaseIndex] ?? "";
+  const activeAction = nightActions[activePhaseKey];
+  const { targetPlayerId: activeTarget, confirmed: activeTargetConfirmed } =
+    getSoloTarget(activeAction);
+
+  const handleTargetClick = useCallback(
+    (playerId: string) => {
+      action.mutate({
+        actionId: WerewolfAction.SetNightTarget,
+        payload: {
+          roleId: activePhaseKey,
+          targetPlayerId: activeTarget === playerId ? undefined : playerId,
+        },
+      });
+    },
+    [action, activePhaseKey, activeTarget],
+  );
+
+  const handlePhaseChange = useCallback(
+    (roleId: string) => {
+      const newIndex = nightPhaseOrder.indexOf(roleId);
+      if (newIndex !== -1) {
+        action.mutate({
+          actionId: WerewolfAction.SetNightPhase,
+          payload: { phaseIndex: newIndex },
+        });
+      }
+    },
+    [action, nightPhaseOrder],
+  );
+
+  if (!isNighttime) return null;
+
   const modeConfig = GAME_MODES[gameState.gameMode];
   const activePhaseLabel = getPhaseLabel(activePhaseKey, modeConfig);
   const isTeamPhase = isTeamPhaseKey(activePhaseKey);
 
-  const activeAction = nightActions[activePhaseKey];
-  const { targetPlayerId: activeTarget, confirmed: activeTargetConfirmed } =
-    getSoloTarget(activeAction);
   const activeTargetName = activeTarget
     ? gameState.players.find((p) => p.id === activeTarget)?.name
     : undefined;
@@ -121,14 +151,42 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
     gameState.visibleRoleAssignments,
   );
 
-  function handleTargetClick(playerId: string) {
-    action.mutate({
-      actionId: WerewolfAction.SetNightTarget,
-      payload: {
-        roleId: activePhaseKey,
-        targetPlayerId: activeTarget === playerId ? undefined : playerId,
-      },
-    });
+  function renderPlayerActions(playerId: string, isDead: boolean) {
+    if (playerId === gameState.gameOwner?.id) return null;
+    if (isDead) {
+      return (
+        <Button
+          variant="outline"
+          size="xs"
+          onClick={() => {
+            action.mutate({
+              actionId: WerewolfAction.MarkPlayerAlive,
+              payload: { playerId },
+            });
+          }}
+          disabled={action.isPending}
+        >
+          Revive
+        </Button>
+      );
+    }
+    return (
+      <Button
+        variant="destructive"
+        size="xs"
+        onClick={() => {
+          if (window.confirm("Mark this player as dead?")) {
+            action.mutate({
+              actionId: WerewolfAction.MarkPlayerDead,
+              payload: { playerId },
+            });
+          }
+        }}
+        disabled={action.isPending}
+      >
+        Kill
+      </Button>
+    );
   }
 
   const timer =
@@ -215,53 +273,13 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
         assignments={gameState.visibleRoleAssignments}
         gameMode={gameState.gameMode}
         deadPlayerIds={gameState.deadPlayerIds}
-        renderActions={(playerId, isDead) =>
-          playerId !== gameState.gameOwner?.id &&
-          (isDead ? (
-            <Button
-              variant="outline"
-              size="xs"
-              onClick={() => {
-                action.mutate({
-                  actionId: WerewolfAction.MarkPlayerAlive,
-                  payload: { playerId },
-                });
-              }}
-              disabled={action.isPending}
-            >
-              Revive
-            </Button>
-          ) : (
-            <Button
-              variant="destructive"
-              size="xs"
-              onClick={() => {
-                if (window.confirm("Mark this player as dead?")) {
-                  action.mutate({
-                    actionId: WerewolfAction.MarkPlayerDead,
-                    payload: { playerId },
-                  });
-                }
-              }}
-              disabled={action.isPending}
-            >
-              Kill
-            </Button>
-          ))
-        }
+        renderActions={renderPlayerActions}
       />
       <GameRolesList
         roles={gameState.rolesInPlay ?? []}
         gameMode={gameState.gameMode}
         selectedRoleId={activePhaseKey}
-        onSelectedIdChange={(roleId) => {
-          const newIndex = nightPhaseOrder.indexOf(roleId);
-          if (newIndex !== -1)
-            action.mutate({
-              actionId: WerewolfAction.SetNightPhase,
-              payload: { phaseIndex: newIndex },
-            });
-        }}
+        onSelectedIdChange={handlePhaseChange}
       />
     </div>
   );

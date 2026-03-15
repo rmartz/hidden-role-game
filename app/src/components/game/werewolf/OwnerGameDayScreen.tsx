@@ -34,27 +34,79 @@ export function OwnerGameDayScreen({ gameId, gameState, turnState }: Props) {
 
   if (!isDaytime) return null;
 
-  // Build night summary: group by targeted player → list of roles that targeted them.
   const modeConfig = GAME_MODES[gameState.gameMode];
-  const nightActions = phase.nightActions;
-  const targetSummary = new Map<string, string[]>();
-  for (const [phaseKey, action] of Object.entries(nightActions)) {
-    if ("targetPlayerId" in action) {
-      const roleName = modeConfig.roles[phaseKey]?.name ?? phaseKey;
-      const existing = targetSummary.get(action.targetPlayerId) ?? [];
-      existing.push(roleName);
-      targetSummary.set(action.targetPlayerId, existing);
-    } else if ("votes" in action && action.suggestedTargetId) {
-      // Team phase: use the agreed target.
-      const label = phaseKey.startsWith("team:")
-        ? phaseKey.slice(5) + " Team"
-        : phaseKey;
-      const existing = targetSummary.get(action.suggestedTargetId) ?? [];
-      existing.push(label);
-      targetSummary.set(action.suggestedTargetId, existing);
-    }
+
+  function phaseLabel(phaseKey: string): string {
+    return phaseKey.startsWith("team:")
+      ? phaseKey.slice(5) + " Team"
+      : (modeConfig.roles[phaseKey]?.name ?? phaseKey);
   }
-  const hasTargets = targetSummary.size > 0;
+
+  function targetPlayerIdOf(
+    a: (typeof phase.nightActions)[string],
+  ): string | undefined {
+    if ("targetPlayerId" in a) return a.targetPlayerId;
+    if ("votes" in a && a.suggestedTargetId) return a.suggestedTargetId;
+    return undefined;
+  }
+
+  const targetSummaryEntries = Object.entries(phase.nightActions)
+    .flatMap(([phaseKey, a]) => {
+      const targetId = targetPlayerIdOf(a);
+      return targetId ? [{ targetId, label: phaseLabel(phaseKey) }] : [];
+    })
+    .reduce<{ targetId: string; playerName: string; labels: string[] }[]>(
+      (acc, { targetId, label }) => {
+        const existing = acc.find((e) => e.targetId === targetId);
+        if (existing) {
+          existing.labels.push(label);
+        } else {
+          const playerName =
+            gameState.players.find((p) => p.id === targetId)?.name ?? targetId;
+          acc.push({ targetId, playerName, labels: [label] });
+        }
+        return acc;
+      },
+      [],
+    );
+
+  function renderPlayerActions(playerId: string, isDead: boolean) {
+    if (playerId === gameState.gameOwner?.id) return null;
+    if (isDead) {
+      return (
+        <Button
+          variant="outline"
+          size="xs"
+          onClick={() => {
+            action.mutate({
+              actionId: WerewolfAction.MarkPlayerAlive,
+              payload: { playerId },
+            });
+          }}
+          disabled={action.isPending}
+        >
+          Revive
+        </Button>
+      );
+    }
+    return (
+      <Button
+        variant="destructive"
+        size="xs"
+        onClick={() => {
+          if (window.confirm("Mark this player as dead?")) {
+            action.mutate({
+              actionId: WerewolfAction.MarkPlayerDead,
+              payload: { playerId },
+            });
+          }
+        }}
+        disabled={action.isPending}
+      >
+        Kill
+      </Button>
+    );
+  }
 
   const timer =
     dayPhaseSeconds !== null
@@ -75,24 +127,19 @@ export function OwnerGameDayScreen({ gameId, gameState, turnState }: Props) {
         isAdvancing={action.isPending}
         timer={timer}
       >
-        {hasTargets && (
+        {targetSummaryEntries.length > 0 && (
           <div className="mb-4 rounded-md border p-3">
             <h2 className="text-sm font-semibold mb-2">Night Summary</h2>
             <ul className="space-y-1 text-sm">
-              {[...targetSummary.entries()].map(([playerId, roleNames]) => {
-                const playerName =
-                  gameState.players.find((p) => p.id === playerId)?.name ??
-                  playerId;
-                return (
-                  <li key={playerId}>
-                    <strong className="text-foreground">{playerName}</strong>
-                    <span className="text-muted-foreground">
-                      {" "}
-                      — targeted by {roleNames.join(", ")}
-                    </span>
-                  </li>
-                );
-              })}
+              {targetSummaryEntries.map(({ targetId, playerName, labels }) => (
+                <li key={targetId}>
+                  <strong className="text-foreground">{playerName}</strong>
+                  <span className="text-muted-foreground">
+                    {" "}
+                    — targeted by {labels.join(", ")}
+                  </span>
+                </li>
+              ))}
             </ul>
           </div>
         )}
@@ -101,40 +148,7 @@ export function OwnerGameDayScreen({ gameId, gameState, turnState }: Props) {
         assignments={gameState.visibleRoleAssignments}
         gameMode={gameState.gameMode}
         deadPlayerIds={gameState.deadPlayerIds}
-        renderActions={(playerId, isDead) =>
-          playerId !== gameState.gameOwner?.id &&
-          (isDead ? (
-            <Button
-              variant="outline"
-              size="xs"
-              onClick={() => {
-                action.mutate({
-                  actionId: WerewolfAction.MarkPlayerAlive,
-                  payload: { playerId },
-                });
-              }}
-              disabled={action.isPending}
-            >
-              Revive
-            </Button>
-          ) : (
-            <Button
-              variant="destructive"
-              size="xs"
-              onClick={() => {
-                if (window.confirm("Mark this player as dead?")) {
-                  action.mutate({
-                    actionId: WerewolfAction.MarkPlayerDead,
-                    payload: { playerId },
-                  });
-                }
-              }}
-              disabled={action.isPending}
-            >
-              Kill
-            </Button>
-          ))
-        }
+        renderActions={renderPlayerActions}
       />
       <GameRolesList
         roles={gameState.rolesInPlay ?? []}

@@ -28,6 +28,10 @@ export function PlayersRoleList({
   if (assignments.length === 0) return null;
 
   const deadSet = new Set(deadPlayerIds ?? []);
+  const enriched = assignments.map((t) => ({
+    ...t,
+    isDead: deadSet.has(t.player.id),
+  }));
 
   return (
     <Card className="mb-5">
@@ -36,26 +40,23 @@ export function PlayersRoleList({
       </CardHeader>
       <CardContent>
         <ItemGroup>
-          {assignments.map((t) => {
-            const isDead = deadSet.has(t.player.id);
-            return (
-              <Item key={t.player.id} size="sm">
-                <ItemContent>
-                  <ItemTitle
-                    className={
-                      isDead ? "italic text-muted-foreground line-through" : ""
-                    }
-                  >
-                    {t.player.name}
-                  </ItemTitle>
-                </ItemContent>
-                <ItemActions>
-                  <RoleLabel role={t.role} gameMode={gameMode} />
-                  {renderActions?.(t.player.id, isDead)}
-                </ItemActions>
-              </Item>
-            );
-          })}
+          {enriched.map(({ player, role, isDead }) => (
+            <Item key={player.id} size="sm">
+              <ItemContent>
+                <ItemTitle
+                  className={
+                    isDead ? "italic text-muted-foreground line-through" : ""
+                  }
+                >
+                  {player.name}
+                </ItemTitle>
+              </ItemContent>
+              <ItemActions>
+                <RoleLabel role={role} gameMode={gameMode} />
+                {renderActions?.(player.id, isDead)}
+              </ItemActions>
+            </Item>
+          ))}
         </ItemGroup>
       </CardContent>
     </Card>
