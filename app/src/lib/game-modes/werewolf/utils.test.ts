@@ -11,6 +11,10 @@ import {
   isOwnerPlaying,
   currentTurnState,
   getConfirmLabel,
+  getPhaseLabel,
+  targetPlayerIdOf,
+  getSoloTarget,
+  isPlayersTurn,
 } from "./utils";
 
 function makePlayingGame(
@@ -207,6 +211,125 @@ describe("currentTurnState", () => {
   it("returns correct turnState for day phase", () => {
     const game = makePlayingGame(dayTurnState);
     expect(currentTurnState(game)).toEqual(dayTurnState);
+  });
+});
+
+describe("getPhaseLabel", () => {
+  const roles = {
+    seer: { name: "Seer" },
+    bodyguard: { name: "Bodyguard" },
+  };
+
+  it("returns '<team> Team' for team phase keys", () => {
+    expect(getPhaseLabel("team:Bad", roles)).toBe("Bad Team");
+    expect(getPhaseLabel("team:Good", roles)).toBe("Good Team");
+  });
+
+  it("returns the role name for known solo role keys", () => {
+    expect(getPhaseLabel("seer", roles)).toBe("Seer");
+    expect(getPhaseLabel("bodyguard", roles)).toBe("Bodyguard");
+  });
+
+  it("returns the raw key as fallback for unknown solo role keys", () => {
+    expect(getPhaseLabel("unknown-role", roles)).toBe("unknown-role");
+  });
+});
+
+describe("targetPlayerIdOf", () => {
+  it("returns targetPlayerId from a NightAction", () => {
+    expect(targetPlayerIdOf({ targetPlayerId: "p1" })).toBe("p1");
+  });
+
+  it("returns suggestedTargetId from a TeamNightAction when set", () => {
+    expect(targetPlayerIdOf({ votes: [], suggestedTargetId: "p2" })).toBe("p2");
+  });
+
+  it("returns undefined from a TeamNightAction with no suggestedTargetId", () => {
+    expect(targetPlayerIdOf({ votes: [] })).toBeUndefined();
+  });
+});
+
+describe("getSoloTarget", () => {
+  it("returns undefined target and false confirmed when action is undefined", () => {
+    expect(getSoloTarget(undefined)).toEqual({
+      targetPlayerId: undefined,
+      confirmed: false,
+    });
+  });
+
+  it("returns targetPlayerId and confirmed from a NightAction", () => {
+    expect(getSoloTarget({ targetPlayerId: "p1", confirmed: true })).toEqual({
+      targetPlayerId: "p1",
+      confirmed: true,
+    });
+  });
+
+  it("defaults confirmed to false when absent in a NightAction", () => {
+    expect(getSoloTarget({ targetPlayerId: "p1" })).toEqual({
+      targetPlayerId: "p1",
+      confirmed: false,
+    });
+  });
+
+  it("returns suggestedTargetId and confirmed from a TeamNightAction", () => {
+    expect(
+      getSoloTarget({ votes: [], suggestedTargetId: "p2", confirmed: true }),
+    ).toEqual({ targetPlayerId: "p2", confirmed: true });
+  });
+
+  it("returns undefined target when TeamNightAction has no suggestedTargetId", () => {
+    expect(getSoloTarget({ votes: [] })).toEqual({
+      targetPlayerId: undefined,
+      confirmed: false,
+    });
+  });
+});
+
+describe("isPlayersTurn", () => {
+  it("returns false when myRole is null", () => {
+    expect(isPlayersTurn(null, WerewolfRole.Seer)).toBe(false);
+  });
+
+  it("returns false when activePhaseKey is undefined", () => {
+    expect(
+      isPlayersTurn({ id: WerewolfRole.Seer, team: Team.Good }, undefined),
+    ).toBe(false);
+  });
+
+  it("returns true for a solo phase matching the player's role ID", () => {
+    expect(
+      isPlayersTurn(
+        { id: WerewolfRole.Seer, team: Team.Good },
+        WerewolfRole.Seer,
+      ),
+    ).toBe(true);
+  });
+
+  it("returns false for a solo phase that does not match the player's role ID", () => {
+    expect(
+      isPlayersTurn(
+        { id: WerewolfRole.Bodyguard, team: Team.Good },
+        WerewolfRole.Seer,
+      ),
+    ).toBe(false);
+  });
+
+  it("returns true for a team phase matching the player's team", () => {
+    expect(
+      isPlayersTurn(
+        { id: WerewolfRole.Werewolf, team: Team.Bad },
+        getTeamPhaseKey(Team.Bad),
+      ),
+    ).toBe(true);
+  });
+
+  it("returns false for a team phase that does not match the player's team", () => {
+    expect(
+      isPlayersTurn(
+        { id: WerewolfRole.Seer, team: Team.Good },
+        getTeamPhaseKey(Team.Bad),
+      ),
+    ).toBe(false);
   });
 });
 

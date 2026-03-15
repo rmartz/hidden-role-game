@@ -8,11 +8,10 @@ import {
   isTeamNightAction,
   isTeamPhaseKey,
   getTargetablePlayers,
+  getPhaseLabel,
+  getSoloTarget,
 } from "@/lib/game-modes/werewolf";
-import type {
-  WerewolfTurnState,
-  AnyNightAction,
-} from "@/lib/game-modes/werewolf";
+import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
 import { useGameAction } from "@/hooks";
 import { GameRolesList } from "@/components/game";
@@ -24,35 +23,6 @@ interface Props {
   gameId: string;
   gameState: PlayerGameState;
   turnState: WerewolfTurnState;
-}
-
-function getPhaseLabel(
-  phaseKey: string,
-  modeConfig: { roles: Record<string, { name: string }> },
-): string {
-  if (isTeamPhaseKey(phaseKey)) {
-    const teamName = phaseKey.slice("team:".length);
-    return `${teamName} Team`;
-  }
-  return modeConfig.roles[phaseKey]?.name ?? phaseKey;
-}
-
-/** Extract a single target + confirmed state from any night action type. */
-function getSoloTarget(action: AnyNightAction | undefined): {
-  targetPlayerId: string | undefined;
-  confirmed: boolean;
-} {
-  if (!action) return { targetPlayerId: undefined, confirmed: false };
-  if (isTeamNightAction(action)) {
-    return {
-      targetPlayerId: action.suggestedTargetId,
-      confirmed: action.confirmed ?? false,
-    };
-  }
-  return {
-    targetPlayerId: action.targetPlayerId,
-    confirmed: action.confirmed ?? false,
-  };
 }
 
 export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
@@ -119,7 +89,7 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
   if (!isNighttime) return null;
 
   const modeConfig = GAME_MODES[gameState.gameMode];
-  const activePhaseLabel = getPhaseLabel(activePhaseKey, modeConfig);
+  const activePhaseLabel = getPhaseLabel(activePhaseKey, modeConfig.roles);
   const isTeamPhase = isTeamPhaseKey(activePhaseKey);
 
   const activeTargetName = activeTarget

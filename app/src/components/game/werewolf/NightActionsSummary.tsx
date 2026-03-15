@@ -1,3 +1,4 @@
+import { getPhaseLabel, targetPlayerIdOf } from "@/lib/game-modes/werewolf";
 import type { AnyNightAction } from "@/lib/game-modes/werewolf";
 
 interface Props {
@@ -6,26 +7,13 @@ interface Props {
   roles: Record<string, { name: string }>;
 }
 
-function phaseLabel(
-  phaseKey: string,
-  roles: Record<string, { name: string }>,
-): string {
-  return phaseKey.startsWith("team:")
-    ? phaseKey.slice(5) + " Team"
-    : (roles[phaseKey]?.name ?? phaseKey);
-}
-
-function targetPlayerIdOf(a: AnyNightAction): string | undefined {
-  if ("targetPlayerId" in a) return a.targetPlayerId;
-  if ("votes" in a && a.suggestedTargetId) return a.suggestedTargetId;
-  return undefined;
-}
-
 export function NightActionsSummary({ nightActions, players, roles }: Props) {
   const entries = Object.entries(nightActions)
     .flatMap(([phaseKey, a]) => {
       const targetId = targetPlayerIdOf(a);
-      return targetId ? [{ targetId, label: phaseLabel(phaseKey, roles) }] : [];
+      return targetId
+        ? [{ targetId, label: getPhaseLabel(phaseKey, roles) }]
+        : [];
     })
     .reduce<{ targetId: string; playerName: string; labels: string[] }[]>(
       (acc, { targetId, label }) => {

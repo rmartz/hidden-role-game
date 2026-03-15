@@ -2,6 +2,7 @@ import { GameStatus, Team } from "@/lib/types";
 import type { Game, PlayerRoleAssignment } from "@/lib/types";
 import { WakesAtNight, TargetCategory, WerewolfPhase } from "./types";
 import type {
+  AnyNightAction,
   TargetablePlayer,
   TeamNightVote,
   WerewolfNighttimePhase,
@@ -258,6 +259,61 @@ export function validateActiveNightPlayer(
   // Solo phase — exact role match.
   if (callerAssignment.roleDefinitionId !== activePhaseKey) return undefined;
   return { phase, activePhaseKey, isTeamPhase: false };
+}
+
+// ---------------------------------------------------------------------------
+// UI display helpers
+// ---------------------------------------------------------------------------
+
+/** Returns a human-readable label for a night phase key. */
+export function getPhaseLabel(
+  phaseKey: string,
+  roles: Record<string, { name: string }>,
+): string {
+  if (isTeamPhaseKey(phaseKey)) {
+    return `${phaseKey.slice(TEAM_PHASE_PREFIX.length)} Team`;
+  }
+  return roles[phaseKey]?.name ?? phaseKey;
+}
+
+/** Extracts the targeted player ID from any night action type. */
+export function targetPlayerIdOf(a: AnyNightAction): string | undefined {
+  if ("targetPlayerId" in a) return a.targetPlayerId;
+  if ("suggestedTargetId" in a) return a.suggestedTargetId;
+  return undefined;
+}
+
+/** Extracts the single active target + confirmed state from any night action type. */
+export function getSoloTarget(action: AnyNightAction | undefined): {
+  targetPlayerId: string | undefined;
+  confirmed: boolean;
+} {
+  if (!action) return { targetPlayerId: undefined, confirmed: false };
+  if ("votes" in action) {
+    return {
+      targetPlayerId: action.suggestedTargetId,
+      confirmed: action.confirmed ?? false,
+    };
+  }
+  return {
+    targetPlayerId: action.targetPlayerId,
+    confirmed: action.confirmed ?? false,
+  };
+}
+
+/**
+ * Returns true if the current night phase is this player's turn.
+ * Team phases match by team name; solo phases match by role ID.
+ */
+export function isPlayersTurn(
+  myRole: { id: string; team: string } | null,
+  activePhaseKey: string | undefined,
+): boolean {
+  if (!myRole || !activePhaseKey) return false;
+  if (isTeamPhaseKey(activePhaseKey)) {
+    return myRole.team === activePhaseKey.slice(TEAM_PHASE_PREFIX.length);
+  }
+  return myRole.id === activePhaseKey;
 }
 
 /**

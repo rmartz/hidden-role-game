@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import {
   getTargetablePlayers,
   isTeamPhaseKey,
+  isPlayersTurn,
 } from "@/lib/game-modes/werewolf";
 import type { WerewolfNighttimePhase } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
@@ -17,23 +18,6 @@ interface Props {
   phase: WerewolfNighttimePhase;
   turn: number;
   deadPlayerIds: string[];
-}
-
-/**
- * Check if the current phase is this player's turn.
- * For solo roles: myRole.id matches the active phase key.
- * For team phases: myRole.team matches the team in the phase key.
- */
-function isPlayersTurn(
-  myRole: { id: string; team: string } | null,
-  activePhaseKey: string | undefined,
-): boolean {
-  if (!myRole || !activePhaseKey) return false;
-  if (isTeamPhaseKey(activePhaseKey)) {
-    const teamName = activePhaseKey.slice("team:".length);
-    return myRole.team === teamName;
-  }
-  return myRole.id === activePhaseKey;
 }
 
 export function PlayerGameNightScreen({
