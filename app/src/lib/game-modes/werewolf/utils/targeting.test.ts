@@ -91,6 +91,24 @@ describe("getTargetablePlayers", () => {
     );
     expect(result.map((p) => p.id)).not.toContain("p1");
   });
+
+  it("Narrator view excludes Seer from Seer phase targets", () => {
+    const assignments = [
+      {
+        player: { id: "p1" },
+        role: { id: WerewolfRole.Seer, team: Team.Good },
+      },
+    ];
+    const result = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      WerewolfRole.Seer,
+      null,
+      assignments,
+    );
+    expect(result.map((p) => p.id)).not.toContain("p1");
+  });
 });
 
 // ---------------------------------------------------------------------------

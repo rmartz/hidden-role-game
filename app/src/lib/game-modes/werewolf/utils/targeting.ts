@@ -41,7 +41,7 @@ export function getTargetablePlayers(
         if ((a.role.team as Team) === team) excludeIds.push(a.player.id);
       }
     }
-  } else if (myPlayerId !== null) {
+  } else {
     const role = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
       activePhaseKey
     ];
@@ -49,7 +49,7 @@ export function getTargetablePlayers(
       role?.targetCategory === TargetCategory.Attack ||
       role?.targetCategory === TargetCategory.Investigate;
     if (restrictsSelf) {
-      excludeIds.push(myPlayerId);
+      if (myPlayerId !== null) excludeIds.push(myPlayerId);
       for (const a of visibleRoleAssignments) {
         if (a.role.id === activePhaseKey) excludeIds.push(a.player.id);
       }
