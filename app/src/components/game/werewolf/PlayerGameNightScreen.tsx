@@ -129,7 +129,7 @@ export function PlayerGameNightScreen({
       </p>
       {!isFirstTurn && (
         <div>
-          {isTeamPhase && !isConfirmed && (
+          {isTeamPhase && !isConfirmed && hasVisibleTeammates && (
             <div className="mb-3 rounded-md border p-2">
               <p className="text-xs font-medium text-muted-foreground mb-1">
                 Teammate votes:
