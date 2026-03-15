@@ -13,6 +13,7 @@ import {
 } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
+import { getPlayer } from "@/lib/player-utils";
 import { useGameAction } from "@/hooks";
 import { GameRolesList } from "@/components/game";
 import { OwnerHeader } from "./OwnerHeader";
@@ -107,14 +108,10 @@ export function OwnerGameNightScreen({
         : a.role.id === activePhaseKey,
     )
     .filter((a) => !turnState.deadPlayerIds.includes(a.player.id))
-    .map(
-      (a) =>
-        gameState.players.find((p) => p.id === a.player.id)?.name ??
-        a.player.id,
-    );
+    .map((a) => getPlayer(gameState.players, a.player.id)?.name ?? a.player.id);
 
   const activeTargetName = activeTarget
-    ? gameState.players.find((p) => p.id === activeTarget)?.name
+    ? getPlayer(gameState.players, activeTarget)?.name
     : undefined;
 
   const teamAction =
@@ -127,10 +124,9 @@ export function OwnerGameNightScreen({
   const resolvedVotes = (teamAction?.votes ?? []).map((vote) => ({
     key: vote.playerId,
     voterName:
-      gameState.players.find((p) => p.id === vote.playerId)?.name ??
-      vote.playerId,
+      getPlayer(gameState.players, vote.playerId)?.name ?? vote.playerId,
     targetName:
-      gameState.players.find((p) => p.id === vote.targetPlayerId)?.name ??
+      getPlayer(gameState.players, vote.targetPlayerId)?.name ??
       vote.targetPlayerId,
   }));
 
