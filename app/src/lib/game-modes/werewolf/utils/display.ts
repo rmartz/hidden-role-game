@@ -5,6 +5,8 @@ import type { WerewolfRoleDefinition } from "../roles";
 import { isTeamPhaseKey, TEAM_PHASE_PREFIX } from "./phase-keys";
 import { targetPlayerIdOf } from "./targeting";
 import { getPlayerName } from "@/lib/player-utils";
+import { Team } from "@/lib/types";
+import type { VisibleTeammate } from "@/server/types";
 
 export interface NightSummaryEntry {
   targetId: string;
@@ -94,6 +96,29 @@ export function getActionText(
     default:
       return `You targeted ${targetName}.`;
   }
+}
+
+/**
+ * Computes the narrator's view of an investigation result.
+ * Returns the target name and alignment, or undefined if conditions aren't met.
+ */
+export function getInvestigationResultForNarrator(
+  isInvestigatePhase: boolean,
+  activeTarget: string | undefined,
+  activeTargetConfirmed: boolean | undefined,
+  activeTargetName: string | undefined,
+  visibleRoleAssignments: VisibleTeammate[],
+): { targetName: string; isWerewolfTeam: boolean } | undefined {
+  if (!isInvestigatePhase || !activeTarget || !activeTargetConfirmed)
+    return undefined;
+  const targetAssignment = visibleRoleAssignments.find(
+    (a) => a.player.id === activeTarget,
+  );
+  if (!targetAssignment) return undefined;
+  return {
+    targetName: activeTargetName ?? activeTarget,
+    isWerewolfTeam: targetAssignment.role.team === Team.Bad,
+  };
 }
 
 /**

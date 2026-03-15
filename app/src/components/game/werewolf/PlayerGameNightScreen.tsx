@@ -11,6 +11,7 @@ import type { PlayerGameState } from "@/server/types";
 import { getPlayerName } from "@/lib/player-utils";
 import { GameTimer } from "@/components/game";
 import { PlayerFirstTurnScreen } from "./PlayerFirstTurnScreen";
+import { PlayerInvestigationResult } from "./PlayerInvestigationResult";
 import { PlayerTargetSelection } from "./PlayerTargetSelection";
 
 interface PlayerGameNightScreenProps {
@@ -136,24 +137,15 @@ export function PlayerGameNightScreen({
         myNightTarget={gameState.myNightTarget}
       />
       {gameState.investigationResult && (
-        <div className="mt-4 rounded-md border p-3 text-sm">
-          <p className="font-medium">Investigation result:</p>
-          <p className="mt-1">
-            <strong className="text-foreground">
-              {getPlayerName(
-                gameState.players,
-                gameState.investigationResult.targetPlayerId,
-              ) ?? gameState.investigationResult.targetPlayerId}
-            </strong>{" "}
-            is{" "}
-            <strong className="text-foreground">
-              {gameState.investigationResult.isWerewolfTeam
-                ? "on the Werewolf team"
-                : "not on the Werewolf team"}
-            </strong>
-            .
-          </p>
-        </div>
+        <PlayerInvestigationResult
+          targetName={
+            getPlayerName(
+              gameState.players,
+              gameState.investigationResult.targetPlayerId,
+            ) ?? gameState.investigationResult.targetPlayerId
+          }
+          isWerewolfTeam={gameState.investigationResult.isWerewolfTeam}
+        />
       )}
     </div>
   );
