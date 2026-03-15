@@ -36,4 +36,26 @@ describe("buildNightPhaseOrder", () => {
     const order = buildNightPhaseOrder(1, assignments);
     expect(order).not.toContain(WerewolfRole.Villager);
   });
+
+  it("skips team phase when all team players are dead", () => {
+    const order = buildNightPhaseOrder(2, assignments, ["p1"]);
+    expect(order).not.toContain(getTeamPhaseKey(Team.Bad));
+    expect(order).toContain(WerewolfRole.Seer);
+  });
+
+  it("skips solo phase when the role player is dead", () => {
+    const order = buildNightPhaseOrder(2, assignments, ["p2"]);
+    expect(order).toContain(getTeamPhaseKey(Team.Bad));
+    expect(order).not.toContain(WerewolfRole.Seer);
+  });
+
+  it("keeps team phase when at least one team player is alive", () => {
+    const multiWolf = [
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "w2", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "p2", roleDefinitionId: WerewolfRole.Seer },
+    ];
+    const order = buildNightPhaseOrder(2, multiWolf, ["w1"]);
+    expect(order).toContain(getTeamPhaseKey(Team.Bad));
+  });
 });
