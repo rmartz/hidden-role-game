@@ -7,7 +7,7 @@ interface Props {
   roles: Record<string, { name: string }>;
 }
 
-export function NightResolutionSummary({
+export function NightOutcomeSummary({
   nightResolution,
   players,
   roles,
