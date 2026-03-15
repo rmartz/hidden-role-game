@@ -89,8 +89,25 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
   if (!isNighttime) return null;
 
   const modeConfig = GAME_MODES[gameState.gameMode];
-  const activePhaseLabel = getPhaseLabel(activePhaseKey, modeConfig.roles);
+  const activePhaseLabel = getPhaseLabel(
+    activePhaseKey,
+    modeConfig.roles,
+    modeConfig.teamLabels as Record<string, string>,
+  );
   const isTeamPhase = isTeamPhaseKey(activePhaseKey);
+
+  const activePlayerNames = gameState.visibleRoleAssignments
+    .filter((a) =>
+      isTeamPhase
+        ? (a.role.team as string) === activePhaseKey.slice("team:".length)
+        : a.role.id === activePhaseKey,
+    )
+    .filter((a) => !turnState.deadPlayerIds.includes(a.player.id))
+    .map(
+      (a) =>
+        gameState.players.find((p) => p.id === a.player.id)?.name ??
+        a.player.id,
+    );
 
   const activeTargetName = activeTarget
     ? gameState.players.find((p) => p.id === activeTarget)?.name
@@ -144,6 +161,9 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
         <p className="mb-4 text-muted-foreground">
           Currently awake:{" "}
           <strong className="text-foreground">{activePhaseLabel}</strong>
+          {activePlayerNames.length > 0 && (
+            <span> ({activePlayerNames.join(", ")})</span>
+          )}
         </p>
         {!isFirstTurn && (
           <OwnerNightTargetPanel
