@@ -134,7 +134,7 @@ export function OwnerGameNightScreen({
     gameState.gameOwner?.id,
     turnState.deadPlayerIds,
     activePhaseKey,
-    null,
+    undefined,
     gameState.visibleRoleAssignments,
   );
 

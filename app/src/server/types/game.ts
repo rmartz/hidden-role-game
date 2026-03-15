@@ -43,12 +43,12 @@ export interface PlayerGameState {
   status: GameStatusState;
   gameMode: GameMode;
   players: PublicLobbyPlayer[];
-  gameOwner: PublicLobbyPlayer | null;
-  /** The current player's own player ID. Null for the narrator/owner. */
-  myPlayerId: string | null;
-  myRole: PublicRoleInfo | null;
+  gameOwner: PublicLobbyPlayer | undefined;
+  /** The current player's own player ID. Undefined for the narrator/owner. */
+  myPlayerId: string | undefined;
+  myRole: PublicRoleInfo | undefined;
   visibleRoleAssignments: VisibleTeammate[];
-  rolesInPlay: RoleInPlay[] | null;
+  rolesInPlay: RoleInPlay[] | undefined;
   /** All night targets keyed by phase key. Only populated for the narrator/owner. */
   nightActions?: Record<string, AnyNightAction>;
   /** The current player's night target (playerId). Only populated for non-owner players during nighttime. */

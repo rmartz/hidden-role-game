@@ -5,7 +5,7 @@ import { PlayerRow } from "./PlayerRow";
 
 interface PlayerListProps {
   lobby: PublicLobby;
-  userPlayerId: string | null;
+  userPlayerId: string | undefined;
   showLeave: boolean;
   showRemovePlayer: boolean;
   showMakeOwner: boolean;

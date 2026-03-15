@@ -68,8 +68,8 @@ describe("isOwnerPlaying", () => {
     expect(isOwnerPlaying(game, "owner-1")).toBe(false);
   });
 
-  it("returns false when ownerPlayerId is null", () => {
-    const game = makePlayingGame(nightTurnState, { ownerPlayerId: null });
+  it("returns false when ownerPlayerId is undefined", () => {
+    const game = makePlayingGame(nightTurnState, { ownerPlayerId: undefined });
     expect(isOwnerPlaying(game, "owner-1")).toBe(false);
   });
 });

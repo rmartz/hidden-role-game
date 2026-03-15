@@ -53,7 +53,7 @@ export async function POST(request: Request): Promise<Response> {
     roleSlots,
     gameMode,
     lobby.config.showRolesInPlay,
-    ownerPlayer?.id ?? null,
+    ownerPlayer?.id ?? undefined,
     lobby.config.timerConfig,
   );
 

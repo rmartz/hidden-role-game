@@ -30,7 +30,7 @@ function makeGameWithPlayers(
     roleAssignments,
     configuredRoleSlots,
     showRolesInPlay,
-    ownerPlayerId: null,
+    ownerPlayerId: undefined,
   };
 }
 

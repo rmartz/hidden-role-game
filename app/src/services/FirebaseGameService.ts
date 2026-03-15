@@ -70,8 +70,8 @@ export class FirebaseGameService {
         gameMode: game.gameMode,
         players: publicPlayers,
         gameOwner: { id: caller.id, name: caller.name },
-        myPlayerId: null,
-        myRole: null,
+        myPlayerId: undefined,
+        myRole: undefined,
         visibleRoleAssignments,
         rolesInPlay: gameInitializationService.buildRolesInPlay(game),
         ...(nightActions ? { nightActions } : {}),
@@ -154,7 +154,7 @@ export class FirebaseGameService {
             name:
               playerById.get(game.ownerPlayerId)?.name ?? game.ownerPlayerId,
           }
-        : null,
+        : undefined,
       myPlayerId: callerId,
       myRole: { id: myRole.id, name: myRole.name, team: myRole.team },
       visibleRoleAssignments,
@@ -188,7 +188,7 @@ export class FirebaseGameService {
     roleSlots: RoleSlot[],
     gameMode: GameMode,
     showRolesInPlay: ShowRolesInPlay,
-    ownerPlayerId: string | null,
+    ownerPlayerId: string | undefined,
     timerConfig?: import("@/lib/types").TimerConfig,
   ): Promise<Game> {
     const { roles } = this.getModeDefinition(gameMode);

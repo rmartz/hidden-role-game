@@ -133,7 +133,7 @@ export interface Game {
   roleAssignments: PlayerRoleAssignment[];
   configuredRoleSlots: RoleSlot[];
   showRolesInPlay: ShowRolesInPlay;
-  ownerPlayerId: string | null;
+  ownerPlayerId: string | undefined;
   timerConfig?: TimerConfig;
 }
 

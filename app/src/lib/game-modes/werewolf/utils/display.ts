@@ -58,7 +58,7 @@ export function getPhaseLabel(
  * Team phases match by team name; solo phases match by role ID.
  */
 export function isPlayersTurn(
-  myRole: { id: string; team: string } | null,
+  myRole: { id: string; team: string } | undefined,
   activePhaseKey: string | undefined,
 ): boolean {
   if (!myRole || !activePhaseKey) return false;

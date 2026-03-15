@@ -76,15 +76,15 @@ export class GameInitializationService {
 
   /**
    * Returns the roles visible to players based on the game's showRolesInPlay
-   * setting, or null if role visibility is disabled.
+   * setting, or undefined if role visibility is disabled.
    */
-  buildRolesInPlay(game: Game): RoleInPlay[] | null {
+  buildRolesInPlay(game: Game): RoleInPlay[] | undefined {
     const { roles } = GAME_MODES[game.gameMode];
     const slotMap = new Map(game.configuredRoleSlots.map((s) => [s.roleId, s]));
 
     switch (game.showRolesInPlay) {
       case ShowRolesInPlay.None:
-        return null;
+        return undefined;
 
       case ShowRolesInPlay.ConfiguredOnly:
         return game.configuredRoleSlots.flatMap((slot) => {

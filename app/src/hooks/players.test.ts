@@ -33,7 +33,7 @@ describe("useRemovePlayer", () => {
   it("calls removePlayer and invokes onSuccess with targetPlayerId", async () => {
     vi.mocked(api.removePlayer).mockResolvedValue({
       status: ServerResponseStatus.Success,
-      data: { lobby: null },
+      data: { lobby: undefined },
     });
 
     const onSuccess = vi.fn();

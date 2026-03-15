@@ -15,7 +15,7 @@ import { isTeamPhaseKey, parseTeamPhaseKey } from "./phase-keys";
  *     player and any role-visible role-holders are excluded.
  *   - Solo phase, all other categories: no self/role exclusions.
  *
- * Pass `myPlayerId = null` for the narrator view (the narrator is already
+ * Pass `myPlayerId = undefined` for the narrator view (the narrator is already
  * absent from the players list).
  * Pass `activePhaseKey = ""` and `visibleRoleAssignments = []` when no
  * phase-aware exclusion is needed (e.g. in tests).
@@ -25,7 +25,7 @@ export function getTargetablePlayers(
   ownerPlayerId: string | undefined,
   deadPlayerIds: string[],
   activePhaseKey: string,
-  myPlayerId: string | null,
+  myPlayerId: string | undefined,
   visibleRoleAssignments: {
     player: { id: string };
     role: { id: string; team: string };
@@ -49,7 +49,7 @@ export function getTargetablePlayers(
       role?.targetCategory === TargetCategory.Attack ||
       role?.targetCategory === TargetCategory.Investigate;
     if (restrictsSelf) {
-      if (myPlayerId !== null) excludeIds.push(myPlayerId);
+      if (myPlayerId !== undefined) excludeIds.push(myPlayerId);
       for (const a of visibleRoleAssignments) {
         if (a.role.id === activePhaseKey) excludeIds.push(a.player.id);
       }

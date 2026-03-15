@@ -86,7 +86,7 @@ export function useUpdateLobbyConfig(lobbyId: string) {
  * Fetches the lobby the user currently belongs to. Clears the local session
  * if the lobby no longer exists or the session is invalid (404/403).
  */
-export function useStoredLobbyQuery(storedLobbyId: string | null) {
+export function useStoredLobbyQuery(storedLobbyId: string | undefined) {
   return useQuery({
     queryKey: ["stored-lobby", storedLobbyId],
     queryFn: async () => {

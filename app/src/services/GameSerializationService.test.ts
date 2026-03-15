@@ -102,7 +102,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
       ],
       configuredRoleSlots: [],
       showRolesInPlay: ShowRolesInPlay.None,
-      ownerPlayerId: null,
+      ownerPlayerId: undefined,
     };
 
     const result = service.extractDaytimeNightState(game, "p2", seerRole);

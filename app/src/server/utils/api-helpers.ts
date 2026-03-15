@@ -69,7 +69,7 @@ const MAX_PLAYER_NAME_LENGTH = 32;
 // Block HTML and JSON structural characters while allowing international scripts
 const INVALID_NAME_CHARS = /[<>&"{}[\]\\`]/;
 
-export function validatePlayerName(name: string): string | null {
+export function validatePlayerName(name: string): string | undefined {
   if (!name || name.length === 0) {
     return "Player name must not be empty";
   }
@@ -79,5 +79,5 @@ export function validatePlayerName(name: string): string | null {
   if (INVALID_NAME_CHARS.test(name)) {
     return "Player name contains invalid characters";
   }
-  return null;
+  return undefined;
 }

@@ -144,7 +144,7 @@ describe("useLeaveAndJoinLobby", () => {
   it("removes player, clears session, joins new lobby, calls onSuccess", async () => {
     vi.mocked(api.removePlayer).mockResolvedValue({
       status: ServerResponseStatus.Success,
-      data: { lobby: null },
+      data: { lobby: undefined },
     });
     vi.mocked(api.joinLobby).mockResolvedValue({
       status: ServerResponseStatus.Success,
@@ -269,9 +269,11 @@ describe("useStoredLobbyQuery", () => {
     expect(result.current.data).toBeNull();
   });
 
-  it("returns null when storedLobbyId is null", () => {
+  it("returns null when storedLobbyId is undefined", () => {
     const { wrapper } = createWrapper();
-    const { result } = renderHook(() => useStoredLobbyQuery(null), { wrapper });
+    const { result } = renderHook(() => useStoredLobbyQuery(undefined), {
+      wrapper,
+    });
 
     // Query is disabled, so it stays in pending state without fetching
     expect(result.current.fetchStatus).toBe("idle");

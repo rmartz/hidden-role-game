@@ -51,7 +51,7 @@ function makeSecretVillainGame(
     roleAssignments,
     configuredRoleSlots,
     showRolesInPlay,
-    ownerPlayerId: null,
+    ownerPlayerId: undefined,
   };
 }
 
@@ -184,13 +184,13 @@ describe("GameInitializationService.buildInitialTurnState", () => {
 // ---------------------------------------------------------------------------
 
 describe("GameInitializationService.buildRolesInPlay", () => {
-  it("returns null when showRolesInPlay is None", () => {
+  it("returns undefined when showRolesInPlay is None", () => {
     const game = makeSecretVillainGame(
       [{ playerId: "p1", roleDefinitionId: SecretVillainRole.Good }],
       ShowRolesInPlay.None,
     );
 
-    expect(service.buildRolesInPlay(game)).toBeNull();
+    expect(service.buildRolesInPlay(game)).toBeUndefined();
   });
 
   it("returns roles with count when showRolesInPlay is RoleAndCount", () => {
@@ -209,7 +209,7 @@ describe("GameInitializationService.buildRolesInPlay", () => {
 
     const result = service.buildRolesInPlay(game);
 
-    expect(result).not.toBeNull();
+    expect(result).toBeDefined();
     expect(result).toContainEqual(
       expect.objectContaining({
         id: SecretVillainRole.Good,
