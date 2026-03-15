@@ -132,10 +132,11 @@ export function OwnerGameNightScreen({
     | undefined;
   const isInvestigatePhase =
     activeRoleDef?.targetCategory === TargetCategory.Investigate;
-  const isResultRevealed =
-    activeAction && "resultRevealed" in activeAction
-      ? (activeAction.resultRevealed ?? false)
-      : false;
+  const isResultRevealed = !!(
+    activeAction &&
+    "resultRevealed" in activeAction &&
+    activeAction.resultRevealed
+  );
   const investigationResult = getInvestigationResultForNarrator(
     isInvestigatePhase,
     activeTarget,
