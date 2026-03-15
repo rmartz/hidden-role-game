@@ -1,57 +1,36 @@
 "use client";
 
-import { TargetCategory } from "@/lib/game-modes/werewolf";
+import { getActionText } from "@/lib/game-modes/werewolf";
+import { getPlayer } from "@/lib/player-utils";
 import type { PlayerGameState } from "@/server/types";
 
-interface Props {
+interface PlayerNightSummaryProps {
   players: PlayerGameState["players"];
   nightSummary: PlayerGameState["nightSummary"];
   myLastNightAction: PlayerGameState["myLastNightAction"];
-}
-
-function getActionText(
-  category: TargetCategory,
-  targetName: string,
-  targetWasKilled: boolean,
-): string {
-  switch (category) {
-    case TargetCategory.Protect:
-      return `You Protected ${targetName}.`;
-    case TargetCategory.Investigate:
-      return `You Investigated ${targetName}.`;
-    case TargetCategory.Attack:
-      return targetWasKilled
-        ? `You Attacked ${targetName}.`
-        : `You Attacked ${targetName}, but something protected them.`;
-    default:
-      return `You targeted ${targetName}.`;
-  }
 }
 
 export function PlayerNightSummary({
   players,
   nightSummary,
   myLastNightAction,
-}: Props) {
+}: PlayerNightSummaryProps) {
   const hasDeaths = (nightSummary?.length ?? 0) > 0;
   if (!hasDeaths && !myLastNightAction) return null;
 
   const killedEntries = (nightSummary ?? []).map((event) => ({
     key: event.targetPlayerId,
     name:
-      players.find((p) => p.id === event.targetPlayerId)?.name ??
-      event.targetPlayerId,
+      getPlayer(players, event.targetPlayerId)?.name ?? event.targetPlayerId,
   }));
 
   const actionText = myLastNightAction
     ? getActionText(
         myLastNightAction.category,
-        players.find((p) => p.id === myLastNightAction.targetPlayerId)?.name ??
+        getPlayer(players, myLastNightAction.targetPlayerId)?.name ??
           myLastNightAction.targetPlayerId,
-        (nightSummary ?? []).some(
-          (e) =>
-            e.died && e.targetPlayerId === myLastNightAction.targetPlayerId,
-        ),
+        nightSummary,
+        myLastNightAction.targetPlayerId,
       )
     : null;
 
