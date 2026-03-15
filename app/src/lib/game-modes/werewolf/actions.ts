@@ -40,6 +40,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       const nightPhaseOrder = buildNightPhaseOrder(
         nextTurn,
         game.roleAssignments,
+        ts.deadPlayerIds,
       );
       game.status = {
         type: GameStatus.Playing,
