@@ -6,9 +6,10 @@ import { WerewolfPhase, WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
 import { useGameAction } from "@/hooks";
-import { GameRolesList, PlayersRoleList } from "@/components/game";
-import { Button } from "@/components/ui/button";
+import { GameRolesList } from "@/components/game";
+import { NightActionsSummary } from "./NightActionsSummary";
 import { OwnerHeader } from "./OwnerHeader";
+import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
 
 interface Props {
   gameId: string;
@@ -34,28 +35,6 @@ export function OwnerGameDayScreen({ gameId, gameState, turnState }: Props) {
 
   if (!isDaytime) return null;
 
-  // Build night summary: group by targeted player → list of roles that targeted them.
-  const modeConfig = GAME_MODES[gameState.gameMode];
-  const nightActions = phase.nightActions;
-  const targetSummary = new Map<string, string[]>();
-  for (const [phaseKey, action] of Object.entries(nightActions)) {
-    if ("targetPlayerId" in action) {
-      const roleName = modeConfig.roles[phaseKey]?.name ?? phaseKey;
-      const existing = targetSummary.get(action.targetPlayerId) ?? [];
-      existing.push(roleName);
-      targetSummary.set(action.targetPlayerId, existing);
-    } else if ("votes" in action && action.suggestedTargetId) {
-      // Team phase: use the agreed target.
-      const label = phaseKey.startsWith("team:")
-        ? phaseKey.slice(5) + " Team"
-        : phaseKey;
-      const existing = targetSummary.get(action.suggestedTargetId) ?? [];
-      existing.push(label);
-      targetSummary.set(action.suggestedTargetId, existing);
-    }
-  }
-  const hasTargets = targetSummary.size > 0;
-
   const timer =
     dayPhaseSeconds !== null
       ? {
@@ -75,66 +54,18 @@ export function OwnerGameDayScreen({ gameId, gameState, turnState }: Props) {
         isAdvancing={action.isPending}
         timer={timer}
       >
-        {hasTargets && (
-          <div className="mb-4 rounded-md border p-3">
-            <h2 className="text-sm font-semibold mb-2">Night Summary</h2>
-            <ul className="space-y-1 text-sm">
-              {[...targetSummary.entries()].map(([playerId, roleNames]) => {
-                const playerName =
-                  gameState.players.find((p) => p.id === playerId)?.name ??
-                  playerId;
-                return (
-                  <li key={playerId}>
-                    <strong className="text-foreground">{playerName}</strong>
-                    <span className="text-muted-foreground">
-                      {" "}
-                      — targeted by {roleNames.join(", ")}
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
+        <NightActionsSummary
+          nightActions={phase.nightActions}
+          players={gameState.players}
+          roles={GAME_MODES[gameState.gameMode].roles}
+        />
       </OwnerHeader>
-      <PlayersRoleList
+      <OwnerPlayerActionsGrid
+        gameId={gameId}
         assignments={gameState.visibleRoleAssignments}
         gameMode={gameState.gameMode}
         deadPlayerIds={gameState.deadPlayerIds}
-        renderActions={(playerId, isDead) =>
-          playerId !== gameState.gameOwner?.id &&
-          (isDead ? (
-            <Button
-              variant="outline"
-              size="xs"
-              onClick={() => {
-                action.mutate({
-                  actionId: WerewolfAction.MarkPlayerAlive,
-                  payload: { playerId },
-                });
-              }}
-              disabled={action.isPending}
-            >
-              Revive
-            </Button>
-          ) : (
-            <Button
-              variant="destructive"
-              size="xs"
-              onClick={() => {
-                if (window.confirm("Mark this player as dead?")) {
-                  action.mutate({
-                    actionId: WerewolfAction.MarkPlayerDead,
-                    payload: { playerId },
-                  });
-                }
-              }}
-              disabled={action.isPending}
-            >
-              Kill
-            </Button>
-          ))
-        }
+        gameOwnerId={gameState.gameOwner?.id}
       />
       <GameRolesList
         roles={gameState.rolesInPlay ?? []}
