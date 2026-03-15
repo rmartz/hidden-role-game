@@ -135,6 +135,26 @@ export function PlayerGameNightScreen({
         suggestedTargetId={suggestedTargetId}
         myNightTarget={gameState.myNightTarget}
       />
+      {gameState.investigationResult && (
+        <div className="mt-4 rounded-md border p-3 text-sm">
+          <p className="font-medium">Investigation result:</p>
+          <p className="mt-1">
+            <strong className="text-foreground">
+              {getPlayerName(
+                gameState.players,
+                gameState.investigationResult.targetPlayerId,
+              ) ?? gameState.investigationResult.targetPlayerId}
+            </strong>{" "}
+            is{" "}
+            <strong className="text-foreground">
+              {gameState.investigationResult.isWerewolfTeam
+                ? "on the Werewolf team"
+                : "not on the Werewolf team"}
+            </strong>
+            .
+          </p>
+        </div>
+      )}
     </div>
   );
 }

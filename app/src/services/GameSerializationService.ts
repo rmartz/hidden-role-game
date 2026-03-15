@@ -1,15 +1,15 @@
-import { GameStatus } from "@/lib/types";
-import type { Game, RoleDefinition, Team } from "@/lib/types";
+import { GameStatus, Team } from "@/lib/types";
+import type { Game, RoleDefinition } from "@/lib/types";
 import type { PlayerGameState } from "@/server/types";
 import {
   isTeamNightAction,
   getTeamPhaseKey,
   getTeamPlayerIds,
   WerewolfPhase,
+  TargetCategory,
 } from "@/lib/game-modes/werewolf";
 import type {
   AnyNightAction,
-  TargetCategory,
   WerewolfRoleDefinition,
   WerewolfTurnState,
 } from "@/lib/game-modes/werewolf";
@@ -99,10 +99,36 @@ export class GameSerializationService {
     if (!myAction || isTeamNightAction(myAction)) {
       return { myNightTarget: undefined, myNightTargetConfirmed: false };
     }
-    return {
+
+    const result: Partial<PlayerGameState> = {
       myNightTarget: myAction.targetPlayerId,
       myNightTargetConfirmed: myAction.confirmed ?? false,
     };
+
+    // For Investigate roles, include the result once the narrator has revealed it.
+    const myRoleDef = GAME_MODES[game.gameMode].roles[myRole.id] as
+      | WerewolfRoleDefinition
+      | undefined;
+    if (
+      myRoleDef?.targetCategory === TargetCategory.Investigate &&
+      myAction.confirmed &&
+      myAction.resultRevealed
+    ) {
+      const targetAssignment = game.roleAssignments.find(
+        (a) => a.playerId === myAction.targetPlayerId,
+      );
+      const targetRoleDef = targetAssignment
+        ? (GAME_MODES[game.gameMode].roles[
+            targetAssignment.roleDefinitionId
+          ] as WerewolfRoleDefinition | undefined)
+        : undefined;
+      result.investigationResult = {
+        targetPlayerId: myAction.targetPlayerId,
+        isWerewolfTeam: targetRoleDef?.team === Team.Bad,
+      };
+    }
+
+    return result;
   }
 
   /**

@@ -78,6 +78,11 @@ export interface PlayerGameState {
    * their input was recorded. Only populated for non-owner players during daytime.
    */
   myLastNightAction?: { targetPlayerId: string; category: TargetCategory };
+  /**
+   * Investigation result for the Seer during nighttime.
+   * Only populated after the narrator explicitly reveals it.
+   */
+  investigationResult?: { targetPlayerId: string; isWerewolfTeam: boolean };
   /** Phase timer configuration. Present when the lobby has timers enabled. */
   timerConfig?: TimerConfig;
 }

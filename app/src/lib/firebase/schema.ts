@@ -294,6 +294,7 @@ export interface FirebasePlayerState {
   deadPlayerIds?: string[];
   nightSummary?: { targetPlayerId: string; died: boolean }[];
   myLastNightAction?: { targetPlayerId: string; category: string };
+  investigationResult?: { targetPlayerId: string; isWerewolfTeam: boolean };
   timerConfig?: TimerConfig;
 }
 
@@ -328,6 +329,9 @@ export function playerStateToFirebase(
     ...(state.nightSummary?.length ? { nightSummary: state.nightSummary } : {}),
     ...(state.myLastNightAction
       ? { myLastNightAction: state.myLastNightAction }
+      : {}),
+    ...(state.investigationResult
+      ? { investigationResult: state.investigationResult }
       : {}),
     ...(state.timerConfig ? { timerConfig: state.timerConfig } : {}),
   };
@@ -382,6 +386,9 @@ export function firebaseToPlayerState(
             category: raw.myLastNightAction.category as TargetCategory,
           },
         }
+      : {}),
+    ...(raw.investigationResult
+      ? { investigationResult: raw.investigationResult }
       : {}),
     ...(raw.timerConfig ? { timerConfig: raw.timerConfig } : {}),
   };

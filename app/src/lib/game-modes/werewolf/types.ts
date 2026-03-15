@@ -6,6 +6,8 @@ export enum WerewolfPhase {
 export interface NightAction {
   targetPlayerId: string;
   confirmed?: boolean;
+  /** True once the narrator has revealed the investigation result to the player. */
+  resultRevealed?: boolean;
 }
 
 export interface TeamNightVote {

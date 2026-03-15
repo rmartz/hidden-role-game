@@ -10,8 +10,14 @@ import {
   getTargetablePlayers,
   getPhaseLabel,
   getSoloTarget,
+  TargetCategory,
 } from "@/lib/game-modes/werewolf";
-import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
+import type {
+  WerewolfTurnState,
+  WerewolfRoleDefinition,
+} from "@/lib/game-modes/werewolf";
+import { Team } from "@/lib/types";
+import { Button } from "@/components/ui/button";
 import type { PlayerGameState } from "@/server/types";
 import { getPlayerName } from "@/lib/player-utils";
 import { useGameAction } from "@/hooks";
@@ -121,6 +127,29 @@ export function OwnerGameNightScreen({
 
   const isFirstTurn = turnState.turn === 1;
 
+  const activeRoleDef = modeConfig.roles[activePhaseKey] as
+    | WerewolfRoleDefinition
+    | undefined;
+  const isInvestigatePhase =
+    activeRoleDef?.targetCategory === TargetCategory.Investigate;
+  const isResultRevealed =
+    activeAction && !isTeamNightAction(activeAction)
+      ? (activeAction.resultRevealed ?? false)
+      : false;
+  const investigationResult =
+    isInvestigatePhase && activeTarget && activeTargetConfirmed
+      ? (() => {
+          const targetAssignment = gameState.visibleRoleAssignments.find(
+            (a) => a.player.id === activeTarget,
+          );
+          if (!targetAssignment) return undefined;
+          return {
+            targetName: activeTargetName ?? activeTarget,
+            isWerewolfTeam: targetAssignment.role.team === Team.Bad,
+          };
+        })()
+      : undefined;
+
   const resolvedVotes = (teamAction?.votes ?? []).map((vote) => ({
     key: vote.playerId,
     voterName: getPlayerName(gameState.players, vote.playerId) ?? vote.playerId,
@@ -175,6 +204,40 @@ export function OwnerGameNightScreen({
             onTargetClick={handleTargetClick}
             isPending={action.isPending}
           />
+        )}
+        {investigationResult && (
+          <div className="mt-3 rounded-md border p-3 text-sm">
+            <p className="font-medium mb-2">
+              Investigation result:{" "}
+              <strong className="text-foreground">
+                {investigationResult.targetName}
+              </strong>{" "}
+              is{" "}
+              <strong className="text-foreground">
+                {investigationResult.isWerewolfTeam ? "" : "not "}on the
+                Werewolf team
+              </strong>
+              .
+            </p>
+            {isResultRevealed ? (
+              <p className="text-xs text-muted-foreground">
+                Result revealed to Seer.
+              </p>
+            ) : (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() =>
+                  { action.mutate({
+                    actionId: WerewolfAction.RevealInvestigationResult,
+                  }); }
+                }
+                disabled={action.isPending}
+              >
+                Reveal to Seer
+              </Button>
+            )}
+          </div>
         )}
       </OwnerHeader>
       <OwnerPlayerActionsGrid
