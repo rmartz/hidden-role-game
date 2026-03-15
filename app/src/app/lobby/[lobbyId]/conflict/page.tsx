@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getPlayerId, getLobbyId } from "@/lib/api";
-import { getPlayer } from "@/lib/player-utils";
+import { getPlayerName } from "@/lib/player-utils";
 import {
   useLeaveAndJoinLobby,
   useStoredLobbyQuery,
@@ -22,8 +22,7 @@ export default function LobbyConflictPage() {
   const conflictLobbyQuery = useStoredLobbyQuery(storedLobbyId);
 
   const defaultName =
-    getPlayer(conflictLobbyQuery.data?.players ?? [], myPlayerId ?? "")?.name ??
-    "";
+    getPlayerName(conflictLobbyQuery.data?.players, myPlayerId) ?? "";
   const [playerName, setPlayerName] = useState("");
 
   useEffect(() => {

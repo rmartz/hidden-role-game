@@ -4,7 +4,7 @@ import { WEREWOLF_ROLES } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
 import { isTeamPhaseKey, TEAM_PHASE_PREFIX } from "./phase-keys";
 import { targetPlayerIdOf } from "./targeting";
-import { getPlayer } from "@/lib/player-utils";
+import { getPlayerName } from "@/lib/player-utils";
 
 export interface NightSummaryEntry {
   targetId: string;
@@ -33,7 +33,7 @@ export function buildNightSummary(
       if (existing) {
         existing.labels.push(label);
       } else {
-        const playerName = getPlayer(players, targetId)?.name ?? targetId;
+        const playerName = getPlayerName(players, targetId) ?? targetId;
         acc.push({ targetId, playerName, labels: [label] });
       }
       return acc;
