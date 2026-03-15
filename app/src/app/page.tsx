@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getLobbyId, getPlayerId } from "@/lib/api";
+import { getPlayerName } from "@/lib/player-utils";
 import { useCreateLobby, useJoinLobby, useStoredLobbyQuery } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,7 +26,7 @@ export default function Home() {
   const storedLobbyQuery = useStoredLobbyQuery(storedLobbyId);
 
   const storedPlayerName =
-    storedLobbyQuery.data?.players.find((p) => p.id === myPlayerId)?.name ?? "";
+    getPlayerName(storedLobbyQuery.data?.players, myPlayerId) ?? "";
 
   useEffect(() => {
     if (storedPlayerName && !playerName) {

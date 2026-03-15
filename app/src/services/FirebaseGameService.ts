@@ -9,6 +9,7 @@ import type {
 } from "@/lib/types";
 import type { PublicRoleInfo, PlayerGameState } from "@/server/types";
 import { GAME_MODES } from "@/lib/game-modes";
+import { getPlayer } from "@/lib/player-utils";
 import { assignRoles, adjustRoleSlots } from "@/server/utils";
 import { getAdminDatabase } from "@/lib/firebase/admin";
 import { ServerValue } from "firebase-admin/database";
@@ -38,7 +39,7 @@ export class FirebaseGameService {
   ): PlayerGameState | null {
     const { roles } = this.getModeDefinition(game.gameMode);
 
-    const caller = game.players.find((p) => p.id === callerId);
+    const caller = getPlayer(game.players, callerId);
     if (!caller) return null;
 
     const playerById = new Map(game.players.map((p) => [p.id, p]));
@@ -197,7 +198,7 @@ export class FirebaseGameService {
     const roleAssignments = assignRoles(rolePlayers, roleSlots);
 
     const ownerPlayer = ownerPlayerId
-      ? players.find((p) => p.id === ownerPlayerId)
+      ? getPlayer(players, ownerPlayerId)
       : null;
     const gamePlayers: GamePlayer[] = [
       ...gameInitializationService.buildGamePlayers(

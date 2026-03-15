@@ -16,6 +16,7 @@ import {
 } from "./utils";
 import { WEREWOLF_ROLES } from "./roles";
 import type { WerewolfRoleDefinition } from "./roles";
+import { getPlayer } from "@/lib/player-utils";
 
 export enum WerewolfAction {
   StartNight = "start-night",
@@ -179,7 +180,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
 
       // Team targeting: cannot target players the caller knows are teammates.
       if (team && !isOwner) {
-        const caller = game.players.find((p) => p.id === callerId);
+        const caller = getPlayer(game.players, callerId);
         const visibleTeammateIds = (caller?.visibleRoles ?? []).map(
           (vr) => vr.playerId,
         );

@@ -1,5 +1,6 @@
 import type { NightResolutionEvent } from "@/lib/game-modes/werewolf";
 import { NightOutcomeSummaryItem } from "./NightOutcomeSummaryItem";
+import { getPlayerName } from "@/lib/player-utils";
 
 interface NightOutcomeSummaryProps {
   nightResolution: NightResolutionEvent[];
@@ -23,7 +24,7 @@ export function NightOutcomeSummary({
             key={event.targetPlayerId}
             event={event}
             playerName={
-              players.find((p) => p.id === event.targetPlayerId)?.name ??
+              getPlayerName(players, event.targetPlayerId) ??
               event.targetPlayerId
             }
             roles={roles}

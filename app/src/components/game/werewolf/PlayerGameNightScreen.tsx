@@ -8,6 +8,7 @@ import {
 } from "@/lib/game-modes/werewolf";
 import type { WerewolfNighttimePhase } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
+import { getPlayerName } from "@/lib/player-utils";
 import { GameTimer } from "@/components/game";
 import { PlayerFirstTurnScreen } from "./PlayerFirstTurnScreen";
 import { PlayerTargetSelection } from "./PlayerTargetSelection";
@@ -81,8 +82,7 @@ export function PlayerGameNightScreen({
   const resolvedTeamVotes = (gameState.teamVotes ?? []).map((vote) => ({
     playerName: vote.playerName,
     targetName:
-      gameState.players.find((p) => p.id === vote.targetPlayerId)?.name ??
-      "Unknown",
+      getPlayerName(gameState.players, vote.targetPlayerId) ?? "Unknown",
   }));
   const suggestedTargetId = gameState.suggestedTargetId;
   const allAgreed = gameState.allAgreed ?? false;

@@ -1,7 +1,7 @@
 "use client";
 
 import { getActionText } from "@/lib/game-modes/werewolf";
-import { getPlayer } from "@/lib/player-utils";
+import { getPlayerName } from "@/lib/player-utils";
 import type { PlayerGameState } from "@/server/types";
 
 interface PlayerNightSummaryProps {
@@ -20,14 +20,13 @@ export function PlayerNightSummary({
 
   const killedEntries = (nightSummary ?? []).map((event) => ({
     key: event.targetPlayerId,
-    name:
-      getPlayer(players, event.targetPlayerId)?.name ?? event.targetPlayerId,
+    name: getPlayerName(players, event.targetPlayerId) ?? event.targetPlayerId,
   }));
 
   const actionText = myLastNightAction
     ? getActionText(
         myLastNightAction.category,
-        getPlayer(players, myLastNightAction.targetPlayerId)?.name ??
+        getPlayerName(players, myLastNightAction.targetPlayerId) ??
           myLastNightAction.targetPlayerId,
         nightSummary,
         myLastNightAction.targetPlayerId,
