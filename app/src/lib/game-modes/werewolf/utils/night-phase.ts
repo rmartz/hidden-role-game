@@ -12,11 +12,22 @@ import { currentTurnState } from "./game-state";
  * team phase key (e.g. "team:Bad"). Solo roles use their role ID.
  * Phases where all relevant players are dead are omitted.
  */
+function hasAlivePlayers(
+  roleId: string,
+  roleAssignments: PlayerRoleAssignment[],
+  deadPlayerIds: Set<string>,
+): boolean {
+  return roleAssignments.some(
+    (a) => a.roleDefinitionId === roleId && !deadPlayerIds.has(a.playerId),
+  );
+}
+
 export function buildNightPhaseOrder(
   turn: number,
   roleAssignments: PlayerRoleAssignment[],
   deadPlayerIds: string[] = [],
 ): string[] {
+  const dead = new Set(deadPlayerIds);
   const phaseKeys: string[] = [];
   const emittedTeams = new Set<string>();
 
@@ -24,24 +35,13 @@ export function buildNightPhaseOrder(
     if (role.wakesAtNight === WakesAtNight.Never) continue;
     if (role.wakesAtNight === WakesAtNight.FirstNightOnly && turn !== 1)
       continue;
+    if (!hasAlivePlayers(role.id as string, roleAssignments, dead)) continue;
 
     if (role.teamTargeting) {
       if (emittedTeams.has(role.team)) continue;
-      const hasAlive = roleAssignments.some(
-        (a) =>
-          a.roleDefinitionId === (role.id as string) &&
-          !deadPlayerIds.includes(a.playerId),
-      );
-      if (!hasAlive) continue;
       emittedTeams.add(role.team);
       phaseKeys.push(getTeamPhaseKey(role.team));
     } else {
-      const hasAlive = roleAssignments.some(
-        (a) =>
-          a.roleDefinitionId === (role.id as string) &&
-          !deadPlayerIds.includes(a.playerId),
-      );
-      if (!hasAlive) continue;
       phaseKeys.push(role.id);
     }
   }
