@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 interface Props {
   gameId: string;
-  roleId: string | undefined;
+  roleId?: string;
   hasTarget: boolean;
   isConfirmed: boolean;
   isTeamPhase?: boolean;

@@ -16,7 +16,7 @@ interface Props {
   targets: readonly (readonly [TargetablePlayer, boolean])[];
   isConfirmed: boolean;
   isTeamPhase: boolean;
-  confirmPhaseKey: string | undefined;
+  confirmPhaseKey?: string;
   hasTarget: boolean;
   allAgreed: boolean;
   hasVisibleTeammates?: boolean;

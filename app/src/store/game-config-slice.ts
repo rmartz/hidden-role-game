@@ -54,7 +54,7 @@ export interface GameConfigState {
   roleMaxes: Record<string, number>;
   showConfigToPlayers: boolean;
   showRolesInPlay: ShowRolesInPlay;
-  timerConfig: TimerConfig | undefined;
+  timerConfig?: TimerConfig;
   isValid: boolean;
   /** Increments on every user-initiated action. Used to detect when a sync is needed. */
   syncVersion: number;

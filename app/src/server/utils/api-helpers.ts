@@ -49,7 +49,7 @@ export async function authenticateLobby(
 
 export async function authenticateGame(
   gameId: string,
-  sessionId: string | undefined,
+  sessionId?: string,
 ): Promise<Response | { game: Game; caller: GamePlayer }> {
   if (!sessionId) {
     return errorResponse("No session", 401);

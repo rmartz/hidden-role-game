@@ -1,7 +1,7 @@
 /** Returns the player with the given ID, or undefined if not found. */
 export function getPlayer<T extends { id: string }>(
-  players: T[] | undefined,
-  id: string | undefined,
+  players?: T[],
+  id?: string,
 ): T | undefined {
   if (!players || !id) return undefined;
   return players.find((p) => p.id === id);
@@ -9,8 +9,8 @@ export function getPlayer<T extends { id: string }>(
 
 /** Returns the player's name, or undefined if the player is not found. */
 export function getPlayerName(
-  players: { id: string; name: string }[] | undefined,
-  id: string | undefined,
+  players?: { id: string; name: string }[],
+  id?: string,
 ): string | undefined {
   return getPlayer(players, id)?.name;
 }
