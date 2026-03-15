@@ -1,5 +1,7 @@
 import { describe, it, expect } from "vitest";
+import { Team } from "@/lib/types";
 import { WerewolfRole } from "../roles";
+import { getTeamPhaseKey } from "./phase-keys";
 import { getTargetablePlayers } from "./targeting";
 
 const players = [
@@ -88,5 +90,87 @@ describe("getTargetablePlayers", () => {
       [],
     );
     expect(result.map((p) => p.id)).not.toContain("p1");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Team phase targeting
+// ---------------------------------------------------------------------------
+
+const teamPhaseKey = getTeamPhaseKey(Team.Bad);
+
+// Narrator sees all assignments (no self-skip).
+const narratorAssignments = [
+  { player: { id: "p1" }, role: { id: WerewolfRole.Werewolf, team: Team.Bad } },
+  { player: { id: "p2" }, role: { id: WerewolfRole.Werewolf, team: Team.Bad } },
+  {
+    player: { id: "p3" },
+    role: { id: WerewolfRole.Villager, team: Team.Good },
+  },
+];
+
+// Player p1 sees only other team members — their own assignment is absent
+// (mirrors buildGamePlayers which skips `other.playerId === assignment.playerId`).
+const p1Assignments = [
+  { player: { id: "p2" }, role: { id: WerewolfRole.Werewolf, team: Team.Bad } },
+];
+
+describe("getTargetablePlayers — team phase", () => {
+  it("werewolf player cannot target themselves", () => {
+    const result = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      teamPhaseKey,
+      "p1",
+      p1Assignments,
+    );
+    expect(result.map((p) => p.id)).not.toContain("p1");
+  });
+
+  it("werewolf player cannot target visible teammates", () => {
+    const result = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      teamPhaseKey,
+      "p1",
+      p1Assignments,
+    );
+    expect(result.map((p) => p.id)).not.toContain("p2");
+  });
+
+  it("werewolf player can target non-team players", () => {
+    const result = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      teamPhaseKey,
+      "p1",
+      p1Assignments,
+    );
+    expect(result.map((p) => p.id)).toContain("p3");
+  });
+
+  it("narrator and player produce the same targetable set for team phases", () => {
+    const narratorResult = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      teamPhaseKey,
+      null,
+      narratorAssignments,
+    );
+    const playerResult = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      teamPhaseKey,
+      "p1",
+      p1Assignments,
+    );
+    expect(narratorResult.map((p) => p.id).sort()).toEqual(
+      playerResult.map((p) => p.id).sort(),
+    );
   });
 });
