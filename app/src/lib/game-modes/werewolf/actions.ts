@@ -1,12 +1,17 @@
 import { GameStatus } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
-import { WerewolfPhase } from "./types";
-import type { WerewolfNighttimePhase } from "./types";
+import { WerewolfPhase, isTeamNightAction } from "./types";
+import type { WerewolfNighttimePhase, TeamNightAction } from "./types";
 import {
   buildNightPhaseOrder,
   isOwnerPlaying,
   currentTurnState,
   validateActiveNightPlayer,
+  isTeamPhaseKey,
+  parseTeamPhaseKey,
+  getTeamPlayerIds,
+  getTeamMemberPlayerIds,
+  computeSuggestedTarget,
 } from "./utils";
 
 export enum WerewolfAction {
@@ -109,23 +114,31 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       if (ts.turn <= 1) return false;
 
       const phase = ts.phase;
-      const { roleId: explicitRoleId, targetPlayerId } = payload as {
+      const { roleId: explicitPhaseKey, targetPlayerId } = payload as {
         roleId?: unknown;
         targetPlayerId?: unknown;
       };
 
-      // Determine the role being targeted for.
-      // Owner provides an explicit roleId; players use their own role.
+      // Determine the phase key.
+      // Owner provides an explicit roleId/phaseKey; players use their own role.
+      let phaseKey: string;
       const isOwner = callerId === game.ownerPlayerId;
       if (isOwner) {
-        if (typeof explicitRoleId !== "string") return false;
-        if (!phase.nightPhaseOrder.includes(explicitRoleId)) return false;
+        if (typeof explicitPhaseKey !== "string") return false;
+        if (!phase.nightPhaseOrder.includes(explicitPhaseKey)) return false;
+        phaseKey = explicitPhaseKey;
       } else {
         const result = validateActiveNightPlayer(game, callerId);
         if (!result) return false;
-        // Players cannot change a confirmed target.
-        if (phase.nightActions[result.activeRoleId]?.confirmed) return false;
+        phaseKey = result.activePhaseKey;
+
+        // Players cannot change once confirmed.
+        const existing = phase.nightActions[phaseKey];
+        if (existing?.confirmed) return false;
       }
+
+      // For team phases, validate target is not on the same team.
+      const team = parseTeamPhaseKey(phaseKey);
 
       // targetPlayerId undefined = clear; string = set target.
       if (targetPlayerId === undefined) return true;
@@ -133,29 +146,95 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       if (targetPlayerId === game.ownerPlayerId) return false;
       if (!game.players.some((p) => p.id === targetPlayerId)) return false;
       if (ts.deadPlayerIds.includes(targetPlayerId)) return false;
+
+      // Cannot target self.
+      if (targetPlayerId === callerId) return false;
+
+      // Team targeting: cannot target players the caller knows are teammates.
+      if (team && !isOwner) {
+        const caller = game.players.find((p) => p.id === callerId);
+        const visibleTeammateIds = (caller?.visibleRoles ?? []).map(
+          (vr) => vr.playerId,
+        );
+        if (visibleTeammateIds.includes(targetPlayerId)) return false;
+      }
+      if (team && isOwner) {
+        const teamMembers = getTeamMemberPlayerIds(game.roleAssignments, team);
+        if (teamMembers.includes(targetPlayerId)) return false;
+      }
+
       return true;
     },
-    apply(game: Game, payload: unknown) {
+    apply(game: Game, payload: unknown, callerId: string) {
       const ts = currentTurnState(game);
       if (ts?.phase.type !== WerewolfPhase.Nighttime) return;
 
       const phase = ts.phase;
-      const { roleId: explicitRoleId, targetPlayerId } = payload as {
+      const { roleId: explicitPhaseKey, targetPlayerId } = payload as {
         roleId?: string;
         targetPlayerId?: string;
       };
 
-      // If roleId provided, use it; otherwise use the currently active role.
-      const roleId =
-        explicitRoleId ?? phase.nightPhaseOrder[phase.currentPhaseIndex];
-      if (!roleId) return;
+      const phaseKey =
+        explicitPhaseKey ?? phase.nightPhaseOrder[phase.currentPhaseIndex];
+      if (!phaseKey) return;
 
-      if (targetPlayerId === undefined) {
-        phase.nightActions = Object.fromEntries(
-          Object.entries(phase.nightActions).filter(([k]) => k !== roleId),
-        );
+      if (isTeamPhaseKey(phaseKey)) {
+        // Team phase: upsert a player's vote.
+        const existing = phase.nightActions[phaseKey];
+        const teamAction: TeamNightAction =
+          existing && isTeamNightAction(existing)
+            ? { ...existing, votes: [...existing.votes] }
+            : { votes: [] };
+
+        const isOwner = callerId === game.ownerPlayerId;
+        if (isOwner) {
+          // Owner override: set all alive team members' votes.
+          const team = parseTeamPhaseKey(phaseKey);
+          const aliveTeamIds = team
+            ? getTeamPlayerIds(game.roleAssignments, team, ts.deadPlayerIds)
+            : [];
+          if (targetPlayerId === undefined) {
+            teamAction.votes = [];
+          } else {
+            teamAction.votes = aliveTeamIds.map((pid) => ({
+              playerId: pid,
+              targetPlayerId,
+            }));
+          }
+        } else if (targetPlayerId === undefined) {
+          // Remove caller's vote.
+          teamAction.votes = teamAction.votes.filter(
+            (v) => v.playerId !== callerId,
+          );
+        } else {
+          // Upsert caller's vote.
+          const existingVote = teamAction.votes.find(
+            (v) => v.playerId === callerId,
+          );
+          if (existingVote) {
+            existingVote.targetPlayerId = targetPlayerId;
+          } else {
+            teamAction.votes.push({ playerId: callerId, targetPlayerId });
+          }
+        }
+
+        const suggested = computeSuggestedTarget(teamAction.votes);
+        if (suggested !== undefined) {
+          teamAction.suggestedTargetId = suggested;
+        } else {
+          delete teamAction.suggestedTargetId;
+        }
+        phase.nightActions[phaseKey] = teamAction;
       } else {
-        phase.nightActions[roleId] = { targetPlayerId };
+        // Solo phase: existing behavior.
+        if (targetPlayerId === undefined) {
+          phase.nightActions = Object.fromEntries(
+            Object.entries(phase.nightActions).filter(([k]) => k !== phaseKey),
+          );
+        } else {
+          phase.nightActions[phaseKey] = { targetPlayerId };
+        }
       }
     },
   },
@@ -164,10 +243,39 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       const result = validateActiveNightPlayer(game, callerId);
       if (!result) return false;
 
-      // Must have a target set and not already confirmed.
-      const action = result.phase.nightActions[result.activeRoleId];
+      const action = result.phase.nightActions[result.activePhaseKey];
       if (!action) return false;
       if (action.confirmed) return false;
+
+      if (result.isTeamPhase) {
+        // Team phase: all alive team members must agree on the same target.
+        if (!isTeamNightAction(action)) return false;
+        const team = parseTeamPhaseKey(result.activePhaseKey);
+        if (!team) return false;
+        const ts = currentTurnState(game);
+        const aliveTeamIds = getTeamPlayerIds(
+          game.roleAssignments,
+          team,
+          ts?.deadPlayerIds ?? [],
+        );
+        if (aliveTeamIds.length === 0) return false;
+        const targets = new Set(
+          action.votes
+            .filter((v) => aliveTeamIds.includes(v.playerId))
+            .map((v) => v.targetPlayerId),
+        );
+        // All alive members must have voted and all for the same target.
+        const voterIds = new Set(
+          action.votes
+            .filter((v) => aliveTeamIds.includes(v.playerId))
+            .map((v) => v.playerId),
+        );
+        if (voterIds.size !== aliveTeamIds.length) return false;
+        if (targets.size !== 1) return false;
+        return true;
+      }
+
+      // Solo phase: must have a target set.
       return true;
     },
     apply(game: Game) {
@@ -175,12 +283,12 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       if (ts?.phase.type !== WerewolfPhase.Nighttime) return;
 
       const phase = ts.phase;
-      const activeRoleId = phase.nightPhaseOrder[phase.currentPhaseIndex];
-      if (!activeRoleId) return;
+      const activePhaseKey = phase.nightPhaseOrder[phase.currentPhaseIndex];
+      if (!activePhaseKey) return;
 
-      const action = phase.nightActions[activeRoleId];
+      const action = phase.nightActions[activePhaseKey];
       if (action) {
-        phase.nightActions[activeRoleId] = { ...action, confirmed: true };
+        phase.nightActions[activePhaseKey] = { ...action, confirmed: true };
       }
     },
   },

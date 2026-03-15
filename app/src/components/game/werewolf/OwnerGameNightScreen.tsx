@@ -2,9 +2,17 @@
 
 import { useCallback, useMemo } from "react";
 import { GAME_MODES } from "@/lib/game-modes";
-import { WerewolfPhase, WerewolfAction } from "@/lib/game-modes/werewolf";
-import { getTargetablePlayers } from "@/lib/game-modes/werewolf";
-import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
+import {
+  WerewolfPhase,
+  WerewolfAction,
+  isTeamNightAction,
+  isTeamPhaseKey,
+  getTargetablePlayers,
+} from "@/lib/game-modes/werewolf";
+import type {
+  WerewolfTurnState,
+  AnyNightAction,
+} from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
 import { useGameAction } from "@/hooks";
 import { GameRolesList, PlayersRoleList } from "@/components/game";
@@ -15,6 +23,35 @@ interface Props {
   gameId: string;
   gameState: PlayerGameState;
   turnState: WerewolfTurnState;
+}
+
+function getPhaseLabel(
+  phaseKey: string,
+  modeConfig: { roles: Record<string, { name: string }> },
+): string {
+  if (isTeamPhaseKey(phaseKey)) {
+    const teamName = phaseKey.slice("team:".length);
+    return `${teamName} Team`;
+  }
+  return modeConfig.roles[phaseKey]?.name ?? phaseKey;
+}
+
+/** Extract a single target + confirmed state from any night action type. */
+function getSoloTarget(action: AnyNightAction | undefined): {
+  targetPlayerId: string | undefined;
+  confirmed: boolean;
+} {
+  if (!action) return { targetPlayerId: undefined, confirmed: false };
+  if (isTeamNightAction(action)) {
+    return {
+      targetPlayerId: action.suggestedTargetId,
+      confirmed: action.confirmed ?? false,
+    };
+  }
+  return {
+    targetPlayerId: action.targetPlayerId,
+    confirmed: action.confirmed ?? false,
+  };
 }
 
 export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
@@ -46,32 +83,49 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
   if (!isNighttime) return null;
 
   const nightActions = phase.nightActions;
-  const activeRoleId = nightPhaseOrder[currentPhaseIndex] ?? "";
+  const activePhaseKey = nightPhaseOrder[currentPhaseIndex] ?? "";
   const modeConfig = GAME_MODES[gameState.gameMode];
-  const activeRoleName =
-    (activeRoleId ? modeConfig.roles[activeRoleId]?.name : undefined) ??
-    activeRoleId;
+  const activePhaseLabel = getPhaseLabel(activePhaseKey, modeConfig);
+  const isTeamPhase = isTeamPhaseKey(activePhaseKey);
 
-  const activeAction = nightActions[activeRoleId];
-  const activeTarget = activeAction?.targetPlayerId;
-  const activeTargetConfirmed = activeAction?.confirmed ?? false;
+  const activeAction = nightActions[activePhaseKey];
+  const { targetPlayerId: activeTarget, confirmed: activeTargetConfirmed } =
+    getSoloTarget(activeAction);
   const activeTargetName = activeTarget
     ? gameState.players.find((p) => p.id === activeTarget)?.name
     : undefined;
 
+  const teamAction =
+    isTeamPhase && activeAction && isTeamNightAction(activeAction)
+      ? activeAction
+      : undefined;
+
   const isFirstTurn = turnState.turn === 1;
+
+  const resolvedVotes = (teamAction?.votes ?? []).map((vote) => ({
+    key: vote.playerId,
+    voterName:
+      gameState.players.find((p) => p.id === vote.playerId)?.name ??
+      vote.playerId,
+    targetName:
+      gameState.players.find((p) => p.id === vote.targetPlayerId)?.name ??
+      vote.targetPlayerId,
+  }));
 
   const targetablePlayers = getTargetablePlayers(
     gameState.players,
     gameState.gameOwner?.id,
     turnState.deadPlayerIds,
+    activePhaseKey,
+    null,
+    gameState.visibleRoleAssignments,
   );
 
   function handleTargetClick(playerId: string) {
     action.mutate({
       actionId: WerewolfAction.SetNightTarget,
       payload: {
-        roleId: activeRoleId,
+        roleId: activePhaseKey,
         targetPlayerId: activeTarget === playerId ? undefined : playerId,
       },
     });
@@ -98,12 +152,32 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
       >
         <p className="mb-4 text-muted-foreground">
           Currently awake:{" "}
-          <strong className="text-foreground">{activeRoleName}</strong>
+          <strong className="text-foreground">{activePhaseLabel}</strong>
         </p>
         {!isFirstTurn && (
           <div className="mb-4 rounded-md border p-3">
+            {teamAction && (
+              <div className="mb-2">
+                <p className="text-xs font-medium text-muted-foreground mb-1">
+                  Votes:
+                </p>
+                {resolvedVotes.length === 0 ? (
+                  <p className="text-xs text-muted-foreground italic">
+                    No votes yet
+                  </p>
+                ) : (
+                  <ul className="text-xs space-y-0.5">
+                    {resolvedVotes.map((vote) => (
+                      <li key={vote.key}>
+                        {vote.voterName} → {vote.targetName}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
             <p className="text-sm font-medium mb-2">
-              Target:{" "}
+              {teamAction ? "Suggested target: " : "Target: "}
               {activeTargetName ? (
                 <>
                   <strong className="text-foreground">
@@ -179,7 +253,7 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
       <GameRolesList
         roles={gameState.rolesInPlay ?? []}
         gameMode={gameState.gameMode}
-        selectedRoleId={activeRoleId}
+        selectedRoleId={activePhaseKey}
         onSelectedIdChange={(roleId) => {
           const newIndex = nightPhaseOrder.indexOf(roleId);
           if (newIndex !== -1)

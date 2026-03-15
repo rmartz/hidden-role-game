@@ -10,7 +10,7 @@ interface Props {
 }
 
 export function WerewolfGameScreen({ gameId, gameState }: Props) {
-  if (gameState.gameOwner) {
+  if (gameState.myRole === null) {
     return <WerewolfOwnerScreen gameId={gameId} gameState={gameState} />;
   }
   return <WerewolfPlayerScreen gameId={gameId} gameState={gameState} />;

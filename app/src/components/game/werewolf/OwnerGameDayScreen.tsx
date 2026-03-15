@@ -38,11 +38,21 @@ export function OwnerGameDayScreen({ gameId, gameState, turnState }: Props) {
   const modeConfig = GAME_MODES[gameState.gameMode];
   const nightActions = phase.nightActions;
   const targetSummary = new Map<string, string[]>();
-  for (const [roleId, { targetPlayerId }] of Object.entries(nightActions)) {
-    const roleName = modeConfig.roles[roleId]?.name ?? roleId;
-    const existing = targetSummary.get(targetPlayerId) ?? [];
-    existing.push(roleName);
-    targetSummary.set(targetPlayerId, existing);
+  for (const [phaseKey, action] of Object.entries(nightActions)) {
+    if ("targetPlayerId" in action) {
+      const roleName = modeConfig.roles[phaseKey]?.name ?? phaseKey;
+      const existing = targetSummary.get(action.targetPlayerId) ?? [];
+      existing.push(roleName);
+      targetSummary.set(action.targetPlayerId, existing);
+    } else if ("votes" in action && action.suggestedTargetId) {
+      // Team phase: use the agreed target.
+      const label = phaseKey.startsWith("team:")
+        ? phaseKey.slice(5) + " Team"
+        : phaseKey;
+      const existing = targetSummary.get(action.suggestedTargetId) ?? [];
+      existing.push(label);
+      targetSummary.set(action.suggestedTargetId, existing);
+    }
   }
   const hasTargets = targetSummary.size > 0;
 

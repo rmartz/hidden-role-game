@@ -5,7 +5,7 @@ import type {
   Team,
   TimerConfig,
 } from "@/lib/types";
-import type { NightAction } from "@/lib/game-modes/werewolf";
+import type { AnyNightAction } from "@/lib/game-modes/werewolf";
 import type { PublicLobbyPlayer } from "./lobby";
 
 export type { RoleSlot };
@@ -44,15 +44,23 @@ export interface PlayerGameState {
   gameMode: GameMode;
   players: PublicLobbyPlayer[];
   gameOwner: PublicLobbyPlayer | null;
+  /** The current player's own player ID. Null for the narrator/owner. */
+  myPlayerId: string | null;
   myRole: PublicRoleInfo | null;
   visibleRoleAssignments: VisibleTeammate[];
   rolesInPlay: RoleInPlay[] | null;
-  /** All night targets keyed by roleId. Only populated for the narrator/owner. */
-  nightActions?: Record<string, NightAction>;
-  /** The current player's role's night target (playerId). Only populated for non-owner players during nighttime. */
+  /** All night targets keyed by phase key. Only populated for the narrator/owner. */
+  nightActions?: Record<string, AnyNightAction>;
+  /** The current player's night target (playerId). Only populated for non-owner players during nighttime. */
   myNightTarget?: string;
   /** Whether the player has confirmed their night target. */
   myNightTargetConfirmed?: boolean;
+  /** Per-player votes from teammates during a team night phase. */
+  teamVotes?: { playerName: string; targetPlayerId: string }[];
+  /** The most-voted target during a team night phase. */
+  suggestedTargetId?: string;
+  /** Whether all alive team members agree on the same target. */
+  allAgreed?: boolean;
   /** Whether this player has been marked as dead by the narrator. */
   amDead?: boolean;
   /** Player IDs marked as dead by the narrator. */

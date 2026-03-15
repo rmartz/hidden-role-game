@@ -143,7 +143,7 @@ export interface Game {
  */
 export interface GameAction {
   isValid(game: Game, callerId: string, payload: unknown): boolean;
-  apply(game: Game, payload: unknown): void;
+  apply(game: Game, payload: unknown, callerId: string): void;
 }
 
 // --- Phase Timer Configuration ---

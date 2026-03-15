@@ -8,16 +8,35 @@ export interface NightAction {
   confirmed?: boolean;
 }
 
+export interface TeamNightVote {
+  playerId: string;
+  targetPlayerId: string;
+}
+
+export interface TeamNightAction {
+  votes: TeamNightVote[];
+  suggestedTargetId?: string;
+  confirmed?: boolean;
+}
+
+export type AnyNightAction = NightAction | TeamNightAction;
+
+export function isTeamNightAction(
+  action: AnyNightAction,
+): action is TeamNightAction {
+  return "votes" in action;
+}
+
 export interface WerewolfNighttimePhase {
   type: WerewolfPhase.Nighttime;
   /** Unix epoch ms when this night role phase began (reset per role). */
   startedAt: number;
-  /** Role IDs in the order they wake, determined at phase start. */
+  /** Role IDs (or team phase keys like "team:Bad") in wake order. */
   nightPhaseOrder: string[];
-  /** Index into nightPhaseOrder for the currently active role. */
+  /** Index into nightPhaseOrder for the currently active phase. */
   currentPhaseIndex: number;
-  /** Targets chosen by each role during this night. roleId → action. */
-  nightActions: Record<string, NightAction>;
+  /** Targets chosen during this night. Key is roleId or team phase key. */
+  nightActions: Record<string, AnyNightAction>;
 }
 
 export interface WerewolfDaytimePhase {
@@ -25,7 +44,7 @@ export interface WerewolfDaytimePhase {
   /** Unix epoch ms when the day phase began (for elapsed-time display). */
   startedAt: number;
   /** Targets from the preceding night, carried over for narrator summary. */
-  nightActions: Record<string, NightAction>;
+  nightActions: Record<string, AnyNightAction>;
 }
 
 export type WerewolfTurnPhase = WerewolfNighttimePhase | WerewolfDaytimePhase;

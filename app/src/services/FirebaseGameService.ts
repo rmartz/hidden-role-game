@@ -15,7 +15,12 @@ import type {
   PublicRoleInfo,
   PlayerGameState,
 } from "@/server/types";
-import type { NightAction } from "@/lib/game-modes/werewolf";
+import {
+  isTeamNightAction,
+  getTeamPhaseKey,
+  getTeamPlayerIds,
+} from "@/lib/game-modes/werewolf";
+import type { AnyNightAction } from "@/lib/game-modes/werewolf";
 import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase, buildNightPhaseOrder } from "@/lib/game-modes/werewolf";
 import type {
@@ -197,6 +202,7 @@ export class FirebaseGameService {
         gameMode: game.gameMode,
         players: publicPlayers,
         gameOwner: { id: caller.id, name: caller.name },
+        myPlayerId: null,
         myRole: null,
         visibleRoleAssignments,
         rolesInPlay: this.buildRolesInPlay(game),
@@ -250,10 +256,16 @@ export class FirebaseGameService {
       });
     }
 
-    // Include myNightTarget during nighttime (after first night).
-    const myAction = nightActions?.[myAssignment.roleDefinitionId];
-    const myNightTarget = myAction?.targetPlayerId;
-    const myNightTargetConfirmed = myAction?.confirmed ?? false;
+    // Include night targeting state.
+    const nightTargetState = nightActions
+      ? this.extractPlayerNightState(
+          nightActions,
+          game,
+          callerId,
+          myRole,
+          deadPlayerIds,
+        )
+      : {};
 
     const amDead = deadPlayerIds.includes(callerId);
 
@@ -261,11 +273,18 @@ export class FirebaseGameService {
       status: game.status,
       gameMode: game.gameMode,
       players: publicPlayers,
-      gameOwner: null,
+      gameOwner: game.ownerPlayerId
+        ? {
+            id: game.ownerPlayerId,
+            name:
+              playerById.get(game.ownerPlayerId)?.name ?? game.ownerPlayerId,
+          }
+        : null,
+      myPlayerId: callerId,
       myRole: { id: myRole.id, name: myRole.name, team: myRole.team },
       visibleRoleAssignments,
       rolesInPlay: this.buildRolesInPlay(game),
-      ...(nightActions ? { myNightTarget, myNightTargetConfirmed } : {}),
+      ...nightTargetState,
       ...(amDead ? { amDead: true } : {}),
       ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
       ...(game.timerConfig ? { timerConfig: game.timerConfig } : {}),
@@ -275,7 +294,7 @@ export class FirebaseGameService {
   /** Extracts nightActions from the current turnState, if present. */
   private extractNightActions(
     game: Game,
-  ): Record<string, NightAction> | undefined {
+  ): Record<string, AnyNightAction> | undefined {
     if (game.status.type !== GameStatus.Playing) return undefined;
     const ts = game.status.turnState as WerewolfTurnState | undefined;
     if (!ts) return undefined;
@@ -288,6 +307,74 @@ export class FirebaseGameService {
     if (game.status.type !== GameStatus.Playing) return [];
     const ts = game.status.turnState as WerewolfTurnState | undefined;
     return ts?.deadPlayerIds ?? [];
+  }
+
+  /**
+   * Extracts the night targeting state for a non-owner player.
+   * For solo roles: returns myNightTarget/myNightTargetConfirmed.
+   * For team phases: also returns teamVotes, suggestedTargetId, allAgreed.
+   */
+  private extractPlayerNightState(
+    nightActions: Record<string, AnyNightAction>,
+    game: Game,
+    callerId: string,
+    myRole: RoleDefinition,
+    deadPlayerIds: string[],
+  ): Partial<PlayerGameState> {
+    // Check if the player's role belongs to a team phase.
+    const roleDef = GAME_MODES[game.gameMode].roles[myRole.id] as
+      | { teamTargeting?: boolean; team?: string }
+      | undefined;
+
+    if (roleDef?.teamTargeting && roleDef.team) {
+      const phaseKey = getTeamPhaseKey(roleDef.team as Team);
+      const action = nightActions[phaseKey];
+      if (!action || !isTeamNightAction(action)) {
+        return { myNightTarget: undefined, myNightTargetConfirmed: false };
+      }
+
+      const myVote = action.votes.find((v) => v.playerId === callerId);
+      const playerById = new Map(game.players.map((p) => [p.id, p]));
+
+      const aliveTeamIds = getTeamPlayerIds(
+        game.roleAssignments,
+        roleDef.team as Team,
+        deadPlayerIds,
+      );
+
+      const teamVotes = action.votes
+        .filter((v) => aliveTeamIds.includes(v.playerId))
+        .map((v) => ({
+          playerName: playerById.get(v.playerId)?.name ?? "Unknown",
+          targetPlayerId: v.targetPlayerId,
+        }));
+
+      // All alive team members agree if they all voted for the same target.
+      const aliveVotes = action.votes.filter((v) =>
+        aliveTeamIds.includes(v.playerId),
+      );
+      const uniqueTargets = new Set(aliveVotes.map((v) => v.targetPlayerId));
+      const allAgreed =
+        aliveVotes.length === aliveTeamIds.length && uniqueTargets.size === 1;
+
+      return {
+        myNightTarget: myVote?.targetPlayerId,
+        myNightTargetConfirmed: action.confirmed ?? false,
+        teamVotes,
+        suggestedTargetId: action.suggestedTargetId,
+        allAgreed,
+      };
+    }
+
+    // Solo role: look up by role ID.
+    const myAction = nightActions[myRole.id];
+    if (!myAction || isTeamNightAction(myAction)) {
+      return { myNightTarget: undefined, myNightTargetConfirmed: false };
+    }
+    return {
+      myNightTarget: myAction.targetPlayerId,
+      myNightTargetConfirmed: myAction.confirmed ?? false,
+    };
   }
 
   /** Writes pre-computed PlayerGameState for every player in the game. */
@@ -377,7 +464,7 @@ export class FirebaseGameService {
         id: p.id,
         name: p.name,
         sessionId: playerIdToSession.get(p.id) ?? "",
-        visibleRoles: [],
+        visibleRoles: p.visibleRoles ?? [],
       }),
     );
 
@@ -421,25 +508,55 @@ export class FirebaseGameService {
     callerId: string,
     payload: unknown,
   ): Promise<{ game: Game } | { error: string }> {
-    const game = await this.getGame(gameId);
-    if (!game) return { error: "Game not found" };
+    // Pre-fetch stable game data (players, roleAssignments don't change during play).
+    const baseGame = await this.getGame(gameId);
+    if (!baseGame) return { error: "Game not found" };
 
-    const config = this.getModeDefinition(game.gameMode);
+    const config = this.getModeDefinition(baseGame.gameMode);
     const action = config.actions[actionId];
     if (!action) return { error: "Unknown action" };
 
-    if (!action.isValid(game, callerId, payload)) {
+    // Use a Firebase transaction on `public/status` so concurrent actions are
+    // serialized and each sees the latest committed state, preventing lost updates.
+    let finalGame: Game | undefined;
+    const result = await gameRef(gameId)
+      .child("public/status")
+      .transaction((currentStatusJson: string | null) => {
+        // Firebase may call the callback with null before it has the cached
+        // value. Fall back to the pre-fetched status so Firebase can compare
+        // and retry with the real server value if it differs.
+        const statusJson = currentStatusJson ?? JSON.stringify(baseGame.status);
+        const currentStatus = JSON.parse(
+          statusJson,
+        ) as import("@/lib/types").GameStatusState;
+        const game: Game = { ...baseGame, status: currentStatus };
+        if (!action.isValid(game, callerId, payload)) return undefined; // abort
+        action.apply(game, payload, callerId);
+        finalGame = game;
+        return JSON.stringify(game.status);
+      });
+
+    if (!result.committed || !finalGame) {
       return { error: "Action not valid for current game state" };
     }
 
-    action.apply(game, payload);
-
-    await gameRef(gameId)
-      .child("public/status")
-      .set(JSON.stringify(game.status));
-    await this.writeAllPlayerStates(game);
-
-    return { game };
+    // Use the committed status from the transaction snapshot rather than
+    // re-fetching via getGame(). The snapshot is guaranteed to reflect exactly
+    // what was written — avoids potential SDK cache staleness and removes the
+    // concurrent-write window where a stale writeAllPlayerStates could
+    // overwrite a more-recent commit.
+    const committedStatusJson = result.snapshot.val() as string | null;
+    const committedGame =
+      committedStatusJson !== null
+        ? ({
+            ...baseGame,
+            status: JSON.parse(
+              committedStatusJson,
+            ) as import("@/lib/types").GameStatusState,
+          } as Game)
+        : finalGame;
+    await this.writeAllPlayerStates(committedGame);
+    return { game: committedGame };
   }
 
   public adjustRoleSlotsForPlayer(

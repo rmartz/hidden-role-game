@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
+import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
 import type { Game } from "@/lib/types";
 import { WerewolfPhase } from "./types";
 import type { WerewolfTurnState } from "./types";
@@ -7,6 +7,7 @@ import { WerewolfRole } from "./roles";
 import {
   buildNightPhaseOrder,
   getTargetablePlayers,
+  getTeamPhaseKey,
   isOwnerPlaying,
   currentTurnState,
   getConfirmLabel,
@@ -57,32 +58,46 @@ const players = [
 
 describe("getTargetablePlayers", () => {
   it("excludes the game owner", () => {
-    const result = getTargetablePlayers(players, "owner", []);
+    const result = getTargetablePlayers(players, "owner", [], "", null, []);
     expect(result.map((p) => p.id)).toEqual(["p1", "p2", "p3"]);
   });
 
   it("excludes dead players", () => {
-    const result = getTargetablePlayers(players, "owner", ["p2"]);
+    const result = getTargetablePlayers(players, "owner", ["p2"], "", null, []);
     expect(result.map((p) => p.id)).toEqual(["p1", "p3"]);
   });
 
   it("excludes multiple dead players", () => {
-    const result = getTargetablePlayers(players, "owner", ["p1", "p3"]);
+    const result = getTargetablePlayers(
+      players,
+      "owner",
+      ["p1", "p3"],
+      "",
+      null,
+      [],
+    );
     expect(result.map((p) => p.id)).toEqual(["p2"]);
   });
 
   it("returns all non-owner players when no one is dead", () => {
-    const result = getTargetablePlayers(players, "owner", []);
+    const result = getTargetablePlayers(players, "owner", [], "", null, []);
     expect(result).toHaveLength(3);
   });
 
   it("handles undefined ownerPlayerId", () => {
-    const result = getTargetablePlayers(players, undefined, []);
+    const result = getTargetablePlayers(players, undefined, [], "", null, []);
     expect(result).toHaveLength(4);
   });
 
   it("returns empty array when all non-owner players are dead", () => {
-    const result = getTargetablePlayers(players, "owner", ["p1", "p2", "p3"]);
+    const result = getTargetablePlayers(
+      players,
+      "owner",
+      ["p1", "p2", "p3"],
+      "",
+      null,
+      [],
+    );
     expect(result).toHaveLength(0);
   });
 });
@@ -97,14 +112,14 @@ describe("buildNightPhaseOrder", () => {
 
   it("includes EveryNight and FirstNightOnly roles on turn 1", () => {
     const order = buildNightPhaseOrder(1, assignments);
-    expect(order).toContain(WerewolfRole.Werewolf);
+    expect(order).toContain(getTeamPhaseKey(Team.Bad));
     expect(order).toContain(WerewolfRole.Seer);
     expect(order).toContain(WerewolfRole.Mason);
   });
 
   it("excludes FirstNightOnly roles on turn 2+", () => {
     const order = buildNightPhaseOrder(2, assignments);
-    expect(order).toContain(WerewolfRole.Werewolf);
+    expect(order).toContain(getTeamPhaseKey(Team.Bad));
     expect(order).toContain(WerewolfRole.Seer);
     expect(order).not.toContain(WerewolfRole.Mason);
   });
