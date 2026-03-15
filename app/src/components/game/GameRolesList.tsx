@@ -19,6 +19,18 @@ export function GameRolesList({
 }: Props) {
   if (roles.length === 0) return null;
 
+  function countPrefix(r: RoleInPlay): string {
+    if (r.count !== undefined) return `${String(r.count)}× `;
+    if (r.min !== r.max) return `${String(r.min)}–${String(r.max)} `;
+    return "";
+  }
+
+  const enriched = roles.map((r) => ({
+    ...r,
+    isSelected: r.id === selectedRoleId,
+    prefix: countPrefix(r),
+  }));
+
   return (
     <Card className="mb-5">
       <CardHeader>
@@ -26,31 +38,22 @@ export function GameRolesList({
       </CardHeader>
       <CardContent>
         <ItemGroup>
-          {roles.map((r) => {
-            const isSelected = r.id === selectedRoleId;
-            const prefix =
-              r.count !== undefined
-                ? `${String(r.count)}× `
-                : r.min !== r.max
-                  ? `${String(r.min)}–${String(r.max)} `
-                  : "";
-            return (
-              <Item
-                key={r.id}
-                size="sm"
-                variant={isSelected ? "muted" : "default"}
-                onClick={() => onSelectedIdChange?.(r.id)}
-                className={onSelectedIdChange ? "cursor-pointer" : undefined}
-              >
-                <ItemContent>
-                  <ItemTitle>
-                    {prefix}
-                    <RoleLabel role={r} gameMode={gameMode} />
-                  </ItemTitle>
-                </ItemContent>
-              </Item>
-            );
-          })}
+          {enriched.map((r) => (
+            <Item
+              key={r.id}
+              size="sm"
+              variant={r.isSelected ? "muted" : "default"}
+              onClick={() => onSelectedIdChange?.(r.id)}
+              className={onSelectedIdChange ? "cursor-pointer" : undefined}
+            >
+              <ItemContent>
+                <ItemTitle>
+                  {r.prefix}
+                  <RoleLabel role={r} gameMode={gameMode} />
+                </ItemTitle>
+              </ItemContent>
+            </Item>
+          ))}
         </ItemGroup>
       </CardContent>
     </Card>
