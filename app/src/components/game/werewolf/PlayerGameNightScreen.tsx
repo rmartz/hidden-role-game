@@ -76,6 +76,8 @@ export function PlayerGameNightScreen({
   }
 
   const isConfirmed = gameState.myNightTargetConfirmed ?? false;
+  const hasVisibleTeammates =
+    isTeamPhase && gameState.visibleRoleAssignments.length > 1;
   const resolvedTeamVotes = (gameState.teamVotes ?? []).map((vote) => ({
     playerName: vote.playerName,
     targetName:
@@ -128,6 +130,7 @@ export function PlayerGameNightScreen({
         confirmPhaseKey={confirmPhaseKey}
         hasTarget={!!gameState.myNightTarget}
         allAgreed={allAgreed}
+        hasVisibleTeammates={hasVisibleTeammates}
         teamVotes={resolvedTeamVotes}
         suggestedTargetId={suggestedTargetId}
         myNightTarget={gameState.myNightTarget}

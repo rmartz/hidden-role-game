@@ -19,6 +19,7 @@ interface Props {
   confirmPhaseKey: string | undefined;
   hasTarget: boolean;
   allAgreed: boolean;
+  hasVisibleTeammates?: boolean;
   teamVotes?: TeamVoteDisplay[];
   suggestedTargetId?: string;
   myNightTarget?: string;
@@ -32,16 +33,16 @@ export function PlayerTargetSelection({
   confirmPhaseKey,
   hasTarget,
   allAgreed,
+  hasVisibleTeammates = false,
   teamVotes = [],
   suggestedTargetId,
   myNightTarget,
 }: Props) {
   const action = useGameAction(gameId);
-  const hasTeammates = teamVotes.length > 0 || isTeamPhase;
 
   return (
     <div>
-      {isTeamPhase && !isConfirmed && hasTeammates && (
+      {isTeamPhase && !isConfirmed && hasVisibleTeammates && (
         <div className="mb-3 rounded-md border p-2">
           <p className="text-xs font-medium text-muted-foreground mb-1">
             Teammate votes:
