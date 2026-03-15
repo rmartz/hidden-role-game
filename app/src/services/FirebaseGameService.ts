@@ -20,7 +20,11 @@ import {
   getTeamPhaseKey,
   getTeamPlayerIds,
 } from "@/lib/game-modes/werewolf";
-import type { AnyNightAction } from "@/lib/game-modes/werewolf";
+import type {
+  AnyNightAction,
+  TargetCategory,
+  WerewolfRoleDefinition,
+} from "@/lib/game-modes/werewolf";
 import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase, buildNightPhaseOrder } from "@/lib/game-modes/werewolf";
 import type {
@@ -431,23 +435,28 @@ export class FirebaseGameService {
     game: Game,
     callerId: string,
     myRole: RoleDefinition,
-  ): { targetPlayerId: string } | undefined {
+  ): { targetPlayerId: string; category: TargetCategory } | undefined {
     const roleDef = GAME_MODES[game.gameMode].roles[myRole.id] as
-      | { teamTargeting?: boolean; team?: string }
+      | WerewolfRoleDefinition
       | undefined;
+    if (!roleDef) return undefined;
 
-    if (roleDef?.teamTargeting && roleDef.team) {
-      const phaseKey = getTeamPhaseKey(roleDef.team as Team);
+    const { targetCategory: category } = roleDef;
+
+    if (roleDef.teamTargeting) {
+      const phaseKey = getTeamPhaseKey(roleDef.team);
       const action = nightActions[phaseKey];
       if (!action || !isTeamNightAction(action)) return undefined;
       const myVote = action.votes.find((v) => v.playerId === callerId);
-      return myVote ? { targetPlayerId: myVote.targetPlayerId } : undefined;
+      return myVote
+        ? { targetPlayerId: myVote.targetPlayerId, category }
+        : undefined;
     }
 
     const myAction = nightActions[myRole.id];
     if (!myAction || isTeamNightAction(myAction)) return undefined;
     return myAction.targetPlayerId
-      ? { targetPlayerId: myAction.targetPlayerId }
+      ? { targetPlayerId: myAction.targetPlayerId, category }
       : undefined;
   }
 

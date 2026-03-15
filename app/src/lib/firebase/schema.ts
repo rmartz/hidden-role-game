@@ -20,7 +20,7 @@ import type {
   RoleSlot,
   TimerConfig,
 } from "@/lib/types";
-import type { AnyNightAction } from "@/lib/game-modes/werewolf";
+import type { AnyNightAction, TargetCategory } from "@/lib/game-modes/werewolf";
 import type {
   PublicLobby,
   PlayerGameState,
@@ -293,7 +293,7 @@ export interface FirebasePlayerState {
   amDead?: boolean;
   deadPlayerIds?: string[];
   nightSummary?: { targetPlayerId: string; died: boolean }[];
-  myLastNightAction?: { targetPlayerId: string };
+  myLastNightAction?: { targetPlayerId: string; category: string };
   timerConfig?: TimerConfig;
 }
 
@@ -376,7 +376,12 @@ export function firebaseToPlayerState(
     ...(raw.deadPlayerIds?.length ? { deadPlayerIds: raw.deadPlayerIds } : {}),
     ...(raw.nightSummary?.length ? { nightSummary: raw.nightSummary } : {}),
     ...(raw.myLastNightAction
-      ? { myLastNightAction: raw.myLastNightAction }
+      ? {
+          myLastNightAction: {
+            targetPlayerId: raw.myLastNightAction.targetPlayerId,
+            category: raw.myLastNightAction.category as TargetCategory,
+          },
+        }
       : {}),
     ...(raw.timerConfig ? { timerConfig: raw.timerConfig } : {}),
   };

@@ -5,7 +5,7 @@ import type {
   Team,
   TimerConfig,
 } from "@/lib/types";
-import type { AnyNightAction } from "@/lib/game-modes/werewolf";
+import type { AnyNightAction, TargetCategory } from "@/lib/game-modes/werewolf";
 import type { PublicLobbyPlayer } from "./lobby";
 
 export type { RoleSlot };
@@ -77,7 +77,7 @@ export interface PlayerGameState {
    * Present even if the action was negated, so players can confirm
    * their input was recorded. Only populated for non-owner players during daytime.
    */
-  myLastNightAction?: { targetPlayerId: string };
+  myLastNightAction?: { targetPlayerId: string; category: TargetCategory };
   /** Phase timer configuration. Present when the lobby has timers enabled. */
   timerConfig?: TimerConfig;
 }

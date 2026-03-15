@@ -2,6 +2,13 @@ import { describe, it, expect } from "vitest";
 import { GameService } from "./GameService";
 import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
 import type { Game, GamePlayer, RoleSlot } from "@/lib/types";
+import {
+  WerewolfPhase,
+  WerewolfRole,
+  TargetCategory,
+  getTeamPhaseKey,
+} from "@/lib/game-modes/werewolf";
+import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 
 const DEFAULT_SLOTS: RoleSlot[] = [
   { roleId: "good", min: 1, max: 1 },
@@ -194,5 +201,212 @@ describe("GameService.getPlayerGameState", () => {
     expect(result?.rolesInPlay).toContainEqual(
       expect.objectContaining({ id: "bad", min: 0, max: 2 }),
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// extractDaytimeNightState / extractMyLastNightTarget
+// (tested indirectly via getPlayerGameState with a Werewolf daytime game)
+// ---------------------------------------------------------------------------
+
+function makeWerewolfDaytimeGame(
+  overrides: Partial<{
+    nightActions: WerewolfTurnState["phase"]["nightActions"];
+    nightResolution: Extract<
+      WerewolfTurnState["phase"],
+      { type: WerewolfPhase.Daytime }
+    >["nightResolution"];
+    deadPlayerIds: string[];
+  }> = {},
+): Game {
+  const turnState: WerewolfTurnState = {
+    turn: 2,
+    phase: {
+      type: WerewolfPhase.Daytime,
+      startedAt: 1000,
+      nightActions: overrides.nightActions ?? {},
+      ...(overrides.nightResolution !== undefined
+        ? { nightResolution: overrides.nightResolution }
+        : {}),
+    },
+    deadPlayerIds: overrides.deadPlayerIds ?? [],
+  };
+  return {
+    id: "game-1",
+    lobbyId: "lobby-1",
+    gameMode: GameMode.Werewolf,
+    status: { type: GameStatus.Playing, turnState },
+    players: [
+      { id: "owner", name: "Owner", sessionId: "s0", visibleRoles: [] },
+      { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
+      { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
+      { id: "p3", name: "Charlie", sessionId: "s3", visibleRoles: [] },
+    ],
+    roleAssignments: [
+      { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "p2", roleDefinitionId: WerewolfRole.Seer },
+      { playerId: "p3", roleDefinitionId: WerewolfRole.Bodyguard },
+    ],
+    configuredRoleSlots: [],
+    showRolesInPlay: ShowRolesInPlay.None,
+    ownerPlayerId: "owner",
+  };
+}
+
+describe("GameService.getPlayerGameState — daytime night summary", () => {
+  const service = new GameService();
+
+  it("nightSummary is absent during nighttime phase", () => {
+    const game: Game = {
+      id: "game-1",
+      lobbyId: "lobby-1",
+      gameMode: GameMode.Werewolf,
+      status: {
+        type: GameStatus.Playing,
+        turnState: {
+          turn: 2,
+          phase: {
+            type: WerewolfPhase.Nighttime,
+            startedAt: 1000,
+            nightPhaseOrder: [WerewolfRole.Werewolf],
+            currentPhaseIndex: 0,
+            nightActions: {},
+          },
+          deadPlayerIds: [],
+        } satisfies WerewolfTurnState,
+      },
+      players: [{ id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] }],
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+      ],
+      configuredRoleSlots: [],
+      showRolesInPlay: ShowRolesInPlay.None,
+      ownerPlayerId: null,
+    };
+
+    const result = service.getPlayerGameState(game, "p1");
+    expect(result?.nightSummary).toBeUndefined();
+  });
+
+  it("nightSummary is absent when no players died", () => {
+    const game = makeWerewolfDaytimeGame({
+      nightResolution: [
+        {
+          targetPlayerId: "p2",
+          attackedBy: ["p1"],
+          protectedBy: ["p3"],
+          died: false,
+        },
+      ],
+    });
+    const result = service.getPlayerGameState(game, "p1");
+    expect(result?.nightSummary).toBeUndefined();
+  });
+
+  it("nightSummary contains only players who died", () => {
+    const game = makeWerewolfDaytimeGame({
+      nightResolution: [
+        {
+          targetPlayerId: "p2",
+          attackedBy: ["p1"],
+          protectedBy: [],
+          died: true,
+        },
+        {
+          targetPlayerId: "p3",
+          attackedBy: ["p1"],
+          protectedBy: ["p3"],
+          died: false,
+        },
+      ],
+    });
+    const result = service.getPlayerGameState(game, "p1");
+    expect(result?.nightSummary).toEqual([
+      { targetPlayerId: "p2", died: true },
+    ]);
+  });
+
+  it("nightSummary does not include attackedBy or protectedBy", () => {
+    const game = makeWerewolfDaytimeGame({
+      nightResolution: [
+        {
+          targetPlayerId: "p2",
+          attackedBy: ["p1"],
+          protectedBy: [],
+          died: true,
+        },
+      ],
+    });
+    const result = service.getPlayerGameState(game, "p1");
+    const event = result?.nightSummary?.[0];
+    expect(event).not.toHaveProperty("attackedBy");
+    expect(event).not.toHaveProperty("protectedBy");
+  });
+
+  it("myLastNightAction reflects the Werewolf's team vote with Attack category", () => {
+    const game = makeWerewolfDaytimeGame({
+      nightActions: {
+        [getTeamPhaseKey(Team.Bad)]: {
+          votes: [{ playerId: "p1", targetPlayerId: "p3" }],
+          confirmed: true,
+        },
+      },
+    });
+    const result = service.getPlayerGameState(game, "p1");
+    expect(result?.myLastNightAction).toEqual({
+      targetPlayerId: "p3",
+      category: TargetCategory.Attack,
+    });
+  });
+
+  it("myLastNightAction reflects the Seer's target with Investigate category", () => {
+    const game = makeWerewolfDaytimeGame({
+      nightActions: {
+        [WerewolfRole.Seer]: { targetPlayerId: "p1", confirmed: true },
+      },
+    });
+    const result = service.getPlayerGameState(game, "p2");
+    expect(result?.myLastNightAction).toEqual({
+      targetPlayerId: "p1",
+      category: TargetCategory.Investigate,
+    });
+  });
+
+  it("myLastNightAction reflects the Bodyguard's target with Protect category", () => {
+    const game = makeWerewolfDaytimeGame({
+      nightActions: {
+        [WerewolfRole.Bodyguard]: { targetPlayerId: "p1", confirmed: true },
+      },
+    });
+    const result = service.getPlayerGameState(game, "p3");
+    expect(result?.myLastNightAction).toEqual({
+      targetPlayerId: "p1",
+      category: TargetCategory.Protect,
+    });
+  });
+
+  it("myLastNightAction is absent when player took no action", () => {
+    const game = makeWerewolfDaytimeGame({ nightActions: {} });
+    const result = service.getPlayerGameState(game, "p1");
+    expect(result?.myLastNightAction).toBeUndefined();
+  });
+
+  it("narrator never receives nightSummary or myLastNightAction", () => {
+    const game = makeWerewolfDaytimeGame({
+      nightResolution: [
+        {
+          targetPlayerId: "p2",
+          attackedBy: ["p1"],
+          protectedBy: [],
+          died: true,
+        },
+      ],
+      nightActions: {
+        [WerewolfRole.Werewolf]: { targetPlayerId: "p2", confirmed: true },
+      },
+    });
+    const result = service.getPlayerGameState(game, "owner");
+    expect(result?.nightSummary).toBeUndefined();
+    expect(result?.myLastNightAction).toBeUndefined();
   });
 });
