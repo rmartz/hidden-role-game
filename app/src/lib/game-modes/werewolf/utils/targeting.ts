@@ -11,7 +11,8 @@ import { isTeamPhaseKey, parseTeamPhaseKey } from "./phase-keys";
  * (`myPlayerId`), and phase-specific exclusions derived from
  * `visibleRoleAssignments`:
  *   - Team phase: all players on the active team are excluded.
- *   - Solo phase: the player(s) assigned to the active role are excluded.
+ *   - Solo phase (player view only): the player(s) assigned to the active role
+ *     are excluded, unless the role has `canSelfTarget: true`.
  *
  * Pass `myPlayerId = null` for the narrator view (the narrator is already
  * absent from the players list).
@@ -45,7 +46,7 @@ export function getTargetablePlayers(
         if ((a.role.team as Team) === team) excludeIds.push(a.player.id);
       }
     }
-  } else {
+  } else if (myPlayerId !== null) {
     for (const a of visibleRoleAssignments) {
       if (a.role.id === activePhaseKey) excludeIds.push(a.player.id);
     }
