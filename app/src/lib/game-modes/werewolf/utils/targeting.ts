@@ -10,7 +10,7 @@ import { isTeamPhaseKey, parseTeamPhaseKey } from "./phase-keys";
  * Returns the list of players eligible to be targeted during a night phase.
  * Excludes the game owner (narrator), dead players, and phase-specific
  * exclusions derived from `visibleRoleAssignments`:
- *   - Team phase: all players on the active team are excluded.
+ *   - Team phase: the acting player and all visible teammates are excluded.
  *   - Solo phase, Attack/Investigate category (player view only): the acting
  *     player and any role-visible role-holders are excluded.
  *   - Solo phase, all other categories: no self/role exclusions.
@@ -34,6 +34,7 @@ export function getTargetablePlayers(
   const excludeIds: string[] = [];
 
   if (isTeamPhaseKey(activePhaseKey)) {
+    if (myPlayerId) excludeIds.push(myPlayerId);
     const team = parseTeamPhaseKey(activePhaseKey);
     if (team) {
       for (const a of visibleRoleAssignments) {
