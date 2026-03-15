@@ -63,7 +63,7 @@ export function PlayerGameNightScreen({
   }
 
   const isFirstTurn = turn === 1;
-  const isTeamPhase = activePhaseKey ? isTeamPhaseKey(activePhaseKey) : false;
+  const isTeamPhase = !!(activePhaseKey && isTeamPhaseKey(activePhaseKey));
   const teammateNames = gameState.visibleRoleAssignments.map(
     (a) => a.player.name,
   );
