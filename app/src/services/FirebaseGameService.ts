@@ -5,22 +5,10 @@ import type {
   GameModeConfig,
   GamePlayer,
   LobbyPlayer,
-  PlayerRoleAssignment,
-  RoleDefinition,
   RoleSlot,
-  Team,
 } from "@/lib/types";
-import type {
-  RoleInPlay,
-  PublicRoleInfo,
-  PlayerGameState,
-} from "@/server/types";
+import type { PublicRoleInfo, PlayerGameState } from "@/server/types";
 import { GAME_MODES } from "@/lib/game-modes";
-import { WerewolfPhase, buildNightPhaseOrder } from "@/lib/game-modes/werewolf";
-import type {
-  WerewolfTurnState,
-  WerewolfNighttimePhase,
-} from "@/lib/game-modes/werewolf";
 import { assignRoles, adjustRoleSlots } from "@/server/utils";
 import { getAdminDatabase } from "@/lib/firebase/admin";
 import { ServerValue } from "firebase-admin/database";
@@ -33,6 +21,7 @@ import {
   type FirebasePlayerState,
 } from "@/lib/firebase/schema";
 import { gameSerializationService } from "./GameSerializationService";
+import { gameInitializationService } from "./GameInitializationService";
 
 function gameRef(gameId: string) {
   return getAdminDatabase().ref(`games/${gameId}`);
@@ -41,123 +30,6 @@ function gameRef(gameId: string) {
 export class FirebaseGameService {
   public getModeDefinition(gameMode: GameMode): GameModeConfig {
     return GAME_MODES[gameMode];
-  }
-
-  private buildGamePlayers(
-    players: LobbyPlayer[],
-    roleAssignments: PlayerRoleAssignment[],
-    roles: Record<string, RoleDefinition<string, Team>>,
-  ): GamePlayer[] {
-    const playerById = new Map(players.map((p) => [p.id, p]));
-
-    return roleAssignments.map((assignment) => {
-      const player = playerById.get(assignment.playerId);
-      if (!player) throw new Error(`Player not found: ${assignment.playerId}`);
-      const myRole = roles[assignment.roleDefinitionId];
-
-      const visibleRoles: PlayerRoleAssignment[] = [];
-      const visibleTeams = new Set(myRole?.canSeeTeam ?? []);
-      const visibleRoleIds = new Set(myRole?.canSeeRole ?? []);
-      if (visibleTeams.size > 0 || visibleRoleIds.size > 0) {
-        for (const other of roleAssignments) {
-          if (other.playerId === assignment.playerId) continue;
-          const role = roles[other.roleDefinitionId];
-          if (!role) continue;
-          if (visibleTeams.has(role.team) || visibleRoleIds.has(role.id)) {
-            visibleRoles.push(other);
-          }
-        }
-      }
-
-      return { ...player, visibleRoles };
-    });
-  }
-
-  private buildInitialTurnState(
-    gameMode: GameMode,
-    roleAssignments: PlayerRoleAssignment[],
-  ): WerewolfTurnState | undefined {
-    if (gameMode !== GameMode.Werewolf) return undefined;
-    const nightPhaseOrder = buildNightPhaseOrder(1, roleAssignments);
-    const phase: WerewolfNighttimePhase = {
-      type: WerewolfPhase.Nighttime,
-      startedAt: Date.now(),
-      nightPhaseOrder,
-      currentPhaseIndex: 0,
-      nightActions: {},
-    };
-    return { turn: 1, phase, deadPlayerIds: [] };
-  }
-
-  private buildRolesInPlay(game: Game): RoleInPlay[] | null {
-    const { roles } = this.getModeDefinition(game.gameMode);
-    const slotMap = new Map(game.configuredRoleSlots.map((s) => [s.roleId, s]));
-
-    switch (game.showRolesInPlay) {
-      case ShowRolesInPlay.None:
-        return null;
-
-      case ShowRolesInPlay.ConfiguredOnly:
-        return game.configuredRoleSlots.flatMap((slot) => {
-          if (slot.max === 0) return [];
-          const role = roles[slot.roleId];
-          if (!role) return [];
-          return [
-            {
-              id: role.id,
-              name: role.name,
-              team: role.team,
-              min: slot.min,
-              max: slot.max,
-            },
-          ];
-        });
-
-      case ShowRolesInPlay.AssignedRolesOnly: {
-        const seen = new Set<string>();
-        return game.roleAssignments.flatMap((a) => {
-          if (seen.has(a.roleDefinitionId)) return [];
-          seen.add(a.roleDefinitionId);
-          const role = roles[a.roleDefinitionId];
-          const slot = slotMap.get(a.roleDefinitionId);
-          if (!role) return [];
-          return [
-            {
-              id: role.id,
-              name: role.name,
-              team: role.team,
-              min: slot?.min ?? 0,
-              max: slot?.max ?? 0,
-            },
-          ];
-        });
-      }
-
-      case ShowRolesInPlay.RoleAndCount: {
-        const counts = new Map<string, number>();
-        for (const a of game.roleAssignments) {
-          counts.set(
-            a.roleDefinitionId,
-            (counts.get(a.roleDefinitionId) ?? 0) + 1,
-          );
-        }
-        return [...counts.entries()].flatMap(([roleId, count]) => {
-          const role = roles[roleId];
-          const slot = slotMap.get(roleId);
-          if (!role) return [];
-          return [
-            {
-              id: role.id,
-              name: role.name,
-              team: role.team,
-              min: slot?.min ?? 0,
-              max: slot?.max ?? 0,
-              count,
-            },
-          ];
-        });
-      }
-    }
   }
 
   public getPlayerGameState(
@@ -200,7 +72,7 @@ export class FirebaseGameService {
         myPlayerId: null,
         myRole: null,
         visibleRoleAssignments,
-        rolesInPlay: this.buildRolesInPlay(game),
+        rolesInPlay: gameInitializationService.buildRolesInPlay(game),
         ...(nightActions ? { nightActions } : {}),
         ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
         ...(game.timerConfig ? { timerConfig: game.timerConfig } : {}),
@@ -285,7 +157,7 @@ export class FirebaseGameService {
       myPlayerId: callerId,
       myRole: { id: myRole.id, name: myRole.name, team: myRole.team },
       visibleRoleAssignments,
-      rolesInPlay: this.buildRolesInPlay(game),
+      rolesInPlay: gameInitializationService.buildRolesInPlay(game),
       ...nightTargetState,
       ...daytimeNightState,
       ...(amDead ? { amDead: true } : {}),
@@ -328,7 +200,11 @@ export class FirebaseGameService {
       ? players.find((p) => p.id === ownerPlayerId)
       : null;
     const gamePlayers: GamePlayer[] = [
-      ...this.buildGamePlayers(rolePlayers, roleAssignments, roles),
+      ...gameInitializationService.buildGamePlayers(
+        rolePlayers,
+        roleAssignments,
+        roles,
+      ),
       ...(ownerPlayer ? [{ ...ownerPlayer, visibleRoles: [] }] : []),
     ];
 
@@ -405,7 +281,7 @@ export class FirebaseGameService {
 
     game.status = {
       type: GameStatus.Playing,
-      turnState: this.buildInitialTurnState(
+      turnState: gameInitializationService.buildInitialTurnState(
         game.gameMode,
         game.roleAssignments,
       ),
