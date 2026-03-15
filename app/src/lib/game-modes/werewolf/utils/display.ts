@@ -1,6 +1,6 @@
 import { TargetCategory } from "../types";
 import type { AnyNightAction } from "../types";
-import { WEREWOLF_ROLES } from "../roles";
+import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
 import { isTeamPhaseKey, TEAM_PHASE_PREFIX } from "./phase-keys";
 import { targetPlayerIdOf } from "./targeting";
@@ -123,11 +123,14 @@ export function getInvestigationResultForNarrator(
 
 /**
  * Returns the confirm button label for a given phase key based on its target category.
- * Team phase keys return "Attack". Solo roles: Attack, Protect, Investigate, or "Confirm".
+ * Team phase keys return "Attack". Solo roles: Attack, Protect, Investigate,
+ * Silence (Spellcaster), Use Ability (Witch), or "Confirm".
  */
 export function getConfirmLabel(phaseKey?: string): string {
   if (!phaseKey) return "Confirm";
   if (isTeamPhaseKey(phaseKey)) return "Attack";
+  if ((phaseKey as WerewolfRole) === WerewolfRole.Witch) return "Use Ability";
+  if ((phaseKey as WerewolfRole) === WerewolfRole.Spellcaster) return "Silence";
   const roleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
     phaseKey
   ];

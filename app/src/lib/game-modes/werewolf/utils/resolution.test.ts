@@ -8,18 +8,21 @@ const assignments = [
   { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
   { playerId: "bg1", roleDefinitionId: WerewolfRole.Bodyguard },
   { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+  { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
   { playerId: "chup1", roleDefinitionId: WerewolfRole.Chupacabra },
+  { playerId: "witch1", roleDefinitionId: WerewolfRole.Witch },
+  { playerId: "sc1", roleDefinitionId: WerewolfRole.Spellcaster },
 ];
 
 describe("resolveNightActions", () => {
   it("marks an attacked player as died", () => {
-    const result = resolveNightActions(
+    const { events } = resolveNightActions(
       { [getTeamPhaseKey(Team.Bad)]: { votes: [], suggestedTargetId: "p1" } },
       assignments,
       [],
     );
-    expect(result).toHaveLength(1);
-    expect(result[0]).toMatchObject({
+    expect(events).toHaveLength(1);
+    expect(events[0]).toMatchObject({
       targetPlayerId: "p1",
       attackedBy: [getTeamPhaseKey(Team.Bad)],
       protectedBy: [],
@@ -28,7 +31,7 @@ describe("resolveNightActions", () => {
   });
 
   it("marks a protected player as survived when attacked", () => {
-    const result = resolveNightActions(
+    const { events } = resolveNightActions(
       {
         [getTeamPhaseKey(Team.Bad)]: { votes: [], suggestedTargetId: "p1" },
         [WerewolfRole.Bodyguard]: { targetPlayerId: "p1" },
@@ -36,7 +39,7 @@ describe("resolveNightActions", () => {
       assignments,
       [],
     );
-    const event = result.find((e) => e.targetPlayerId === "p1");
+    const event = events.find((e) => e.targetPlayerId === "p1");
     expect(event).toMatchObject({
       attackedBy: [getTeamPhaseKey(Team.Bad)],
       protectedBy: [WerewolfRole.Bodyguard],
@@ -45,52 +48,122 @@ describe("resolveNightActions", () => {
   });
 
   it("does not include a player only protected (no attack)", () => {
-    const result = resolveNightActions(
+    const { events } = resolveNightActions(
       { [WerewolfRole.Bodyguard]: { targetPlayerId: "p1" } },
       assignments,
       [],
     );
-    expect(result).toHaveLength(0);
+    expect(events).toHaveLength(0);
   });
 
   it("skips team actions with no suggestedTargetId", () => {
-    const result = resolveNightActions(
+    const { events } = resolveNightActions(
       { [getTeamPhaseKey(Team.Bad)]: { votes: [] } },
       assignments,
       [],
     );
-    expect(result).toHaveLength(0);
+    expect(events).toHaveLength(0);
   });
 
   it("Chupacabra attack applies when target is on Team.Bad", () => {
-    const result = resolveNightActions(
+    const { events } = resolveNightActions(
       { [WerewolfRole.Chupacabra]: { targetPlayerId: "w1" } },
       assignments,
       [],
     );
-    expect(result.find((e) => e.targetPlayerId === "w1")?.died).toBe(true);
+    expect(events.find((e) => e.targetPlayerId === "w1")?.died).toBe(true);
   });
 
   it("Chupacabra attack does not apply when target is not on Team.Bad and werewolves are alive", () => {
-    const result = resolveNightActions(
+    const { events } = resolveNightActions(
       { [WerewolfRole.Chupacabra]: { targetPlayerId: "p1" } },
       assignments,
       [],
     );
-    expect(result).toHaveLength(0);
+    expect(events).toHaveLength(0);
   });
 
   it("Chupacabra attack applies when all Team.Bad players are dead", () => {
-    const result = resolveNightActions(
+    const { events } = resolveNightActions(
       { [WerewolfRole.Chupacabra]: { targetPlayerId: "p1" } },
       assignments,
       ["w1"], // w1 is the only werewolf and is dead
     );
-    expect(result.find((e) => e.targetPlayerId === "p1")?.died).toBe(true);
+    expect(events.find((e) => e.targetPlayerId === "p1")?.died).toBe(true);
   });
 
   it("returns empty array when no night actions set", () => {
-    const result = resolveNightActions({}, assignments, []);
-    expect(result).toHaveLength(0);
+    const { events } = resolveNightActions({}, assignments, []);
+    expect(events).toHaveLength(0);
+  });
+
+  describe("Witch", () => {
+    it("protects an attacked player when Witch targets them", () => {
+      const { events } = resolveNightActions(
+        {
+          [getTeamPhaseKey(Team.Bad)]: { votes: [], suggestedTargetId: "p1" },
+          [WerewolfRole.Witch]: { targetPlayerId: "p1" },
+        },
+        assignments,
+        [],
+      );
+      const event = events.find((e) => e.targetPlayerId === "p1");
+      expect(event).toMatchObject({
+        protectedBy: [WerewolfRole.Witch],
+        died: false,
+      });
+    });
+
+    it("attacks an unattacked player when Witch targets them", () => {
+      const { events } = resolveNightActions(
+        {
+          [getTeamPhaseKey(Team.Bad)]: { votes: [], suggestedTargetId: "p1" },
+          [WerewolfRole.Witch]: { targetPlayerId: "p2" },
+        },
+        assignments,
+        [],
+      );
+      const event = events.find((e) => e.targetPlayerId === "p2");
+      expect(event).toMatchObject({
+        attackedBy: [WerewolfRole.Witch],
+        protectedBy: [],
+        died: true,
+      });
+    });
+
+    it("has no effect when Witch takes no action", () => {
+      const { events } = resolveNightActions(
+        { [getTeamPhaseKey(Team.Bad)]: { votes: [], suggestedTargetId: "p1" } },
+        assignments,
+        [],
+      );
+      expect(events).toHaveLength(1);
+      expect(events[0]?.targetPlayerId).toBe("p1");
+    });
+  });
+
+  describe("Spellcaster", () => {
+    it("silences a targeted player", () => {
+      const { silencedPlayerIds } = resolveNightActions(
+        { [WerewolfRole.Spellcaster]: { targetPlayerId: "p1" } },
+        assignments,
+        [],
+      );
+      expect(silencedPlayerIds).toStrictEqual(["p1"]);
+    });
+
+    it("does not affect attacks/protections", () => {
+      const { events } = resolveNightActions(
+        { [WerewolfRole.Spellcaster]: { targetPlayerId: "p1" } },
+        assignments,
+        [],
+      );
+      expect(events).toHaveLength(0);
+    });
+
+    it("returns empty silencedPlayerIds when Spellcaster takes no action", () => {
+      const { silencedPlayerIds } = resolveNightActions({}, assignments, []);
+      expect(silencedPlayerIds).toHaveLength(0);
+    });
   });
 });

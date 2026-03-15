@@ -240,8 +240,12 @@ describe("getConfirmLabel", () => {
     expect(getConfirmLabel(WerewolfRole.Seer)).toBe("Investigate");
   });
 
-  it("returns 'Confirm' for Special roles like Witch", () => {
-    expect(getConfirmLabel(WerewolfRole.Witch)).toBe("Confirm");
+  it("returns 'Use Ability' for Witch", () => {
+    expect(getConfirmLabel(WerewolfRole.Witch)).toBe("Use Ability");
+  });
+
+  it("returns 'Silence' for Spellcaster", () => {
+    expect(getConfirmLabel(WerewolfRole.Spellcaster)).toBe("Silence");
   });
 
   it("returns 'Confirm' for None roles like Villager", () => {

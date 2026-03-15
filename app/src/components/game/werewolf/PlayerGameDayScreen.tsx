@@ -44,6 +44,7 @@ export function PlayerGameDayScreen({ gameState, turnState }: Props) {
         players={gameState.players}
         nightSummary={gameState.nightSummary}
         myLastNightAction={gameState.myLastNightAction}
+        silencedPlayerIds={gameState.silencedPlayerIds}
       />
 
       {gameState.amDead && (

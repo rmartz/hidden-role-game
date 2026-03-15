@@ -123,6 +123,23 @@ export function PlayerGameNightScreen({
         <strong className="text-foreground">{gameState.myRole?.name}</strong> —
         wake up and take your action.
       </p>
+      {gameState.witchAbilityUsed && (
+        <p className="mb-4 text-sm text-muted-foreground italic">
+          You have already used your special ability this game.
+        </p>
+      )}
+      {!gameState.witchAbilityUsed &&
+        gameState.attackedPlayerIds &&
+        gameState.attackedPlayerIds.length > 0 && (
+          <div className="mb-4 rounded-md border p-3 text-sm">
+            <p className="font-medium mb-1">Currently under attack:</p>
+            <ul className="space-y-0.5">
+              {gameState.attackedPlayerIds.map((id) => (
+                <li key={id}>{getPlayerName(gameState.players, id) ?? id}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       <PlayerTargetSelection
         gameId={gameId}
         targets={targets}

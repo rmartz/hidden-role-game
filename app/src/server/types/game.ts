@@ -83,6 +83,18 @@ export interface PlayerGameState {
    * Only populated after the narrator explicitly reveals it.
    */
   investigationResult?: { targetPlayerId: string; isWerewolfTeam: boolean };
+  /**
+   * Player IDs currently attacked but not yet protected.
+   * Only populated for the Witch during her night phase, before she acts.
+   */
+  attackedPlayerIds?: string[];
+  /** Whether the Witch has already used her once-per-game special ability. */
+  witchAbilityUsed?: boolean;
+  /**
+   * Player IDs silenced by the Spellcaster during the preceding night.
+   * Visible to all players during daytime.
+   */
+  silencedPlayerIds?: string[];
   /** Phase timer configuration. Present when the lobby has timers enabled. */
   timerConfig?: TimerConfig;
 }

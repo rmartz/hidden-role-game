@@ -1112,8 +1112,8 @@ describe("SetNightTarget — Bodyguard self-targeting", () => {
       [getTeamPhaseKey(Team.Bad)]: { votes: [], suggestedTargetId: "p2" },
       [WerewolfRole.Bodyguard]: { targetPlayerId: "p2" },
     };
-    const result = resolveNightActions(nightActions, assignments, []);
-    const event = result.find((e) => e.targetPlayerId === "p2");
+    const { events } = resolveNightActions(nightActions, assignments, []);
+    const event = events.find((e) => e.targetPlayerId === "p2");
     expect(event?.died).toBe(false);
   });
 });
@@ -1236,5 +1236,127 @@ describe("RevealInvestigationResult", () => {
       confirmed: true,
       resultRevealed: true,
     });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Witch ability
+// ---------------------------------------------------------------------------
+
+describe("SetNightTarget — Witch once-per-game restriction", () => {
+  const action = WEREWOLF_ACTIONS[WerewolfAction.SetNightTarget];
+
+  function makeWitchGame(witchAbilityUsed = false) {
+    const ts: WerewolfTurnState = {
+      turn: 2,
+      phase: {
+        type: WerewolfPhase.Nighttime,
+        startedAt: 1000,
+        nightPhaseOrder: [WerewolfRole.Witch],
+        currentPhaseIndex: 0,
+        nightActions: {},
+      },
+      deadPlayerIds: [],
+      ...(witchAbilityUsed ? { witchAbilityUsed: true } : {}),
+    };
+    return makePlayingGame(ts, {
+      players: [
+        { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
+        { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
+        { id: "p3", name: "Charlie", sessionId: "s3", visibleRoles: [] },
+      ],
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Witch },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+      ],
+    });
+  }
+
+  it("Witch can set target when ability not yet used", () => {
+    const game = makeWitchGame(false);
+    expect(action.isValid(game, "p1", { targetPlayerId: "p2" })).toBe(true);
+  });
+
+  it("Witch cannot set target when ability already used", () => {
+    const game = makeWitchGame(true);
+    expect(action.isValid(game, "p1", { targetPlayerId: "p2" })).toBe(false);
+  });
+});
+
+describe("ConfirmNightTarget — sets witchAbilityUsed for Witch", () => {
+  const confirmAction = WEREWOLF_ACTIONS[WerewolfAction.ConfirmNightTarget];
+  const setTargetAction = WEREWOLF_ACTIONS[WerewolfAction.SetNightTarget];
+
+  it("sets witchAbilityUsed on the turn state after Witch confirms", () => {
+    const ts: WerewolfTurnState = {
+      turn: 2,
+      phase: {
+        type: WerewolfPhase.Nighttime,
+        startedAt: 1000,
+        nightPhaseOrder: [WerewolfRole.Witch],
+        currentPhaseIndex: 0,
+        nightActions: {},
+      },
+      deadPlayerIds: [],
+    };
+    const game = makePlayingGame(ts, {
+      players: [
+        { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
+        { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
+        { id: "p3", name: "Charlie", sessionId: "s3", visibleRoles: [] },
+      ],
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Witch },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+      ],
+    });
+
+    setTargetAction.apply(game, { targetPlayerId: "p2" }, "p1");
+    expect(confirmAction.isValid(game, "p1", undefined)).toBe(true);
+    confirmAction.apply(game, null, "p1");
+
+    const resultTs = (game.status as { turnState: WerewolfTurnState })
+      .turnState;
+    expect(resultTs.witchAbilityUsed).toBe(true);
+  });
+
+  it("witchAbilityUsed is carried forward into the next night", () => {
+    const startNight = WEREWOLF_ACTIONS[WerewolfAction.StartNight];
+    const startDay = WEREWOLF_ACTIONS[WerewolfAction.StartDay];
+
+    const ts: WerewolfTurnState = {
+      turn: 2,
+      phase: {
+        type: WerewolfPhase.Nighttime,
+        startedAt: 1000,
+        nightPhaseOrder: [WerewolfRole.Witch],
+        currentPhaseIndex: 0,
+        nightActions: {
+          [WerewolfRole.Witch]: { targetPlayerId: "p2", confirmed: true },
+        },
+      },
+      deadPlayerIds: [],
+      witchAbilityUsed: true,
+    };
+    const game = makePlayingGame(ts, {
+      players: [
+        { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
+        { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
+        { id: "p3", name: "Charlie", sessionId: "s3", visibleRoles: [] },
+      ],
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Witch },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+      ],
+    });
+
+    startDay.apply(game, null, "owner-1");
+    startNight.apply(game, null, "owner-1");
+
+    const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(newTs.witchAbilityUsed).toBe(true);
   });
 });

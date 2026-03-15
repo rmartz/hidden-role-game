@@ -7,12 +7,14 @@ import {
   getTeamPlayerIds,
   WerewolfPhase,
   TargetCategory,
+  getInterimAttackedPlayerIds,
 } from "@/lib/game-modes/werewolf";
 import type {
   AnyNightAction,
   WerewolfRoleDefinition,
   WerewolfTurnState,
 } from "@/lib/game-modes/werewolf";
+import { WerewolfRole } from "@/lib/game-modes/werewolf/roles";
 import { GAME_MODES } from "@/lib/game-modes";
 
 /**
@@ -128,6 +130,23 @@ export class GameSerializationService {
       };
     }
 
+    // For the Witch, include attacked-player info and ability-used state.
+    if ((myRole.id as WerewolfRole) === WerewolfRole.Witch) {
+      const ts =
+        game.status.type === GameStatus.Playing
+          ? (game.status.turnState as WerewolfTurnState | undefined)
+          : undefined;
+      result.witchAbilityUsed = ts?.witchAbilityUsed ?? false;
+      if (!ts?.witchAbilityUsed) {
+        const attacked = getInterimAttackedPlayerIds(
+          nightActions,
+          game.roleAssignments,
+          deadPlayerIds,
+        );
+        if (attacked.length > 0) result.attackedPlayerIds = attacked;
+      }
+    }
+
     return result;
   }
 
@@ -162,9 +181,12 @@ export class GameSerializationService {
       myRole,
     );
 
+    const silencedPlayerIds = phase.silencedPlayerIds ?? [];
+
     return {
       ...(nightSummary.length > 0 ? { nightSummary } : {}),
       ...(myLastNightAction ? { myLastNightAction } : {}),
+      ...(silencedPlayerIds.length > 0 ? { silencedPlayerIds } : {}),
     };
   }
 

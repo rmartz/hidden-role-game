@@ -59,6 +59,8 @@ export interface WerewolfDaytimePhase {
   nightActions: Record<string, AnyNightAction>;
   /** Resolved attack/protect outcomes, computed when transitioning to day. */
   nightResolution?: NightResolutionEvent[];
+  /** Player IDs silenced by the Spellcaster during the preceding night. */
+  silencedPlayerIds?: string[];
 }
 
 export type WerewolfTurnPhase = WerewolfNighttimePhase | WerewolfDaytimePhase;
@@ -68,6 +70,8 @@ export interface WerewolfTurnState {
   phase: WerewolfTurnPhase;
   /** Player IDs that have been marked as dead by the narrator. */
   deadPlayerIds: string[];
+  /** True once the Witch has used her once-per-game special ability. */
+  witchAbilityUsed?: boolean;
 }
 
 export interface TargetablePlayer {

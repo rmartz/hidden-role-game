@@ -14,7 +14,7 @@ import {
   computeSuggestedTarget,
   resolveNightActions,
 } from "./utils";
-import { WEREWOLF_ROLES } from "./roles";
+import { WEREWOLF_ROLES, WerewolfRole } from "./roles";
 import type { WerewolfRoleDefinition } from "./roles";
 import { getPlayer } from "@/lib/player-utils";
 
@@ -56,6 +56,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
             nightActions: {},
           },
           deadPlayerIds: ts.deadPlayerIds,
+          ...(ts.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
         },
       };
     },
@@ -69,11 +70,12 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       const ts = currentTurnState(game);
       if (!ts) return;
       const nightPhase = ts.phase as WerewolfNighttimePhase;
-      const nightResolution = resolveNightActions(
-        nightPhase.nightActions,
-        game.roleAssignments,
-        ts.deadPlayerIds,
-      );
+      const { events: nightResolution, silencedPlayerIds } =
+        resolveNightActions(
+          nightPhase.nightActions,
+          game.roleAssignments,
+          ts.deadPlayerIds,
+        );
       const newDeadIds = nightResolution
         .filter((e) => e.died)
         .map((e) => e.targetPlayerId);
@@ -86,8 +88,10 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
             startedAt: Date.now(),
             nightActions: nightPhase.nightActions,
             ...(nightResolution.length > 0 ? { nightResolution } : {}),
+            ...(silencedPlayerIds.length > 0 ? { silencedPlayerIds } : {}),
           },
           deadPlayerIds: [...ts.deadPlayerIds, ...newDeadIds],
+          ...(ts.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
         },
       };
     },
@@ -151,6 +155,13 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
         const existing = phase.nightActions[phaseKey];
         if (existing?.confirmed) return false;
       }
+
+      // Witch can only use her ability once per game.
+      if (
+        (phaseKey as WerewolfRole) === WerewolfRole.Witch &&
+        ts.witchAbilityUsed
+      )
+        return false;
 
       // For team phases, validate target is not on the same team.
       const team = parseTeamPhaseKey(phaseKey);
@@ -318,6 +329,10 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       const action = phase.nightActions[activePhaseKey];
       if (action) {
         phase.nightActions[activePhaseKey] = { ...action, confirmed: true };
+      }
+
+      if ((activePhaseKey as WerewolfRole) === WerewolfRole.Witch) {
+        ts.witchAbilityUsed = true;
       }
     },
   },

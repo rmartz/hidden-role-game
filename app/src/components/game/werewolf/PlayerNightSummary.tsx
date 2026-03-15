@@ -8,15 +8,18 @@ interface PlayerNightSummaryProps {
   players: PlayerGameState["players"];
   nightSummary: PlayerGameState["nightSummary"];
   myLastNightAction: PlayerGameState["myLastNightAction"];
+  silencedPlayerIds?: PlayerGameState["silencedPlayerIds"];
 }
 
 export function PlayerNightSummary({
   players,
   nightSummary,
   myLastNightAction,
+  silencedPlayerIds,
 }: PlayerNightSummaryProps) {
   const hasDeaths = (nightSummary?.length ?? 0) > 0;
-  if (!hasDeaths && !myLastNightAction) return null;
+  const hasSilenced = (silencedPlayerIds?.length ?? 0) > 0;
+  if (!hasDeaths && !hasSilenced && !myLastNightAction) return null;
 
   const killedEntries = (nightSummary ?? []).map((event) => ({
     key: event.targetPlayerId,
@@ -36,11 +39,16 @@ export function PlayerNightSummary({
   return (
     <div className="mb-5">
       <h2 className="text-lg font-semibold mb-2">Last Night</h2>
-      {hasDeaths ? (
+      {hasDeaths || hasSilenced ? (
         <ul className="space-y-1">
           {killedEntries.map((entry) => (
             <li key={entry.key} className="text-sm">
               {entry.name} was eliminated.
+            </li>
+          ))}
+          {(silencedPlayerIds ?? []).map((id) => (
+            <li key={id} className="text-sm">
+              {getPlayerName(players, id) ?? id} was silenced.
             </li>
           ))}
         </ul>
