@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 
 export type IncrementDirection = "increment" | "decrement";
 
-interface Props {
+interface IncrementerProps {
   value: number;
   onChange: (direction: IncrementDirection) => void;
   disabled?: boolean;
@@ -16,7 +16,7 @@ export function Incrementer({
   disabled,
   minValue,
   maxValue,
-}: Props) {
+}: IncrementerProps) {
   function handleDecrement() {
     onChange("decrement");
   }

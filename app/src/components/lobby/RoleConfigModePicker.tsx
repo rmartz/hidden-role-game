@@ -6,11 +6,11 @@ import { setRoleConfigMode } from "@/store/game-config-slice";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-interface Props {
+interface RoleConfigModePickerProps {
   disabled?: boolean;
 }
 
-export function RoleConfigModePicker({ disabled }: Props) {
+export function RoleConfigModePicker({ disabled }: RoleConfigModePickerProps) {
   const dispatch = useAppDispatch();
   const roleConfigMode = useAppSelector((s) => s.gameConfig.roleConfigMode);
 

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlayerRow } from "./PlayerRow";
 
-interface Props {
+interface PlayerListProps {
   lobby: PublicLobby;
   userPlayerId: string | null;
   showLeave: boolean;
@@ -29,7 +29,7 @@ export function PlayerList({
   onRefetch,
   onRemovePlayer,
   onTransferOwner,
-}: Props) {
+}: PlayerListProps) {
   return (
     <Card className="mb-5">
       <CardHeader className="flex flex-row items-center gap-3 space-y-0">

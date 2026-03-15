@@ -8,12 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-interface Props {
+interface JoinPromptProps {
   lobbyId: string;
   onJoined?: () => void;
 }
 
-export function JoinPrompt({ lobbyId, onJoined }: Props) {
+export function JoinPrompt({ lobbyId, onJoined }: JoinPromptProps) {
   const queryClient = useQueryClient();
   const [playerName, setPlayerName] = useState("");
 
