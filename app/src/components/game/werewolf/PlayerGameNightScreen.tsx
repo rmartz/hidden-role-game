@@ -78,7 +78,12 @@ export function PlayerGameNightScreen({
     gameState.visibleRoleAssignments.length === 1 ? "teammate" : "teammates";
 
   const isConfirmed = gameState.myNightTargetConfirmed ?? false;
-  const teamVotes = gameState.teamVotes;
+  const resolvedTeamVotes = (gameState.teamVotes ?? []).map((vote) => ({
+    playerName: vote.playerName,
+    targetName:
+      gameState.players.find((p) => p.id === vote.targetPlayerId)?.name ??
+      "Unknown",
+  }));
   const suggestedTargetId = gameState.suggestedTargetId;
   const allAgreed = gameState.allAgreed ?? false;
 
@@ -129,19 +134,13 @@ export function PlayerGameNightScreen({
               <p className="text-xs font-medium text-muted-foreground mb-1">
                 Teammate votes:
               </p>
-              {teamVotes && teamVotes.length > 0 ? (
+              {resolvedTeamVotes.length > 0 ? (
                 <ul className="text-xs space-y-0.5">
-                  {teamVotes.map((vote, i) => {
-                    const targetName =
-                      gameState.players.find(
-                        (p) => p.id === vote.targetPlayerId,
-                      )?.name ?? "Unknown";
-                    return (
-                      <li key={i}>
-                        {vote.playerName} → {targetName}
-                      </li>
-                    );
-                  })}
+                  {resolvedTeamVotes.map((vote, i) => (
+                    <li key={i}>
+                      {vote.playerName} → {vote.targetName}
+                    </li>
+                  ))}
                 </ul>
               ) : (
                 <p className="text-xs text-muted-foreground">No votes yet.</p>

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
+import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
 import type { Game } from "@/lib/types";
 import { WerewolfPhase } from "./types";
 import type { WerewolfTurnState } from "./types";
@@ -7,6 +7,7 @@ import { WerewolfRole } from "./roles";
 import {
   buildNightPhaseOrder,
   getTargetablePlayers,
+  getTeamPhaseKey,
   isOwnerPlaying,
   currentTurnState,
   getConfirmLabel,
@@ -111,14 +112,14 @@ describe("buildNightPhaseOrder", () => {
 
   it("includes EveryNight and FirstNightOnly roles on turn 1", () => {
     const order = buildNightPhaseOrder(1, assignments);
-    expect(order).toContain("team:Bad");
+    expect(order).toContain(getTeamPhaseKey(Team.Bad));
     expect(order).toContain(WerewolfRole.Seer);
     expect(order).toContain(WerewolfRole.Mason);
   });
 
   it("excludes FirstNightOnly roles on turn 2+", () => {
     const order = buildNightPhaseOrder(2, assignments);
-    expect(order).toContain("team:Bad");
+    expect(order).toContain(getTeamPhaseKey(Team.Bad));
     expect(order).toContain(WerewolfRole.Seer);
     expect(order).not.toContain(WerewolfRole.Mason);
   });

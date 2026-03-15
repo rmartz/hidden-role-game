@@ -102,6 +102,16 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
 
   const isFirstTurn = turnState.turn === 1;
 
+  const resolvedVotes = (teamAction?.votes ?? []).map((vote) => ({
+    key: vote.playerId,
+    voterName:
+      gameState.players.find((p) => p.id === vote.playerId)?.name ??
+      vote.playerId,
+    targetName:
+      gameState.players.find((p) => p.id === vote.targetPlayerId)?.name ??
+      vote.targetPlayerId,
+  }));
+
   const targetablePlayers = getTargetablePlayers(
     gameState.players,
     gameState.gameOwner?.id,
@@ -151,26 +161,17 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
                 <p className="text-xs font-medium text-muted-foreground mb-1">
                   Votes:
                 </p>
-                {teamAction.votes.length === 0 ? (
+                {resolvedVotes.length === 0 ? (
                   <p className="text-xs text-muted-foreground italic">
                     No votes yet
                   </p>
                 ) : (
                   <ul className="text-xs space-y-0.5">
-                    {teamAction.votes.map((vote) => {
-                      const voterName =
-                        gameState.players.find((p) => p.id === vote.playerId)
-                          ?.name ?? vote.playerId;
-                      const targetName =
-                        gameState.players.find(
-                          (p) => p.id === vote.targetPlayerId,
-                        )?.name ?? vote.targetPlayerId;
-                      return (
-                        <li key={vote.playerId}>
-                          {voterName} → {targetName}
-                        </li>
-                      );
-                    })}
+                    {resolvedVotes.map((vote) => (
+                      <li key={vote.key}>
+                        {vote.voterName} → {vote.targetName}
+                      </li>
+                    ))}
                   </ul>
                 )}
               </div>
