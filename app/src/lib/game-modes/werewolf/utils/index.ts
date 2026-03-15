@@ -3,3 +3,4 @@ export * from "./targeting";
 export * from "./game-state";
 export * from "./night-phase";
 export * from "./display";
+export * from "./resolution";
