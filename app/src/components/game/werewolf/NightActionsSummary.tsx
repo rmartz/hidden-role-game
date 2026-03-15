@@ -1,4 +1,4 @@
-import { getPhaseLabel, targetPlayerIdOf } from "@/lib/game-modes/werewolf";
+import { buildNightSummary } from "@/lib/game-modes/werewolf";
 import type { AnyNightAction } from "@/lib/game-modes/werewolf";
 
 interface Props {
@@ -8,27 +8,7 @@ interface Props {
 }
 
 export function NightActionsSummary({ nightActions, players, roles }: Props) {
-  const entries = Object.entries(nightActions)
-    .flatMap(([phaseKey, a]) => {
-      const targetId = targetPlayerIdOf(a);
-      return targetId
-        ? [{ targetId, label: getPhaseLabel(phaseKey, roles) }]
-        : [];
-    })
-    .reduce<{ targetId: string; playerName: string; labels: string[] }[]>(
-      (acc, { targetId, label }) => {
-        const existing = acc.find((e) => e.targetId === targetId);
-        if (existing) {
-          existing.labels.push(label);
-        } else {
-          const playerName =
-            players.find((p) => p.id === targetId)?.name ?? targetId;
-          acc.push({ targetId, playerName, labels: [label] });
-        }
-        return acc;
-      },
-      [],
-    );
+  const entries = buildNightSummary(nightActions, players, roles);
 
   if (entries.length === 0) return null;
 

@@ -1,7 +1,44 @@
 import { TargetCategory } from "../types";
+import type { AnyNightAction } from "../types";
 import { WEREWOLF_ROLES } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
 import { isTeamPhaseKey, TEAM_PHASE_PREFIX } from "./phase-keys";
+import { targetPlayerIdOf } from "./targeting";
+
+export interface NightSummaryEntry {
+  targetId: string;
+  playerName: string;
+  labels: string[];
+}
+
+/**
+ * Builds a grouped summary of night actions: one entry per targeted player,
+ * listing which phase keys targeted them. Phases with no target are omitted.
+ */
+export function buildNightSummary(
+  nightActions: Record<string, AnyNightAction>,
+  players: { id: string; name: string }[],
+  roles: Record<string, { name: string }>,
+): NightSummaryEntry[] {
+  return Object.entries(nightActions)
+    .flatMap(([phaseKey, a]) => {
+      const targetId = targetPlayerIdOf(a);
+      return targetId
+        ? [{ targetId, label: getPhaseLabel(phaseKey, roles) }]
+        : [];
+    })
+    .reduce<NightSummaryEntry[]>((acc, { targetId, label }) => {
+      const existing = acc.find((e) => e.targetId === targetId);
+      if (existing) {
+        existing.labels.push(label);
+      } else {
+        const playerName =
+          players.find((p) => p.id === targetId)?.name ?? targetId;
+        acc.push({ targetId, playerName, labels: [label] });
+      }
+      return acc;
+    }, []);
+}
 
 /** Returns a human-readable label for a night phase key. */
 export function getPhaseLabel(
