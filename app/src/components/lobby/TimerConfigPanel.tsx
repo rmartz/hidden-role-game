@@ -84,58 +84,60 @@ export function TimerConfigPanel({ timerConfig, disabled, onChange }: Props) {
     onChange({ ...timerConfig, [row.field]: newValue });
   }
 
+  const enrichedRows = TIMER_ROWS.map((row) => {
+    const value = timerConfig?.[row.field] ?? null;
+    return value !== null
+      ? { ...row, value, isEnabled: true as const }
+      : { ...row, value: null, isEnabled: false as const };
+  });
+
   return (
     <div className="space-y-3">
       <p className="text-sm font-medium">Phase Timers</p>
-      {TIMER_ROWS.map((row) => {
-        const value = timerConfig?.[row.field] ?? null;
-        const isEnabled = value !== null;
-
-        return (
-          <div key={row.field} className="flex items-center gap-3">
-            <Switch
-              id={`timer-${row.field}`}
-              checked={isEnabled}
-              disabled={disabled ?? readOnly}
-              onCheckedChange={(checked) => {
-                handleToggle(row, checked);
-              }}
-            />
-            <Label
-              htmlFor={`timer-${row.field}`}
-              className="text-sm min-w-[140px]"
-            >
-              {row.label}
-            </Label>
-            {isEnabled && (
-              <div className="flex items-center gap-1">
-                {readOnly || disabled ? (
-                  <span className="text-sm text-muted-foreground">
-                    {formatDuration(value)}
+      {enrichedRows.map((row) => (
+        <div key={row.field} className="flex items-center gap-3">
+          <Switch
+            id={`timer-${row.field}`}
+            checked={row.isEnabled}
+            disabled={disabled ?? readOnly}
+            onCheckedChange={(checked) => {
+              handleToggle(row, checked);
+            }}
+          />
+          <Label
+            htmlFor={`timer-${row.field}`}
+            className="text-sm min-w-[140px]"
+          >
+            {row.label}
+          </Label>
+          {row.isEnabled && (
+            <div className="flex items-center gap-1">
+              {readOnly || disabled ? (
+                <span className="text-sm text-muted-foreground">
+                  {formatDuration(row.value)}
+                </span>
+              ) : (
+                <>
+                  <Incrementer
+                    value={row.value}
+                    onChange={(dir) => {
+                      handleIncrement(row, dir);
+                    }}
+                    minValue={row.min}
+                    maxValue={row.max}
+                  />
+                  <span className="text-xs text-muted-foreground ml-1">
+                    {formatDuration(row.value)}
                   </span>
-                ) : (
-                  <>
-                    <Incrementer
-                      value={value}
-                      onChange={(dir) => {
-                        handleIncrement(row, dir);
-                      }}
-                      minValue={row.min}
-                      maxValue={row.max}
-                    />
-                    <span className="text-xs text-muted-foreground ml-1">
-                      {formatDuration(value)}
-                    </span>
-                  </>
-                )}
-              </div>
-            )}
-            {!isEnabled && (
-              <span className="text-xs text-muted-foreground">Manual</span>
-            )}
-          </div>
-        );
-      })}
+                </>
+              )}
+            </div>
+          )}
+          {!row.isEnabled && (
+            <span className="text-xs text-muted-foreground">Manual</span>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
