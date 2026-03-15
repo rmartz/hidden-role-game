@@ -1,7 +1,7 @@
 import type { NightResolutionEvent } from "@/lib/game-modes/werewolf";
 import { NightOutcomeSummaryItem } from "./NightOutcomeSummaryItem";
 
-interface Props {
+interface NightOutcomeSummaryProps {
   nightResolution: NightResolutionEvent[];
   players: { id: string; name: string }[];
   roles: Record<string, { name: string }>;
@@ -11,7 +11,7 @@ export function NightOutcomeSummary({
   nightResolution,
   players,
   roles,
-}: Props) {
+}: NightOutcomeSummaryProps) {
   if (nightResolution.length === 0) return null;
 
   return (

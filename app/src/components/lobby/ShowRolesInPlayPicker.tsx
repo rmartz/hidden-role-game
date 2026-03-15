@@ -43,13 +43,17 @@ const SHOW_ROLES_OPTIONS: {
   },
 ];
 
-interface Props {
+interface ShowRolesInPlayPickerProps {
   value: ShowRolesInPlay;
   disabled?: boolean;
   onChange?: (value: ShowRolesInPlay) => void;
 }
 
-export function ShowRolesInPlayPicker({ value, disabled, onChange }: Props) {
+export function ShowRolesInPlayPicker({
+  value,
+  disabled,
+  onChange,
+}: ShowRolesInPlayPickerProps) {
   return (
     <div className="space-y-1">
       <Label>Show roles in play</Label>

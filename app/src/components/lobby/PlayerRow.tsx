@@ -2,7 +2,7 @@ import type { PublicLobbyPlayer } from "@/server/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-interface Props {
+interface PlayerRowProps {
   player: PublicLobbyPlayer;
   ownerPlayerId: string;
   isCurrentUser: boolean;
@@ -24,7 +24,7 @@ export function PlayerRow({
   disabled,
   onRemovePlayer,
   onTransferOwner,
-}: Props) {
+}: PlayerRowProps) {
   function handleLeave() {
     if (window.confirm("Leave this lobby?")) onRemovePlayer(player.id);
   }

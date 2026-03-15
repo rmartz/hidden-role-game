@@ -12,7 +12,7 @@ import { GameTimer } from "@/components/game";
 import { PlayerFirstTurnScreen } from "./PlayerFirstTurnScreen";
 import { PlayerTargetSelection } from "./PlayerTargetSelection";
 
-interface Props {
+interface PlayerGameNightScreenProps {
   gameId: string;
   gameState: PlayerGameState;
   phase: WerewolfNighttimePhase;
@@ -26,7 +26,7 @@ export function PlayerGameNightScreen({
   phase,
   turn,
   deadPlayerIds,
-}: Props) {
+}: PlayerGameNightScreenProps) {
   const nightPhaseSeconds = gameState.timerConfig?.nightPhaseSeconds ?? null;
 
   const phaseStartedAt = useMemo(

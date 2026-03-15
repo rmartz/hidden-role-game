@@ -5,12 +5,15 @@ import type { PlayerGameState } from "@/server/types";
 import { PlayerStartingScreen } from "./PlayerStartingScreen";
 import { PlayerGameScreen } from "./PlayerGameScreen";
 
-interface Props {
+interface WerewolfPlayerScreenProps {
   gameId: string;
   gameState: PlayerGameState;
 }
 
-export function WerewolfPlayerScreen({ gameId, gameState }: Props) {
+export function WerewolfPlayerScreen({
+  gameId,
+  gameState,
+}: WerewolfPlayerScreenProps) {
   if (gameState.status.type === GameStatus.Starting) {
     return <PlayerStartingScreen gameState={gameState} />;
   }

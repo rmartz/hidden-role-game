@@ -19,13 +19,17 @@ import { OwnerHeader } from "./OwnerHeader";
 import { OwnerNightTargetPanel } from "./OwnerNightTargetPanel";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
 
-interface Props {
+interface OwnerGameNightScreenProps {
   gameId: string;
   gameState: PlayerGameState;
   turnState: WerewolfTurnState;
 }
 
-export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
+export function OwnerGameNightScreen({
+  gameId,
+  gameState,
+  turnState,
+}: OwnerGameNightScreenProps) {
   const nightPhaseSeconds = gameState.timerConfig?.nightPhaseSeconds ?? null;
   const action = useGameAction(gameId);
 

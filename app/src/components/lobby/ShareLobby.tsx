@@ -13,11 +13,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-interface Props {
+interface ShareLobbyProps {
   lobbyId: string;
 }
 
-export function ShareLobby({ lobbyId }: Props) {
+export function ShareLobby({ lobbyId }: ShareLobbyProps) {
   const [copied, setCopied] = useState(false);
   const lobbyUrl = `${window.location.origin}/lobby/${lobbyId}`;
 
