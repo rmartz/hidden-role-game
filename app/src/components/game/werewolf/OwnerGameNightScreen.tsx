@@ -15,10 +15,10 @@ import type {
 } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
 import { useGameAction } from "@/hooks";
-import { GameRolesList, PlayersRoleList } from "@/components/game";
-import { Button } from "@/components/ui/button";
+import { GameRolesList } from "@/components/game";
 import { OwnerHeader } from "./OwnerHeader";
 import { OwnerNightTargetPanel } from "./OwnerNightTargetPanel";
+import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
 
 interface Props {
   gameId: string;
@@ -152,44 +152,6 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
     gameState.visibleRoleAssignments,
   );
 
-  function renderPlayerActions(playerId: string, isDead: boolean) {
-    if (playerId === gameState.gameOwner?.id) return null;
-    if (isDead) {
-      return (
-        <Button
-          variant="outline"
-          size="xs"
-          onClick={() => {
-            action.mutate({
-              actionId: WerewolfAction.MarkPlayerAlive,
-              payload: { playerId },
-            });
-          }}
-          disabled={action.isPending}
-        >
-          Revive
-        </Button>
-      );
-    }
-    return (
-      <Button
-        variant="destructive"
-        size="xs"
-        onClick={() => {
-          if (window.confirm("Mark this player as dead?")) {
-            action.mutate({
-              actionId: WerewolfAction.MarkPlayerDead,
-              payload: { playerId },
-            });
-          }
-        }}
-        disabled={action.isPending}
-      >
-        Kill
-      </Button>
-    );
-  }
-
   const timer =
     nightPhaseSeconds !== null
       ? {
@@ -226,11 +188,12 @@ export function OwnerGameNightScreen({ gameId, gameState, turnState }: Props) {
           />
         )}
       </OwnerHeader>
-      <PlayersRoleList
+      <OwnerPlayerActionsGrid
+        gameId={gameId}
         assignments={gameState.visibleRoleAssignments}
         gameMode={gameState.gameMode}
         deadPlayerIds={gameState.deadPlayerIds}
-        renderActions={renderPlayerActions}
+        gameOwnerId={gameState.gameOwner?.id}
       />
       <GameRolesList
         roles={gameState.rolesInPlay ?? []}
