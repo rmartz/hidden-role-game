@@ -1,7 +1,7 @@
 "use client";
 
 interface Props {
-  roleName: string | undefined;
+  roleName?: string;
   teammateNames: string[];
 }
 

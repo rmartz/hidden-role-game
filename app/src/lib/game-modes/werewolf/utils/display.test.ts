@@ -176,8 +176,8 @@ describe("getSoloTarget", () => {
 });
 
 describe("isPlayersTurn", () => {
-  it("returns false when myRole is null", () => {
-    expect(isPlayersTurn(null, WerewolfRole.Seer)).toBe(false);
+  it("returns false when myRole is undefined", () => {
+    expect(isPlayersTurn(undefined, WerewolfRole.Seer)).toBe(false);
   });
 
   it("returns false when activePhaseKey is undefined", () => {

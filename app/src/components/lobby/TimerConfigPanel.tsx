@@ -49,7 +49,7 @@ function formatDuration(seconds: number): string {
 }
 
 interface Props {
-  timerConfig: TimerConfig | undefined;
+  timerConfig?: TimerConfig;
   disabled?: boolean;
   onChange?: (config: TimerConfig | undefined) => void;
 }

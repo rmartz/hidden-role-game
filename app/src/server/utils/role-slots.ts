@@ -28,12 +28,12 @@ export function adjustRoleSlots(
   const compare = (roleId: string, count: number) =>
     count - (otherMap.get(roleId) ?? 0);
 
-  const [bestRole] = candidates.reduce<[string | null, number]>(
+  const [bestRole] = candidates.reduce<[string | undefined, number]>(
     ([best, bestScore], [roleId, count]) => {
       const score = compare(roleId, count);
       return score > bestScore ? [roleId, score] : [best, bestScore];
     },
-    [null, -Infinity],
+    [undefined, -Infinity],
   );
 
   if (!bestRole) return current;

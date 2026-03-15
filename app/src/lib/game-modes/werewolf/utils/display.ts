@@ -58,8 +58,8 @@ export function getPhaseLabel(
  * Team phases match by team name; solo phases match by role ID.
  */
 export function isPlayersTurn(
-  myRole: { id: string; team: string } | null,
-  activePhaseKey: string | undefined,
+  myRole?: { id: string; team: string },
+  activePhaseKey?: string,
 ): boolean {
   if (!myRole || !activePhaseKey) return false;
   if (isTeamPhaseKey(activePhaseKey)) {
@@ -100,7 +100,7 @@ export function getActionText(
  * Returns the confirm button label for a given phase key based on its target category.
  * Team phase keys return "Attack". Solo roles: Attack, Protect, Investigate, or "Confirm".
  */
-export function getConfirmLabel(phaseKey: string | undefined): string {
+export function getConfirmLabel(phaseKey?: string): string {
   if (!phaseKey) return "Confirm";
   if (isTeamPhaseKey(phaseKey)) return "Attack";
   const roleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[

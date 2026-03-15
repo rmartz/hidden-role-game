@@ -6,8 +6,8 @@ import { getClientAuth } from "@/lib/firebase/client";
 import { getSessionId } from "@/lib/api";
 
 // Module-level deduplication: only one sign-in attempt at a time.
-let signInPromise: Promise<void> | null = null;
-let signedInSessionId: string | null = null;
+let signInPromise: Promise<void> | undefined = undefined;
+let signedInSessionId: string | undefined = undefined;
 
 async function doSignIn(): Promise<void> {
   const auth = getClientAuth();
@@ -31,10 +31,10 @@ function ensureSignedIn(): Promise<void> {
   const sessionId = getSessionId();
   // Invalidate cached promise if the session changed.
   if (signedInSessionId !== sessionId) {
-    signInPromise = null;
+    signInPromise = undefined;
   }
   signInPromise ??= doSignIn().catch((err: unknown) => {
-    signInPromise = null;
+    signInPromise = undefined;
     throw err;
   });
   return signInPromise;

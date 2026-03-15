@@ -25,19 +25,17 @@ export default function LobbyPage() {
   const queryClient = useQueryClient();
 
   // undefined = not yet read from localStorage (avoid SSR mismatch)
-  const [storedLobbyId, setStoredLobbyId] = useState<string | null | undefined>(
+  const [storedLobbyId, setStoredLobbyId] = useState<string | undefined>(
     undefined,
   );
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | undefined>(undefined);
   useEffect(() => {
     setStoredLobbyId(getLobbyId());
     setSessionId(getSessionId());
   }, []);
 
   const hasDifferentLobby =
-    storedLobbyId !== undefined &&
-    storedLobbyId !== null &&
-    storedLobbyId !== lobbyId;
+    storedLobbyId !== undefined && storedLobbyId !== lobbyId;
 
   const { isConnected: wsConnected } = useLobbyWebSocket(lobbyId, sessionId);
 

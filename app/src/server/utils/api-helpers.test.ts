@@ -64,7 +64,7 @@ function makeGame(overrides: Partial<Game> = {}): Game {
     roleAssignments: [],
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
-    ownerPlayerId: null,
+    ownerPlayerId: undefined,
     ...overrides,
   };
 }
@@ -198,32 +198,32 @@ describe("authenticateGame", () => {
 });
 
 describe("validatePlayerName", () => {
-  it("returns null for a valid name", () => {
-    expect(validatePlayerName("Alice")).toBeNull();
+  it("returns undefined for a valid name", () => {
+    expect(validatePlayerName("Alice")).toBeUndefined();
   });
 
   it("returns an error for an empty name", () => {
-    expect(validatePlayerName("")).not.toBeNull();
+    expect(validatePlayerName("")).toBeDefined();
   });
 
   it("returns an error for a name that is too long", () => {
-    expect(validatePlayerName("a".repeat(33))).not.toBeNull();
+    expect(validatePlayerName("a".repeat(33))).toBeDefined();
   });
 
   it("accepts a name at the maximum length", () => {
-    expect(validatePlayerName("a".repeat(32))).toBeNull();
+    expect(validatePlayerName("a".repeat(32))).toBeUndefined();
   });
 
   it.each(["<script>", "foo&bar", 'say "hi"', "{json}", "[arr]"])(
     "returns an error for name containing invalid chars: %s",
     (name) => {
-      expect(validatePlayerName(name)).not.toBeNull();
+      expect(validatePlayerName(name)).toBeDefined();
     },
   );
 
   it("allows international characters", () => {
-    expect(validatePlayerName("Ångström")).toBeNull();
-    expect(validatePlayerName("O'Brien")).toBeNull();
-    expect(validatePlayerName("José-María")).toBeNull();
+    expect(validatePlayerName("Ångström")).toBeUndefined();
+    expect(validatePlayerName("O'Brien")).toBeUndefined();
+    expect(validatePlayerName("José-María")).toBeUndefined();
   });
 });

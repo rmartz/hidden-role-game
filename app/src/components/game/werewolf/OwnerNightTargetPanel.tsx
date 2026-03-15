@@ -12,10 +12,10 @@ interface ResolvedVote {
 interface Props {
   teamAction: boolean;
   resolvedVotes: ResolvedVote[];
-  activeTargetName: string | undefined;
+  activeTargetName?: string;
   activeTargetConfirmed: boolean;
   targetablePlayers: TargetablePlayer[];
-  activeTarget: string | undefined;
+  activeTarget?: string;
   onTargetClick: (playerId: string) => void;
   isPending: boolean;
 }

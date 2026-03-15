@@ -238,7 +238,7 @@ export function gameToFirebase(game: Game): FirebaseGamePublic {
       max: s.max,
     })),
     showRolesInPlay: game.showRolesInPlay,
-    ownerPlayerId: game.ownerPlayerId,
+    ownerPlayerId: game.ownerPlayerId ?? null,
     ...(game.timerConfig ? { timerConfig: game.timerConfig } : {}),
   };
 }
@@ -263,7 +263,7 @@ export function firebaseToGame(
       firebaseToRoleSlot,
     ),
     showRolesInPlay: pub.showRolesInPlay as Game["showRolesInPlay"],
-    ownerPlayerId: pub.ownerPlayerId,
+    ownerPlayerId: pub.ownerPlayerId ?? undefined,
     ...(pub.timerConfig ? { timerConfig: pub.timerConfig } : {}),
   };
 }
@@ -304,11 +304,11 @@ export function playerStateToFirebase(
     statusJson: JSON.stringify(state.status),
     gameMode: state.gameMode,
     players: state.players,
-    gameOwner: state.gameOwner,
-    myPlayerId: state.myPlayerId,
-    myRole: state.myRole,
+    gameOwner: state.gameOwner ?? null,
+    myPlayerId: state.myPlayerId ?? null,
+    myRole: state.myRole ?? null,
     visibleRoleAssignments: state.visibleRoleAssignments,
-    rolesInPlay: state.rolesInPlay,
+    rolesInPlay: state.rolesInPlay ?? null,
     ...(state.nightActions ? { nightActions: state.nightActions } : {}),
     ...(state.myNightTarget !== undefined
       ? { myNightTarget: state.myNightTarget }
@@ -340,15 +340,15 @@ export function firebaseToPlayerState(
     status: JSON.parse(raw.statusJson) as GameStatusState,
     gameMode: raw.gameMode as PlayerGameState["gameMode"],
     players: raw.players ?? [],
-    gameOwner: raw.gameOwner,
-    myPlayerId: raw.myPlayerId,
+    gameOwner: raw.gameOwner ?? undefined,
+    myPlayerId: raw.myPlayerId ?? undefined,
     myRole: raw.myRole
       ? {
           id: raw.myRole.id,
           name: raw.myRole.name,
           team: raw.myRole.team as import("@/lib/types").Team,
         }
-      : null,
+      : undefined,
     visibleRoleAssignments: (raw.visibleRoleAssignments ?? []).map(
       (v): VisibleTeammate => ({
         player: v.player,
@@ -359,7 +359,7 @@ export function firebaseToPlayerState(
         },
       }),
     ),
-    rolesInPlay: raw.rolesInPlay ?? null,
+    rolesInPlay: raw.rolesInPlay ?? undefined,
     ...(raw.nightActions ? { nightActions: raw.nightActions } : {}),
     ...(raw.myNightTarget !== undefined
       ? { myNightTarget: raw.myNightTarget }

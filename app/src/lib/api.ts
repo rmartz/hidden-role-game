@@ -13,27 +13,27 @@ const SESSION_KEY = "x-session-id";
 const PLAYER_ID_KEY = "player-id";
 const LOBBY_ID_KEY = "lobby-id";
 
-export function getSessionId(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem(SESSION_KEY);
+export function getSessionId(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  return localStorage.getItem(SESSION_KEY) ?? undefined;
 }
 
 function saveSessionId(sessionId: string): void {
   localStorage.setItem(SESSION_KEY, sessionId);
 }
 
-export function getPlayerId(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem(PLAYER_ID_KEY);
+export function getPlayerId(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  return localStorage.getItem(PLAYER_ID_KEY) ?? undefined;
 }
 
 function savePlayerId(playerId: string): void {
   localStorage.setItem(PLAYER_ID_KEY, playerId);
 }
 
-export function getLobbyId(): string | null {
-  if (typeof window === "undefined") return null;
-  return localStorage.getItem(LOBBY_ID_KEY);
+export function getLobbyId(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  return localStorage.getItem(LOBBY_ID_KEY) ?? undefined;
 }
 
 function saveLobbyId(lobbyId: string): void {
@@ -189,7 +189,7 @@ export async function updateLobbyConfig(
 export async function removePlayer(
   lobbyId: string,
   playerId: string,
-): Promise<ServerResponse<{ lobby: PublicLobby | null }>> {
+): Promise<ServerResponse<{ lobby: PublicLobby | undefined }>> {
   const sessionId = getSessionId();
   const headers: HeadersInit = { "Content-Type": "application/json" };
   if (sessionId) headers["x-session-id"] = sessionId;
@@ -198,6 +198,6 @@ export async function removePlayer(
     headers,
   });
   return (await response.json()) as ServerResponse<{
-    lobby: PublicLobby | null;
+    lobby: PublicLobby | undefined;
   }>;
 }

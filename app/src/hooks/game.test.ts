@@ -34,17 +34,17 @@ const mockGameState: PlayerGameState = {
   status: { type: GameStatus.Playing },
   gameMode: GameMode.SecretVillain,
   players: [{ id: "player-1", name: "Alice" }],
-  gameOwner: null,
+  gameOwner: undefined,
   myPlayerId: "player-1",
   myRole: { id: "villager", name: "Villager", team: Team.Good },
   visibleRoleAssignments: [],
-  rolesInPlay: null,
+  rolesInPlay: undefined,
 };
 
 const mockOwnerGameState: PlayerGameState = {
   ...mockGameState,
   gameOwner: { id: "player-1", name: "Alice" },
-  myRole: null,
+  myRole: undefined,
   visibleRoleAssignments: [
     {
       player: { id: "player-1", name: "Alice" },

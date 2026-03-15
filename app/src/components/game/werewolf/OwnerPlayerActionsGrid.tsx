@@ -9,8 +9,8 @@ interface Props {
   gameId: string;
   assignments: VisibleTeammate[];
   gameMode: GameMode;
-  deadPlayerIds: string[] | undefined;
-  gameOwnerId: string | undefined;
+  deadPlayerIds?: string[];
+  gameOwnerId?: string;
 }
 
 export function OwnerPlayerActionsGrid({

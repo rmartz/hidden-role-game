@@ -13,12 +13,26 @@ const players = [
 
 describe("getTargetablePlayers", () => {
   it("excludes the game owner", () => {
-    const result = getTargetablePlayers(players, "owner", [], "", null, []);
+    const result = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      "",
+      undefined,
+      [],
+    );
     expect(result.map((p) => p.id)).toEqual(["p1", "p2", "p3"]);
   });
 
   it("excludes dead players", () => {
-    const result = getTargetablePlayers(players, "owner", ["p2"], "", null, []);
+    const result = getTargetablePlayers(
+      players,
+      "owner",
+      ["p2"],
+      "",
+      undefined,
+      [],
+    );
     expect(result.map((p) => p.id)).toEqual(["p1", "p3"]);
   });
 
@@ -28,19 +42,33 @@ describe("getTargetablePlayers", () => {
       "owner",
       ["p1", "p3"],
       "",
-      null,
+      undefined,
       [],
     );
     expect(result.map((p) => p.id)).toEqual(["p2"]);
   });
 
   it("returns all non-owner players when no one is dead", () => {
-    const result = getTargetablePlayers(players, "owner", [], "", null, []);
+    const result = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      "",
+      undefined,
+      [],
+    );
     expect(result).toHaveLength(3);
   });
 
   it("handles undefined ownerPlayerId", () => {
-    const result = getTargetablePlayers(players, undefined, [], "", null, []);
+    const result = getTargetablePlayers(
+      players,
+      undefined,
+      [],
+      "",
+      undefined,
+      [],
+    );
     expect(result).toHaveLength(4);
   });
 
@@ -50,7 +78,7 @@ describe("getTargetablePlayers", () => {
       "owner",
       ["p1", "p2", "p3"],
       "",
-      null,
+      undefined,
       [],
     );
     expect(result).toHaveLength(0);
@@ -104,7 +132,7 @@ describe("getTargetablePlayers", () => {
       "owner",
       [],
       WerewolfRole.Seer,
-      null,
+      undefined,
       assignments,
     );
     expect(result.map((p) => p.id)).not.toContain("p1");
@@ -138,7 +166,7 @@ describe("getTargetablePlayers — solo phase", () => {
       "owner",
       [],
       WerewolfRole.Seer,
-      null,
+      undefined,
       seerNarratorAssignments,
     );
     const playerResult = getTargetablePlayers(
@@ -166,7 +194,7 @@ describe("getTargetablePlayers — solo phase", () => {
       "owner",
       [],
       WerewolfRole.Bodyguard,
-      null,
+      undefined,
       assignments,
     );
     expect(result.map((p) => p.id)).toContain("p1");
@@ -238,7 +266,7 @@ describe("getTargetablePlayers — team phase", () => {
       "owner",
       [],
       teamPhaseKey,
-      null,
+      undefined,
       narratorAssignments,
     );
     const playerResult = getTargetablePlayers(

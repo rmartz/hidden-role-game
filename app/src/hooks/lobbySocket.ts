@@ -17,7 +17,7 @@ import { useFirebaseAuth } from "@/hooks/firebaseAuth";
  */
 export function useLobbyWebSocket(
   lobbyId: string,
-  sessionId: string | null,
+  sessionId?: string,
 ): { isConnected: boolean } {
   const queryClient = useQueryClient();
   const isActive = useRef(false);

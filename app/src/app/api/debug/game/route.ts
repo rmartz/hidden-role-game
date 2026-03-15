@@ -66,7 +66,7 @@ export async function POST(request: Request): Promise<Response> {
     roleSlots,
     gameMode,
     showRolesInPlay,
-    ownerPlayer?.id ?? null,
+    ownerPlayer?.id ?? undefined,
     timerConfig,
   );
 
