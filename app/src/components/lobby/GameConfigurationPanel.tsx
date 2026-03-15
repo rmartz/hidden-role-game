@@ -71,6 +71,34 @@ export function GameConfigurationPanel(props: Props) {
   const roleDefinitions = GAME_MODES[activeGameMode].roles;
   const ownerTitle = GAME_MODES[activeGameMode].ownerTitle;
   const roleSlotsRequired = getRoleSlotsRequired(activeGameMode, playerCount);
+  const disabled = readOnly ? true : props.isPending;
+
+  const resolved = readOnly
+    ? {
+        showRolesInPlay: config.showRolesInPlay,
+        showConfigToPlayers: config.showConfigToPlayers,
+        timerConfig: config.timerConfig,
+        onShowRolesInPlayChange: undefined,
+        onShowConfigToPlayersChange: undefined,
+        onTimerConfigChange: undefined,
+      }
+    : {
+        showRolesInPlay,
+        showConfigToPlayers,
+        timerConfig,
+        onShowRolesInPlayChange: (value: typeof showRolesInPlay) =>
+          dispatch(setShowRolesInPlay(value)),
+        onShowConfigToPlayersChange: (value: boolean) =>
+          dispatch(setShowConfigToPlayers(value)),
+        onTimerConfigChange: (value: typeof timerConfig) =>
+          dispatch(setTimerConfig(value)),
+      };
+
+  const ownerTitleText = ownerTitle
+    ? readOnly
+      ? `This game has a ${ownerTitle} who can see all roles.`
+      : `You will be the ${ownerTitle} and will see all player roles. Role slots are for the remaining ${String(roleSlotsRequired)} players.`
+    : null;
 
   return (
     <>
@@ -110,51 +138,27 @@ export function GameConfigurationPanel(props: Props) {
             </div>
             <div>
               <ShowRolesInPlayPicker
-                value={readOnly ? config.showRolesInPlay : showRolesInPlay}
-                disabled={readOnly ? true : props.isPending}
-                onChange={
-                  readOnly
-                    ? undefined
-                    : (value) => {
-                        dispatch(setShowRolesInPlay(value));
-                      }
-                }
+                value={resolved.showRolesInPlay}
+                disabled={disabled}
+                onChange={resolved.onShowRolesInPlayChange}
               />
             </div>
           </div>
 
           <ConfigurationToggles
-            showConfigToPlayers={
-              readOnly ? config.showConfigToPlayers : showConfigToPlayers
-            }
-            disabled={readOnly ? true : props.isPending}
-            onShowConfigToPlayersChange={
-              readOnly
-                ? undefined
-                : (value) => {
-                    dispatch(setShowConfigToPlayers(value));
-                  }
-            }
+            showConfigToPlayers={resolved.showConfigToPlayers}
+            disabled={disabled}
+            onShowConfigToPlayersChange={resolved.onShowConfigToPlayersChange}
           />
 
           <TimerConfigPanel
-            timerConfig={readOnly ? config.timerConfig : timerConfig}
-            disabled={readOnly ? true : props.isPending}
-            onChange={
-              readOnly
-                ? undefined
-                : (value) => {
-                    dispatch(setTimerConfig(value));
-                  }
-            }
+            timerConfig={resolved.timerConfig}
+            disabled={disabled}
+            onChange={resolved.onTimerConfigChange}
           />
 
-          {ownerTitle && (
-            <p className="text-sm text-muted-foreground">
-              {readOnly
-                ? `This game has a ${ownerTitle} who can see all roles.`
-                : `You will be the ${ownerTitle} and will see all player roles. Role slots are for the remaining ${String(roleSlotsRequired)} players.`}
-            </p>
+          {ownerTitleText && (
+            <p className="text-sm text-muted-foreground">{ownerTitleText}</p>
           )}
 
           {!readOnly && (
