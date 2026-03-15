@@ -2,16 +2,14 @@
 
 import { useMemo } from "react";
 import {
-  WerewolfAction,
   getTargetablePlayers,
   isTeamPhaseKey,
 } from "@/lib/game-modes/werewolf";
 import type { WerewolfNighttimePhase } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
-import { useGameAction } from "@/hooks";
 import { GameTimer } from "@/components/game";
-import { Button } from "@/components/ui/button";
-import { ConfirmTargetButton } from "./ConfirmTargetButton";
+import { PlayerFirstTurnScreen } from "./PlayerFirstTurnScreen";
+import { PlayerTargetSelection } from "./PlayerTargetSelection";
 
 interface Props {
   gameId: string;
@@ -45,7 +43,6 @@ export function PlayerGameNightScreen({
   turn,
   deadPlayerIds,
 }: Props) {
-  const action = useGameAction(gameId);
   const nightPhaseSeconds = gameState.timerConfig?.nightPhaseSeconds ?? null;
 
   const phaseStartedAt = useMemo(
@@ -69,13 +66,30 @@ export function PlayerGameNightScreen({
   const activePhaseKey = phase.nightPhaseOrder[phase.currentPhaseIndex];
   const isMyTurn = isPlayersTurn(gameState.myRole, activePhaseKey);
 
-  if (!isMyTurn) return <div />;
+  if (!isMyTurn) {
+    return (
+      <div className="p-5">
+        <p className="text-muted-foreground italic">
+          Stop peeking, you dirty cheater.
+        </p>
+      </div>
+    );
+  }
 
   const isFirstTurn = turn === 1;
   const isTeamPhase = activePhaseKey ? isTeamPhaseKey(activePhaseKey) : false;
-  const hasVisibleTeammates = gameState.visibleRoleAssignments.length > 0;
-  const teammateLabel =
-    gameState.visibleRoleAssignments.length === 1 ? "teammate" : "teammates";
+  const teammateNames = gameState.visibleRoleAssignments.map(
+    (a) => a.player.name,
+  );
+
+  if (isFirstTurn) {
+    return (
+      <PlayerFirstTurnScreen
+        roleName={gameState.myRole?.name}
+        teammateNames={teammateNames}
+      />
+    );
+  }
 
   const isConfirmed = gameState.myNightTargetConfirmed ?? false;
   const resolvedTeamVotes = (gameState.teamVotes ?? []).map((vote) => ({
@@ -100,7 +114,6 @@ export function PlayerGameNightScreen({
     ? allTargets.filter(([, isSelected]) => isSelected)
     : allTargets;
 
-  // The phase key to pass for confirm label (team key or role ID).
   const confirmPhaseKey = isTeamPhase ? activePhaseKey : gameState.myRole?.id;
 
   return (
@@ -120,88 +133,21 @@ export function PlayerGameNightScreen({
         />
       )}
       <p className="text-muted-foreground mb-4">
-        <strong className="text-foreground">{gameState.myRole?.name}</strong> —{" "}
-        {isFirstTurn
-          ? hasVisibleTeammates
-            ? `awake, find your ${teammateLabel} and make yourself known to the Narrator.`
-            : "awake and make yourself known to the Narrator."
-          : "wake up and take your action."}
+        <strong className="text-foreground">{gameState.myRole?.name}</strong> —
+        wake up and take your action.
       </p>
-      {!isFirstTurn && (
-        <div>
-          {isTeamPhase && !isConfirmed && hasVisibleTeammates && (
-            <div className="mb-3 rounded-md border p-2">
-              <p className="text-xs font-medium text-muted-foreground mb-1">
-                Teammate votes:
-              </p>
-              {resolvedTeamVotes.length > 0 ? (
-                <ul className="text-xs space-y-0.5">
-                  {resolvedTeamVotes.map((vote, i) => (
-                    <li key={i}>
-                      {vote.playerName} → {vote.targetName}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-xs text-muted-foreground">No votes yet.</p>
-              )}
-            </div>
-          )}
-
-          <h2 className="text-lg font-semibold mb-2">
-            {isConfirmed ? "Your target" : "Choose a target"}
-          </h2>
-          <div className="flex flex-col gap-2">
-            {targets.map(([player, isSelected]) => (
-              <Button
-                key={player.id}
-                variant={isSelected ? "default" : "outline"}
-                onClick={() => {
-                  action.mutate({
-                    actionId: WerewolfAction.SetNightTarget,
-                    payload: {
-                      targetPlayerId: isSelected ? undefined : player.id,
-                    },
-                  });
-                }}
-                disabled={action.isPending || isConfirmed}
-                className="justify-start"
-              >
-                {player.name}
-                {isSelected && " (selected)"}
-              </Button>
-            ))}
-          </div>
-
-          {isTeamPhase &&
-            suggestedTargetId &&
-            gameState.myNightTarget !== suggestedTargetId &&
-            !isConfirmed && (
-              <Button
-                variant="secondary"
-                className="mt-2"
-                onClick={() => {
-                  action.mutate({
-                    actionId: WerewolfAction.SetNightTarget,
-                    payload: { targetPlayerId: suggestedTargetId },
-                  });
-                }}
-                disabled={action.isPending}
-              >
-                Approve suggested target
-              </Button>
-            )}
-
-          <ConfirmTargetButton
-            gameId={gameId}
-            roleId={confirmPhaseKey}
-            hasTarget={!!gameState.myNightTarget}
-            isConfirmed={isConfirmed}
-            isTeamPhase={isTeamPhase}
-            allAgreed={allAgreed}
-          />
-        </div>
-      )}
+      <PlayerTargetSelection
+        gameId={gameId}
+        targets={targets}
+        isConfirmed={isConfirmed}
+        isTeamPhase={isTeamPhase}
+        confirmPhaseKey={confirmPhaseKey}
+        hasTarget={!!gameState.myNightTarget}
+        allAgreed={allAgreed}
+        teamVotes={resolvedTeamVotes}
+        suggestedTargetId={suggestedTargetId}
+        myNightTarget={gameState.myNightTarget}
+      />
     </div>
   );
 }
