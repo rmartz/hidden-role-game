@@ -10,29 +10,37 @@ import { currentTurnState } from "./game-state";
  * Returns the ordered list of phase keys that wake during a Werewolf night.
  * Roles with `teamTargeting` on the same team are grouped into a single
  * team phase key (e.g. "team:Bad"). Solo roles use their role ID.
+ * Phases where all relevant players are dead are omitted.
  */
+function hasAlivePlayers(
+  roleId: string,
+  roleAssignments: PlayerRoleAssignment[],
+  deadPlayerIds: Set<string>,
+): boolean {
+  return roleAssignments.some(
+    (a) => a.roleDefinitionId === roleId && !deadPlayerIds.has(a.playerId),
+  );
+}
+
 export function buildNightPhaseOrder(
   turn: number,
   roleAssignments: PlayerRoleAssignment[],
+  deadPlayerIds: string[] = [],
 ): string[] {
-  const assignedRoleIds = new Set(
-    roleAssignments.map((a) => a.roleDefinitionId),
-  );
-
+  const dead = new Set(deadPlayerIds);
   const phaseKeys: string[] = [];
   const emittedTeams = new Set<string>();
 
   for (const role of Object.values(WEREWOLF_ROLES)) {
-    if (!assignedRoleIds.has(role.id)) continue;
     if (role.wakesAtNight === WakesAtNight.Never) continue;
     if (role.wakesAtNight === WakesAtNight.FirstNightOnly && turn !== 1)
       continue;
+    if (!hasAlivePlayers(role.id as string, roleAssignments, dead)) continue;
 
     if (role.teamTargeting) {
-      if (!emittedTeams.has(role.team)) {
-        emittedTeams.add(role.team);
-        phaseKeys.push(getTeamPhaseKey(role.team));
-      }
+      if (emittedTeams.has(role.team)) continue;
+      emittedTeams.add(role.team);
+      phaseKeys.push(getTeamPhaseKey(role.team));
     } else {
       phaseKeys.push(role.id);
     }
