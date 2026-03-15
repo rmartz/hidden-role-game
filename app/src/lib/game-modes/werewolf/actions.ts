@@ -24,6 +24,7 @@ export enum WerewolfAction {
   SetNightPhase = "set-night-phase",
   SetNightTarget = "set-night-target",
   ConfirmNightTarget = "confirm-night-target",
+  RevealInvestigationResult = "reveal-investigation-result",
   MarkPlayerDead = "mark-player-dead",
   MarkPlayerAlive = "mark-player-alive",
 }
@@ -317,6 +318,38 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       const action = phase.nightActions[activePhaseKey];
       if (action) {
         phase.nightActions[activePhaseKey] = { ...action, confirmed: true };
+      }
+    },
+  },
+  [WerewolfAction.RevealInvestigationResult]: {
+    isValid(game: Game, callerId: string) {
+      if (!isOwnerPlaying(game, callerId)) return false;
+      const ts = currentTurnState(game);
+      if (ts?.phase.type !== WerewolfPhase.Nighttime) return false;
+      const phase = ts.phase;
+      const activePhaseKey = phase.nightPhaseOrder[phase.currentPhaseIndex];
+      if (!activePhaseKey) return false;
+      const roleDef = (
+        WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
+      )[activePhaseKey];
+      if (roleDef?.targetCategory !== TargetCategory.Investigate) return false;
+      const action = phase.nightActions[activePhaseKey];
+      if (!action || isTeamNightAction(action)) return false;
+      if (!action.confirmed) return false;
+      return !action.resultRevealed;
+    },
+    apply(game: Game) {
+      const ts = currentTurnState(game);
+      if (ts?.phase.type !== WerewolfPhase.Nighttime) return;
+      const phase = ts.phase;
+      const activePhaseKey = phase.nightPhaseOrder[phase.currentPhaseIndex];
+      if (!activePhaseKey) return;
+      const action = phase.nightActions[activePhaseKey];
+      if (action && !isTeamNightAction(action)) {
+        phase.nightActions[activePhaseKey] = {
+          ...action,
+          resultRevealed: true,
+        };
       }
     },
   },

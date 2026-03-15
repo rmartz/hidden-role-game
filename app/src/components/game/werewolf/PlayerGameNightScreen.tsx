@@ -11,6 +11,7 @@ import type { PlayerGameState } from "@/server/types";
 import { getPlayerName } from "@/lib/player-utils";
 import { GameTimer } from "@/components/game";
 import { PlayerFirstTurnScreen } from "./PlayerFirstTurnScreen";
+import { PlayerInvestigationResult } from "./PlayerInvestigationResult";
 import { PlayerTargetSelection } from "./PlayerTargetSelection";
 
 interface PlayerGameNightScreenProps {
@@ -62,7 +63,7 @@ export function PlayerGameNightScreen({
   }
 
   const isFirstTurn = turn === 1;
-  const isTeamPhase = activePhaseKey ? isTeamPhaseKey(activePhaseKey) : false;
+  const isTeamPhase = !!(activePhaseKey && isTeamPhaseKey(activePhaseKey));
   const teammateNames = gameState.visibleRoleAssignments.map(
     (a) => a.player.name,
   );
@@ -135,6 +136,17 @@ export function PlayerGameNightScreen({
         suggestedTargetId={suggestedTargetId}
         myNightTarget={gameState.myNightTarget}
       />
+      {gameState.investigationResult && (
+        <PlayerInvestigationResult
+          targetName={
+            getPlayerName(
+              gameState.players,
+              gameState.investigationResult.targetPlayerId,
+            ) ?? gameState.investigationResult.targetPlayerId
+          }
+          isWerewolfTeam={gameState.investigationResult.isWerewolfTeam}
+        />
+      )}
     </div>
   );
 }

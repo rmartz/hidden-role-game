@@ -10,13 +10,19 @@ import {
   getTargetablePlayers,
   getPhaseLabel,
   getSoloTarget,
+  TargetCategory,
+  getInvestigationResultForNarrator,
 } from "@/lib/game-modes/werewolf";
-import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
+import type {
+  WerewolfTurnState,
+  WerewolfRoleDefinition,
+} from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
 import { getPlayerName } from "@/lib/player-utils";
 import { useGameAction } from "@/hooks";
 import { GameRolesList } from "@/components/game";
 import { OwnerHeader } from "./OwnerHeader";
+import { OwnerInvestigationConfirm } from "./OwnerInvestigationConfirm";
 import { OwnerNightTargetPanel } from "./OwnerNightTargetPanel";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
 
@@ -121,6 +127,24 @@ export function OwnerGameNightScreen({
 
   const isFirstTurn = turnState.turn === 1;
 
+  const activeRoleDef = modeConfig.roles[activePhaseKey] as
+    | WerewolfRoleDefinition
+    | undefined;
+  const isInvestigatePhase =
+    activeRoleDef?.targetCategory === TargetCategory.Investigate;
+  const isResultRevealed = !!(
+    activeAction &&
+    "resultRevealed" in activeAction &&
+    activeAction.resultRevealed
+  );
+  const investigationResult = getInvestigationResultForNarrator(
+    isInvestigatePhase,
+    activeTarget,
+    activeTargetConfirmed,
+    activeTargetName,
+    gameState.visibleRoleAssignments,
+  );
+
   const resolvedVotes = (teamAction?.votes ?? []).map((vote) => ({
     key: vote.playerId,
     voterName: getPlayerName(gameState.players, vote.playerId) ?? vote.playerId,
@@ -174,6 +198,14 @@ export function OwnerGameNightScreen({
             activeTarget={activeTarget}
             onTargetClick={handleTargetClick}
             isPending={action.isPending}
+          />
+        )}
+        {investigationResult && (
+          <OwnerInvestigationConfirm
+            gameId={gameId}
+            targetName={investigationResult.targetName}
+            isWerewolfTeam={investigationResult.isWerewolfTeam}
+            isResultRevealed={isResultRevealed}
           />
         )}
       </OwnerHeader>
