@@ -69,6 +69,34 @@ export function isPlayersTurn(
 }
 
 /**
+ * Returns a human-readable confirmation string for a player's own night action.
+ * For Attack category, appends a note when the target survived (was protected).
+ */
+export function getActionText(
+  category: TargetCategory,
+  targetName: string,
+  nightSummary: { targetPlayerId: string; died: boolean }[] | undefined,
+  targetPlayerId: string,
+): string {
+  switch (category) {
+    case TargetCategory.Protect:
+      return `You Protected ${targetName}.`;
+    case TargetCategory.Investigate:
+      return `You Investigated ${targetName}.`;
+    case TargetCategory.Attack: {
+      const targetWasKilled = (nightSummary ?? []).some(
+        (e) => e.died && e.targetPlayerId === targetPlayerId,
+      );
+      return targetWasKilled
+        ? `You Attacked ${targetName}.`
+        : `You Attacked ${targetName}, but something protected them.`;
+    }
+    default:
+      return `You targeted ${targetName}.`;
+  }
+}
+
+/**
  * Returns the confirm button label for a given phase key based on its target category.
  * Team phase keys return "Attack". Solo roles: Attack, Protect, Investigate, or "Confirm".
  */

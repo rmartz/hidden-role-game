@@ -10,6 +10,7 @@ import {
   PlayersRoleList,
   RoleLabel,
 } from "@/components/game";
+import { PlayerNightSummary } from "./PlayerNightSummary";
 
 interface Props {
   gameState: PlayerGameState;
@@ -38,6 +39,12 @@ export function PlayerGameDayScreen({ gameState, turnState }: Props) {
         <GameTimer startedAt={phaseStartedAt} />
       )}
       <p className="mb-4 text-muted-foreground">The game is underway.</p>
+
+      <PlayerNightSummary
+        players={gameState.players}
+        nightSummary={gameState.nightSummary}
+        myLastNightAction={gameState.myLastNightAction}
+      />
 
       {gameState.amDead && (
         <p className="mb-4 font-semibold text-muted-foreground italic">
