@@ -292,6 +292,8 @@ export interface FirebasePlayerState {
   allAgreed?: boolean;
   amDead?: boolean;
   deadPlayerIds?: string[];
+  nightSummary?: { targetPlayerId: string; died: boolean }[];
+  myLastNightAction?: { targetPlayerId: string };
   timerConfig?: TimerConfig;
 }
 
@@ -322,6 +324,10 @@ export function playerStateToFirebase(
     ...(state.amDead ? { amDead: true } : {}),
     ...(state.deadPlayerIds?.length
       ? { deadPlayerIds: state.deadPlayerIds }
+      : {}),
+    ...(state.nightSummary?.length ? { nightSummary: state.nightSummary } : {}),
+    ...(state.myLastNightAction
+      ? { myLastNightAction: state.myLastNightAction }
       : {}),
     ...(state.timerConfig ? { timerConfig: state.timerConfig } : {}),
   };
@@ -368,6 +374,10 @@ export function firebaseToPlayerState(
     ...(raw.allAgreed !== undefined ? { allAgreed: raw.allAgreed } : {}),
     ...(raw.amDead ? { amDead: true } : {}),
     ...(raw.deadPlayerIds?.length ? { deadPlayerIds: raw.deadPlayerIds } : {}),
+    ...(raw.nightSummary?.length ? { nightSummary: raw.nightSummary } : {}),
+    ...(raw.myLastNightAction
+      ? { myLastNightAction: raw.myLastNightAction }
+      : {}),
     ...(raw.timerConfig ? { timerConfig: raw.timerConfig } : {}),
   };
 }

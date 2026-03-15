@@ -269,6 +269,13 @@ export class FirebaseGameService {
 
     const amDead = deadPlayerIds.includes(callerId);
 
+    // Daytime-only: sanitized night outcomes and personal action confirmation.
+    const daytimeNightState = this.extractDaytimeNightState(
+      game,
+      callerId,
+      myRole,
+    );
+
     return {
       status: game.status,
       gameMode: game.gameMode,
@@ -285,6 +292,7 @@ export class FirebaseGameService {
       visibleRoleAssignments,
       rolesInPlay: this.buildRolesInPlay(game),
       ...nightTargetState,
+      ...daytimeNightState,
       ...(amDead ? { amDead: true } : {}),
       ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
       ...(game.timerConfig ? { timerConfig: game.timerConfig } : {}),
@@ -375,6 +383,72 @@ export class FirebaseGameService {
       myNightTarget: myAction.targetPlayerId,
       myNightTargetConfirmed: myAction.confirmed ?? false,
     };
+  }
+
+  /**
+   * Extracts sanitized night outcomes and the player's own last action for
+   * display at the start of the day. Only populated during daytime phases.
+   *
+   * nightSummary: only events where something happened (died === true),
+   * with attacker/protector info stripped — players cannot infer who acted.
+   *
+   * myLastNightAction: the target the player chose, even if their action was
+   * negated, so they can confirm their input was recorded.
+   */
+  private extractDaytimeNightState(
+    game: Game,
+    callerId: string,
+    myRole: RoleDefinition,
+  ): Partial<PlayerGameState> {
+    if (game.status.type !== GameStatus.Playing) return {};
+    const ts = game.status.turnState as WerewolfTurnState | undefined;
+    if (ts?.phase.type !== WerewolfPhase.Daytime) return {};
+    const phase = ts.phase;
+
+    const nightSummary = (phase.nightResolution ?? [])
+      .filter((e) => e.died)
+      .map((e) => ({ targetPlayerId: e.targetPlayerId, died: e.died }));
+
+    const myLastNightAction = this.extractMyLastNightTarget(
+      phase.nightActions,
+      game,
+      callerId,
+      myRole,
+    );
+
+    return {
+      ...(nightSummary.length > 0 ? { nightSummary } : {}),
+      ...(myLastNightAction ? { myLastNightAction } : {}),
+    };
+  }
+
+  /**
+   * Returns the target the player chose during the preceding night, or
+   * undefined if they took no action.
+   */
+  private extractMyLastNightTarget(
+    nightActions: Record<string, AnyNightAction>,
+    game: Game,
+    callerId: string,
+    myRole: RoleDefinition,
+  ): { targetPlayerId: string } | undefined {
+    const roleDef = GAME_MODES[game.gameMode].roles[myRole.id] as
+      | { teamTargeting?: boolean; team?: string }
+      | undefined;
+
+    if (roleDef?.teamTargeting && roleDef.team) {
+      const phaseKey = getTeamPhaseKey(roleDef.team as Team);
+      const action = nightActions[phaseKey];
+      if (!action || !isTeamNightAction(action)) return undefined;
+      const myVote = action.votes.find((v) => v.playerId === callerId);
+      return myVote ? { targetPlayerId: myVote.targetPlayerId } : undefined;
+    }
+
+    const myAction = nightActions[myRole.id];
+    if (!myAction || isTeamNightAction(myAction)) return undefined;
+    return myAction.targetPlayerId
+      ? { targetPlayerId: myAction.targetPlayerId }
+      : undefined;
   }
 
   /** Writes pre-computed PlayerGameState for every player in the game. */
