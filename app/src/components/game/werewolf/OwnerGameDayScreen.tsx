@@ -74,7 +74,7 @@ export function OwnerGameDayScreen({ gameId, gameState, turnState }: Props) {
         <NightActionsSummary
           nightActions={phase.nightActions}
           players={gameState.players}
-          roles={GAME_MODES[gameState.gameMode].roles}
+          roles={modeConfig.roles}
         />
         {resolvedSummary.length > 0 && (
           <div className="mb-4 rounded-md border p-3">
