@@ -1097,7 +1097,7 @@ describe("SetNightTarget — Bodyguard self-targeting", () => {
     expect(action.isValid(game, "p1", { targetPlayerId: "p1" })).toBe(true);
   });
 
-  it("non-protect role cannot target themselves", () => {
+  it("Attack role cannot target themselves", () => {
     const game = makePlayingGame(nightTurn2State);
     // p1 is Werewolf (Attack), targeting themselves
     expect(action.isValid(game, "p1", { targetPlayerId: "p1" })).toBe(false);

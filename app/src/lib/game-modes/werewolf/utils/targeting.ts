@@ -1,5 +1,6 @@
 import { Team } from "@/lib/types";
 import type { PlayerRoleAssignment } from "@/lib/types";
+import { TargetCategory } from "../types";
 import type { AnyNightAction, TargetablePlayer, TeamNightVote } from "../types";
 import { WEREWOLF_ROLES } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
@@ -7,12 +8,12 @@ import { isTeamPhaseKey, parseTeamPhaseKey } from "./phase-keys";
 
 /**
  * Returns the list of players eligible to be targeted during a night phase.
- * Excludes the game owner (narrator), dead players, the acting player
- * (`myPlayerId`), and phase-specific exclusions derived from
- * `visibleRoleAssignments`:
+ * Excludes the game owner (narrator), dead players, and phase-specific
+ * exclusions derived from `visibleRoleAssignments`:
  *   - Team phase: all players on the active team are excluded.
- *   - Solo phase (player view only): the player(s) assigned to the active role
- *     are excluded, unless the role has `canSelfTarget: true`.
+ *   - Solo phase, Attack/Investigate category (player view only): the acting
+ *     player and any role-visible role-holders are excluded.
+ *   - Solo phase, all other categories: no self/role exclusions.
  *
  * Pass `myPlayerId = null` for the narrator view (the narrator is already
  * absent from the players list).
@@ -32,13 +33,6 @@ export function getTargetablePlayers(
 ): TargetablePlayer[] {
   const excludeIds: string[] = [];
 
-  const canSelfTarget =
-    myPlayerId !== null &&
-    !isTeamPhaseKey(activePhaseKey) &&
-    !!(WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[activePhaseKey]
-      ?.canSelfTarget;
-  if (!canSelfTarget && myPlayerId) excludeIds.push(myPlayerId);
-
   if (isTeamPhaseKey(activePhaseKey)) {
     const team = parseTeamPhaseKey(activePhaseKey);
     if (team) {
@@ -47,8 +41,17 @@ export function getTargetablePlayers(
       }
     }
   } else if (myPlayerId !== null) {
-    for (const a of visibleRoleAssignments) {
-      if (a.role.id === activePhaseKey) excludeIds.push(a.player.id);
+    const role = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
+      activePhaseKey
+    ];
+    const restrictsSelf =
+      role?.targetCategory === TargetCategory.Attack ||
+      role?.targetCategory === TargetCategory.Investigate;
+    if (restrictsSelf) {
+      excludeIds.push(myPlayerId);
+      for (const a of visibleRoleAssignments) {
+        if (a.role.id === activePhaseKey) excludeIds.push(a.player.id);
+      }
     }
   }
 
