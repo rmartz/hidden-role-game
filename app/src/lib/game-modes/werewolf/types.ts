@@ -39,12 +39,24 @@ export interface WerewolfNighttimePhase {
   nightActions: Record<string, AnyNightAction>;
 }
 
+export interface NightResolutionEvent {
+  targetPlayerId: string;
+  /** Phase keys (role IDs or team phase keys) that attacked this player. */
+  attackedBy: string[];
+  /** Phase keys (role IDs) that protected this player. */
+  protectedBy: string[];
+  /** True if the player was attacked and not protected — they die. */
+  died: boolean;
+}
+
 export interface WerewolfDaytimePhase {
   type: WerewolfPhase.Daytime;
   /** Unix epoch ms when the day phase began (for elapsed-time display). */
   startedAt: number;
   /** Targets from the preceding night, carried over for narrator summary. */
   nightActions: Record<string, AnyNightAction>;
+  /** Resolved attack/protect outcomes, computed when transitioning to day. */
+  nightResolution?: NightResolutionEvent[];
 }
 
 export type WerewolfTurnPhase = WerewolfNighttimePhase | WerewolfDaytimePhase;
