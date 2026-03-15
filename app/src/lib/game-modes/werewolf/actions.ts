@@ -1,6 +1,6 @@
 import { GameStatus } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
-import { WerewolfPhase, isTeamNightAction } from "./types";
+import { WerewolfPhase, isTeamNightAction, TargetCategory } from "./types";
 import type { WerewolfNighttimePhase, TeamNightAction } from "./types";
 import {
   buildNightPhaseOrder,
@@ -12,7 +12,10 @@ import {
   getTeamPlayerIds,
   getTeamMemberPlayerIds,
   computeSuggestedTarget,
+  resolveNightActions,
 } from "./utils";
+import { WEREWOLF_ROLES } from "./roles";
+import type { WerewolfRoleDefinition } from "./roles";
 
 export enum WerewolfAction {
   StartNight = "start-night",
@@ -63,6 +66,14 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       const ts = currentTurnState(game);
       if (!ts) return;
       const nightPhase = ts.phase as WerewolfNighttimePhase;
+      const nightResolution = resolveNightActions(
+        nightPhase.nightActions,
+        game.roleAssignments,
+        ts.deadPlayerIds,
+      );
+      const newDeadIds = nightResolution
+        .filter((e) => e.died)
+        .map((e) => e.targetPlayerId);
       game.status = {
         type: GameStatus.Playing,
         turnState: {
@@ -71,8 +82,9 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
             type: WerewolfPhase.Daytime,
             startedAt: Date.now(),
             nightActions: nightPhase.nightActions,
+            ...(nightResolution.length > 0 ? { nightResolution } : {}),
           },
-          deadPlayerIds: ts.deadPlayerIds,
+          deadPlayerIds: [...ts.deadPlayerIds, ...newDeadIds],
         },
       };
     },
@@ -147,8 +159,19 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       if (!game.players.some((p) => p.id === targetPlayerId)) return false;
       if (ts.deadPlayerIds.includes(targetPlayerId)) return false;
 
-      // Cannot target self.
-      if (targetPlayerId === callerId) return false;
+      // Cannot target self, unless the role allows self-targeting (Protect category).
+      if (targetPlayerId === callerId) {
+        const callerAssignment = game.roleAssignments.find(
+          (a) => a.playerId === callerId,
+        );
+        const callerRoleDef = callerAssignment
+          ? (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
+              callerAssignment.roleDefinitionId
+            ]
+          : undefined;
+        if (callerRoleDef?.targetCategory !== TargetCategory.Protect)
+          return false;
+      }
 
       // Team targeting: cannot target players the caller knows are teammates.
       if (team && !isOwner) {

@@ -15,6 +15,7 @@ import {
   getTeamPhaseKey,
   computeSuggestedTarget,
   getTeamPlayerIds,
+  resolveNightActions,
 } from "./utils";
 
 function makePlayingGame(
@@ -216,6 +217,76 @@ describe("WerewolfAction.StartDay", () => {
       const phase = ts.phase as { startedAt: number };
       expect(phase.startedAt).toBeGreaterThanOrEqual(before);
       expect(phase.startedAt).toBeLessThanOrEqual(after);
+    });
+
+    it("resolves night actions and adds killed players to deadPlayerIds", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          nightActions: {
+            [getTeamPhaseKey(Team.Bad)]: {
+              votes: [],
+              suggestedTargetId: "p2",
+            },
+          },
+        }),
+      );
+      action.apply(game, null, "owner-1");
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      expect(ts.deadPlayerIds).toContain("p2");
+    });
+
+    it("does not kill a player protected by Bodyguard", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          nightActions: {
+            [getTeamPhaseKey(Team.Bad)]: {
+              votes: [],
+              suggestedTargetId: "p2",
+            },
+            [WerewolfRole.Bodyguard]: { targetPlayerId: "p2" },
+          },
+        }),
+        {
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Seer },
+            { playerId: "p3", roleDefinitionId: WerewolfRole.Bodyguard },
+          ],
+        },
+      );
+      action.apply(game, null, "owner-1");
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      expect(ts.deadPlayerIds).not.toContain("p2");
+    });
+
+    it("stores nightResolution in the daytime phase", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          nightActions: {
+            [getTeamPhaseKey(Team.Bad)]: {
+              votes: [],
+              suggestedTargetId: "p2",
+            },
+          },
+        }),
+      );
+      action.apply(game, null, "owner-1");
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      const phase = ts.phase as import("./types").WerewolfDaytimePhase;
+      expect(phase.nightResolution).toBeDefined();
+      expect(phase.nightResolution).toHaveLength(1);
+      expect(phase.nightResolution![0]).toMatchObject({
+        targetPlayerId: "p2",
+        died: true,
+      });
+    });
+
+    it("omits nightResolution when there are no night actions", () => {
+      const game = makePlayingGame(nightTurnState);
+      action.apply(game, null, "owner-1");
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      const phase = ts.phase as import("./types").WerewolfDaytimePhase;
+      expect(phase.nightResolution).toBeUndefined();
     });
   });
 });
@@ -991,5 +1062,58 @@ describe("ConfirmNightTarget — team phase", () => {
     const phase = ts.phase as WerewolfNighttimePhase;
     const teamAction = phase.nightActions[TEAM_BAD_KEY] as TeamNightAction;
     expect(teamAction.confirmed).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Bodyguard self-targeting
+// ---------------------------------------------------------------------------
+
+describe("SetNightTarget — Bodyguard self-targeting", () => {
+  const action = WEREWOLF_ACTIONS[WerewolfAction.SetNightTarget];
+
+  function makeBodyguardGame(nightState: WerewolfTurnState): Game {
+    return makePlayingGame(nightState, {
+      players: [
+        { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
+        { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
+        { id: "p3", name: "Charlie", sessionId: "s3", visibleRoles: [] },
+      ],
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Bodyguard },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Seer },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+      ],
+    });
+  }
+
+  const bodyguardNightState = makeNightState({
+    turn: 2,
+    nightPhaseOrder: [WerewolfRole.Bodyguard],
+  });
+
+  it("Bodyguard can target themselves", () => {
+    const game = makeBodyguardGame(bodyguardNightState);
+    expect(action.isValid(game, "p1", { targetPlayerId: "p1" })).toBe(true);
+  });
+
+  it("non-protect role cannot target themselves", () => {
+    const game = makePlayingGame(nightTurn2State);
+    // p1 is Werewolf (Attack), targeting themselves
+    expect(action.isValid(game, "p1", { targetPlayerId: "p1" })).toBe(false);
+  });
+
+  it("Bodyguard self-protection is applied by resolveNightActions", () => {
+    const assignments = [
+      { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "p2", roleDefinitionId: WerewolfRole.Bodyguard },
+    ];
+    const nightActions = {
+      [getTeamPhaseKey(Team.Bad)]: { votes: [], suggestedTargetId: "p2" },
+      [WerewolfRole.Bodyguard]: { targetPlayerId: "p2" },
+    };
+    const result = resolveNightActions(nightActions, assignments, []);
+    const event = result.find((e) => e.targetPlayerId === "p2");
+    expect(event?.died).toBe(false);
   });
 });

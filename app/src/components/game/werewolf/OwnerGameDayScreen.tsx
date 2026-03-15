@@ -7,7 +7,7 @@ import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
 import { useGameAction } from "@/hooks";
 import { GameRolesList } from "@/components/game";
-import { NightActionsSummary } from "./NightActionsSummary";
+import { NightOutcomeSummary } from "./NightOutcomeSummary";
 import { OwnerHeader } from "./OwnerHeader";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
 
@@ -35,6 +35,8 @@ export function OwnerGameDayScreen({ gameId, gameState, turnState }: Props) {
 
   if (!isDaytime) return null;
 
+  const modeConfig = GAME_MODES[gameState.gameMode];
+
   const timer =
     dayPhaseSeconds !== null
       ? {
@@ -54,10 +56,10 @@ export function OwnerGameDayScreen({ gameId, gameState, turnState }: Props) {
         isAdvancing={action.isPending}
         timer={timer}
       >
-        <NightActionsSummary
-          nightActions={phase.nightActions}
+        <NightOutcomeSummary
+          nightResolution={phase.nightResolution ?? []}
           players={gameState.players}
-          roles={GAME_MODES[gameState.gameMode].roles}
+          roles={modeConfig.roles}
         />
       </OwnerHeader>
       <OwnerPlayerActionsGrid
