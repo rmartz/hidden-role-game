@@ -44,9 +44,11 @@ export function buildNightSummary(
 export function getPhaseLabel(
   phaseKey: string,
   roles: Record<string, { name: string }>,
+  teamLabels?: Partial<Record<string, string>>,
 ): string {
   if (isTeamPhaseKey(phaseKey)) {
-    return `${phaseKey.slice(TEAM_PHASE_PREFIX.length)} Team`;
+    const team = phaseKey.slice(TEAM_PHASE_PREFIX.length);
+    return teamLabels?.[team] ?? `${team} Team`;
   }
   return roles[phaseKey]?.name ?? phaseKey;
 }
