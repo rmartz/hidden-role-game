@@ -1,4 +1,7 @@
 import { describe, it, expect } from "vitest";
+import { Team } from "@/lib/types";
+import { WerewolfRole } from "../roles";
+import { getTeamPhaseKey } from "./phase-keys";
 import { getTargetablePlayers } from "./targeting";
 
 const players = [
@@ -51,5 +54,203 @@ describe("getTargetablePlayers", () => {
       [],
     );
     expect(result).toHaveLength(0);
+  });
+
+  it("Bodyguard can target themselves", () => {
+    const result = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      WerewolfRole.Bodyguard,
+      "p1",
+      [],
+    );
+    expect(result.map((p) => p.id)).toContain("p1");
+  });
+
+  it("Witch can target themselves", () => {
+    const result = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      WerewolfRole.Witch,
+      "p1",
+      [],
+    );
+    expect(result.map((p) => p.id)).toContain("p1");
+  });
+
+  it("Seer cannot target themselves", () => {
+    const result = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      WerewolfRole.Seer,
+      "p1",
+      [],
+    );
+    expect(result.map((p) => p.id)).not.toContain("p1");
+  });
+
+  it("Narrator view excludes Seer from Seer phase targets", () => {
+    const assignments = [
+      {
+        player: { id: "p1" },
+        role: { id: WerewolfRole.Seer, team: Team.Good },
+      },
+    ];
+    const result = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      WerewolfRole.Seer,
+      null,
+      assignments,
+    );
+    expect(result.map((p) => p.id)).not.toContain("p1");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Solo phase targeting — narrator vs player parity
+// ---------------------------------------------------------------------------
+
+// Narrator sees all assignments including the acting player's own role.
+const seerNarratorAssignments = [
+  { player: { id: "p1" }, role: { id: WerewolfRole.Seer, team: Team.Good } },
+  {
+    player: { id: "p2" },
+    role: { id: WerewolfRole.Villager, team: Team.Good },
+  },
+  {
+    player: { id: "p3" },
+    role: { id: WerewolfRole.Villager, team: Team.Good },
+  },
+];
+
+// Player p1 does not see their own assignment (mirrors buildGamePlayers).
+const seerPlayerAssignments: typeof seerNarratorAssignments = [];
+
+describe("getTargetablePlayers — solo phase", () => {
+  it("narrator and player produce the same targetable set for Investigate phase", () => {
+    const narratorResult = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      WerewolfRole.Seer,
+      null,
+      seerNarratorAssignments,
+    );
+    const playerResult = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      WerewolfRole.Seer,
+      "p1",
+      seerPlayerAssignments,
+    );
+    expect(narratorResult.map((p) => p.id).sort()).toEqual(
+      playerResult.map((p) => p.id).sort(),
+    );
+  });
+
+  it("narrator does not exclude Bodyguard from Protect phase targets", () => {
+    const assignments = [
+      {
+        player: { id: "p1" },
+        role: { id: WerewolfRole.Bodyguard, team: Team.Good },
+      },
+    ];
+    const result = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      WerewolfRole.Bodyguard,
+      null,
+      assignments,
+    );
+    expect(result.map((p) => p.id)).toContain("p1");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Team phase targeting
+// ---------------------------------------------------------------------------
+
+const teamPhaseKey = getTeamPhaseKey(Team.Bad);
+
+// Narrator sees all assignments (no self-skip).
+const narratorAssignments = [
+  { player: { id: "p1" }, role: { id: WerewolfRole.Werewolf, team: Team.Bad } },
+  { player: { id: "p2" }, role: { id: WerewolfRole.Werewolf, team: Team.Bad } },
+  {
+    player: { id: "p3" },
+    role: { id: WerewolfRole.Villager, team: Team.Good },
+  },
+];
+
+// Player p1 sees only other team members — their own assignment is absent
+// (mirrors buildGamePlayers which skips `other.playerId === assignment.playerId`).
+const p1Assignments = [
+  { player: { id: "p2" }, role: { id: WerewolfRole.Werewolf, team: Team.Bad } },
+];
+
+describe("getTargetablePlayers — team phase", () => {
+  it("werewolf player cannot target themselves", () => {
+    const result = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      teamPhaseKey,
+      "p1",
+      p1Assignments,
+    );
+    expect(result.map((p) => p.id)).not.toContain("p1");
+  });
+
+  it("werewolf player cannot target visible teammates", () => {
+    const result = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      teamPhaseKey,
+      "p1",
+      p1Assignments,
+    );
+    expect(result.map((p) => p.id)).not.toContain("p2");
+  });
+
+  it("werewolf player can target non-team players", () => {
+    const result = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      teamPhaseKey,
+      "p1",
+      p1Assignments,
+    );
+    expect(result.map((p) => p.id)).toContain("p3");
+  });
+
+  it("narrator and player produce the same targetable set for team phases", () => {
+    const narratorResult = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      teamPhaseKey,
+      null,
+      narratorAssignments,
+    );
+    const playerResult = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      teamPhaseKey,
+      "p1",
+      p1Assignments,
+    );
+    expect(narratorResult.map((p) => p.id).sort()).toEqual(
+      playerResult.map((p) => p.id).sort(),
+    );
   });
 });

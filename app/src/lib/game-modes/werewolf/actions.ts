@@ -160,7 +160,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       if (!game.players.some((p) => p.id === targetPlayerId)) return false;
       if (ts.deadPlayerIds.includes(targetPlayerId)) return false;
 
-      // Cannot target self, unless the role allows self-targeting (Protect category).
+      // Attack and Investigate roles cannot target themselves.
       if (targetPlayerId === callerId) {
         const callerAssignment = game.roleAssignments.find(
           (a) => a.playerId === callerId,
@@ -170,7 +170,10 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
               callerAssignment.roleDefinitionId
             ]
           : undefined;
-        if (callerRoleDef?.targetCategory !== TargetCategory.Protect)
+        if (
+          callerRoleDef?.targetCategory === TargetCategory.Attack ||
+          callerRoleDef?.targetCategory === TargetCategory.Investigate
+        )
           return false;
       }
 
