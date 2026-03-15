@@ -22,6 +22,8 @@ export interface WerewolfRoleDefinition extends RoleDefinition<
   targetCategory: TargetCategory;
   /** When true, all players with this role on the same team wake and target together. */
   teamTargeting?: boolean;
+  /** When true, the player may include themselves in their target list. */
+  canSelfTarget?: boolean;
 }
 
 export const MIN_PLAYERS = 5;
@@ -68,6 +70,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Good,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Special,
+    canSelfTarget: true,
   },
   [WerewolfRole.Spellcaster]: {
     id: WerewolfRole.Spellcaster,
@@ -104,5 +107,6 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Good,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Protect,
+    canSelfTarget: true,
   },
 };

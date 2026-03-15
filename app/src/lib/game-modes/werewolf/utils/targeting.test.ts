@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { WerewolfRole } from "../roles";
 import { getTargetablePlayers } from "./targeting";
 
 const players = [
@@ -51,5 +52,41 @@ describe("getTargetablePlayers", () => {
       [],
     );
     expect(result).toHaveLength(0);
+  });
+
+  it("Bodyguard can target themselves", () => {
+    const result = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      WerewolfRole.Bodyguard,
+      "p1",
+      [],
+    );
+    expect(result.map((p) => p.id)).toContain("p1");
+  });
+
+  it("Witch can target themselves", () => {
+    const result = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      WerewolfRole.Witch,
+      "p1",
+      [],
+    );
+    expect(result.map((p) => p.id)).toContain("p1");
+  });
+
+  it("Seer cannot target themselves", () => {
+    const result = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      WerewolfRole.Seer,
+      "p1",
+      [],
+    );
+    expect(result.map((p) => p.id)).not.toContain("p1");
   });
 });

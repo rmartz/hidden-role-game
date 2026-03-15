@@ -30,7 +30,13 @@ export function getTargetablePlayers(
   }[],
 ): TargetablePlayer[] {
   const excludeIds: string[] = [];
-  if (myPlayerId) excludeIds.push(myPlayerId);
+
+  const canSelfTarget =
+    myPlayerId !== null &&
+    !isTeamPhaseKey(activePhaseKey) &&
+    !!(WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[activePhaseKey]
+      ?.canSelfTarget;
+  if (!canSelfTarget && myPlayerId) excludeIds.push(myPlayerId);
 
   if (isTeamPhaseKey(activePhaseKey)) {
     const team = parseTeamPhaseKey(activePhaseKey);
