@@ -70,7 +70,7 @@ export function OwnerNightTargetPanel({
             size="sm"
             variant={activeTarget === player.id ? "default" : "outline"}
             onClick={() => {
-              onTargetClick(player.id);
+              onTargetClick(activeTarget === player.id ? undefined : player.id);
             }}
             disabled={isPending}
           >
