@@ -43,7 +43,7 @@ export function buildNightPhaseOrder(
       if (emittedTeams.has(role.team)) continue;
       emittedTeams.add(role.team);
       phaseKeys.push(getTeamPhaseKey(role.team));
-    } else if ((role.id) === WerewolfRole.Witch) {
+    } else if (role.id === WerewolfRole.Witch) {
       witchPhaseKey = role.id;
     } else {
       phaseKeys.push(role.id);
