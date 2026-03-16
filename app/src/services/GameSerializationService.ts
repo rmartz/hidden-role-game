@@ -101,6 +101,42 @@ export class GameSerializationService {
       };
     }
 
+    // For the Witch, include attacked-player info and ability-used state.
+    // This must run before the early-return below, since the Witch may not
+    // have chosen a target yet but still needs to see who is under attack.
+    if ((myRole.id as WerewolfRole) === WerewolfRole.Witch) {
+      const ts =
+        game.status.type === GameStatus.Playing
+          ? (game.status.turnState as WerewolfTurnState | undefined)
+          : undefined;
+      const witchAction = nightActions[myRole.id];
+      const witchSoloAction =
+        witchAction && !isTeamNightAction(witchAction)
+          ? witchAction
+          : undefined;
+      const result: Partial<PlayerGameState> = {
+        myNightTarget: witchSoloAction?.targetPlayerId,
+        myNightTargetConfirmed: witchSoloAction?.confirmed ?? false,
+        witchAbilityUsed: ts?.witchAbilityUsed ?? false,
+      };
+      if (!ts?.witchAbilityUsed) {
+        const attacked = getInterimAttackedPlayerIds(
+          nightActions,
+          game.roleAssignments,
+          deadPlayerIds,
+        );
+        if (attacked.length > 0) {
+          result.nightStatus = attacked.map(
+            (id): NighttimeNightStatusEntry => ({
+              targetPlayerId: id,
+              effect: "attacked",
+            }),
+          );
+        }
+      }
+      return result;
+    }
+
     const myAction = nightActions[myRole.id];
     if (!myAction || isTeamNightAction(myAction)) {
       return { myNightTarget: undefined, myNightTargetConfirmed: false };
@@ -132,30 +168,6 @@ export class GameSerializationService {
         targetPlayerId: myAction.targetPlayerId,
         isWerewolfTeam: targetRoleDef?.team === Team.Bad,
       };
-    }
-
-    // For the Witch, include attacked-player info and ability-used state.
-    if ((myRole.id as WerewolfRole) === WerewolfRole.Witch) {
-      const ts =
-        game.status.type === GameStatus.Playing
-          ? (game.status.turnState as WerewolfTurnState | undefined)
-          : undefined;
-      result.witchAbilityUsed = ts?.witchAbilityUsed ?? false;
-      if (!ts?.witchAbilityUsed) {
-        const attacked = getInterimAttackedPlayerIds(
-          nightActions,
-          game.roleAssignments,
-          deadPlayerIds,
-        );
-        if (attacked.length > 0) {
-          result.nightStatus = attacked.map(
-            (id): NighttimeNightStatusEntry => ({
-              targetPlayerId: id,
-              effect: "attacked",
-            }),
-          );
-        }
-      }
     }
 
     return result;
