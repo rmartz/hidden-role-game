@@ -50,10 +50,10 @@ export function PlayerTargetSelection({
 
   return (
     <div>
-      {witchAbilityUsed !== undefined && (
+      {confirmPhaseKey === WerewolfRole.Witch && (
         <WitchInformationPanel
           players={players}
-          witchAbilityUsed={witchAbilityUsed}
+          witchAbilityUsed={witchAbilityUsed ?? false}
           attackedPlayerIds={attackedPlayerIds ?? []}
         />
       )}
