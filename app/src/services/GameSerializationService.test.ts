@@ -373,6 +373,34 @@ describe("GameSerializationService.extractPlayerNightState (suffixed group phase
     expect(result.previousNightTargetId).toBe("p3");
   });
 
+  it("previousNightTargetId is set even before any vote has been cast in the second phase", () => {
+    // Reproduces the bug: when nightActions has no entry for the bonus phase yet
+    // (before any player votes), previousNightTargetId must still be surfaced so
+    // the first phase's target is immediately shown as unavailable.
+    const nightActions = {
+      [WerewolfRole.Werewolf]: {
+        votes: [
+          { playerId: "w1", targetPlayerId: "p3" },
+          { playerId: "w2", targetPlayerId: "p3" },
+        ],
+        suggestedTargetId: "p3",
+        confirmed: true,
+      },
+      // BONUS_PHASE_KEY intentionally absent — no action created yet
+    };
+    const game = makeNighttimeGameWithBonusPhase(nightActions);
+    const result = service.extractPlayerNightState(
+      nightActions as Parameters<typeof service.extractPlayerNightState>[0],
+      game,
+      "w1",
+      werewolfRole,
+      [],
+    );
+    expect(result.previousNightTargetId).toBe("p3");
+    expect(result.myNightTarget).toBeUndefined();
+    expect(result.myNightTargetConfirmed).toBe(false);
+  });
+
   it("myNightTarget reflects the player's vote in the second phase action, not the first", () => {
     const nightActions = {
       [WerewolfRole.Werewolf]: {

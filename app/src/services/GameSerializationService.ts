@@ -90,9 +90,25 @@ export class GameSerializationService {
           ? activePhaseKey
           : groupPhaseKey;
 
+      // For a suffixed repeat phase (e.g. "werewolf-werewolf:2"), surface the
+      // first phase's suggestedTargetId as previousNightTargetId so the player
+      // UI disables that button (within-night exclusion). Computed before the
+      // early return so it is set even when no phase-2 action exists yet.
+      let previousNightTargetId: string | undefined;
+      if (lookupKey !== groupPhaseKey) {
+        const baseAction = nightActions[groupPhaseKey];
+        if (baseAction && isTeamNightAction(baseAction)) {
+          previousNightTargetId = baseAction.suggestedTargetId;
+        }
+      }
+
       const action = nightActions[lookupKey];
       if (!action || !isTeamNightAction(action)) {
-        return { myNightTarget: undefined, myNightTargetConfirmed: false };
+        return {
+          myNightTarget: undefined,
+          myNightTargetConfirmed: false,
+          ...(previousNightTargetId ? { previousNightTargetId } : {}),
+        };
       }
 
       const myVote = action.votes.find((v) => v.playerId === callerId);
@@ -118,17 +134,6 @@ export class GameSerializationService {
       const allAgreed =
         aliveVotes.length === aliveParticipantIds.length &&
         uniqueTargets.size === 1;
-
-      // For a suffixed repeat phase (e.g. "werewolf-werewolf:2"), surface the
-      // first phase's suggestedTargetId as previousNightTargetId so the player
-      // UI disables that button (within-night exclusion).
-      let previousNightTargetId: string | undefined;
-      if (lookupKey !== groupPhaseKey) {
-        const baseAction = nightActions[groupPhaseKey];
-        if (baseAction && isTeamNightAction(baseAction)) {
-          previousNightTargetId = baseAction.suggestedTargetId;
-        }
-      }
 
       return {
         myNightTarget: myVote?.targetPlayerId,
