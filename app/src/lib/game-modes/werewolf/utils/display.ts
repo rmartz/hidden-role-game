@@ -124,15 +124,32 @@ export function getInvestigationResultForNarrator(
   };
 }
 
+export interface WitchConfirmContext {
+  selectedTargetId: string | undefined;
+  attackedPlayerIds: string[];
+}
+
 /**
  * Returns the confirm button label for a given phase key based on its target category.
  * Team phase keys return "Attack". Solo roles: Attack, Protect, Investigate,
- * Silence (Spellcaster), Use Ability (Witch), or "Confirm".
+ * Silence (Spellcaster), or "Confirm".
+ * For the Witch: "Protect" if the selected target is under attack, "Attack" if not,
+ * or "Use Ability" when no target is selected.
  */
-export function getConfirmLabel(phaseKey?: PhaseKey): string {
+export function getConfirmLabel(
+  phaseKey?: PhaseKey,
+  witchContext?: WitchConfirmContext,
+): string {
   if (!phaseKey) return "Confirm";
   if (isTeamPhaseKey(phaseKey)) return "Attack";
-  if (phaseKey === WerewolfRole.Witch) return "Use Ability";
+  if (phaseKey === WerewolfRole.Witch) {
+    if (!witchContext?.selectedTargetId) return "Use Ability";
+    return witchContext.attackedPlayerIds.includes(
+      witchContext.selectedTargetId,
+    )
+      ? "Protect"
+      : "Attack";
+  }
   if (phaseKey === WerewolfRole.Spellcaster) return "Silence";
   const roleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
     phaseKey

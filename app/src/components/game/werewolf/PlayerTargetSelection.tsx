@@ -1,6 +1,6 @@
 "use client";
 
-import { WerewolfAction } from "@/lib/game-modes/werewolf";
+import { WerewolfAction, WerewolfRole } from "@/lib/game-modes/werewolf";
 import type { PhaseKey, TargetablePlayer } from "@/lib/game-modes/werewolf";
 import { useGameAction } from "@/hooks";
 import { Button } from "@/components/ui/button";
@@ -128,6 +128,14 @@ export function PlayerTargetSelection({
         isConfirmed={isConfirmed}
         isTeamPhase={isTeamPhase}
         allAgreed={allAgreed}
+        witchContext={
+          confirmPhaseKey === WerewolfRole.Witch
+            ? {
+                selectedTargetId: myNightTarget,
+                attackedPlayerIds: attackedPlayerIds ?? [],
+              }
+            : undefined
+        }
       />
     </div>
   );

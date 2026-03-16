@@ -240,8 +240,35 @@ describe("getConfirmLabel", () => {
     expect(getConfirmLabel(WerewolfRole.Seer)).toBe("Investigate");
   });
 
-  it("returns 'Use Ability' for Witch", () => {
+  it("returns 'Use Ability' for Witch with no selected target", () => {
     expect(getConfirmLabel(WerewolfRole.Witch)).toBe("Use Ability");
+  });
+
+  it("returns 'Use Ability' for Witch when witchContext has no selectedTargetId", () => {
+    expect(
+      getConfirmLabel(WerewolfRole.Witch, {
+        selectedTargetId: undefined,
+        attackedPlayerIds: ["p1"],
+      }),
+    ).toBe("Use Ability");
+  });
+
+  it("returns 'Protect' for Witch when selected target is under attack", () => {
+    expect(
+      getConfirmLabel(WerewolfRole.Witch, {
+        selectedTargetId: "p1",
+        attackedPlayerIds: ["p1", "p2"],
+      }),
+    ).toBe("Protect");
+  });
+
+  it("returns 'Attack' for Witch when selected target is not under attack", () => {
+    expect(
+      getConfirmLabel(WerewolfRole.Witch, {
+        selectedTargetId: "p3",
+        attackedPlayerIds: ["p1"],
+      }),
+    ).toBe("Attack");
   });
 
   it("returns 'Silence' for Spellcaster", () => {
