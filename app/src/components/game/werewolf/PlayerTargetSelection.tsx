@@ -28,6 +28,7 @@ interface Props {
   myNightTarget?: string;
   witchAbilityUsed?: boolean;
   attackedPlayerIds?: string[];
+  previousNightTargetId?: string;
 }
 
 export function PlayerTargetSelection({
@@ -45,6 +46,7 @@ export function PlayerTargetSelection({
   myNightTarget,
   witchAbilityUsed,
   attackedPlayerIds,
+  previousNightTargetId,
 }: Props) {
   const action = useGameAction(gameId);
 
@@ -109,11 +111,16 @@ export function PlayerTargetSelection({
                 },
               });
             }}
-            disabled={action.isPending || isConfirmed}
+            disabled={
+              action.isPending ||
+              isConfirmed ||
+              player.id === previousNightTargetId
+            }
             className="justify-start"
           >
             {player.name}
             {isSelected && " (selected)"}
+            {player.id === previousNightTargetId && " (unavailable)"}
           </Button>
         ))}
         {!isConfirmed && (

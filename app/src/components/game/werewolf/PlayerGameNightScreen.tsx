@@ -145,6 +145,7 @@ export function PlayerGameNightScreen({
         myNightTarget={gameState.myNightTarget}
         witchAbilityUsed={gameState.witchAbilityUsed}
         attackedPlayerIds={attackedPlayerIds}
+        previousNightTargetId={gameState.previousNightTargetId}
       />
       {gameState.investigationResult && (
         <PlayerInvestigationResult

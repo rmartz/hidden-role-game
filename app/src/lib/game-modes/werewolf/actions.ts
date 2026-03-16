@@ -57,6 +57,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
           },
           deadPlayerIds: ts.deadPlayerIds,
           ...(ts.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
+          ...(ts.lastTargets ? { lastTargets: ts.lastTargets } : {}),
         },
       };
     },
@@ -78,6 +79,21 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       const newDeadIds = nightResolution
         .filter((e) => e.type === "killed" && e.died)
         .map((e) => e.targetPlayerId);
+
+      // Build lastTargets for roles that prevent consecutive same-player targeting.
+      const lastTargets: Record<string, string> = {};
+      for (const [phaseKey, action] of Object.entries(
+        nightPhase.nightActions,
+      )) {
+        if (isTeamNightAction(action)) continue;
+        const roleDef = (
+          WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
+        )[phaseKey];
+        if (roleDef?.preventRepeatTarget && action.targetPlayerId) {
+          lastTargets[phaseKey] = action.targetPlayerId;
+        }
+      }
+
       game.status = {
         type: GameStatus.Playing,
         turnState: {
@@ -90,6 +106,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
           },
           deadPlayerIds: [...ts.deadPlayerIds, ...newDeadIds],
           ...(ts.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
+          ...(Object.keys(lastTargets).length > 0 ? { lastTargets } : {}),
         },
       };
     },
@@ -170,6 +187,16 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       if (targetPlayerId === game.ownerPlayerId) return false;
       if (!game.players.some((p) => p.id === targetPlayerId)) return false;
       if (ts.deadPlayerIds.includes(targetPlayerId)) return false;
+
+      // Roles with preventRepeatTarget cannot target the same player twice in a row.
+      const phaseRoleDef = (
+        WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
+      )[phaseKey];
+      if (
+        phaseRoleDef?.preventRepeatTarget &&
+        ts.lastTargets?.[phaseKey] === targetPlayerId
+      )
+        return false;
 
       // Attack and Investigate roles cannot target themselves.
       if (targetPlayerId === callerId) {

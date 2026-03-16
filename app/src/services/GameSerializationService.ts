@@ -143,18 +143,41 @@ export class GameSerializationService {
 
     const myAction = nightActions[myRole.id];
     if (!myAction || isTeamNightAction(myAction)) {
-      return { myNightTarget: undefined, myNightTargetConfirmed: false };
+      const ts =
+        game.status.type === GameStatus.Playing
+          ? (game.status.turnState as WerewolfTurnState | undefined)
+          : undefined;
+      const myRoleDefForRepeat = GAME_MODES[game.gameMode].roles[myRole.id] as
+        | WerewolfRoleDefinition
+        | undefined;
+      const previousNightTargetId = myRoleDefForRepeat?.preventRepeatTarget
+        ? ts?.lastTargets?.[myRole.id]
+        : undefined;
+      return {
+        myNightTarget: undefined,
+        myNightTargetConfirmed: false,
+        ...(previousNightTargetId ? { previousNightTargetId } : {}),
+      };
     }
+
+    const ts =
+      game.status.type === GameStatus.Playing
+        ? (game.status.turnState as WerewolfTurnState | undefined)
+        : undefined;
+    const myRoleDef = GAME_MODES[game.gameMode].roles[myRole.id] as
+      | WerewolfRoleDefinition
+      | undefined;
+    const previousNightTargetId = myRoleDef?.preventRepeatTarget
+      ? ts?.lastTargets?.[myRole.id]
+      : undefined;
 
     const result: Partial<PlayerGameState> = {
       myNightTarget: myAction.targetPlayerId,
       myNightTargetConfirmed: myAction.confirmed ?? false,
+      ...(previousNightTargetId ? { previousNightTargetId } : {}),
     };
 
     // For Investigate roles, include the result once the narrator has revealed it.
-    const myRoleDef = GAME_MODES[game.gameMode].roles[myRole.id] as
-      | WerewolfRoleDefinition
-      | undefined;
     if (
       myRoleDef?.targetCategory === TargetCategory.Investigate &&
       myAction.confirmed &&

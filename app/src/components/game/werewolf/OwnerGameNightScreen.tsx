@@ -154,6 +154,10 @@ export function OwnerGameNightScreen({
       vote.targetPlayerId,
   }));
 
+  const previousTargetId = activeRoleDef?.preventRepeatTarget
+    ? turnState.lastTargets?.[activePhaseKey]
+    : undefined;
+
   const targetablePlayers = getTargetablePlayers(
     gameState.players,
     gameState.gameOwner?.id,
@@ -206,6 +210,7 @@ export function OwnerGameNightScreen({
               activeTarget={activeTarget}
               onTargetClick={handleTargetClick}
               isPending={action.isPending}
+              previousTargetId={previousTargetId}
             />
           ))}
         {investigationResult && (

@@ -80,6 +80,12 @@ export interface WerewolfTurnState {
   deadPlayerIds: string[];
   /** True once the Witch has used her once-per-game special ability. */
   witchAbilityUsed?: boolean;
+  /**
+   * Maps phase key → player ID that was targeted last night.
+   * Used to prevent roles with preventRepeatTarget from targeting the same
+   * player on consecutive nights.
+   */
+  lastTargets?: Record<string, string>;
 }
 
 export interface TargetablePlayer {

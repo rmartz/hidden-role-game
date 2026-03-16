@@ -89,6 +89,13 @@ export interface PlayerGameState {
    */
   nightStatus?: NightStatusEntry[];
   /**
+  /**
+   * For roles with preventRepeatTarget, the player ID that cannot be targeted
+   * this night (was targeted last night). Shown as disabled in the UI.
+   * Only populated for non-owner players during their nighttime phase.
+   */
+  previousNightTargetId?: string;
+  /**
    * Investigation result for the Seer during nighttime.
    * Only populated after the narrator explicitly reveals it.
    */
