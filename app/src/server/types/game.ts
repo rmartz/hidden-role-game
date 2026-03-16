@@ -39,12 +39,21 @@ export interface VisibleTeammate {
   role: PublicRoleInfo;
 }
 
-export type NightPlayerEffect = "killed" | "silenced" | "attacked";
-
-export interface NightStatusEntry {
+/** Night effects visible during the daytime summary. */
+export interface DaytimeNightStatusEntry {
   targetPlayerId: string;
-  effect: NightPlayerEffect;
+  effect: "killed" | "silenced";
 }
+
+/** Night effects visible to the Witch during their nighttime phase only. */
+export interface NighttimeNightStatusEntry {
+  targetPlayerId: string;
+  effect: "attacked";
+}
+
+export type NightStatusEntry =
+  | DaytimeNightStatusEntry
+  | NighttimeNightStatusEntry;
 
 export interface PlayerGameState {
   status: GameStatusState;

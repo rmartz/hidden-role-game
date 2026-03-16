@@ -1,6 +1,10 @@
 import { GameStatus, Team } from "@/lib/types";
 import type { Game, RoleDefinition } from "@/lib/types";
-import type { NightStatusEntry, PlayerGameState } from "@/server/types";
+import type {
+  DaytimeNightStatusEntry,
+  NighttimeNightStatusEntry,
+  PlayerGameState,
+} from "@/server/types";
 import {
   isTeamNightAction,
   getTeamPhaseKey,
@@ -145,7 +149,7 @@ export class GameSerializationService {
         );
         if (attacked.length > 0) {
           result.nightStatus = attacked.map(
-            (id): NightStatusEntry => ({
+            (id): NighttimeNightStatusEntry => ({
               targetPlayerId: id,
               effect: "attacked",
             }),
@@ -177,17 +181,20 @@ export class GameSerializationService {
     if (ts?.phase.type !== WerewolfPhase.Daytime) return {};
     const phase = ts.phase;
 
-    const nightStatus: NightStatusEntry[] = [
+    const nightStatus: DaytimeNightStatusEntry[] = [
       ...(phase.nightResolution ?? [])
         .filter((e) => e.died)
         .map(
-          (e): NightStatusEntry => ({
+          (e): DaytimeNightStatusEntry => ({
             targetPlayerId: e.targetPlayerId,
             effect: "killed",
           }),
         ),
       ...(phase.silencedPlayerIds ?? []).map(
-        (id): NightStatusEntry => ({ targetPlayerId: id, effect: "silenced" }),
+        (id): DaytimeNightStatusEntry => ({
+          targetPlayerId: id,
+          effect: "silenced",
+        }),
       ),
     ];
 
