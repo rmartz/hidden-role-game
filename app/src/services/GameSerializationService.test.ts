@@ -221,7 +221,7 @@ describe("GameSerializationService.extractPlayerNightState (Witch)", () => {
 
   it("returns witchAbilityUsed and nightStatus even when Witch has not acted yet", () => {
     const nightActions = {
-      [getTeamPhaseKey(Team.Bad)]: { votes: [], suggestedTargetId: "p2" },
+      [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p2" },
     };
     const game = makeNighttimeGame(nightActions);
     const result = service.extractPlayerNightState(
@@ -240,7 +240,7 @@ describe("GameSerializationService.extractPlayerNightState (Witch)", () => {
 
   it("returns myNightTarget when the Witch has chosen a target", () => {
     const nightActions = {
-      [getTeamPhaseKey(Team.Bad)]: { votes: [], suggestedTargetId: "p2" },
+      [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p2" },
       [WerewolfRole.Witch]: { targetPlayerId: "p1" },
     };
     const game = makeNighttimeGame(nightActions);
@@ -257,7 +257,7 @@ describe("GameSerializationService.extractPlayerNightState (Witch)", () => {
 
   it("returns no nightStatus when witchAbilityUsed is true", () => {
     const nightActions = {
-      [getTeamPhaseKey(Team.Bad)]: { votes: [], suggestedTargetId: "p2" },
+      [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p2" },
     };
     const game = makeNighttimeGame(nightActions, true);
     const result = service.extractPlayerNightState(
