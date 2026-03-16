@@ -36,7 +36,7 @@ export function getTargetablePlayers(
     if (myPlayerId) excludeIds.push(myPlayerId);
     const primaryRole = (
       WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
-    )[activePhaseKey];
+    )[baseGroupPhaseKey(activePhaseKey)];
     if (primaryRole) {
       for (const a of visibleRoleAssignments) {
         if (a.role.team === (primaryRole.team as string))

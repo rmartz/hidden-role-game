@@ -119,12 +119,24 @@ export class GameSerializationService {
         aliveVotes.length === aliveParticipantIds.length &&
         uniqueTargets.size === 1;
 
+      // For a suffixed repeat phase (e.g. "werewolf-werewolf:2"), surface the
+      // first phase's suggestedTargetId as previousNightTargetId so the player
+      // UI disables that button (within-night exclusion).
+      let previousNightTargetId: string | undefined;
+      if (lookupKey !== groupPhaseKey) {
+        const baseAction = nightActions[groupPhaseKey];
+        if (baseAction && isTeamNightAction(baseAction)) {
+          previousNightTargetId = baseAction.suggestedTargetId;
+        }
+      }
+
       return {
         myNightTarget: myVote?.targetPlayerId,
         myNightTargetConfirmed: action.confirmed ?? false,
         teamVotes,
         suggestedTargetId: action.suggestedTargetId,
         allAgreed,
+        ...(previousNightTargetId ? { previousNightTargetId } : {}),
       };
     }
 
