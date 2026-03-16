@@ -253,7 +253,6 @@ export function OwnerGameNightScreen({
         nightPhaseOrder={nightPhaseOrder}
         currentPhaseIndex={currentPhaseIndex}
         roles={modeConfig.roles}
-        teamLabels={modeConfig.teamLabels as Record<string, string>}
       />
       <GameRolesList
         roles={gameState.rolesInPlay ?? []}
