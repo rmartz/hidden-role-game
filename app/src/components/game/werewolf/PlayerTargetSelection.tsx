@@ -94,6 +94,15 @@ export function PlayerTargetSelection({
           ) : (
             <p className="text-xs text-muted-foreground">No votes yet.</p>
           )}
+          {suggestedTargetId && (
+            <GroupTargetSuggestion
+              gameId={gameId}
+              players={players}
+              suggestedTargetId={suggestedTargetId}
+              myNightTarget={myNightTarget}
+              isConfirmed={isConfirmed}
+            />
+          )}
         </div>
       )}
 
@@ -150,16 +159,6 @@ export function PlayerTargetSelection({
             </Button>
           )}
         </div>
-      )}
-
-      {isGroupPhase && suggestedTargetId && (
-        <GroupTargetSuggestion
-          gameId={gameId}
-          players={players}
-          suggestedTargetId={suggestedTargetId}
-          myNightTarget={myNightTarget}
-          isConfirmed={isConfirmed}
-        />
       )}
 
       <ConfirmTargetButton

@@ -40,9 +40,9 @@ export const WEREWOLF_COPY = {
   },
   roleDisplay: {
     yourRole: "Your Role",
-    revealRole: "Reveal Role",
-    hidesAutomatically: "Hides automatically. Tap to hide now.",
-    hide: "Hide",
+    showRole: "Show role",
+    roleRevealed: (roleName: string, teamLabel: string) =>
+      `${roleName} (${teamLabel})`,
   },
   playerLists: {
     activePlayers: (count: number) => `Active Players (${String(count)})`,

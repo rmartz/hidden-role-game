@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { WerewolfPhase } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
-import { GameTimer, PlayersRoleList } from "@/components/game";
+import { GameTimer } from "@/components/game";
 import { PlayerNightSummary } from "./PlayerNightSummary";
 import { PlayerRoleDisplay } from "./PlayerRoleDisplay";
 import { PlayerStatusLists } from "./PlayerStatusLists";
@@ -59,12 +59,7 @@ export function PlayerGameDayScreen({ gameState, turnState }: Props) {
         players={gameState.players}
         deadPlayerIds={turnState.deadPlayerIds}
         gameOwnerId={gameState.gameOwner?.id}
-      />
-
-      <PlayersRoleList
-        assignments={gameState.visibleRoleAssignments}
-        gameMode={gameState.gameMode}
-        deadPlayerIds={gameState.deadPlayerIds}
+        roleAssignments={gameState.visibleRoleAssignments}
       />
     </div>
   );

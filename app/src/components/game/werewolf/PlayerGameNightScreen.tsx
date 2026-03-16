@@ -14,7 +14,6 @@ import { PlayerFirstTurnScreen } from "./PlayerFirstTurnScreen";
 import { PlayerInvestigationResult } from "./PlayerInvestigationResult";
 import { PlayerTargetSelection } from "./PlayerTargetSelection";
 import { PlayerRoleDisplay } from "./PlayerRoleDisplay";
-import { PlayerStatusLists } from "./PlayerStatusLists";
 import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 
 interface PlayerGameNightScreenProps {
@@ -158,11 +157,6 @@ export function PlayerGameNightScreen({
         witchAbilityUsed={gameState.witchAbilityUsed}
         attackedPlayerIds={attackedPlayerIds}
         previousNightTargetId={gameState.previousNightTargetId}
-      />
-      <PlayerStatusLists
-        players={gameState.players}
-        deadPlayerIds={deadPlayerIds}
-        gameOwnerId={gameState.gameOwner?.id}
       />
       {gameState.investigationResult && (
         <PlayerInvestigationResult

@@ -28,8 +28,8 @@ export function GroupTargetSuggestion({
   const isApproved = myNightTarget === suggestedTargetId;
 
   return (
-    <div className="mt-3 rounded-md border p-2">
-      <p className="text-sm mb-2">
+    <div className="mt-2 pt-2 border-t">
+      <p className="text-xs mb-1.5">
         {WEREWOLF_COPY.targetSelection.suggestedTarget(suggestedName)}
       </p>
       {!isApproved && !isConfirmed && (

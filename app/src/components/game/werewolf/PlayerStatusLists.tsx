@@ -1,4 +1,4 @@
-import type { PublicLobbyPlayer } from "@/server/types";
+import type { PublicLobbyPlayer, VisibleTeammate } from "@/server/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 
@@ -7,17 +7,24 @@ interface Props {
   deadPlayerIds: string[];
   /** ID of the game owner (narrator) to exclude from the lists. */
   gameOwnerId?: string;
+  /** Known role assignments — if provided, role is shown next to eliminated players. */
+  roleAssignments?: VisibleTeammate[];
 }
 
 export function PlayerStatusLists({
   players,
   deadPlayerIds,
   gameOwnerId,
+  roleAssignments,
 }: Props) {
   const deadSet = new Set(deadPlayerIds);
   const filtered = players.filter((p) => p.id !== gameOwnerId);
   const activePlayers = filtered.filter((p) => !deadSet.has(p.id));
   const deadPlayers = filtered.filter((p) => deadSet.has(p.id));
+
+  const roleMap = new Map(
+    (roleAssignments ?? []).map((a) => [a.player.id, a.role.name]),
+  );
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
@@ -54,11 +61,17 @@ export function PlayerStatusLists({
             </p>
           ) : (
             <ul className="text-sm space-y-1">
-              {deadPlayers.map((p) => (
-                <li key={p.id} className="text-muted-foreground">
-                  {p.name}
-                </li>
-              ))}
+              {deadPlayers.map((p) => {
+                const roleName = roleMap.get(p.id);
+                return (
+                  <li key={p.id} className="text-muted-foreground">
+                    {p.name}
+                    {roleName && (
+                      <span className="text-xs ml-1">({roleName})</span>
+                    )}
+                  </li>
+                );
+              })}
             </ul>
           )}
         </CardContent>

@@ -1,6 +1,11 @@
 import { getPhaseLabel } from "@/lib/game-modes/werewolf";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Item, ItemContent, ItemTitle } from "@/components/ui/item";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface NightPhaseOrderListProps {
   nightPhaseOrder: string[];
@@ -17,59 +22,55 @@ export function NightPhaseOrderList({
 }: NightPhaseOrderListProps) {
   if (nightPhaseOrder.length === 0) return null;
 
+  const currentPhaseKey = nightPhaseOrder[currentPhaseIndex];
+
   return (
     <Card className="mb-5">
       <CardHeader>
         <CardTitle>Night Order</CardTitle>
       </CardHeader>
       <CardContent>
-        <ol className="list-none space-y-1">
+        <Accordion defaultValue={currentPhaseKey ? [currentPhaseKey] : []}>
           {nightPhaseOrder.map((phaseKey, index) => {
             const isCurrent = index === currentPhaseIndex;
             const isPast = index < currentPhaseIndex;
             const label = getPhaseLabel(phaseKey, roles);
-            const playerNames = phasePlayerNames?.[phaseKey];
+            const playerNames = phasePlayerNames?.[phaseKey] ?? [];
             return (
-              <Item
+              <AccordionItem
                 key={`${phaseKey}-${String(index)}`}
-                size="sm"
-                variant={isCurrent ? "muted" : "default"}
+                value={phaseKey}
                 className={isPast ? "opacity-40" : undefined}
               >
-                <ItemContent>
-                  <ItemTitle>
-                    <span className="text-muted-foreground mr-2 tabular-nums">
-                      {String(index + 1)}.
+                <AccordionTrigger>
+                  <span className="text-muted-foreground mr-2 tabular-nums">
+                    {String(index + 1)}.
+                  </span>
+                  {label}
+                  {isCurrent && (
+                    <span className="ml-2 text-xs font-normal text-muted-foreground">
+                      (current)
                     </span>
-                    {label}
-                    {isCurrent && (
-                      <span className="ml-2 text-xs font-normal text-muted-foreground">
-                        (current)
-                      </span>
-                    )}
-                  </ItemTitle>
-                  {playerNames && playerNames.length > 0 && (
-                    <details className="mt-0.5 ml-5">
-                      <summary className="text-xs cursor-pointer text-muted-foreground list-none">
-                        Show players
-                      </summary>
-                      <ul className="mt-0.5 space-y-0.5">
-                        {playerNames.map((name) => (
-                          <li
-                            key={name}
-                            className="text-xs text-muted-foreground"
-                          >
-                            {name}
-                          </li>
-                        ))}
-                      </ul>
-                    </details>
                   )}
-                </ItemContent>
-              </Item>
+                </AccordionTrigger>
+                {playerNames.length > 0 && (
+                  <AccordionContent>
+                    <ul className="space-y-0.5 ml-5">
+                      {playerNames.map((name) => (
+                        <li
+                          key={name}
+                          className="text-xs text-muted-foreground"
+                        >
+                          {name}
+                        </li>
+                      ))}
+                    </ul>
+                  </AccordionContent>
+                )}
+              </AccordionItem>
             );
           })}
-        </ol>
+        </Accordion>
       </CardContent>
     </Card>
   );
