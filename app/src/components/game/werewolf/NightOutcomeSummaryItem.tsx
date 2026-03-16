@@ -3,17 +3,14 @@ import type { NightResolutionEvent } from "@/lib/game-modes/werewolf";
 
 interface Props {
   playerName: string;
-  killedEvent?: Extract<NightResolutionEvent, { type: "killed" }>;
-  silenced: boolean;
+  events?: NightResolutionEvent[];
   roles: Record<string, { name: string }>;
 }
 
-export function NightOutcomeSummaryItem({
-  playerName,
-  killedEvent,
-  silenced,
-  roles,
-}: Props) {
+export function NightOutcomeSummaryItem({ playerName, events, roles }: Props) {
+  const silenced = events?.some((event) => event.type === "silenced");
+  const killedEvent = events?.find((event) => event.type === "killed");
+
   return (
     <li>
       <strong className="text-foreground">{playerName}</strong>
