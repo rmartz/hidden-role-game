@@ -191,7 +191,8 @@ export function OwnerGameNightScreen({
         </p>
         {!isFirstTurn &&
           ((activePhaseKey as WerewolfRole) === WerewolfRole.Witch &&
-          turnState.witchAbilityUsed ? (
+          turnState.witchAbilityUsed &&
+          !activeTargetConfirmed ? (
             <p className="mb-4 text-sm text-muted-foreground italic">
               The Witch has already used their special ability this game.
             </p>
