@@ -5,7 +5,7 @@ import type {
   Team,
   TimerConfig,
 } from "@/lib/types";
-import type { AnyNightAction, TargetCategory } from "@/lib/game-modes/werewolf";
+import type { AnyNightAction } from "@/lib/game-modes/werewolf";
 import type { PublicLobbyPlayer } from "./lobby";
 
 export type { RoleSlot };
@@ -88,12 +88,6 @@ export interface PlayerGameState {
    * Only populated for non-owner players.
    */
   nightStatus?: NightStatusEntry[];
-  /**
-   * The target the player chose during the preceding night.
-   * Present even if the action was negated, so players can confirm
-   * their input was recorded. Only populated for non-owner players during daytime.
-   */
-  myLastNightAction?: { targetPlayerId: string; category: TargetCategory };
   /**
    * Investigation result for the Seer during nighttime.
    * Only populated after the narrator explicitly reveals it.

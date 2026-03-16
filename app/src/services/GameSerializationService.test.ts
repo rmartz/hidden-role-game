@@ -4,7 +4,6 @@ import type { Game } from "@/lib/types";
 import {
   WerewolfPhase,
   WerewolfRole,
-  TargetCategory,
   getTeamPhaseKey,
 } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
@@ -13,18 +12,6 @@ import { GameSerializationService } from "./GameSerializationService";
 // ---------------------------------------------------------------------------
 // Test fixtures
 // ---------------------------------------------------------------------------
-
-const werewolfRole = {
-  id: WerewolfRole.Werewolf,
-  name: "Werewolf",
-  team: Team.Bad,
-};
-const seerRole = { id: WerewolfRole.Seer, name: "Seer", team: Team.Good };
-const bodyguardRole = {
-  id: WerewolfRole.Bodyguard,
-  name: "Bodyguard",
-  team: Team.Good,
-};
 
 function makeDaytimeGame(
   overrides: Partial<{
@@ -105,7 +92,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
       ownerPlayerId: undefined,
     };
 
-    const result = service.extractDaytimeNightState(game, "p2", seerRole);
+    const result = service.extractDaytimeNightState(game);
     expect(result).toEqual({});
   });
 
@@ -122,7 +109,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
       ],
     });
 
-    const result = service.extractDaytimeNightState(game, "p1", werewolfRole);
+    const result = service.extractDaytimeNightState(game);
     expect(result.nightStatus).toBeUndefined();
   });
 
@@ -146,7 +133,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
       ],
     });
 
-    const result = service.extractDaytimeNightState(game, "p1", werewolfRole);
+    const result = service.extractDaytimeNightState(game);
     expect(result.nightStatus).toEqual([
       { targetPlayerId: "p2", effect: "killed" },
     ]);
@@ -157,7 +144,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
       nightResolution: [{ type: "silenced", targetPlayerId: "p3" }],
     });
 
-    const result = service.extractDaytimeNightState(game, "p1", werewolfRole);
+    const result = service.extractDaytimeNightState(game);
     expect(result.nightStatus).toEqual([
       { targetPlayerId: "p3", effect: "silenced" },
     ]);
@@ -176,7 +163,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
       ],
     });
 
-    const result = service.extractDaytimeNightState(game, "p1", werewolfRole);
+    const result = service.extractDaytimeNightState(game);
     const entry = result.nightStatus?.[0];
     expect(entry).not.toHaveProperty("attackedBy");
     expect(entry).not.toHaveProperty("protectedBy");
@@ -282,107 +269,5 @@ describe("GameSerializationService.extractPlayerNightState (Witch)", () => {
     );
     expect(result.witchAbilityUsed).toBe(true);
     expect(result.nightStatus).toBeUndefined();
-  });
-});
-
-// ---------------------------------------------------------------------------
-// extractMyLastNightTarget
-// ---------------------------------------------------------------------------
-
-describe("GameSerializationService.extractMyLastNightTarget", () => {
-  const service = new GameSerializationService();
-
-  it("returns undefined when the player took no action", () => {
-    const game = makeDaytimeGame({ nightActions: {} });
-
-    const result = service.extractMyLastNightTarget({}, game, "p2", seerRole);
-    expect(result).toBeUndefined();
-  });
-
-  it("returns Attack category for a Werewolf team vote", () => {
-    const nightActions = {
-      [getTeamPhaseKey(Team.Bad)]: {
-        votes: [{ playerId: "p1", targetPlayerId: "p3" }],
-        confirmed: true,
-      },
-    };
-    const game = makeDaytimeGame({ nightActions });
-
-    const result = service.extractMyLastNightTarget(
-      nightActions,
-      game,
-      "p1",
-      werewolfRole,
-    );
-    expect(result).toEqual({
-      targetPlayerId: "p3",
-      category: TargetCategory.Attack,
-    });
-  });
-
-  it("returns Investigate category for the Seer's action", () => {
-    const nightActions = {
-      [WerewolfRole.Seer]: { targetPlayerId: "p1", confirmed: true },
-    };
-    const game = makeDaytimeGame({ nightActions });
-
-    const result = service.extractMyLastNightTarget(
-      nightActions,
-      game,
-      "p2",
-      seerRole,
-    );
-    expect(result).toEqual({
-      targetPlayerId: "p1",
-      category: TargetCategory.Investigate,
-    });
-  });
-
-  it("returns Protect category for the Bodyguard's action", () => {
-    const nightActions = {
-      [WerewolfRole.Bodyguard]: { targetPlayerId: "p1", confirmed: true },
-    };
-    const game = makeDaytimeGame({ nightActions });
-
-    const result = service.extractMyLastNightTarget(
-      nightActions,
-      game,
-      "p3",
-      bodyguardRole,
-    );
-    expect(result).toEqual({
-      targetPlayerId: "p1",
-      category: TargetCategory.Protect,
-    });
-  });
-
-  it("returns undefined when the Werewolf's team phase action is missing", () => {
-    const game = makeDaytimeGame({ nightActions: {} });
-
-    const result = service.extractMyLastNightTarget(
-      {},
-      game,
-      "p1",
-      werewolfRole,
-    );
-    expect(result).toBeUndefined();
-  });
-
-  it("returns undefined when the Werewolf voted but there is no matching vote entry", () => {
-    const nightActions = {
-      [getTeamPhaseKey(Team.Bad)]: {
-        votes: [{ playerId: "p99", targetPlayerId: "p3" }],
-        confirmed: false,
-      },
-    };
-    const game = makeDaytimeGame({ nightActions });
-
-    const result = service.extractMyLastNightTarget(
-      nightActions,
-      game,
-      "p1",
-      werewolfRole,
-    );
-    expect(result).toBeUndefined();
   });
 });

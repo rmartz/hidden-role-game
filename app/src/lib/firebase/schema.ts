@@ -20,7 +20,7 @@ import type {
   RoleSlot,
   TimerConfig,
 } from "@/lib/types";
-import type { AnyNightAction, TargetCategory } from "@/lib/game-modes/werewolf";
+import type { AnyNightAction } from "@/lib/game-modes/werewolf";
 import type {
   PublicLobby,
   PlayerGameState,
@@ -294,7 +294,6 @@ export interface FirebasePlayerState {
   amDead?: boolean;
   deadPlayerIds?: string[];
   nightStatus?: NightStatusEntry[];
-  myLastNightAction?: { targetPlayerId: string; category: string };
   investigationResult?: { targetPlayerId: string; isWerewolfTeam: boolean };
   witchAbilityUsed?: boolean;
   timerConfig?: TimerConfig;
@@ -329,9 +328,6 @@ export function playerStateToFirebase(
       ? { deadPlayerIds: state.deadPlayerIds }
       : {}),
     ...(state.nightStatus?.length ? { nightStatus: state.nightStatus } : {}),
-    ...(state.myLastNightAction
-      ? { myLastNightAction: state.myLastNightAction }
-      : {}),
     ...(state.investigationResult
       ? { investigationResult: state.investigationResult }
       : {}),
@@ -382,14 +378,6 @@ export function firebaseToPlayerState(
     ...(raw.amDead ? { amDead: true } : {}),
     ...(raw.deadPlayerIds?.length ? { deadPlayerIds: raw.deadPlayerIds } : {}),
     ...(raw.nightStatus?.length ? { nightStatus: raw.nightStatus } : {}),
-    ...(raw.myLastNightAction
-      ? {
-          myLastNightAction: {
-            targetPlayerId: raw.myLastNightAction.targetPlayerId,
-            category: raw.myLastNightAction.category as TargetCategory,
-          },
-        }
-      : {}),
     ...(raw.investigationResult
       ? { investigationResult: raw.investigationResult }
       : {}),

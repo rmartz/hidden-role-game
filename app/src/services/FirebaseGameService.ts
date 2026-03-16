@@ -138,11 +138,8 @@ export class FirebaseGameService {
     const amDead = deadPlayerIds.includes(callerId);
 
     // Daytime-only: sanitized night outcomes and personal action confirmation.
-    const daytimeNightState = gameSerializationService.extractDaytimeNightState(
-      game,
-      callerId,
-      myRole,
-    );
+    const daytimeNightState =
+      gameSerializationService.extractDaytimeNightState(game);
 
     return {
       status: game.status,

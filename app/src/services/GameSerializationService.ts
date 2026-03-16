@@ -183,15 +183,8 @@ export class GameSerializationService {
    *
    * nightStatus: killed entries from deaths and silenced entries from the
    * Spellcaster, with attacker/protector info stripped.
-   *
-   * myLastNightAction: the target the player chose, even if their action was
-   * negated, so they can confirm their input was recorded.
    */
-  extractDaytimeNightState(
-    game: Game,
-    callerId: string,
-    myRole: RoleDefinition,
-  ): Partial<PlayerGameState> {
+  extractDaytimeNightState(game: Game): Partial<PlayerGameState> {
     if (game.status.type !== GameStatus.Playing) return {};
     const ts = game.status.turnState as WerewolfTurnState | undefined;
     if (ts?.phase.type !== WerewolfPhase.Daytime) return {};
@@ -207,51 +200,9 @@ export class GameSerializationService {
       return [];
     });
 
-    const myLastNightAction = this.extractMyLastNightTarget(
-      phase.nightActions,
-      game,
-      callerId,
-      myRole,
-    );
-
     return {
       ...(nightStatus.length > 0 ? { nightStatus } : {}),
-      ...(myLastNightAction ? { myLastNightAction } : {}),
     };
-  }
-
-  /**
-   * Returns the target the player chose during the preceding night, or
-   * undefined if they took no action.
-   */
-  extractMyLastNightTarget(
-    nightActions: Record<string, AnyNightAction>,
-    game: Game,
-    callerId: string,
-    myRole: RoleDefinition,
-  ): { targetPlayerId: string; category: TargetCategory } | undefined {
-    const roleDef = GAME_MODES[game.gameMode].roles[myRole.id] as
-      | WerewolfRoleDefinition
-      | undefined;
-    if (!roleDef) return undefined;
-
-    const { targetCategory: category } = roleDef;
-
-    if (roleDef.teamTargeting) {
-      const phaseKey = getTeamPhaseKey(roleDef.team);
-      const action = nightActions[phaseKey];
-      if (!action || !isTeamNightAction(action)) return undefined;
-      const myVote = action.votes.find((v) => v.playerId === callerId);
-      return myVote
-        ? { targetPlayerId: myVote.targetPlayerId, category }
-        : undefined;
-    }
-
-    const myAction = nightActions[myRole.id];
-    if (!myAction || isTeamNightAction(myAction)) return undefined;
-    return myAction.targetPlayerId
-      ? { targetPlayerId: myAction.targetPlayerId, category }
-      : undefined;
   }
 }
 
