@@ -181,22 +181,15 @@ export class GameSerializationService {
     if (ts?.phase.type !== WerewolfPhase.Daytime) return {};
     const phase = ts.phase;
 
-    const nightStatus: DaytimeNightStatusEntry[] = [
-      ...(phase.nightResolution ?? [])
-        .filter((e) => e.died)
-        .map(
-          (e): DaytimeNightStatusEntry => ({
-            targetPlayerId: e.targetPlayerId,
-            effect: "killed",
-          }),
-        ),
-      ...(phase.silencedPlayerIds ?? []).map(
-        (id): DaytimeNightStatusEntry => ({
-          targetPlayerId: id,
-          effect: "silenced",
-        }),
-      ),
-    ];
+    const nightStatus: DaytimeNightStatusEntry[] = (
+      phase.nightResolution ?? []
+    ).flatMap((e): DaytimeNightStatusEntry[] => {
+      if (e.type === "combat" && e.died)
+        return [{ targetPlayerId: e.targetPlayerId, effect: "killed" }];
+      if (e.type === "silenced")
+        return [{ targetPlayerId: e.targetPlayerId, effect: "silenced" }];
+      return [];
+    });
 
     const myLastNightAction = this.extractMyLastNightTarget(
       phase.nightActions,

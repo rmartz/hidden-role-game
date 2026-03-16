@@ -2,7 +2,7 @@ import { getPhaseLabel } from "@/lib/game-modes/werewolf";
 import type { NightResolutionEvent } from "@/lib/game-modes/werewolf";
 
 interface Props {
-  event: NightResolutionEvent;
+  event: Extract<NightResolutionEvent, { type: "combat" }>;
   playerName: string;
   roles: Record<string, { name: string }>;
 }

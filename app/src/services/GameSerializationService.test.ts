@@ -33,7 +33,6 @@ function makeDaytimeGame(
       WerewolfTurnState["phase"],
       { type: WerewolfPhase.Daytime }
     >["nightResolution"];
-    silencedPlayerIds: string[];
     deadPlayerIds: string[];
   }> = {},
 ): Game {
@@ -45,9 +44,6 @@ function makeDaytimeGame(
       nightActions: overrides.nightActions ?? {},
       ...(overrides.nightResolution !== undefined
         ? { nightResolution: overrides.nightResolution }
-        : {}),
-      ...(overrides.silencedPlayerIds !== undefined
-        ? { silencedPlayerIds: overrides.silencedPlayerIds }
         : {}),
     },
     deadPlayerIds: overrides.deadPlayerIds ?? [],
@@ -117,6 +113,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
     const game = makeDaytimeGame({
       nightResolution: [
         {
+          type: "combat" as const,
           targetPlayerId: "p2",
           attackedBy: ["p1"],
           protectedBy: ["p3"],
@@ -133,12 +130,14 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
     const game = makeDaytimeGame({
       nightResolution: [
         {
+          type: "combat" as const,
           targetPlayerId: "p2",
           attackedBy: ["p1"],
           protectedBy: [],
           died: true,
         },
         {
+          type: "combat" as const,
           targetPlayerId: "p3",
           attackedBy: ["p1"],
           protectedBy: ["p3"],
@@ -154,7 +153,9 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
   });
 
   it("nightStatus contains silenced entry for each silenced player", () => {
-    const game = makeDaytimeGame({ silencedPlayerIds: ["p3"] });
+    const game = makeDaytimeGame({
+      nightResolution: [{ type: "silenced", targetPlayerId: "p3" }],
+    });
 
     const result = service.extractDaytimeNightState(game, "p1", werewolfRole);
     expect(result.nightStatus).toEqual([
@@ -166,6 +167,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
     const game = makeDaytimeGame({
       nightResolution: [
         {
+          type: "combat" as const,
           targetPlayerId: "p2",
           attackedBy: ["p1"],
           protectedBy: [],

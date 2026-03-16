@@ -16,7 +16,7 @@ const assignments = [
 
 describe("resolveNightActions", () => {
   it("marks an attacked player as died", () => {
-    const { events } = resolveNightActions(
+    const events = resolveNightActions(
       { [getTeamPhaseKey(Team.Bad)]: { votes: [], suggestedTargetId: "p1" } },
       assignments,
       [],
@@ -31,7 +31,7 @@ describe("resolveNightActions", () => {
   });
 
   it("marks a protected player as survived when attacked", () => {
-    const { events } = resolveNightActions(
+    const events = resolveNightActions(
       {
         [getTeamPhaseKey(Team.Bad)]: { votes: [], suggestedTargetId: "p1" },
         [WerewolfRole.Bodyguard]: { targetPlayerId: "p1" },
@@ -48,7 +48,7 @@ describe("resolveNightActions", () => {
   });
 
   it("does not include a player only protected (no attack)", () => {
-    const { events } = resolveNightActions(
+    const events = resolveNightActions(
       { [WerewolfRole.Bodyguard]: { targetPlayerId: "p1" } },
       assignments,
       [],
@@ -57,7 +57,7 @@ describe("resolveNightActions", () => {
   });
 
   it("skips team actions with no suggestedTargetId", () => {
-    const { events } = resolveNightActions(
+    const events = resolveNightActions(
       { [getTeamPhaseKey(Team.Bad)]: { votes: [] } },
       assignments,
       [],
@@ -66,16 +66,17 @@ describe("resolveNightActions", () => {
   });
 
   it("Chupacabra attack applies when target is on Team.Bad", () => {
-    const { events } = resolveNightActions(
+    const events = resolveNightActions(
       { [WerewolfRole.Chupacabra]: { targetPlayerId: "w1" } },
       assignments,
       [],
     );
-    expect(events.find((e) => e.targetPlayerId === "w1")?.died).toBe(true);
+    const e = events.find((e) => e.targetPlayerId === "w1");
+    expect(e?.type === "combat" && e.died).toBe(true);
   });
 
   it("Chupacabra attack does not apply when target is not on Team.Bad and werewolves are alive", () => {
-    const { events } = resolveNightActions(
+    const events = resolveNightActions(
       { [WerewolfRole.Chupacabra]: { targetPlayerId: "p1" } },
       assignments,
       [],
@@ -84,22 +85,23 @@ describe("resolveNightActions", () => {
   });
 
   it("Chupacabra attack applies when all Team.Bad players are dead", () => {
-    const { events } = resolveNightActions(
+    const events = resolveNightActions(
       { [WerewolfRole.Chupacabra]: { targetPlayerId: "p1" } },
       assignments,
       ["w1"], // w1 is the only werewolf and is dead
     );
-    expect(events.find((e) => e.targetPlayerId === "p1")?.died).toBe(true);
+    const e = events.find((e) => e.targetPlayerId === "p1");
+    expect(e?.type === "combat" && e.died).toBe(true);
   });
 
   it("returns empty array when no night actions set", () => {
-    const { events } = resolveNightActions({}, assignments, []);
+    const events = resolveNightActions({}, assignments, []);
     expect(events).toHaveLength(0);
   });
 
   describe("Witch", () => {
     it("protects an attacked player when Witch targets them", () => {
-      const { events } = resolveNightActions(
+      const events = resolveNightActions(
         {
           [getTeamPhaseKey(Team.Bad)]: { votes: [], suggestedTargetId: "p1" },
           [WerewolfRole.Witch]: { targetPlayerId: "p1" },
@@ -115,7 +117,7 @@ describe("resolveNightActions", () => {
     });
 
     it("attacks an unattacked player when Witch targets them", () => {
-      const { events } = resolveNightActions(
+      const events = resolveNightActions(
         {
           [getTeamPhaseKey(Team.Bad)]: { votes: [], suggestedTargetId: "p1" },
           [WerewolfRole.Witch]: { targetPlayerId: "p2" },
@@ -132,7 +134,7 @@ describe("resolveNightActions", () => {
     });
 
     it("has no effect when Witch takes no action", () => {
-      const { events } = resolveNightActions(
+      const events = resolveNightActions(
         { [getTeamPhaseKey(Team.Bad)]: { votes: [], suggestedTargetId: "p1" } },
         assignments,
         [],
@@ -143,27 +145,27 @@ describe("resolveNightActions", () => {
   });
 
   describe("Spellcaster", () => {
-    it("silences a targeted player", () => {
-      const { silencedPlayerIds } = resolveNightActions(
+    it("emits a silenced event for the targeted player", () => {
+      const events = resolveNightActions(
         { [WerewolfRole.Spellcaster]: { targetPlayerId: "p1" } },
         assignments,
         [],
       );
-      expect(silencedPlayerIds).toStrictEqual(["p1"]);
+      expect(events).toContainEqual({ type: "silenced", targetPlayerId: "p1" });
     });
 
-    it("does not affect attacks/protections", () => {
-      const { events } = resolveNightActions(
+    it("does not emit combat events for a silenced player", () => {
+      const events = resolveNightActions(
         { [WerewolfRole.Spellcaster]: { targetPlayerId: "p1" } },
         assignments,
         [],
       );
-      expect(events).toHaveLength(0);
+      expect(events.filter((e) => e.type === "combat")).toHaveLength(0);
     });
 
-    it("returns empty silencedPlayerIds when Spellcaster takes no action", () => {
-      const { silencedPlayerIds } = resolveNightActions({}, assignments, []);
-      expect(silencedPlayerIds).toHaveLength(0);
+    it("emits no events when Spellcaster takes no action", () => {
+      const events = resolveNightActions({}, assignments, []);
+      expect(events.filter((e) => e.type === "silenced")).toHaveLength(0);
     });
   });
 });

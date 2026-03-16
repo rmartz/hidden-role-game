@@ -70,14 +70,13 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       const ts = currentTurnState(game);
       if (!ts) return;
       const nightPhase = ts.phase as WerewolfNighttimePhase;
-      const { events: nightResolution, silencedPlayerIds } =
-        resolveNightActions(
-          nightPhase.nightActions,
-          game.roleAssignments,
-          ts.deadPlayerIds,
-        );
+      const nightResolution = resolveNightActions(
+        nightPhase.nightActions,
+        game.roleAssignments,
+        ts.deadPlayerIds,
+      );
       const newDeadIds = nightResolution
-        .filter((e) => e.died)
+        .filter((e) => e.type === "combat" && e.died)
         .map((e) => e.targetPlayerId);
       game.status = {
         type: GameStatus.Playing,
@@ -88,7 +87,6 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
             startedAt: Date.now(),
             nightActions: nightPhase.nightActions,
             ...(nightResolution.length > 0 ? { nightResolution } : {}),
-            ...(silencedPlayerIds.length > 0 ? { silencedPlayerIds } : {}),
           },
           deadPlayerIds: [...ts.deadPlayerIds, ...newDeadIds],
           ...(ts.witchAbilityUsed ? { witchAbilityUsed: true } : {}),

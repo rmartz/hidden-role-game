@@ -98,13 +98,14 @@ function collectBaseAttacksAndProtections(
   return { attacks, protections };
 }
 
-function buildResolutionEvents(
+function buildCombatEvents(
   attacks: Map<string, string[]>,
   protections: Map<string, string[]>,
 ): NightResolutionEvent[] {
   return Array.from(attacks.entries()).map(([targetPlayerId, attackedBy]) => {
     const protectedBy = protections.get(targetPlayerId) ?? [];
     return {
+      type: "combat" as const,
       targetPlayerId,
       attackedBy,
       protectedBy,
@@ -132,18 +133,18 @@ export function getInterimAttackedPlayerIds(
 }
 
 /**
- * Resolves all night actions into a list of outcome events and silenced players.
- * Only players who were targeted for attack appear in events.
+ * Resolves all night actions into a flat list of outcome events.
+ * Only players who were targeted for attack appear as "combat" events.
  * Chupacabra attack only applies if the target is on Team.Bad,
  * or if all Team.Bad players are already dead.
  * Witch conditionally protects (if target is already attacked) or attacks.
- * Spellcaster silences their target for the current day.
+ * Spellcaster emits a "silenced" event for their target.
  */
 export function resolveNightActions(
   nightActions: Record<string, AnyNightAction>,
   roleAssignments: PlayerRoleAssignment[],
   deadPlayerIds: string[],
-): { events: NightResolutionEvent[]; silencedPlayerIds: string[] } {
+): NightResolutionEvent[] {
   const { attacks, protections } = collectBaseAttacksAndProtections(
     nightActions,
     roleAssignments,
@@ -166,17 +167,16 @@ export function resolveNightActions(
     }
   }
 
-  // Spellcaster: collect silenced targets.
-  const silencedPlayerIds: string[] = [];
+  const combatEvents = buildCombatEvents(attacks, protections);
+
+  // Spellcaster: emit a silenced event for their target.
   const spellcasterAction = nightActions[WerewolfRole.Spellcaster] as
     | { targetPlayerId?: string }
     | undefined;
-  if (spellcasterAction?.targetPlayerId) {
-    silencedPlayerIds.push(spellcasterAction.targetPlayerId);
-  }
+  const silencedEvents: NightResolutionEvent[] =
+    spellcasterAction?.targetPlayerId
+      ? [{ type: "silenced", targetPlayerId: spellcasterAction.targetPlayerId }]
+      : [];
 
-  return {
-    events: buildResolutionEvents(attacks, protections),
-    silencedPlayerIds,
-  };
+  return [...combatEvents, ...silencedEvents];
 }

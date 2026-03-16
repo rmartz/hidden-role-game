@@ -41,15 +41,21 @@ export interface WerewolfNighttimePhase {
   nightActions: Record<string, AnyNightAction>;
 }
 
-export interface NightResolutionEvent {
-  targetPlayerId: string;
-  /** Phase keys (role IDs or team phase keys) that attacked this player. */
-  attackedBy: string[];
-  /** Phase keys (role IDs) that protected this player. */
-  protectedBy: string[];
-  /** True if the player was attacked and not protected — they die. */
-  died: boolean;
-}
+export type NightResolutionEvent =
+  | {
+      type: "combat";
+      targetPlayerId: string;
+      /** Phase keys (role IDs or team phase keys) that attacked this player. */
+      attackedBy: string[];
+      /** Phase keys (role IDs) that protected this player. */
+      protectedBy: string[];
+      /** True if the player was attacked and not protected — they die. */
+      died: boolean;
+    }
+  | {
+      type: "silenced";
+      targetPlayerId: string;
+    };
 
 export interface WerewolfDaytimePhase {
   type: WerewolfPhase.Daytime;
@@ -59,8 +65,6 @@ export interface WerewolfDaytimePhase {
   nightActions: Record<string, AnyNightAction>;
   /** Resolved attack/protect outcomes, computed when transitioning to day. */
   nightResolution?: NightResolutionEvent[];
-  /** Player IDs silenced by the Spellcaster during the preceding night. */
-  silencedPlayerIds?: string[];
 }
 
 export type WerewolfTurnPhase = WerewolfNighttimePhase | WerewolfDaytimePhase;
