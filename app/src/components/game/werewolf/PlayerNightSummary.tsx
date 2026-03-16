@@ -1,5 +1,6 @@
 "use client";
 
+import groupBy from "lodash/groupBy";
 import { getActionText } from "@/lib/game-modes/werewolf";
 import { getPlayerName } from "@/lib/player-utils";
 import type { PlayerGameState } from "@/server/types";
@@ -15,12 +16,8 @@ export function PlayerNightSummary({
   nightStatus,
   myLastNightAction,
 }: PlayerNightSummaryProps) {
-  const killedEntries = (nightStatus ?? []).filter(
-    (e) => e.effect === "killed",
-  );
-  const silencedEntries = (nightStatus ?? []).filter(
-    (e) => e.effect === "silenced",
-  );
+  const { killed: killedEntries = [], silenced: silencedEntries = [] } =
+    groupBy(nightStatus, (e) => e.effect);
   const hasEvents = killedEntries.length > 0 || silencedEntries.length > 0;
   if (!hasEvents && !myLastNightAction) return null;
 
