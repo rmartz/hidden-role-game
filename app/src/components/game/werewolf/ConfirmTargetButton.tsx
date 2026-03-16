@@ -34,8 +34,6 @@ export function ConfirmTargetButton({
     );
   }
 
-  if (!hasTarget) return null;
-
   // Group phases require all members to agree before confirming.
   const disabled = action.isPending || (isGroupPhase && !allAgreed);
 
@@ -49,7 +47,7 @@ export function ConfirmTargetButton({
         }}
         disabled={disabled}
       >
-        {getConfirmLabel(roleId, witchContext)}
+        {hasTarget ? getConfirmLabel(roleId, witchContext) : "Skip"}
       </Button>
       {isGroupPhase && !allAgreed && (
         <p className="mt-1 text-xs text-muted-foreground">

@@ -135,7 +135,7 @@ export function PlayerTargetSelection({
             disabled={action.isPending}
             className="justify-start"
           >
-            Skip
+            No target
           </Button>
         )}
       </div>
