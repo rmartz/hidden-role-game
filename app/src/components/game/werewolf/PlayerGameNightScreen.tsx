@@ -80,7 +80,10 @@ export function PlayerGameNightScreen({
 
   const isConfirmed = gameState.myNightTargetConfirmed ?? false;
   const hasVisibleTeammates =
-    isTeamPhase && gameState.visibleRoleAssignments.length > 0;
+    isTeamPhase &&
+    gameState.visibleRoleAssignments.some(
+      (a) => !deadPlayerIds.includes(a.player.id),
+    );
   const resolvedTeamVotes = (gameState.teamVotes ?? []).map((vote) => ({
     playerName: vote.playerName,
     targetName:
