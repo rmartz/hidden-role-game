@@ -25,7 +25,15 @@ export function PlayerGameDayScreen({ gameState, turnState }: Props) {
 
   return (
     <div className="p-5">
-      <h1 className="text-2xl font-bold mb-2">Hidden Role Game</h1>
+      <div className="flex items-start justify-between mb-2">
+        <h1 className="text-2xl font-bold">Hidden Role Game</h1>
+        {gameState.myRole && (
+          <PlayerRoleDisplay
+            role={gameState.myRole}
+            gameMode={gameState.gameMode}
+          />
+        )}
+      </div>
       {dayPhaseSeconds !== null ? (
         <GameTimer
           durationSeconds={dayPhaseSeconds}
@@ -46,13 +54,6 @@ export function PlayerGameDayScreen({ gameState, turnState }: Props) {
         <p className="mb-4 font-semibold text-muted-foreground italic">
           You have been eliminated.
         </p>
-      )}
-
-      {gameState.myRole && (
-        <PlayerRoleDisplay
-          role={gameState.myRole}
-          gameMode={gameState.gameMode}
-        />
       )}
 
       <PlayerStatusLists

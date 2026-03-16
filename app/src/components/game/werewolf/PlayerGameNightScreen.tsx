@@ -13,7 +13,6 @@ import { GameTimer } from "@/components/game";
 import { PlayerFirstTurnScreen } from "./PlayerFirstTurnScreen";
 import { PlayerInvestigationResult } from "./PlayerInvestigationResult";
 import { PlayerTargetSelection } from "./PlayerTargetSelection";
-import { PlayerRoleDisplay } from "./PlayerRoleDisplay";
 import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 
 interface PlayerGameNightScreenProps {
@@ -135,12 +134,6 @@ export function PlayerGameNightScreen({
         />
       )}
       <p className="text-muted-foreground mb-4">{WEREWOLF_COPY.night.wakeUp}</p>
-      {!isConfirmed && gameState.myRole && (
-        <PlayerRoleDisplay
-          role={gameState.myRole}
-          gameMode={gameState.gameMode}
-        />
-      )}
       <PlayerTargetSelection
         gameId={gameId}
         players={gameState.players}

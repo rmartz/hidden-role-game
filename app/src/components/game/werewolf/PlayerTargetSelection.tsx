@@ -135,7 +135,6 @@ export function PlayerTargetSelection({
               className="justify-start"
             >
               {player.name}
-              {isSelected && " (selected)"}
               {player.id === previousNightTargetId && " (unavailable)"}
             </Button>
           ))}

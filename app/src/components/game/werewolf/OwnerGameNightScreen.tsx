@@ -90,36 +90,6 @@ export function OwnerGameNightScreen({
     [action, activePhaseKey],
   );
 
-  const phasePlayerNames = useMemo(() => {
-    const result: Record<string, string[]> = {};
-    for (const phaseKey of nightPhaseOrder) {
-      const baseKey = baseGroupPhaseKey(phaseKey);
-      const names = gameState.visibleRoleAssignments
-        .filter((a) => {
-          if (turnState.deadPlayerIds.includes(a.player.id)) return false;
-          const rid = a.role.id;
-          if (rid === baseKey) return true;
-          const roleDef = (
-            WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
-          )[rid];
-          return (
-            (roleDef?.wakesWith as string | undefined) === baseKey ||
-            rid === phaseKey
-          );
-        })
-        .map(
-          (a) => getPlayerName(gameState.players, a.player.id) ?? a.player.id,
-        );
-      result[phaseKey] = names;
-    }
-    return result;
-  }, [
-    nightPhaseOrder,
-    gameState.visibleRoleAssignments,
-    gameState.players,
-    turnState.deadPlayerIds,
-  ]);
-
   if (!isNighttime) return null;
 
   const modeConfig = GAME_MODES[gameState.gameMode];
@@ -231,7 +201,7 @@ export function OwnerGameNightScreen({
       ) : (
         <GameTimer startedAt={timer.startedAt} resetKey={timer.resetKey} />
       )}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-5 mb-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
         <Card>
           <CardContent className="pt-4">
             <p className="mb-4 text-muted-foreground">
@@ -283,7 +253,6 @@ export function OwnerGameNightScreen({
           nightPhaseOrder={nightPhaseOrder}
           currentPhaseIndex={currentPhaseIndex}
           roles={modeConfig.roles}
-          phasePlayerNames={phasePlayerNames}
         />
       </div>
       <OwnerPlayerActionsGrid

@@ -2,7 +2,7 @@
 
 import type { VisibleTeammate } from "@/server/types";
 import type { GameMode } from "@/lib/types";
-import { PlayersRoleList } from "@/components/game";
+import { NarratorPlayerRoleLists } from "@/components/game";
 import { OwnerPlayerActionItem } from "./OwnerPlayerActionItem";
 
 interface Props {
@@ -21,7 +21,7 @@ export function OwnerPlayerActionsGrid({
   gameOwnerId,
 }: Props) {
   return (
-    <PlayersRoleList
+    <NarratorPlayerRoleLists
       assignments={assignments}
       gameMode={gameMode}
       deadPlayerIds={deadPlayerIds}

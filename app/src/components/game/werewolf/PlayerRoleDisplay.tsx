@@ -31,20 +31,15 @@ export function PlayerRoleDisplay({ role, gameMode }: Props) {
   const teamLabel = teamLabels?.[role.team] ?? role.team;
 
   return (
-    <div className="mb-5">
-      <h2 className="text-lg font-semibold mb-2">
-        {WEREWOLF_COPY.roleDisplay.yourRole}
-      </h2>
-      <Button
-        variant={revealed ? "secondary" : "outline"}
-        onClick={() => {
-          setRevealed((v) => !v);
-        }}
-      >
-        {revealed
-          ? WEREWOLF_COPY.roleDisplay.roleRevealed(role.name, teamLabel)
-          : WEREWOLF_COPY.roleDisplay.showRole}
-      </Button>
-    </div>
+    <Button
+      variant={revealed ? "secondary" : "outline"}
+      onClick={() => {
+        setRevealed((v) => !v);
+      }}
+    >
+      {revealed
+        ? WEREWOLF_COPY.roleDisplay.roleRevealed(role.name, teamLabel)
+        : WEREWOLF_COPY.roleDisplay.showRole}
+    </Button>
   );
 }
