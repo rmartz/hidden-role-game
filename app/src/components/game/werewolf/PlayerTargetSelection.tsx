@@ -96,52 +96,58 @@ export function PlayerTargetSelection({
       )}
 
       <h2 className="text-lg font-semibold mb-2">
-        {isConfirmed ? "Your target" : "Choose a target"}
+        {isConfirmed && myNightTarget === null
+          ? "You did not perform an action this turn"
+          : isConfirmed
+            ? "Your target"
+            : "Choose a target"}
       </h2>
-      <div className="flex flex-col gap-2">
-        {targets.map(([player, isSelected]) => (
-          <Button
-            key={player.id}
-            variant={isSelected ? "default" : "outline"}
-            onClick={() => {
-              action.mutate({
-                actionId: WerewolfAction.SetNightTarget,
-                payload: {
-                  targetPlayerId: isSelected ? undefined : player.id,
-                },
-              });
-            }}
-            disabled={
-              action.isPending ||
-              isConfirmed ||
-              player.id === previousNightTargetId
-            }
-            className="justify-start"
-          >
-            {player.name}
-            {isSelected && " (selected)"}
-            {player.id === previousNightTargetId && " (unavailable)"}
-          </Button>
-        ))}
-        {!isConfirmed && (
-          <Button
-            variant={myNightTarget === null ? "default" : "outline"}
-            onClick={() => {
-              action.mutate({
-                actionId: WerewolfAction.SetNightTarget,
-                payload: {
-                  targetPlayerId: myNightTarget === null ? undefined : null,
-                },
-              });
-            }}
-            disabled={action.isPending}
-            className="justify-start"
-          >
-            No target
-            {myNightTarget === null && " (selected)"}
-          </Button>
-        )}
-      </div>
+      {!(isConfirmed && myNightTarget === null) && (
+        <div className="flex flex-col gap-2">
+          {targets.map(([player, isSelected]) => (
+            <Button
+              key={player.id}
+              variant={isSelected ? "default" : "outline"}
+              onClick={() => {
+                action.mutate({
+                  actionId: WerewolfAction.SetNightTarget,
+                  payload: {
+                    targetPlayerId: isSelected ? undefined : player.id,
+                  },
+                });
+              }}
+              disabled={
+                action.isPending ||
+                isConfirmed ||
+                player.id === previousNightTargetId
+              }
+              className="justify-start"
+            >
+              {player.name}
+              {isSelected && " (selected)"}
+              {player.id === previousNightTargetId && " (unavailable)"}
+            </Button>
+          ))}
+          {!isConfirmed && (
+            <Button
+              variant={myNightTarget === null ? "default" : "outline"}
+              onClick={() => {
+                action.mutate({
+                  actionId: WerewolfAction.SetNightTarget,
+                  payload: {
+                    targetPlayerId: myNightTarget === null ? undefined : null,
+                  },
+                });
+              }}
+              disabled={action.isPending}
+              className="justify-start"
+            >
+              No target
+              {myNightTarget === null && " (selected)"}
+            </Button>
+          )}
+        </div>
+      )}
 
       {isGroupPhase &&
         suggestedTargetId &&
