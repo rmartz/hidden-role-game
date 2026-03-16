@@ -76,7 +76,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
         ts.deadPlayerIds,
       );
       const newDeadIds = nightResolution
-        .filter((e) => e.type === "combat" && e.died)
+        .filter((e) => e.type === "killed" && e.died)
         .map((e) => e.targetPlayerId);
       game.status = {
         type: GameStatus.Playing,

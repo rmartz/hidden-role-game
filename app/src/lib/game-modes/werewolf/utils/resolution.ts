@@ -98,14 +98,14 @@ function collectBaseAttacksAndProtections(
   return { attacks, protections };
 }
 
-function buildCombatEvents(
+function buildKilledEvents(
   attacks: Map<string, string[]>,
   protections: Map<string, string[]>,
 ): NightResolutionEvent[] {
   return Array.from(attacks.entries()).map(([targetPlayerId, attackedBy]) => {
     const protectedBy = protections.get(targetPlayerId) ?? [];
     return {
-      type: "combat" as const,
+      type: "killed" as const,
       targetPlayerId,
       attackedBy,
       protectedBy,
@@ -134,7 +134,7 @@ export function getInterimAttackedPlayerIds(
 
 /**
  * Resolves all night actions into a flat list of outcome events.
- * Only players who were targeted for attack appear as "combat" events.
+ * Only players who were targeted for attack appear as "killed" events.
  * Chupacabra attack only applies if the target is on Team.Bad,
  * or if all Team.Bad players are already dead.
  * Witch conditionally protects (if target is already attacked) or attacks.
@@ -167,7 +167,7 @@ export function resolveNightActions(
     }
   }
 
-  const combatEvents = buildCombatEvents(attacks, protections);
+  const combatEvents = buildKilledEvents(attacks, protections);
 
   // Spellcaster: emit a silenced event for their target.
   const spellcasterAction = nightActions[WerewolfRole.Spellcaster] as

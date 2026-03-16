@@ -276,7 +276,7 @@ describe("WerewolfAction.StartDay", () => {
       expect(phase.nightResolution).toBeDefined();
       expect(phase.nightResolution).toHaveLength(1);
       expect(phase.nightResolution![0]).toMatchObject({
-        type: "combat",
+        type: "killed",
         targetPlayerId: "p2",
         died: true,
       });
@@ -1115,7 +1115,7 @@ describe("SetNightTarget — Bodyguard self-targeting", () => {
     };
     const events = resolveNightActions(nightActions, assignments, []);
     const event = events.find((e) => e.targetPlayerId === "p2");
-    expect(event?.type === "combat" && event.died).toBe(false);
+    expect(event?.type === "killed" && event.died).toBe(false);
   });
 });
 

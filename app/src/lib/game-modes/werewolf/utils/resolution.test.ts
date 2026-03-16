@@ -72,7 +72,7 @@ describe("resolveNightActions", () => {
       [],
     );
     const e = events.find((e) => e.targetPlayerId === "w1");
-    expect(e?.type === "combat" && e.died).toBe(true);
+    expect(e?.type === "killed" && e.died).toBe(true);
   });
 
   it("Chupacabra attack does not apply when target is not on Team.Bad and werewolves are alive", () => {
@@ -91,7 +91,7 @@ describe("resolveNightActions", () => {
       ["w1"], // w1 is the only werewolf and is dead
     );
     const e = events.find((e) => e.targetPlayerId === "p1");
-    expect(e?.type === "combat" && e.died).toBe(true);
+    expect(e?.type === "killed" && e.died).toBe(true);
   });
 
   it("returns empty array when no night actions set", () => {
@@ -160,7 +160,7 @@ describe("resolveNightActions", () => {
         assignments,
         [],
       );
-      expect(events.filter((e) => e.type === "combat")).toHaveLength(0);
+      expect(events.filter((e) => e.type === "killed")).toHaveLength(0);
     });
 
     it("emits no events when Spellcaster takes no action", () => {

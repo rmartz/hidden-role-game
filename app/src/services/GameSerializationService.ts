@@ -184,7 +184,7 @@ export class GameSerializationService {
     const nightStatus: DaytimeNightStatusEntry[] = (
       phase.nightResolution ?? []
     ).flatMap((e): DaytimeNightStatusEntry[] => {
-      if (e.type === "combat" && e.died)
+      if (e.type === "killed" && e.died)
         return [{ targetPlayerId: e.targetPlayerId, effect: "killed" }];
       if (e.type === "silenced")
         return [{ targetPlayerId: e.targetPlayerId, effect: "silenced" }];

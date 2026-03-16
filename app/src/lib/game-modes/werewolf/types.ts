@@ -43,7 +43,7 @@ export interface WerewolfNighttimePhase {
 
 export type NightResolutionEvent =
   | {
-      type: "combat";
+      type: "killed";
       targetPlayerId: string;
       /** Phase keys (role IDs or team phase keys) that attacked this player. */
       attackedBy: string[];

@@ -113,7 +113,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
     const game = makeDaytimeGame({
       nightResolution: [
         {
-          type: "combat" as const,
+          type: "killed" as const,
           targetPlayerId: "p2",
           attackedBy: ["p1"],
           protectedBy: ["p3"],
@@ -130,14 +130,14 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
     const game = makeDaytimeGame({
       nightResolution: [
         {
-          type: "combat" as const,
+          type: "killed" as const,
           targetPlayerId: "p2",
           attackedBy: ["p1"],
           protectedBy: [],
           died: true,
         },
         {
-          type: "combat" as const,
+          type: "killed" as const,
           targetPlayerId: "p3",
           attackedBy: ["p1"],
           protectedBy: ["p3"],
@@ -167,7 +167,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
     const game = makeDaytimeGame({
       nightResolution: [
         {
-          type: "combat" as const,
+          type: "killed" as const,
           targetPlayerId: "p2",
           attackedBy: ["p1"],
           protectedBy: [],
