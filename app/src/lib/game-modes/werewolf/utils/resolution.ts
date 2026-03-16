@@ -4,7 +4,7 @@ import { TargetCategory } from "../types";
 import type { AnyNightAction, NightResolutionEvent } from "../types";
 import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
-import { isTeamPhaseKey } from "./phase-keys";
+import { isGroupPhaseKey } from "./phase-keys";
 
 function allTeamBadAreDead(
   roleAssignments: PlayerRoleAssignment[],
@@ -62,7 +62,7 @@ function collectBaseAttacksAndProtections(
     )
       continue;
 
-    if (isTeamPhaseKey(phaseKey)) {
+    if (isGroupPhaseKey(phaseKey)) {
       const teamAction = action as { suggestedTargetId?: string };
       if (!teamAction.suggestedTargetId) continue;
       const tid = teamAction.suggestedTargetId;

@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Team } from "@/lib/types";
 import { WerewolfRole } from "../roles";
-import { getTeamPhaseKey } from "./phase-keys";
 import { getTargetablePlayers } from "./targeting";
 
 const players = [
@@ -205,31 +204,26 @@ describe("getTargetablePlayers — solo phase", () => {
 // Team phase targeting
 // ---------------------------------------------------------------------------
 
-const teamPhaseKey = getTeamPhaseKey(Team.Bad);
-
 // Narrator sees all assignments (no self-skip).
 const narratorAssignments = [
-  { player: { id: "p1" }, role: { id: WerewolfRole.Werewolf, team: Team.Bad } },
-  { player: { id: "p2" }, role: { id: WerewolfRole.Werewolf, team: Team.Bad } },
-  {
-    player: { id: "p3" },
-    role: { id: WerewolfRole.Villager, team: Team.Good },
-  },
+  { player: { id: "p1" }, role: { id: WerewolfRole.Werewolf, team: "Bad" } },
+  { player: { id: "p2" }, role: { id: WerewolfRole.Werewolf, team: "Bad" } },
+  { player: { id: "p3" }, role: { id: WerewolfRole.Villager, team: "Good" } },
 ];
 
 // Player p1 sees only other team members — their own assignment is absent
 // (mirrors buildGamePlayers which skips `other.playerId === assignment.playerId`).
 const p1Assignments = [
-  { player: { id: "p2" }, role: { id: WerewolfRole.Werewolf, team: Team.Bad } },
+  { player: { id: "p2" }, role: { id: WerewolfRole.Werewolf, team: "Bad" } },
 ];
 
-describe("getTargetablePlayers — team phase", () => {
+describe("getTargetablePlayers — group phase (Werewolf)", () => {
   it("werewolf player cannot target themselves", () => {
     const result = getTargetablePlayers(
       players,
       "owner",
       [],
-      teamPhaseKey,
+      WerewolfRole.Werewolf,
       "p1",
       p1Assignments,
     );
@@ -241,7 +235,7 @@ describe("getTargetablePlayers — team phase", () => {
       players,
       "owner",
       [],
-      teamPhaseKey,
+      WerewolfRole.Werewolf,
       "p1",
       p1Assignments,
     );
@@ -253,19 +247,19 @@ describe("getTargetablePlayers — team phase", () => {
       players,
       "owner",
       [],
-      teamPhaseKey,
+      WerewolfRole.Werewolf,
       "p1",
       p1Assignments,
     );
     expect(result.map((p) => p.id)).toContain("p3");
   });
 
-  it("narrator and player produce the same targetable set for team phases", () => {
+  it("narrator and player produce the same targetable set for group phases", () => {
     const narratorResult = getTargetablePlayers(
       players,
       "owner",
       [],
-      teamPhaseKey,
+      WerewolfRole.Werewolf,
       undefined,
       narratorAssignments,
     );
@@ -273,7 +267,7 @@ describe("getTargetablePlayers — team phase", () => {
       players,
       "owner",
       [],
-      teamPhaseKey,
+      WerewolfRole.Werewolf,
       "p1",
       p1Assignments,
     );

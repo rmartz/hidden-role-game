@@ -7,10 +7,9 @@ import {
   isOwnerPlaying,
   currentTurnState,
   validateActiveNightPlayer,
-  isTeamPhaseKey,
-  parseTeamPhaseKey,
-  getTeamPlayerIds,
-  getTeamMemberPlayerIds,
+  isGroupPhaseKey,
+  getGroupPhasePlayerIds,
+  getGroupPhaseMemberIds,
   computeSuggestedTarget,
   resolveNightActions,
 } from "./utils";
@@ -29,6 +28,14 @@ export enum WerewolfAction {
   MarkPlayerAlive = "mark-player-alive",
 }
 
+function isWolfCub(playerId: string, game: Game): boolean {
+  return game.roleAssignments.some(
+    (a) =>
+      a.playerId === playerId &&
+      (a.roleDefinitionId) === (WerewolfRole.WolfCub as string),
+  );
+}
+
 export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.StartNight]: {
     isValid(game: Game, callerId: string) {
@@ -39,10 +46,13 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       const ts = currentTurnState(game);
       if (!ts) return;
       const nextTurn = ts.turn + 1;
+      // If a Wolf Cub died last turn, Werewolves get an extra phase this night.
+      const extraGroupPhaseKeys = ts.wolfCubDied ? [WerewolfRole.Werewolf] : [];
       const nightPhaseOrder = buildNightPhaseOrder(
         nextTurn,
         game.roleAssignments,
         ts.deadPlayerIds,
+        extraGroupPhaseKeys,
       );
       game.status = {
         type: GameStatus.Playing,
@@ -94,6 +104,8 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
         }
       }
 
+      const wolfCubDied =
+        ts.wolfCubDied === true || newDeadIds.some((id) => isWolfCub(id, game));
       game.status = {
         type: GameStatus.Playing,
         turnState: {
@@ -107,6 +119,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
           deadPlayerIds: [...ts.deadPlayerIds, ...newDeadIds],
           ...(ts.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
           ...(Object.keys(lastTargets).length > 0 ? { lastTargets } : {}),
+          ...(wolfCubDied ? { wolfCubDied: true } : {}),
         },
       };
     },
@@ -178,9 +191,6 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       )
         return false;
 
-      // For team phases, validate target is not on the same team.
-      const team = parseTeamPhaseKey(phaseKey);
-
       // targetPlayerId undefined = clear; string = set target.
       if (targetPlayerId === undefined) return true;
       if (typeof targetPlayerId !== "string") return false;
@@ -215,17 +225,20 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
           return false;
       }
 
-      // Team targeting: cannot target players the caller knows are teammates.
-      if (team && !isOwner) {
+      // Group phases: cannot target players the caller knows are team members.
+      if (isGroupPhaseKey(phaseKey) && !isOwner) {
         const caller = getPlayer(game.players, callerId);
         const visibleTeammateIds = (caller?.visibleRoles ?? []).map(
           (vr) => vr.playerId,
         );
         if (visibleTeammateIds.includes(targetPlayerId)) return false;
       }
-      if (team && isOwner) {
-        const teamMembers = getTeamMemberPlayerIds(game.roleAssignments, team);
-        if (teamMembers.includes(targetPlayerId)) return false;
+      if (isGroupPhaseKey(phaseKey) && isOwner) {
+        const memberIds = getGroupPhaseMemberIds(
+          game.roleAssignments,
+          phaseKey,
+        );
+        if (memberIds.includes(targetPlayerId)) return false;
       }
 
       return true;
@@ -244,8 +257,8 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
         explicitPhaseKey ?? phase.nightPhaseOrder[phase.currentPhaseIndex];
       if (!phaseKey) return;
 
-      if (isTeamPhaseKey(phaseKey)) {
-        // Team phase: upsert a player's vote.
+      if (isGroupPhaseKey(phaseKey)) {
+        // Group phase: upsert a player's vote.
         const existing = phase.nightActions[phaseKey];
         const teamAction: TeamNightAction =
           existing && isTeamNightAction(existing)
@@ -254,15 +267,16 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
 
         const isOwner = callerId === game.ownerPlayerId;
         if (isOwner) {
-          // Owner override: set all alive team members' votes.
-          const team = parseTeamPhaseKey(phaseKey);
-          const aliveTeamIds = team
-            ? getTeamPlayerIds(game.roleAssignments, team, ts.deadPlayerIds)
-            : [];
+          // Owner override: set all alive phase participants' votes.
+          const aliveParticipantIds = getGroupPhasePlayerIds(
+            game.roleAssignments,
+            phaseKey,
+            ts.deadPlayerIds,
+          );
           if (targetPlayerId === undefined) {
             teamAction.votes = [];
           } else {
-            teamAction.votes = aliveTeamIds.map((pid) => ({
+            teamAction.votes = aliveParticipantIds.map((pid) => ({
               playerId: pid,
               targetPlayerId,
             }));
@@ -292,7 +306,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
         }
         phase.nightActions[phaseKey] = teamAction;
       } else {
-        // Solo phase: existing behavior.
+        // Solo phase.
         if (targetPlayerId === undefined) {
           phase.nightActions = Object.fromEntries(
             Object.entries(phase.nightActions).filter(([k]) => k !== phaseKey),
@@ -312,30 +326,28 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       if (!action) return false;
       if (action.confirmed) return false;
 
-      if (result.isTeamPhase) {
-        // Team phase: all alive team members must agree on the same target.
+      if (result.isGroupPhase) {
+        // Group phase: all alive participants must agree on the same target.
         if (!isTeamNightAction(action)) return false;
-        const team = parseTeamPhaseKey(result.activePhaseKey);
-        if (!team) return false;
         const ts = currentTurnState(game);
-        const aliveTeamIds = getTeamPlayerIds(
+        const aliveParticipantIds = getGroupPhasePlayerIds(
           game.roleAssignments,
-          team,
+          result.activePhaseKey,
           ts?.deadPlayerIds ?? [],
         );
-        if (aliveTeamIds.length === 0) return false;
+        if (aliveParticipantIds.length === 0) return false;
         const targets = new Set(
           action.votes
-            .filter((v) => aliveTeamIds.includes(v.playerId))
+            .filter((v) => aliveParticipantIds.includes(v.playerId))
             .map((v) => v.targetPlayerId),
         );
-        // All alive members must have voted and all for the same target.
+        // All alive participants must have voted and all for the same target.
         const voterIds = new Set(
           action.votes
-            .filter((v) => aliveTeamIds.includes(v.playerId))
+            .filter((v) => aliveParticipantIds.includes(v.playerId))
             .map((v) => v.playerId),
         );
-        if (voterIds.size !== aliveTeamIds.length) return false;
+        if (voterIds.size !== aliveParticipantIds.length) return false;
         if (targets.size !== 1) return false;
         return true;
       }
@@ -409,6 +421,9 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       if (!ts) return;
       const { playerId } = payload as { playerId: string };
       ts.deadPlayerIds = [...ts.deadPlayerIds, playerId];
+      if (isWolfCub(playerId, game)) {
+        ts.wolfCubDied = true;
+      }
     },
   },
   [WerewolfAction.MarkPlayerAlive]: {

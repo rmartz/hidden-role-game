@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
+import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 import type { Game } from "@/lib/types";
 import { WerewolfPhase } from "./types";
 import type {
@@ -12,9 +12,8 @@ import { WerewolfRole } from "./roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./actions";
 import {
   buildNightPhaseOrder,
-  getTeamPhaseKey,
   computeSuggestedTarget,
-  getTeamPlayerIds,
+  getGroupPhasePlayerIds,
   resolveNightActions,
 } from "./utils";
 
@@ -151,14 +150,18 @@ describe("WerewolfAction.StartNight", () => {
       expect(ts.phase.type).toBe(WerewolfPhase.Nighttime);
     });
 
-    it("builds nightPhaseOrder with team phase key for werewolves", () => {
+    it("builds nightPhaseOrder with a single Werewolf group phase key", () => {
       const game = makePlayingGame(dayTurnState);
       action.apply(game, null, "owner-1");
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
       const phase = ts.phase as WerewolfNighttimePhase;
-      expect(phase.nightPhaseOrder).toContain(getTeamPhaseKey(Team.Bad));
+      expect(phase.nightPhaseOrder).toContain(WerewolfRole.Werewolf);
       expect(phase.nightPhaseOrder).toContain(WerewolfRole.Seer);
-      expect(phase.nightPhaseOrder).not.toContain(WerewolfRole.Werewolf);
+      expect(
+        phase.nightPhaseOrder.filter(
+          (k) => k === (WerewolfRole.Werewolf as string),
+        ),
+      ).toHaveLength(1);
       expect(phase.currentPhaseIndex).toBe(0);
     });
 
@@ -223,7 +226,7 @@ describe("WerewolfAction.StartDay", () => {
       const game = makePlayingGame(
         makeNightState({
           nightActions: {
-            [getTeamPhaseKey(Team.Bad)]: {
+            [WerewolfRole.Werewolf]: {
               votes: [],
               suggestedTargetId: "p2",
             },
@@ -239,7 +242,7 @@ describe("WerewolfAction.StartDay", () => {
       const game = makePlayingGame(
         makeNightState({
           nightActions: {
-            [getTeamPhaseKey(Team.Bad)]: {
+            [WerewolfRole.Werewolf]: {
               votes: [],
               suggestedTargetId: "p2",
             },
@@ -263,7 +266,7 @@ describe("WerewolfAction.StartDay", () => {
       const game = makePlayingGame(
         makeNightState({
           nightActions: {
-            [getTeamPhaseKey(Team.Bad)]: {
+            [WerewolfRole.Werewolf]: {
               votes: [],
               suggestedTargetId: "p2",
             },
@@ -382,7 +385,7 @@ describe("WerewolfAction.SetNightTarget", () => {
       const game = makePlayingGame(nightTurn2State);
       expect(
         action.isValid(game, "owner-1", {
-          roleId: WerewolfRole.Werewolf,
+          roleId: WerewolfRole.Seer,
           targetPlayerId: "p1",
         }),
       ).toBe(true);
@@ -489,12 +492,12 @@ describe("WerewolfAction.SetNightTarget", () => {
       const game = makePlayingGame(nightTurn2State);
       action.apply(
         game,
-        { roleId: WerewolfRole.Werewolf, targetPlayerId: "p1" },
+        { roleId: WerewolfRole.Seer, targetPlayerId: "p1" },
         "owner-1",
       );
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
       const phase = ts.phase as WerewolfNighttimePhase;
-      expect(phase.nightActions[WerewolfRole.Werewolf]).toEqual({
+      expect(phase.nightActions[WerewolfRole.Seer]).toEqual({
         targetPlayerId: "p1",
       });
     });
@@ -504,18 +507,18 @@ describe("WerewolfAction.SetNightTarget", () => {
         makeNightState({
           turn: 2,
           nightActions: {
-            [WerewolfRole.Werewolf]: { targetPlayerId: "p1" },
+            [WerewolfRole.Seer]: { targetPlayerId: "p1" },
           },
         }),
       );
       action.apply(
         game,
-        { roleId: WerewolfRole.Werewolf, targetPlayerId: undefined },
+        { roleId: WerewolfRole.Seer, targetPlayerId: undefined },
         "owner-1",
       );
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
       const phase = ts.phase as WerewolfNighttimePhase;
-      expect(phase.nightActions[WerewolfRole.Werewolf]).toBeUndefined();
+      expect(phase.nightActions[WerewolfRole.Seer]).toBeUndefined();
     });
 
     it("does not affect other roles when clearing", () => {
@@ -523,33 +526,40 @@ describe("WerewolfAction.SetNightTarget", () => {
         makeNightState({
           turn: 2,
           nightActions: {
-            [WerewolfRole.Werewolf]: { targetPlayerId: "p1" },
-            [WerewolfRole.Seer]: { targetPlayerId: "p2" },
+            [WerewolfRole.Seer]: { targetPlayerId: "p1" },
+            [WerewolfRole.Bodyguard]: { targetPlayerId: "p3" },
           },
         }),
       );
       action.apply(
         game,
-        { roleId: WerewolfRole.Werewolf, targetPlayerId: undefined },
+        { roleId: WerewolfRole.Seer, targetPlayerId: undefined },
         "owner-1",
       );
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
       const phase = ts.phase as WerewolfNighttimePhase;
-      expect(phase.nightActions[WerewolfRole.Werewolf]).toBeUndefined();
-      expect(phase.nightActions[WerewolfRole.Seer]).toEqual({
-        targetPlayerId: "p2",
+      expect(phase.nightActions[WerewolfRole.Seer]).toBeUndefined();
+      expect(phase.nightActions[WerewolfRole.Bodyguard]).toEqual({
+        targetPlayerId: "p3",
       });
     });
   });
 
   describe("apply — player (inferred roleId, solo)", () => {
+    // Use Seer (p2) as the active solo role by putting Seer first in the phase order.
+    const seerActiveState = makeNightState({
+      turn: 2,
+      nightPhaseOrder: [WerewolfRole.Seer, WerewolfRole.Werewolf],
+      currentPhaseIndex: 0,
+    });
+
     it("sets the night action for the active role", () => {
-      const game = makePlayingGame(nightTurn2State);
-      action.apply(game, { targetPlayerId: "p2" }, "p1");
+      const game = makePlayingGame(seerActiveState);
+      action.apply(game, { targetPlayerId: "p1" }, "p2");
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
       const phase = ts.phase as WerewolfNighttimePhase;
-      expect(phase.nightActions[WerewolfRole.Werewolf]).toEqual({
-        targetPlayerId: "p2",
+      expect(phase.nightActions[WerewolfRole.Seer]).toEqual({
+        targetPlayerId: "p1",
       });
     });
 
@@ -557,31 +567,35 @@ describe("WerewolfAction.SetNightTarget", () => {
       const game = makePlayingGame(
         makeNightState({
           turn: 2,
+          nightPhaseOrder: [WerewolfRole.Seer, WerewolfRole.Werewolf],
+          currentPhaseIndex: 0,
           nightActions: {
-            [WerewolfRole.Werewolf]: { targetPlayerId: "p2" },
+            [WerewolfRole.Seer]: { targetPlayerId: "p1" },
           },
         }),
       );
-      action.apply(game, { targetPlayerId: undefined }, "p1");
+      action.apply(game, { targetPlayerId: undefined }, "p2");
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
       const phase = ts.phase as WerewolfNighttimePhase;
-      expect(phase.nightActions[WerewolfRole.Werewolf]).toBeUndefined();
+      expect(phase.nightActions[WerewolfRole.Seer]).toBeUndefined();
     });
 
     it("overwrites a previous target", () => {
       const game = makePlayingGame(
         makeNightState({
           turn: 2,
+          nightPhaseOrder: [WerewolfRole.Seer, WerewolfRole.Werewolf],
+          currentPhaseIndex: 0,
           nightActions: {
-            [WerewolfRole.Werewolf]: { targetPlayerId: "p3" },
+            [WerewolfRole.Seer]: { targetPlayerId: "p3" },
           },
         }),
       );
-      action.apply(game, { targetPlayerId: "p2" }, "p1");
+      action.apply(game, { targetPlayerId: "p1" }, "p2");
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
       const phase = ts.phase as WerewolfNighttimePhase;
-      expect(phase.nightActions[WerewolfRole.Werewolf]).toEqual({
-        targetPlayerId: "p2",
+      expect(phase.nightActions[WerewolfRole.Seer]).toEqual({
+        targetPlayerId: "p1",
       });
     });
   });
@@ -595,78 +609,92 @@ describe("WerewolfAction.ConfirmNightTarget", () => {
   const action = WEREWOLF_ACTIONS[WerewolfAction.ConfirmNightTarget];
 
   describe("isValid (solo)", () => {
+    // Use Seer (p2) as the active solo role.
+    const seerActiveState = makeNightState({
+      turn: 2,
+      nightPhaseOrder: [WerewolfRole.Seer, WerewolfRole.Werewolf],
+      currentPhaseIndex: 0,
+    });
+
     it("returns true when active player has an unconfirmed target on turn 2+", () => {
       const game = makePlayingGame(
         makeNightState({
           turn: 2,
+          nightPhaseOrder: [WerewolfRole.Seer, WerewolfRole.Werewolf],
+          currentPhaseIndex: 0,
           nightActions: {
-            [WerewolfRole.Werewolf]: { targetPlayerId: "p2" },
+            [WerewolfRole.Seer]: { targetPlayerId: "p1" },
           },
         }),
       );
-      expect(action.isValid(game, "p1", null)).toBe(true);
+      expect(action.isValid(game, "p2", null)).toBe(true);
     });
 
     it("returns false when no target is set", () => {
-      const game = makePlayingGame(makeNightState({ turn: 2 }));
-      expect(action.isValid(game, "p1", null)).toBe(false);
+      const game = makePlayingGame(seerActiveState);
+      expect(action.isValid(game, "p2", null)).toBe(false);
     });
 
     it("returns false when target is already confirmed", () => {
       const game = makePlayingGame(
         makeNightState({
           turn: 2,
+          nightPhaseOrder: [WerewolfRole.Seer, WerewolfRole.Werewolf],
+          currentPhaseIndex: 0,
           nightActions: {
-            [WerewolfRole.Werewolf]: {
-              targetPlayerId: "p2",
-              confirmed: true,
-            },
-          },
-        }),
-      );
-      expect(action.isValid(game, "p1", null)).toBe(false);
-    });
-
-    it("returns false on first turn", () => {
-      const game = makePlayingGame(
-        makeNightState({
-          turn: 1,
-          nightActions: {
-            [WerewolfRole.Werewolf]: { targetPlayerId: "p2" },
-          },
-        }),
-      );
-      expect(action.isValid(game, "p1", null)).toBe(false);
-    });
-
-    it("returns false when caller is not the active role", () => {
-      const game = makePlayingGame(
-        makeNightState({
-          turn: 2,
-          nightActions: {
-            [WerewolfRole.Werewolf]: { targetPlayerId: "p1" },
+            [WerewolfRole.Seer]: { targetPlayerId: "p1", confirmed: true },
           },
         }),
       );
       expect(action.isValid(game, "p2", null)).toBe(false);
     });
 
-    it("returns false when caller has no role assignment", () => {
+    it("returns false on first turn", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 1,
+          nightPhaseOrder: [WerewolfRole.Seer, WerewolfRole.Werewolf],
+          currentPhaseIndex: 0,
+          nightActions: {
+            [WerewolfRole.Seer]: { targetPlayerId: "p1" },
+          },
+        }),
+      );
+      expect(action.isValid(game, "p2", null)).toBe(false);
+    });
+
+    it("returns false when caller is not the active role", () => {
       const game = makePlayingGame(
         makeNightState({
           turn: 2,
+          nightPhaseOrder: [WerewolfRole.Seer, WerewolfRole.Werewolf],
+          currentPhaseIndex: 0,
           nightActions: {
-            [WerewolfRole.Werewolf]: { targetPlayerId: "p2" },
+            [WerewolfRole.Seer]: { targetPlayerId: "p1" },
           },
         }),
-        { roleAssignments: [] },
       );
       expect(action.isValid(game, "p1", null)).toBe(false);
     });
 
+    it("returns false when caller has no role assignment", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightPhaseOrder: [WerewolfRole.Seer, WerewolfRole.Werewolf],
+          currentPhaseIndex: 0,
+          nightActions: {
+            [WerewolfRole.Seer]: { targetPlayerId: "p1" },
+          },
+        }),
+        { roleAssignments: [] },
+      );
+      expect(action.isValid(game, "p2", null)).toBe(false);
+    });
+
     it("returns false during daytime", () => {
       const game = makePlayingGame(dayTurnState);
-      expect(action.isValid(game, "p1", null)).toBe(false);
+      expect(action.isValid(game, "p2", null)).toBe(false);
     });
   });
 
@@ -713,7 +741,7 @@ describe("WerewolfAction.ConfirmNightTarget", () => {
 // Team targeting — buildNightPhaseOrder, SetNightTarget, ConfirmNightTarget
 // ---------------------------------------------------------------------------
 
-const TEAM_BAD_KEY = getTeamPhaseKey(Team.Bad);
+const TEAM_BAD_KEY = WerewolfRole.Werewolf;
 
 function makeTeamGame(
   turnState: WerewolfTurnState,
@@ -779,26 +807,30 @@ function makeTeamNightState(
 }
 
 describe("buildNightPhaseOrder — team targeting", () => {
-  it("emits a team phase key instead of individual werewolf role IDs", () => {
+  it("emits a single Werewolf group phase key for multiple werewolves", () => {
     const assignments = [
       { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
       { playerId: "w2", roleDefinitionId: WerewolfRole.Werewolf },
       { playerId: "p3", roleDefinitionId: WerewolfRole.Seer },
     ];
     const order = buildNightPhaseOrder(2, assignments);
-    expect(order).toContain(TEAM_BAD_KEY);
+    expect(order).toContain(WerewolfRole.Werewolf);
     expect(order).toContain(WerewolfRole.Seer);
-    expect(order).not.toContain(WerewolfRole.Werewolf);
+    expect(
+      order.filter((k) => k === (WerewolfRole.Werewolf as string)),
+    ).toHaveLength(1);
   });
 
-  it("emits team phase key even for a single werewolf", () => {
+  it("emits group phase key even for a single werewolf", () => {
     const assignments = [
       { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
       { playerId: "p3", roleDefinitionId: WerewolfRole.Seer },
     ];
     const order = buildNightPhaseOrder(2, assignments);
-    expect(order).toContain(TEAM_BAD_KEY);
-    expect(order).not.toContain(WerewolfRole.Werewolf);
+    expect(order).toContain(WerewolfRole.Werewolf);
+    expect(
+      order.filter((k) => k === (WerewolfRole.Werewolf as string)),
+    ).toHaveLength(1);
   });
 
   it("does not group Chupacabra into team phase", () => {
@@ -843,7 +875,7 @@ describe("computeSuggestedTarget", () => {
   });
 });
 
-describe("getTeamPlayerIds", () => {
+describe("getGroupPhasePlayerIds", () => {
   const assignments = [
     { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
     { playerId: "w2", roleDefinitionId: WerewolfRole.Werewolf },
@@ -851,11 +883,15 @@ describe("getTeamPlayerIds", () => {
   ];
 
   it("returns alive team players with teamTargeting", () => {
-    expect(getTeamPlayerIds(assignments, Team.Bad, [])).toEqual(["w1", "w2"]);
+    expect(
+      getGroupPhasePlayerIds(assignments, WerewolfRole.Werewolf, []),
+    ).toEqual(["w1", "w2"]);
   });
 
   it("excludes dead players", () => {
-    expect(getTeamPlayerIds(assignments, Team.Bad, ["w2"])).toEqual(["w1"]);
+    expect(
+      getGroupPhasePlayerIds(assignments, WerewolfRole.Werewolf, ["w2"]),
+    ).toEqual(["w1"]);
   });
 });
 
@@ -1110,7 +1146,7 @@ describe("SetNightTarget — Bodyguard self-targeting", () => {
       { playerId: "p2", roleDefinitionId: WerewolfRole.Bodyguard },
     ];
     const nightActions = {
-      [getTeamPhaseKey(Team.Bad)]: { votes: [], suggestedTargetId: "p2" },
+      [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p2" },
       [WerewolfRole.Bodyguard]: { targetPlayerId: "p2" },
     };
     const events = resolveNightActions(nightActions, assignments, []);

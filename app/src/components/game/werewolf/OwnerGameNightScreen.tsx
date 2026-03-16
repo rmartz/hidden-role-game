@@ -6,7 +6,7 @@ import {
   WerewolfPhase,
   WerewolfAction,
   isTeamNightAction,
-  isTeamPhaseKey,
+  isGroupPhaseKey,
   getTargetablePlayers,
   getPhaseLabel,
   getSoloTarget,
@@ -18,6 +18,7 @@ import type {
   WerewolfTurnState,
   WerewolfRoleDefinition,
 } from "@/lib/game-modes/werewolf";
+import { WEREWOLF_ROLES } from "@/lib/game-modes/werewolf/roles";
 import type { PlayerGameState } from "@/server/types";
 import { getPlayerName } from "@/lib/player-utils";
 import { useGameAction } from "@/hooks";
@@ -102,19 +103,20 @@ export function OwnerGameNightScreen({
   if (!isNighttime) return null;
 
   const modeConfig = GAME_MODES[gameState.gameMode];
-  const activePhaseLabel = getPhaseLabel(
-    activePhaseKey,
-    modeConfig.roles,
-    modeConfig.teamLabels as Record<string, string>,
-  );
-  const isTeamPhase = isTeamPhaseKey(activePhaseKey);
+  const activePhaseLabel = getPhaseLabel(activePhaseKey, modeConfig.roles);
+  const isGroupPhase = isGroupPhaseKey(activePhaseKey);
 
   const activePlayerNames = gameState.visibleRoleAssignments
-    .filter((a) =>
-      isTeamPhase
-        ? (a.role.team as string) === activePhaseKey.slice("team:".length)
-        : a.role.id === activePhaseKey,
-    )
+    .filter((a) => {
+      if (a.role.id === activePhaseKey) return true;
+      if (isGroupPhase) {
+        const roleDef = (
+          WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
+        )[a.role.id];
+        return (roleDef?.wakesWith as string | undefined) === activePhaseKey;
+      }
+      return false;
+    })
     .filter((a) => !turnState.deadPlayerIds.includes(a.player.id))
     .map((a) => getPlayerName(gameState.players, a.player.id) ?? a.player.id);
 
@@ -123,7 +125,7 @@ export function OwnerGameNightScreen({
     : undefined;
 
   const teamAction =
-    isTeamPhase && activeAction && isTeamNightAction(activeAction)
+    isGroupPhase && activeAction && isTeamNightAction(activeAction)
       ? activeAction
       : undefined;
 

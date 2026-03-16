@@ -1,7 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Team } from "@/lib/types";
 import { WerewolfRole } from "../roles";
-import { getTeamPhaseKey } from "./phase-keys";
 import { resolveNightActions } from "./resolution";
 
 const assignments = [
@@ -17,14 +15,14 @@ const assignments = [
 describe("resolveNightActions", () => {
   it("marks an attacked player as died", () => {
     const events = resolveNightActions(
-      { [getTeamPhaseKey(Team.Bad)]: { votes: [], suggestedTargetId: "p1" } },
+      { [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" } },
       assignments,
       [],
     );
     expect(events).toHaveLength(1);
     expect(events[0]).toMatchObject({
       targetPlayerId: "p1",
-      attackedBy: [getTeamPhaseKey(Team.Bad)],
+      attackedBy: [WerewolfRole.Werewolf],
       protectedBy: [],
       died: true,
     });
@@ -33,7 +31,7 @@ describe("resolveNightActions", () => {
   it("marks a protected player as survived when attacked", () => {
     const events = resolveNightActions(
       {
-        [getTeamPhaseKey(Team.Bad)]: { votes: [], suggestedTargetId: "p1" },
+        [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
         [WerewolfRole.Bodyguard]: { targetPlayerId: "p1" },
       },
       assignments,
@@ -41,7 +39,7 @@ describe("resolveNightActions", () => {
     );
     const event = events.find((e) => e.targetPlayerId === "p1");
     expect(event).toMatchObject({
-      attackedBy: [getTeamPhaseKey(Team.Bad)],
+      attackedBy: [WerewolfRole.Werewolf],
       protectedBy: [WerewolfRole.Bodyguard],
       died: false,
     });
@@ -58,7 +56,7 @@ describe("resolveNightActions", () => {
 
   it("skips team actions with no suggestedTargetId", () => {
     const events = resolveNightActions(
-      { [getTeamPhaseKey(Team.Bad)]: { votes: [] } },
+      { [WerewolfRole.Werewolf]: { votes: [] } },
       assignments,
       [],
     );
@@ -103,7 +101,7 @@ describe("resolveNightActions", () => {
     it("protects an attacked player when Witch targets them", () => {
       const events = resolveNightActions(
         {
-          [getTeamPhaseKey(Team.Bad)]: { votes: [], suggestedTargetId: "p1" },
+          [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
           [WerewolfRole.Witch]: { targetPlayerId: "p1" },
         },
         assignments,
@@ -119,7 +117,7 @@ describe("resolveNightActions", () => {
     it("attacks an unattacked player when Witch targets them", () => {
       const events = resolveNightActions(
         {
-          [getTeamPhaseKey(Team.Bad)]: { votes: [], suggestedTargetId: "p1" },
+          [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
           [WerewolfRole.Witch]: { targetPlayerId: "p2" },
         },
         assignments,
@@ -135,7 +133,7 @@ describe("resolveNightActions", () => {
 
     it("has no effect when Witch takes no action", () => {
       const events = resolveNightActions(
-        { [getTeamPhaseKey(Team.Bad)]: { votes: [], suggestedTargetId: "p1" } },
+        { [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" } },
         assignments,
         [],
       );

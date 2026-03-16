@@ -7,8 +7,7 @@ import type {
 } from "@/server/types";
 import {
   isTeamNightAction,
-  getTeamPhaseKey,
-  getTeamPlayerIds,
+  getGroupPhasePlayerIds,
   WerewolfPhase,
   TargetCategory,
   getInterimAttackedPlayerIds,
@@ -53,7 +52,8 @@ export class GameSerializationService {
   /**
    * Extracts the night targeting state for a non-owner player.
    * For solo roles: returns myNightTarget/myNightTargetConfirmed.
-   * For team phases: also returns teamVotes, suggestedTargetId, allAgreed.
+   * For group phases (teamTargeting or wakesWith): also returns teamVotes,
+   * suggestedTargetId, allAgreed.
    */
   extractPlayerNightState(
     nightActions: Record<string, AnyNightAction>,
@@ -63,12 +63,17 @@ export class GameSerializationService {
     deadPlayerIds: string[],
   ): Partial<PlayerGameState> {
     const roleDef = GAME_MODES[game.gameMode].roles[myRole.id] as
-      | { teamTargeting?: boolean; team?: string }
+      | WerewolfRoleDefinition
       | undefined;
 
-    if (roleDef?.teamTargeting && roleDef.team) {
-      const phaseKey = getTeamPhaseKey(roleDef.team as Team);
-      const action = nightActions[phaseKey];
+    // Determine if this player participates in a group phase.
+    // Primary group phase roles have teamTargeting; secondary roles have wakesWith.
+    const groupPhaseKey = roleDef?.teamTargeting
+      ? myRole.id
+      : roleDef?.wakesWith;
+
+    if (groupPhaseKey) {
+      const action = nightActions[groupPhaseKey];
       if (!action || !isTeamNightAction(action)) {
         return { myNightTarget: undefined, myNightTargetConfirmed: false };
       }
@@ -76,25 +81,26 @@ export class GameSerializationService {
       const myVote = action.votes.find((v) => v.playerId === callerId);
       const playerById = new Map(game.players.map((p) => [p.id, p]));
 
-      const aliveTeamIds = getTeamPlayerIds(
+      const aliveParticipantIds = getGroupPhasePlayerIds(
         game.roleAssignments,
-        roleDef.team as Team,
+        groupPhaseKey,
         deadPlayerIds,
       );
 
       const teamVotes = action.votes
-        .filter((v) => aliveTeamIds.includes(v.playerId))
+        .filter((v) => aliveParticipantIds.includes(v.playerId))
         .map((v) => ({
           playerName: playerById.get(v.playerId)?.name ?? "Unknown",
           targetPlayerId: v.targetPlayerId,
         }));
 
       const aliveVotes = action.votes.filter((v) =>
-        aliveTeamIds.includes(v.playerId),
+        aliveParticipantIds.includes(v.playerId),
       );
       const uniqueTargets = new Set(aliveVotes.map((v) => v.targetPlayerId));
       const allAgreed =
-        aliveVotes.length === aliveTeamIds.length && uniqueTargets.size === 1;
+        aliveVotes.length === aliveParticipantIds.length &&
+        uniqueTargets.size === 1;
 
       return {
         myNightTarget: myVote?.targetPlayerId,

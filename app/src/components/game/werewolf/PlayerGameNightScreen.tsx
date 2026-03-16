@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import {
   getTargetablePlayers,
-  isTeamPhaseKey,
+  isGroupPhaseKey,
   isPlayersTurn,
 } from "@/lib/game-modes/werewolf";
 import type { WerewolfNighttimePhase } from "@/lib/game-modes/werewolf";
@@ -64,7 +64,7 @@ export function PlayerGameNightScreen({
   }
 
   const isFirstTurn = turn === 1;
-  const isTeamPhase = !!(activePhaseKey && isTeamPhaseKey(activePhaseKey));
+  const isTeamPhase = !!(activePhaseKey && isGroupPhaseKey(activePhaseKey));
   const teammateNames = gameState.visibleRoleAssignments.map(
     (a) => a.player.name,
   );
@@ -105,6 +105,8 @@ export function PlayerGameNightScreen({
     ? allTargets.filter(([, isSelected]) => isSelected)
     : allTargets;
 
+  // For group phases (Werewolf, Wolf Cub waking together), use the phase key;
+  // solo phases use the player's own role ID.
   const confirmPhaseKey = (
     isTeamPhase ? activePhaseKey : gameState.myRole?.id
   ) as PhaseKey | undefined;
