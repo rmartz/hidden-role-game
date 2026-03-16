@@ -287,8 +287,13 @@ export interface FirebasePlayerState {
   rolesInPlay?: RoleInPlay[] | null;
   nightActions?: Record<string, AnyNightAction>;
   myNightTarget?: string;
+  /** True when the player has intentionally chosen to skip their night action. */
+  myNightTargetSkipped?: boolean;
   myNightTargetConfirmed?: boolean;
-  teamVotes?: { playerName: string; targetPlayerId: string }[];
+  teamVotes?: (
+    | { playerName: string; targetPlayerId: string }
+    | { playerName: string; skipped: true }
+  )[];
   suggestedTargetId?: string;
   allAgreed?: boolean;
   amDead?: boolean;
@@ -314,7 +319,9 @@ export function playerStateToFirebase(
     rolesInPlay: state.rolesInPlay ?? null,
     ...(state.nightActions ? { nightActions: state.nightActions } : {}),
     ...(state.myNightTarget !== undefined
-      ? { myNightTarget: state.myNightTarget }
+      ? state.myNightTarget === null
+        ? { myNightTargetSkipped: true }
+        : { myNightTarget: state.myNightTarget }
       : {}),
     ...(state.myNightTargetConfirmed !== undefined
       ? { myNightTargetConfirmed: state.myNightTargetConfirmed }
@@ -368,9 +375,11 @@ export function firebaseToPlayerState(
     ),
     rolesInPlay: raw.rolesInPlay ?? undefined,
     ...(raw.nightActions ? { nightActions: raw.nightActions } : {}),
-    ...(raw.myNightTarget !== undefined
-      ? { myNightTarget: raw.myNightTarget }
-      : {}),
+    ...(raw.myNightTargetSkipped
+      ? { myNightTarget: null }
+      : raw.myNightTarget !== undefined
+        ? { myNightTarget: raw.myNightTarget }
+        : {}),
     ...(raw.myNightTargetConfirmed !== undefined
       ? { myNightTargetConfirmed: raw.myNightTargetConfirmed }
       : {}),

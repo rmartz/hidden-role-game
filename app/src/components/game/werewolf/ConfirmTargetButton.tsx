@@ -9,6 +9,8 @@ interface Props {
   gameId: string;
   roleId?: PhaseKey;
   hasTarget: boolean;
+  /** Whether the player has made an active decision (target or intentional skip). */
+  hasDecided: boolean;
   isConfirmed: boolean;
   isGroupPhase?: boolean;
   allAgreed?: boolean;
@@ -19,6 +21,7 @@ export function ConfirmTargetButton({
   gameId,
   roleId,
   hasTarget,
+  hasDecided,
   isConfirmed,
   isGroupPhase,
   allAgreed,
@@ -33,6 +36,8 @@ export function ConfirmTargetButton({
       </p>
     );
   }
+
+  if (!hasDecided) return null;
 
   // Group phases require all members to agree before confirming.
   const disabled = action.isPending || (isGroupPhase && !allAgreed);

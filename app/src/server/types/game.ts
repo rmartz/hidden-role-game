@@ -67,12 +67,18 @@ export interface PlayerGameState {
   rolesInPlay?: RoleInPlay[];
   /** All night targets keyed by phase key. Only populated for the narrator/owner. */
   nightActions?: Record<string, AnyNightAction>;
-  /** The current player's night target (playerId). Only populated for non-owner players during nighttime. */
-  myNightTarget?: string;
+  /**
+   * The current player's night target (playerId). null = intentional skip;
+   * undefined = no decision made yet. Only populated for non-owner players during nighttime.
+   */
+  myNightTarget?: string | null;
   /** Whether the player has confirmed their night target. */
   myNightTargetConfirmed?: boolean;
   /** Per-player votes from teammates during a team night phase. */
-  teamVotes?: { playerName: string; targetPlayerId: string }[];
+  teamVotes?: (
+    | { playerName: string; targetPlayerId: string }
+    | { playerName: string; skipped: true }
+  )[];
   /** The most-voted target during a group night phase. */
   suggestedTargetId?: string;
   /** Whether all alive group members agree on the same target. */

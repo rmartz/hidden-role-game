@@ -124,19 +124,24 @@ export class GameSerializationService {
         .filter((v) => aliveParticipantIds.includes(v.playerId))
         .map((v) => ({
           playerName: playerById.get(v.playerId)?.name ?? "Unknown",
-          targetPlayerId: v.targetPlayerId,
+          ...(v.skipped
+            ? { skipped: true as const }
+            : { targetPlayerId: v.targetPlayerId ?? "" }),
         }));
 
       const aliveVotes = action.votes.filter((v) =>
         aliveParticipantIds.includes(v.playerId),
       );
-      const uniqueTargets = new Set(aliveVotes.map((v) => v.targetPlayerId));
+      const allSkipped = aliveVotes.every((v) => v.skipped === true);
+      const uniqueTargets = new Set(
+        aliveVotes.filter((v) => !v.skipped).map((v) => v.targetPlayerId),
+      );
       const allAgreed =
         aliveVotes.length === aliveParticipantIds.length &&
-        uniqueTargets.size === 1;
+        (allSkipped || uniqueTargets.size === 1);
 
       return {
-        myNightTarget: myVote?.targetPlayerId,
+        myNightTarget: myVote?.skipped ? null : myVote?.targetPlayerId,
         myNightTargetConfirmed: action.confirmed ?? false,
         teamVotes,
         suggestedTargetId: action.suggestedTargetId,
@@ -159,7 +164,9 @@ export class GameSerializationService {
           ? witchAction
           : undefined;
       const result: Partial<PlayerGameState> = {
-        myNightTarget: witchSoloAction?.targetPlayerId,
+        myNightTarget: witchSoloAction?.skipped
+          ? null
+          : witchSoloAction?.targetPlayerId,
         myNightTargetConfirmed: witchSoloAction?.confirmed ?? false,
         witchAbilityUsed: ts?.witchAbilityUsed ?? false,
       };
@@ -212,7 +219,7 @@ export class GameSerializationService {
       : undefined;
 
     const result: Partial<PlayerGameState> = {
-      myNightTarget: myAction.targetPlayerId,
+      myNightTarget: myAction.skipped ? null : myAction.targetPlayerId,
       myNightTargetConfirmed: myAction.confirmed ?? false,
       ...(previousNightTargetId ? { previousNightTargetId } : {}),
     };
@@ -221,7 +228,8 @@ export class GameSerializationService {
     if (
       myRoleDef?.targetCategory === TargetCategory.Investigate &&
       myAction.confirmed &&
-      myAction.resultRevealed
+      myAction.resultRevealed &&
+      myAction.targetPlayerId
     ) {
       const targetAssignment = game.roleAssignments.find(
         (a) => a.playerId === myAction.targetPlayerId,

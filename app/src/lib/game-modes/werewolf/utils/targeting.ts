@@ -121,6 +121,7 @@ export function computeSuggestedTarget(
 
   const counts = new Map<string, number>();
   for (const v of votes) {
+    if (v.skipped || !v.targetPlayerId) continue;
     counts.set(v.targetPlayerId, (counts.get(v.targetPlayerId) ?? 0) + 1);
   }
 

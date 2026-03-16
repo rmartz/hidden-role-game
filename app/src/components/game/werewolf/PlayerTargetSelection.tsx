@@ -25,7 +25,7 @@ interface Props {
   hasVisibleTeammates?: boolean;
   teamVotes?: TeamVoteDisplay[];
   suggestedTargetId?: string;
-  myNightTarget?: string;
+  myNightTarget?: string | null;
   witchAbilityUsed?: boolean;
   attackedPlayerIds?: string[];
   previousNightTargetId?: string;
@@ -125,17 +125,20 @@ export function PlayerTargetSelection({
         ))}
         {!isConfirmed && (
           <Button
-            variant={!hasTarget ? "default" : "outline"}
+            variant={myNightTarget === null ? "default" : "outline"}
             onClick={() => {
               action.mutate({
                 actionId: WerewolfAction.SetNightTarget,
-                payload: { targetPlayerId: undefined },
+                payload: {
+                  targetPlayerId: myNightTarget === null ? undefined : null,
+                },
               });
             }}
             disabled={action.isPending}
             className="justify-start"
           >
             No target
+            {myNightTarget === null && " (selected)"}
           </Button>
         )}
       </div>
@@ -163,13 +166,14 @@ export function PlayerTargetSelection({
         gameId={gameId}
         roleId={confirmPhaseKey}
         hasTarget={hasTarget}
+        hasDecided={isGroupPhase || myNightTarget !== undefined}
         isConfirmed={isConfirmed}
         isGroupPhase={isGroupPhase}
         allAgreed={allAgreed}
         witchContext={
           confirmPhaseKey === WerewolfRole.Witch
             ? {
-                selectedTargetId: myNightTarget,
+                selectedTargetId: myNightTarget ?? undefined,
                 attackedPlayerIds: attackedPlayerIds ?? [],
               }
             : undefined

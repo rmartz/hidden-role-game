@@ -4,7 +4,9 @@ export enum WerewolfPhase {
 }
 
 export interface NightAction {
-  targetPlayerId: string;
+  targetPlayerId?: string;
+  /** True when the player intentionally chose to take no action this night. */
+  skipped?: true;
   confirmed?: boolean;
   /** True once the narrator has revealed the investigation result to the player. */
   resultRevealed?: boolean;
@@ -12,7 +14,9 @@ export interface NightAction {
 
 export interface TeamNightVote {
   playerId: string;
-  targetPlayerId: string;
+  targetPlayerId?: string;
+  /** True when this player intentionally voted to skip (take no action). */
+  skipped?: true;
 }
 
 export interface TeamNightAction {
