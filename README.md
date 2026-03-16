@@ -43,6 +43,10 @@ hidden-role-game/
 └── pnpm-workspace.yaml
 ```
 
+## Game Modes
+
+See [docs/](docs/README.md) for detailed documentation on each game mode, including roles, actions, and data flow.
+
 ## Game Flow
 
 1. A player creates a lobby and configures the role mix
