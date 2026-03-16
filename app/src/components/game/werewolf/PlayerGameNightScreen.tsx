@@ -86,7 +86,9 @@ export function PlayerGameNightScreen({
   const resolvedTeamVotes = (gameState.teamVotes ?? []).map((vote) => ({
     playerName: vote.playerName,
     targetName:
-      getPlayerName(gameState.players, vote.targetPlayerId) ?? "Unknown",
+      "skipped" in vote
+        ? "No target"
+        : (getPlayerName(gameState.players, vote.targetPlayerId) ?? "Unknown"),
   }));
   const suggestedTargetId = gameState.suggestedTargetId;
   const allAgreed = gameState.allAgreed ?? false;

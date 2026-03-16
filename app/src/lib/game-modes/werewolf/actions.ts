@@ -196,8 +196,9 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       )
         return false;
 
-      // targetPlayerId undefined = clear; string = set target.
+      // targetPlayerId undefined = clear; null = intentional skip; string = set target.
       if (targetPlayerId === undefined) return true;
+      if (targetPlayerId === null) return true;
       if (typeof targetPlayerId !== "string") return false;
       if (targetPlayerId === game.ownerPlayerId) return false;
       if (!game.players.some((p) => p.id === targetPlayerId)) return false;
@@ -268,7 +269,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       const phase = ts.phase;
       const { roleId: explicitPhaseKey, targetPlayerId } = payload as {
         roleId?: string;
-        targetPlayerId?: string;
+        targetPlayerId?: string | null;
       };
 
       const phaseKey =
@@ -293,6 +294,11 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
           );
           if (targetPlayerId === undefined) {
             groupAction.votes = [];
+          } else if (targetPlayerId === null) {
+            groupAction.votes = aliveParticipantIds.map((pid) => ({
+              playerId: pid,
+              skipped: true as const,
+            }));
           } else {
             groupAction.votes = aliveParticipantIds.map((pid) => ({
               playerId: pid,
@@ -305,12 +311,20 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
             (v) => v.playerId !== callerId,
           );
         } else {
-          // Upsert caller's vote.
+          // Upsert caller's vote (target or intentional skip).
           const existingVote = groupAction.votes.find(
             (v) => v.playerId === callerId,
           );
-          if (existingVote) {
+          if (targetPlayerId === null) {
+            if (existingVote) {
+              delete existingVote.targetPlayerId;
+              existingVote.skipped = true;
+            } else {
+              groupAction.votes.push({ playerId: callerId, skipped: true });
+            }
+          } else if (existingVote) {
             existingVote.targetPlayerId = targetPlayerId;
+            delete existingVote.skipped;
           } else {
             groupAction.votes.push({ playerId: callerId, targetPlayerId });
           }
@@ -326,9 +340,13 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       } else {
         // Solo phase.
         if (targetPlayerId === undefined) {
+          // Clear: remove the action entirely (back to undecided state).
           phase.nightActions = Object.fromEntries(
             Object.entries(phase.nightActions).filter(([k]) => k !== phaseKey),
           );
+        } else if (targetPlayerId === null) {
+          // Intentional skip.
+          phase.nightActions[phaseKey] = { skipped: true };
         } else {
           phase.nightActions[phaseKey] = { targetPlayerId };
         }
@@ -345,7 +363,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       if (action.confirmed) return false;
 
       if (result.isGroupPhase) {
-        // Group phase: all alive participants must agree on the same target.
+        // Group phase: all alive participants must agree (same target or all skip).
         if (!isTeamNightAction(action)) return false;
         const ts = currentTurnState(game);
         const aliveParticipantIds = getGroupPhasePlayerIds(
@@ -354,23 +372,22 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
           ts?.deadPlayerIds ?? [],
         );
         if (aliveParticipantIds.length === 0) return false;
-        const targets = new Set(
-          action.votes
-            .filter((v) => aliveParticipantIds.includes(v.playerId))
-            .map((v) => v.targetPlayerId),
+        const aliveVotes = action.votes.filter((v) =>
+          aliveParticipantIds.includes(v.playerId),
         );
-        // All alive participants must have voted and all for the same target.
-        const voterIds = new Set(
-          action.votes
-            .filter((v) => aliveParticipantIds.includes(v.playerId))
-            .map((v) => v.playerId),
-        );
+        // All alive participants must have voted.
+        const voterIds = new Set(aliveVotes.map((v) => v.playerId));
         if (voterIds.size !== aliveParticipantIds.length) return false;
-        if (targets.size !== 1) return false;
-        return true;
+        // All must agree: either all skipped, or all voted for the same target.
+        const allSkipped = aliveVotes.every((v) => v.skipped === true);
+        if (allSkipped) return true;
+        const targets = new Set(
+          aliveVotes.filter((v) => !v.skipped).map((v) => v.targetPlayerId),
+        );
+        return targets.size === 1 && !aliveVotes.some((v) => v.skipped);
       }
 
-      // Solo phase: must have a target set.
+      // Solo phase: action must exist (has a target or is an intentional skip).
       return true;
     },
     apply(game: Game) {

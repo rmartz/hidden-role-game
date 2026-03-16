@@ -3,17 +3,19 @@ export enum WerewolfPhase {
   Daytime = "daytime",
 }
 
-export interface NightAction {
-  targetPlayerId: string;
+export type NightAction = {
   confirmed?: boolean;
   /** True once the narrator has revealed the investigation result to the player. */
   resultRevealed?: boolean;
-}
+} & (
+  | { targetPlayerId: string; skipped?: never }
+  | { skipped: true; targetPlayerId?: never }
+  | { targetPlayerId?: never; skipped?: never }
+);
 
-export interface TeamNightVote {
-  playerId: string;
-  targetPlayerId: string;
-}
+export type TeamNightVote =
+  | { playerId: string; targetPlayerId: string; skipped?: never }
+  | { playerId: string; skipped: true; targetPlayerId?: never };
 
 export interface TeamNightAction {
   votes: TeamNightVote[];
