@@ -3,10 +3,13 @@ import type { AnyNightAction } from "../types";
 import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
 import { isTeamPhaseKey, TEAM_PHASE_PREFIX } from "./phase-keys";
+import type { PhaseKey } from "./phase-keys";
 import { targetPlayerIdOf } from "./targeting";
 import { getPlayerName } from "@/lib/player-utils";
 import { Team } from "@/lib/types";
-import type { VisibleTeammate } from "@/server/types";
+import type { NightStatusEntry, VisibleTeammate } from "@/server/types";
+
+export type { PhaseKey };
 
 export interface NightSummaryEntry {
   targetId: string;
@@ -77,7 +80,7 @@ export function isPlayersTurn(
 export function getActionText(
   category: TargetCategory,
   targetName: string,
-  nightSummary: { targetPlayerId: string; died: boolean }[] | undefined,
+  nightStatus: NightStatusEntry[] | undefined,
   targetPlayerId: string,
 ): string {
   switch (category) {
@@ -86,8 +89,8 @@ export function getActionText(
     case TargetCategory.Investigate:
       return `You Investigated ${targetName}.`;
     case TargetCategory.Attack: {
-      const targetWasKilled = (nightSummary ?? []).some(
-        (e) => e.died && e.targetPlayerId === targetPlayerId,
+      const targetWasKilled = (nightStatus ?? []).some(
+        (e) => e.effect === "killed" && e.targetPlayerId === targetPlayerId,
       );
       return targetWasKilled
         ? `You Attacked ${targetName}.`
@@ -126,11 +129,11 @@ export function getInvestigationResultForNarrator(
  * Team phase keys return "Attack". Solo roles: Attack, Protect, Investigate,
  * Silence (Spellcaster), Use Ability (Witch), or "Confirm".
  */
-export function getConfirmLabel(phaseKey?: string): string {
+export function getConfirmLabel(phaseKey?: PhaseKey): string {
   if (!phaseKey) return "Confirm";
   if (isTeamPhaseKey(phaseKey)) return "Attack";
-  if ((phaseKey as WerewolfRole) === WerewolfRole.Witch) return "Use Ability";
-  if ((phaseKey as WerewolfRole) === WerewolfRole.Spellcaster) return "Silence";
+  if (phaseKey === WerewolfRole.Witch) return "Use Ability";
+  if (phaseKey === WerewolfRole.Spellcaster) return "Silence";
   const roleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
     phaseKey
   ];

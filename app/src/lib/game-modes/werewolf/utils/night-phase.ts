@@ -50,7 +50,7 @@ export function buildNightPhaseOrder(
     }
   }
 
-  // Witch always acts last — she needs to see all prior attacks before choosing.
+  // Witch always acts last — they need to see all prior attacks before choosing.
   if (witchPhaseKey !== undefined) phaseKeys.push(witchPhaseKey);
 
   return phaseKeys;

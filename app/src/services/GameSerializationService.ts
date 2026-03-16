@@ -1,6 +1,6 @@
 import { GameStatus, Team } from "@/lib/types";
 import type { Game, RoleDefinition } from "@/lib/types";
-import type { PlayerGameState } from "@/server/types";
+import type { NightStatusEntry, PlayerGameState } from "@/server/types";
 import {
   isTeamNightAction,
   getTeamPhaseKey,
@@ -143,7 +143,14 @@ export class GameSerializationService {
           game.roleAssignments,
           deadPlayerIds,
         );
-        if (attacked.length > 0) result.attackedPlayerIds = attacked;
+        if (attacked.length > 0) {
+          result.nightStatus = attacked.map(
+            (id): NightStatusEntry => ({
+              targetPlayerId: id,
+              effect: "attacked",
+            }),
+          );
+        }
       }
     }
 
@@ -154,8 +161,8 @@ export class GameSerializationService {
    * Extracts sanitized night outcomes and the player's own last action for
    * display at the start of the day. Only populated during daytime phases.
    *
-   * nightSummary: only events where something happened (died === true),
-   * with attacker/protector info stripped — players cannot infer who acted.
+   * nightStatus: killed entries from deaths and silenced entries from the
+   * Spellcaster, with attacker/protector info stripped.
    *
    * myLastNightAction: the target the player chose, even if their action was
    * negated, so they can confirm their input was recorded.
@@ -170,9 +177,19 @@ export class GameSerializationService {
     if (ts?.phase.type !== WerewolfPhase.Daytime) return {};
     const phase = ts.phase;
 
-    const nightSummary = (phase.nightResolution ?? [])
-      .filter((e) => e.died)
-      .map((e) => ({ targetPlayerId: e.targetPlayerId, died: e.died }));
+    const nightStatus: NightStatusEntry[] = [
+      ...(phase.nightResolution ?? [])
+        .filter((e) => e.died)
+        .map(
+          (e): NightStatusEntry => ({
+            targetPlayerId: e.targetPlayerId,
+            effect: "killed",
+          }),
+        ),
+      ...(phase.silencedPlayerIds ?? []).map(
+        (id): NightStatusEntry => ({ targetPlayerId: id, effect: "silenced" }),
+      ),
+    ];
 
     const myLastNightAction = this.extractMyLastNightTarget(
       phase.nightActions,
@@ -181,12 +198,9 @@ export class GameSerializationService {
       myRole,
     );
 
-    const silencedPlayerIds = phase.silencedPlayerIds ?? [];
-
     return {
-      ...(nightSummary.length > 0 ? { nightSummary } : {}),
+      ...(nightStatus.length > 0 ? { nightStatus } : {}),
       ...(myLastNightAction ? { myLastNightAction } : {}),
-      ...(silencedPlayerIds.length > 0 ? { silencedPlayerIds } : {}),
     };
   }
 

@@ -33,6 +33,7 @@ function makeDaytimeGame(
       WerewolfTurnState["phase"],
       { type: WerewolfPhase.Daytime }
     >["nightResolution"];
+    silencedPlayerIds: string[];
     deadPlayerIds: string[];
   }> = {},
 ): Game {
@@ -44,6 +45,9 @@ function makeDaytimeGame(
       nightActions: overrides.nightActions ?? {},
       ...(overrides.nightResolution !== undefined
         ? { nightResolution: overrides.nightResolution }
+        : {}),
+      ...(overrides.silencedPlayerIds !== undefined
+        ? { silencedPlayerIds: overrides.silencedPlayerIds }
         : {}),
     },
     deadPlayerIds: overrides.deadPlayerIds ?? [],
@@ -109,7 +113,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
     expect(result).toEqual({});
   });
 
-  it("nightSummary is absent when no players died", () => {
+  it("nightStatus is absent when no players died or were silenced", () => {
     const game = makeDaytimeGame({
       nightResolution: [
         {
@@ -122,10 +126,10 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
     });
 
     const result = service.extractDaytimeNightState(game, "p1", werewolfRole);
-    expect(result.nightSummary).toBeUndefined();
+    expect(result.nightStatus).toBeUndefined();
   });
 
-  it("nightSummary contains only players who died", () => {
+  it("nightStatus contains killed entry for each player who died", () => {
     const game = makeDaytimeGame({
       nightResolution: [
         {
@@ -144,10 +148,21 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
     });
 
     const result = service.extractDaytimeNightState(game, "p1", werewolfRole);
-    expect(result.nightSummary).toEqual([{ targetPlayerId: "p2", died: true }]);
+    expect(result.nightStatus).toEqual([
+      { targetPlayerId: "p2", effect: "killed" },
+    ]);
   });
 
-  it("nightSummary omits attackedBy and protectedBy", () => {
+  it("nightStatus contains silenced entry for each silenced player", () => {
+    const game = makeDaytimeGame({ silencedPlayerIds: ["p3"] });
+
+    const result = service.extractDaytimeNightState(game, "p1", werewolfRole);
+    expect(result.nightStatus).toEqual([
+      { targetPlayerId: "p3", effect: "silenced" },
+    ]);
+  });
+
+  it("nightStatus omits attackedBy and protectedBy", () => {
     const game = makeDaytimeGame({
       nightResolution: [
         {
@@ -160,9 +175,9 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
     });
 
     const result = service.extractDaytimeNightState(game, "p1", werewolfRole);
-    const event = result.nightSummary?.[0];
-    expect(event).not.toHaveProperty("attackedBy");
-    expect(event).not.toHaveProperty("protectedBy");
+    const entry = result.nightStatus?.[0];
+    expect(entry).not.toHaveProperty("attackedBy");
+    expect(entry).not.toHaveProperty("protectedBy");
   });
 });
 

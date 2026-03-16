@@ -1,12 +1,13 @@
 "use client";
 
 import { WerewolfAction, getConfirmLabel } from "@/lib/game-modes/werewolf";
+import type { PhaseKey } from "@/lib/game-modes/werewolf";
 import { useGameAction } from "@/hooks";
 import { Button } from "@/components/ui/button";
 
 interface Props {
   gameId: string;
-  roleId?: string;
+  roleId?: PhaseKey;
   hasTarget: boolean;
   isConfirmed: boolean;
   isTeamPhase?: boolean;

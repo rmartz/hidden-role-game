@@ -39,6 +39,13 @@ export interface VisibleTeammate {
   role: PublicRoleInfo;
 }
 
+export type NightPlayerEffect = "killed" | "silenced" | "attacked";
+
+export interface NightStatusEntry {
+  targetPlayerId: string;
+  effect: NightPlayerEffect;
+}
+
 export interface PlayerGameState {
   status: GameStatusState;
   gameMode: GameMode;
@@ -66,12 +73,12 @@ export interface PlayerGameState {
   /** Player IDs marked as dead by the narrator. */
   deadPlayerIds?: string[];
   /**
-   * Sanitized night outcomes shown to players at the start of the day.
-   * Only includes events where something happened (e.g. a death).
-   * Omits who performed the action and any negated/blocked actions.
-   * Only populated for non-owner players during daytime.
+   * Night effect outcomes visible to players. During daytime: killed/silenced
+   * entries from the preceding night. During nighttime for the Witch: attacked
+   * entries showing players currently under attack before they act.
+   * Only populated for non-owner players.
    */
-  nightSummary?: { targetPlayerId: string; died: boolean }[];
+  nightStatus?: NightStatusEntry[];
   /**
    * The target the player chose during the preceding night.
    * Present even if the action was negated, so players can confirm
@@ -83,18 +90,8 @@ export interface PlayerGameState {
    * Only populated after the narrator explicitly reveals it.
    */
   investigationResult?: { targetPlayerId: string; isWerewolfTeam: boolean };
-  /**
-   * Player IDs currently attacked but not yet protected.
-   * Only populated for the Witch during her night phase, before she acts.
-   */
-  attackedPlayerIds?: string[];
-  /** Whether the Witch has already used her once-per-game special ability. */
+  /** Whether the Witch has already used their once-per-game special ability. */
   witchAbilityUsed?: boolean;
-  /**
-   * Player IDs silenced by the Spellcaster during the preceding night.
-   * Visible to all players during daytime.
-   */
-  silencedPlayerIds?: string[];
   /** Phase timer configuration. Present when the lobby has timers enabled. */
   timerConfig?: TimerConfig;
 }

@@ -115,8 +115,8 @@ function buildResolutionEvents(
 
 /**
  * Returns player IDs who are currently attacked but not yet protected,
- * excluding the Witch's own action. Used to show the Witch her available
- * targets before she acts.
+ * excluding the Witch's own action. Used to show the Witch their available
+ * targets before they act.
  */
 export function getInterimAttackedPlayerIds(
   nightActions: Record<string, AnyNightAction>,

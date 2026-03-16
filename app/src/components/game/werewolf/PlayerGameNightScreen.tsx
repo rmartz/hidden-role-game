@@ -8,6 +8,7 @@ import {
 } from "@/lib/game-modes/werewolf";
 import type { WerewolfNighttimePhase } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
+import type { PhaseKey } from "@/lib/game-modes/werewolf";
 import { getPlayerName } from "@/lib/player-utils";
 import { GameTimer } from "@/components/game";
 import { PlayerFirstTurnScreen } from "./PlayerFirstTurnScreen";
@@ -101,7 +102,13 @@ export function PlayerGameNightScreen({
     ? allTargets.filter(([, isSelected]) => isSelected)
     : allTargets;
 
-  const confirmPhaseKey = isTeamPhase ? activePhaseKey : gameState.myRole?.id;
+  const confirmPhaseKey = (
+    isTeamPhase ? activePhaseKey : gameState.myRole?.id
+  ) as PhaseKey | undefined;
+
+  const attackedPlayerIds = (gameState.nightStatus ?? [])
+    .filter((e) => e.effect === "attacked")
+    .map((e) => e.targetPlayerId);
 
   return (
     <div className="p-5">
@@ -123,25 +130,9 @@ export function PlayerGameNightScreen({
         <strong className="text-foreground">{gameState.myRole?.name}</strong> —
         wake up and take your action.
       </p>
-      {gameState.witchAbilityUsed && (
-        <p className="mb-4 text-sm text-muted-foreground italic">
-          You have already used your special ability this game.
-        </p>
-      )}
-      {!gameState.witchAbilityUsed &&
-        gameState.attackedPlayerIds &&
-        gameState.attackedPlayerIds.length > 0 && (
-          <div className="mb-4 rounded-md border p-3 text-sm">
-            <p className="font-medium mb-1">Currently under attack:</p>
-            <ul className="space-y-0.5">
-              {gameState.attackedPlayerIds.map((id) => (
-                <li key={id}>{getPlayerName(gameState.players, id) ?? id}</li>
-              ))}
-            </ul>
-          </div>
-        )}
       <PlayerTargetSelection
         gameId={gameId}
+        players={gameState.players}
         targets={targets}
         isConfirmed={isConfirmed}
         isTeamPhase={isTeamPhase}
@@ -152,6 +143,8 @@ export function PlayerGameNightScreen({
         teamVotes={resolvedTeamVotes}
         suggestedTargetId={suggestedTargetId}
         myNightTarget={gameState.myNightTarget}
+        witchAbilityUsed={gameState.witchAbilityUsed}
+        attackedPlayerIds={attackedPlayerIds}
       />
       {gameState.investigationResult && (
         <PlayerInvestigationResult
