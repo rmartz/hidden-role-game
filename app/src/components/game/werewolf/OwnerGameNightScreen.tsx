@@ -13,6 +13,7 @@ import {
   TargetCategory,
   getInvestigationResultForNarrator,
 } from "@/lib/game-modes/werewolf";
+import { WerewolfRole } from "@/lib/game-modes/werewolf/roles";
 import type {
   WerewolfTurnState,
   WerewolfRoleDefinition,
@@ -188,18 +189,24 @@ export function OwnerGameNightScreen({
             <span> ({activePlayerNames.join(", ")})</span>
           )}
         </p>
-        {!isFirstTurn && (
-          <OwnerNightTargetPanel
-            teamAction={!!teamAction}
-            resolvedVotes={resolvedVotes}
-            activeTargetName={activeTargetName}
-            activeTargetConfirmed={activeTargetConfirmed}
-            targetablePlayers={targetablePlayers}
-            activeTarget={activeTarget}
-            onTargetClick={handleTargetClick}
-            isPending={action.isPending}
-          />
-        )}
+        {!isFirstTurn &&
+          ((activePhaseKey as WerewolfRole) === WerewolfRole.Witch &&
+          turnState.witchAbilityUsed ? (
+            <p className="mb-4 text-sm text-muted-foreground italic">
+              The Witch has already used their special ability this game.
+            </p>
+          ) : (
+            <OwnerNightTargetPanel
+              teamAction={!!teamAction}
+              resolvedVotes={resolvedVotes}
+              activeTargetName={activeTargetName}
+              activeTargetConfirmed={activeTargetConfirmed}
+              targetablePlayers={targetablePlayers}
+              activeTarget={activeTarget}
+              onTargetClick={handleTargetClick}
+              isPending={action.isPending}
+            />
+          ))}
         {investigationResult && (
           <OwnerInvestigationConfirm
             gameId={gameId}

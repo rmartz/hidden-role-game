@@ -36,6 +36,10 @@ export class GameSerializationService {
     const ts = game.status.turnState as WerewolfTurnState | undefined;
     if (!ts) return undefined;
     const { nightActions } = ts.phase;
+    // During nighttime, always return the record (even if empty) so that
+    // extractPlayerNightState can read turn-state fields like witchAbilityUsed
+    // before any actions have been recorded.
+    if (ts.phase.type === WerewolfPhase.Nighttime) return nightActions;
     return Object.keys(nightActions).length > 0 ? nightActions : undefined;
   }
 
