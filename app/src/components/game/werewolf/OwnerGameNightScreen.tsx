@@ -26,6 +26,7 @@ import { OwnerHeader } from "./OwnerHeader";
 import { OwnerInvestigationConfirm } from "./OwnerInvestigationConfirm";
 import { OwnerNightTargetPanel } from "./OwnerNightTargetPanel";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
+import { NightPhaseOrderList } from "./NightPhaseOrderList";
 
 interface OwnerGameNightScreenProps {
   gameId: string;
@@ -228,6 +229,12 @@ export function OwnerGameNightScreen({
         gameMode={gameState.gameMode}
         deadPlayerIds={gameState.deadPlayerIds}
         gameOwnerId={gameState.gameOwner?.id}
+      />
+      <NightPhaseOrderList
+        nightPhaseOrder={nightPhaseOrder}
+        currentPhaseIndex={currentPhaseIndex}
+        roles={modeConfig.roles}
+        teamLabels={modeConfig.teamLabels as Record<string, string>}
       />
       <GameRolesList
         roles={gameState.rolesInPlay ?? []}
