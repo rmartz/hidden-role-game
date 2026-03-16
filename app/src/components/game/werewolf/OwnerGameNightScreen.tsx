@@ -240,13 +240,11 @@ export function OwnerGameNightScreen({
                 isResultRevealed={isResultRevealed}
               />
             )}
-            <Button
-              onClick={handleAdvance}
-              disabled={action.isPending}
-              className="mt-2"
-            >
-              {isLastPhase ? "Start the Day" : "Next Role"}
-            </Button>
+            <div className="flex justify-end mt-2">
+              <Button onClick={handleAdvance} disabled={action.isPending}>
+                {isLastPhase ? "Start the Day" : "Next Role"}
+              </Button>
+            </div>
           </CardContent>
         </Card>
         <NightPhaseOrderList

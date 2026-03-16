@@ -60,7 +60,7 @@ export function ConfirmTargetButton({
       : WEREWOLF_COPY.confirmButton.skip;
 
   return (
-    <div className="mt-3">
+    <div className="mt-3 max-w-sm mx-auto flex justify-end">
       <Tooltip>
         <TooltipTrigger>
           <span className="inline-block">

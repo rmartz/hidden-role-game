@@ -106,7 +106,7 @@ export function PlayerTargetSelection({
         </div>
       )}
 
-      <h2 className="text-lg font-semibold mb-2">
+      <h2 className="text-lg font-semibold mb-2 text-center">
         {isConfirmed && myNightTarget === null
           ? WEREWOLF_COPY.targetSelection.noAction
           : isConfirmed
@@ -114,7 +114,7 @@ export function PlayerTargetSelection({
             : WEREWOLF_COPY.targetSelection.chooseTarget}
       </h2>
       {!(isConfirmed && myNightTarget === null) && (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 max-w-sm mx-auto">
           {targets.map(([player, isSelected]) => (
             <Button
               key={player.id}
@@ -132,7 +132,6 @@ export function PlayerTargetSelection({
                 isConfirmed ||
                 player.id === previousNightTargetId
               }
-              className="justify-start"
             >
               {player.name}
               {player.id === previousNightTargetId && " (unavailable)"}
@@ -150,7 +149,6 @@ export function PlayerTargetSelection({
                 });
               }}
               disabled={action.isPending}
-              className="justify-start"
             >
               {myNightTarget === null
                 ? WEREWOLF_COPY.targetSelection.noTarget_selected
