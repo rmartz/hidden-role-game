@@ -48,12 +48,24 @@ export function PlayerTargetSelection({
 }: Props) {
   const action = useGameAction(gameId);
 
+  if (confirmPhaseKey === WerewolfRole.Witch && witchAbilityUsed) {
+    return (
+      <div>
+        <WitchInformationPanel
+          players={players}
+          witchAbilityUsed={true}
+          attackedPlayerIds={[]}
+        />
+      </div>
+    );
+  }
+
   return (
     <div>
       {confirmPhaseKey === WerewolfRole.Witch && (
         <WitchInformationPanel
           players={players}
-          witchAbilityUsed={witchAbilityUsed ?? false}
+          witchAbilityUsed={false}
           attackedPlayerIds={attackedPlayerIds ?? []}
         />
       )}
