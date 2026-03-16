@@ -17,7 +17,7 @@ export function WitchInformationPanel({
   if (witchAbilityUsed) {
     return (
       <p className="mb-4 text-sm text-muted-foreground italic">
-        You have already used your special ability this game.
+        You used your special ability this game.
       </p>
     );
   }

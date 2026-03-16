@@ -94,7 +94,7 @@ export function getActionText(
       );
       return targetWasKilled
         ? `You Attacked ${targetName}.`
-        : `You Attacked ${targetName}, but something protected them.`;
+        : `You Attacked ${targetName}, but it had no effect.`;
     }
     default:
       return `You targeted ${targetName}.`;
