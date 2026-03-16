@@ -160,9 +160,7 @@ export function OwnerGameNightScreen({
     voterName: getPlayerName(gameState.players, vote.playerId) ?? vote.playerId,
     targetName: vote.skipped
       ? "No target"
-      : (getPlayerName(gameState.players, vote.targetPlayerId) ??
-        vote.targetPlayerId ??
-        "Unknown"),
+      : (getPlayerName(gameState.players, vote.targetPlayerId) ?? "Unknown"),
   }));
 
   // Cross-night exclusion for roles with preventRepeatTarget (Bodyguard, Spellcaster).
