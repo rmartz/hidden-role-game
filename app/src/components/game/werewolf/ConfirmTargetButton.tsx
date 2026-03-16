@@ -37,7 +37,7 @@ export function ConfirmTargetButton({
   if (isConfirmed) {
     return (
       <p className="mt-3 text-sm text-green-600 font-medium">
-        Target confirmed. Wait for the Narrator to continue.
+        Action confirmed. Wait for the Narrator to continue.
       </p>
     );
   }
