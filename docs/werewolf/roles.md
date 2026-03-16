@@ -62,3 +62,33 @@ Additional roles (Bodyguard, Witch, etc.) are configured per game in the lobby.
 - **Masons** see all other Masons (`canSeeRole: [Mason]`).
 - **Dead players** have their roles revealed to all living players automatically.
 - All other roles see only their own identity.
+
+```mermaid
+graph LR
+    WW[Werewolf] -->|sees all| Bad[Team Bad players]
+    Mason -->|sees all| Masons[Other Masons]
+    All[All players] -->|see roles of| Dead[Dead players]
+    Narrator -->|sees all| Assignments[All role assignments]
+```
+
+## Night Phase Ordering Logic
+
+```mermaid
+flowchart TD
+    Start([For each role in WEREWOLF_ROLES]) --> WakesNever{wakesAtNight = Never?}
+    WakesNever -->|Yes| Skip[Skip]
+    WakesNever -->|No| FirstNight{wakesAtNight = FirstNightOnly\nAND turn > 1?}
+    FirstNight -->|Yes| Skip
+    FirstNight -->|No| WakesWith{wakesWith set?}
+    WakesWith -->|Yes| SkipOwn[Skip — joins primary phase]
+    WakesWith -->|No| Alive{Any alive participants\nor wakesWith participants?}
+    Alive -->|No| Skip
+    Alive -->|Yes| Add[Add phase key to order]
+    Add --> IsWitch{Is Witch?}
+    IsWitch -->|Yes| MoveLast[Move to end of order]
+    IsWitch -->|No| Next
+    MoveLast --> Next[Next role]
+    Skip --> Next
+    SkipOwn --> Next
+    Next --> Done([nightPhaseOrder complete])
+```

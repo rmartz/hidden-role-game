@@ -59,6 +59,21 @@ These fields are only populated when the active phase matches the player's role.
 | `nightStatus`       | `{ targetPlayerId, effect: "killed" \| "silenced" }[]` — outcome of the previous night                        |
 | `myLastNightAction` | `{ targetPlayerId, category }` — the player's own action from the previous night; confirms input was recorded |
 
+## Game Phase State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> Daytime : game created
+    Daytime --> Nighttime : start-night (Narrator)
+    Nighttime --> Daytime : start-day (Narrator)
+
+    state Nighttime {
+        [*] --> Phase
+        Phase --> Phase : set-night-phase (advance)
+        Phase --> [*] : all phases complete
+    }
+```
+
 ## Data Flow Per Phase
 
 ### Lobby → Game Start
@@ -69,6 +84,30 @@ These fields are only populated when the active phase matches the player's role.
 4. Clients receive real-time updates via Firebase `onValue`.
 
 ### Night Phase
+
+```mermaid
+sequenceDiagram
+    participant N as Narrator
+    participant API as Next.js API
+    participant DB as Firebase RTDB
+    participant P as Player
+
+    N->>API: advance (set-night-phase)
+    API->>DB: write PlayerGameState per session
+    DB-->>P: onValue push (myNightTarget, teamVotes…)
+
+    P->>API: action (set-night-target)
+    API->>DB: write updated PlayerGameState
+    DB-->>N: onValue push (nightActions updated)
+
+    P->>API: action (confirm-night-target)
+    API->>DB: write confirmed state
+    DB-->>N: onValue push
+
+    N->>API: advance (start-day)
+    API->>DB: write resolved PlayerGameState
+    DB-->>P: onValue push (nightStatus, myLastNightAction)
+```
 
 ```
 Narrator advances phase (set-night-phase)

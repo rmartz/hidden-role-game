@@ -22,7 +22,7 @@ A quest-voting game set in Arthurian legend. Players on the Good team try to pas
 
 ### Secret Villain
 
-A social deduction game where one Bad player (the Special Bad) is hidden even from their own teammates. Bad players know the full team; the Special Bad operates alone. The app handles role distribution only.
+A social deduction game where one Bad player (the Special Bad) cannot identify their own teammates. Regular Bad players know the full Bad team (including who the Special Bad is); the Special Bad operates without knowledge of their allies. The app handles role distribution only.
 
 - [Roles](secret-villain/roles.md) — three roles with deliberate visibility asymmetry
 - [Actions](secret-villain/actions.md) — no app-managed actions

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Secret Villain is a social deduction game where one Bad player (the Special Bad) is hidden even from their own team. Bad players know each other but do not know which one is the Special Bad.
+Secret Villain is a social deduction game where one Bad player (the Special Bad) cannot identify their own teammates. Regular Bad players can see the full Bad team — including the Special Bad — but the Special Bad operates without knowledge of their allies.
 
 ## Role Table
 

@@ -127,3 +127,20 @@ interface TeamNightAction {
 4. Returns `NightResolutionEvent[]`:
    - `{ type: "killed", targetPlayerId, attackedBy, protectedBy, died }`
    - `{ type: "silenced", targetPlayerId }`
+
+```mermaid
+flowchart TD
+    Start([start-day called]) --> Collect[Collect attacks and protections\nfrom Werewolves, Bodyguard, Chupacabra]
+    Collect --> Witch{Witch used ability?}
+    Witch -->|protect target| Protect[Remove pending attack on target]
+    Witch -->|attack target| NewAttack[Add new attack on target]
+    Witch -->|skipped| Spellcaster
+    Protect --> Spellcaster
+    NewAttack --> Spellcaster
+    Spellcaster{Spellcaster acted?}
+    Spellcaster -->|yes| Silence[Emit silenced event for target]
+    Spellcaster -->|no| Resolve
+    Silence --> Resolve
+    Resolve[For each collected attack:\nif protected → died = false\nelse → died = true\nemit killed event]
+    Resolve --> Return([Return NightResolutionEvent array])
+```
