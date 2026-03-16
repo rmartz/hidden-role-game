@@ -267,3 +267,136 @@ describe("GameSerializationService.extractPlayerNightState (Witch)", () => {
     expect(result.nightStatus).toBeUndefined();
   });
 });
+
+// ---------------------------------------------------------------------------
+// extractPlayerNightState — suffixed group phase key (Wolf Cub bonus attack)
+// ---------------------------------------------------------------------------
+
+const BONUS_PHASE_KEY = `${WerewolfRole.Werewolf as string}:2`;
+
+const werewolfRole = {
+  id: WerewolfRole.Werewolf,
+  name: "Werewolf",
+  team: Team.Bad,
+};
+
+function makeNighttimeGameWithBonusPhase(
+  nightActions: Record<string, unknown> = {},
+  currentPhaseIndex = 1,
+): Game {
+  const turnState: WerewolfTurnState = {
+    turn: 2,
+    phase: {
+      type: WerewolfPhase.Nighttime,
+      startedAt: 1000,
+      nightPhaseOrder: [WerewolfRole.Werewolf, BONUS_PHASE_KEY],
+      currentPhaseIndex,
+      nightActions: nightActions as Record<
+        string,
+        import("@/lib/game-modes/werewolf").AnyNightAction
+      >,
+    },
+    deadPlayerIds: [],
+  };
+  return {
+    id: "game-1",
+    lobbyId: "lobby-1",
+    gameMode: GameMode.Werewolf,
+    status: { type: GameStatus.Playing, turnState },
+    players: [
+      { id: "w1", name: "Wolf1", sessionId: "sw1", visibleRoles: [] },
+      { id: "w2", name: "Wolf2", sessionId: "sw2", visibleRoles: [] },
+      { id: "p3", name: "Villager", sessionId: "s3", visibleRoles: [] },
+    ],
+    roleAssignments: [
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "w2", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+    ],
+    configuredRoleSlots: [],
+    showRolesInPlay: ShowRolesInPlay.None,
+    ownerPlayerId: undefined,
+  };
+}
+
+describe("GameSerializationService.extractPlayerNightState (suffixed group phase)", () => {
+  const service = new GameSerializationService();
+
+  it("myNightTargetConfirmed is false for the second phase even when the first phase is confirmed", () => {
+    const nightActions = {
+      [WerewolfRole.Werewolf]: {
+        votes: [
+          { playerId: "w1", targetPlayerId: "p3" },
+          { playerId: "w2", targetPlayerId: "p3" },
+        ],
+        suggestedTargetId: "p3",
+        confirmed: true,
+      },
+      [BONUS_PHASE_KEY]: {
+        votes: [{ playerId: "w1", targetPlayerId: "p3" }],
+        suggestedTargetId: "p3",
+      },
+    };
+    const game = makeNighttimeGameWithBonusPhase(nightActions);
+    const result = service.extractPlayerNightState(
+      nightActions as Parameters<typeof service.extractPlayerNightState>[0],
+      game,
+      "w1",
+      werewolfRole,
+      [],
+    );
+    expect(result.myNightTargetConfirmed).toBe(false);
+  });
+
+  it("previousNightTargetId is set to the first phase's suggestedTargetId in the second phase", () => {
+    const nightActions = {
+      [WerewolfRole.Werewolf]: {
+        votes: [
+          { playerId: "w1", targetPlayerId: "p3" },
+          { playerId: "w2", targetPlayerId: "p3" },
+        ],
+        suggestedTargetId: "p3",
+        confirmed: true,
+      },
+      [BONUS_PHASE_KEY]: {
+        votes: [],
+      },
+    };
+    const game = makeNighttimeGameWithBonusPhase(nightActions);
+    const result = service.extractPlayerNightState(
+      nightActions as Parameters<typeof service.extractPlayerNightState>[0],
+      game,
+      "w1",
+      werewolfRole,
+      [],
+    );
+    expect(result.previousNightTargetId).toBe("p3");
+  });
+
+  it("myNightTarget reflects the player's vote in the second phase action, not the first", () => {
+    const nightActions = {
+      [WerewolfRole.Werewolf]: {
+        votes: [
+          { playerId: "w1", targetPlayerId: "p3" },
+          { playerId: "w2", targetPlayerId: "p3" },
+        ],
+        suggestedTargetId: "p3",
+        confirmed: true,
+      },
+      // Second phase: w1 has not yet voted (votes empty).
+      [BONUS_PHASE_KEY]: {
+        votes: [],
+      },
+    };
+    const game = makeNighttimeGameWithBonusPhase(nightActions);
+    const result = service.extractPlayerNightState(
+      nightActions as Parameters<typeof service.extractPlayerNightState>[0],
+      game,
+      "w1",
+      werewolfRole,
+      [],
+    );
+    // The second-phase action has no vote from w1, so myNightTarget is undefined.
+    expect(result.myNightTarget).toBeUndefined();
+  });
+});

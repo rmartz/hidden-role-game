@@ -41,17 +41,17 @@ The Narrator's session is stored separately and receives a different (fuller) `P
 
 These fields are only populated when the active phase matches the player's role.
 
-| Field                    | Roles                     | Description                                                                                                    |
-| ------------------------ | ------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| `myNightTarget`          | All night-waking roles    | Selected target player ID (`string`), intentional skip (`null`), or undecided (`undefined`)                    |
-| `myNightTargetConfirmed` | All night-waking roles    | Whether the selection is locked in                                                                             |
-| `teamVotes`              | Werewolf (group phase)    | `({ playerName, targetPlayerId } \| { playerName, skipped: true })[]` — all alive group members' current votes |
-| `suggestedTargetId`      | Werewolf (group phase)    | The plurality vote target (undefined if tie or all skipped)                                                    |
-| `allAgreed`              | Werewolf (group phase)    | `true` when all alive members have voted for the same target or all have skipped                               |
-| `investigationResult`    | Seer                      | `{ targetPlayerId, isWerewolfTeam }` — only after Narrator calls `reveal-investigation-result`                 |
-| `witchAbilityUsed`       | Witch                     | `false` when ability is available; `true` once used                                                            |
-| `nightStatus`            | Witch (ability available) | `{ targetPlayerId, effect: "attacked" }[]` — players currently under attack this night                         |
-| `previousNightTargetId`  | Bodyguard, Spellcaster    | Player ID targeted last night; that player is unavailable for selection this night                             |
+| Field                    | Roles                                           | Description                                                                                                                                                                               |
+| ------------------------ | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `myNightTarget`          | All night-waking roles                          | Selected target player ID (`string`), intentional skip (`null`), or undecided (`undefined`)                                                                                               |
+| `myNightTargetConfirmed` | All night-waking roles                          | Whether the selection is locked in                                                                                                                                                        |
+| `teamVotes`              | Werewolf (group phase)                          | `({ playerName, targetPlayerId } \| { playerName, skipped: true })[]` — all alive group members' current votes                                                                            |
+| `suggestedTargetId`      | Werewolf (group phase)                          | The plurality vote target (undefined if tie or all skipped)                                                                                                                               |
+| `allAgreed`              | Werewolf (group phase)                          | `true` when all alive members have voted for the same target or all have skipped                                                                                                          |
+| `investigationResult`    | Seer                                            | `{ targetPlayerId, isWerewolfTeam }` — only after Narrator calls `reveal-investigation-result`                                                                                            |
+| `witchAbilityUsed`       | Witch                                           | `false` when ability is available; `true` once used                                                                                                                                       |
+| `nightStatus`            | Witch (ability available)                       | `{ targetPlayerId, effect: "attacked" }[]` — players currently under attack this night                                                                                                    |
+| `previousNightTargetId`  | Bodyguard, Spellcaster; Werewolf (second phase) | Player ID unavailable this turn: previous night's target for `preventRepeatTarget` roles; first phase's `suggestedTargetId` for the second Werewolf attack phase (within-night exclusion) |
 
 ### Player Fields — Daytime (day start)
 
