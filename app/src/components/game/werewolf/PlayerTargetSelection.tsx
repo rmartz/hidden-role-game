@@ -116,6 +116,21 @@ export function PlayerTargetSelection({
             {isSelected && " (selected)"}
           </Button>
         ))}
+        {!isConfirmed && (
+          <Button
+            variant={!hasTarget ? "default" : "outline"}
+            onClick={() => {
+              action.mutate({
+                actionId: WerewolfAction.SetNightTarget,
+                payload: { targetPlayerId: undefined },
+              });
+            }}
+            disabled={action.isPending}
+            className="justify-start"
+          >
+            Skip
+          </Button>
+        )}
       </div>
 
       {isTeamPhase &&

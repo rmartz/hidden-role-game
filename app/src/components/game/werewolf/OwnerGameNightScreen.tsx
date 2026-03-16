@@ -73,16 +73,16 @@ export function OwnerGameNightScreen({
     getSoloTarget(activeAction);
 
   const handleTargetClick = useCallback(
-    (playerId: string) => {
+    (playerId: string | undefined) => {
       action.mutate({
         actionId: WerewolfAction.SetNightTarget,
         payload: {
           roleId: activePhaseKey,
-          targetPlayerId: activeTarget === playerId ? undefined : playerId,
+          targetPlayerId: playerId,
         },
       });
     },
-    [action, activePhaseKey, activeTarget],
+    [action, activePhaseKey],
   );
 
   const handlePhaseChange = useCallback(
