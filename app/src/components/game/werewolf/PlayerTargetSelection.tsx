@@ -18,7 +18,7 @@ interface Props {
   players: PublicLobbyPlayer[];
   targets: readonly (readonly [TargetablePlayer, boolean])[];
   isConfirmed: boolean;
-  isTeamPhase: boolean;
+  isGroupPhase: boolean;
   confirmPhaseKey?: PhaseKey;
   hasTarget: boolean;
   allAgreed: boolean;
@@ -36,7 +36,7 @@ export function PlayerTargetSelection({
   players,
   targets,
   isConfirmed,
-  isTeamPhase,
+  isGroupPhase,
   confirmPhaseKey,
   hasTarget,
   allAgreed,
@@ -76,7 +76,7 @@ export function PlayerTargetSelection({
         />
       )}
 
-      {isTeamPhase && !isConfirmed && hasVisibleTeammates && (
+      {isGroupPhase && !isConfirmed && hasVisibleTeammates && (
         <div className="mb-3 rounded-md border p-2">
           <p className="text-xs font-medium text-muted-foreground mb-1">
             Teammate votes:
@@ -140,7 +140,7 @@ export function PlayerTargetSelection({
         )}
       </div>
 
-      {isTeamPhase &&
+      {isGroupPhase &&
         suggestedTargetId &&
         myNightTarget !== suggestedTargetId &&
         !isConfirmed && (
@@ -164,7 +164,7 @@ export function PlayerTargetSelection({
         roleId={confirmPhaseKey}
         hasTarget={hasTarget}
         isConfirmed={isConfirmed}
-        isTeamPhase={isTeamPhase}
+        isGroupPhase={isGroupPhase}
         allAgreed={allAgreed}
         witchContext={
           confirmPhaseKey === WerewolfRole.Witch

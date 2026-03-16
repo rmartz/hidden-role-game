@@ -3,12 +3,11 @@
 import { useMemo } from "react";
 import {
   getTargetablePlayers,
-  isTeamPhaseKey,
+  isGroupPhaseKey,
   isPlayersTurn,
 } from "@/lib/game-modes/werewolf";
 import type { WerewolfNighttimePhase } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
-import type { PhaseKey } from "@/lib/game-modes/werewolf";
 import { getPlayerName } from "@/lib/player-utils";
 import { GameTimer } from "@/components/game";
 import { PlayerFirstTurnScreen } from "./PlayerFirstTurnScreen";
@@ -64,7 +63,7 @@ export function PlayerGameNightScreen({
   }
 
   const isFirstTurn = turn === 1;
-  const isTeamPhase = !!(activePhaseKey && isTeamPhaseKey(activePhaseKey));
+  const isGroupPhase = !!(activePhaseKey && isGroupPhaseKey(activePhaseKey));
   const teammateNames = gameState.visibleRoleAssignments.map(
     (a) => a.player.name,
   );
@@ -80,7 +79,7 @@ export function PlayerGameNightScreen({
 
   const isConfirmed = gameState.myNightTargetConfirmed ?? false;
   const hasVisibleTeammates =
-    isTeamPhase &&
+    isGroupPhase &&
     gameState.visibleRoleAssignments.some(
       (a) => !deadPlayerIds.includes(a.player.id),
     );
@@ -105,9 +104,9 @@ export function PlayerGameNightScreen({
     ? allTargets.filter(([, isSelected]) => isSelected)
     : allTargets;
 
-  const confirmPhaseKey = (
-    isTeamPhase ? activePhaseKey : gameState.myRole?.id
-  ) as PhaseKey | undefined;
+  // For group phases (Werewolf, Wolf Cub waking together), use the phase key;
+  // solo phases use the player's own role ID.
+  const confirmPhaseKey = isGroupPhase ? activePhaseKey : gameState.myRole?.id;
 
   const attackedPlayerIds = (gameState.nightStatus ?? [])
     .filter((e) => e.effect === "attacked")
@@ -138,7 +137,7 @@ export function PlayerGameNightScreen({
         players={gameState.players}
         targets={targets}
         isConfirmed={isConfirmed}
-        isTeamPhase={isTeamPhase}
+        isGroupPhase={isGroupPhase}
         confirmPhaseKey={confirmPhaseKey}
         hasTarget={!!gameState.myNightTarget}
         allAgreed={allAgreed}

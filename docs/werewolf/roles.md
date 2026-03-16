@@ -9,11 +9,12 @@ Each player is secretly assigned one role. The Narrator has no role and runs the
 | Role          | ID                       | Team    | Wakes at Night     | Night Action         | Notes                                                                                                       |
 | ------------- | ------------------------ | ------- | ------------------ | -------------------- | ----------------------------------------------------------------------------------------------------------- |
 | Villager      | `werewolf-villager`      | Good    | Never              | —                    | Baseline good-team role                                                                                     |
-| Werewolf      | `werewolf-werewolf`      | Bad     | Every Night        | Attack (team vote)   | Sees all Bad-team players; votes jointly with other Werewolves                                              |
+| Werewolf      | `werewolf-werewolf`      | Bad     | Every Night        | Attack (group vote)  | Sees all Bad-team players; votes jointly with other Werewolves and Wolf Cubs                                |
+| Wolf Cub      | `werewolf-wolf-cub`      | Bad     | Every Night        | Attack (group vote)  | Wakes with Werewolves (`wakesWith`); when killed, Werewolves receive two attack phases the following night  |
 | Seer          | `werewolf-seer`          | Good    | Every Night        | Investigate          | Learns whether the target is on Team Bad; Narrator reveals result                                           |
-| Bodyguard     | `werewolf-bodyguard`     | Good    | Every Night        | Protect              | Chosen target survives any attack that night                                                                |
+| Bodyguard     | `werewolf-bodyguard`     | Good    | Every Night        | Protect              | Chosen target survives any attack that night; cannot protect the same player on consecutive nights          |
 | Witch         | `werewolf-witch`         | Good    | Every Night (last) | Special (once)       | After all other roles act, may protect the attacked player **or** attack any other player; one-time ability |
-| Spellcaster   | `werewolf-spellcaster`   | Good    | Every Night        | Silence              | Target is silenced the following day (visible to all players)                                               |
+| Spellcaster   | `werewolf-spellcaster`   | Good    | Every Night        | Silence              | Target is silenced the following day; cannot silence the same player on consecutive nights                  |
 | Mason         | `werewolf-mason`         | Good    | First Night Only   | —                    | Masons see each other's identities; no action after night 1                                                 |
 | Chupacabra    | `werewolf-chupacabra`    | Neutral | Every Night        | Attack (conditional) | Attack lands only if target is on Team Bad, **or** if all Team Bad players are already dead                 |
 | Village Idiot | `werewolf-village-idiot` | Good    | Never              | —                    | Baseline good-team role                                                                                     |
@@ -29,8 +30,9 @@ interface WerewolfRoleDefinition {
   targetCategory: TargetCategory; // None | Attack | Protect | Investigate | Special
   canSeeTeam?: Team[]; // Teams whose members this role can see
   canSeeRole?: WerewolfRole[]; // Specific roles this role can identify
-  teamTargeting?: boolean; // True = group phase (Werewolves vote together)
-  wakesWith?: WerewolfRole; // Secondary role that joins another role's phase
+  teamTargeting?: boolean; // True = primary role for a group phase (Werewolves vote together)
+  preventRepeatTarget?: boolean; // True = cannot target the same player on consecutive nights (Bodyguard, Spellcaster)
+  wakesWith?: WerewolfRole; // Secondary role that silently joins the referenced role's group phase
 }
 ```
 
@@ -58,7 +60,8 @@ Additional roles (Bodyguard, Witch, etc.) are configured per game in the lobby.
 
 ## Visibility Rules
 
-- **Werewolves** see all other Team Bad players (`canSeeTeam: [Team.Bad]`).
+- **Werewolves** see all other Team Bad players (`canSeeTeam: [Team.Bad]`), including Wolf Cubs.
+- **Wolf Cubs** see all other Team Bad players (`canSeeTeam: [Team.Bad]`), including Werewolves.
 - **Masons** see all other Masons (`canSeeRole: [Mason]`).
 - **Dead players** have their roles revealed to all living players automatically.
 - All other roles see only their own identity.

@@ -1,16 +1,15 @@
-import { Team } from "@/lib/types";
 import type { PlayerRoleAssignment } from "@/lib/types";
 import { TargetCategory } from "../types";
 import type { AnyNightAction, TargetablePlayer, TeamNightVote } from "../types";
 import { WEREWOLF_ROLES } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
-import { isTeamPhaseKey, parseTeamPhaseKey } from "./phase-keys";
+import { isGroupPhaseKey, baseGroupPhaseKey } from "./phase-keys";
 
 /**
  * Returns the list of players eligible to be targeted during a night phase.
  * Excludes the game owner (narrator), dead players, and phase-specific
  * exclusions derived from `visibleRoleAssignments`:
- *   - Team phase: the acting player and all visible teammates are excluded.
+ *   - Group phase: the acting player and all visible teammates are excluded.
  *   - Solo phase, Attack/Investigate category (player view only): the acting
  *     player and any role-visible role-holders are excluded.
  *   - Solo phase, all other categories: no self/role exclusions.
@@ -33,12 +32,15 @@ export function getTargetablePlayers(
 ): TargetablePlayer[] {
   const excludeIds: string[] = [];
 
-  if (isTeamPhaseKey(activePhaseKey)) {
+  if (isGroupPhaseKey(activePhaseKey)) {
     if (myPlayerId) excludeIds.push(myPlayerId);
-    const team = parseTeamPhaseKey(activePhaseKey);
-    if (team) {
+    const primaryRole = (
+      WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
+    )[baseGroupPhaseKey(activePhaseKey)];
+    if (primaryRole) {
       for (const a of visibleRoleAssignments) {
-        if ((a.role.team as Team) === team) excludeIds.push(a.player.id);
+        if (a.role.team === (primaryRole.team as string))
+          excludeIds.push(a.player.id);
       }
     }
   } else {
@@ -65,43 +67,45 @@ export function getTargetablePlayers(
 }
 
 /**
- * Returns the alive player IDs that belong to a team phase
- * (have `teamTargeting` and matching team).
+ * Returns the alive player IDs that participate in a group phase:
+ * the primary role (teamTargeting) and any roles with `wakesWith` pointing to it.
  */
-export function getTeamPlayerIds(
+export function getGroupPhasePlayerIds(
   roleAssignments: PlayerRoleAssignment[],
-  team: Team,
+  phaseKey: string,
   deadPlayerIds: string[],
 ): string[] {
+  const baseKey = baseGroupPhaseKey(phaseKey);
   return roleAssignments
     .filter((a) => {
+      if (deadPlayerIds.includes(a.playerId)) return false;
+      if (a.roleDefinitionId === baseKey) return true;
       const role = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
         a.roleDefinitionId
       ];
-      return (
-        role?.teamTargeting &&
-        role.team === team &&
-        !deadPlayerIds.includes(a.playerId)
-      );
+      return (role?.wakesWith as string | undefined) === baseKey;
     })
     .map((a) => a.playerId);
 }
 
 /**
- * Returns all player IDs on the given team (alive or dead) so they can be
- * excluded from targeting. Includes any role on the team, not just
- * teamTargeting roles.
+ * Returns all player IDs on the same team as the group phase primary role
+ * (alive or dead) so they can be excluded from targeting.
  */
-export function getTeamMemberPlayerIds(
+export function getGroupPhaseMemberIds(
   roleAssignments: PlayerRoleAssignment[],
-  team: Team,
+  phaseKey: string,
 ): string[] {
+  const primaryRole = (
+    WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
+  )[baseGroupPhaseKey(phaseKey)];
+  if (!primaryRole) return [];
   return roleAssignments
     .filter((a) => {
       const role = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
         a.roleDefinitionId
       ];
-      return role?.team === team;
+      return role?.team === primaryRole.team;
     })
     .map((a) => a.playerId);
 }

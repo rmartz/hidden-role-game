@@ -2,7 +2,7 @@ import { TargetCategory } from "../types";
 import type { AnyNightAction } from "../types";
 import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
-import { isTeamPhaseKey, TEAM_PHASE_PREFIX } from "./phase-keys";
+import { isGroupPhaseKey, baseGroupPhaseKey } from "./phase-keys";
 import type { PhaseKey } from "./phase-keys";
 import { targetPlayerIdOf } from "./targeting";
 import { getPlayerName } from "@/lib/player-utils";
@@ -49,26 +49,28 @@ export function buildNightSummary(
 export function getPhaseLabel(
   phaseKey: string,
   roles: Record<string, { name: string }>,
-  teamLabels?: Partial<Record<string, string>>,
 ): string {
-  if (isTeamPhaseKey(phaseKey)) {
-    const team = phaseKey.slice(TEAM_PHASE_PREFIX.length);
-    return teamLabels?.[team] ?? `${team} Team`;
-  }
-  return roles[phaseKey]?.name ?? phaseKey;
+  return roles[baseGroupPhaseKey(phaseKey)]?.name ?? phaseKey;
 }
 
 /**
  * Returns true if the current night phase is this player's turn.
- * Team phases match by team name; solo phases match by role ID.
+ * Group phases match if the player is the primary role or has wakesWith pointing to it.
+ * Handles suffixed repeat phase keys (e.g. "werewolf-werewolf:2").
+ * Solo phases match by exact role ID.
  */
 export function isPlayersTurn(
-  myRole?: { id: string; team: string },
+  myRole?: { id: string },
   activePhaseKey?: string,
 ): boolean {
   if (!myRole || !activePhaseKey) return false;
-  if (isTeamPhaseKey(activePhaseKey)) {
-    return myRole.team === activePhaseKey.slice(TEAM_PHASE_PREFIX.length);
+  if (isGroupPhaseKey(activePhaseKey)) {
+    const baseKey = baseGroupPhaseKey(activePhaseKey);
+    if (myRole.id === baseKey) return true;
+    const roleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
+      myRole.id
+    ];
+    return (roleDef?.wakesWith as string | undefined) === baseKey;
   }
   return myRole.id === activePhaseKey;
 }
@@ -131,7 +133,7 @@ export interface WitchConfirmContext {
 
 /**
  * Returns the confirm button label for a given phase key based on its target category.
- * Team phase keys return "Attack". Solo roles: Attack, Protect, Investigate,
+ * Group phase keys return "Attack". Solo roles: Attack, Protect, Investigate,
  * Silence (Spellcaster), or "Confirm".
  * For the Witch: "Protect" if the selected target is under attack, "Attack" if not,
  * or "Use Ability" when no target is selected.
@@ -141,8 +143,8 @@ export function getConfirmLabel(
   witchContext?: WitchConfirmContext,
 ): string {
   if (!phaseKey) return "Confirm";
-  if (isTeamPhaseKey(phaseKey)) return "Attack";
-  if (phaseKey === WerewolfRole.Witch) {
+  if (isGroupPhaseKey(phaseKey)) return "Attack";
+  if ((phaseKey as WerewolfRole) === WerewolfRole.Witch) {
     if (!witchContext?.selectedTargetId) return "Use Ability";
     return witchContext.attackedPlayerIds.includes(
       witchContext.selectedTargetId,
@@ -150,7 +152,7 @@ export function getConfirmLabel(
       ? "Protect"
       : "Attack";
   }
-  if (phaseKey === WerewolfRole.Spellcaster) return "Silence";
+  if ((phaseKey as WerewolfRole) === WerewolfRole.Spellcaster) return "Silence";
   const roleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
     phaseKey
   ];

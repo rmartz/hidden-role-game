@@ -1,7 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { Team } from "@/lib/types";
 import { WerewolfRole } from "../roles";
-import { getTeamPhaseKey } from "./phase-keys";
 import {
   buildNightSummary,
   getPhaseLabel,
@@ -15,7 +13,11 @@ const players = [
   { id: "p2", name: "Bob" },
   { id: "p3", name: "Charlie" },
 ];
-const roles = { seer: { name: "Seer" }, bodyguard: { name: "Bodyguard" } };
+const roles = {
+  seer: { name: "Seer" },
+  bodyguard: { name: "Bodyguard" },
+  [WerewolfRole.Werewolf]: { name: "Werewolf" },
+};
 
 describe("buildNightSummary", () => {
   it("returns an empty array when no actions have targets", () => {
@@ -63,9 +65,11 @@ describe("buildNightSummary", () => {
     });
   });
 
-  it("uses suggestedTargetId for team actions", () => {
+  it("uses suggestedTargetId for group phase actions", () => {
     const result = buildNightSummary(
-      { "team:Bad": { votes: [], suggestedTargetId: "p2" } },
+      {
+        [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p2" },
+      },
       players,
       roles,
     );
@@ -73,7 +77,7 @@ describe("buildNightSummary", () => {
     expect(result[0]).toEqual({
       targetId: "p2",
       playerName: "Bob",
-      labels: ["Bad Team"],
+      labels: ["Werewolf"],
     });
   });
 
@@ -108,11 +112,11 @@ describe("getPhaseLabel", () => {
   const labelRoles = {
     seer: { name: "Seer" },
     bodyguard: { name: "Bodyguard" },
+    [WerewolfRole.Werewolf]: { name: "Werewolf" },
   };
 
-  it("returns '<team> Team' for team phase keys", () => {
-    expect(getPhaseLabel("team:Bad", labelRoles)).toBe("Bad Team");
-    expect(getPhaseLabel("team:Good", labelRoles)).toBe("Good Team");
+  it("returns the role name for group phase keys (Werewolf)", () => {
+    expect(getPhaseLabel(WerewolfRole.Werewolf, labelRoles)).toBe("Werewolf");
   });
 
   it("returns the role name for known solo role keys", () => {
@@ -181,44 +185,36 @@ describe("isPlayersTurn", () => {
   });
 
   it("returns false when activePhaseKey is undefined", () => {
-    expect(
-      isPlayersTurn({ id: WerewolfRole.Seer, team: Team.Good }, undefined),
-    ).toBe(false);
+    expect(isPlayersTurn({ id: WerewolfRole.Seer }, undefined)).toBe(false);
   });
 
   it("returns true for a solo phase matching the player's role ID", () => {
-    expect(
-      isPlayersTurn(
-        { id: WerewolfRole.Seer, team: Team.Good },
-        WerewolfRole.Seer,
-      ),
-    ).toBe(true);
+    expect(isPlayersTurn({ id: WerewolfRole.Seer }, WerewolfRole.Seer)).toBe(
+      true,
+    );
   });
 
   it("returns false for a solo phase that does not match the player's role ID", () => {
     expect(
-      isPlayersTurn(
-        { id: WerewolfRole.Bodyguard, team: Team.Good },
-        WerewolfRole.Seer,
-      ),
+      isPlayersTurn({ id: WerewolfRole.Bodyguard }, WerewolfRole.Seer),
     ).toBe(false);
   });
 
-  it("returns true for a team phase matching the player's team", () => {
+  it("returns true for a Werewolf player during the Werewolf group phase", () => {
     expect(
-      isPlayersTurn(
-        { id: WerewolfRole.Werewolf, team: Team.Bad },
-        getTeamPhaseKey(Team.Bad),
-      ),
+      isPlayersTurn({ id: WerewolfRole.Werewolf }, WerewolfRole.Werewolf),
     ).toBe(true);
   });
 
-  it("returns false for a team phase that does not match the player's team", () => {
+  it("returns true for a Wolf Cub during the Werewolf group phase (wakesWith)", () => {
     expect(
-      isPlayersTurn(
-        { id: WerewolfRole.Seer, team: Team.Good },
-        getTeamPhaseKey(Team.Bad),
-      ),
+      isPlayersTurn({ id: WerewolfRole.WolfCub }, WerewolfRole.Werewolf),
+    ).toBe(true);
+  });
+
+  it("returns false for a Seer during the Werewolf group phase", () => {
+    expect(
+      isPlayersTurn({ id: WerewolfRole.Seer }, WerewolfRole.Werewolf),
     ).toBe(false);
   });
 });
@@ -226,6 +222,10 @@ describe("isPlayersTurn", () => {
 describe("getConfirmLabel", () => {
   it("returns 'Attack' for Werewolf", () => {
     expect(getConfirmLabel(WerewolfRole.Werewolf)).toBe("Attack");
+  });
+
+  it("returns 'Attack' for Wolf Cub", () => {
+    expect(getConfirmLabel(WerewolfRole.WolfCub)).toBe("Attack");
   });
 
   it("returns 'Attack' for Chupacabra", () => {

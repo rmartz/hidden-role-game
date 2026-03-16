@@ -5,6 +5,7 @@ import { WakesAtNight, TargetCategory } from "./types";
 export enum WerewolfRole {
   Villager = "werewolf-villager",
   Werewolf = "werewolf-werewolf",
+  WolfCub = "werewolf-wolf-cub",
   Seer = "werewolf-seer",
   Witch = "werewolf-witch",
   Spellcaster = "werewolf-spellcaster",
@@ -20,10 +21,15 @@ export interface WerewolfRoleDefinition extends RoleDefinition<
 > {
   wakesAtNight: WakesAtNight;
   targetCategory: TargetCategory;
-  /** When true, all players with this role on the same team wake and target together. */
+  /** When true, this role is the primary role for a group voting phase. */
   teamTargeting?: boolean;
   /** When true, the role cannot target the same player on consecutive nights. */
   preventRepeatTarget?: boolean;
+  /**
+   * When set, this role secretly joins the referenced role's night phase
+   * instead of having its own. Other players only see the primary role's name.
+   */
+  wakesWith?: WerewolfRole;
 }
 
 export const MIN_PLAYERS = 5;
@@ -56,6 +62,15 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Attack,
     teamTargeting: true,
+  },
+  [WerewolfRole.WolfCub]: {
+    id: WerewolfRole.WolfCub,
+    name: "Wolf Cub",
+    team: Team.Bad,
+    canSeeTeam: [Team.Bad],
+    wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Attack,
+    wakesWith: WerewolfRole.Werewolf,
   },
   [WerewolfRole.Seer]: {
     id: WerewolfRole.Seer,

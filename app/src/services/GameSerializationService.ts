@@ -7,11 +7,11 @@ import type {
 } from "@/server/types";
 import {
   isTeamNightAction,
-  getTeamPhaseKey,
-  getTeamPlayerIds,
+  getGroupPhasePlayerIds,
   WerewolfPhase,
   TargetCategory,
   getInterimAttackedPlayerIds,
+  baseGroupPhaseKey,
 } from "@/lib/game-modes/werewolf";
 import type {
   AnyNightAction,
@@ -53,7 +53,8 @@ export class GameSerializationService {
   /**
    * Extracts the night targeting state for a non-owner player.
    * For solo roles: returns myNightTarget/myNightTargetConfirmed.
-   * For team phases: also returns teamVotes, suggestedTargetId, allAgreed.
+   * For group phases (teamTargeting or wakesWith): also returns teamVotes,
+   * suggestedTargetId, allAgreed.
    */
   extractPlayerNightState(
     nightActions: Record<string, AnyNightAction>,
@@ -63,38 +64,76 @@ export class GameSerializationService {
     deadPlayerIds: string[],
   ): Partial<PlayerGameState> {
     const roleDef = GAME_MODES[game.gameMode].roles[myRole.id] as
-      | { teamTargeting?: boolean; team?: string }
+      | WerewolfRoleDefinition
       | undefined;
 
-    if (roleDef?.teamTargeting && roleDef.team) {
-      const phaseKey = getTeamPhaseKey(roleDef.team as Team);
-      const action = nightActions[phaseKey];
+    // Determine if this player participates in a group phase.
+    // Primary group phase roles have teamTargeting; secondary roles have wakesWith.
+    const groupPhaseKey = roleDef?.teamTargeting
+      ? myRole.id
+      : roleDef?.wakesWith;
+
+    if (groupPhaseKey) {
+      // If the active phase is a suffixed repeat of this group phase
+      // (e.g. "werewolf-werewolf:2"), look up the action under that key
+      // so the player sees the fresh second-phase state, not the confirmed first.
+      const ts =
+        game.status.type === GameStatus.Playing
+          ? (game.status.turnState as WerewolfTurnState | undefined)
+          : undefined;
+      const activePhaseKey =
+        ts?.phase.type === WerewolfPhase.Nighttime
+          ? ts.phase.nightPhaseOrder[ts.phase.currentPhaseIndex]
+          : undefined;
+      const lookupKey =
+        activePhaseKey && baseGroupPhaseKey(activePhaseKey) === groupPhaseKey
+          ? activePhaseKey
+          : groupPhaseKey;
+
+      // For a suffixed repeat phase (e.g. "werewolf-werewolf:2"), surface the
+      // first phase's suggestedTargetId as previousNightTargetId so the player
+      // UI disables that button (within-night exclusion). Computed before the
+      // early return so it is set even when no phase-2 action exists yet.
+      let previousNightTargetId: string | undefined;
+      if (lookupKey !== groupPhaseKey) {
+        const baseAction = nightActions[groupPhaseKey];
+        if (baseAction && isTeamNightAction(baseAction)) {
+          previousNightTargetId = baseAction.suggestedTargetId;
+        }
+      }
+
+      const action = nightActions[lookupKey];
       if (!action || !isTeamNightAction(action)) {
-        return { myNightTarget: undefined, myNightTargetConfirmed: false };
+        return {
+          myNightTarget: undefined,
+          myNightTargetConfirmed: false,
+          ...(previousNightTargetId ? { previousNightTargetId } : {}),
+        };
       }
 
       const myVote = action.votes.find((v) => v.playerId === callerId);
       const playerById = new Map(game.players.map((p) => [p.id, p]));
 
-      const aliveTeamIds = getTeamPlayerIds(
+      const aliveParticipantIds = getGroupPhasePlayerIds(
         game.roleAssignments,
-        roleDef.team as Team,
+        groupPhaseKey,
         deadPlayerIds,
       );
 
       const teamVotes = action.votes
-        .filter((v) => aliveTeamIds.includes(v.playerId))
+        .filter((v) => aliveParticipantIds.includes(v.playerId))
         .map((v) => ({
           playerName: playerById.get(v.playerId)?.name ?? "Unknown",
           targetPlayerId: v.targetPlayerId,
         }));
 
       const aliveVotes = action.votes.filter((v) =>
-        aliveTeamIds.includes(v.playerId),
+        aliveParticipantIds.includes(v.playerId),
       );
       const uniqueTargets = new Set(aliveVotes.map((v) => v.targetPlayerId));
       const allAgreed =
-        aliveVotes.length === aliveTeamIds.length && uniqueTargets.size === 1;
+        aliveVotes.length === aliveParticipantIds.length &&
+        uniqueTargets.size === 1;
 
       return {
         myNightTarget: myVote?.targetPlayerId,
@@ -102,6 +141,7 @@ export class GameSerializationService {
         teamVotes,
         suggestedTargetId: action.suggestedTargetId,
         allAgreed,
+        ...(previousNightTargetId ? { previousNightTargetId } : {}),
       };
     }
 

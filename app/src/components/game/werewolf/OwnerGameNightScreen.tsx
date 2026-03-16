@@ -6,7 +6,8 @@ import {
   WerewolfPhase,
   WerewolfAction,
   isTeamNightAction,
-  isTeamPhaseKey,
+  isGroupPhaseKey,
+  baseGroupPhaseKey,
   getTargetablePlayers,
   getPhaseLabel,
   getSoloTarget,
@@ -18,6 +19,7 @@ import type {
   WerewolfTurnState,
   WerewolfRoleDefinition,
 } from "@/lib/game-modes/werewolf";
+import { WEREWOLF_ROLES } from "@/lib/game-modes/werewolf/roles";
 import type { PlayerGameState } from "@/server/types";
 import { getPlayerName } from "@/lib/player-utils";
 import { useGameAction } from "@/hooks";
@@ -102,19 +104,25 @@ export function OwnerGameNightScreen({
   if (!isNighttime) return null;
 
   const modeConfig = GAME_MODES[gameState.gameMode];
-  const activePhaseLabel = getPhaseLabel(
-    activePhaseKey,
-    modeConfig.roles,
-    modeConfig.teamLabels as Record<string, string>,
-  );
-  const isTeamPhase = isTeamPhaseKey(activePhaseKey);
+  const activePhaseLabel = getPhaseLabel(activePhaseKey, modeConfig.roles);
+  const isGroupPhase = isGroupPhaseKey(activePhaseKey);
+  // For suffixed repeat phases (e.g. "werewolf-werewolf:2"), strip the suffix
+  // to match role IDs and look up role definitions.
+  const baseActivePhaseKey = baseGroupPhaseKey(activePhaseKey);
 
   const activePlayerNames = gameState.visibleRoleAssignments
-    .filter((a) =>
-      isTeamPhase
-        ? (a.role.team as string) === activePhaseKey.slice("team:".length)
-        : a.role.id === activePhaseKey,
-    )
+    .filter((a) => {
+      if (a.role.id === baseActivePhaseKey) return true;
+      if (isGroupPhase) {
+        const roleDef = (
+          WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
+        )[a.role.id];
+        return (
+          (roleDef?.wakesWith as string | undefined) === baseActivePhaseKey
+        );
+      }
+      return false;
+    })
     .filter((a) => !turnState.deadPlayerIds.includes(a.player.id))
     .map((a) => getPlayerName(gameState.players, a.player.id) ?? a.player.id);
 
@@ -122,14 +130,14 @@ export function OwnerGameNightScreen({
     ? getPlayerName(gameState.players, activeTarget)
     : undefined;
 
-  const teamAction =
-    isTeamPhase && activeAction && isTeamNightAction(activeAction)
+  const groupAction =
+    isGroupPhase && activeAction && isTeamNightAction(activeAction)
       ? activeAction
       : undefined;
 
   const isFirstTurn = turnState.turn === 1;
 
-  const activeRoleDef = modeConfig.roles[activePhaseKey] as
+  const activeRoleDef = modeConfig.roles[baseActivePhaseKey] as
     | WerewolfRoleDefinition
     | undefined;
   const isInvestigatePhase =
@@ -147,7 +155,7 @@ export function OwnerGameNightScreen({
     gameState.visibleRoleAssignments,
   );
 
-  const resolvedVotes = (teamAction?.votes ?? []).map((vote) => ({
+  const resolvedVotes = (groupAction?.votes ?? []).map((vote) => ({
     key: vote.playerId,
     voterName: getPlayerName(gameState.players, vote.playerId) ?? vote.playerId,
     targetName:
@@ -155,9 +163,20 @@ export function OwnerGameNightScreen({
       vote.targetPlayerId,
   }));
 
-  const previousTargetId = activeRoleDef?.preventRepeatTarget
-    ? turnState.lastTargets?.[activePhaseKey]
-    : undefined;
+  // Cross-night exclusion for roles with preventRepeatTarget (Bodyguard, Spellcaster).
+  // Within-night exclusion for suffixed repeat group phases (e.g. "werewolf-werewolf:2"):
+  // the second phase cannot target whoever the first phase selected.
+  const previousTargetId: string | undefined =
+    activeRoleDef?.preventRepeatTarget
+      ? turnState.lastTargets?.[baseActivePhaseKey]
+      : baseActivePhaseKey !== activePhaseKey
+        ? (() => {
+            const baseAction = nightActions[baseActivePhaseKey];
+            return baseAction && isTeamNightAction(baseAction)
+              ? baseAction.suggestedTargetId
+              : undefined;
+          })()
+        : undefined;
 
   const targetablePlayers = getTargetablePlayers(
     gameState.players,
@@ -203,7 +222,7 @@ export function OwnerGameNightScreen({
             </p>
           ) : (
             <OwnerNightTargetPanel
-              teamAction={!!teamAction}
+              groupAction={!!groupAction}
               resolvedVotes={resolvedVotes}
               activeTargetName={activeTargetName}
               activeTargetConfirmed={activeTargetConfirmed}
@@ -234,7 +253,6 @@ export function OwnerGameNightScreen({
         nightPhaseOrder={nightPhaseOrder}
         currentPhaseIndex={currentPhaseIndex}
         roles={modeConfig.roles}
-        teamLabels={modeConfig.teamLabels as Record<string, string>}
       />
       <GameRolesList
         roles={gameState.rolesInPlay ?? []}

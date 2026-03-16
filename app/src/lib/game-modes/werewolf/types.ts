@@ -33,11 +33,11 @@ export interface WerewolfNighttimePhase {
   type: WerewolfPhase.Nighttime;
   /** Unix epoch ms when this night role phase began (reset per role). */
   startedAt: number;
-  /** Role IDs (or team phase keys like "team:Bad") in wake order. */
+  /** Role IDs in wake order. Group phases use the primary role's ID. */
   nightPhaseOrder: string[];
   /** Index into nightPhaseOrder for the currently active phase. */
   currentPhaseIndex: number;
-  /** Targets chosen during this night. Key is roleId or team phase key. */
+  /** Targets chosen during this night. Key is roleId. */
   nightActions: Record<string, AnyNightAction>;
 }
 
@@ -86,6 +86,8 @@ export interface WerewolfTurnState {
    * player on consecutive nights.
    */
   lastTargets?: Record<string, string>;
+  /** True if a Wolf Cub died this turn — Werewolves get two phases the following night. */
+  wolfCubDied?: boolean;
 }
 
 export interface TargetablePlayer {
