@@ -126,7 +126,7 @@ export class GameSerializationService {
           playerName: playerById.get(v.playerId)?.name ?? "Unknown",
           ...(v.skipped
             ? { skipped: true as const }
-            : { targetPlayerId: v.targetPlayerId ?? "" }),
+            : { targetPlayerId: v.targetPlayerId }),
         }));
 
       const aliveVotes = action.votes.filter((v) =>
