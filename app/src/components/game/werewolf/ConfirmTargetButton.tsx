@@ -4,6 +4,11 @@ import { WerewolfAction, getConfirmLabel } from "@/lib/game-modes/werewolf";
 import type { PhaseKey, WitchConfirmContext } from "@/lib/game-modes/werewolf";
 import { useGameAction } from "@/hooks";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface Props {
   gameId: string;
@@ -53,18 +58,23 @@ export function ConfirmTargetButton({
 
   return (
     <div className="mt-3">
-      <div title={tooltip} className="inline-block">
-        <Button
-          onClick={() => {
-            action.mutate({
-              actionId: WerewolfAction.ConfirmNightTarget,
-            });
-          }}
-          disabled={disabled}
-        >
-          {label}
-        </Button>
-      </div>
+      <Tooltip>
+        <TooltipTrigger>
+          <span className="inline-block">
+            <Button
+              onClick={() => {
+                action.mutate({
+                  actionId: WerewolfAction.ConfirmNightTarget,
+                });
+              }}
+              disabled={disabled}
+            >
+              {label}
+            </Button>
+          </span>
+        </TooltipTrigger>
+        {tooltip && <TooltipContent>{tooltip}</TooltipContent>}
+      </Tooltip>
     </div>
   );
 }
