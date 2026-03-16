@@ -39,7 +39,7 @@ export function getTargetablePlayers(
     )[activePhaseKey];
     if (primaryRole) {
       for (const a of visibleRoleAssignments) {
-        if ((a.role.team) === (primaryRole.team as string))
+        if (a.role.team === (primaryRole.team as string))
           excludeIds.push(a.player.id);
       }
     }

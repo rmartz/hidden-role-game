@@ -142,7 +142,7 @@ export function getConfirmLabel(
 ): string {
   if (!phaseKey) return "Confirm";
   if (isGroupPhaseKey(phaseKey)) return "Attack";
-  if (phaseKey === WerewolfRole.Witch) {
+  if ((phaseKey as WerewolfRole) === WerewolfRole.Witch) {
     if (!witchContext?.selectedTargetId) return "Use Ability";
     return witchContext.attackedPlayerIds.includes(
       witchContext.selectedTargetId,
@@ -150,7 +150,7 @@ export function getConfirmLabel(
       ? "Protect"
       : "Attack";
   }
-  if (phaseKey === WerewolfRole.Spellcaster) return "Silence";
+  if ((phaseKey as WerewolfRole) === WerewolfRole.Spellcaster) return "Silence";
   const roleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
     phaseKey
   ];

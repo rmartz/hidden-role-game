@@ -8,7 +8,6 @@ import {
 } from "@/lib/game-modes/werewolf";
 import type { WerewolfNighttimePhase } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
-import type { PhaseKey } from "@/lib/game-modes/werewolf";
 import { getPlayerName } from "@/lib/player-utils";
 import { GameTimer } from "@/components/game";
 import { PlayerFirstTurnScreen } from "./PlayerFirstTurnScreen";
@@ -107,9 +106,7 @@ export function PlayerGameNightScreen({
 
   // For group phases (Werewolf, Wolf Cub waking together), use the phase key;
   // solo phases use the player's own role ID.
-  const confirmPhaseKey = (
-    isTeamPhase ? activePhaseKey : gameState.myRole?.id
-  ) as PhaseKey | undefined;
+  const confirmPhaseKey = isTeamPhase ? activePhaseKey : gameState.myRole?.id;
 
   const attackedPlayerIds = (gameState.nightStatus ?? [])
     .filter((e) => e.effect === "attacked")
