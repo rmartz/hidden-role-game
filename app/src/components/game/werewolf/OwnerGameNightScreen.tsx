@@ -7,6 +7,7 @@ import {
   WerewolfAction,
   isTeamNightAction,
   isGroupPhaseKey,
+  baseGroupPhaseKey,
   getTargetablePlayers,
   getPhaseLabel,
   getSoloTarget,
@@ -105,15 +106,20 @@ export function OwnerGameNightScreen({
   const modeConfig = GAME_MODES[gameState.gameMode];
   const activePhaseLabel = getPhaseLabel(activePhaseKey, modeConfig.roles);
   const isGroupPhase = isGroupPhaseKey(activePhaseKey);
+  // For suffixed repeat phases (e.g. "werewolf-werewolf:2"), strip the suffix
+  // to match role IDs and look up role definitions.
+  const baseActivePhaseKey = baseGroupPhaseKey(activePhaseKey);
 
   const activePlayerNames = gameState.visibleRoleAssignments
     .filter((a) => {
-      if (a.role.id === activePhaseKey) return true;
+      if (a.role.id === baseActivePhaseKey) return true;
       if (isGroupPhase) {
         const roleDef = (
           WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
         )[a.role.id];
-        return (roleDef?.wakesWith as string | undefined) === activePhaseKey;
+        return (
+          (roleDef?.wakesWith as string | undefined) === baseActivePhaseKey
+        );
       }
       return false;
     })
@@ -131,7 +137,7 @@ export function OwnerGameNightScreen({
 
   const isFirstTurn = turnState.turn === 1;
 
-  const activeRoleDef = modeConfig.roles[activePhaseKey] as
+  const activeRoleDef = modeConfig.roles[baseActivePhaseKey] as
     | WerewolfRoleDefinition
     | undefined;
   const isInvestigatePhase =
@@ -157,9 +163,20 @@ export function OwnerGameNightScreen({
       vote.targetPlayerId,
   }));
 
-  const previousTargetId = activeRoleDef?.preventRepeatTarget
-    ? turnState.lastTargets?.[activePhaseKey]
-    : undefined;
+  // Cross-night exclusion for roles with preventRepeatTarget (Bodyguard, Spellcaster).
+  // Within-night exclusion for suffixed repeat group phases (e.g. "werewolf-werewolf:2"):
+  // the second phase cannot target whoever the first phase selected.
+  const previousTargetId: string | undefined =
+    activeRoleDef?.preventRepeatTarget
+      ? turnState.lastTargets?.[baseActivePhaseKey]
+      : baseActivePhaseKey !== activePhaseKey
+        ? (() => {
+            const baseAction = nightActions[baseActivePhaseKey];
+            return baseAction && isTeamNightAction(baseAction)
+              ? baseAction.suggestedTargetId
+              : undefined;
+          })()
+        : undefined;
 
   const targetablePlayers = getTargetablePlayers(
     gameState.players,

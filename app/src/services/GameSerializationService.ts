@@ -11,6 +11,7 @@ import {
   WerewolfPhase,
   TargetCategory,
   getInterimAttackedPlayerIds,
+  baseGroupPhaseKey,
 } from "@/lib/game-modes/werewolf";
 import type {
   AnyNightAction,
@@ -73,7 +74,23 @@ export class GameSerializationService {
       : roleDef?.wakesWith;
 
     if (groupPhaseKey) {
-      const action = nightActions[groupPhaseKey];
+      // If the active phase is a suffixed repeat of this group phase
+      // (e.g. "werewolf-werewolf:2"), look up the action under that key
+      // so the player sees the fresh second-phase state, not the confirmed first.
+      const ts =
+        game.status.type === GameStatus.Playing
+          ? (game.status.turnState as WerewolfTurnState | undefined)
+          : undefined;
+      const activePhaseKey =
+        ts?.phase.type === WerewolfPhase.Nighttime
+          ? ts.phase.nightPhaseOrder[ts.phase.currentPhaseIndex]
+          : undefined;
+      const lookupKey =
+        activePhaseKey && baseGroupPhaseKey(activePhaseKey) === groupPhaseKey
+          ? activePhaseKey
+          : groupPhaseKey;
+
+      const action = nightActions[lookupKey];
       if (!action || !isTeamNightAction(action)) {
         return { myNightTarget: undefined, myNightTargetConfirmed: false };
       }
