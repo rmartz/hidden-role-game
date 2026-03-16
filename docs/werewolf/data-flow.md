@@ -54,10 +54,9 @@ These fields are only populated when the active phase matches the player's role.
 
 ### Player Fields — Daytime (day start)
 
-| Field               | Description                                                                                                   |
-| ------------------- | ------------------------------------------------------------------------------------------------------------- |
-| `nightStatus`       | `{ targetPlayerId, effect: "killed" \| "silenced" }[]` — outcome of the previous night                        |
-| `myLastNightAction` | `{ targetPlayerId, category }` — the player's own action from the previous night; confirms input was recorded |
+| Field         | Description                                                                            |
+| ------------- | -------------------------------------------------------------------------------------- |
+| `nightStatus` | `{ targetPlayerId, effect: "killed" \| "silenced" }[]` — outcome of the previous night |
 
 ## Game Phase State Machine
 
