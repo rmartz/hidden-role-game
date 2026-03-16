@@ -13,6 +13,9 @@ import { GameTimer } from "@/components/game";
 import { PlayerFirstTurnScreen } from "./PlayerFirstTurnScreen";
 import { PlayerInvestigationResult } from "./PlayerInvestigationResult";
 import { PlayerTargetSelection } from "./PlayerTargetSelection";
+import { PlayerRoleDisplay } from "./PlayerRoleDisplay";
+import { PlayerStatusLists } from "./PlayerStatusLists";
+import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 
 interface PlayerGameNightScreenProps {
   gameId: string;
@@ -40,10 +43,10 @@ export function PlayerGameNightScreen({
     return (
       <div className="p-5">
         <h1 className="text-2xl font-bold mb-2 text-muted-foreground">
-          You Have Been Eliminated
+          {WEREWOLF_COPY.night.youAreEliminated}
         </h1>
         <p className="text-muted-foreground">
-          You are no longer in the game. Stay quiet while the night continues.
+          {WEREWOLF_COPY.night.eliminatedSubtext}
         </p>
       </div>
     );
@@ -56,7 +59,7 @@ export function PlayerGameNightScreen({
     return (
       <div className="p-5">
         <p className="text-muted-foreground italic">
-          Stop peeking, you dirty cheater.
+          {WEREWOLF_COPY.night.stopPeeking}
         </p>
       </div>
     );
@@ -116,7 +119,9 @@ export function PlayerGameNightScreen({
 
   return (
     <div className="p-5">
-      <h1 className="text-2xl font-bold mb-2">It&apos;s Your Turn</h1>
+      <h1 className="text-2xl font-bold mb-2">
+        {WEREWOLF_COPY.night.yourTurn}
+      </h1>
       {nightPhaseSeconds !== null ? (
         <GameTimer
           durationSeconds={nightPhaseSeconds}
@@ -130,10 +135,13 @@ export function PlayerGameNightScreen({
           resetKey={phase.currentPhaseIndex}
         />
       )}
-      <p className="text-muted-foreground mb-4">
-        <strong className="text-foreground">{gameState.myRole?.name}</strong> —
-        wake up and take your action.
-      </p>
+      <p className="text-muted-foreground mb-4">{WEREWOLF_COPY.night.wakeUp}</p>
+      {!isConfirmed && gameState.myRole && (
+        <PlayerRoleDisplay
+          role={gameState.myRole}
+          gameMode={gameState.gameMode}
+        />
+      )}
       <PlayerTargetSelection
         gameId={gameId}
         players={gameState.players}
@@ -150,6 +158,11 @@ export function PlayerGameNightScreen({
         witchAbilityUsed={gameState.witchAbilityUsed}
         attackedPlayerIds={attackedPlayerIds}
         previousNightTargetId={gameState.previousNightTargetId}
+      />
+      <PlayerStatusLists
+        players={gameState.players}
+        deadPlayerIds={deadPlayerIds}
+        gameOwnerId={gameState.gameOwner?.id}
       />
       {gameState.investigationResult && (
         <PlayerInvestigationResult

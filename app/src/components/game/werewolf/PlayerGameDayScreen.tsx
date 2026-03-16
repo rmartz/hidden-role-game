@@ -4,13 +4,10 @@ import { useMemo } from "react";
 import { WerewolfPhase } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
-import {
-  GameRolesList,
-  GameTimer,
-  PlayersRoleList,
-  RoleLabel,
-} from "@/components/game";
+import { GameTimer, PlayersRoleList } from "@/components/game";
 import { PlayerNightSummary } from "./PlayerNightSummary";
+import { PlayerRoleDisplay } from "./PlayerRoleDisplay";
+import { PlayerStatusLists } from "./PlayerStatusLists";
 
 interface Props {
   gameState: PlayerGameState;
@@ -52,21 +49,22 @@ export function PlayerGameDayScreen({ gameState, turnState }: Props) {
       )}
 
       {gameState.myRole && (
-        <div className="mb-5">
-          <h2 className="text-lg font-semibold mb-2">Your Role</h2>
-          <RoleLabel role={gameState.myRole} gameMode={gameState.gameMode} />
-        </div>
+        <PlayerRoleDisplay
+          role={gameState.myRole}
+          gameMode={gameState.gameMode}
+        />
       )}
+
+      <PlayerStatusLists
+        players={gameState.players}
+        deadPlayerIds={turnState.deadPlayerIds}
+        gameOwnerId={gameState.gameOwner?.id}
+      />
 
       <PlayersRoleList
         assignments={gameState.visibleRoleAssignments}
         gameMode={gameState.gameMode}
         deadPlayerIds={gameState.deadPlayerIds}
-      />
-
-      <GameRolesList
-        roles={gameState.rolesInPlay ?? []}
-        gameMode={gameState.gameMode}
       />
     </div>
   );

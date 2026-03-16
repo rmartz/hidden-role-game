@@ -1,0 +1,52 @@
+"use client";
+
+import { WerewolfAction } from "@/lib/game-modes/werewolf";
+import { useGameAction } from "@/hooks";
+import { Button } from "@/components/ui/button";
+import { getPlayerName } from "@/lib/player-utils";
+import type { PublicLobbyPlayer } from "@/server/types";
+import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
+
+interface Props {
+  gameId: string;
+  players: PublicLobbyPlayer[];
+  suggestedTargetId: string;
+  myNightTarget?: string | null;
+  isConfirmed: boolean;
+}
+
+export function GroupTargetSuggestion({
+  gameId,
+  players,
+  suggestedTargetId,
+  myNightTarget,
+  isConfirmed,
+}: Props) {
+  const action = useGameAction(gameId);
+  const suggestedName =
+    getPlayerName(players, suggestedTargetId) ?? suggestedTargetId;
+  const isApproved = myNightTarget === suggestedTargetId;
+
+  return (
+    <div className="mt-3 rounded-md border p-2">
+      <p className="text-sm mb-2">
+        {WEREWOLF_COPY.targetSelection.suggestedTarget(suggestedName)}
+      </p>
+      {!isApproved && !isConfirmed && (
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => {
+            action.mutate({
+              actionId: WerewolfAction.SetNightTarget,
+              payload: { targetPlayerId: suggestedTargetId },
+            });
+          }}
+          disabled={action.isPending}
+        >
+          {WEREWOLF_COPY.targetSelection.approveTarget}
+        </Button>
+      )}
+    </div>
+  );
+}

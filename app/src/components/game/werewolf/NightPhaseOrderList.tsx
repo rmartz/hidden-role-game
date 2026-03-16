@@ -6,12 +6,14 @@ interface NightPhaseOrderListProps {
   nightPhaseOrder: string[];
   currentPhaseIndex: number;
   roles: Record<string, { name: string }>;
+  phasePlayerNames?: Record<string, string[]>;
 }
 
 export function NightPhaseOrderList({
   nightPhaseOrder,
   currentPhaseIndex,
   roles,
+  phasePlayerNames,
 }: NightPhaseOrderListProps) {
   if (nightPhaseOrder.length === 0) return null;
 
@@ -26,6 +28,7 @@ export function NightPhaseOrderList({
             const isCurrent = index === currentPhaseIndex;
             const isPast = index < currentPhaseIndex;
             const label = getPhaseLabel(phaseKey, roles);
+            const playerNames = phasePlayerNames?.[phaseKey];
             return (
               <Item
                 key={`${phaseKey}-${String(index)}`}
@@ -45,6 +48,23 @@ export function NightPhaseOrderList({
                       </span>
                     )}
                   </ItemTitle>
+                  {playerNames && playerNames.length > 0 && (
+                    <details className="mt-0.5 ml-5">
+                      <summary className="text-xs cursor-pointer text-muted-foreground list-none">
+                        Show players
+                      </summary>
+                      <ul className="mt-0.5 space-y-0.5">
+                        {playerNames.map((name) => (
+                          <li
+                            key={name}
+                            className="text-xs text-muted-foreground"
+                          >
+                            {name}
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  )}
                 </ItemContent>
               </Item>
             );

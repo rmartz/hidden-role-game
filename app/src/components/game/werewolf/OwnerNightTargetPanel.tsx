@@ -11,6 +11,7 @@ interface ResolvedVote {
 
 interface Props {
   groupAction: boolean;
+  groupMemberCount?: number;
   resolvedVotes: ResolvedVote[];
   activeTargetName?: string;
   activeTargetConfirmed: boolean;
@@ -23,6 +24,7 @@ interface Props {
 
 export function OwnerNightTargetPanel({
   groupAction,
+  groupMemberCount,
   resolvedVotes,
   activeTargetName,
   activeTargetConfirmed,
@@ -34,26 +36,31 @@ export function OwnerNightTargetPanel({
 }: Props) {
   return (
     <div className="mb-4 rounded-md border p-3">
-      {groupAction && (
-        <div className="mb-2">
-          <p className="text-xs font-medium text-muted-foreground mb-1">
-            Votes:
-          </p>
-          {resolvedVotes.length === 0 ? (
-            <p className="text-xs text-muted-foreground italic">No votes yet</p>
-          ) : (
-            <ul className="text-xs space-y-0.5">
-              {resolvedVotes.map((vote) => (
-                <li key={vote.key}>
-                  {vote.voterName} → {vote.targetName}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
+      {groupAction &&
+        (groupMemberCount === undefined || groupMemberCount > 1) && (
+          <div className="mb-2">
+            <p className="text-xs font-medium text-muted-foreground mb-1">
+              Votes:
+            </p>
+            {resolvedVotes.length === 0 ? (
+              <p className="text-xs text-muted-foreground italic">
+                No votes yet
+              </p>
+            ) : (
+              <ul className="text-xs space-y-0.5">
+                {resolvedVotes.map((vote) => (
+                  <li key={vote.key}>
+                    {vote.voterName} → {vote.targetName}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
       <p className="text-sm font-medium mb-2">
-        {groupAction ? "Suggested target: " : "Target: "}
+        {groupAction && groupMemberCount !== undefined && groupMemberCount > 1
+          ? "Suggested target: "
+          : "Target: "}
         {activeTargetName ? (
           <>
             <strong className="text-foreground">{activeTargetName}</strong>

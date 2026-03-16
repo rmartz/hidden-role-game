@@ -1,0 +1,68 @@
+import type { PublicLobbyPlayer } from "@/server/types";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
+
+interface Props {
+  players: PublicLobbyPlayer[];
+  deadPlayerIds: string[];
+  /** ID of the game owner (narrator) to exclude from the lists. */
+  gameOwnerId?: string;
+}
+
+export function PlayerStatusLists({
+  players,
+  deadPlayerIds,
+  gameOwnerId,
+}: Props) {
+  const deadSet = new Set(deadPlayerIds);
+  const filtered = players.filter((p) => p.id !== gameOwnerId);
+  const activePlayers = filtered.filter((p) => !deadSet.has(p.id));
+  const deadPlayers = filtered.filter((p) => deadSet.has(p.id));
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+      <Card>
+        <CardHeader className="pb-2 pt-4">
+          <CardTitle className="text-sm">
+            {WEREWOLF_COPY.playerLists.activePlayers(activePlayers.length)}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {activePlayers.length === 0 ? (
+            <p className="text-sm text-muted-foreground italic">
+              {WEREWOLF_COPY.playerLists.none}
+            </p>
+          ) : (
+            <ul className="text-sm space-y-1">
+              {activePlayers.map((p) => (
+                <li key={p.id}>{p.name}</li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader className="pb-2 pt-4">
+          <CardTitle className="text-sm">
+            {WEREWOLF_COPY.playerLists.eliminated(deadPlayers.length)}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {deadPlayers.length === 0 ? (
+            <p className="text-sm text-muted-foreground italic">
+              {WEREWOLF_COPY.playerLists.noneYet}
+            </p>
+          ) : (
+            <ul className="text-sm space-y-1">
+              {deadPlayers.map((p) => (
+                <li key={p.id} className="text-muted-foreground">
+                  {p.name}
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
