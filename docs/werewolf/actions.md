@@ -36,10 +36,10 @@ Actions are the mechanism by which the Narrator and players mutate game state. E
 **When:** During Nighttime, turn 2+
 **Effect:** Sets or clears a night target.
 
-- **Solo roles** (Seer, Bodyguard, Witch, etc.): stores `{ targetPlayerId }` under the role's phase key.
-- **Group phases** (Werewolves): upserts the caller's vote in `votes[]`; the Narrator override sets all alive participants' votes at once and also sets `suggestedTargetId`.
+- **Solo roles** (Seer, Bodyguard, Witch, etc.): stores `{ targetPlayerId }` under the role's phase key. Passing `targetPlayerId: null` records an intentional skip (`{ skipped: true }`); passing `undefined` clears the selection.
+- **Group phases** (Werewolves): upserts the caller's vote in `votes[]`. Passing `null` records a skip vote; passing `undefined` removes the vote. The Narrator override sets all alive participants' votes at once and also sets `suggestedTargetId`.
 
-**Payload:** `{ roleId?: string; targetPlayerId?: string }`
+**Payload:** `{ roleId?: string; targetPlayerId?: string | null }`
 
 **Validation:**
 
@@ -47,6 +47,8 @@ Actions are the mechanism by which the Narrator and players mutate game state. E
 - Target must exist, not be dead, not be the game owner.
 - Attack/Investigate roles cannot target themselves.
 - Group phase players cannot target visible teammates; Narrator cannot target group members.
+- Roles with `preventRepeatTarget` (Bodyguard, Spellcaster) cannot target the same player as they targeted the previous night (`lastTargets` in `WerewolfTurnState`).
+- In a suffixed repeat group phase (e.g., `"werewolf-werewolf:2"`), the target cannot match the `suggestedTargetId` from the base phase's action (within-night exclusion).
 - Cannot change a confirmed target (players only; Narrator can override).
 
 ---
@@ -57,8 +59,8 @@ Actions are the mechanism by which the Narrator and players mutate game state. E
 **When:** During Nighttime, turn 2+
 **Effect:** Locks in the player's selected target.
 
-- **Solo phases:** sets `confirmed: true` on the role's night action.
-- **Group phases:** requires all alive phase participants to have voted for the same target before confirming. Once confirmed, no player can change their vote.
+- **Solo phases:** sets `confirmed: true` on the role's night action. Allowed even when no target is set (intentional skip).
+- **Group phases:** requires all alive phase participants to have voted for the same target (or all skipped) before confirming. Once confirmed, no player can change their vote.
 
 ---
 
@@ -88,31 +90,39 @@ Actions are the mechanism by which the Narrator and players mutate game state. E
 
 ## Action Payload Summary
 
-| Action                        | Caller                    | Payload                                        |
-| ----------------------------- | ------------------------- | ---------------------------------------------- |
-| `start-night`                 | Narrator                  | none                                           |
-| `start-day`                   | Narrator                  | none                                           |
-| `set-night-phase`             | Narrator                  | `{ phaseIndex: number }`                       |
-| `set-night-target`            | Narrator or active player | `{ roleId?: string; targetPlayerId?: string }` |
-| `confirm-night-target`        | Active player             | none                                           |
-| `reveal-investigation-result` | Narrator                  | none                                           |
-| `mark-player-dead`            | Narrator                  | `{ playerId: string }`                         |
-| `mark-player-alive`           | Narrator                  | `{ playerId: string }`                         |
+| Action                        | Caller                    | Payload                                                |
+| ----------------------------- | ------------------------- | ------------------------------------------------------ |
+| `start-night`                 | Narrator                  | none                                                   |
+| `start-day`                   | Narrator                  | none                                                   |
+| `set-night-phase`             | Narrator                  | `{ phaseIndex: number }`                               |
+| `set-night-target`            | Narrator or active player | `{ roleId?: string; targetPlayerId?: string \| null }` |
+| `confirm-night-target`        | Active player             | none                                                   |
+| `reveal-investigation-result` | Narrator                  | none                                                   |
+| `mark-player-dead`            | Narrator                  | `{ playerId: string }`                                 |
+| `mark-player-alive`           | Narrator                  | `{ playerId: string }`                                 |
 
 ## Night Action Types
 
 ```typescript
 // Solo role action (Seer, Bodyguard, Witch, Spellcaster, Chupacabra)
 interface NightAction {
-  targetPlayerId?: string;
+  targetPlayerId?: string; // absent when skipped
+  skipped?: true; // set when the player intentionally chose "Skip"
   confirmed?: boolean;
   resultRevealed?: boolean; // Seer only
 }
 
+// Individual vote within a group phase
+interface TeamNightVote {
+  playerId: string;
+  targetPlayerId?: string; // absent when skipped
+  skipped?: true; // set when this player intentionally voted "Skip"
+}
+
 // Group phase action (Werewolves)
 interface TeamNightAction {
-  votes: { playerId: string; targetPlayerId: string }[];
-  suggestedTargetId?: string; // majority vote target
+  votes: TeamNightVote[];
+  suggestedTargetId?: string; // plurality vote target; absent if tie or all skipped
   confirmed?: boolean;
 }
 ```
