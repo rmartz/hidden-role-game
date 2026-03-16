@@ -294,6 +294,7 @@ export interface FirebasePlayerState {
   amDead?: boolean;
   deadPlayerIds?: string[];
   nightStatus?: NightStatusEntry[];
+  previousNightTargetId?: string;
   investigationResult?: { targetPlayerId: string; isWerewolfTeam: boolean };
   witchAbilityUsed?: boolean;
   timerConfig?: TimerConfig;
@@ -328,6 +329,9 @@ export function playerStateToFirebase(
       ? { deadPlayerIds: state.deadPlayerIds }
       : {}),
     ...(state.nightStatus?.length ? { nightStatus: state.nightStatus } : {}),
+    ...(state.previousNightTargetId
+      ? { previousNightTargetId: state.previousNightTargetId }
+      : {}),
     ...(state.investigationResult
       ? { investigationResult: state.investigationResult }
       : {}),
@@ -378,6 +382,9 @@ export function firebaseToPlayerState(
     ...(raw.amDead ? { amDead: true } : {}),
     ...(raw.deadPlayerIds?.length ? { deadPlayerIds: raw.deadPlayerIds } : {}),
     ...(raw.nightStatus?.length ? { nightStatus: raw.nightStatus } : {}),
+    ...(raw.previousNightTargetId
+      ? { previousNightTargetId: raw.previousNightTargetId }
+      : {}),
     ...(raw.investigationResult
       ? { investigationResult: raw.investigationResult }
       : {}),

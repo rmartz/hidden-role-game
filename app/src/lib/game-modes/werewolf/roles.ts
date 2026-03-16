@@ -22,6 +22,8 @@ export interface WerewolfRoleDefinition extends RoleDefinition<
   targetCategory: TargetCategory;
   /** When true, all players with this role on the same team wake and target together. */
   teamTargeting?: boolean;
+  /** When true, the role cannot target the same player on consecutive nights. */
+  preventRepeatTarget?: boolean;
 }
 
 export const MIN_PLAYERS = 5;
@@ -75,6 +77,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Good,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Special,
+    preventRepeatTarget: true,
   },
   [WerewolfRole.Mason]: {
     id: WerewolfRole.Mason,
@@ -104,5 +107,6 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Good,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Protect,
+    preventRepeatTarget: true,
   },
 };

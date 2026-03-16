@@ -18,6 +18,7 @@ interface Props {
   activeTarget?: string;
   onTargetClick: (playerId: string | undefined) => void;
   isPending: boolean;
+  previousTargetId?: string;
 }
 
 export function OwnerNightTargetPanel({
@@ -29,6 +30,7 @@ export function OwnerNightTargetPanel({
   activeTarget,
   onTargetClick,
   isPending,
+  previousTargetId,
 }: Props) {
   return (
     <div className="mb-4 rounded-md border p-3">
@@ -72,9 +74,10 @@ export function OwnerNightTargetPanel({
             onClick={() => {
               onTargetClick(activeTarget === player.id ? undefined : player.id);
             }}
-            disabled={isPending}
+            disabled={isPending || player.id === previousTargetId}
           >
             {player.name}
+            {player.id === previousTargetId && " (unavailable)"}
           </Button>
         ))}
         <Button
