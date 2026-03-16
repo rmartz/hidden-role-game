@@ -14,7 +14,7 @@ import {
   computeSuggestedTarget,
   resolveNightActions,
 } from "./utils";
-import { WEREWOLF_ROLES } from "./roles";
+import { WEREWOLF_ROLES, WerewolfRole } from "./roles";
 import type { WerewolfRoleDefinition } from "./roles";
 import { getPlayer } from "@/lib/player-utils";
 
@@ -56,6 +56,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
             nightActions: {},
           },
           deadPlayerIds: ts.deadPlayerIds,
+          ...(ts.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
         },
       };
     },
@@ -75,7 +76,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
         ts.deadPlayerIds,
       );
       const newDeadIds = nightResolution
-        .filter((e) => e.died)
+        .filter((e) => e.type === "killed" && e.died)
         .map((e) => e.targetPlayerId);
       game.status = {
         type: GameStatus.Playing,
@@ -88,6 +89,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
             ...(nightResolution.length > 0 ? { nightResolution } : {}),
           },
           deadPlayerIds: [...ts.deadPlayerIds, ...newDeadIds],
+          ...(ts.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
         },
       };
     },
@@ -151,6 +153,13 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
         const existing = phase.nightActions[phaseKey];
         if (existing?.confirmed) return false;
       }
+
+      // Witch can only use her ability once per game.
+      if (
+        (phaseKey as WerewolfRole) === WerewolfRole.Witch &&
+        ts.witchAbilityUsed
+      )
+        return false;
 
       // For team phases, validate target is not on the same team.
       const team = parseTeamPhaseKey(phaseKey);
@@ -318,6 +327,10 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       const action = phase.nightActions[activePhaseKey];
       if (action) {
         phase.nightActions[activePhaseKey] = { ...action, confirmed: true };
+      }
+
+      if ((activePhaseKey as WerewolfRole) === WerewolfRole.Witch) {
+        ts.witchAbilityUsed = true;
       }
     },
   },

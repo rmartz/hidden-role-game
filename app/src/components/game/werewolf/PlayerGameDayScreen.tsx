@@ -42,7 +42,7 @@ export function PlayerGameDayScreen({ gameState, turnState }: Props) {
 
       <PlayerNightSummary
         players={gameState.players}
-        nightSummary={gameState.nightSummary}
+        nightStatus={gameState.nightStatus}
         myLastNightAction={gameState.myLastNightAction}
       />
 

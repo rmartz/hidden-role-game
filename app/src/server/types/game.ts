@@ -39,6 +39,22 @@ export interface VisibleTeammate {
   role: PublicRoleInfo;
 }
 
+/** Night effects visible during the daytime summary. */
+export interface DaytimeNightStatusEntry {
+  targetPlayerId: string;
+  effect: "killed" | "silenced";
+}
+
+/** Night effects visible to the Witch during their nighttime phase only. */
+export interface NighttimeNightStatusEntry {
+  targetPlayerId: string;
+  effect: "attacked";
+}
+
+export type NightStatusEntry =
+  | DaytimeNightStatusEntry
+  | NighttimeNightStatusEntry;
+
 export interface PlayerGameState {
   status: GameStatusState;
   gameMode: GameMode;
@@ -66,12 +82,12 @@ export interface PlayerGameState {
   /** Player IDs marked as dead by the narrator. */
   deadPlayerIds?: string[];
   /**
-   * Sanitized night outcomes shown to players at the start of the day.
-   * Only includes events where something happened (e.g. a death).
-   * Omits who performed the action and any negated/blocked actions.
-   * Only populated for non-owner players during daytime.
+   * Night effect outcomes visible to players. During daytime: killed/silenced
+   * entries from the preceding night. During nighttime for the Witch: attacked
+   * entries showing players currently under attack before they act.
+   * Only populated for non-owner players.
    */
-  nightSummary?: { targetPlayerId: string; died: boolean }[];
+  nightStatus?: NightStatusEntry[];
   /**
    * The target the player chose during the preceding night.
    * Present even if the action was negated, so players can confirm
@@ -83,6 +99,8 @@ export interface PlayerGameState {
    * Only populated after the narrator explicitly reveals it.
    */
   investigationResult?: { targetPlayerId: string; isWerewolfTeam: boolean };
+  /** Whether the Witch has already used their once-per-game special ability. */
+  witchAbilityUsed?: boolean;
   /** Phase timer configuration. Present when the lobby has timers enabled. */
   timerConfig?: TimerConfig;
 }

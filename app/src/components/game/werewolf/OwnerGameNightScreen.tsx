@@ -13,6 +13,7 @@ import {
   TargetCategory,
   getInvestigationResultForNarrator,
 } from "@/lib/game-modes/werewolf";
+import { WerewolfRole } from "@/lib/game-modes/werewolf/roles";
 import type {
   WerewolfTurnState,
   WerewolfRoleDefinition,
@@ -72,16 +73,16 @@ export function OwnerGameNightScreen({
     getSoloTarget(activeAction);
 
   const handleTargetClick = useCallback(
-    (playerId: string) => {
+    (playerId: string | undefined) => {
       action.mutate({
         actionId: WerewolfAction.SetNightTarget,
         payload: {
           roleId: activePhaseKey,
-          targetPlayerId: activeTarget === playerId ? undefined : playerId,
+          targetPlayerId: playerId,
         },
       });
     },
-    [action, activePhaseKey, activeTarget],
+    [action, activePhaseKey],
   );
 
   const handlePhaseChange = useCallback(
@@ -188,18 +189,25 @@ export function OwnerGameNightScreen({
             <span> ({activePlayerNames.join(", ")})</span>
           )}
         </p>
-        {!isFirstTurn && (
-          <OwnerNightTargetPanel
-            teamAction={!!teamAction}
-            resolvedVotes={resolvedVotes}
-            activeTargetName={activeTargetName}
-            activeTargetConfirmed={activeTargetConfirmed}
-            targetablePlayers={targetablePlayers}
-            activeTarget={activeTarget}
-            onTargetClick={handleTargetClick}
-            isPending={action.isPending}
-          />
-        )}
+        {!isFirstTurn &&
+          ((activePhaseKey as WerewolfRole) === WerewolfRole.Witch &&
+          turnState.witchAbilityUsed &&
+          !activeTargetConfirmed ? (
+            <p className="mb-4 text-sm text-muted-foreground italic">
+              The Witch has already used their special ability this game.
+            </p>
+          ) : (
+            <OwnerNightTargetPanel
+              teamAction={!!teamAction}
+              resolvedVotes={resolvedVotes}
+              activeTargetName={activeTargetName}
+              activeTargetConfirmed={activeTargetConfirmed}
+              targetablePlayers={targetablePlayers}
+              activeTarget={activeTarget}
+              onTargetClick={handleTargetClick}
+              isPending={action.isPending}
+            />
+          ))}
         {investigationResult && (
           <OwnerInvestigationConfirm
             gameId={gameId}

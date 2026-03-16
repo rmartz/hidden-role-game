@@ -57,7 +57,7 @@ export function OwnerGameDayScreen({ gameId, gameState, turnState }: Props) {
         timer={timer}
       >
         <NightOutcomeSummary
-          nightResolution={phase.nightResolution ?? []}
+          events={phase.nightResolution ?? []}
           players={gameState.players}
           roles={modeConfig.roles}
         />

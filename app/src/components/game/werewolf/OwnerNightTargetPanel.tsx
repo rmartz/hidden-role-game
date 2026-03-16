@@ -16,7 +16,7 @@ interface Props {
   activeTargetConfirmed: boolean;
   targetablePlayers: TargetablePlayer[];
   activeTarget?: string;
-  onTargetClick: (playerId: string) => void;
+  onTargetClick: (playerId: string | undefined) => void;
   isPending: boolean;
 }
 
@@ -70,13 +70,23 @@ export function OwnerNightTargetPanel({
             size="sm"
             variant={activeTarget === player.id ? "default" : "outline"}
             onClick={() => {
-              onTargetClick(player.id);
+              onTargetClick(activeTarget === player.id ? undefined : player.id);
             }}
             disabled={isPending}
           >
             {player.name}
           </Button>
         ))}
+        <Button
+          size="sm"
+          variant={activeTarget === undefined ? "default" : "outline"}
+          onClick={() => {
+            onTargetClick(undefined);
+          }}
+          disabled={isPending}
+        >
+          Skip
+        </Button>
       </div>
     </div>
   );

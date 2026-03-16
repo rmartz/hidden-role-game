@@ -1,12 +1,15 @@
 import { TargetCategory } from "../types";
 import type { AnyNightAction } from "../types";
-import { WEREWOLF_ROLES } from "../roles";
+import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
 import { isTeamPhaseKey, TEAM_PHASE_PREFIX } from "./phase-keys";
+import type { PhaseKey } from "./phase-keys";
 import { targetPlayerIdOf } from "./targeting";
 import { getPlayerName } from "@/lib/player-utils";
 import { Team } from "@/lib/types";
-import type { VisibleTeammate } from "@/server/types";
+import type { NightStatusEntry, VisibleTeammate } from "@/server/types";
+
+export type { PhaseKey };
 
 export interface NightSummaryEntry {
   targetId: string;
@@ -77,7 +80,7 @@ export function isPlayersTurn(
 export function getActionText(
   category: TargetCategory,
   targetName: string,
-  nightSummary: { targetPlayerId: string; died: boolean }[] | undefined,
+  nightStatus: NightStatusEntry[] | undefined,
   targetPlayerId: string,
 ): string {
   switch (category) {
@@ -86,12 +89,12 @@ export function getActionText(
     case TargetCategory.Investigate:
       return `You Investigated ${targetName}.`;
     case TargetCategory.Attack: {
-      const targetWasKilled = (nightSummary ?? []).some(
-        (e) => e.died && e.targetPlayerId === targetPlayerId,
+      const targetWasKilled = (nightStatus ?? []).some(
+        (e) => e.effect === "killed" && e.targetPlayerId === targetPlayerId,
       );
       return targetWasKilled
         ? `You Attacked ${targetName}.`
-        : `You Attacked ${targetName}, but something protected them.`;
+        : `You Attacked ${targetName}, but it had no effect.`;
     }
     default:
       return `You targeted ${targetName}.`;
@@ -121,13 +124,33 @@ export function getInvestigationResultForNarrator(
   };
 }
 
+export interface WitchConfirmContext {
+  selectedTargetId: string | undefined;
+  attackedPlayerIds: string[];
+}
+
 /**
  * Returns the confirm button label for a given phase key based on its target category.
- * Team phase keys return "Attack". Solo roles: Attack, Protect, Investigate, or "Confirm".
+ * Team phase keys return "Attack". Solo roles: Attack, Protect, Investigate,
+ * Silence (Spellcaster), or "Confirm".
+ * For the Witch: "Protect" if the selected target is under attack, "Attack" if not,
+ * or "Use Ability" when no target is selected.
  */
-export function getConfirmLabel(phaseKey?: string): string {
+export function getConfirmLabel(
+  phaseKey?: PhaseKey,
+  witchContext?: WitchConfirmContext,
+): string {
   if (!phaseKey) return "Confirm";
   if (isTeamPhaseKey(phaseKey)) return "Attack";
+  if (phaseKey === WerewolfRole.Witch) {
+    if (!witchContext?.selectedTargetId) return "Use Ability";
+    return witchContext.attackedPlayerIds.includes(
+      witchContext.selectedTargetId,
+    )
+      ? "Protect"
+      : "Attack";
+  }
+  if (phaseKey === WerewolfRole.Spellcaster) return "Silence";
   const roleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
     phaseKey
   ];

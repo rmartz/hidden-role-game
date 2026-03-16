@@ -26,6 +26,7 @@ import type {
   PlayerGameState,
   RoleInPlay,
   VisibleTeammate,
+  NightStatusEntry,
 } from "@/server/types";
 
 // ---------------------------------------------------------------------------
@@ -292,9 +293,10 @@ export interface FirebasePlayerState {
   allAgreed?: boolean;
   amDead?: boolean;
   deadPlayerIds?: string[];
-  nightSummary?: { targetPlayerId: string; died: boolean }[];
+  nightStatus?: NightStatusEntry[];
   myLastNightAction?: { targetPlayerId: string; category: string };
   investigationResult?: { targetPlayerId: string; isWerewolfTeam: boolean };
+  witchAbilityUsed?: boolean;
   timerConfig?: TimerConfig;
 }
 
@@ -326,13 +328,14 @@ export function playerStateToFirebase(
     ...(state.deadPlayerIds?.length
       ? { deadPlayerIds: state.deadPlayerIds }
       : {}),
-    ...(state.nightSummary?.length ? { nightSummary: state.nightSummary } : {}),
+    ...(state.nightStatus?.length ? { nightStatus: state.nightStatus } : {}),
     ...(state.myLastNightAction
       ? { myLastNightAction: state.myLastNightAction }
       : {}),
     ...(state.investigationResult
       ? { investigationResult: state.investigationResult }
       : {}),
+    ...(state.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
     ...(state.timerConfig ? { timerConfig: state.timerConfig } : {}),
   };
 }
@@ -378,7 +381,7 @@ export function firebaseToPlayerState(
     ...(raw.allAgreed !== undefined ? { allAgreed: raw.allAgreed } : {}),
     ...(raw.amDead ? { amDead: true } : {}),
     ...(raw.deadPlayerIds?.length ? { deadPlayerIds: raw.deadPlayerIds } : {}),
-    ...(raw.nightSummary?.length ? { nightSummary: raw.nightSummary } : {}),
+    ...(raw.nightStatus?.length ? { nightStatus: raw.nightStatus } : {}),
     ...(raw.myLastNightAction
       ? {
           myLastNightAction: {
@@ -390,6 +393,7 @@ export function firebaseToPlayerState(
     ...(raw.investigationResult
       ? { investigationResult: raw.investigationResult }
       : {}),
+    ...(raw.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
     ...(raw.timerConfig ? { timerConfig: raw.timerConfig } : {}),
   };
 }

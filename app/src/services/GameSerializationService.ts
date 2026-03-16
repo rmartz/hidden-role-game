@@ -1,18 +1,24 @@
 import { GameStatus, Team } from "@/lib/types";
 import type { Game, RoleDefinition } from "@/lib/types";
-import type { PlayerGameState } from "@/server/types";
+import type {
+  DaytimeNightStatusEntry,
+  NighttimeNightStatusEntry,
+  PlayerGameState,
+} from "@/server/types";
 import {
   isTeamNightAction,
   getTeamPhaseKey,
   getTeamPlayerIds,
   WerewolfPhase,
   TargetCategory,
+  getInterimAttackedPlayerIds,
 } from "@/lib/game-modes/werewolf";
 import type {
   AnyNightAction,
   WerewolfRoleDefinition,
   WerewolfTurnState,
 } from "@/lib/game-modes/werewolf";
+import { WerewolfRole } from "@/lib/game-modes/werewolf/roles";
 import { GAME_MODES } from "@/lib/game-modes";
 
 /**
@@ -30,6 +36,10 @@ export class GameSerializationService {
     const ts = game.status.turnState as WerewolfTurnState | undefined;
     if (!ts) return undefined;
     const { nightActions } = ts.phase;
+    // During nighttime, always return the record (even if empty) so that
+    // extractPlayerNightState can read turn-state fields like witchAbilityUsed
+    // before any actions have been recorded.
+    if (ts.phase.type === WerewolfPhase.Nighttime) return nightActions;
     return Object.keys(nightActions).length > 0 ? nightActions : undefined;
   }
 
@@ -95,6 +105,42 @@ export class GameSerializationService {
       };
     }
 
+    // For the Witch, include attacked-player info and ability-used state.
+    // This must run before the early-return below, since the Witch may not
+    // have chosen a target yet but still needs to see who is under attack.
+    if ((myRole.id as WerewolfRole) === WerewolfRole.Witch) {
+      const ts =
+        game.status.type === GameStatus.Playing
+          ? (game.status.turnState as WerewolfTurnState | undefined)
+          : undefined;
+      const witchAction = nightActions[myRole.id];
+      const witchSoloAction =
+        witchAction && !isTeamNightAction(witchAction)
+          ? witchAction
+          : undefined;
+      const result: Partial<PlayerGameState> = {
+        myNightTarget: witchSoloAction?.targetPlayerId,
+        myNightTargetConfirmed: witchSoloAction?.confirmed ?? false,
+        witchAbilityUsed: ts?.witchAbilityUsed ?? false,
+      };
+      if (!ts?.witchAbilityUsed) {
+        const attacked = getInterimAttackedPlayerIds(
+          nightActions,
+          game.roleAssignments,
+          deadPlayerIds,
+        );
+        if (attacked.length > 0) {
+          result.nightStatus = attacked.map(
+            (id): NighttimeNightStatusEntry => ({
+              targetPlayerId: id,
+              effect: "attacked",
+            }),
+          );
+        }
+      }
+      return result;
+    }
+
     const myAction = nightActions[myRole.id];
     if (!myAction || isTeamNightAction(myAction)) {
       return { myNightTarget: undefined, myNightTargetConfirmed: false };
@@ -135,8 +181,8 @@ export class GameSerializationService {
    * Extracts sanitized night outcomes and the player's own last action for
    * display at the start of the day. Only populated during daytime phases.
    *
-   * nightSummary: only events where something happened (died === true),
-   * with attacker/protector info stripped — players cannot infer who acted.
+   * nightStatus: killed entries from deaths and silenced entries from the
+   * Spellcaster, with attacker/protector info stripped.
    *
    * myLastNightAction: the target the player chose, even if their action was
    * negated, so they can confirm their input was recorded.
@@ -151,9 +197,15 @@ export class GameSerializationService {
     if (ts?.phase.type !== WerewolfPhase.Daytime) return {};
     const phase = ts.phase;
 
-    const nightSummary = (phase.nightResolution ?? [])
-      .filter((e) => e.died)
-      .map((e) => ({ targetPlayerId: e.targetPlayerId, died: e.died }));
+    const nightStatus: DaytimeNightStatusEntry[] = (
+      phase.nightResolution ?? []
+    ).flatMap((e): DaytimeNightStatusEntry[] => {
+      if (e.type === "killed" && e.died)
+        return [{ targetPlayerId: e.targetPlayerId, effect: "killed" }];
+      if (e.type === "silenced")
+        return [{ targetPlayerId: e.targetPlayerId, effect: "silenced" }];
+      return [];
+    });
 
     const myLastNightAction = this.extractMyLastNightTarget(
       phase.nightActions,
@@ -163,7 +215,7 @@ export class GameSerializationService {
     );
 
     return {
-      ...(nightSummary.length > 0 ? { nightSummary } : {}),
+      ...(nightStatus.length > 0 ? { nightStatus } : {}),
       ...(myLastNightAction ? { myLastNightAction } : {}),
     };
   }

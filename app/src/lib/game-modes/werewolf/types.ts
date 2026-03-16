@@ -41,7 +41,8 @@ export interface WerewolfNighttimePhase {
   nightActions: Record<string, AnyNightAction>;
 }
 
-export interface NightResolutionEvent {
+export interface AttackNightResolutionEvent {
+  type: "killed";
   targetPlayerId: string;
   /** Phase keys (role IDs or team phase keys) that attacked this player. */
   attackedBy: string[];
@@ -50,6 +51,15 @@ export interface NightResolutionEvent {
   /** True if the player was attacked and not protected — they die. */
   died: boolean;
 }
+
+export interface SilencedNightResolutionEvent {
+  type: "silenced";
+  targetPlayerId: string;
+}
+
+export type NightResolutionEvent =
+  | AttackNightResolutionEvent
+  | SilencedNightResolutionEvent;
 
 export interface WerewolfDaytimePhase {
   type: WerewolfPhase.Daytime;
@@ -68,6 +78,8 @@ export interface WerewolfTurnState {
   phase: WerewolfTurnPhase;
   /** Player IDs that have been marked as dead by the narrator. */
   deadPlayerIds: string[];
+  /** True once the Witch has used her once-per-game special ability. */
+  witchAbilityUsed?: boolean;
 }
 
 export interface TargetablePlayer {

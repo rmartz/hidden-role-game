@@ -1,10 +1,12 @@
 "use client";
 
-import { WerewolfAction } from "@/lib/game-modes/werewolf";
-import type { TargetablePlayer } from "@/lib/game-modes/werewolf";
+import { WerewolfAction, WerewolfRole } from "@/lib/game-modes/werewolf";
+import type { PhaseKey, TargetablePlayer } from "@/lib/game-modes/werewolf";
 import { useGameAction } from "@/hooks";
 import { Button } from "@/components/ui/button";
+import type { PublicLobbyPlayer } from "@/server/types";
 import { ConfirmTargetButton } from "./ConfirmTargetButton";
+import { WitchInformationPanel } from "./WitchInformationPanel";
 
 interface TeamVoteDisplay {
   playerName: string;
@@ -13,20 +15,24 @@ interface TeamVoteDisplay {
 
 interface Props {
   gameId: string;
+  players: PublicLobbyPlayer[];
   targets: readonly (readonly [TargetablePlayer, boolean])[];
   isConfirmed: boolean;
   isTeamPhase: boolean;
-  confirmPhaseKey?: string;
+  confirmPhaseKey?: PhaseKey;
   hasTarget: boolean;
   allAgreed: boolean;
   hasVisibleTeammates?: boolean;
   teamVotes?: TeamVoteDisplay[];
   suggestedTargetId?: string;
   myNightTarget?: string;
+  witchAbilityUsed?: boolean;
+  attackedPlayerIds?: string[];
 }
 
 export function PlayerTargetSelection({
   gameId,
+  players,
   targets,
   isConfirmed,
   isTeamPhase,
@@ -37,11 +43,37 @@ export function PlayerTargetSelection({
   teamVotes = [],
   suggestedTargetId,
   myNightTarget,
+  witchAbilityUsed,
+  attackedPlayerIds,
 }: Props) {
   const action = useGameAction(gameId);
 
+  if (
+    confirmPhaseKey === WerewolfRole.Witch &&
+    witchAbilityUsed &&
+    !isConfirmed
+  ) {
+    return (
+      <div>
+        <WitchInformationPanel
+          players={players}
+          witchAbilityUsed={true}
+          attackedPlayerIds={[]}
+        />
+      </div>
+    );
+  }
+
   return (
     <div>
+      {confirmPhaseKey === WerewolfRole.Witch && !witchAbilityUsed && (
+        <WitchInformationPanel
+          players={players}
+          witchAbilityUsed={false}
+          attackedPlayerIds={attackedPlayerIds ?? []}
+        />
+      )}
+
       {isTeamPhase && !isConfirmed && hasVisibleTeammates && (
         <div className="mb-3 rounded-md border p-2">
           <p className="text-xs font-medium text-muted-foreground mb-1">
@@ -84,6 +116,21 @@ export function PlayerTargetSelection({
             {isSelected && " (selected)"}
           </Button>
         ))}
+        {!isConfirmed && (
+          <Button
+            variant={!hasTarget ? "default" : "outline"}
+            onClick={() => {
+              action.mutate({
+                actionId: WerewolfAction.SetNightTarget,
+                payload: { targetPlayerId: undefined },
+              });
+            }}
+            disabled={action.isPending}
+            className="justify-start"
+          >
+            Skip
+          </Button>
+        )}
       </div>
 
       {isTeamPhase &&
@@ -112,6 +159,14 @@ export function PlayerTargetSelection({
         isConfirmed={isConfirmed}
         isTeamPhase={isTeamPhase}
         allAgreed={allAgreed}
+        witchContext={
+          confirmPhaseKey === WerewolfRole.Witch
+            ? {
+                selectedTargetId: myNightTarget,
+                attackedPlayerIds: attackedPlayerIds ?? [],
+              }
+            : undefined
+        }
       />
     </div>
   );

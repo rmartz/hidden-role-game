@@ -1,16 +1,18 @@
 "use client";
 
 import { WerewolfAction, getConfirmLabel } from "@/lib/game-modes/werewolf";
+import type { PhaseKey, WitchConfirmContext } from "@/lib/game-modes/werewolf";
 import { useGameAction } from "@/hooks";
 import { Button } from "@/components/ui/button";
 
 interface Props {
   gameId: string;
-  roleId?: string;
+  roleId?: PhaseKey;
   hasTarget: boolean;
   isConfirmed: boolean;
   isTeamPhase?: boolean;
   allAgreed?: boolean;
+  witchContext?: WitchConfirmContext;
 }
 
 export function ConfirmTargetButton({
@@ -20,6 +22,7 @@ export function ConfirmTargetButton({
   isConfirmed,
   isTeamPhase,
   allAgreed,
+  witchContext,
 }: Props) {
   const action = useGameAction(gameId);
 
@@ -46,7 +49,7 @@ export function ConfirmTargetButton({
         }}
         disabled={disabled}
       >
-        {getConfirmLabel(roleId)}
+        {getConfirmLabel(roleId, witchContext)}
       </Button>
       {isTeamPhase && !allAgreed && (
         <p className="mt-1 text-xs text-muted-foreground">

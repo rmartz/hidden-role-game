@@ -1,7 +1,7 @@
 import type { Game, PlayerRoleAssignment } from "@/lib/types";
 import { WakesAtNight, WerewolfPhase } from "../types";
 import type { WerewolfNighttimePhase } from "../types";
-import { WEREWOLF_ROLES } from "../roles";
+import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
 import { parseTeamPhaseKey, getTeamPhaseKey } from "./phase-keys";
 import { currentTurnState } from "./game-state";
@@ -31,6 +31,8 @@ export function buildNightPhaseOrder(
   const phaseKeys: string[] = [];
   const emittedTeams = new Set<string>();
 
+  let witchPhaseKey: string | undefined;
+
   for (const role of Object.values(WEREWOLF_ROLES)) {
     if (role.wakesAtNight === WakesAtNight.Never) continue;
     if (role.wakesAtNight === WakesAtNight.FirstNightOnly && turn !== 1)
@@ -41,10 +43,15 @@ export function buildNightPhaseOrder(
       if (emittedTeams.has(role.team)) continue;
       emittedTeams.add(role.team);
       phaseKeys.push(getTeamPhaseKey(role.team));
+    } else if (role.id === WerewolfRole.Witch) {
+      witchPhaseKey = role.id;
     } else {
       phaseKeys.push(role.id);
     }
   }
+
+  // Witch always acts last — they need to see all prior attacks before choosing.
+  if (witchPhaseKey !== undefined) phaseKeys.push(witchPhaseKey);
 
   return phaseKeys;
 }
