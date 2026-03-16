@@ -63,9 +63,9 @@ function collectBaseAttacksAndProtections(
       continue;
 
     if (isGroupPhaseKey(phaseKey)) {
-      const teamAction = action as { suggestedTargetId?: string };
-      if (!teamAction.suggestedTargetId) continue;
-      const tid = teamAction.suggestedTargetId;
+      const groupAction = action as { suggestedTargetId?: string };
+      if (!groupAction.suggestedTargetId) continue;
+      const tid = groupAction.suggestedTargetId;
       attacks.set(tid, [...(attacks.get(tid) ?? []), phaseKey]);
       continue;
     }

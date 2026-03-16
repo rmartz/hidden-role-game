@@ -10,7 +10,7 @@ interface ResolvedVote {
 }
 
 interface Props {
-  teamAction: boolean;
+  groupAction: boolean;
   resolvedVotes: ResolvedVote[];
   activeTargetName?: string;
   activeTargetConfirmed: boolean;
@@ -22,7 +22,7 @@ interface Props {
 }
 
 export function OwnerNightTargetPanel({
-  teamAction,
+  groupAction,
   resolvedVotes,
   activeTargetName,
   activeTargetConfirmed,
@@ -34,7 +34,7 @@ export function OwnerNightTargetPanel({
 }: Props) {
   return (
     <div className="mb-4 rounded-md border p-3">
-      {teamAction && (
+      {groupAction && (
         <div className="mb-2">
           <p className="text-xs font-medium text-muted-foreground mb-1">
             Votes:
@@ -53,7 +53,7 @@ export function OwnerNightTargetPanel({
         </div>
       )}
       <p className="text-sm font-medium mb-2">
-        {teamAction ? "Suggested target: " : "Target: "}
+        {groupAction ? "Suggested target: " : "Target: "}
         {activeTargetName ? (
           <>
             <strong className="text-foreground">{activeTargetName}</strong>

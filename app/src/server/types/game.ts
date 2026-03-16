@@ -73,9 +73,9 @@ export interface PlayerGameState {
   myNightTargetConfirmed?: boolean;
   /** Per-player votes from teammates during a team night phase. */
   teamVotes?: { playerName: string; targetPlayerId: string }[];
-  /** The most-voted target during a team night phase. */
+  /** The most-voted target during a group night phase. */
   suggestedTargetId?: string;
-  /** Whether all alive team members agree on the same target. */
+  /** Whether all alive group members agree on the same target. */
   allAgreed?: boolean;
   /** Whether this player has been marked as dead by the narrator. */
   amDead?: boolean;

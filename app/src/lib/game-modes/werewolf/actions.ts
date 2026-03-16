@@ -278,7 +278,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       if (isGroupPhaseKey(phaseKey)) {
         // Group phase: upsert a player's vote.
         const existing = phase.nightActions[phaseKey];
-        const teamAction: TeamNightAction =
+        const groupAction: TeamNightAction =
           existing && isTeamNightAction(existing)
             ? { ...existing, votes: [...existing.votes] }
             : { votes: [] };
@@ -292,37 +292,37 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
             ts.deadPlayerIds,
           );
           if (targetPlayerId === undefined) {
-            teamAction.votes = [];
+            groupAction.votes = [];
           } else {
-            teamAction.votes = aliveParticipantIds.map((pid) => ({
+            groupAction.votes = aliveParticipantIds.map((pid) => ({
               playerId: pid,
               targetPlayerId,
             }));
           }
         } else if (targetPlayerId === undefined) {
           // Remove caller's vote.
-          teamAction.votes = teamAction.votes.filter(
+          groupAction.votes = groupAction.votes.filter(
             (v) => v.playerId !== callerId,
           );
         } else {
           // Upsert caller's vote.
-          const existingVote = teamAction.votes.find(
+          const existingVote = groupAction.votes.find(
             (v) => v.playerId === callerId,
           );
           if (existingVote) {
             existingVote.targetPlayerId = targetPlayerId;
           } else {
-            teamAction.votes.push({ playerId: callerId, targetPlayerId });
+            groupAction.votes.push({ playerId: callerId, targetPlayerId });
           }
         }
 
-        const suggested = computeSuggestedTarget(teamAction.votes);
+        const suggested = computeSuggestedTarget(groupAction.votes);
         if (suggested !== undefined) {
-          teamAction.suggestedTargetId = suggested;
+          groupAction.suggestedTargetId = suggested;
         } else {
-          delete teamAction.suggestedTargetId;
+          delete groupAction.suggestedTargetId;
         }
-        phase.nightActions[phaseKey] = teamAction;
+        phase.nightActions[phaseKey] = groupAction;
       } else {
         // Solo phase.
         if (targetPlayerId === undefined) {

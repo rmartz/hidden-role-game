@@ -919,11 +919,11 @@ describe("SetNightTarget — team phase", () => {
     action.apply(game, { targetPlayerId: "p3" }, "w1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
     const phase = ts.phase as WerewolfNighttimePhase;
-    const teamAction = phase.nightActions[TEAM_BAD_KEY] as TeamNightAction;
-    expect(teamAction.votes).toEqual([
+    const groupAction = phase.nightActions[TEAM_BAD_KEY] as TeamNightAction;
+    expect(groupAction.votes).toEqual([
       { playerId: "w1", targetPlayerId: "p3" },
     ]);
-    expect(teamAction.suggestedTargetId).toBe("p3");
+    expect(groupAction.suggestedTargetId).toBe("p3");
   });
 
   it("second voter updates the TeamNightAction", () => {
@@ -932,10 +932,10 @@ describe("SetNightTarget — team phase", () => {
     action.apply(game, { targetPlayerId: "p4" }, "w2");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
     const phase = ts.phase as WerewolfNighttimePhase;
-    const teamAction = phase.nightActions[TEAM_BAD_KEY] as TeamNightAction;
-    expect(teamAction.votes).toHaveLength(2);
+    const groupAction = phase.nightActions[TEAM_BAD_KEY] as TeamNightAction;
+    expect(groupAction.votes).toHaveLength(2);
     // Tied — no suggested target.
-    expect(teamAction.suggestedTargetId).toBeUndefined();
+    expect(groupAction.suggestedTargetId).toBeUndefined();
   });
 
   it("voter can change their vote", () => {
@@ -944,8 +944,8 @@ describe("SetNightTarget — team phase", () => {
     action.apply(game, { targetPlayerId: "p4" }, "w1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
     const phase = ts.phase as WerewolfNighttimePhase;
-    const teamAction = phase.nightActions[TEAM_BAD_KEY] as TeamNightAction;
-    expect(teamAction.votes).toEqual([
+    const groupAction = phase.nightActions[TEAM_BAD_KEY] as TeamNightAction;
+    expect(groupAction.votes).toEqual([
       { playerId: "w1", targetPlayerId: "p4" },
     ]);
   });
@@ -956,8 +956,8 @@ describe("SetNightTarget — team phase", () => {
     action.apply(game, { targetPlayerId: undefined }, "w1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
     const phase = ts.phase as WerewolfNighttimePhase;
-    const teamAction = phase.nightActions[TEAM_BAD_KEY] as TeamNightAction;
-    expect(teamAction.votes).toEqual([]);
+    const groupAction = phase.nightActions[TEAM_BAD_KEY] as TeamNightAction;
+    expect(groupAction.votes).toEqual([]);
   });
 
   it("owner override sets all alive team members' votes", () => {
@@ -969,12 +969,12 @@ describe("SetNightTarget — team phase", () => {
     );
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
     const phase = ts.phase as WerewolfNighttimePhase;
-    const teamAction = phase.nightActions[TEAM_BAD_KEY] as TeamNightAction;
-    expect(teamAction.votes).toEqual([
+    const groupAction = phase.nightActions[TEAM_BAD_KEY] as TeamNightAction;
+    expect(groupAction.votes).toEqual([
       { playerId: "w1", targetPlayerId: "p4" },
       { playerId: "w2", targetPlayerId: "p4" },
     ]);
-    expect(teamAction.suggestedTargetId).toBe("p4");
+    expect(groupAction.suggestedTargetId).toBe("p4");
   });
 
   it("blocks voting after team confirmed", () => {
@@ -1097,8 +1097,8 @@ describe("ConfirmNightTarget — team phase", () => {
     action.apply(game, null, "w1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
     const phase = ts.phase as WerewolfNighttimePhase;
-    const teamAction = phase.nightActions[TEAM_BAD_KEY] as TeamNightAction;
-    expect(teamAction.confirmed).toBe(true);
+    const groupAction = phase.nightActions[TEAM_BAD_KEY] as TeamNightAction;
+    expect(groupAction.confirmed).toBe(true);
   });
 });
 

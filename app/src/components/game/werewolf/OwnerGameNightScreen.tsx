@@ -124,7 +124,7 @@ export function OwnerGameNightScreen({
     ? getPlayerName(gameState.players, activeTarget)
     : undefined;
 
-  const teamAction =
+  const groupAction =
     isGroupPhase && activeAction && isTeamNightAction(activeAction)
       ? activeAction
       : undefined;
@@ -149,7 +149,7 @@ export function OwnerGameNightScreen({
     gameState.visibleRoleAssignments,
   );
 
-  const resolvedVotes = (teamAction?.votes ?? []).map((vote) => ({
+  const resolvedVotes = (groupAction?.votes ?? []).map((vote) => ({
     key: vote.playerId,
     voterName: getPlayerName(gameState.players, vote.playerId) ?? vote.playerId,
     targetName:
@@ -205,7 +205,7 @@ export function OwnerGameNightScreen({
             </p>
           ) : (
             <OwnerNightTargetPanel
-              teamAction={!!teamAction}
+              groupAction={!!groupAction}
               resolvedVotes={resolvedVotes}
               activeTargetName={activeTargetName}
               activeTargetConfirmed={activeTargetConfirmed}
