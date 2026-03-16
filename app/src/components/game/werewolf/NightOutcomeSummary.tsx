@@ -4,16 +4,19 @@ import { getPlayerName } from "@/lib/player-utils";
 
 interface NightOutcomeSummaryProps {
   nightResolution: NightResolutionEvent[];
+  silencedPlayerIds?: string[];
   players: { id: string; name: string }[];
   roles: Record<string, { name: string }>;
 }
 
 export function NightOutcomeSummary({
   nightResolution,
+  silencedPlayerIds = [],
   players,
   roles,
 }: NightOutcomeSummaryProps) {
-  if (nightResolution.length === 0) return null;
+  if (nightResolution.length === 0 && silencedPlayerIds.length === 0)
+    return null;
 
   return (
     <div className="mb-4 rounded-md border p-3">
@@ -29,6 +32,14 @@ export function NightOutcomeSummary({
             }
             roles={roles}
           />
+        ))}
+        {silencedPlayerIds.map((id) => (
+          <li key={id}>
+            <strong className="text-foreground">
+              {getPlayerName(players, id) ?? id}
+            </strong>
+            <span className="ml-1 text-yellow-600 font-medium">(silenced)</span>
+          </li>
         ))}
       </ul>
     </div>
