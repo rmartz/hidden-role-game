@@ -3,7 +3,7 @@ import { TargetCategory } from "../types";
 import type { AnyNightAction, TargetablePlayer, TeamNightVote } from "../types";
 import { WEREWOLF_ROLES } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
-import { isGroupPhaseKey } from "./phase-keys";
+import { isGroupPhaseKey, baseGroupPhaseKey } from "./phase-keys";
 
 /**
  * Returns the list of players eligible to be targeted during a night phase.
@@ -75,14 +75,15 @@ export function getGroupPhasePlayerIds(
   phaseKey: string,
   deadPlayerIds: string[],
 ): string[] {
+  const baseKey = baseGroupPhaseKey(phaseKey);
   return roleAssignments
     .filter((a) => {
       if (deadPlayerIds.includes(a.playerId)) return false;
-      if (a.roleDefinitionId === phaseKey) return true;
+      if (a.roleDefinitionId === baseKey) return true;
       const role = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
         a.roleDefinitionId
       ];
-      return (role?.wakesWith as string | undefined) === phaseKey;
+      return (role?.wakesWith as string | undefined) === baseKey;
     })
     .map((a) => a.playerId);
 }
@@ -97,7 +98,7 @@ export function getGroupPhaseMemberIds(
 ): string[] {
   const primaryRole = (
     WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
-  )[phaseKey];
+  )[baseGroupPhaseKey(phaseKey)];
   if (!primaryRole) return [];
   return roleAssignments
     .filter((a) => {

@@ -8,6 +8,8 @@ import {
   currentTurnState,
   validateActiveNightPlayer,
   isGroupPhaseKey,
+  baseGroupPhaseKey,
+  GROUP_PHASE_KEY_SEPARATOR,
   getGroupPhasePlayerIds,
   getGroupPhaseMemberIds,
   computeSuggestedTarget,
@@ -47,7 +49,10 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       if (!ts) return;
       const nextTurn = ts.turn + 1;
       // If a Wolf Cub died last turn, Werewolves get an extra phase this night.
-      const extraGroupPhaseKeys = ts.wolfCubDied ? [WerewolfRole.Werewolf] : [];
+      // Use a suffixed key so the second phase has its own nightActions entry.
+      const wolfCubBonusPhaseKey =
+        WerewolfRole.Werewolf + GROUP_PHASE_KEY_SEPARATOR + "2";
+      const extraGroupPhaseKeys = ts.wolfCubDied ? [wolfCubBonusPhaseKey] : [];
       const nightPhaseOrder = buildNightPhaseOrder(
         nextTurn,
         game.roleAssignments,
@@ -197,6 +202,19 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
       if (targetPlayerId === game.ownerPlayerId) return false;
       if (!game.players.some((p) => p.id === targetPlayerId)) return false;
       if (ts.deadPlayerIds.includes(targetPlayerId)) return false;
+
+      // Suffixed repeat group phases (e.g. Wolf Cub bonus attack) cannot pick the
+      // same target as the base phase confirmed earlier this same night.
+      const baseKey = baseGroupPhaseKey(phaseKey);
+      if (baseKey !== phaseKey) {
+        const priorAction = phase.nightActions[baseKey];
+        if (
+          priorAction &&
+          isTeamNightAction(priorAction) &&
+          priorAction.suggestedTargetId === targetPlayerId
+        )
+          return false;
+      }
 
       // Roles with preventRepeatTarget cannot target the same player twice in a row.
       const phaseRoleDef = (

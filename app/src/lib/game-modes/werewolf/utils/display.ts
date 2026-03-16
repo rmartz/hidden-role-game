@@ -2,7 +2,7 @@ import { TargetCategory } from "../types";
 import type { AnyNightAction } from "../types";
 import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
-import { isGroupPhaseKey } from "./phase-keys";
+import { isGroupPhaseKey, baseGroupPhaseKey } from "./phase-keys";
 import type { PhaseKey } from "./phase-keys";
 import { targetPlayerIdOf } from "./targeting";
 import { getPlayerName } from "@/lib/player-utils";
@@ -50,12 +50,13 @@ export function getPhaseLabel(
   phaseKey: string,
   roles: Record<string, { name: string }>,
 ): string {
-  return roles[phaseKey]?.name ?? phaseKey;
+  return roles[baseGroupPhaseKey(phaseKey)]?.name ?? phaseKey;
 }
 
 /**
  * Returns true if the current night phase is this player's turn.
  * Group phases match if the player is the primary role or has wakesWith pointing to it.
+ * Handles suffixed repeat phase keys (e.g. "werewolf-werewolf:2").
  * Solo phases match by exact role ID.
  */
 export function isPlayersTurn(
@@ -63,14 +64,15 @@ export function isPlayersTurn(
   activePhaseKey?: string,
 ): boolean {
   if (!myRole || !activePhaseKey) return false;
-  if (myRole.id === activePhaseKey) return true;
   if (isGroupPhaseKey(activePhaseKey)) {
+    const baseKey = baseGroupPhaseKey(activePhaseKey);
+    if (myRole.id === baseKey) return true;
     const roleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
       myRole.id
     ];
-    return (roleDef?.wakesWith as string | undefined) === activePhaseKey;
+    return (roleDef?.wakesWith as string | undefined) === baseKey;
   }
-  return false;
+  return myRole.id === activePhaseKey;
 }
 
 /**
