@@ -76,7 +76,9 @@ export function buildNightPhaseOrder(
   }
 
   // Extra group phase keys are inserted before the Witch (e.g. Wolf Cub bonus phases).
+  // Skip any extra phase where all group participants are dead.
   for (const key of extraGroupPhaseKeys) {
+    if (!hasAliveGroupParticipants(key, roleAssignments, dead)) continue;
     phaseKeys.push(key);
   }
 

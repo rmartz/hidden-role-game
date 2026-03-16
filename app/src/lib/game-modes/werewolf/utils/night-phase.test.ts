@@ -90,4 +90,29 @@ describe("buildNightPhaseOrder", () => {
     const lastIdx = order.lastIndexOf(WerewolfRole.Werewolf);
     expect(firstIdx).not.toBe(lastIdx); // appears twice
   });
+
+  it("skips extraGroupPhaseKey when all group participants are dead", () => {
+    // Simulates the Wolf Cub bonus phase when all werewolves are dead.
+    const BONUS_PHASE_KEY = `${WerewolfRole.Werewolf}:2`;
+    const order = buildNightPhaseOrder(
+      2,
+      assignments,
+      ["p1"], // p1 is the only Werewolf — now dead
+      [BONUS_PHASE_KEY],
+    );
+    expect(order).not.toContain(WerewolfRole.Werewolf); // base phase also skipped
+    expect(order).not.toContain(BONUS_PHASE_KEY); // bonus phase skipped too
+    expect(order).toContain(WerewolfRole.Seer);
+  });
+
+  it("keeps extraGroupPhaseKey when at least one group participant is alive", () => {
+    const BONUS_PHASE_KEY = `${WerewolfRole.Werewolf}:2`;
+    const multiWolf = [
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "w2", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "p2", roleDefinitionId: WerewolfRole.Seer },
+    ];
+    const order = buildNightPhaseOrder(2, multiWolf, ["w1"], [BONUS_PHASE_KEY]);
+    expect(order).toContain(BONUS_PHASE_KEY); // w2 is still alive
+  });
 });
