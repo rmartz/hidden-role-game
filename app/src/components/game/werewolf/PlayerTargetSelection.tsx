@@ -104,12 +104,10 @@ export function PlayerTargetSelection({
             onClick={() => {
               action.mutate({
                 actionId: WerewolfAction.SetNightTarget,
-                payload: {
-                  targetPlayerId: isSelected ? undefined : player.id,
-                },
+                payload: { targetPlayerId: player.id },
               });
             }}
-            disabled={action.isPending || isConfirmed}
+            disabled={action.isPending || isConfirmed || isSelected}
             className="justify-start"
           >
             {player.name}
