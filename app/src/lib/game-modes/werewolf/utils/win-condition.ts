@@ -7,11 +7,16 @@ import { WerewolfRole, WEREWOLF_ROLES } from "../roles";
  * Returns a Finished status with the winner if a win condition is met,
  * or undefined if the game should continue.
  *
- * Priority (when badAlive === 0):
- * 1. Chupacabra wins: no Bad players alive, Chupacabra alive, ≤1 Good player alive
- * 2. Village wins: no Bad players alive AND no Neutral players alive
- *    (Chupacabra still alive → game continues until Chupacabra wins or is eliminated)
- * 3. Werewolves win: Bad team count ≥ non-Bad count
+ * When badAlive === 0:
+ * 1. Chupacabra wins: Chupacabra alive, ≤1 Good player alive
+ * 2. Draw: no Bad, no Neutral, no Good players alive (everyone eliminated simultaneously)
+ * 3. Village wins: no Bad and no Neutral players remain
+ *    (Chupacabra still alive with >1 Good → game continues)
+ *
+ * When badAlive > 0:
+ * 4. Game continues if Chupacabra is the only remaining opposition (goodAlive === 0):
+ *    their win conditions conflict and will resolve through night kills
+ * 5. Werewolves win: Bad team count ≥ non-Bad count (Good + Chupacabra)
  */
 export function checkWinCondition(
   game: Game,
@@ -43,15 +48,25 @@ export function checkWinCondition(
   }
 
   if (badAlive === 0) {
-    // Chupacabra wins if it's alive and only ≤1 Good player remains
-    if (chupacabraAlive && goodAlive <= 1) {
-      return { type: GameStatus.Finished, winner: WerewolfWinner.Chupacabra };
+    if (chupacabraAlive) {
+      // Chupacabra wins if it's alive and only ≤1 Good player remains
+      if (goodAlive <= 1) {
+        return { type: GameStatus.Finished, winner: WerewolfWinner.Chupacabra };
+      }
+      // Chupacabra alive with >1 Good player remaining — game continues
+      return undefined;
     }
-    // Village wins only when no Bad and no Neutral players remain
-    if (!chupacabraAlive) {
-      return { type: GameStatus.Finished, winner: WerewolfWinner.Village };
+    // No Bad, no Neutral — draw if no Good remain either (simultaneous eliminations)
+    if (goodAlive === 0) {
+      return { type: GameStatus.Finished, winner: WerewolfWinner.Draw };
     }
-    // Chupacabra alive with >1 Good player remaining — game continues
+    // Village wins: no Bad and no Neutral remain
+    return { type: GameStatus.Finished, winner: WerewolfWinner.Village };
+  }
+
+  // Bad players still alive but only Chupacabra remains as opposition:
+  // their win conditions conflict and will resolve through night kills — game continues
+  if (chupacabraAlive && goodAlive === 0) {
     return undefined;
   }
 
@@ -69,6 +84,7 @@ export const WerewolfWinner = {
   Werewolves: "Werewolves",
   Village: "Village",
   Chupacabra: "Chupacabra",
+  Draw: "Draw",
 } as const;
 export type WerewolfWinner =
   (typeof WerewolfWinner)[keyof typeof WerewolfWinner];

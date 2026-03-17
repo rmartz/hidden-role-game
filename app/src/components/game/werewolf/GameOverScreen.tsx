@@ -45,17 +45,22 @@ export function GameOverScreen({ gameState }: GameOverScreenProps) {
   const { winner } = finishedStatus;
   const victory = isVictory(winner, gameState.myRole);
 
+  const isDraw = winner === WerewolfWinner.Draw;
   const heading =
     gameState.myRole === undefined
       ? winner
-        ? WEREWOLF_COPY.gameOver.winnerLabel(winner)
+        ? isDraw
+          ? WEREWOLF_COPY.gameOver.draw
+          : WEREWOLF_COPY.gameOver.winnerLabel(winner)
         : WEREWOLF_COPY.gameOver.defeat
-      : victory
-        ? WEREWOLF_COPY.gameOver.victory
-        : WEREWOLF_COPY.gameOver.defeat;
+      : isDraw
+        ? WEREWOLF_COPY.gameOver.draw
+        : victory
+          ? WEREWOLF_COPY.gameOver.victory
+          : WEREWOLF_COPY.gameOver.defeat;
 
   const subheading =
-    winner && gameState.myRole !== undefined
+    winner && !isDraw && gameState.myRole !== undefined
       ? WEREWOLF_COPY.gameOver.winnerLabel(winner)
       : undefined;
 

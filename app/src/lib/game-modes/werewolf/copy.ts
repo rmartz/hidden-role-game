@@ -85,6 +85,7 @@ export const WEREWOLF_COPY = {
   gameOver: {
     victory: "Victory!",
     defeat: "Game Over",
+    draw: "Draw",
     winnerLabel: (winner: string) => `${winner} Won`,
     endGame: "End Game",
     rolesRevealHeading: "Final Roles",
