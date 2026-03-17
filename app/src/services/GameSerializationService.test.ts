@@ -430,18 +430,14 @@ describe("GameSerializationService.extractPlayerNightState (suffixed group phase
 });
 
 // ---------------------------------------------------------------------------
-// serializePlayerState — mustVoteGuilty (Village Idiot)
+// extractDaytimeNightState — mustVoteGuilty (Village Idiot)
 // ---------------------------------------------------------------------------
 
-function makeDaytimeGameWithTrial(options: {
-  callerRoleId: WerewolfRole;
-  verdict?: "eliminated" | "innocent";
-}): Game {
+function makeDaytimeGameWithTrial(callerRoleId: WerewolfRole): Game {
   const activeTrial = {
     defendantId: "p1",
     startedAt: 2000,
     votes: [] as { playerId: string; vote: "guilty" | "innocent" }[],
-    ...(options.verdict ? { verdict: options.verdict } : {}),
   };
   const turnState: WerewolfTurnState = {
     turn: 1,
@@ -465,7 +461,7 @@ function makeDaytimeGameWithTrial(options: {
     ],
     roleAssignments: [
       { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
-      { playerId: "p2", roleDefinitionId: options.callerRoleId },
+      { playerId: "p2", roleDefinitionId: callerRoleId },
       { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
     ],
     configuredRoleSlots: [],
@@ -478,15 +474,13 @@ describe("GameSerializationService.extractDaytimeNightState — mustVoteGuilty",
   const service = new GameSerializationService();
 
   it("sets mustVoteGuilty for a Village Idiot caller during an active trial", () => {
-    const game = makeDaytimeGameWithTrial({
-      callerRoleId: WerewolfRole.VillageIdiot,
-    });
+    const game = makeDaytimeGameWithTrial(WerewolfRole.VillageIdiot);
     const result = service.extractDaytimeNightState(game, "p2");
     expect(result.activeTrial?.mustVoteGuilty).toBe(true);
   });
 
   it("does not set mustVoteGuilty for a non-Village-Idiot caller", () => {
-    const game = makeDaytimeGameWithTrial({ callerRoleId: WerewolfRole.Seer });
+    const game = makeDaytimeGameWithTrial(WerewolfRole.Seer);
     const result = service.extractDaytimeNightState(game, "p2");
     expect(result.activeTrial?.mustVoteGuilty).toBeUndefined();
   });

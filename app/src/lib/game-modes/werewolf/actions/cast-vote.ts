@@ -2,7 +2,7 @@ import type { Game, GameAction } from "@/lib/types";
 import type { DaytimeVote } from "../types";
 import { WerewolfPhase } from "../types";
 import { currentTurnState } from "../utils";
-import { WerewolfRole, WEREWOLF_ROLES } from "../roles";
+import { WEREWOLF_ROLES, isWerewolfRole } from "../roles";
 import { applyTrialVerdict } from "./resolve-trial";
 
 const VALID_VOTES: DaytimeVote[] = ["guilty", "innocent"];
@@ -30,7 +30,8 @@ export const castVoteAction: GameAction = {
     )?.roleDefinitionId;
     if (
       callerRoleId !== undefined &&
-      WEREWOLF_ROLES[callerRoleId as WerewolfRole].alwaysVotesGuilty &&
+      isWerewolfRole(callerRoleId) &&
+      WEREWOLF_ROLES[callerRoleId].alwaysVotesGuilty &&
       vote !== "guilty"
     )
       return false;

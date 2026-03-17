@@ -1,7 +1,7 @@
 import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase } from "../types";
 import { currentTurnState, isOwnerPlaying } from "../utils";
-import { WerewolfRole, WEREWOLF_ROLES } from "../roles";
+import { WEREWOLF_ROLES, isWerewolfRole } from "../roles";
 import { applyTrialVerdict } from "./resolve-trial";
 
 export const startTrialAction: GameAction = {
@@ -22,8 +22,8 @@ export const startTrialAction: GameAction = {
     if (ts?.phase.type !== WerewolfPhase.Daytime) return;
     const { defendantId } = payload as { defendantId: string };
 
-    // Pre-populate guilty votes for Village Idiots (they must always vote guilty)
-    const villageIdiotVotes = game.players
+    // Pre-populate guilty votes for roles that must always vote guilty
+    const precastGuiltyVotes = game.players
       .filter((p) => {
         if (p.id === game.ownerPlayerId) return false;
         if (p.id === defendantId) return false;
@@ -33,7 +33,8 @@ export const startTrialAction: GameAction = {
         )?.roleDefinitionId;
         return (
           roleId !== undefined &&
-          WEREWOLF_ROLES[roleId as WerewolfRole].alwaysVotesGuilty === true
+          isWerewolfRole(roleId) &&
+          WEREWOLF_ROLES[roleId].alwaysVotesGuilty === true
         );
       })
       .map((p) => ({ playerId: p.id, vote: "guilty" as const }));
@@ -41,11 +42,11 @@ export const startTrialAction: GameAction = {
     const activeTrial = {
       defendantId,
       startedAt: Date.now(),
-      votes: villageIdiotVotes,
+      votes: precastGuiltyVotes,
     };
     ts.phase.activeTrial = activeTrial;
 
-    // Auto-resolve if Village Idiots account for all eligible votes
+    // Auto-resolve if precast votes account for all eligible votes
     const eligibleCount = game.players.filter(
       (p) =>
         p.id !== game.ownerPlayerId &&

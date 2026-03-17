@@ -128,3 +128,8 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     preventRepeatTarget: true,
   },
 };
+
+/** Returns true if the given string is a known WerewolfRole. */
+export function isWerewolfRole(id: string): id is WerewolfRole {
+  return id in WEREWOLF_ROLES;
+}
