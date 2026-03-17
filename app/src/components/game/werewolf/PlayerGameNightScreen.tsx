@@ -35,46 +35,13 @@ export function PlayerGameNightScreen({
     [phase.startedAt],
   );
 
-  if (gameState.amDead) {
-    return (
-      <div className="p-5">
-        <h1 className="text-2xl font-bold mb-2 text-muted-foreground">
-          {WEREWOLF_COPY.night.youAreEliminated}
-        </h1>
-        <p className="text-muted-foreground">
-          {WEREWOLF_COPY.night.eliminatedSubtext}
-        </p>
-      </div>
-    );
-  }
-
   const activePhaseKey = phase.nightPhaseOrder[phase.currentPhaseIndex];
   const isMyTurn = isPlayersTurn(gameState.myRole, activePhaseKey);
-
-  if (!isMyTurn) {
-    return (
-      <div className="p-5">
-        <p className="text-muted-foreground italic">
-          {WEREWOLF_COPY.night.stopPeeking}
-        </p>
-      </div>
-    );
-  }
-
   const isFirstTurn = turn === 1;
   const isGroupPhase = !!(activePhaseKey && isGroupPhaseKey(activePhaseKey));
   const teammateNames = gameState.visibleRoleAssignments.map(
     (a) => a.player.name,
   );
-
-  if (isFirstTurn) {
-    return (
-      <PlayerFirstTurnScreen
-        roleName={gameState.myRole?.name}
-        teammateNames={teammateNames}
-      />
-    );
-  }
 
   const isConfirmed = gameState.myNightTargetConfirmed ?? false;
   const hasVisibleTeammates =
@@ -113,7 +80,27 @@ export function PlayerGameNightScreen({
     .filter((e) => e.effect === "attacked")
     .map((e) => e.targetPlayerId);
 
-  return (
+  const content = gameState.amDead ? (
+    <div className="p-5">
+      <h1 className="text-2xl font-bold mb-2 text-muted-foreground">
+        {WEREWOLF_COPY.night.youAreEliminated}
+      </h1>
+      <p className="text-muted-foreground">
+        {WEREWOLF_COPY.night.eliminatedSubtext}
+      </p>
+    </div>
+  ) : !isMyTurn ? (
+    <div className="p-5">
+      <p className="text-muted-foreground italic">
+        {WEREWOLF_COPY.night.stopPeeking}
+      </p>
+    </div>
+  ) : isFirstTurn ? (
+    <PlayerFirstTurnScreen
+      roleName={gameState.myRole?.name}
+      teammateNames={teammateNames}
+    />
+  ) : (
     <div className="p-5">
       <div className="max-w-sm mx-auto">
         <h1 className="text-2xl font-bold mb-2">
@@ -158,4 +145,6 @@ export function PlayerGameNightScreen({
       </div>
     </div>
   );
+
+  return content;
 }

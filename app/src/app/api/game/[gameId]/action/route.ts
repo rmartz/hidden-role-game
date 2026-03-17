@@ -25,7 +25,7 @@ export async function POST(
     gameId,
     body.actionId,
     caller.id,
-    body.payload ?? null,
+    body.payload,
   );
 
   if ("error" in result) {

@@ -36,41 +36,11 @@ export function TrialVotePanel({
   );
 
   const { trial } = WEREWOLF_COPY;
-
-  if (activeTrial.verdict) {
-    const verdictLabel =
-      activeTrial.verdict === "eliminated"
-        ? trial.verdictLabelEliminated
-        : trial.verdictLabelInnocent;
-    return (
-      <Card className="p-4 mb-4">
-        <p className="font-semibold mb-2">
-          <span className="font-bold">
-            {trial.verdictHeading(defendantName, verdictLabel)}
-          </span>
-        </p>
-        {activeTrial.voteResults && activeTrial.voteResults.length > 0 && (
-          <ul className="text-sm text-muted-foreground mb-3 space-y-0.5">
-            {activeTrial.voteResults.map((r) => (
-              <li key={r.playerName}>
-                {r.playerName}: {r.vote}
-              </li>
-            ))}
-          </ul>
-        )}
-        {activeTrial.verdict === "eliminated" && activeTrial.eliminatedRole && (
-          <p className="text-sm text-muted-foreground">
-            {trial.eliminatedWereRole(defendantName)}{" "}
-            <span className="font-medium">
-              {activeTrial.eliminatedRole.name}
-            </span>
-            {trial.eliminatedRoleSuffix}
-          </p>
-        )}
-      </Card>
-    );
-  }
-
+  const verdictLabel = activeTrial.verdict
+    ? activeTrial.verdict === "eliminated"
+      ? trial.verdictLabelEliminated
+      : trial.verdictLabelInnocent
+    : undefined;
   const isDefendant = myPlayerId === activeTrial.defendantId;
   const hasVoted = !!activeTrial.myVote;
   const trialStartedAt = new Date(activeTrial.startedAt);
@@ -82,20 +52,40 @@ export function TrialVotePanel({
     />
   );
 
-  if (isDefendant) {
-    return (
-      <Card className="p-4 mb-4">
-        <p className="font-semibold mb-1">{trial.youAreOnTrial}</p>
-        <p className="text-sm text-muted-foreground mb-2">
-          {trial.youAreOnTrialSubtext}
+  const cardContent = verdictLabel ? (
+    <>
+      <p className="font-semibold mb-2">
+        <span className="font-bold">
+          {trial.verdictHeading(defendantName, verdictLabel)}
+        </span>
+      </p>
+      {activeTrial.voteResults && activeTrial.voteResults.length > 0 && (
+        <ul className="text-sm text-muted-foreground mb-3 space-y-0.5">
+          {activeTrial.voteResults.map((r) => (
+            <li key={r.playerName}>
+              {r.playerName}: {r.vote}
+            </li>
+          ))}
+        </ul>
+      )}
+      {activeTrial.verdict === "eliminated" && activeTrial.eliminatedRole && (
+        <p className="text-sm text-muted-foreground">
+          {trial.eliminatedWereRole(defendantName)}{" "}
+          <span className="font-medium">{activeTrial.eliminatedRole.name}</span>
+          {trial.eliminatedRoleSuffix}
         </p>
-        {timer}
-      </Card>
-    );
-  }
-
-  return (
-    <Card className="p-4 mb-4">
+      )}
+    </>
+  ) : isDefendant ? (
+    <>
+      <p className="font-semibold mb-1">{trial.youAreOnTrial}</p>
+      <p className="text-sm text-muted-foreground mb-2">
+        {trial.youAreOnTrialSubtext}
+      </p>
+      {timer}
+    </>
+  ) : (
+    <>
       <p className="font-semibold mb-1">{trial.voteHeading(defendantName)}</p>
       {timer}
       <p className="text-sm text-muted-foreground mb-3 mt-2">
@@ -128,6 +118,8 @@ export function TrialVotePanel({
           </Button>
         </div>
       )}
-    </Card>
+    </>
   );
+
+  return <Card className="p-4 mb-4">{cardContent}</Card>;
 }
