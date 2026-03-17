@@ -86,10 +86,11 @@ export default function LobbyConflictPage() {
     router,
   ]);
 
-  const joinMutation = useLeaveAndJoinLobby(() => {
+  function onJoinSuccess() {
     if (validatedGameMode)
       router.replace(`/${validatedGameMode}/lobby/${lobbyId}`);
-  });
+  }
+  const joinMutation = useLeaveAndJoinLobby(onJoinSuccess);
 
   function handleJoin() {
     if (!storedLobbyId || !myPlayerId) return;
@@ -98,28 +99,25 @@ export default function LobbyConflictPage() {
 
   if (!validatedGameMode) return null;
 
-  if (
+  const content =
     targetLobbyQuery.isLoading ||
     conflictLobbyQuery.isLoading ||
     !conflictLobbyQuery.data ||
-    !storedLobbyId
-  ) {
-    return (
+    !storedLobbyId ? (
       <p className="p-5 text-muted-foreground">{LOBBY_PAGE_COPY.loading}</p>
+    ) : (
+      <div className="p-5">
+        <h1 className="text-2xl font-bold mb-4">{LOBBY_PAGE_COPY.title}</h1>
+        <LobbyConflictResolution
+          conflictLobby={conflictLobbyQuery.data}
+          conflictLobbyId={storedLobbyId}
+          playerName={playerName}
+          onPlayerNameChange={setPlayerName}
+          isJoining={joinMutation.isPending}
+          onJoin={handleJoin}
+        />
+      </div>
     );
-  }
 
-  return (
-    <div className="p-5">
-      <h1 className="text-2xl font-bold mb-4">{LOBBY_PAGE_COPY.title}</h1>
-      <LobbyConflictResolution
-        conflictLobby={conflictLobbyQuery.data}
-        conflictLobbyId={storedLobbyId}
-        playerName={playerName}
-        onPlayerNameChange={setPlayerName}
-        isJoining={joinMutation.isPending}
-        onJoin={handleJoin}
-      />
-    </div>
-  );
+  return content;
 }

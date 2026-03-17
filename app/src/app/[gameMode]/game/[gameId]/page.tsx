@@ -3,30 +3,13 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { GameMode, GameStatus } from "@/lib/types";
-import type { PlayerGameState } from "@/server/types";
 import { useGameStateQuery, GameModeContext } from "@/hooks";
 import { WerewolfGameScreen } from "@/components/game";
 import { parseGameMode } from "@/lib/game-modes";
 import { GAME_PAGE_COPY } from "../copy";
+import { UnsupportedGameMode } from "../UnsupportedGameMode";
 
 const POLL_INTERVAL_MS = 2000;
-
-function getGameScreen(
-  gameMode: GameMode,
-  gameId: string,
-  gameState: PlayerGameState,
-): React.ReactNode {
-  switch (gameMode) {
-    case GameMode.Werewolf:
-      return <WerewolfGameScreen gameId={gameId} gameState={gameState} />;
-    default:
-      return (
-        <p className="p-5 text-destructive">
-          {GAME_PAGE_COPY.unsupportedGameMode}
-        </p>
-      );
-  }
-}
 
 export default function GameModePage() {
   const { gameId, gameMode: gameModeParam } = useParams<{
@@ -80,9 +63,18 @@ export default function GameModePage() {
 
   if (!validatedGameMode) return null;
 
-  const gameScreen = gameState
-    ? getGameScreen(validatedGameMode, gameId, gameState)
-    : null;
+  let gameScreen = null;
+  if (gameState) {
+    switch (validatedGameMode) {
+      case GameMode.Werewolf:
+        gameScreen = (
+          <WerewolfGameScreen gameId={gameId} gameState={gameState} />
+        );
+        break;
+      default:
+        gameScreen = <UnsupportedGameMode />;
+    }
+  }
 
   const loadingMessage = isLoading ? (
     <p className="text-muted-foreground">{GAME_PAGE_COPY.loading}</p>
