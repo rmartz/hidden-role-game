@@ -16,10 +16,11 @@ describe("isRoleActive", () => {
       expect(isRoleActive("unknown-role", WerewolfRole.Witch)).toBe(false);
     });
 
-    it("works for player role IDs as well as phase keys", () => {
-      // myRole.id is a player's assigned role, not a phase key — still valid
+    it("accepts the raw string value of a role (e.g. a player role ID from the database)", () => {
+      // myRole.id comes back as a plain string from Firebase — not the TS enum
+      // member — so the function must handle raw string values correctly
       expect(
-        isRoleActive(WerewolfRole.Spellcaster, WerewolfRole.Spellcaster),
+        isRoleActive("werewolf-spellcaster", WerewolfRole.Spellcaster),
       ).toBe(true);
     });
   });
