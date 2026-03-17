@@ -1,15 +1,11 @@
 import type { Lobby, Game, GamePlayer } from "@/lib/types";
-import { GameMode } from "@/lib/types";
 import { ServerResponseStatus } from "@/server/types";
 import { lobbyService } from "@/services/LobbyService";
 import { gameService } from "@/services/GameService";
 import { isValidSession } from "./lobby-helpers";
+import { parseGameMode } from "@/lib/game-modes";
 
-export function parseGameMode(value: string): GameMode | undefined {
-  return (Object.values(GameMode) as string[]).includes(value)
-    ? (value as GameMode)
-    : undefined;
-}
+export { parseGameMode };
 
 export function errorResponse(error: string, status: number): Response {
   return Response.json(

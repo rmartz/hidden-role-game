@@ -43,6 +43,16 @@ describe("POST /api/lobby/create", () => {
     expect(res.status).toBe(200);
   });
 
+  it("should return 400 for an invalid game mode", async () => {
+    const res = await createLobby(
+      postRequest("http://localhost/api/lobby/create", {
+        playerName: "Alice",
+        gameMode: "not-a-real-mode",
+      }),
+    );
+    expect(res.status).toBe(400);
+  });
+
   it("should create a lobby with a player name and return sessionId", async () => {
     const res = await createLobby(
       postRequest("http://localhost/api/lobby/create", { playerName: "Alice" }),

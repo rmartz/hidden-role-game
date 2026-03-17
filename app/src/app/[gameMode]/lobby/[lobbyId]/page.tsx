@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { GameMode } from "@/lib/types";
 import { getPlayerId, getLobbyId, getSessionId } from "@/lib/api";
+import { parseGameMode } from "@/lib/game-modes";
 import {
   useLobbyQuery,
   useLobbyWebSocket,
@@ -29,11 +29,7 @@ export default function LobbyPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const validatedGameMode = (Object.values(GameMode) as string[]).includes(
-    gameModeParam,
-  )
-    ? (gameModeParam as GameMode)
-    : undefined;
+  const validatedGameMode = parseGameMode(gameModeParam);
 
   // undefined = not yet read from localStorage (avoid SSR mismatch)
   const [storedLobbyId, setStoredLobbyId] = useState<string | undefined>(

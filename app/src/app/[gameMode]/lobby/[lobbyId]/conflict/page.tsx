@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getPlayerId, getLobbyId } from "@/lib/api";
 import { getPlayerName } from "@/lib/player-utils";
+import { parseGameMode } from "@/lib/game-modes";
 import {
   useLeaveAndJoinLobby,
   useStoredLobbyQuery,
@@ -13,11 +14,13 @@ import { LobbyConflictResolution } from "@/components/lobby";
 import { LOBBY_PAGE_COPY } from "../../copy";
 
 export default function LobbyConflictPage() {
-  const { lobbyId, gameMode } = useParams<{
+  const { lobbyId, gameMode: gameModeParam } = useParams<{
     lobbyId: string;
     gameMode: string;
   }>();
   const router = useRouter();
+
+  const validatedGameMode = parseGameMode(gameModeParam);
 
   const storedLobbyId = getLobbyId();
   const myPlayerId = getPlayerId();
@@ -30,6 +33,10 @@ export default function LobbyConflictPage() {
   const [playerName, setPlayerName] = useState("");
 
   useEffect(() => {
+    if (!validatedGameMode) router.push("/");
+  }, [validatedGameMode, router]);
+
+  useEffect(() => {
     if (defaultName && !playerName) {
       setPlayerName(defaultName);
     }
@@ -38,9 +45,12 @@ export default function LobbyConflictPage() {
   // If the target lobby doesn't exist, redirect to the stored lobby (or home if none).
   useEffect(() => {
     if (!targetLobbyQuery.isLoading && targetLobbyQuery.data === false) {
-      const fallback = storedLobbyId
-        ? `/${conflictLobbyQuery.data?.config.gameMode ?? gameMode}/lobby/${storedLobbyId}`
-        : "/";
+      const resolvedGameMode =
+        conflictLobbyQuery.data?.config.gameMode ?? validatedGameMode;
+      const fallback =
+        storedLobbyId && resolvedGameMode
+          ? `/${resolvedGameMode}/lobby/${storedLobbyId}`
+          : "/";
       router.replace(fallback);
     }
   }, [
@@ -48,38 +58,45 @@ export default function LobbyConflictPage() {
     targetLobbyQuery.data,
     storedLobbyId,
     conflictLobbyQuery.data,
-    gameMode,
+    validatedGameMode,
     router,
   ]);
 
   // If there's no stored lobby ID, there's nothing to conflict with — go back to the lobby.
   useEffect(() => {
-    if (!storedLobbyId) {
-      router.replace(`/${gameMode}/lobby/${lobbyId}`);
+    if (!storedLobbyId && validatedGameMode) {
+      router.replace(`/${validatedGameMode}/lobby/${lobbyId}`);
     }
-  }, [storedLobbyId, lobbyId, gameMode, router]);
+  }, [storedLobbyId, lobbyId, validatedGameMode, router]);
 
   // If the stored lobby no longer exists (cleared in queryFn on 404/403), go back to the lobby.
   useEffect(() => {
-    if (!conflictLobbyQuery.isLoading && conflictLobbyQuery.data === null) {
-      router.replace(`/${gameMode}/lobby/${lobbyId}`);
+    if (
+      !conflictLobbyQuery.isLoading &&
+      conflictLobbyQuery.data === null &&
+      validatedGameMode
+    ) {
+      router.replace(`/${validatedGameMode}/lobby/${lobbyId}`);
     }
   }, [
     conflictLobbyQuery.isLoading,
     conflictLobbyQuery.data,
     lobbyId,
-    gameMode,
+    validatedGameMode,
     router,
   ]);
 
   const joinMutation = useLeaveAndJoinLobby(() => {
-    router.replace(`/${gameMode}/lobby/${lobbyId}`);
+    if (validatedGameMode)
+      router.replace(`/${validatedGameMode}/lobby/${lobbyId}`);
   });
 
   function handleJoin() {
     if (!storedLobbyId || !myPlayerId) return;
     joinMutation.mutate({ storedLobbyId, myPlayerId, lobbyId, playerName });
   }
+
+  if (!validatedGameMode) return null;
 
   if (
     targetLobbyQuery.isLoading ||

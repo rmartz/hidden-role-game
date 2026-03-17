@@ -6,6 +6,7 @@ import { GameMode, GameStatus } from "@/lib/types";
 import type { PlayerGameState } from "@/server/types";
 import { useGameStateQuery, GameModeContext } from "@/hooks";
 import { WerewolfGameScreen } from "@/components/game";
+import { parseGameMode } from "@/lib/game-modes";
 import { GAME_PAGE_COPY } from "../copy";
 
 const POLL_INTERVAL_MS = 2000;
@@ -19,7 +20,11 @@ function getGameScreen(
     case GameMode.Werewolf:
       return <WerewolfGameScreen gameId={gameId} gameState={gameState} />;
     default:
-      throw new Error(`Unhandled game mode: ${gameMode}`);
+      return (
+        <p className="p-5 text-destructive">
+          {GAME_PAGE_COPY.unsupportedGameMode}
+        </p>
+      );
   }
 }
 
@@ -34,11 +39,7 @@ export default function GameModePage() {
     POLL_INTERVAL_MS,
   );
 
-  const validatedGameMode = (Object.values(GameMode) as string[]).includes(
-    gameModeParam,
-  )
-    ? (gameModeParam as GameMode)
-    : undefined;
+  const validatedGameMode = parseGameMode(gameModeParam);
 
   const {
     data: gameState,

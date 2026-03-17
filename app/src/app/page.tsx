@@ -7,6 +7,7 @@ import { GAME_MODES } from "@/lib/game-modes";
 import { getLobbyId, getPlayerId } from "@/lib/api";
 import { getPlayerName } from "@/lib/player-utils";
 import { useCreateLobby, useJoinLobby, useStoredLobbyQuery } from "@/hooks";
+import { HOME_PAGE_COPY } from "./copy";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -65,7 +66,7 @@ export default function Home() {
       <CardContent className="pt-6 space-y-3">
         {activeLobby.gameId ? (
           <>
-            <p>You have an active game in progress.</p>
+            <p>{HOME_PAGE_COPY.activeGame}</p>
             <Button
               onClick={() => {
                 const { gameId } = activeLobby;
@@ -73,12 +74,12 @@ export default function Home() {
                   router.push(`/${activeLobby.config.gameMode}/game/${gameId}`);
               }}
             >
-              Rejoin Game
+              {HOME_PAGE_COPY.rejoinGame}
             </Button>
           </>
         ) : (
           <>
-            <p>You are already in lobby: {storedLobbyId}</p>
+            <p>{HOME_PAGE_COPY.activeLobby(storedLobbyId ?? "")}</p>
             <Button
               onClick={() => {
                 if (storedLobbyId)
@@ -87,7 +88,7 @@ export default function Home() {
                   );
               }}
             >
-              Rejoin Lobby
+              {HOME_PAGE_COPY.rejoinLobby}
             </Button>
           </>
         )}
@@ -97,15 +98,20 @@ export default function Home() {
 
   return (
     <div className="p-5">
-      <h1 className="text-2xl font-bold mb-4">Hidden Role Game</h1>
+      <h1 className="text-2xl font-bold mb-4">{HOME_PAGE_COPY.title}</h1>
 
       {activeLobbyPanel}
 
-      {error && <p className="text-destructive text-sm mb-3">Error: {error}</p>}
+      {error && (
+        <p className="text-destructive text-sm mb-3">
+          {HOME_PAGE_COPY.errorPrefix}
+          {error}
+        </p>
+      )}
 
       <div className="space-y-3 mb-4">
         <div className="space-y-1">
-          <Label htmlFor="player-name">Your name</Label>
+          <Label htmlFor="player-name">{HOME_PAGE_COPY.playerNameLabel}</Label>
           <Input
             id="player-name"
             type="text"
@@ -113,12 +119,12 @@ export default function Home() {
             onChange={(e) => {
               setPlayerName(e.target.value);
             }}
-            placeholder="Enter your name"
+            placeholder={HOME_PAGE_COPY.playerNamePlaceholder}
             className="max-w-xs"
           />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="lobby-id">Lobby ID</Label>
+          <Label htmlFor="lobby-id">{HOME_PAGE_COPY.lobbyIdLabel}</Label>
           <Input
             id="lobby-id"
             type="text"
@@ -126,12 +132,12 @@ export default function Home() {
             onChange={(e) => {
               setLobbyIdInput(e.target.value);
             }}
-            placeholder="Leave blank to create a new lobby"
+            placeholder={HOME_PAGE_COPY.lobbyIdPlaceholder}
             className="max-w-xs"
           />
         </div>
         <div className="space-y-1">
-          <Label htmlFor="game-mode">Game</Label>
+          <Label htmlFor="game-mode">{HOME_PAGE_COPY.gameModeLabel}</Label>
           <Select
             value={selectedGameMode}
             onValueChange={(v) => {
@@ -160,7 +166,9 @@ export default function Home() {
           }}
           disabled={loading || playerName.trim() === ""}
         >
-          {createMutation.isPending ? "Creating..." : "Create Lobby"}
+          {createMutation.isPending
+            ? HOME_PAGE_COPY.creating
+            : HOME_PAGE_COPY.createLobby}
         </Button>
         <Button
           variant="outline"
@@ -171,7 +179,9 @@ export default function Home() {
             loading || playerName.trim() === "" || lobbyIdInput.trim() === ""
           }
         >
-          {joinMutation.isPending ? "Joining..." : "Join Lobby"}
+          {joinMutation.isPending
+            ? HOME_PAGE_COPY.joining
+            : HOME_PAGE_COPY.joinLobby}
         </Button>
       </div>
     </div>
