@@ -1,7 +1,7 @@
 import type { Game, GameAction } from "@/lib/types";
 import type { DaytimeVote } from "../types";
 import { WerewolfPhase } from "../types";
-import { currentTurnState } from "../utils";
+import { currentTurnState, checkWinCondition } from "../utils";
 import { WEREWOLF_ROLES, isWerewolfRole } from "../roles";
 import { applyTrialVerdict } from "./resolve-trial";
 
@@ -54,6 +54,10 @@ export const castVoteAction: GameAction = {
     ).length;
     if (activeTrial.votes.length >= eligibleCount) {
       applyTrialVerdict(activeTrial, ts, game);
+      const winResult = checkWinCondition(game, ts.deadPlayerIds);
+      if (winResult) {
+        game.status = winResult;
+      }
     }
   },
 };
