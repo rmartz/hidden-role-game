@@ -10,13 +10,13 @@ export const WEREWOLF_COPY = {
       "Stop peeking, you dirty cheater.",
       "If you can read this your eyes are open.",
       "Ask your narrator if 'your eyes are open' is right for you.",
-      "Eyes closed means you can't read this. Hmm.",
+      '"Good at following instructions", huh?',
     ],
     eliminatedNight: [
       "Respectful spookiness ensues.",
       "It's 10pm, do you know where your kids are?",
       "Please haunt responsibly.",
-      "Please keep your haunting to the designated haunting areas.",
+      "First time?",
     ],
     currentlyAwake: (label: string, players: string) =>
       players
