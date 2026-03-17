@@ -111,15 +111,18 @@ describe("StartNight — Wolf Cub bonus phase lifecycle", () => {
           deadPlayerIds: [],
         } satisfies WerewolfTurnState,
       },
+      // Extra Villager keeps game alive after wolf cub is eliminated
       players: [
         { id: "w1", name: "Wolf1", sessionId: "sw1", visibleRoles: [] },
         { id: "c1", name: "Cub", sessionId: "sc1", visibleRoles: [] },
         { id: "p3", name: "Seer", sessionId: "s3", visibleRoles: [] },
+        { id: "p4", name: "Villager", sessionId: "s4", visibleRoles: [] },
       ],
       roleAssignments: [
         { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
         { playerId: "c1", roleDefinitionId: WerewolfRole.WolfCub },
         { playerId: "p3", roleDefinitionId: WerewolfRole.Seer },
+        { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
       ],
       configuredRoleSlots: [],
       showRolesInPlay: ShowRolesInPlay.None,

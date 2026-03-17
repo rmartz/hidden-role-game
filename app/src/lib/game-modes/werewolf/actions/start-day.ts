@@ -6,6 +6,7 @@ import {
   currentTurnState,
   isOwnerPlaying,
   resolveNightActions,
+  checkWinCondition,
 } from "../utils";
 import { WEREWOLF_ROLES } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
@@ -41,6 +42,13 @@ export const startDayAction: GameAction = {
       }
     }
 
+    const updatedDeadIds = [...ts.deadPlayerIds, ...newDeadIds];
+    const winResult = checkWinCondition(game, updatedDeadIds);
+    if (winResult) {
+      game.status = winResult;
+      return;
+    }
+
     const wolfCubDied =
       ts.wolfCubDied === true || didWolfCubDie(newDeadIds, game);
     game.status = {
@@ -53,7 +61,7 @@ export const startDayAction: GameAction = {
           nightActions: nightPhase.nightActions,
           ...(nightResolution.length > 0 ? { nightResolution } : {}),
         },
-        deadPlayerIds: [...ts.deadPlayerIds, ...newDeadIds],
+        deadPlayerIds: updatedDeadIds,
         ...(ts.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
         ...(Object.keys(lastTargets).length > 0 ? { lastTargets } : {}),
         ...(wolfCubDied ? { wolfCubDied: true } : {}),

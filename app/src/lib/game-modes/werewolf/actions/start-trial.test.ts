@@ -109,8 +109,13 @@ describe("WerewolfAction.StartTrial", () => {
     });
 
     it("auto-resolves when all eligible players are Village Idiots", () => {
-      // p1 is defendant; p2 and p3 are both Village Idiots
+      // 3-player game: p1 is defendant; p2 and p3 are both Village Idiots
       const game = makePlayingGame(makeDayState(), {
+        players: [
+          { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
+          { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
+          { id: "p3", name: "Charlie", sessionId: "s3", visibleRoles: [] },
+        ],
         roleAssignments: [
           { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
           { playerId: "p2", roleDefinitionId: WerewolfRole.VillageIdiot },

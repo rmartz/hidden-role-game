@@ -1,7 +1,7 @@
 import type { Game, GameAction } from "@/lib/types";
 import type { ActiveTrial, WerewolfTurnState } from "../types";
 import { WerewolfPhase } from "../types";
-import { currentTurnState, isOwnerPlaying } from "../utils";
+import { currentTurnState, isOwnerPlaying, checkWinCondition } from "../utils";
 import { didWolfCubDie } from "./helpers";
 
 export function applyTrialVerdict(
@@ -47,5 +47,9 @@ export const resolveTrialAction: GameAction = {
     const { activeTrial } = ts.phase;
     if (!activeTrial) return;
     applyTrialVerdict(activeTrial, ts, game);
+    const winResult = checkWinCondition(game, ts.deadPlayerIds);
+    if (winResult) {
+      game.status = winResult;
+    }
   },
 };

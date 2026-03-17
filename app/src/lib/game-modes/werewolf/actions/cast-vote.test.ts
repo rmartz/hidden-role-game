@@ -149,9 +149,21 @@ describe("WerewolfAction.CastVote", () => {
     });
 
     it("auto-resolves when all eligible players have voted", () => {
-      // p1 is defendant, p3 is the only other eligible voter
+      // 3-player game: p1 is defendant, p2 and p3 are the only eligible voters
       const game = makePlayingGame(
         makeDayStateWithTrial({ defendantId: "p1", votes: [] }),
+        {
+          players: [
+            { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
+            { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
+            { id: "p3", name: "Charlie", sessionId: "s3", visibleRoles: [] },
+          ],
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Seer },
+            { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+          ],
+        },
       );
       action.apply(game, { vote: "guilty" }, "p2");
       action.apply(game, { vote: "innocent" }, "p3");

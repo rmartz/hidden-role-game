@@ -324,16 +324,19 @@ describe("ConfirmNightTarget — sets witchAbilityUsed for Witch", () => {
       deadPlayerIds: [],
       witchAbilityUsed: true,
     };
+    // Werewolf added to prevent Village win after Witch kills p2
     const game = makePlayingGame(ts, {
       players: [
         { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
         { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
         { id: "p3", name: "Charlie", sessionId: "s3", visibleRoles: [] },
+        { id: "p4", name: "Dan", sessionId: "s4", visibleRoles: [] },
       ],
       roleAssignments: [
         { playerId: "p1", roleDefinitionId: WerewolfRole.Witch },
         { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
         { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p4", roleDefinitionId: WerewolfRole.Werewolf },
       ],
     });
 

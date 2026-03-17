@@ -82,6 +82,13 @@ export const WEREWOLF_COPY = {
     openButton: "View Glossary",
     roleInfoLabel: "Role information",
   },
+  gameOver: {
+    victory: "Victory!",
+    defeat: "Game Over",
+    winnerLabel: (winner: string) => `${winner} Won`,
+    endGame: "End Game",
+    rolesRevealHeading: "Final Roles",
+  },
   narrator: {
     nightTitle: (turn: number, phase: number, total: number) =>
       `Night — Turn ${String(turn)} (${String(phase)}/${String(total)})`,
