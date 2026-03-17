@@ -1,7 +1,7 @@
 import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase } from "../types";
 import { currentTurnState, isOwnerPlaying } from "../utils";
-import { isWolfCubDead } from "./helpers";
+import { didWolfCubDie } from "./helpers";
 
 export const resolveTrialAction: GameAction = {
   isValid(game: Game, callerId: string) {
@@ -34,7 +34,7 @@ export const resolveTrialAction: GameAction = {
       const { defendantId } = activeTrial;
       if (!ts.deadPlayerIds.includes(defendantId)) {
         ts.deadPlayerIds = [...ts.deadPlayerIds, defendantId];
-        if (isWolfCubDead([defendantId], game)) {
+        if (didWolfCubDie([defendantId], game)) {
           ts.wolfCubDied = true;
         }
       }
