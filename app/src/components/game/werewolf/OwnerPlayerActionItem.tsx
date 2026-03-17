@@ -1,6 +1,6 @@
 "use client";
 
-import { WerewolfAction } from "@/lib/game-modes/werewolf";
+import { WEREWOLF_COPY, WerewolfAction } from "@/lib/game-modes/werewolf";
 import { useGameAction } from "@/hooks";
 import { Button } from "@/components/ui/button";
 
@@ -55,18 +55,25 @@ export function OwnerPlayerActionItem({
     });
   };
 
+  if (isDaytime) {
+    return (
+      <div className="flex gap-1">
+        {!hasActiveTrial && (
+          <Button
+            variant="outline"
+            size="xs"
+            onClick={handlePutToVote}
+            disabled={action.isPending}
+          >
+            {WEREWOLF_COPY.trial.putToVote}
+          </Button>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="flex gap-1">
-      {isDaytime && !hasActiveTrial && (
-        <Button
-          variant="outline"
-          size="xs"
-          onClick={handlePutToVote}
-          disabled={action.isPending}
-        >
-          Put to Vote
-        </Button>
-      )}
       <Button
         variant="destructive"
         size="xs"

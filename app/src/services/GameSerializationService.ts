@@ -281,7 +281,10 @@ export class GameSerializationService {
     if (phase.activeTrial) {
       const { activeTrial } = phase;
       const alivePlayerCount = game.players.filter(
-        (p) => p.id !== game.ownerPlayerId && !ts.deadPlayerIds.includes(p.id),
+        (p) =>
+          p.id !== game.ownerPlayerId &&
+          p.id !== activeTrial.defendantId &&
+          !ts.deadPlayerIds.includes(p.id),
       ).length;
       const myVote = activeTrial.votes.find(
         (v) => v.playerId === callerId,

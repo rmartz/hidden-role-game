@@ -8,7 +8,7 @@ export const startTrialAction: GameAction = {
     const ts = currentTurnState(game);
     if (!ts) return false;
     if (ts.phase.type !== WerewolfPhase.Daytime) return false;
-    if (ts.phase.activeTrial) return false;
+    if (ts.phase.activeTrial && !ts.phase.activeTrial.verdict) return false;
     const { defendantId } = payload as { defendantId?: unknown };
     if (typeof defendantId !== "string") return false;
     if (defendantId === game.ownerPlayerId) return false;

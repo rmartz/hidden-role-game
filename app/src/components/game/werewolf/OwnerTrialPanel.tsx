@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 import type { ActiveTrial } from "@/lib/game-modes/werewolf";
-import { WerewolfAction } from "@/lib/game-modes/werewolf";
+import { WEREWOLF_COPY, WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { PublicLobbyPlayer } from "@/server/types/lobby";
 import { useGameAction } from "@/hooks";
 import { Button } from "@/components/ui/button";
@@ -34,17 +34,20 @@ export function OwnerTrialPanel({
     action.mutate({ actionId: WerewolfAction.ResolveTrial });
   }, [action]);
 
+  const { trial } = WEREWOLF_COPY;
+
   if (activeTrial.verdict) {
     const verdictLabel =
-      activeTrial.verdict === "eliminated" ? "Eliminated" : "Innocent";
+      activeTrial.verdict === "eliminated"
+        ? trial.verdictLabelEliminated
+        : trial.verdictLabelInnocent;
     return (
       <div className="mb-3 pb-3 border-b">
         <p className="font-semibold mb-1">
-          Verdict: <span className="font-bold">{defendantName}</span> —{" "}
-          {verdictLabel}
+          {trial.narratorVerdictHeading(defendantName, verdictLabel)}
         </p>
         <p className="text-sm text-muted-foreground">
-          Guilty: {guiltyCount} · Innocent: {innocentCount}
+          {trial.guiltyInnocentCount(guiltyCount, innocentCount)}
         </p>
       </div>
     );
@@ -53,11 +56,14 @@ export function OwnerTrialPanel({
   return (
     <div className="mb-3 pb-3 border-b">
       <p className="font-semibold mb-2">
-        Trial: <span className="font-bold">{defendantName}</span>
+        {trial.narratorTrialHeading(defendantName)}
       </p>
       <p className="text-sm text-muted-foreground mb-3">
-        Guilty: {guiltyCount} · Innocent: {innocentCount} · Total votes:{" "}
-        {activeTrial.votes.length}
+        {trial.guiltyInnocentTotal(
+          guiltyCount,
+          innocentCount,
+          activeTrial.votes.length,
+        )}
       </p>
       {activeTrial.votes.length > 0 && (
         <ul className="text-sm text-muted-foreground mb-3 space-y-0.5">
@@ -74,7 +80,7 @@ export function OwnerTrialPanel({
         onClick={handleResolve}
         disabled={action.isPending}
       >
-        Resolve Trial
+        {trial.resolveTrial}
       </Button>
     </div>
   );

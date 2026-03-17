@@ -61,6 +61,7 @@ export function PlayerGameDayScreen({
           gameId={gameId}
           activeTrial={gameState.activeTrial}
           players={gameState.players}
+          myPlayerId={gameState.myPlayerId}
         />
       )}
 

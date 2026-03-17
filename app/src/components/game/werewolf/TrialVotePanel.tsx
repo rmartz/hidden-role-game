@@ -2,7 +2,7 @@
 
 import { useCallback } from "react";
 import type { DaytimeVote } from "@/lib/game-modes/werewolf";
-import { WerewolfAction } from "@/lib/game-modes/werewolf";
+import { WEREWOLF_COPY, WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
 import { useGameAction } from "@/hooks";
 import { Button } from "@/components/ui/button";
@@ -12,12 +12,14 @@ interface TrialVotePanelProps {
   gameId: string;
   activeTrial: NonNullable<PlayerGameState["activeTrial"]>;
   players: PlayerGameState["players"];
+  myPlayerId?: string;
 }
 
 export function TrialVotePanel({
   gameId,
   activeTrial,
   players,
+  myPlayerId,
 }: TrialVotePanelProps) {
   const action = useGameAction(gameId);
   const defendant = players.find((p) => p.id === activeTrial.defendantId);
@@ -30,15 +32,18 @@ export function TrialVotePanel({
     [action],
   );
 
+  const { trial } = WEREWOLF_COPY;
+
   if (activeTrial.verdict) {
     const verdictLabel =
-      activeTrial.verdict === "eliminated" ? "Eliminated" : "Innocent";
+      activeTrial.verdict === "eliminated"
+        ? trial.verdictLabelEliminated
+        : trial.verdictLabelInnocent;
     return (
       <Card className="p-4 mb-4">
         <p className="font-semibold mb-2">
-          Verdict:{" "}
           <span className="font-bold">
-            {defendantName} — {verdictLabel}
+            {trial.verdictHeading(defendantName, verdictLabel)}
           </span>
         </p>
         {activeTrial.voteResults && activeTrial.voteResults.length > 0 && (
@@ -52,29 +57,37 @@ export function TrialVotePanel({
         )}
         {activeTrial.verdict === "eliminated" && activeTrial.eliminatedRole && (
           <p className="text-sm text-muted-foreground">
-            {defendantName} was eliminated. They were a{" "}
+            {trial.eliminatedWereRole(defendantName)}{" "}
             <span className="font-medium">
               {activeTrial.eliminatedRole.name}
             </span>
-            .
+            {trial.eliminatedRoleSuffix}
           </p>
         )}
       </Card>
     );
   }
 
+  const isDefendant = myPlayerId === activeTrial.defendantId;
   const hasVoted = !!activeTrial.myVote;
+
+  if (isDefendant) {
+    return (
+      <Card className="p-4 mb-4">
+        <p className="font-semibold mb-1">{trial.youAreOnTrial}</p>
+        <p className="text-sm text-muted-foreground">
+          {trial.youAreOnTrialSubtext}
+        </p>
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-4 mb-4">
-      <p className="font-semibold mb-1">
-        Vote: put <span className="font-bold">{defendantName}</span> on trial
-      </p>
+      <p className="font-semibold mb-1">{trial.voteHeading(defendantName)}</p>
       <p className="text-sm text-muted-foreground mb-3">
-        {activeTrial.voteCount} of {activeTrial.playerCount} votes cast
-        {hasVoted &&
-          activeTrial.myVote &&
-          ` · Your vote: ${activeTrial.myVote}`}
+        {trial.votesCast(activeTrial.voteCount, activeTrial.playerCount)}
+        {hasVoted && activeTrial.myVote && trial.yourVote(activeTrial.myVote)}
       </p>
       {!hasVoted && (
         <div className="flex justify-center gap-2">
@@ -86,17 +99,17 @@ export function TrialVotePanel({
             }}
             disabled={action.isPending}
           >
-            Guilty
+            {trial.guiltyButton}
           </Button>
           <Button
             size="sm"
-            variant="outline"
+            variant="default"
             onClick={() => {
               castVote("innocent");
             }}
             disabled={action.isPending}
           >
-            Innocent
+            {trial.innocentButton}
           </Button>
         </div>
       )}

@@ -1,7 +1,35 @@
 import type { Game, GameAction } from "@/lib/types";
+import type { ActiveTrial, WerewolfTurnState } from "../types";
 import { WerewolfPhase } from "../types";
 import { currentTurnState, isOwnerPlaying } from "../utils";
 import { didWolfCubDie } from "./helpers";
+
+export function applyTrialVerdict(
+  activeTrial: ActiveTrial,
+  ts: WerewolfTurnState,
+  game: Game,
+) {
+  const guiltyCount = activeTrial.votes.filter(
+    (v) => v.vote === "guilty",
+  ).length;
+  const innocentCount = activeTrial.votes.filter(
+    (v) => v.vote === "innocent",
+  ).length;
+
+  // Strictly more Guilty than Innocent → eliminated; ties/abstentions → innocent
+  const eliminated = guiltyCount > innocentCount;
+  activeTrial.verdict = eliminated ? "eliminated" : "innocent";
+
+  if (eliminated) {
+    const { defendantId } = activeTrial;
+    if (!ts.deadPlayerIds.includes(defendantId)) {
+      ts.deadPlayerIds = [...ts.deadPlayerIds, defendantId];
+      if (didWolfCubDie([defendantId], game)) {
+        ts.wolfCubDied = true;
+      }
+    }
+  }
+}
 
 export const resolveTrialAction: GameAction = {
   isValid(game: Game, callerId: string) {
@@ -18,26 +46,6 @@ export const resolveTrialAction: GameAction = {
     if (ts?.phase.type !== WerewolfPhase.Daytime) return;
     const { activeTrial } = ts.phase;
     if (!activeTrial) return;
-
-    const guiltyCount = activeTrial.votes.filter(
-      (v) => v.vote === "guilty",
-    ).length;
-    const innocentCount = activeTrial.votes.filter(
-      (v) => v.vote === "innocent",
-    ).length;
-
-    // Strictly more Guilty than Innocent → eliminated; ties/abstentions → innocent
-    const eliminated = guiltyCount > innocentCount;
-    activeTrial.verdict = eliminated ? "eliminated" : "innocent";
-
-    if (eliminated) {
-      const { defendantId } = activeTrial;
-      if (!ts.deadPlayerIds.includes(defendantId)) {
-        ts.deadPlayerIds = [...ts.deadPlayerIds, defendantId];
-        if (didWolfCubDie([defendantId], game)) {
-          ts.wolfCubDied = true;
-        }
-      }
-    }
+    applyTrialVerdict(activeTrial, ts, game);
   },
 };

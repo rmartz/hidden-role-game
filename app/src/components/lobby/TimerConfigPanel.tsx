@@ -39,6 +39,14 @@ const TIMER_ROWS: TimerRow[] = [
     max: 900,
     step: 30,
   },
+  {
+    label: "Voting phase",
+    field: "votePhaseSeconds",
+    defaultSeconds: 60,
+    min: 15,
+    max: 300,
+    step: 15,
+  },
 ];
 
 function formatDuration(seconds: number): string {
@@ -63,6 +71,7 @@ export function TimerConfigPanel({ timerConfig, disabled, onChange }: Props) {
       startCountdownSeconds: null,
       nightPhaseSeconds: null,
       dayPhaseSeconds: null,
+      votePhaseSeconds: null,
     };
     onChange({
       ...current,
@@ -76,7 +85,7 @@ export function TimerConfigPanel({ timerConfig, disabled, onChange }: Props) {
   ) {
     if (!onChange || !timerConfig) return;
     const currentValue = timerConfig[row.field];
-    if (currentValue === null || currentValue === undefined) return;
+    if (currentValue === null) return;
     const newValue =
       direction === "increment"
         ? Math.min(row.max, currentValue + row.step)

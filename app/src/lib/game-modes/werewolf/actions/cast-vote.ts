@@ -2,6 +2,7 @@ import type { Game, GameAction } from "@/lib/types";
 import type { DaytimeVote } from "../types";
 import { WerewolfPhase } from "../types";
 import { currentTurnState } from "../utils";
+import { applyTrialVerdict } from "./resolve-trial";
 
 const VALID_VOTES: DaytimeVote[] = ["guilty", "innocent"];
 
@@ -17,6 +18,7 @@ export const castVoteAction: GameAction = {
     if (activeTrial.verdict) return false;
     if (ts.deadPlayerIds.includes(callerId)) return false;
     if (!game.players.some((p) => p.id === callerId)) return false;
+    if (activeTrial.defendantId === callerId) return false;
     if (activeTrial.votes.some((v) => v.playerId === callerId)) return false;
     const { vote } = payload as { vote?: unknown };
     return (
@@ -30,5 +32,16 @@ export const castVoteAction: GameAction = {
     if (!activeTrial) return;
     const { vote } = payload as { vote: DaytimeVote };
     activeTrial.votes = [...activeTrial.votes, { playerId: callerId, vote }];
+
+    // Auto-resolve when every eligible player (alive, non-owner, non-defendant) has voted
+    const eligibleCount = game.players.filter(
+      (p) =>
+        p.id !== game.ownerPlayerId &&
+        p.id !== activeTrial.defendantId &&
+        !ts.deadPlayerIds.includes(p.id),
+    ).length;
+    if (activeTrial.votes.length >= eligibleCount) {
+      applyTrialVerdict(activeTrial, ts, game);
+    }
   },
 };
