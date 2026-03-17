@@ -15,18 +15,19 @@ import type {
   LobbyJoinResponse,
   UpdateLobbyConfigRequest,
 } from "@/server/types";
+import type { GameMode } from "@/lib/types";
 
-export function useCreateLobby() {
+export function useCreateLobby(gameMode: GameMode) {
   const router = useRouter();
   return useMutation({
     mutationFn: async (playerName: string) => {
-      const response = await createLobby(playerName);
+      const response = await createLobby(playerName, gameMode);
       if (response.status === ServerResponseStatus.Error)
         throw new Error(response.error);
       return response.data;
     },
     onSuccess: (data) => {
-      router.push(`/lobby/${data.lobby.id}`);
+      router.push(`/${data.lobby.config.gameMode}/lobby/${data.lobby.id}`);
     },
   });
 }

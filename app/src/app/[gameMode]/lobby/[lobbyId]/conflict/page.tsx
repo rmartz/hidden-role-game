@@ -10,9 +10,13 @@ import {
   useLobbyExistsQuery,
 } from "@/hooks";
 import { LobbyConflictResolution } from "@/components/lobby";
+import { LOBBY_PAGE_COPY } from "../../copy";
 
 export default function LobbyConflictPage() {
-  const { lobbyId } = useParams<{ lobbyId: string }>();
+  const { lobbyId, gameMode } = useParams<{
+    lobbyId: string;
+    gameMode: string;
+  }>();
   const router = useRouter();
 
   const storedLobbyId = getLobbyId();
@@ -34,31 +38,42 @@ export default function LobbyConflictPage() {
   // If the target lobby doesn't exist, redirect to the stored lobby (or home if none).
   useEffect(() => {
     if (!targetLobbyQuery.isLoading && targetLobbyQuery.data === false) {
-      router.replace(storedLobbyId ? `/lobby/${storedLobbyId}` : "/");
+      const fallback = storedLobbyId
+        ? `/${conflictLobbyQuery.data?.config.gameMode ?? gameMode}/lobby/${storedLobbyId}`
+        : "/";
+      router.replace(fallback);
     }
   }, [
     targetLobbyQuery.isLoading,
     targetLobbyQuery.data,
     storedLobbyId,
+    conflictLobbyQuery.data,
+    gameMode,
     router,
   ]);
 
   // If there's no stored lobby ID, there's nothing to conflict with — go back to the lobby.
   useEffect(() => {
     if (!storedLobbyId) {
-      router.replace(`/lobby/${lobbyId}`);
+      router.replace(`/${gameMode}/lobby/${lobbyId}`);
     }
-  }, [storedLobbyId, lobbyId, router]);
+  }, [storedLobbyId, lobbyId, gameMode, router]);
 
   // If the stored lobby no longer exists (cleared in queryFn on 404/403), go back to the lobby.
   useEffect(() => {
     if (!conflictLobbyQuery.isLoading && conflictLobbyQuery.data === null) {
-      router.replace(`/lobby/${lobbyId}`);
+      router.replace(`/${gameMode}/lobby/${lobbyId}`);
     }
-  }, [conflictLobbyQuery.isLoading, conflictLobbyQuery.data, lobbyId, router]);
+  }, [
+    conflictLobbyQuery.isLoading,
+    conflictLobbyQuery.data,
+    lobbyId,
+    gameMode,
+    router,
+  ]);
 
   const joinMutation = useLeaveAndJoinLobby(() => {
-    router.replace(`/lobby/${lobbyId}`);
+    router.replace(`/${gameMode}/lobby/${lobbyId}`);
   });
 
   function handleJoin() {
@@ -72,12 +87,14 @@ export default function LobbyConflictPage() {
     !conflictLobbyQuery.data ||
     !storedLobbyId
   ) {
-    return <p className="p-5 text-muted-foreground">Loading...</p>;
+    return (
+      <p className="p-5 text-muted-foreground">{LOBBY_PAGE_COPY.loading}</p>
+    );
   }
 
   return (
     <div className="p-5">
-      <h1 className="text-2xl font-bold mb-4">Hidden Role Game</h1>
+      <h1 className="text-2xl font-bold mb-4">{LOBBY_PAGE_COPY.title}</h1>
       <LobbyConflictResolution
         conflictLobby={conflictLobbyQuery.data}
         conflictLobbyId={storedLobbyId}

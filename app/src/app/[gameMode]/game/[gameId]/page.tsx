@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { GameMode, GameStatus } from "@/lib/types";
 import type { PlayerGameState } from "@/server/types";
-import { useGameStateQuery } from "@/hooks";
+import { useGameStateQuery, GameModeContext } from "@/hooks";
 import { WerewolfGameScreen } from "@/components/game";
 
 const POLL_INTERVAL_MS = 2000;
@@ -43,7 +43,7 @@ export default function GameModePage() {
     data: gameState,
     isLoading,
     error,
-  } = useGameStateQuery(gameId, refetchInterval);
+  } = useGameStateQuery(gameId, validatedGameMode, refetchInterval);
 
   const gameStatus = gameState?.status.type;
   const actualGameMode = gameState?.gameMode;
@@ -72,7 +72,7 @@ export default function GameModePage() {
       validatedGameMode &&
       actualGameMode !== validatedGameMode
     ) {
-      router.replace(`/game/${gameId}/${actualGameMode}`);
+      router.replace(`/${actualGameMode}/game/${gameId}`);
     }
   }, [gameId, actualGameMode, validatedGameMode, router]);
 
@@ -97,5 +97,11 @@ export default function GameModePage() {
     </div>
   );
 
-  return gameScreen ?? loadingView;
+  const content = gameScreen ?? loadingView;
+
+  return (
+    <GameModeContext.Provider value={validatedGameMode}>
+      {content}
+    </GameModeContext.Provider>
+  );
 }

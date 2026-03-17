@@ -41,10 +41,11 @@ export function LobbyConflictResolution({
             variant="outline"
             onClick={() => {
               const { gameId } = conflictLobby;
+              const { gameMode } = conflictLobby.config;
               if (gameId) {
-                router.push(`/game/${gameId}`);
+                router.push(`/${gameMode}/game/${gameId}`);
               } else {
-                router.push(`/lobby/${conflictLobbyId}`);
+                router.push(`/${gameMode}/lobby/${conflictLobbyId}`);
               }
             }}
           >

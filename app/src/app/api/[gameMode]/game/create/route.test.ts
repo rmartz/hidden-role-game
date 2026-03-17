@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { POST as createLobby } from "../../lobby/create/route";
-import { POST as joinLobby } from "../../lobby/[lobbyId]/join/route";
+import { POST as createLobby } from "../../../lobby/create/route";
+import { POST as joinLobby } from "../../../lobby/[lobbyId]/join/route";
 import { POST as startGame } from "./route";
 import { postRequest, makeLobbyParams } from "@/app/api/test-utils";
 

@@ -4,3 +4,4 @@ export * from "./players";
 export * from "./game";
 export * from "./configSync";
 export * from "./firebaseAuth";
+export * from "./gameModeContext";

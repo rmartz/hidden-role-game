@@ -26,7 +26,11 @@ export function PlayerGameScreen({ gameId, gameState }: PlayerGameScreenProps) {
   const isNighttime = turnState?.phase.type === WerewolfPhase.Nighttime;
 
   // Poll throughout nighttime to detect when this player's turn starts or ends.
-  useGameStateQuery(gameId, isNighttime ? POLL_INTERVAL_MS : undefined);
+  useGameStateQuery(
+    gameId,
+    gameState.gameMode,
+    isNighttime ? POLL_INTERVAL_MS : undefined,
+  );
 
   if (status.type !== GameStatus.Playing || !turnState) return null;
 

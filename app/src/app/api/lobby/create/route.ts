@@ -24,15 +24,18 @@ export async function POST(request: Request): Promise<Response> {
     sessionId,
   };
 
-  const defaultGameMode = GameMode.SecretVillain;
+  const selectedGameMode =
+    body.gameMode && Object.values(GameMode).includes(body.gameMode)
+      ? body.gameMode
+      : GameMode.SecretVillain;
   const lobby = {
     id: randomUUID(),
     ownerSessionId: sessionId,
     players: [owner],
     config: {
-      gameMode: defaultGameMode,
+      gameMode: selectedGameMode,
       roleConfigMode: RoleConfigMode.Default,
-      roleSlots: getDefaultRoleSlots(defaultGameMode, 1),
+      roleSlots: getDefaultRoleSlots(selectedGameMode, 1),
       showConfigToPlayers: false,
       showRolesInPlay: ShowRolesInPlay.None,
     },

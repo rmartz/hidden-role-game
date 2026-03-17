@@ -2,12 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { GameStatus } from "@/lib/types";
-import { useGameStateQuery } from "@/hooks";
+import type { GameMode } from "@/lib/types";
+import { useGameStateQuery, GameModeContext } from "@/hooks";
 import { WerewolfGameScreen } from "@/components/game";
 
 const POLL_INTERVAL_MS = 2000;
 
-export function GameScreenForPlayer({ gameId }: { gameId: string }) {
+export function GameScreenForPlayer({
+  gameId,
+  gameMode,
+}: {
+  gameId: string;
+  gameMode: GameMode;
+}) {
   const [refetchInterval, setRefetchInterval] = useState<number | undefined>(
     POLL_INTERVAL_MS,
   );
@@ -16,7 +23,7 @@ export function GameScreenForPlayer({ gameId }: { gameId: string }) {
     data: gameState,
     isLoading,
     error,
-  } = useGameStateQuery(gameId, refetchInterval);
+  } = useGameStateQuery(gameId, gameMode, refetchInterval);
 
   const gameStatus = gameState?.status.type;
 
@@ -37,5 +44,9 @@ export function GameScreenForPlayer({ gameId }: { gameId: string }) {
     );
   }
 
-  return <WerewolfGameScreen gameId={gameId} gameState={gameState} />;
+  return (
+    <GameModeContext.Provider value={gameMode}>
+      <WerewolfGameScreen gameId={gameId} gameState={gameState} />
+    </GameModeContext.Provider>
+  );
 }

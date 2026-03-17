@@ -60,11 +60,12 @@ export type { PublicLobbyPlayer } from "@/server/types";
 
 export async function createLobby(
   playerName: string,
+  gameMode: GameMode,
 ): Promise<ServerResponse<LobbyJoinResponse>> {
   const response = await fetch("/api/lobby/create", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ playerName }),
+    body: JSON.stringify({ playerName, gameMode }),
   });
   const data = (await response.json()) as ServerResponse<LobbyJoinResponse>;
   if (data.status === ServerResponseStatus.Success) {
@@ -123,7 +124,7 @@ export async function startGame(
   const sessionId = getSessionId();
   const headers: HeadersInit = { "Content-Type": "application/json" };
   if (sessionId) headers["x-session-id"] = sessionId;
-  const response = await fetch("/api/game/create", {
+  const response = await fetch(`/api/${gameMode}/game/create`, {
     method: "POST",
     headers,
     body: JSON.stringify({ lobbyId, roleSlots, gameMode }),
@@ -133,11 +134,12 @@ export async function startGame(
 
 export async function advanceGame(
   gameId: string,
+  gameMode: GameMode,
 ): Promise<ServerResponse<Record<string, never>>> {
   const sessionId = getSessionId();
   const headers: HeadersInit = { "Content-Type": "application/json" };
   if (sessionId) headers["x-session-id"] = sessionId;
-  const response = await fetch(`/api/game/${gameId}/advance`, {
+  const response = await fetch(`/api/${gameMode}/game/${gameId}/advance`, {
     method: "POST",
     headers,
   });
@@ -146,13 +148,14 @@ export async function advanceGame(
 
 export async function applyGameAction(
   gameId: string,
+  gameMode: GameMode,
   actionId: string,
   payload?: unknown,
 ): Promise<ServerResponse<Record<string, never>>> {
   const sessionId = getSessionId();
   const headers: HeadersInit = { "Content-Type": "application/json" };
   if (sessionId) headers["x-session-id"] = sessionId;
-  const response = await fetch(`/api/game/${gameId}/action`, {
+  const response = await fetch(`/api/${gameMode}/game/${gameId}/action`, {
     method: "POST",
     headers,
     body: JSON.stringify({ actionId, payload }),
@@ -162,11 +165,12 @@ export async function applyGameAction(
 
 export async function getGameState(
   gameId: string,
+  gameMode: GameMode,
 ): Promise<{ data: ServerResponse<PlayerGameState>; httpStatus: number }> {
   const sessionId = getSessionId();
   const headers: HeadersInit = {};
   if (sessionId) headers["x-session-id"] = sessionId;
-  const response = await fetch(`/api/game/${gameId}`, { headers });
+  const response = await fetch(`/api/${gameMode}/game/${gameId}`, { headers });
   const data = (await response.json()) as ServerResponse<PlayerGameState>;
   return { data, httpStatus: response.status };
 }

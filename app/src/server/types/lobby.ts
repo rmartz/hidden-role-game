@@ -30,6 +30,7 @@ export interface PublicLobby {
 
 export interface CreateLobbyRequest {
   playerName: string;
+  gameMode?: GameMode;
 }
 
 export interface JoinLobbyRequest {

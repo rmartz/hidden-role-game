@@ -79,6 +79,6 @@ export async function POST(request: Request): Promise<Response> {
 
   return Response.json({
     status: ServerResponseStatus.Success,
-    data: { gameId: game.id, players: debugPlayers },
+    data: { gameId: game.id, gameMode, players: debugPlayers },
   });
 }

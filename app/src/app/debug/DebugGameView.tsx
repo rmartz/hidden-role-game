@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import type { GameMode } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import type { DebugPlayer } from "@/app/api/debug/game/route";
 import { GameScreenForPlayer } from "./GameScreenForPlayer";
 
 export interface GameInfo {
   gameId: string;
+  gameMode: GameMode;
   players: DebugPlayer[];
 }
 
@@ -20,7 +22,7 @@ export function DebugGameView({
 }) {
   const queryClient = useQueryClient();
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const { gameId, players } = gameInfo;
+  const { gameId, gameMode, players } = gameInfo;
 
   function handleSelectPlayer(index: number) {
     const player = players[index];
@@ -62,6 +64,7 @@ export function DebugGameView({
           <GameScreenForPlayer
             key={`${gameId}-${selectedPlayer.id}`}
             gameId={gameId}
+            gameMode={gameMode}
           />
         </div>
       )}
