@@ -10,11 +10,13 @@ import {
 import { RoleLabel } from "@/components/RoleLabel";
 import type { IncrementDirection } from "./Incrementer";
 import { Incrementer } from "./Incrementer";
+import { RoleTooltip } from "./RoleTooltip";
 
 interface ReadOnlyProps {
   role: RoleDefinition<string, Team>;
   gameMode: GameMode;
   roleConfigMode: RoleConfigMode;
+  roleInfoSrLabel?: string;
   min: number;
   max: number;
   readOnly: true;
@@ -24,6 +26,7 @@ interface EditableProps {
   role: RoleDefinition<string, Team>;
   gameMode: GameMode;
   roleConfigMode: RoleConfigMode;
+  roleInfoSrLabel?: string;
   readOnly: false;
   disabled: boolean;
 }
@@ -31,7 +34,7 @@ interface EditableProps {
 type RoleConfigEntryProps = ReadOnlyProps | EditableProps;
 
 export function RoleConfigEntry(props: RoleConfigEntryProps) {
-  const { role, gameMode, roleConfigMode, readOnly } = props;
+  const { role, gameMode, roleConfigMode, readOnly, roleInfoSrLabel } = props;
 
   const dispatch = useAppDispatch();
   const count = useAppSelector((s) => s.gameConfig.roleCounts[role.id] ?? 0);
@@ -70,7 +73,10 @@ export function RoleConfigEntry(props: RoleConfigEntryProps) {
     <li
       className={`py-1 ${isAdvanced ? "flex flex-col gap-1" : "flex items-start gap-2"}`}
     >
-      <span className="min-w-40">
+      <span className="min-w-40 flex items-center gap-1">
+        {roleInfoSrLabel && (
+          <RoleTooltip role={role} srLabel={roleInfoSrLabel} />
+        )}
         <RoleLabel role={role} gameMode={gameMode} />
       </span>
       {readOnly ? (

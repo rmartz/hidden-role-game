@@ -68,8 +68,10 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
   }, [config, playerCount, readOnly, dispatch]);
 
   const activeGameMode = readOnly ? config.gameMode : selectedGameMode;
-  const roleDefinitions = GAME_MODES[activeGameMode].roles;
-  const ownerTitle = GAME_MODES[activeGameMode].ownerTitle;
+  const activeModeConfig = GAME_MODES[activeGameMode];
+  const roleDefinitions = activeModeConfig.roles;
+  const ownerTitle = activeModeConfig.ownerTitle;
+  const roleInfoSrLabel = activeModeConfig.roleInfoSrLabel;
   const roleSlotsRequired = getRoleSlotsRequired(activeGameMode, playerCount);
   const disabled = readOnly ? true : props.isPending;
 
@@ -123,6 +125,7 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
                   roleConfigMode={config.roleConfigMode}
                   playerCount={playerCount}
                   gameMode={activeGameMode}
+                  roleInfoSrLabel={roleInfoSrLabel}
                   readOnly={true}
                 />
               ) : (
@@ -131,6 +134,7 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
                   playerCount={roleSlotsRequired}
                   roleConfigMode={roleConfigMode}
                   gameMode={selectedGameMode}
+                  roleInfoSrLabel={roleInfoSrLabel}
                   readOnly={false}
                   disabled={props.isPending}
                 />

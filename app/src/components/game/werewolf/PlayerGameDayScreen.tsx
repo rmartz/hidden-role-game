@@ -1,10 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
+import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
+import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 import type { PlayerGameState } from "@/server/types";
-import { GameTimer } from "@/components/game";
+import { GameTimer, RoleGlossaryDialog } from "@/components/game";
 import { PlayerNightSummary } from "./PlayerNightSummary";
 import { PlayerRoleDisplay } from "./PlayerRoleDisplay";
 import { PlayerStatusLists } from "./PlayerStatusLists";
@@ -28,10 +30,17 @@ export function PlayerGameDayScreen({
     [isDaytime, phase.startedAt],
   );
 
+  const modeConfig = GAME_MODES[gameState.gameMode];
+  const glossaryRoles = gameState.rolesInPlay?.length
+    ? gameState.rolesInPlay
+        .map((r) => modeConfig.roles[r.id])
+        .filter((r) => r !== undefined)
+    : Object.values(modeConfig.roles);
+
   return (
     <div className="p-5 max-w-lg mx-auto">
       <div className="flex items-start justify-between mb-2">
-        <h1 className="text-2xl font-bold">Hidden Role Game</h1>
+        <h1 className="text-2xl font-bold">{WEREWOLF_COPY.day.title}</h1>
         {gameState.myRole && (
           <PlayerRoleDisplay
             role={gameState.myRole}
@@ -43,7 +52,17 @@ export function PlayerGameDayScreen({
         durationSeconds={gameState.timerConfig?.dayPhaseSeconds}
         startedAt={phaseStartedAt}
       />
-      <p className="mb-4 text-muted-foreground">The game is underway.</p>
+      <p className="mb-4 text-muted-foreground">
+        {WEREWOLF_COPY.day.gameUnderway}
+      </p>
+      <div className="mb-4">
+        <RoleGlossaryDialog
+          roles={glossaryRoles}
+          gameMode={gameState.gameMode}
+          title={WEREWOLF_COPY.glossary.dialogTitle}
+          triggerLabel={WEREWOLF_COPY.glossary.openButton}
+        />
+      </div>
 
       <PlayerNightSummary
         players={gameState.players}
