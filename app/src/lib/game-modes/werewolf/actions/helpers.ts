@@ -1,10 +1,9 @@
 import type { Game } from "@/lib/types";
 import { WerewolfRole } from "../roles";
 
-export function isWolfCub(playerId: string, game: Game): boolean {
-  return game.roleAssignments.some(
-    (a) =>
-      a.playerId === playerId &&
-      a.roleDefinitionId === (WerewolfRole.WolfCub as string),
-  );
+export function didWolfCubDie(newDeadIds: string[], game: Game): boolean {
+  const wolfCubId = game.roleAssignments.find(
+    (a) => a.roleDefinitionId === (WerewolfRole.WolfCub as string),
+  )?.playerId;
+  return !!wolfCubId && newDeadIds.some((id) => id === wolfCubId);
 }

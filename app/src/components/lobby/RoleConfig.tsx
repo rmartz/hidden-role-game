@@ -25,9 +25,9 @@ interface EditableProps {
   disabled: boolean;
 }
 
-type Props = ReadOnlyProps | EditableProps;
+type RoleConfigProps = ReadOnlyProps | EditableProps;
 
-export function RoleConfig(props: Props) {
+export function RoleConfig(props: RoleConfigProps) {
   const { roleDefinitions, playerCount, gameMode, roleConfigMode, readOnly } =
     props;
 

@@ -8,6 +8,9 @@ import { setNightTargetAction } from "./set-night-target";
 import { confirmNightTargetAction } from "./confirm-night-target";
 import { revealInvestigationResultAction } from "./reveal-investigation-result";
 import { markPlayerDeadAction, markPlayerAliveAction } from "./mark-player";
+import { startTrialAction } from "./start-trial";
+import { castVoteAction } from "./cast-vote";
+import { resolveTrialAction } from "./resolve-trial";
 
 export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.StartNight]: startNightAction,
@@ -18,4 +21,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.RevealInvestigationResult]: revealInvestigationResultAction,
   [WerewolfAction.MarkPlayerDead]: markPlayerDeadAction,
   [WerewolfAction.MarkPlayerAlive]: markPlayerAliveAction,
+  [WerewolfAction.StartTrial]: startTrialAction,
+  [WerewolfAction.CastVote]: castVoteAction,
+  [WerewolfAction.ResolveTrial]: resolveTrialAction,
 };

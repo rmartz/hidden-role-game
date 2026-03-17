@@ -9,7 +9,7 @@ import {
 } from "../utils";
 import { WEREWOLF_ROLES } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
-import { isWolfCub } from "./helpers";
+import { didWolfCubDie } from "./helpers";
 
 export const startDayAction: GameAction = {
   isValid(game: Game, callerId: string) {
@@ -42,7 +42,7 @@ export const startDayAction: GameAction = {
     }
 
     const wolfCubDied =
-      ts.wolfCubDied === true || newDeadIds.some((id) => isWolfCub(id, game));
+      ts.wolfCubDied === true || didWolfCubDie(newDeadIds, game);
     game.status = {
       type: GameStatus.Playing,
       turnState: {

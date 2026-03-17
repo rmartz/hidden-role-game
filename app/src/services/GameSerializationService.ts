@@ -255,7 +255,10 @@ export class GameSerializationService {
    * nightStatus: killed entries from deaths and silenced entries from the
    * Spellcaster, with attacker/protector info stripped.
    */
-  extractDaytimeNightState(game: Game): Partial<PlayerGameState> {
+  extractDaytimeNightState(
+    game: Game,
+    callerId: string,
+  ): Partial<PlayerGameState> {
     if (game.status.type !== GameStatus.Playing) return {};
     const ts = game.status.turnState as WerewolfTurnState | undefined;
     if (ts?.phase.type !== WerewolfPhase.Daytime) return {};
@@ -271,9 +274,57 @@ export class GameSerializationService {
       return [];
     });
 
-    return {
+    const result: Partial<PlayerGameState> = {
       ...(nightStatus.length > 0 ? { nightStatus } : {}),
     };
+
+    if (phase.activeTrial) {
+      const { activeTrial } = phase;
+      const alivePlayerCount = game.players.filter(
+        (p) =>
+          p.id !== game.ownerPlayerId &&
+          p.id !== activeTrial.defendantId &&
+          !ts.deadPlayerIds.includes(p.id),
+      ).length;
+      const myVote = activeTrial.votes.find(
+        (v) => v.playerId === callerId,
+      )?.vote;
+      const playerById = new Map(game.players.map((p) => [p.id, p]));
+
+      result.activeTrial = {
+        defendantId: activeTrial.defendantId,
+        startedAt: activeTrial.startedAt,
+        ...(myVote !== undefined ? { myVote } : {}),
+        voteCount: activeTrial.votes.length,
+        playerCount: alivePlayerCount,
+        ...(activeTrial.verdict ? { verdict: activeTrial.verdict } : {}),
+      };
+
+      if (activeTrial.verdict) {
+        result.activeTrial.voteResults = activeTrial.votes.map((v) => ({
+          playerName: playerById.get(v.playerId)?.name ?? v.playerId,
+          vote: v.vote,
+        }));
+
+        if (activeTrial.verdict === "eliminated") {
+          const assignment = game.roleAssignments.find(
+            (a) => a.playerId === activeTrial.defendantId,
+          );
+          const roleDef = assignment
+            ? GAME_MODES[game.gameMode].roles[assignment.roleDefinitionId]
+            : undefined;
+          if (roleDef) {
+            result.activeTrial.eliminatedRole = {
+              id: roleDef.id,
+              name: roleDef.name,
+              team: roleDef.team,
+            };
+          }
+        }
+      }
+    }
+
+    return result;
   }
 }
 

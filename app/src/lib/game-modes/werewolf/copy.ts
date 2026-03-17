@@ -50,6 +50,31 @@ export const WEREWOLF_COPY = {
     none: "None",
     noneYet: "None yet",
   },
+  trial: {
+    verdictHeading: (name: string, label: string) =>
+      `Verdict: ${name} — ${label}`,
+    verdictLabelEliminated: "Eliminated",
+    verdictLabelInnocent: "Innocent",
+    eliminatedWereRole: (name: string) => `${name} was eliminated. They were a`,
+    eliminatedRoleSuffix: ".",
+    youAreOnTrial: "You are on trial",
+    youAreOnTrialSubtext: "You are currently on trial, try to look innocent.",
+    voteHeading: (name: string) => `Vote: ${name} is on trial`,
+    votesCast: (count: number, total: number) =>
+      `${String(count)} of ${String(total)} votes cast`,
+    yourVote: (vote: string) => ` · Your vote: ${vote}`,
+    guiltyButton: "Guilty",
+    innocentButton: "Innocent",
+    narratorTrialHeading: (name: string) => `Trial: ${name}`,
+    narratorVerdictHeading: (name: string, label: string) =>
+      `Verdict: ${name} — ${label}`,
+    guiltyInnocentCount: (guilty: number, innocent: number) =>
+      `Guilty: ${String(guilty)} · Innocent: ${String(innocent)}`,
+    guiltyInnocentTotal: (guilty: number, innocent: number, total: number) =>
+      `Guilty: ${String(guilty)} · Innocent: ${String(innocent)} · Total votes: ${String(total)}`,
+    resolveTrial: "Resolve Trial",
+    putToVote: "Put to Vote",
+  },
   narrator: {
     nightTitle: (turn: number, phase: number, total: number) =>
       `Night — Turn ${String(turn)} (${String(phase)}/${String(total)})`,

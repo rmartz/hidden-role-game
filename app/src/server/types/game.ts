@@ -5,7 +5,7 @@ import type {
   Team,
   TimerConfig,
 } from "@/lib/types";
-import type { AnyNightAction } from "@/lib/game-modes/werewolf";
+import type { AnyNightAction, DaytimeVote } from "@/lib/game-modes/werewolf";
 import type { PublicLobbyPlayer } from "./lobby";
 
 export type { RoleSlot };
@@ -110,4 +110,17 @@ export interface PlayerGameState {
   witchAbilityUsed?: boolean;
   /** Phase timer configuration. Present when the lobby has timers enabled. */
   timerConfig?: TimerConfig;
+  /** Active elimination trial. Sanitized view: no raw per-player vote breakdown. */
+  activeTrial?: {
+    defendantId: string;
+    startedAt: number;
+    myVote?: DaytimeVote;
+    voteCount: number;
+    playerCount: number;
+    verdict?: "eliminated" | "innocent";
+    /** Per-player vote results, populated once verdict is set. */
+    voteResults?: { playerName: string; vote: DaytimeVote }[];
+    /** Role of the eliminated player, populated when verdict is "eliminated". */
+    eliminatedRole?: { id: string; name: string; team: Team };
+  };
 }

@@ -1,5 +1,6 @@
 import type { TimerConfig, GameStatusState, Team } from "@/lib/types";
-import type { AnyNightAction } from "@/lib/game-modes/werewolf";
+import { parseTimerConfig } from "./lobby";
+import type { AnyNightAction, DaytimeVote } from "@/lib/game-modes/werewolf";
 import type {
   PlayerGameState,
   RoleInPlay,
@@ -38,6 +39,16 @@ export interface FirebasePlayerState {
   investigationResult?: { targetPlayerId: string; isWerewolfTeam: boolean };
   witchAbilityUsed?: boolean;
   timerConfig?: TimerConfig;
+  activeTrial?: {
+    defendantId: string;
+    startedAt: number;
+    myVote?: DaytimeVote;
+    voteCount: number;
+    playerCount: number;
+    verdict?: "eliminated" | "innocent";
+    voteResults?: { playerName: string; vote: DaytimeVote }[];
+    eliminatedRole?: { id: string; name: string; team: string };
+  };
 }
 
 export function playerStateToFirebase(
@@ -79,6 +90,7 @@ export function playerStateToFirebase(
       : {}),
     ...(state.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
     ...(state.timerConfig ? { timerConfig: state.timerConfig } : {}),
+    ...(state.activeTrial ? { activeTrial: state.activeTrial } : {}),
   };
 }
 
@@ -133,6 +145,17 @@ export function firebaseToPlayerState(
       ? { investigationResult: raw.investigationResult }
       : {}),
     ...(raw.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
-    ...(raw.timerConfig ? { timerConfig: raw.timerConfig } : {}),
+    ...(raw.timerConfig
+      ? {
+          timerConfig: parseTimerConfig(
+            raw.timerConfig as Record<string, unknown>,
+          ),
+        }
+      : {}),
+    ...(raw.activeTrial
+      ? {
+          activeTrial: raw.activeTrial as PlayerGameState["activeTrial"],
+        }
+      : {}),
   };
 }

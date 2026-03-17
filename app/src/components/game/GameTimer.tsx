@@ -8,30 +8,23 @@ function formatTime(totalSeconds: number): string {
   return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
 }
 
-interface TimedProps {
-  durationSeconds: number;
-  onTimerTrigger: () => void;
-}
-
-interface ManualProps {
-  durationSeconds?: undefined;
-  onTimerTrigger?: undefined;
-}
-
-type Props = (TimedProps | ManualProps) & {
+interface GameTimerProps {
+  durationSeconds?: number;
+  onTimerTrigger?: () => void;
   startedAt: Date;
   /** Timer resets whenever this value changes. */
   resetKey?: string | number;
-};
+}
 
 export function GameTimer({
   durationSeconds,
   startedAt,
   onTimerTrigger,
   resetKey,
-}: Props) {
+}: GameTimerProps) {
   const isTimed = durationSeconds !== undefined;
-  const startedAtMs = startedAt.getTime();
+  const rawStartedAtMs = startedAt.getTime();
+  const startedAtMs = isNaN(rawStartedAtMs) ? Date.now() : rawStartedAtMs;
 
   const [elapsedSeconds, setElapsedSeconds] = useState(() =>
     Math.max(0, Math.floor((Date.now() - startedAtMs) / 1000)),

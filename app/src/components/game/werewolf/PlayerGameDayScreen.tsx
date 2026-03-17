@@ -8,17 +8,19 @@ import { GameTimer } from "@/components/game";
 import { PlayerNightSummary } from "./PlayerNightSummary";
 import { PlayerRoleDisplay } from "./PlayerRoleDisplay";
 import { PlayerStatusLists } from "./PlayerStatusLists";
+import { TrialVotePanel } from "./TrialVotePanel";
 
 interface PlayerGameDayScreenProps {
+  gameId: string;
   gameState: PlayerGameState;
   turnState: WerewolfTurnState;
 }
 
 export function PlayerGameDayScreen({
+  gameId,
   gameState,
   turnState,
 }: PlayerGameDayScreenProps) {
-  const dayPhaseSeconds = gameState.timerConfig?.dayPhaseSeconds ?? null;
   const { phase } = turnState;
   const isDaytime = phase.type === WerewolfPhase.Daytime;
   const phaseStartedAt = useMemo(
@@ -37,21 +39,26 @@ export function PlayerGameDayScreen({
           />
         )}
       </div>
-      {dayPhaseSeconds !== null ? (
-        <GameTimer
-          durationSeconds={dayPhaseSeconds}
-          startedAt={phaseStartedAt}
-          onTimerTrigger={noop}
-        />
-      ) : (
-        <GameTimer startedAt={phaseStartedAt} />
-      )}
+      <GameTimer
+        durationSeconds={gameState.timerConfig?.dayPhaseSeconds}
+        startedAt={phaseStartedAt}
+      />
       <p className="mb-4 text-muted-foreground">The game is underway.</p>
 
       <PlayerNightSummary
         players={gameState.players}
         nightStatus={gameState.nightStatus}
       />
+
+      {gameState.activeTrial && (
+        <TrialVotePanel
+          gameId={gameId}
+          activeTrial={gameState.activeTrial}
+          players={gameState.players}
+          myPlayerId={gameState.myPlayerId}
+          votePhaseSeconds={gameState.timerConfig?.votePhaseSeconds}
+        />
+      )}
 
       {gameState.amDead && (
         <p className="mb-4 font-semibold text-muted-foreground italic">
@@ -67,8 +74,4 @@ export function PlayerGameDayScreen({
       />
     </div>
   );
-}
-
-function noop() {
-  // no-op: player day screen has no timer action
 }

@@ -11,6 +11,7 @@ import { GameRolesList, GameTimer } from "@/components/game";
 import { OwnerAdvanceCard } from "./OwnerAdvanceCard";
 import { NightOutcomeSummary } from "./NightOutcomeSummary";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
+import { OwnerTrialPanel } from "./OwnerTrialPanel";
 
 interface OwnerGameDayScreenProps {
   gameId: string;
@@ -23,7 +24,8 @@ export function OwnerGameDayScreen({
   gameState,
   turnState,
 }: OwnerGameDayScreenProps) {
-  const dayPhaseSeconds = gameState.timerConfig?.dayPhaseSeconds ?? null;
+  const dayPhaseSeconds = gameState.timerConfig?.dayPhaseSeconds;
+  const votePhaseSeconds = gameState.timerConfig?.votePhaseSeconds;
   const action = useGameAction(gameId);
 
   const handleAdvance = useCallback(() => {
@@ -41,27 +43,34 @@ export function OwnerGameDayScreen({
   if (!isDaytime) return null;
 
   const modeConfig = GAME_MODES[gameState.gameMode];
+  const activeTrial = phase.activeTrial;
+  const hasActiveTrial = !!activeTrial && !activeTrial.verdict;
 
   return (
     <div className="p-5">
       <h1 className="text-2xl font-bold mb-4">{`Day — Turn ${String(turnState.turn)}`}</h1>
-      {dayPhaseSeconds !== null ? (
-        <GameTimer
-          durationSeconds={dayPhaseSeconds}
-          startedAt={phaseStartedAt}
-          onTimerTrigger={handleAdvance}
-          resetKey={turnState.turn}
-        />
-      ) : (
-        <GameTimer startedAt={phaseStartedAt} resetKey={turnState.turn} />
-      )}
+      <GameTimer
+        durationSeconds={dayPhaseSeconds}
+        startedAt={phaseStartedAt}
+        onTimerTrigger={handleAdvance}
+        resetKey={turnState.turn}
+      />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
         <OwnerAdvanceCard
           label="Start Next Night"
           onAdvance={handleAdvance}
           disabled={action.isPending}
           icon={<WeatherMoonRegular />}
-        />
+        >
+          {activeTrial && (
+            <OwnerTrialPanel
+              gameId={gameId}
+              activeTrial={activeTrial}
+              players={gameState.players}
+              votePhaseSeconds={votePhaseSeconds}
+            />
+          )}
+        </OwnerAdvanceCard>
         <NightOutcomeSummary
           events={phase.nightResolution ?? []}
           players={gameState.players}
@@ -74,6 +83,8 @@ export function OwnerGameDayScreen({
         gameMode={gameState.gameMode}
         deadPlayerIds={gameState.deadPlayerIds}
         gameOwnerId={gameState.gameOwner?.id}
+        isDaytime
+        hasActiveTrial={hasActiveTrial}
       />
       <GameRolesList
         roles={gameState.rolesInPlay ?? []}

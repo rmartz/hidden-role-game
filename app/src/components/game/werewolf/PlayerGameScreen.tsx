@@ -43,5 +43,11 @@ export function PlayerGameScreen({ gameId, gameState }: PlayerGameScreenProps) {
   }
 
   if (!turnState) return null;
-  return <PlayerGameDayScreen gameState={gameState} turnState={turnState} />;
+  return (
+    <PlayerGameDayScreen
+      gameId={gameId}
+      gameState={gameState}
+      turnState={turnState}
+    />
+  );
 }

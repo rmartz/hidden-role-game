@@ -47,7 +47,6 @@ export function OwnerGameNightScreen({
   gameState,
   turnState,
 }: OwnerGameNightScreenProps) {
-  const nightPhaseSeconds = gameState.timerConfig?.nightPhaseSeconds ?? null;
   const action = useGameAction(gameId);
 
   const { phase } = turnState;
@@ -202,16 +201,6 @@ export function OwnerGameNightScreen({
     gameState.visibleRoleAssignments,
   );
 
-  const timer =
-    nightPhaseSeconds !== null
-      ? {
-          durationSeconds: nightPhaseSeconds,
-          startedAt: phaseStartedAt,
-          onTimerTrigger: handleAdvance,
-          resetKey: currentPhaseIndex,
-        }
-      : { startedAt: phaseStartedAt, resetKey: currentPhaseIndex };
-
   return (
     <div className="p-5">
       <h1 className="text-2xl font-bold mb-4">
@@ -221,16 +210,12 @@ export function OwnerGameNightScreen({
           nightPhaseOrder.length,
         )}
       </h1>
-      {timer.durationSeconds !== undefined ? (
-        <GameTimer
-          durationSeconds={timer.durationSeconds}
-          startedAt={timer.startedAt}
-          onTimerTrigger={timer.onTimerTrigger}
-          resetKey={timer.resetKey}
-        />
-      ) : (
-        <GameTimer startedAt={timer.startedAt} resetKey={timer.resetKey} />
-      )}
+      <GameTimer
+        durationSeconds={gameState.timerConfig?.nightPhaseSeconds}
+        startedAt={phaseStartedAt}
+        onTimerTrigger={handleAdvance}
+        resetKey={currentPhaseIndex}
+      />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
         <OwnerAdvanceCard
           label={
