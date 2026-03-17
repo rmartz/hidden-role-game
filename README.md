@@ -82,6 +82,10 @@ Copy `app/.env.example` to `app/.env.local` and fill in your Firebase project va
 | `NEXT_PUBLIC_FIREBASE_PROJECT_ID`   | Client SDK project ID                      |
 | `NEXT_PUBLIC_FIREBASE_DATABASE_URL` | Client SDK RTDB URL                        |
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for code style guidelines and conventions.
+
 ## Getting Started
 
 ```bash
