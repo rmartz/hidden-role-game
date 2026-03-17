@@ -125,6 +125,17 @@ export function OwnerGameNightScreen({
 
   const isFirstTurn = turnState.turn === 1;
 
+  const isActionConfirmed = isGroupPhase
+    ? !!groupAction?.confirmed
+    : activeTargetConfirmed;
+  const isWitchAbilitySkipped =
+    (activePhaseKey as WerewolfRole) === WerewolfRole.Witch &&
+    turnState.witchAbilityUsed;
+  const unconfirmedWarning =
+    !isFirstTurn && !isWitchAbilitySkipped && !isActionConfirmed
+      ? "Player has not confirmed their choice"
+      : undefined;
+
   const activeRoleDef = modeConfig.roles[baseActivePhaseKey] as
     | WerewolfRoleDefinition
     | undefined;
@@ -205,6 +216,7 @@ export function OwnerGameNightScreen({
           label={isLastPhase ? "Start the Day" : "Next Role"}
           onAdvance={handleAdvance}
           disabled={action.isPending}
+          unconfirmedWarning={unconfirmedWarning}
         >
           <p className="mb-4 text-muted-foreground">
             Currently awake:{" "}
