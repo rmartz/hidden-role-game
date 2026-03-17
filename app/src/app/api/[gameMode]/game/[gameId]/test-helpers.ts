@@ -7,7 +7,7 @@ import {
   makeCreateGameParams,
 } from "@/app/api/test-utils";
 
-export async function setupStartedGame() {
+export async function setupStartedSecretVillainGame() {
   const createRes = await createLobby(
     postRequest("http://localhost/api/lobby/create", { playerName: "Alice" }),
   );

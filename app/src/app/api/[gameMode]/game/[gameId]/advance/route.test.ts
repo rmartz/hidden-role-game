@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { POST as advanceGame } from "./route";
-import { setupStartedGame } from "../test-helpers";
+import { setupStartedSecretVillainGame } from "../test-helpers";
 import { makeGameParams } from "@/app/api/test-utils";
 
 describe("POST /api/[gameMode]/game/[gameId]/advance", () => {
@@ -33,7 +33,7 @@ describe("POST /api/[gameMode]/game/[gameId]/advance", () => {
   });
 
   it("should return 409 when game mode param does not match the game", async () => {
-    const { gameId, aliceSession } = await setupStartedGame();
+    const { gameId, aliceSession } = await setupStartedSecretVillainGame();
 
     const res = await advanceGame(
       new Request(`http://localhost/api/avalon/game/${gameId}/advance`, {

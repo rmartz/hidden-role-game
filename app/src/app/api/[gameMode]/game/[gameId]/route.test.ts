@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { GET as getGameState } from "./route";
-import { setupStartedGame } from "./test-helpers";
+import { setupStartedSecretVillainGame } from "./test-helpers";
 import {
   postRequest,
   makeGameParams,
@@ -13,7 +13,7 @@ import { POST as startGame } from "../create/route";
 
 describe("GET /api/game/[gameId]", () => {
   it("should return the player game state for a valid session", async () => {
-    const { gameId, aliceSession } = await setupStartedGame();
+    const { gameId, aliceSession } = await setupStartedSecretVillainGame();
 
     const res = await getGameState(
       new Request(`http://localhost/api/secret-villain/game/${gameId}`, {
@@ -57,7 +57,7 @@ describe("GET /api/game/[gameId]", () => {
   });
 
   it("should return 403 with wrong session header for a valid game", async () => {
-    const { gameId } = await setupStartedGame();
+    const { gameId } = await setupStartedSecretVillainGame();
 
     const res = await getGameState(
       new Request(`http://localhost/api/secret-villain/game/${gameId}`, {
@@ -69,7 +69,7 @@ describe("GET /api/game/[gameId]", () => {
   });
 
   it("should return 409 when the game mode param does not match the game", async () => {
-    const { gameId, aliceSession } = await setupStartedGame();
+    const { gameId, aliceSession } = await setupStartedSecretVillainGame();
 
     const res = await getGameState(
       new Request(`http://localhost/api/avalon/game/${gameId}`, {
@@ -81,7 +81,8 @@ describe("GET /api/game/[gameId]", () => {
   });
 
   it("should show Secret Villain bad role player their bad teammates", async () => {
-    const { gameId, aliceSession, bobSession } = await setupStartedGame();
+    const { gameId, aliceSession, bobSession } =
+      await setupStartedSecretVillainGame();
 
     const aliceRes = await getGameState(
       new Request(`http://localhost/api/secret-villain/game/${gameId}`, {
