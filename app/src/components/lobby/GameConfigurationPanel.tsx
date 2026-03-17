@@ -35,9 +35,9 @@ interface EditableProps {
   onStartGame: (roleSlots: RoleSlot[], gameMode: GameMode) => void;
 }
 
-type Props = ReadOnlyProps | EditableProps;
+type GameConfigurationPanelProps = ReadOnlyProps | EditableProps;
 
-export function GameConfigurationPanel(props: Props) {
+export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
   const { config, playerCount, readOnly } = props;
 
   const dispatch = useAppDispatch();

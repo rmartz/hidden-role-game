@@ -5,18 +5,21 @@ import type { ActiveTrial } from "@/lib/game-modes/werewolf";
 import { WEREWOLF_COPY, WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { PublicLobbyPlayer } from "@/server/types/lobby";
 import { useGameAction } from "@/hooks";
+import { GameTimer } from "@/components/game";
 import { Button } from "@/components/ui/button";
 
 interface OwnerTrialPanelProps {
   gameId: string;
   activeTrial: ActiveTrial;
   players: PublicLobbyPlayer[];
+  votePhaseSeconds: number | undefined;
 }
 
 export function OwnerTrialPanel({
   gameId,
   activeTrial,
   players,
+  votePhaseSeconds,
 }: OwnerTrialPanelProps) {
   const action = useGameAction(gameId);
   const defendant = players.find((p) => p.id === activeTrial.defendantId);
@@ -53,11 +56,19 @@ export function OwnerTrialPanel({
     );
   }
 
+  const trialStartedAt = new Date(activeTrial.startedAt);
+
   return (
     <div className="mb-3 pb-3 border-b">
       <p className="font-semibold mb-2">
         {trial.narratorTrialHeading(defendantName)}
       </p>
+      <GameTimer
+        durationSeconds={votePhaseSeconds}
+        startedAt={trialStartedAt}
+        onTimerTrigger={handleResolve}
+        resetKey={activeTrial.startedAt}
+      />
       <p className="text-sm text-muted-foreground mb-3">
         {trial.guiltyInnocentTotal(
           guiltyCount,

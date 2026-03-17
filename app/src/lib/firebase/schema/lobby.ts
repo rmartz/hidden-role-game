@@ -114,7 +114,11 @@ export function firebaseToLobby(
       showRolesInPlay: pub.config
         .showRolesInPlay as LobbyConfig["showRolesInPlay"],
       ...(pub.config.timerConfig
-        ? { timerConfig: pub.config.timerConfig }
+        ? {
+            timerConfig: parseTimerConfig(
+              pub.config.timerConfig as Record<string, unknown>,
+            ),
+          }
         : {}),
     },
     ...(pub.gameId ? { gameId: pub.gameId } : {}),
@@ -123,6 +127,24 @@ export function firebaseToLobby(
 
 export function firebaseToRoleSlot(s: FirebaseRoleSlot): RoleSlot {
   return { roleId: s.roleId, min: s.min, max: s.max };
+}
+
+/** Strips null values from a raw Firebase TimerConfig (Firebase may return null for absent fields). */
+export function parseTimerConfig(raw: Record<string, unknown>): TimerConfig {
+  return {
+    ...(typeof raw.startCountdownSeconds === "number"
+      ? { startCountdownSeconds: raw.startCountdownSeconds }
+      : {}),
+    ...(typeof raw.nightPhaseSeconds === "number"
+      ? { nightPhaseSeconds: raw.nightPhaseSeconds }
+      : {}),
+    ...(typeof raw.dayPhaseSeconds === "number"
+      ? { dayPhaseSeconds: raw.dayPhaseSeconds }
+      : {}),
+    ...(typeof raw.votePhaseSeconds === "number"
+      ? { votePhaseSeconds: raw.votePhaseSeconds }
+      : {}),
+  };
 }
 
 /**
@@ -150,7 +172,11 @@ export function firebaseToPublicLobby(
       showRolesInPlay: pub.config
         .showRolesInPlay as LobbyConfig["showRolesInPlay"],
       ...(pub.config.timerConfig
-        ? { timerConfig: pub.config.timerConfig }
+        ? {
+            timerConfig: parseTimerConfig(
+              pub.config.timerConfig as Record<string, unknown>,
+            ),
+          }
         : {}),
     },
     ...(pub.gameId ? { gameId: pub.gameId } : {}),

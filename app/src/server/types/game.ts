@@ -113,6 +113,7 @@ export interface PlayerGameState {
   /** Active elimination trial. Sanitized view: no raw per-player vote breakdown. */
   activeTrial?: {
     defendantId: string;
+    startedAt: number;
     myVote?: DaytimeVote;
     voteCount: number;
     playerCount: number;

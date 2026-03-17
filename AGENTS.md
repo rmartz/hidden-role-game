@@ -22,6 +22,7 @@
 ## TypeScript
 
 - Strict mode throughout. No `any` types.
+- Do not use `null` unless required for API compatibility or when explicitly distinguishing `null` from `undefined`. Prefer `undefined` for absent/optional values throughout the codebase.
 - Prefer explicit `interface` names scoped to their component (e.g., `interface OwnerAdvanceCardProps` not `interface Props`).
 
 ## React / Next.js

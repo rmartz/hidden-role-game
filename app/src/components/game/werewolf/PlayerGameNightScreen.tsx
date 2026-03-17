@@ -30,8 +30,6 @@ export function PlayerGameNightScreen({
   turn,
   deadPlayerIds,
 }: PlayerGameNightScreenProps) {
-  const nightPhaseSeconds = gameState.timerConfig?.nightPhaseSeconds ?? null;
-
   const phaseStartedAt = useMemo(
     () => new Date(phase.startedAt),
     [phase.startedAt],
@@ -121,19 +119,11 @@ export function PlayerGameNightScreen({
         <h1 className="text-2xl font-bold mb-2">
           {WEREWOLF_COPY.night.yourTurn}
         </h1>
-        {nightPhaseSeconds !== null ? (
-          <GameTimer
-            durationSeconds={nightPhaseSeconds}
-            startedAt={phaseStartedAt}
-            onTimerTrigger={noop}
-            resetKey={phase.currentPhaseIndex}
-          />
-        ) : (
-          <GameTimer
-            startedAt={phaseStartedAt}
-            resetKey={phase.currentPhaseIndex}
-          />
-        )}
+        <GameTimer
+          durationSeconds={gameState.timerConfig?.nightPhaseSeconds}
+          startedAt={phaseStartedAt}
+          resetKey={phase.currentPhaseIndex}
+        />
         <p className="text-muted-foreground mb-4">
           {WEREWOLF_COPY.night.wakeUp}
         </p>
@@ -168,8 +158,4 @@ export function PlayerGameNightScreen({
       </div>
     </div>
   );
-}
-
-function noop() {
-  // no-op: player night screen has no timer action
 }

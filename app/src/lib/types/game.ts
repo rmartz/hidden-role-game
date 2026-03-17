@@ -149,14 +149,14 @@ export interface GameAction {
 // --- Phase Timer Configuration ---
 
 export interface TimerConfig {
-  /** Seconds for game-start countdown. null = no auto-advance (manual skip only). */
-  startCountdownSeconds: number | null;
-  /** Seconds per night role phase. null = manual only. */
-  nightPhaseSeconds: number | null;
-  /** Seconds for day discussion. null = manual only. */
-  dayPhaseSeconds: number | null;
-  /** Seconds for a daytime elimination vote. null = no auto-resolve. */
-  votePhaseSeconds: number | null;
+  /** Seconds for game-start countdown. Absent = no auto-advance (manual skip only). */
+  startCountdownSeconds?: number;
+  /** Seconds per night role phase. Absent = manual only. */
+  nightPhaseSeconds?: number;
+  /** Seconds for day discussion. Absent = manual only. */
+  dayPhaseSeconds?: number;
+  /** Seconds for a daytime elimination vote. Absent = no auto-resolve. */
+  votePhaseSeconds?: number;
 }
 
 // --- Lobby (top-level entity; game is absent until started) ---

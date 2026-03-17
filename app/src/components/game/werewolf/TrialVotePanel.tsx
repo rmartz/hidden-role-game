@@ -5,6 +5,7 @@ import type { DaytimeVote } from "@/lib/game-modes/werewolf";
 import { WEREWOLF_COPY, WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
 import { useGameAction } from "@/hooks";
+import { GameTimer } from "@/components/game";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -13,6 +14,7 @@ interface TrialVotePanelProps {
   activeTrial: NonNullable<PlayerGameState["activeTrial"]>;
   players: PlayerGameState["players"];
   myPlayerId?: string;
+  votePhaseSeconds?: number;
 }
 
 export function TrialVotePanel({
@@ -20,6 +22,7 @@ export function TrialVotePanel({
   activeTrial,
   players,
   myPlayerId,
+  votePhaseSeconds,
 }: TrialVotePanelProps) {
   const action = useGameAction(gameId);
   const defendant = players.find((p) => p.id === activeTrial.defendantId);
@@ -70,14 +73,23 @@ export function TrialVotePanel({
 
   const isDefendant = myPlayerId === activeTrial.defendantId;
   const hasVoted = !!activeTrial.myVote;
+  const trialStartedAt = new Date(activeTrial.startedAt);
+  const timer = (
+    <GameTimer
+      durationSeconds={votePhaseSeconds}
+      startedAt={trialStartedAt}
+      resetKey={activeTrial.startedAt}
+    />
+  );
 
   if (isDefendant) {
     return (
       <Card className="p-4 mb-4">
         <p className="font-semibold mb-1">{trial.youAreOnTrial}</p>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground mb-2">
           {trial.youAreOnTrialSubtext}
         </p>
+        {timer}
       </Card>
     );
   }
@@ -85,18 +97,20 @@ export function TrialVotePanel({
   return (
     <Card className="p-4 mb-4">
       <p className="font-semibold mb-1">{trial.voteHeading(defendantName)}</p>
-      <p className="text-sm text-muted-foreground mb-3">
+      {timer}
+      <p className="text-sm text-muted-foreground mb-3 mt-2">
         {trial.votesCast(activeTrial.voteCount, activeTrial.playerCount)}
         {hasVoted && activeTrial.myVote && trial.yourVote(activeTrial.myVote)}
       </p>
       {!hasVoted && (
-        <div className="flex justify-center gap-2">
+        <div className="flex justify-center gap-4">
           <Button
             size="sm"
-            variant="destructive"
+            variant="default"
             onClick={() => {
               castVote("guilty");
             }}
+            className="w-32"
             disabled={action.isPending}
           >
             {trial.guiltyButton}
@@ -107,6 +121,7 @@ export function TrialVotePanel({
             onClick={() => {
               castVote("innocent");
             }}
+            className="w-32"
             disabled={action.isPending}
           >
             {trial.innocentButton}

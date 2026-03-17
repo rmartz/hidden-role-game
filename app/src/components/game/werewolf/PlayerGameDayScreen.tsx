@@ -21,7 +21,6 @@ export function PlayerGameDayScreen({
   gameState,
   turnState,
 }: PlayerGameDayScreenProps) {
-  const dayPhaseSeconds = gameState.timerConfig?.dayPhaseSeconds ?? null;
   const { phase } = turnState;
   const isDaytime = phase.type === WerewolfPhase.Daytime;
   const phaseStartedAt = useMemo(
@@ -40,15 +39,10 @@ export function PlayerGameDayScreen({
           />
         )}
       </div>
-      {dayPhaseSeconds !== null ? (
-        <GameTimer
-          durationSeconds={dayPhaseSeconds}
-          startedAt={phaseStartedAt}
-          onTimerTrigger={noop}
-        />
-      ) : (
-        <GameTimer startedAt={phaseStartedAt} />
-      )}
+      <GameTimer
+        durationSeconds={gameState.timerConfig?.dayPhaseSeconds}
+        startedAt={phaseStartedAt}
+      />
       <p className="mb-4 text-muted-foreground">The game is underway.</p>
 
       <PlayerNightSummary
@@ -62,6 +56,7 @@ export function PlayerGameDayScreen({
           activeTrial={gameState.activeTrial}
           players={gameState.players}
           myPlayerId={gameState.myPlayerId}
+          votePhaseSeconds={gameState.timerConfig?.votePhaseSeconds}
         />
       )}
 
@@ -79,8 +74,4 @@ export function PlayerGameDayScreen({
       />
     </div>
   );
-}
-
-function noop() {
-  // no-op: player day screen has no timer action
 }

@@ -15,7 +15,6 @@ interface PlayerStartingScreenProps {
 }
 
 export function PlayerStartingScreen({ gameState }: PlayerStartingScreenProps) {
-  const durationSeconds = gameState.timerConfig?.startCountdownSeconds ?? null;
   const startedAtMs =
     gameState.status.type === GameStatus.Starting
       ? gameState.status.startedAt
@@ -28,15 +27,10 @@ export function PlayerStartingScreen({ gameState }: PlayerStartingScreenProps) {
   return (
     <div className="p-5 max-w-lg mx-auto">
       <h1 className="text-2xl font-bold mb-4">Game Starting</h1>
-      {durationSeconds !== null ? (
-        <GameTimer
-          durationSeconds={durationSeconds}
-          startedAt={startedAt}
-          onTimerTrigger={noop}
-        />
-      ) : (
-        <GameTimer startedAt={startedAt} />
-      )}
+      <GameTimer
+        durationSeconds={gameState.timerConfig?.startCountdownSeconds}
+        startedAt={startedAt}
+      />
 
       {gameState.myRole && (
         <div className="mb-5">
@@ -56,8 +50,4 @@ export function PlayerStartingScreen({ gameState }: PlayerStartingScreenProps) {
       />
     </div>
   );
-}
-
-function noop() {
-  // no-op: player starting screen has no timer action
 }

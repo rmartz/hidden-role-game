@@ -58,16 +58,14 @@ export function OwnerPlayerActionItem({
   if (isDaytime) {
     return (
       <div className="flex gap-1">
-        {!hasActiveTrial && (
-          <Button
-            variant="outline"
-            size="xs"
-            onClick={handlePutToVote}
-            disabled={action.isPending}
-          >
-            {WEREWOLF_COPY.trial.putToVote}
-          </Button>
-        )}
+        <Button
+          variant="outline"
+          size="xs"
+          onClick={handlePutToVote}
+          disabled={action.isPending || !!hasActiveTrial}
+        >
+          {WEREWOLF_COPY.trial.putToVote}
+        </Button>
       </div>
     );
   }

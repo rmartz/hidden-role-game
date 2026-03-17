@@ -293,6 +293,7 @@ export class GameSerializationService {
 
       result.activeTrial = {
         defendantId: activeTrial.defendantId,
+        startedAt: activeTrial.startedAt,
         ...(myVote !== undefined ? { myVote } : {}),
         voteCount: activeTrial.votes.length,
         playerCount: alivePlayerCount,

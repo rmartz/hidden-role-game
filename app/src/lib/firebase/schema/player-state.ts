@@ -1,4 +1,5 @@
 import type { TimerConfig, GameStatusState, Team } from "@/lib/types";
+import { parseTimerConfig } from "./lobby";
 import type { AnyNightAction, DaytimeVote } from "@/lib/game-modes/werewolf";
 import type {
   PlayerGameState,
@@ -40,6 +41,7 @@ export interface FirebasePlayerState {
   timerConfig?: TimerConfig;
   activeTrial?: {
     defendantId: string;
+    startedAt: number;
     myVote?: DaytimeVote;
     voteCount: number;
     playerCount: number;
@@ -143,7 +145,13 @@ export function firebaseToPlayerState(
       ? { investigationResult: raw.investigationResult }
       : {}),
     ...(raw.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
-    ...(raw.timerConfig ? { timerConfig: raw.timerConfig } : {}),
+    ...(raw.timerConfig
+      ? {
+          timerConfig: parseTimerConfig(
+            raw.timerConfig as Record<string, unknown>,
+          ),
+        }
+      : {}),
     ...(raw.activeTrial
       ? {
           activeTrial: raw.activeTrial as PlayerGameState["activeTrial"],

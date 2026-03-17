@@ -24,7 +24,8 @@ export function OwnerGameDayScreen({
   gameState,
   turnState,
 }: OwnerGameDayScreenProps) {
-  const dayPhaseSeconds = gameState.timerConfig?.dayPhaseSeconds ?? null;
+  const dayPhaseSeconds = gameState.timerConfig?.dayPhaseSeconds;
+  const votePhaseSeconds = gameState.timerConfig?.votePhaseSeconds;
   const action = useGameAction(gameId);
 
   const handleAdvance = useCallback(() => {
@@ -48,16 +49,12 @@ export function OwnerGameDayScreen({
   return (
     <div className="p-5">
       <h1 className="text-2xl font-bold mb-4">{`Day — Turn ${String(turnState.turn)}`}</h1>
-      {dayPhaseSeconds !== null ? (
-        <GameTimer
-          durationSeconds={dayPhaseSeconds}
-          startedAt={phaseStartedAt}
-          onTimerTrigger={handleAdvance}
-          resetKey={turnState.turn}
-        />
-      ) : (
-        <GameTimer startedAt={phaseStartedAt} resetKey={turnState.turn} />
-      )}
+      <GameTimer
+        durationSeconds={dayPhaseSeconds}
+        startedAt={phaseStartedAt}
+        onTimerTrigger={handleAdvance}
+        resetKey={turnState.turn}
+      />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
         <OwnerAdvanceCard
           label="Start Next Night"
@@ -70,6 +67,7 @@ export function OwnerGameDayScreen({
               gameId={gameId}
               activeTrial={activeTrial}
               players={gameState.players}
+              votePhaseSeconds={votePhaseSeconds}
             />
           )}
         </OwnerAdvanceCard>

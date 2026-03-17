@@ -42,7 +42,7 @@ const TIMER_ROWS: TimerRow[] = [
   {
     label: "Voting phase",
     field: "votePhaseSeconds",
-    defaultSeconds: 60,
+    defaultSeconds: 20,
     min: 15,
     max: 300,
     step: 15,
@@ -67,15 +67,10 @@ export function TimerConfigPanel({ timerConfig, disabled, onChange }: Props) {
 
   function handleToggle(row: TimerRow, enabled: boolean) {
     if (!onChange) return;
-    const current = timerConfig ?? {
-      startCountdownSeconds: null,
-      nightPhaseSeconds: null,
-      dayPhaseSeconds: null,
-      votePhaseSeconds: null,
-    };
+    const current = timerConfig ?? {};
     onChange({
       ...current,
-      [row.field]: enabled ? row.defaultSeconds : null,
+      [row.field]: enabled ? row.defaultSeconds : undefined,
     });
   }
 
@@ -85,7 +80,7 @@ export function TimerConfigPanel({ timerConfig, disabled, onChange }: Props) {
   ) {
     if (!onChange || !timerConfig) return;
     const currentValue = timerConfig[row.field];
-    if (currentValue === null) return;
+    if (currentValue === undefined) return;
     const newValue =
       direction === "increment"
         ? Math.min(row.max, currentValue + row.step)
