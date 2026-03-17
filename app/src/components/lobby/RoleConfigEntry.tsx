@@ -1,5 +1,6 @@
 import type { GameMode, RoleDefinition, Team } from "@/lib/types";
 import { RoleConfigMode } from "@/lib/types";
+import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   incrementRoleCount,
@@ -10,6 +11,7 @@ import {
 import { RoleLabel } from "@/components/RoleLabel";
 import type { IncrementDirection } from "./Incrementer";
 import { Incrementer } from "./Incrementer";
+import { RoleTooltip } from "./RoleTooltip";
 
 interface ReadOnlyProps {
   role: RoleDefinition<string, Team>;
@@ -70,8 +72,12 @@ export function RoleConfigEntry(props: RoleConfigEntryProps) {
     <li
       className={`py-1 ${isAdvanced ? "flex flex-col gap-1" : "flex items-start gap-2"}`}
     >
-      <span className="min-w-40">
+      <span className="min-w-40 flex items-center gap-1">
         <RoleLabel role={role} gameMode={gameMode} />
+        <RoleTooltip
+          role={role}
+          srLabel={WEREWOLF_COPY.glossary.roleInfoLabel}
+        />
       </span>
       {readOnly ? (
         roleConfigMode === RoleConfigMode.Advanced ? (

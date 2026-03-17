@@ -77,6 +77,11 @@ export const WEREWOLF_COPY = {
     mustVoteGuiltyNote:
       "As the Village Idiot, your vote was automatically cast as Guilty.",
   },
+  glossary: {
+    dialogTitle: "Role Glossary",
+    openButton: "Role Glossary",
+    roleInfoLabel: "Role information",
+  },
   narrator: {
     nightTitle: (turn: number, phase: number, total: number) =>
       `Night — Turn ${String(turn)} (${String(phase)}/${String(total)})`,

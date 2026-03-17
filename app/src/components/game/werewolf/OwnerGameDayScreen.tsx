@@ -5,9 +5,14 @@ import { WeatherMoonRegular } from "@fluentui/react-icons";
 import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase, WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
+import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 import type { PlayerGameState } from "@/server/types";
 import { useGameAction } from "@/hooks";
-import { GameRolesList, GameTimer } from "@/components/game";
+import {
+  GameRolesList,
+  GameTimer,
+  RoleGlossaryDialog,
+} from "@/components/game";
 import { OwnerAdvanceCard } from "./OwnerAdvanceCard";
 import { NightOutcomeSummary } from "./NightOutcomeSummary";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
@@ -45,6 +50,11 @@ export function OwnerGameDayScreen({
   const modeConfig = GAME_MODES[gameState.gameMode];
   const activeTrial = phase.activeTrial;
   const hasActiveTrial = !!activeTrial && !activeTrial.verdict;
+  const glossaryRoles = gameState.rolesInPlay?.length
+    ? gameState.rolesInPlay
+        .map((r) => modeConfig.roles[r.id])
+        .filter((r) => r !== undefined)
+    : Object.values(modeConfig.roles);
 
   return (
     <div className="p-5">
@@ -90,6 +100,14 @@ export function OwnerGameDayScreen({
         roles={gameState.rolesInPlay ?? []}
         gameMode={gameState.gameMode}
       />
+      <div className="mt-3">
+        <RoleGlossaryDialog
+          roles={glossaryRoles}
+          gameMode={gameState.gameMode}
+          title={WEREWOLF_COPY.glossary.dialogTitle}
+          triggerLabel={WEREWOLF_COPY.glossary.openButton}
+        />
+      </div>
     </div>
   );
 }

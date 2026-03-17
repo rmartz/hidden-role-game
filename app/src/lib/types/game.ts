@@ -73,6 +73,10 @@ export interface RoleDefinition<
   id: Role;
   name: string;
   team: T;
+  /** Short one-line description shown in tooltips and glossary headers. */
+  summary?: string;
+  /** Full description shown in the expanded glossary entry. */
+  description?: string;
   canSeeTeam?: T[];
   canSeeRole?: Role[];
 }
