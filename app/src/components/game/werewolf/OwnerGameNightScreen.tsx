@@ -131,10 +131,6 @@ export function OwnerGameNightScreen({
   const isWitchAbilitySkipped =
     (activePhaseKey as WerewolfRole) === WerewolfRole.Witch &&
     turnState.witchAbilityUsed;
-  const unconfirmedWarning =
-    !isFirstTurn && !isWitchAbilitySkipped && !isActionConfirmed
-      ? "Player has not confirmed their choice"
-      : undefined;
 
   const activeRoleDef = modeConfig.roles[baseActivePhaseKey] as
     | WerewolfRoleDefinition
@@ -153,6 +149,13 @@ export function OwnerGameNightScreen({
     activeTargetName,
     gameState.visibleRoleAssignments,
   );
+
+  const unconfirmedWarning =
+    !isFirstTurn && !isWitchAbilitySkipped && !isActionConfirmed
+      ? "Player has not confirmed their choice"
+      : investigationResult && !isResultRevealed
+        ? "Investigation result has not been revealed to the player"
+        : undefined;
 
   const resolvedVotes = (groupAction?.votes ?? []).map((vote) => ({
     key: vote.playerId,
