@@ -14,6 +14,10 @@ export function makePlayerParams(lobbyId: string, playerId: string) {
   return { params: Promise.resolve({ lobbyId, playerId }) };
 }
 
-export function makeGameParams(gameId: string) {
-  return { params: Promise.resolve({ gameId }) };
+export function makeGameParams(gameId: string, gameMode: string) {
+  return { params: Promise.resolve({ gameId, gameMode }) };
+}
+
+export function makeCreateGameParams(gameMode: string) {
+  return { params: Promise.resolve({ gameMode }) };
 }

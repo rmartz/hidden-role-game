@@ -127,9 +127,12 @@ describe("useGameStateQuery", () => {
     });
 
     const { wrapper } = createWrapper();
-    const { result } = renderHook(() => useGameStateQuery("game-1"), {
-      wrapper,
-    });
+    const { result } = renderHook(
+      () => useGameStateQuery("game-1", GameMode.SecretVillain),
+      {
+        wrapper,
+      },
+    );
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
@@ -145,9 +148,12 @@ describe("useGameStateQuery", () => {
     });
 
     const { wrapper } = createWrapper();
-    const { result } = renderHook(() => useGameStateQuery("game-1"), {
-      wrapper,
-    });
+    const { result } = renderHook(
+      () => useGameStateQuery("game-1", GameMode.SecretVillain),
+      {
+        wrapper,
+      },
+    );
 
     await waitFor(() => {
       expect(result.current.isError).toBe(true);
@@ -162,9 +168,12 @@ describe("useGameStateQuery", () => {
     });
 
     const { wrapper } = createWrapper();
-    const { result } = renderHook(() => useGameStateQuery("game-1"), {
-      wrapper,
-    });
+    const { result } = renderHook(
+      () => useGameStateQuery("game-1", GameMode.SecretVillain),
+      {
+        wrapper,
+      },
+    );
 
     await waitFor(() => {
       expect(result.current.isError).toBe(true);
@@ -179,9 +188,12 @@ describe("useGameStateQuery", () => {
     });
 
     const { wrapper } = createWrapper();
-    const { result } = renderHook(() => useGameStateQuery("game-1"), {
-      wrapper,
-    });
+    const { result } = renderHook(
+      () => useGameStateQuery("game-1", GameMode.SecretVillain),
+      {
+        wrapper,
+      },
+    );
 
     await waitFor(() => {
       expect(result.current.isError).toBe(true);
@@ -196,9 +208,12 @@ describe("useGameStateQuery", () => {
     });
 
     const { wrapper } = createWrapper();
-    const { result } = renderHook(() => useGameStateQuery("game-1"), {
-      wrapper,
-    });
+    const { result } = renderHook(
+      () => useGameStateQuery("game-1", GameMode.SecretVillain),
+      {
+        wrapper,
+      },
+    );
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);

@@ -1,4 +1,3 @@
-import { GameMode } from "@/lib/types";
 import { ServerResponseStatus } from "@/server/types";
 import type { CreateGameRequest } from "@/server/types";
 import { lobbyService } from "@/services/LobbyService";
@@ -6,18 +5,21 @@ import { gameService } from "@/services/GameService";
 import {
   authenticateLobby,
   errorResponse,
+  parseGameMode,
   toPublicLobby,
 } from "@/server/utils";
 import { getRoleSlotsRequired } from "@/lib/game-modes";
 
-export async function POST(request: Request): Promise<Response> {
-  const sessionId = request.headers.get("x-session-id") ?? undefined;
-  const { lobbyId, roleSlots, gameMode } =
-    (await request.json()) as CreateGameRequest;
+export async function POST(
+  request: Request,
+  { params }: { params: Promise<{ gameMode: string }> },
+): Promise<Response> {
+  const { gameMode: gameModeParam } = await params;
+  const gameMode = parseGameMode(gameModeParam);
+  if (!gameMode) return errorResponse("Unknown game mode", 400);
 
-  if (!Object.values(GameMode).includes(gameMode)) {
-    return errorResponse("Unknown game mode", 400);
-  }
+  const sessionId = request.headers.get("x-session-id") ?? undefined;
+  const { lobbyId, roleSlots } = (await request.json()) as CreateGameRequest;
 
   const auth = await authenticateLobby(lobbyId, sessionId, {
     requireOwner: true,
@@ -25,6 +27,10 @@ export async function POST(request: Request): Promise<Response> {
   });
   if (auth instanceof Response) return auth;
   const { lobby } = auth;
+
+  if (lobby.config.gameMode !== gameMode) {
+    return errorResponse("Game mode does not match lobby configuration", 409);
+  }
 
   const roleSlotsRequired = getRoleSlotsRequired(
     gameMode,

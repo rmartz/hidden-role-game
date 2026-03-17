@@ -43,7 +43,7 @@ export default function DebugPage() {
       });
       const body = (await res.json()) as {
         status: string;
-        data?: { gameId: string; players: DebugPlayer[] };
+        data?: { gameId: string; gameMode: GameMode; players: DebugPlayer[] };
         error?: string;
       };
       if (!res.ok) {

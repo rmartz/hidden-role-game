@@ -67,9 +67,9 @@ export default function LobbyPage() {
 
   // If the user has a session for a different lobby, send them to the conflict resolution page.
   useEffect(() => {
-    if (hasDifferentLobby)
-      router.replace(`/${gameModeParam}/lobby/${lobbyId}/conflict`);
-  }, [hasDifferentLobby, lobbyId, gameModeParam, router]);
+    if (hasDifferentLobby && validatedGameMode)
+      router.replace(`/${validatedGameMode}/lobby/${lobbyId}/conflict`);
+  }, [hasDifferentLobby, lobbyId, validatedGameMode, router]);
 
   // If the actual game mode doesn't match the URL, redirect to the correct URL.
   useEffect(() => {

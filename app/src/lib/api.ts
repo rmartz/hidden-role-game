@@ -127,7 +127,7 @@ export async function startGame(
   const response = await fetch(`/api/${gameMode}/game/create`, {
     method: "POST",
     headers,
-    body: JSON.stringify({ lobbyId, roleSlots, gameMode }),
+    body: JSON.stringify({ lobbyId, roleSlots }),
   });
   return (await response.json()) as ServerResponse<{ lobby: PublicLobby }>;
 }

@@ -13,7 +13,6 @@ export type { RoleSlot };
 export interface CreateGameRequest {
   lobbyId: string;
   roleSlots: RoleSlot[];
-  gameMode: GameMode;
 }
 
 export interface PublicRoleInfo {

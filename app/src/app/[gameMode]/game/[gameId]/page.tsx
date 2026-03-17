@@ -6,6 +6,7 @@ import { GameMode, GameStatus } from "@/lib/types";
 import type { PlayerGameState } from "@/server/types";
 import { useGameStateQuery, GameModeContext } from "@/hooks";
 import { WerewolfGameScreen } from "@/components/game";
+import { GAME_PAGE_COPY } from "../copy";
 
 const POLL_INTERVAL_MS = 2000;
 
@@ -18,7 +19,7 @@ function getGameScreen(
     case GameMode.Werewolf:
       return <WerewolfGameScreen gameId={gameId} gameState={gameState} />;
     default:
-      return null;
+      throw new Error(`Unhandled game mode: ${gameMode}`);
   }
 }
 
@@ -83,15 +84,18 @@ export default function GameModePage() {
     : null;
 
   const loadingMessage = isLoading ? (
-    <p className="text-muted-foreground">Loading…</p>
+    <p className="text-muted-foreground">{GAME_PAGE_COPY.loading}</p>
   ) : null;
   const errorMessage =
     error && error.message !== "401" && error.message !== "403" ? (
-      <p className="text-destructive text-sm">Error: {error.message}</p>
+      <p className="text-destructive text-sm">
+        {GAME_PAGE_COPY.errorPrefix}
+        {error.message}
+      </p>
     ) : null;
   const loadingView = (
     <div className="p-5">
-      <h1 className="text-2xl font-bold mb-4">Hidden Role Game</h1>
+      <h1 className="text-2xl font-bold mb-4">{GAME_PAGE_COPY.title}</h1>
       {loadingMessage}
       {errorMessage}
     </div>
