@@ -1,3 +1,5 @@
+"use client";
+
 import type { ReactNode } from "react";
 import { GAME_MODES } from "@/lib/game-modes";
 import type { GameMode } from "@/lib/types";
@@ -11,12 +13,7 @@ import {
 } from "@/components/ui/item";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RoleLabel } from "@/components/RoleLabel";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { RoleTooltip } from "@/components/lobby";
 import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 
 interface NarratorPlayerRoleListsProps {
@@ -27,15 +24,6 @@ interface NarratorPlayerRoleListsProps {
   renderActions?: (playerId: string, isDead: boolean) => ReactNode;
 }
 
-function getRoleInfo(
-  roleId: string,
-  gameMode: GameMode | undefined,
-): string | undefined {
-  if (!gameMode) return undefined;
-  const roleDef = GAME_MODES[gameMode].roles[roleId];
-  return roleDef?.summary ?? roleDef?.description;
-}
-
 export function NarratorPlayerRoleLists({
   assignments,
   gameMode,
@@ -44,29 +32,16 @@ export function NarratorPlayerRoleLists({
 }: NarratorPlayerRoleListsProps) {
   if (assignments.length === 0) return null;
 
+  const modeConfig = gameMode ? GAME_MODES[gameMode] : undefined;
   const deadSet = new Set(deadPlayerIds ?? []);
   const active = assignments.filter((a) => !deadSet.has(a.player.id));
   const eliminated = assignments.filter((a) => deadSet.has(a.player.id));
-
-  const roleInfoTooltip = (roleId: string) => {
-    const info = getRoleInfo(roleId, gameMode);
-    if (!info) return null;
-    return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger
-            className="text-xs text-muted-foreground cursor-help px-1"
-            aria-label={WEREWOLF_COPY.roleDisplay.roleInfoLabel}
-          >
-            ?
-          </TooltipTrigger>
-          <TooltipContent side="bottom" className="max-w-56 text-wrap">
-            {info}
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    );
-  };
+  const withFullRole = (a: VisibleTeammate) => ({
+    ...a,
+    fullRole: modeConfig?.roles[a.role.id],
+  });
+  const activeWithRole = active.map(withFullRole);
+  const eliminatedWithRole = eliminated.map(withFullRole);
 
   return (
     <Card className="mb-5">
@@ -74,32 +49,37 @@ export function NarratorPlayerRoleLists({
         <CardTitle>Player Roles</CardTitle>
       </CardHeader>
       <CardContent>
-        {active.length === 0 ? (
+        {activeWithRole.length === 0 ? (
           <p className="text-sm text-muted-foreground italic">None</p>
         ) : (
           <ItemGroup>
-            {active.map(({ player, role }) => (
+            {activeWithRole.map(({ player, role, fullRole }) => (
               <Item key={player.id} size="sm">
                 <ItemContent>
                   <ItemTitle>{player.name}</ItemTitle>
                 </ItemContent>
                 <ItemActions>
                   <RoleLabel role={role} gameMode={gameMode} />
-                  {roleInfoTooltip(role.id)}
+                  {fullRole && (
+                    <RoleTooltip
+                      role={fullRole}
+                      srLabel={WEREWOLF_COPY.roleDisplay.roleInfoLabel}
+                    />
+                  )}
                   {renderActions?.(player.id, false)}
                 </ItemActions>
               </Item>
             ))}
           </ItemGroup>
         )}
-        {eliminated.length > 0 && (
+        {eliminatedWithRole.length > 0 && (
           <>
             <div className="border-t my-3" />
             <p className="text-sm font-semibold mb-2 text-muted-foreground">
               Eliminated
             </p>
             <ItemGroup>
-              {eliminated.map(({ player, role }) => (
+              {eliminatedWithRole.map(({ player, role, fullRole }) => (
                 <Item key={player.id} size="sm">
                   <ItemContent>
                     <ItemTitle className="italic text-muted-foreground line-through">
@@ -108,7 +88,12 @@ export function NarratorPlayerRoleLists({
                   </ItemContent>
                   <ItemActions>
                     <RoleLabel role={role} gameMode={gameMode} />
-                    {roleInfoTooltip(role.id)}
+                    {fullRole && (
+                      <RoleTooltip
+                        role={fullRole}
+                        srLabel={WEREWOLF_COPY.roleDisplay.roleInfoLabel}
+                      />
+                    )}
                     {renderActions?.(player.id, true)}
                   </ItemActions>
                 </Item>
