@@ -48,16 +48,17 @@ export default function LobbyPage() {
   const isOwner =
     !!fetchLobby.data && fetchLobby.data.ownerPlayerId === myPlayerId;
   const gameId = fetchLobby.data?.gameId;
+  const gameMode = fetchLobby.data?.config.gameMode;
 
   // If the user has a session for a different lobby, send them to the conflict resolution page.
   useEffect(() => {
     if (hasDifferentLobby) router.replace(`/lobby/${lobbyId}/conflict`);
   }, [hasDifferentLobby, lobbyId, router]);
 
-  // Once the game starts, redirect all players to the game page.
+  // Once the game starts, redirect all players to the game mode page.
   useEffect(() => {
-    if (gameId) router.push(`/game/${gameId}`);
-  }, [gameId, router]);
+    if (gameId && gameMode) router.push(`/game/${gameId}/${gameMode}`);
+  }, [gameId, gameMode, router]);
 
   // If the lobby doesn't exist or the session is invalid, return to the home page.
   useEffect(() => {
