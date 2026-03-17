@@ -4,6 +4,7 @@ import {
   currentTurnState,
   validateActiveNightPlayer,
   getGroupPhasePlayerIds,
+  isRoleActive,
 } from "../utils";
 import { WerewolfRole } from "../roles";
 
@@ -57,7 +58,7 @@ export const confirmNightTargetAction: GameAction = {
       phase.nightActions[activePhaseKey] = { ...action, confirmed: true };
     }
 
-    if ((activePhaseKey as WerewolfRole) === WerewolfRole.Witch) {
+    if (isRoleActive(activePhaseKey, WerewolfRole.Witch)) {
       ts.witchAbilityUsed = true;
     }
   },

@@ -12,6 +12,7 @@ import {
   TargetCategory,
   getInterimAttackedPlayerIds,
   baseGroupPhaseKey,
+  isRoleActive,
 } from "@/lib/game-modes/werewolf";
 import type {
   AnyNightAction,
@@ -157,7 +158,7 @@ export class GameSerializationService {
     // For the Witch, include attacked-player info and ability-used state.
     // This must run before the early-return below, since the Witch may not
     // have chosen a target yet but still needs to see who is under attack.
-    if ((myRole.id as WerewolfRole) === WerewolfRole.Witch) {
+    if (isRoleActive(myRole.id, WerewolfRole.Witch)) {
       const ts =
         game.status.type === GameStatus.Playing
           ? (game.status.turnState as WerewolfTurnState | undefined)

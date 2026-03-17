@@ -9,6 +9,7 @@ import {
   getGroupPhasePlayerIds,
   getGroupPhaseMemberIds,
   computeSuggestedTarget,
+  isRoleActive,
 } from "../utils";
 import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
@@ -45,10 +46,7 @@ export const setNightTargetAction: GameAction = {
     }
 
     // Witch can only use her ability once per game.
-    if (
-      (phaseKey as WerewolfRole) === WerewolfRole.Witch &&
-      ts.witchAbilityUsed
-    )
+    if (isRoleActive(phaseKey, WerewolfRole.Witch) && ts.witchAbilityUsed)
       return false;
 
     // targetPlayerId undefined = clear; null = intentional skip; string = set target.

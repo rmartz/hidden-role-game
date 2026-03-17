@@ -4,7 +4,7 @@ import { TargetCategory } from "../types";
 import type { AnyNightAction, NightResolutionEvent } from "../types";
 import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
-import { isGroupPhaseKey } from "./phase-keys";
+import { isGroupPhaseKey, isRoleActive } from "./phase-keys";
 
 function allTeamBadAreDead(
   roleAssignments: PlayerRoleAssignment[],
@@ -56,10 +56,7 @@ function collectBaseAttacksAndProtections(
   const protections = new Map<string, string[]>();
 
   for (const [phaseKey, action] of Object.entries(nightActions)) {
-    if (
-      (phaseKey as WerewolfRole) === WerewolfRole.Witch ||
-      (phaseKey as WerewolfRole) === WerewolfRole.Spellcaster
-    )
+    if (isRoleActive(phaseKey, [WerewolfRole.Witch, WerewolfRole.Spellcaster]))
       continue;
 
     if (isGroupPhaseKey(phaseKey)) {
@@ -86,7 +83,7 @@ function collectBaseAttacksAndProtections(
 
     if (role.targetCategory === TargetCategory.Attack) {
       if (
-        (phaseKey as WerewolfRole) === WerewolfRole.Chupacabra &&
+        isRoleActive(phaseKey, WerewolfRole.Chupacabra) &&
         !chupacabraAttackApplies(tid, roleAssignments, deadPlayerIds)
       ) {
         continue;
