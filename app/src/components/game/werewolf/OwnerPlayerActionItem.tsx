@@ -21,23 +21,12 @@ export function OwnerPlayerActionItem({
 }: OwnerPlayerActionItemProps) {
   const action = useGameAction(gameId);
 
-  if (isDead) {
-    return (
-      <Button
-        variant="outline"
-        size="xs"
-        onClick={() => {
-          action.mutate({
-            actionId: WerewolfAction.MarkPlayerAlive,
-            payload: { playerId },
-          });
-        }}
-        disabled={action.isPending}
-      >
-        Revive
-      </Button>
-    );
-  }
+  const handleRevive = () => {
+    action.mutate({
+      actionId: WerewolfAction.MarkPlayerAlive,
+      payload: { playerId },
+    });
+  };
 
   const handleKill = () => {
     if (window.confirm("Mark this player as dead?")) {
@@ -55,31 +44,34 @@ export function OwnerPlayerActionItem({
     });
   };
 
-  if (isDaytime) {
-    return (
-      <div className="flex gap-1">
-        <Button
-          variant="outline"
-          size="xs"
-          onClick={handlePutToVote}
-          disabled={action.isPending || !!hasActiveTrial}
-        >
-          {WEREWOLF_COPY.trial.putToVote}
-        </Button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex gap-1">
-      <Button
-        variant="destructive"
-        size="xs"
-        onClick={handleKill}
-        disabled={action.isPending}
-      >
-        Kill
-      </Button>
-    </div>
+  const button = isDead ? (
+    <Button
+      variant="outline"
+      size="xs"
+      onClick={handleRevive}
+      disabled={action.isPending}
+    >
+      Revive
+    </Button>
+  ) : isDaytime ? (
+    <Button
+      variant="outline"
+      size="xs"
+      onClick={handlePutToVote}
+      disabled={action.isPending || !!hasActiveTrial}
+    >
+      {WEREWOLF_COPY.trial.putToVote}
+    </Button>
+  ) : (
+    <Button
+      variant="destructive"
+      size="xs"
+      onClick={handleKill}
+      disabled={action.isPending}
+    >
+      Kill
+    </Button>
   );
+
+  return <div className="flex gap-1">{button}</div>;
 }

@@ -89,10 +89,10 @@ export function TimerConfigPanel({ timerConfig, disabled, onChange }: Props) {
   }
 
   const enrichedRows = TIMER_ROWS.map((row) => {
-    const value = timerConfig?.[row.field] ?? null;
-    return value !== null
+    const value = timerConfig?.[row.field];
+    return value !== undefined
       ? { ...row, value, isEnabled: true as const }
-      : { ...row, value: null, isEnabled: false as const };
+      : { ...row, isEnabled: false as const };
   });
 
   return (

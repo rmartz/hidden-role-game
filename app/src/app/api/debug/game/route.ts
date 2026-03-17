@@ -45,7 +45,7 @@ export async function POST(request: Request): Promise<Response> {
     }),
   );
 
-  const ownerPlayer = ownerTitle ? players[0] : null;
+  const ownerPlayer = ownerTitle ? players[0] : undefined;
   const roleSlotsRequired = getRoleSlotsRequired(gameMode, playerCount);
   const totalMin = roleSlots.reduce((sum, s) => sum + s.min, 0);
   const totalMax = roleSlots.reduce((sum, s) => sum + s.max, 0);
@@ -74,7 +74,7 @@ export async function POST(request: Request): Promise<Response> {
     id: p.id,
     name: p.name,
     sessionId: p.sessionId,
-    isOwner: p.id === (ownerPlayer?.id ?? null),
+    isOwner: p.id === ownerPlayer?.id,
   }));
 
   return Response.json({

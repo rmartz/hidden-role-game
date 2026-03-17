@@ -14,17 +14,11 @@ export function WitchInformationPanel({
   witchAbilityUsed,
   attackedPlayerIds,
 }: WitchInformationPanelProps) {
-  if (witchAbilityUsed) {
-    return (
-      <p className="mb-4 text-sm text-muted-foreground italic">
-        You used your special ability this game.
-      </p>
-    );
-  }
-
-  if (attackedPlayerIds.length === 0) return null;
-
-  return (
+  return witchAbilityUsed ? (
+    <p className="mb-4 text-sm text-muted-foreground italic">
+      You used your special ability this game.
+    </p>
+  ) : attackedPlayerIds.length > 0 ? (
     <div className="mb-4 rounded-md border p-3 text-sm">
       <p className="font-medium mb-1">Currently under attack:</p>
       <ul className="space-y-0.5">
@@ -33,5 +27,5 @@ export function WitchInformationPanel({
         ))}
       </ul>
     </div>
-  );
+  ) : null;
 }

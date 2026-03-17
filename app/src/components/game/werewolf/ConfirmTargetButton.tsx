@@ -37,14 +37,6 @@ export function ConfirmTargetButton({
 }: ConfirmTargetButtonProps) {
   const action = useGameAction(gameId);
 
-  if (isConfirmed) {
-    return (
-      <p className="mt-3 text-sm text-green-600 font-medium">
-        {WEREWOLF_COPY.confirmButton.actionConfirmed}
-      </p>
-    );
-  }
-
   // Group phases require all members to agree before confirming.
   const needsConsensus = !!(isGroupPhase && hasGroupMembers && !allAgreed);
   const disabled = !hasDecided || action.isPending || needsConsensus;
@@ -59,7 +51,11 @@ export function ConfirmTargetButton({
       ? getConfirmLabel(roleId, witchContext)
       : WEREWOLF_COPY.confirmButton.skip;
 
-  return (
+  const content = isConfirmed ? (
+    <p className="mt-3 text-sm text-green-600 font-medium">
+      {WEREWOLF_COPY.confirmButton.actionConfirmed}
+    </p>
+  ) : (
     <div className="mt-3 max-w-sm mx-auto flex justify-end">
       <Tooltip>
         <TooltipTrigger render={<span />}>
@@ -78,4 +74,6 @@ export function ConfirmTargetButton({
       </Tooltip>
     </div>
   );
+
+  return content;
 }

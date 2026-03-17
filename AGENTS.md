@@ -29,6 +29,7 @@
 
 - `"use client"` directive required on all React client components (Next.js App Router).
 - React hooks must be called unconditionally — hooks before any early returns.
+- Components should have a single JSX return statement. Invalid states should be prevented by the type system or guarded against by the calling component. An early `return null` can be acceptable if the invalid state is infeasible for the parent component to detect, but the component itself should be returned as a single JSX block.
 - Barrel `index.ts` exports for all component/module directories.
 
 ## Package Manager

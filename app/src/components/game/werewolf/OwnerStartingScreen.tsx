@@ -15,7 +15,6 @@ export function OwnerStartingScreen({
   gameState,
   onStart,
 }: OwnerStartingScreenProps) {
-  const durationSeconds = gameState.timerConfig?.startCountdownSeconds ?? null;
   const startedAtMs =
     gameState.status.type === GameStatus.Starting
       ? gameState.status.startedAt
@@ -25,14 +24,11 @@ export function OwnerStartingScreen({
     [startedAtMs],
   );
 
-  const timer =
-    durationSeconds !== null
-      ? {
-          durationSeconds,
-          startedAt,
-          onTimerTrigger: onStart,
-        }
-      : { startedAt };
+  const timer = {
+    durationSeconds: gameState.timerConfig?.startCountdownSeconds,
+    startedAt,
+    onTimerTrigger: onStart,
+  };
 
   return (
     <div className="p-5 max-w-lg mx-auto">

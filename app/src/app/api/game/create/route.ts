@@ -44,8 +44,8 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const ownerPlayer = ownerTitle
-    ? (lobby.players.find((p) => p.sessionId === lobby.ownerSessionId) ?? null)
-    : null;
+    ? lobby.players.find((p) => p.sessionId === lobby.ownerSessionId)
+    : undefined;
 
   const game = await gameService.createGame(
     lobbyId,

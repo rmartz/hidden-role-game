@@ -28,22 +28,22 @@ export function PlayerGameScreen({ gameId, gameState }: PlayerGameScreenProps) {
   // Poll throughout nighttime to detect when this player's turn starts or ends.
   useGameStateQuery(gameId, isNighttime ? POLL_INTERVAL_MS : undefined);
 
-  if (status.type !== GameStatus.Playing) return null;
+  if (status.type !== GameStatus.Playing || !turnState) return null;
 
-  if (turnState?.phase.type === WerewolfPhase.Nighttime) {
-    return (
-      <PlayerGameNightScreen
-        gameId={gameId}
-        gameState={gameState}
-        phase={turnState.phase}
-        turn={turnState.turn}
-        deadPlayerIds={turnState.deadPlayerIds}
-      />
-    );
-  }
+  const isNightPhase =
+    turnState.phase.type === WerewolfPhase.Nighttime
+      ? turnState.phase
+      : undefined;
 
-  if (!turnState) return null;
-  return (
+  return isNightPhase ? (
+    <PlayerGameNightScreen
+      gameId={gameId}
+      gameState={gameState}
+      phase={isNightPhase}
+      turn={turnState.turn}
+      deadPlayerIds={turnState.deadPlayerIds}
+    />
+  ) : (
     <PlayerGameDayScreen
       gameId={gameId}
       gameState={gameState}

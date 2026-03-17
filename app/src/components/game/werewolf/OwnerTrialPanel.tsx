@@ -38,61 +38,61 @@ export function OwnerTrialPanel({
   }, [action]);
 
   const { trial } = WEREWOLF_COPY;
-
-  if (activeTrial.verdict) {
-    const verdictLabel =
-      activeTrial.verdict === "eliminated"
-        ? trial.verdictLabelEliminated
-        : trial.verdictLabelInnocent;
-    return (
-      <div className="mb-3 pb-3 border-b">
-        <p className="font-semibold mb-1">
-          {trial.narratorVerdictHeading(defendantName, verdictLabel)}
-        </p>
-        <p className="text-sm text-muted-foreground">
-          {trial.guiltyInnocentCount(guiltyCount, innocentCount)}
-        </p>
-      </div>
-    );
-  }
-
+  const verdictLabel = activeTrial.verdict
+    ? activeTrial.verdict === "eliminated"
+      ? trial.verdictLabelEliminated
+      : trial.verdictLabelInnocent
+    : undefined;
   const trialStartedAt = new Date(activeTrial.startedAt);
 
   return (
     <div className="mb-3 pb-3 border-b">
-      <p className="font-semibold mb-2">
-        {trial.narratorTrialHeading(defendantName)}
-      </p>
-      <GameTimer
-        durationSeconds={votePhaseSeconds}
-        startedAt={trialStartedAt}
-        onTimerTrigger={handleResolve}
-        resetKey={activeTrial.startedAt}
-      />
-      <p className="text-sm text-muted-foreground mb-3">
-        {trial.guiltyInnocentTotal(
-          guiltyCount,
-          innocentCount,
-          activeTrial.votes.length,
-        )}
-      </p>
-      {activeTrial.votes.length > 0 && (
-        <ul className="text-sm text-muted-foreground mb-3 space-y-0.5">
-          {activeTrial.votes.map((v) => (
-            <li key={v.playerId}>
-              {playerById.get(v.playerId)?.name ?? v.playerId}: {v.vote}
-            </li>
-          ))}
-        </ul>
+      {verdictLabel ? (
+        <>
+          <p className="font-semibold mb-1">
+            {trial.narratorVerdictHeading(defendantName, verdictLabel)}
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {trial.guiltyInnocentCount(guiltyCount, innocentCount)}
+          </p>
+        </>
+      ) : (
+        <>
+          <p className="font-semibold mb-2">
+            {trial.narratorTrialHeading(defendantName)}
+          </p>
+          <GameTimer
+            durationSeconds={votePhaseSeconds}
+            startedAt={trialStartedAt}
+            onTimerTrigger={handleResolve}
+            resetKey={activeTrial.startedAt}
+          />
+          <p className="text-sm text-muted-foreground mb-3">
+            {trial.guiltyInnocentTotal(
+              guiltyCount,
+              innocentCount,
+              activeTrial.votes.length,
+            )}
+          </p>
+          {activeTrial.votes.length > 0 && (
+            <ul className="text-sm text-muted-foreground mb-3 space-y-0.5">
+              {activeTrial.votes.map((v) => (
+                <li key={v.playerId}>
+                  {playerById.get(v.playerId)?.name ?? v.playerId}: {v.vote}
+                </li>
+              ))}
+            </ul>
+          )}
+          <Button
+            size="sm"
+            className="w-full max-w-xs"
+            onClick={handleResolve}
+            disabled={action.isPending}
+          >
+            {trial.resolveTrial}
+          </Button>
+        </>
       )}
-      <Button
-        size="sm"
-        className="w-full max-w-xs"
-        onClick={handleResolve}
-        disabled={action.isPending}
-      >
-        {trial.resolveTrial}
-      </Button>
     </div>
   );
 }
