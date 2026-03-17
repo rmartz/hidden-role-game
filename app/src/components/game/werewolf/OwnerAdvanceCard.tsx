@@ -11,7 +11,9 @@ interface OwnerAdvanceCardProps {
   label: string;
   onAdvance: () => void;
   disabled?: boolean;
-  /** When set, renders the advance button as destructive with this tooltip. */
+  /** Icon rendered on the left side of the advance button. */
+  icon?: ReactNode;
+  /** When set, shows a tooltip on the advance button with this message. */
   unconfirmedWarning?: string;
   children?: ReactNode;
 }
@@ -20,6 +22,7 @@ export function OwnerAdvanceCard({
   label,
   onAdvance,
   disabled,
+  icon,
   unconfirmedWarning,
   children,
 }: OwnerAdvanceCardProps) {
@@ -30,11 +33,8 @@ export function OwnerAdvanceCard({
         <div className="flex justify-center mt-2">
           <Tooltip>
             <TooltipTrigger render={<span />}>
-              <Button
-                onClick={onAdvance}
-                disabled={disabled}
-                variant={unconfirmedWarning ? "secondary" : "default"}
-              >
+              <Button onClick={onAdvance} disabled={disabled}>
+                {icon}
                 {label}
               </Button>
             </TooltipTrigger>

@@ -1,6 +1,11 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
+import {
+  BedRegular,
+  ClockWarningRegular,
+  WeatherSunnyLowRegular,
+} from "@fluentui/react-icons";
 import { GAME_MODES } from "@/lib/game-modes";
 import {
   WerewolfPhase,
@@ -157,6 +162,14 @@ export function OwnerGameNightScreen({
         ? WEREWOLF_COPY.narrator.investigationUnrevealed
         : undefined;
 
+  const advanceIcon = unconfirmedWarning ? (
+    <ClockWarningRegular />
+  ) : isLastPhase ? (
+    <WeatherSunnyLowRegular />
+  ) : (
+    <BedRegular />
+  );
+
   const resolvedVotes = (groupAction?.votes ?? []).map((vote) => ({
     key: vote.playerId,
     voterName: getPlayerName(gameState.players, vote.playerId) ?? vote.playerId,
@@ -227,6 +240,7 @@ export function OwnerGameNightScreen({
           }
           onAdvance={handleAdvance}
           disabled={action.isPending}
+          icon={advanceIcon}
           unconfirmedWarning={unconfirmedWarning}
         >
           <p className="mb-4 text-muted-foreground">

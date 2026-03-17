@@ -32,37 +32,34 @@ export function NarratorPlayerRoleLists({
   const eliminated = assignments.filter((a) => deadSet.has(a.player.id));
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] items-start gap-4 mb-5">
-      <Card>
-        <CardHeader>
-          <CardTitle>Active Player Roles</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {active.length === 0 ? (
-            <p className="text-sm text-muted-foreground italic">None</p>
-          ) : (
-            <ItemGroup>
-              {active.map(({ player, role }) => (
-                <Item key={player.id} size="sm">
-                  <ItemContent>
-                    <ItemTitle>{player.name}</ItemTitle>
-                  </ItemContent>
-                  <ItemActions>
-                    <RoleLabel role={role} gameMode={gameMode} />
-                    {renderActions?.(player.id, false)}
-                  </ItemActions>
-                </Item>
-              ))}
-            </ItemGroup>
-          )}
-        </CardContent>
-      </Card>
-      {eliminated.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Eliminated</CardTitle>
-          </CardHeader>
-          <CardContent>
+    <Card className="mb-5">
+      <CardHeader>
+        <CardTitle>Player Roles</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {active.length === 0 ? (
+          <p className="text-sm text-muted-foreground italic">None</p>
+        ) : (
+          <ItemGroup>
+            {active.map(({ player, role }) => (
+              <Item key={player.id} size="sm">
+                <ItemContent>
+                  <ItemTitle>{player.name}</ItemTitle>
+                </ItemContent>
+                <ItemActions>
+                  <RoleLabel role={role} gameMode={gameMode} />
+                  {renderActions?.(player.id, false)}
+                </ItemActions>
+              </Item>
+            ))}
+          </ItemGroup>
+        )}
+        {eliminated.length > 0 && (
+          <>
+            <div className="border-t my-3" />
+            <p className="text-sm font-semibold mb-2 text-muted-foreground">
+              Eliminated
+            </p>
             <ItemGroup>
               {eliminated.map(({ player, role }) => (
                 <Item key={player.id} size="sm">
@@ -78,9 +75,9 @@ export function NarratorPlayerRoleLists({
                 </Item>
               ))}
             </ItemGroup>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 }

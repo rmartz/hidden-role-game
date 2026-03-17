@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
+import { WeatherMoonRegular } from "@fluentui/react-icons";
 import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase, WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
@@ -54,17 +55,19 @@ export function OwnerGameDayScreen({
       ) : (
         <GameTimer startedAt={phaseStartedAt} resetKey={turnState.turn} />
       )}
-      <OwnerAdvanceCard
-        label="Start Next Night"
-        onAdvance={handleAdvance}
-        disabled={action.isPending}
-      >
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+        <OwnerAdvanceCard
+          label="Start Next Night"
+          onAdvance={handleAdvance}
+          disabled={action.isPending}
+          icon={<WeatherMoonRegular />}
+        />
         <NightOutcomeSummary
           events={phase.nightResolution ?? []}
           players={gameState.players}
           roles={modeConfig.roles}
         />
-      </OwnerAdvanceCard>
+      </div>
       <OwnerPlayerActionsGrid
         gameId={gameId}
         assignments={gameState.visibleRoleAssignments}

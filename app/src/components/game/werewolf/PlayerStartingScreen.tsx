@@ -26,7 +26,7 @@ export function PlayerStartingScreen({ gameState }: PlayerStartingScreenProps) {
   );
 
   return (
-    <div className="p-5">
+    <div className="p-5 max-w-lg mx-auto">
       <h1 className="text-2xl font-bold mb-4">Game Starting</h1>
       {durationSeconds !== null ? (
         <GameTimer

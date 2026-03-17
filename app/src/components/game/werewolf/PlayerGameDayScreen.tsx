@@ -27,7 +27,7 @@ export function PlayerGameDayScreen({
   );
 
   return (
-    <div className="p-5">
+    <div className="p-5 max-w-lg mx-auto">
       <div className="flex items-start justify-between mb-2">
         <h1 className="text-2xl font-bold">Hidden Role Game</h1>
         {gameState.myRole && (

@@ -35,7 +35,7 @@ export function OwnerStartingScreen({
       : { startedAt };
 
   return (
-    <div className="p-5">
+    <div className="p-5 max-w-lg mx-auto">
       <OwnerHeader
         title="Game Starting"
         advanceLabel="Start Now"
