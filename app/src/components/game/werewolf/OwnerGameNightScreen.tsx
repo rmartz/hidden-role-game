@@ -203,7 +203,7 @@ export function OwnerGameNightScreen({
   );
 
   return (
-    <div className="p-5">
+    <div className="p-5 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">
         {WEREWOLF_COPY.narrator.nightTitle(
           turnState.turn,

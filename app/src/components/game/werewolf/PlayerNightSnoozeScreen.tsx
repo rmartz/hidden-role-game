@@ -19,7 +19,7 @@ export function PlayerNightSnoozeScreen({
   );
 
   return (
-    <div className="p-5">
+    <div className="p-5 max-w-lg mx-auto">
       <p className="text-muted-foreground italic">{message}</p>
     </div>
   );

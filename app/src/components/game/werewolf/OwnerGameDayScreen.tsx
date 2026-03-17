@@ -62,7 +62,7 @@ export function OwnerGameDayScreen({
     : Object.values(modeConfig.roles);
 
   return (
-    <div className="p-5">
+    <div className="p-5 max-w-4xl mx-auto">
       <div className="flex items-start justify-between mb-4">
         <h1 className="text-2xl font-bold">{`Day — Turn ${String(turnState.turn)}`}</h1>
         <RoleGlossaryDialog
