@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { GAME_MODES } from "@/lib/game-modes";
 import type { GameMode } from "@/lib/types";
 import type { VisibleTeammate } from "@/server/types";
 import {
@@ -10,6 +11,13 @@ import {
 } from "@/components/ui/item";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RoleLabel } from "@/components/RoleLabel";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 
 interface NarratorPlayerRoleListsProps {
   assignments: VisibleTeammate[];
@@ -17,6 +25,15 @@ interface NarratorPlayerRoleListsProps {
   deadPlayerIds?: string[];
   /** Optional render prop for per-player action buttons (e.g., kill/revive). */
   renderActions?: (playerId: string, isDead: boolean) => ReactNode;
+}
+
+function getRoleInfo(
+  roleId: string,
+  gameMode: GameMode | undefined,
+): string | undefined {
+  if (!gameMode) return undefined;
+  const roleDef = GAME_MODES[gameMode].roles[roleId];
+  return roleDef?.summary ?? roleDef?.description;
 }
 
 export function NarratorPlayerRoleLists({
@@ -30,6 +47,26 @@ export function NarratorPlayerRoleLists({
   const deadSet = new Set(deadPlayerIds ?? []);
   const active = assignments.filter((a) => !deadSet.has(a.player.id));
   const eliminated = assignments.filter((a) => deadSet.has(a.player.id));
+
+  const roleInfoTooltip = (roleId: string) => {
+    const info = getRoleInfo(roleId, gameMode);
+    if (!info) return null;
+    return (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger
+            className="text-xs text-muted-foreground cursor-help px-1"
+            aria-label={WEREWOLF_COPY.roleDisplay.roleInfoLabel}
+          >
+            ?
+          </TooltipTrigger>
+          <TooltipContent side="bottom" className="max-w-56 text-wrap">
+            {info}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    );
+  };
 
   return (
     <Card className="mb-5">
@@ -48,6 +85,7 @@ export function NarratorPlayerRoleLists({
                 </ItemContent>
                 <ItemActions>
                   <RoleLabel role={role} gameMode={gameMode} />
+                  {roleInfoTooltip(role.id)}
                   {renderActions?.(player.id, false)}
                 </ItemActions>
               </Item>
@@ -70,6 +108,7 @@ export function NarratorPlayerRoleLists({
                   </ItemContent>
                   <ItemActions>
                     <RoleLabel role={role} gameMode={gameMode} />
+                    {roleInfoTooltip(role.id)}
                     {renderActions?.(player.id, true)}
                   </ItemActions>
                 </Item>
