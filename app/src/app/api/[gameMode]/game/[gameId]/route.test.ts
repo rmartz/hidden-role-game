@@ -1,64 +1,25 @@
 import { describe, it, expect } from "vitest";
-import { POST as createLobby } from "../../lobby/create/route";
-import { POST as joinLobby } from "../../lobby/[lobbyId]/join/route";
-import { POST as startGame } from "../create/route";
 import { GET as getGameState } from "./route";
+import { setupStartedSecretVillainGame } from "./test-helpers";
 import {
   postRequest,
-  makeLobbyParams,
   makeGameParams,
+  makeCreateGameParams,
+  makeLobbyParams,
 } from "@/app/api/test-utils";
-
-async function setupStartedGame() {
-  const createRes = await createLobby(
-    postRequest("http://localhost/api/lobby/create", { playerName: "Alice" }),
-  );
-  const { data: createData } = await createRes.json();
-  const { lobby, sessionId: aliceSession } = createData;
-
-  const joinRes = await joinLobby(
-    postRequest(`http://localhost/api/lobby/${lobby.id}/join`, {
-      playerName: "Bob",
-    }),
-    makeLobbyParams(lobby.id),
-  );
-  const { data: joinData } = await joinRes.json();
-
-  const startRes = await startGame(
-    new Request("http://localhost/api/game/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-session-id": aliceSession,
-      },
-      body: JSON.stringify({
-        lobbyId: lobby.id,
-        gameMode: "secret-villain",
-        roleSlots: [
-          { roleId: "good", min: 1, max: 1 },
-          { roleId: "bad", min: 1, max: 1 },
-        ],
-      }),
-    }),
-  );
-  const { data: startData } = await startRes.json();
-
-  return {
-    gameId: startData.lobby.gameId as string,
-    aliceSession: aliceSession as string,
-    bobSession: joinData.sessionId as string,
-  };
-}
+import { POST as createLobby } from "../../../lobby/create/route";
+import { POST as joinLobby } from "../../../lobby/[lobbyId]/join/route";
+import { POST as startGame } from "../create/route";
 
 describe("GET /api/game/[gameId]", () => {
   it("should return the player game state for a valid session", async () => {
-    const { gameId, aliceSession } = await setupStartedGame();
+    const { gameId, aliceSession } = await setupStartedSecretVillainGame();
 
     const res = await getGameState(
-      new Request(`http://localhost/api/game/${gameId}`, {
+      new Request(`http://localhost/api/secret-villain/game/${gameId}`, {
         headers: { "x-session-id": aliceSession },
       }),
-      makeGameParams(gameId),
+      makeGameParams(gameId, "secret-villain"),
     );
     expect(res.status).toBe(200);
     const body = await res.json();
@@ -69,52 +30,73 @@ describe("GET /api/game/[gameId]", () => {
     expect(Array.isArray(body.data.visibleRoleAssignments)).toBe(true);
   });
 
+  it("should return 400 for an unknown game mode", async () => {
+    const res = await getGameState(
+      new Request("http://localhost/api/not-a-mode/game/nonexistent-id"),
+      makeGameParams("nonexistent-id", "not-a-mode"),
+    );
+    expect(res.status).toBe(400);
+  });
+
   it("should return 401 with no session header", async () => {
     const res = await getGameState(
-      new Request("http://localhost/api/game/nonexistent-id"),
-      makeGameParams("nonexistent-id"),
+      new Request("http://localhost/api/secret-villain/game/nonexistent-id"),
+      makeGameParams("nonexistent-id", "secret-villain"),
     );
     expect(res.status).toBe(401);
   });
 
   it("should return 403 when the game does not exist", async () => {
     const res = await getGameState(
-      new Request("http://localhost/api/game/nonexistent-id", {
+      new Request("http://localhost/api/secret-villain/game/nonexistent-id", {
         headers: { "x-session-id": "any-session-id" },
       }),
-      makeGameParams("nonexistent-id"),
+      makeGameParams("nonexistent-id", "secret-villain"),
     );
     expect(res.status).toBe(403);
   });
 
   it("should return 403 with wrong session header for a valid game", async () => {
-    const { gameId } = await setupStartedGame();
+    const { gameId } = await setupStartedSecretVillainGame();
 
     const res = await getGameState(
-      new Request(`http://localhost/api/game/${gameId}`, {
+      new Request(`http://localhost/api/secret-villain/game/${gameId}`, {
         headers: { "x-session-id": "not-a-real-session-id" },
       }),
-      makeGameParams(gameId),
+      makeGameParams(gameId, "secret-villain"),
     );
     expect(res.status).toBe(403);
   });
 
-  it("should show Secret Villain bad role player their bad teammates", async () => {
-    const { gameId, aliceSession, bobSession } = await setupStartedGame();
+  it("should return 409 when the game mode param does not match the game", async () => {
+    const { gameId, aliceSession } = await setupStartedSecretVillainGame();
 
-    const aliceRes = await getGameState(
-      new Request(`http://localhost/api/game/${gameId}`, {
+    const res = await getGameState(
+      new Request(`http://localhost/api/avalon/game/${gameId}`, {
         headers: { "x-session-id": aliceSession },
       }),
-      makeGameParams(gameId),
+      makeGameParams(gameId, "avalon"),
+    );
+    expect(res.status).toBe(409);
+  });
+
+  it("should show Secret Villain bad role player their bad teammates", async () => {
+    const { gameId, aliceSession, bobSession } =
+      await setupStartedSecretVillainGame();
+
+    const aliceRes = await getGameState(
+      new Request(`http://localhost/api/secret-villain/game/${gameId}`, {
+        headers: { "x-session-id": aliceSession },
+      }),
+      makeGameParams(gameId, "secret-villain"),
     );
     const aliceBody = await aliceRes.json();
 
     const bobRes = await getGameState(
-      new Request(`http://localhost/api/game/${gameId}`, {
+      new Request(`http://localhost/api/secret-villain/game/${gameId}`, {
         headers: { "x-session-id": bobSession },
       }),
-      makeGameParams(gameId),
+      makeGameParams(gameId, "secret-villain"),
     );
     const bobBody = await bobRes.json();
 
@@ -130,7 +112,10 @@ describe("GET /api/game/[gameId]", () => {
 
   it("should show Avalon special good role player all bad role players", async () => {
     const createRes = await createLobby(
-      postRequest("http://localhost/api/lobby/create", { playerName: "Alice" }),
+      postRequest("http://localhost/api/lobby/create", {
+        playerName: "Alice",
+        gameMode: "avalon",
+      }),
     );
     const { data: createData } = await createRes.json();
     const { lobby, sessionId: aliceSession } = createData;
@@ -145,7 +130,7 @@ describe("GET /api/game/[gameId]", () => {
     const bobSession = joinData.sessionId as string;
 
     const startRes = await startGame(
-      new Request("http://localhost/api/game/create", {
+      new Request("http://localhost/api/avalon/game/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -153,30 +138,30 @@ describe("GET /api/game/[gameId]", () => {
         },
         body: JSON.stringify({
           lobbyId: lobby.id,
-          gameMode: "avalon",
           roleSlots: [
             { roleId: "avalon-special-good", min: 1, max: 1 },
             { roleId: "avalon-bad", min: 1, max: 1 },
           ],
         }),
       }),
+      makeCreateGameParams("avalon"),
     );
     const { data: startData } = await startRes.json();
     const gameId = startData.lobby.gameId as string;
 
     const aliceRes = await getGameState(
-      new Request(`http://localhost/api/game/${gameId}`, {
+      new Request(`http://localhost/api/avalon/game/${gameId}`, {
         headers: { "x-session-id": aliceSession },
       }),
-      makeGameParams(gameId),
+      makeGameParams(gameId, "avalon"),
     );
     const aliceBody = await aliceRes.json();
 
     const bobRes = await getGameState(
-      new Request(`http://localhost/api/game/${gameId}`, {
+      new Request(`http://localhost/api/avalon/game/${gameId}`, {
         headers: { "x-session-id": bobSession },
       }),
-      makeGameParams(gameId),
+      makeGameParams(gameId, "avalon"),
     );
     const bobBody = await bobRes.json();
 

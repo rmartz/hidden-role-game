@@ -8,6 +8,12 @@ export { SecretVillainRole } from "@/lib/game-modes/secret-villain";
 export { AvalonRole } from "@/lib/game-modes/avalon";
 export { WerewolfRole } from "@/lib/game-modes/werewolf";
 
+export function parseGameMode(value: string): GameMode | undefined {
+  return (Object.values(GameMode) as string[]).includes(value)
+    ? (value as GameMode)
+    : undefined;
+}
+
 export const GAME_MODES: Record<GameMode, GameModeConfig> = {
   [GameMode.SecretVillain]: SECRET_VILLAIN_CONFIG,
   [GameMode.Avalon]: AVALON_CONFIG,

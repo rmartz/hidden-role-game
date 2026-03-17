@@ -1,12 +1,19 @@
 import { describe, it, expect } from "vitest";
-import { POST as createLobby } from "../../lobby/create/route";
-import { POST as joinLobby } from "../../lobby/[lobbyId]/join/route";
+import { POST as createLobby } from "../../../lobby/create/route";
+import { POST as joinLobby } from "../../../lobby/[lobbyId]/join/route";
 import { POST as startGame } from "./route";
-import { postRequest, makeLobbyParams } from "@/app/api/test-utils";
+import {
+  postRequest,
+  makeLobbyParams,
+  makeCreateGameParams,
+} from "@/app/api/test-utils";
 
-async function setupLobbyWithPlayers() {
+async function setupLobbyWithPlayers(gameMode?: string) {
   const createRes = await createLobby(
-    postRequest("http://localhost/api/lobby/create", { playerName: "Alice" }),
+    postRequest("http://localhost/api/lobby/create", {
+      playerName: "Alice",
+      ...(gameMode ? { gameMode } : {}),
+    }),
   );
   const { data: createData } = await createRes.json();
   const { lobby, sessionId: aliceSession } = createData;
@@ -31,7 +38,7 @@ describe("POST /api/game/create", () => {
     const { lobbyId, aliceSession } = await setupLobbyWithPlayers();
 
     const res = await startGame(
-      new Request("http://localhost/api/game/create", {
+      new Request("http://localhost/api/secret-villain/game/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,13 +46,13 @@ describe("POST /api/game/create", () => {
         },
         body: JSON.stringify({
           lobbyId,
-          gameMode: "secret-villain",
           roleSlots: [
             { roleId: "good", min: 1, max: 1 },
             { roleId: "bad", min: 1, max: 1 },
           ],
         }),
       }),
+      makeCreateGameParams("secret-villain"),
     );
     expect(res.status).toBe(200);
     const body = await res.json();
@@ -57,7 +64,7 @@ describe("POST /api/game/create", () => {
     const { lobbyId, aliceSession } = await setupLobbyWithPlayers();
 
     const res = await startGame(
-      new Request("http://localhost/api/game/create", {
+      new Request("http://localhost/api/secret-villain/game/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -65,10 +72,10 @@ describe("POST /api/game/create", () => {
         },
         body: JSON.stringify({
           lobbyId,
-          gameMode: "secret-villain",
           roleSlots: [{ roleId: "good", min: 1, max: 1 }],
         }),
       }),
+      makeCreateGameParams("secret-villain"),
     );
     expect(res.status).toBe(400);
   });
@@ -77,7 +84,7 @@ describe("POST /api/game/create", () => {
     const { lobbyId, bobSession } = await setupLobbyWithPlayers();
 
     const res = await startGame(
-      new Request("http://localhost/api/game/create", {
+      new Request("http://localhost/api/secret-villain/game/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -85,22 +92,22 @@ describe("POST /api/game/create", () => {
         },
         body: JSON.stringify({
           lobbyId,
-          gameMode: "secret-villain",
           roleSlots: [
             { roleId: "good", min: 1, max: 1 },
             { roleId: "bad", min: 1, max: 1 },
           ],
         }),
       }),
+      makeCreateGameParams("secret-villain"),
     );
     expect(res.status).toBe(403);
   });
 
   it("should allow starting an Avalon game with Avalon role slots", async () => {
-    const { lobbyId, aliceSession } = await setupLobbyWithPlayers();
+    const { lobbyId, aliceSession } = await setupLobbyWithPlayers("avalon");
 
     const res = await startGame(
-      new Request("http://localhost/api/game/create", {
+      new Request("http://localhost/api/avalon/game/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -108,13 +115,13 @@ describe("POST /api/game/create", () => {
         },
         body: JSON.stringify({
           lobbyId,
-          gameMode: "avalon",
           roleSlots: [
             { roleId: "avalon-good", min: 1, max: 1 },
             { roleId: "avalon-bad", min: 1, max: 1 },
           ],
         }),
       }),
+      makeCreateGameParams("avalon"),
     );
     expect(res.status).toBe(200);
     const body = await res.json();
@@ -123,10 +130,10 @@ describe("POST /api/game/create", () => {
   });
 
   it("should return 400 when using a role from the wrong game mode", async () => {
-    const { lobbyId, aliceSession } = await setupLobbyWithPlayers();
+    const { lobbyId, aliceSession } = await setupLobbyWithPlayers("avalon");
 
     const res = await startGame(
-      new Request("http://localhost/api/game/create", {
+      new Request("http://localhost/api/avalon/game/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -134,22 +141,34 @@ describe("POST /api/game/create", () => {
         },
         body: JSON.stringify({
           lobbyId,
-          gameMode: "avalon",
           roleSlots: [
             { roleId: "good", min: 1, max: 1 },
             { roleId: "bad", min: 1, max: 1 },
           ],
         }),
       }),
+      makeCreateGameParams("avalon"),
     );
     expect(res.status).toBe(400);
   });
 
   it("should return 400 for an unknown game mode", async () => {
+    const res = await startGame(
+      new Request("http://localhost/api/not-a-real-mode/game/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lobbyId: "any", roleSlots: [] }),
+      }),
+      makeCreateGameParams("not-a-real-mode"),
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it("should return 409 when the game mode does not match the lobby", async () => {
     const { lobbyId, aliceSession } = await setupLobbyWithPlayers();
 
     const res = await startGame(
-      new Request("http://localhost/api/game/create", {
+      new Request("http://localhost/api/avalon/game/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -157,15 +176,15 @@ describe("POST /api/game/create", () => {
         },
         body: JSON.stringify({
           lobbyId,
-          gameMode: "not-a-real-mode",
           roleSlots: [
-            { roleId: "good", min: 1, max: 1 },
-            { roleId: "bad", min: 1, max: 1 },
+            { roleId: "avalon-good", min: 1, max: 1 },
+            { roleId: "avalon-bad", min: 1, max: 1 },
           ],
         }),
       }),
+      makeCreateGameParams("avalon"),
     );
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(409);
   });
 
   it("should return 409 when the game has already started", async () => {
@@ -176,42 +195,36 @@ describe("POST /api/game/create", () => {
     ];
 
     await startGame(
-      new Request("http://localhost/api/game/create", {
+      new Request("http://localhost/api/secret-villain/game/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "x-session-id": aliceSession,
         },
-        body: JSON.stringify({
-          lobbyId,
-          gameMode: "secret-villain",
-          roleSlots: slots,
-        }),
+        body: JSON.stringify({ lobbyId, roleSlots: slots }),
       }),
+      makeCreateGameParams("secret-villain"),
     );
 
     const res = await startGame(
-      new Request("http://localhost/api/game/create", {
+      new Request("http://localhost/api/secret-villain/game/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "x-session-id": aliceSession,
         },
-        body: JSON.stringify({
-          lobbyId,
-          gameMode: "secret-villain",
-          roleSlots: slots,
-        }),
+        body: JSON.stringify({ lobbyId, roleSlots: slots }),
       }),
+      makeCreateGameParams("secret-villain"),
     );
     expect(res.status).toBe(409);
   });
 
   it("should allow starting a Werewolf game with Werewolf role slots", async () => {
-    const { lobbyId, aliceSession } = await setupLobbyWithPlayers();
+    const { lobbyId, aliceSession } = await setupLobbyWithPlayers("werewolf");
 
     const res = await startGame(
-      new Request("http://localhost/api/game/create", {
+      new Request("http://localhost/api/werewolf/game/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -219,11 +232,11 @@ describe("POST /api/game/create", () => {
         },
         body: JSON.stringify({
           lobbyId,
-          gameMode: "werewolf",
           // Alice (owner) is the Narrator; Bob gets the only role slot.
           roleSlots: [{ roleId: "werewolf-villager", min: 1, max: 1 }],
         }),
       }),
+      makeCreateGameParams("werewolf"),
     );
     expect(res.status).toBe(200);
     const body = await res.json();

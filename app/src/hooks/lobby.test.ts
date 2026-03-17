@@ -62,7 +62,9 @@ describe("useCreateLobby", () => {
     });
 
     const { wrapper } = createWrapper();
-    const { result } = renderHook(() => useCreateLobby(), { wrapper });
+    const { result } = renderHook(() => useCreateLobby(GameMode.Werewolf), {
+      wrapper,
+    });
 
     act(() => {
       result.current.mutate("Alice");
@@ -72,8 +74,8 @@ describe("useCreateLobby", () => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(api.createLobby).toHaveBeenCalledWith("Alice");
-    expect(mockPush).toHaveBeenCalledWith("/lobby/lobby-1");
+    expect(api.createLobby).toHaveBeenCalledWith("Alice", GameMode.Werewolf);
+    expect(mockPush).toHaveBeenCalledWith("/werewolf/lobby/lobby-1");
   });
 
   it("throws on server error", async () => {
@@ -83,7 +85,9 @@ describe("useCreateLobby", () => {
     });
 
     const { wrapper } = createWrapper();
-    const { result } = renderHook(() => useCreateLobby(), { wrapper });
+    const { result } = renderHook(() => useCreateLobby(GameMode.Werewolf), {
+      wrapper,
+    });
 
     act(() => {
       result.current.mutate("Alice");

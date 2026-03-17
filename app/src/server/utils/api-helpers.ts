@@ -3,6 +3,9 @@ import { ServerResponseStatus } from "@/server/types";
 import { lobbyService } from "@/services/LobbyService";
 import { gameService } from "@/services/GameService";
 import { isValidSession } from "./lobby-helpers";
+import { parseGameMode } from "@/lib/game-modes";
+
+export { parseGameMode };
 
 export function errorResponse(error: string, status: number): Response {
   return Response.json(

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { getPlayerId, getLobbyId, getSessionId } from "@/lib/api";
+import { parseGameMode } from "@/lib/game-modes";
 import {
   useLobbyQuery,
   useLobbyWebSocket,
@@ -18,11 +19,17 @@ import {
   PlayerList,
   ShareLobby,
 } from "@/components/lobby";
+import { LOBBY_PAGE_COPY } from "../copy";
 
 export default function LobbyPage() {
-  const { lobbyId } = useParams<{ lobbyId: string }>();
+  const { lobbyId, gameMode: gameModeParam } = useParams<{
+    lobbyId: string;
+    gameMode: string;
+  }>();
   const router = useRouter();
   const queryClient = useQueryClient();
+
+  const validatedGameMode = parseGameMode(gameModeParam);
 
   // undefined = not yet read from localStorage (avoid SSR mismatch)
   const [storedLobbyId, setStoredLobbyId] = useState<string | undefined>(
@@ -48,16 +55,34 @@ export default function LobbyPage() {
   const isOwner =
     !!fetchLobby.data && fetchLobby.data.ownerPlayerId === myPlayerId;
   const gameId = fetchLobby.data?.gameId;
+  const actualGameMode = fetchLobby.data?.config.gameMode;
+
+  useEffect(() => {
+    if (!validatedGameMode) router.push("/");
+  }, [validatedGameMode, router]);
 
   // If the user has a session for a different lobby, send them to the conflict resolution page.
   useEffect(() => {
-    if (hasDifferentLobby) router.replace(`/lobby/${lobbyId}/conflict`);
-  }, [hasDifferentLobby, lobbyId, router]);
+    if (hasDifferentLobby && validatedGameMode)
+      router.replace(`/${validatedGameMode}/lobby/${lobbyId}/conflict`);
+  }, [hasDifferentLobby, lobbyId, validatedGameMode, router]);
 
-  // Once the game starts, redirect all players to the game page.
+  // If the actual game mode doesn't match the URL, redirect to the correct URL.
   useEffect(() => {
-    if (gameId) router.push(`/game/${gameId}`);
-  }, [gameId, router]);
+    if (
+      actualGameMode &&
+      validatedGameMode &&
+      actualGameMode !== validatedGameMode
+    ) {
+      router.replace(`/${actualGameMode}/lobby/${lobbyId}`);
+    }
+  }, [actualGameMode, validatedGameMode, lobbyId, router]);
+
+  // Once the game starts, redirect all players to the game mode page.
+  useEffect(() => {
+    if (gameId && actualGameMode)
+      router.push(`/${actualGameMode}/game/${gameId}`);
+  }, [gameId, actualGameMode, router]);
 
   // If the lobby doesn't exist or the session is invalid, return to the home page.
   useEffect(() => {
@@ -89,24 +114,49 @@ export default function LobbyPage() {
     void fetchLobby.refetch();
   }
 
-  if (storedLobbyId === undefined || hasDifferentLobby) return null;
+  if (!validatedGameMode || storedLobbyId === undefined || hasDifferentLobby)
+    return null;
+
+  const configPanel =
+    fetchLobby.data && !gameId ? (
+      isOwner || fetchLobby.data.config.showConfigToPlayers ? (
+        isOwner ? (
+          <GameConfigurationPanel
+            config={fetchLobby.data.config}
+            playerCount={fetchLobby.data.players.length}
+            readOnly={false}
+            isPending={startGameMutation.isPending}
+            onStartGame={(roleSlots, gameModeArg) => {
+              startGameMutation.mutate({ roleSlots, gameMode: gameModeArg });
+            }}
+          />
+        ) : (
+          <GameConfigurationPanel
+            config={fetchLobby.data.config}
+            playerCount={fetchLobby.data.players.length}
+            readOnly={true}
+          />
+        )
+      ) : null
+    ) : null;
 
   return (
     <div className="p-5">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold">Hidden Role Game</h1>
-        <ShareLobby lobbyId={lobbyId} />
+        <h1 className="text-2xl font-bold">{LOBBY_PAGE_COPY.title}</h1>
+        <ShareLobby lobbyId={lobbyId} gameMode={validatedGameMode} />
       </div>
 
       {fetchLobby.isLoading && (
-        <p className="text-muted-foreground">Loading...</p>
+        <p className="text-muted-foreground">{LOBBY_PAGE_COPY.loading}</p>
       )}
 
       {fetchLobby.error &&
         fetchLobby.error.message !== "404" &&
         fetchLobby.error.message !== "403" && (
           <p className="text-destructive text-sm mb-3">
-            Error: {fetchLobby.error.message}
+            {LOBBY_PAGE_COPY.errorPrefix}
+            {fetchLobby.error.message}
           </p>
         )}
 
@@ -121,30 +171,12 @@ export default function LobbyPage() {
 
       {removeMutation.error && (
         <p className="text-destructive text-sm mb-3">
-          Error: {removeMutation.error.message}
+          {LOBBY_PAGE_COPY.errorPrefix}
+          {removeMutation.error.message}
         </p>
       )}
 
-      {fetchLobby.data &&
-        !gameId &&
-        (isOwner || fetchLobby.data.config.showConfigToPlayers) &&
-        (isOwner ? (
-          <GameConfigurationPanel
-            config={fetchLobby.data.config}
-            playerCount={fetchLobby.data.players.length}
-            readOnly={false}
-            isPending={startGameMutation.isPending}
-            onStartGame={(roleSlots, gameMode) => {
-              startGameMutation.mutate({ roleSlots, gameMode });
-            }}
-          />
-        ) : (
-          <GameConfigurationPanel
-            config={fetchLobby.data.config}
-            playerCount={fetchLobby.data.players.length}
-            readOnly={true}
-          />
-        ))}
+      {configPanel}
 
       {fetchLobby.data && (
         <PlayerList

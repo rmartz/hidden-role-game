@@ -1,17 +1,24 @@
 import { ServerResponseStatus } from "@/server/types";
 import { gameService } from "@/services/GameService";
-import { authenticateGame, errorResponse } from "@/server/utils";
+import { authenticateGame, errorResponse, parseGameMode } from "@/server/utils";
 
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ gameId: string }> },
+  { params }: { params: Promise<{ gameId: string; gameMode: string }> },
 ): Promise<Response> {
-  const { gameId } = await params;
+  const { gameId, gameMode: gameModeParam } = await params;
+  const gameMode = parseGameMode(gameModeParam);
+  if (!gameMode) return errorResponse("Unknown game mode", 400);
+
   const sessionId = request.headers.get("x-session-id") ?? undefined;
 
   const auth = await authenticateGame(gameId, sessionId);
   if (auth instanceof Response) return auth;
   const { game, caller } = auth;
+
+  if (game.gameMode !== gameMode) {
+    return errorResponse("Game mode mismatch", 409);
+  }
 
   if (caller.id !== game.ownerPlayerId) {
     return errorResponse("Unauthorized", 403);

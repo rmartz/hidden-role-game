@@ -15,11 +15,12 @@ import {
 
 interface ShareLobbyProps {
   lobbyId: string;
+  gameMode: string;
 }
 
-export function ShareLobby({ lobbyId }: ShareLobbyProps) {
+export function ShareLobby({ lobbyId, gameMode }: ShareLobbyProps) {
   const [copied, setCopied] = useState(false);
-  const lobbyUrl = `${window.location.origin}/lobby/${lobbyId}`;
+  const lobbyUrl = `${window.location.origin}/${gameMode}/lobby/${lobbyId}`;
 
   async function handleCopy() {
     await navigator.clipboard.writeText(lobbyUrl);

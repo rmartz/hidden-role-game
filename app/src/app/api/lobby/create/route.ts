@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
-import { getDefaultRoleSlots } from "@/lib/game-modes";
+import { getDefaultRoleSlots, parseGameMode } from "@/lib/game-modes";
 import { ServerResponseStatus, type CreateLobbyRequest } from "@/server/types";
 import { lobbyService } from "@/services/LobbyService";
 import {
@@ -24,15 +24,22 @@ export async function POST(request: Request): Promise<Response> {
     sessionId,
   };
 
-  const defaultGameMode = GameMode.SecretVillain;
+  let selectedGameMode: GameMode;
+  if (body.gameMode) {
+    const parsed = parseGameMode(body.gameMode);
+    if (!parsed) return errorResponse("Unknown game mode", 400);
+    selectedGameMode = parsed;
+  } else {
+    selectedGameMode = GameMode.SecretVillain;
+  }
   const lobby = {
     id: randomUUID(),
     ownerSessionId: sessionId,
     players: [owner],
     config: {
-      gameMode: defaultGameMode,
+      gameMode: selectedGameMode,
       roleConfigMode: RoleConfigMode.Default,
-      roleSlots: getDefaultRoleSlots(defaultGameMode, 1),
+      roleSlots: getDefaultRoleSlots(selectedGameMode, 1),
       showConfigToPlayers: false,
       showRolesInPlay: ShowRolesInPlay.None,
     },

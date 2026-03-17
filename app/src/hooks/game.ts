@@ -20,6 +20,7 @@ import {
 } from "@/lib/firebase/schema";
 import { getSessionId } from "@/lib/api";
 import { useFirebaseAuth } from "@/hooks/firebaseAuth";
+import { useGameModeContext } from "@/hooks/gameModeContext";
 
 export function useStartGame(lobbyId: string) {
   const queryClient = useQueryClient();
@@ -43,7 +44,11 @@ export function useStartGame(lobbyId: string) {
  * updating the TanStack Query cache directly for real-time updates without polling.
  * Falls back to HTTP fetch for the initial load while Firebase connects.
  */
-export function useGameStateQuery(gameId: string, refetchInterval?: number) {
+export function useGameStateQuery(
+  gameId: string,
+  gameMode: GameMode | undefined,
+  refetchInterval?: number,
+) {
   const queryClient = useQueryClient();
   const { isReady } = useFirebaseAuth();
 
@@ -76,13 +81,15 @@ export function useGameStateQuery(gameId: string, refetchInterval?: number) {
   return useQuery({
     queryKey: ["game", gameId],
     queryFn: async () => {
-      const { data, httpStatus } = await getGameState(gameId);
+      if (!gameMode) throw new Error("Game mode not available");
+      const { data, httpStatus } = await getGameState(gameId, gameMode);
       if (httpStatus === 401 || httpStatus === 403)
         throw new Error(String(httpStatus));
       if (data.status === ServerResponseStatus.Error)
         throw new Error(data.error);
       return data.data;
     },
+    enabled: !!gameMode,
     retry: false,
     refetchInterval,
   });
@@ -90,8 +97,9 @@ export function useGameStateQuery(gameId: string, refetchInterval?: number) {
 
 export function useAdvanceGame(gameId: string) {
   const queryClient = useQueryClient();
+  const gameMode = useGameModeContext();
   return useMutation({
-    mutationFn: () => advanceGame(gameId),
+    mutationFn: () => advanceGame(gameId, gameMode),
     onSuccess: (response) => {
       if (response.status === ServerResponseStatus.Error) return;
       void queryClient.invalidateQueries({ queryKey: ["game", gameId] });
@@ -101,6 +109,7 @@ export function useAdvanceGame(gameId: string) {
 
 export function useGameAction(gameId: string) {
   const queryClient = useQueryClient();
+  const gameMode = useGameModeContext();
   return useMutation({
     mutationFn: ({
       actionId,
@@ -108,7 +117,7 @@ export function useGameAction(gameId: string) {
     }: {
       actionId: string;
       payload?: unknown;
-    }) => applyGameAction(gameId, actionId, payload),
+    }) => applyGameAction(gameId, gameMode, actionId, payload),
     onSuccess: (response) => {
       if (response.status === ServerResponseStatus.Error) return;
       void queryClient.invalidateQueries({ queryKey: ["game", gameId] });
