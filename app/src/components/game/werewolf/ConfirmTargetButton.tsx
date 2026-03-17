@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/tooltip";
 import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 
-interface Props {
+interface ConfirmTargetButtonProps {
   gameId: string;
   roleId?: PhaseKey;
   hasTarget: boolean;
@@ -34,7 +34,7 @@ export function ConfirmTargetButton({
   hasGroupMembers,
   allAgreed,
   witchContext,
-}: Props) {
+}: ConfirmTargetButtonProps) {
   const action = useGameAction(gameId);
 
   if (isConfirmed) {

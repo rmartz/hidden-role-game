@@ -2,7 +2,7 @@ import type { PublicLobbyPlayer, VisibleTeammate } from "@/server/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 
-interface Props {
+interface PlayerStatusListsProps {
   players: PublicLobbyPlayer[];
   deadPlayerIds: string[];
   /** ID of the game owner (narrator) to exclude from the lists. */
@@ -16,7 +16,7 @@ export function PlayerStatusLists({
   deadPlayerIds,
   gameOwnerId,
   roleAssignments,
-}: Props) {
+}: PlayerStatusListsProps) {
   const deadSet = new Set(deadPlayerIds);
   const filtered = players.filter((p) => p.id !== gameOwnerId);
   const activePlayers = filtered.filter((p) => !deadSet.has(p.id));

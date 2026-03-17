@@ -7,7 +7,7 @@ import { getPlayerName } from "@/lib/player-utils";
 import type { PublicLobbyPlayer } from "@/server/types";
 import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 
-interface Props {
+interface GroupTargetSuggestionProps {
   gameId: string;
   players: PublicLobbyPlayer[];
   suggestedTargetId: string;
@@ -21,7 +21,7 @@ export function GroupTargetSuggestion({
   suggestedTargetId,
   myNightTarget,
   isConfirmed,
-}: Props) {
+}: GroupTargetSuggestionProps) {
   const action = useGameAction(gameId);
   const suggestedName =
     getPlayerName(players, suggestedTargetId) ?? suggestedTargetId;

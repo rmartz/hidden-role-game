@@ -1,4 +1,4 @@
-interface Props {
+interface PlayerNightSummaryItemProps {
   playerName: string;
   killed: boolean;
   silenced: boolean;
@@ -8,7 +8,7 @@ export function PlayerNightSummaryItem({
   playerName,
   killed,
   silenced,
-}: Props) {
+}: PlayerNightSummaryItemProps) {
   const effects = (
     [killed && "eliminated", silenced && "silenced"] as (string | false)[]
   )

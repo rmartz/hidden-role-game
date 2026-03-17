@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-interface Props {
+interface OwnerAdvanceCardProps {
   label: string;
   onAdvance: () => void;
   disabled?: boolean;
@@ -14,7 +14,7 @@ export function OwnerAdvanceCard({
   onAdvance,
   disabled,
   children,
-}: Props) {
+}: OwnerAdvanceCardProps) {
   return (
     <Card>
       <CardContent className="pt-4">

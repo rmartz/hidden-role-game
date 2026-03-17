@@ -6,12 +6,15 @@ import type { PlayerGameState } from "@/server/types";
 import { GameRolesList, PlayersRoleList } from "@/components/game";
 import { OwnerHeader } from "./OwnerHeader";
 
-interface Props {
+interface OwnerStartingScreenProps {
   gameState: PlayerGameState;
   onStart: () => void;
 }
 
-export function OwnerStartingScreen({ gameState, onStart }: Props) {
+export function OwnerStartingScreen({
+  gameState,
+  onStart,
+}: OwnerStartingScreenProps) {
   const durationSeconds = gameState.timerConfig?.startCountdownSeconds ?? null;
   const startedAtMs =
     gameState.status.type === GameStatus.Starting

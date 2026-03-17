@@ -11,13 +11,17 @@ import { OwnerAdvanceCard } from "./OwnerAdvanceCard";
 import { NightOutcomeSummary } from "./NightOutcomeSummary";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
 
-interface Props {
+interface OwnerGameDayScreenProps {
   gameId: string;
   gameState: PlayerGameState;
   turnState: WerewolfTurnState;
 }
 
-export function OwnerGameDayScreen({ gameId, gameState, turnState }: Props) {
+export function OwnerGameDayScreen({
+  gameId,
+  gameState,
+  turnState,
+}: OwnerGameDayScreenProps) {
   const dayPhaseSeconds = gameState.timerConfig?.dayPhaseSeconds ?? null;
   const action = useGameAction(gameId);
 

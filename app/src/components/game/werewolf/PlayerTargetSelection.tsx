@@ -15,7 +15,7 @@ interface TeamVoteDisplay {
   targetName: string;
 }
 
-interface Props {
+interface PlayerTargetSelectionProps {
   gameId: string;
   players: PublicLobbyPlayer[];
   targets: readonly (readonly [TargetablePlayer, boolean])[];
@@ -49,7 +49,7 @@ export function PlayerTargetSelection({
   witchAbilityUsed,
   attackedPlayerIds,
   previousNightTargetId,
-}: Props) {
+}: PlayerTargetSelectionProps) {
   const action = useGameAction(gameId);
 
   if (

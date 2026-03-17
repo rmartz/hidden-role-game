@@ -4,12 +4,15 @@ import type { PlayerGameState } from "@/server/types";
 import { WerewolfOwnerScreen } from "./WerewolfOwnerScreen";
 import { WerewolfPlayerScreen } from "./WerewolfPlayerScreen";
 
-interface Props {
+interface WerewolfGameScreenProps {
   gameId: string;
   gameState: PlayerGameState;
 }
 
-export function WerewolfGameScreen({ gameId, gameState }: Props) {
+export function WerewolfGameScreen({
+  gameId,
+  gameState,
+}: WerewolfGameScreenProps) {
   if (gameState.myRole === undefined) {
     return <WerewolfOwnerScreen gameId={gameId} gameState={gameState} />;
   }

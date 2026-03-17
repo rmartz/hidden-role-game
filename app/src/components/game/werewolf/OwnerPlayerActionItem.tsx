@@ -4,13 +4,17 @@ import { WerewolfAction } from "@/lib/game-modes/werewolf";
 import { useGameAction } from "@/hooks";
 import { Button } from "@/components/ui/button";
 
-interface Props {
+interface OwnerPlayerActionItemProps {
   gameId: string;
   playerId: string;
   isDead: boolean;
 }
 
-export function OwnerPlayerActionItem({ gameId, playerId, isDead }: Props) {
+export function OwnerPlayerActionItem({
+  gameId,
+  playerId,
+  isDead,
+}: OwnerPlayerActionItemProps) {
   const action = useGameAction(gameId);
 
   if (isDead) {

@@ -9,7 +9,7 @@ interface ResolvedVote {
   targetName: string;
 }
 
-interface Props {
+interface OwnerNightTargetPanelProps {
   groupAction: boolean;
   groupMemberCount?: number;
   resolvedVotes: ResolvedVote[];
@@ -33,7 +33,7 @@ export function OwnerNightTargetPanel({
   onTargetClick,
   isPending,
   previousTargetId,
-}: Props) {
+}: OwnerNightTargetPanelProps) {
   return (
     <div className="mb-4 rounded-md border p-3">
       {groupAction &&

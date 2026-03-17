@@ -10,12 +10,15 @@ import { OwnerGameNightScreen } from "./OwnerGameNightScreen";
 import { OwnerGameDayScreen } from "./OwnerGameDayScreen";
 import { OwnerGameScreen } from "./OwnerGameScreen";
 
-interface Props {
+interface WerewolfOwnerScreenProps {
   gameId: string;
   gameState: PlayerGameState;
 }
 
-export function WerewolfOwnerScreen({ gameId, gameState }: Props) {
+export function WerewolfOwnerScreen({
+  gameId,
+  gameState,
+}: WerewolfOwnerScreenProps) {
   const advanceMutation = useAdvanceGame(gameId);
 
   if (gameState.status.type === GameStatus.Starting) {

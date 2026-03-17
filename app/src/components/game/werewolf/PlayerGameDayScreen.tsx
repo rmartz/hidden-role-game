@@ -9,12 +9,15 @@ import { PlayerNightSummary } from "./PlayerNightSummary";
 import { PlayerRoleDisplay } from "./PlayerRoleDisplay";
 import { PlayerStatusLists } from "./PlayerStatusLists";
 
-interface Props {
+interface PlayerGameDayScreenProps {
   gameState: PlayerGameState;
   turnState: WerewolfTurnState;
 }
 
-export function PlayerGameDayScreen({ gameState, turnState }: Props) {
+export function PlayerGameDayScreen({
+  gameState,
+  turnState,
+}: PlayerGameDayScreenProps) {
   const dayPhaseSeconds = gameState.timerConfig?.dayPhaseSeconds ?? null;
   const { phase } = turnState;
   const isDaytime = phase.type === WerewolfPhase.Daytime;

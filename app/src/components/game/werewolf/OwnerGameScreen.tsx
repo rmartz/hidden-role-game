@@ -1,7 +1,8 @@
 "use client";
 
 import type { PlayerGameState } from "@/server/types";
-import { GameRolesList, NarratorPlayerRoleLists } from "@/components/game";
+import { GameRolesList } from "@/components/game";
+import { NarratorPlayerRoleLists } from "./NarratorPlayerRoleLists";
 
 interface OwnerGameScreenProps {
   gameState: PlayerGameState;

@@ -9,12 +9,12 @@ import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 
 const REVEAL_DURATION_MS = 5000;
 
-interface Props {
+interface PlayerRoleDisplayProps {
   role: PublicRoleInfo;
   gameMode?: GameMode;
 }
 
-export function PlayerRoleDisplay({ role, gameMode }: Props) {
+export function PlayerRoleDisplay({ role, gameMode }: PlayerRoleDisplayProps) {
   const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {

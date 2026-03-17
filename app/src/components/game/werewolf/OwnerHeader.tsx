@@ -18,7 +18,7 @@ type TimerProps = (TimedTimer | ManualTimer) & {
   resetKey?: string | number;
 };
 
-interface Props {
+interface OwnerHeaderProps {
   title: string;
   advanceLabel: string;
   onAdvance: () => void;
@@ -34,7 +34,7 @@ export function OwnerHeader({
   isAdvancing,
   timer,
   children,
-}: Props) {
+}: OwnerHeaderProps) {
   return (
     <>
       <h1 className="text-2xl font-bold mb-4">{title}</h1>

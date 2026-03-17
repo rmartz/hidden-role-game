@@ -11,7 +11,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RoleLabel } from "@/components/RoleLabel";
 
-interface Props {
+interface NarratorPlayerRoleListsProps {
   assignments: VisibleTeammate[];
   gameMode?: GameMode;
   deadPlayerIds?: string[];
@@ -24,7 +24,7 @@ export function NarratorPlayerRoleLists({
   gameMode,
   deadPlayerIds,
   renderActions,
-}: Props) {
+}: NarratorPlayerRoleListsProps) {
   if (assignments.length === 0) return null;
 
   const deadSet = new Set(deadPlayerIds ?? []);
