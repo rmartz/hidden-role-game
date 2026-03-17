@@ -9,9 +9,9 @@ import {
   getGroupPhasePlayerIds,
   getGroupPhaseMemberIds,
   computeSuggestedTarget,
+  isRoleActive,
 } from "../utils";
 import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
-import { isRoleActive } from "../utils/phase-keys";
 import type { WerewolfRoleDefinition } from "../roles";
 import { getPlayer } from "@/lib/player-utils";
 

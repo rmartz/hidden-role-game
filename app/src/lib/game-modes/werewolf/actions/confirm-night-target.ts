@@ -4,9 +4,9 @@ import {
   currentTurnState,
   validateActiveNightPlayer,
   getGroupPhasePlayerIds,
+  isRoleActive,
 } from "../utils";
 import { WerewolfRole } from "../roles";
-import { isRoleActive } from "../utils/phase-keys";
 
 export const confirmNightTargetAction: GameAction = {
   isValid(game: Game, callerId: string) {

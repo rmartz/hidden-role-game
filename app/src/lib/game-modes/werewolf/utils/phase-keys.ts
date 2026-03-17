@@ -20,16 +20,17 @@ export function baseGroupPhaseKey(phaseKey: string): string {
 }
 
 /**
- * Returns true if the given phase key corresponds to the specified role (or any
- * role in the provided list). Combines the `isWerewolfRole` type guard with an
- * equality check so callers don't need to repeat the guard manually.
+ * Returns true if `key` matches the specified role (or any role in a list).
+ * Works for both phase keys and player role IDs — any string that may be a
+ * `WerewolfRole`. Combines the `isWerewolfRole` type guard with an equality
+ * check so callers don't need to repeat the guard manually.
  */
 export function isRoleActive(
-  phaseKey: string,
+  key: string,
   role: WerewolfRole | WerewolfRole[],
 ): boolean {
-  if (!isWerewolfRole(phaseKey)) return false;
-  return Array.isArray(role) ? role.includes(phaseKey) : phaseKey === role;
+  if (!isWerewolfRole(key)) return false;
+  return Array.isArray(role) ? role.includes(key) : key === role;
 }
 
 /**
