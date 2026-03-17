@@ -428,3 +428,60 @@ describe("GameSerializationService.extractPlayerNightState (suffixed group phase
     expect(result.myNightTarget).toBeUndefined();
   });
 });
+
+// ---------------------------------------------------------------------------
+// extractDaytimeNightState — mustVoteGuilty (Village Idiot)
+// ---------------------------------------------------------------------------
+
+function makeDaytimeGameWithTrial(callerRoleId: WerewolfRole): Game {
+  const activeTrial = {
+    defendantId: "p1",
+    startedAt: 2000,
+    votes: [] as { playerId: string; vote: "guilty" | "innocent" }[],
+  };
+  const turnState: WerewolfTurnState = {
+    turn: 1,
+    phase: {
+      type: WerewolfPhase.Daytime,
+      startedAt: 1000,
+      nightActions: {},
+      activeTrial,
+    },
+    deadPlayerIds: [],
+  };
+  return {
+    id: "game-1",
+    lobbyId: "lobby-1",
+    gameMode: GameMode.Werewolf,
+    status: { type: GameStatus.Playing, turnState },
+    players: [
+      { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
+      { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
+      { id: "p3", name: "Charlie", sessionId: "s3", visibleRoles: [] },
+    ],
+    roleAssignments: [
+      { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "p2", roleDefinitionId: callerRoleId },
+      { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+    ],
+    configuredRoleSlots: [],
+    showRolesInPlay: ShowRolesInPlay.None,
+    ownerPlayerId: "owner",
+  };
+}
+
+describe("GameSerializationService.extractDaytimeNightState — mustVoteGuilty", () => {
+  const service = new GameSerializationService();
+
+  it("sets mustVoteGuilty for a Village Idiot caller during an active trial", () => {
+    const game = makeDaytimeGameWithTrial(WerewolfRole.VillageIdiot);
+    const result = service.extractDaytimeNightState(game, "p2");
+    expect(result.activeTrial?.mustVoteGuilty).toBe(true);
+  });
+
+  it("does not set mustVoteGuilty for a non-Village-Idiot caller", () => {
+    const game = makeDaytimeGameWithTrial(WerewolfRole.Seer);
+    const result = service.extractDaytimeNightState(game, "p2");
+    expect(result.activeTrial?.mustVoteGuilty).toBeUndefined();
+  });
+});

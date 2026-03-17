@@ -18,7 +18,11 @@ import type {
   WerewolfRoleDefinition,
   WerewolfTurnState,
 } from "@/lib/game-modes/werewolf";
-import { WerewolfRole } from "@/lib/game-modes/werewolf/roles";
+import {
+  WerewolfRole,
+  WEREWOLF_ROLES,
+  isWerewolfRole,
+} from "@/lib/game-modes/werewolf/roles";
 import { GAME_MODES } from "@/lib/game-modes";
 
 /**
@@ -291,6 +295,14 @@ export class GameSerializationService {
       )?.vote;
       const playerById = new Map(game.players.map((p) => [p.id, p]));
 
+      const callerRoleId = game.roleAssignments.find(
+        (a) => a.playerId === callerId,
+      )?.roleDefinitionId;
+      const mustVoteGuilty =
+        callerRoleId !== undefined &&
+        isWerewolfRole(callerRoleId) &&
+        WEREWOLF_ROLES[callerRoleId].alwaysVotesGuilty === true;
+
       result.activeTrial = {
         defendantId: activeTrial.defendantId,
         startedAt: activeTrial.startedAt,
@@ -298,6 +310,7 @@ export class GameSerializationService {
         voteCount: activeTrial.votes.length,
         playerCount: alivePlayerCount,
         ...(activeTrial.verdict ? { verdict: activeTrial.verdict } : {}),
+        ...(mustVoteGuilty ? { mustVoteGuilty: true } : {}),
       };
 
       if (activeTrial.verdict) {

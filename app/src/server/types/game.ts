@@ -118,6 +118,8 @@ export interface PlayerGameState {
     voteCount: number;
     playerCount: number;
     verdict?: "eliminated" | "innocent";
+    /** When true, this player's role forces them to vote guilty. */
+    mustVoteGuilty?: boolean;
     /** Per-player vote results, populated once verdict is set. */
     voteResults?: { playerName: string; vote: DaytimeVote }[];
     /** Role of the eliminated player, populated when verdict is "eliminated". */

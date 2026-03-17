@@ -30,6 +30,8 @@ export interface WerewolfRoleDefinition extends RoleDefinition<
    * instead of having its own. Other players only see the primary role's name.
    */
   wakesWith?: WerewolfRole;
+  /** When true, this role must always cast a "guilty" vote during elimination trials. */
+  alwaysVotesGuilty?: boolean;
 }
 
 export const MIN_PLAYERS = 5;
@@ -115,6 +117,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Good,
     wakesAtNight: WakesAtNight.Never,
     targetCategory: TargetCategory.None,
+    alwaysVotesGuilty: true,
   },
   [WerewolfRole.Bodyguard]: {
     id: WerewolfRole.Bodyguard,
@@ -125,3 +128,8 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     preventRepeatTarget: true,
   },
 };
+
+/** Returns true if the given string is a known WerewolfRole. */
+export function isWerewolfRole(id: string): id is WerewolfRole {
+  return id in WEREWOLF_ROLES;
+}

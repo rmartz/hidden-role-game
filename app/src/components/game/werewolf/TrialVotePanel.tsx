@@ -92,6 +92,11 @@ export function TrialVotePanel({
         {trial.votesCast(activeTrial.voteCount, activeTrial.playerCount)}
         {hasVoted && activeTrial.myVote && trial.yourVote(activeTrial.myVote)}
       </p>
+      {activeTrial.mustVoteGuilty && hasVoted && (
+        <p className="text-sm text-muted-foreground mb-3">
+          {trial.mustVoteGuiltyNote}
+        </p>
+      )}
       {!hasVoted && (
         <div className="flex justify-center gap-4">
           <Button
@@ -105,17 +110,19 @@ export function TrialVotePanel({
           >
             {trial.guiltyButton}
           </Button>
-          <Button
-            size="sm"
-            variant="default"
-            onClick={() => {
-              castVote("innocent");
-            }}
-            className="w-32"
-            disabled={action.isPending}
-          >
-            {trial.innocentButton}
-          </Button>
+          {!activeTrial.mustVoteGuilty && (
+            <Button
+              size="sm"
+              variant="default"
+              onClick={() => {
+                castVote("innocent");
+              }}
+              className="w-32"
+              disabled={action.isPending}
+            >
+              {trial.innocentButton}
+            </Button>
+          )}
         </div>
       )}
     </>
