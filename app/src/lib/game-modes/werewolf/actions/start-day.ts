@@ -9,7 +9,7 @@ import {
 } from "../utils";
 import { WEREWOLF_ROLES } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
-import { isWolfCubDead } from "./helpers";
+import { wolfCubDied } from "./helpers";
 
 export const startDayAction: GameAction = {
   isValid(game: Game, callerId: string) {
@@ -41,8 +41,8 @@ export const startDayAction: GameAction = {
       }
     }
 
-    const wolfCubDied =
-      ts.wolfCubDied === true || isWolfCubDead(newDeadIds, game);
+    const didWolfCubDie =
+      ts.wolfCubDied === true || wolfCubDied(newDeadIds, game);
     game.status = {
       type: GameStatus.Playing,
       turnState: {
@@ -56,7 +56,7 @@ export const startDayAction: GameAction = {
         deadPlayerIds: [...ts.deadPlayerIds, ...newDeadIds],
         ...(ts.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
         ...(Object.keys(lastTargets).length > 0 ? { lastTargets } : {}),
-        ...(wolfCubDied ? { wolfCubDied: true } : {}),
+        ...(didWolfCubDie ? { wolfCubDied: true } : {}),
       },
     };
   },

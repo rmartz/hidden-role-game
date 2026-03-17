@@ -76,7 +76,7 @@ export function TimerConfigPanel({ timerConfig, disabled, onChange }: Props) {
   ) {
     if (!onChange || !timerConfig) return;
     const currentValue = timerConfig[row.field];
-    if (currentValue == null) return;
+    if (currentValue === null || currentValue === undefined) return;
     const newValue =
       direction === "increment"
         ? Math.min(row.max, currentValue + row.step)
