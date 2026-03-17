@@ -63,7 +63,9 @@ export function TrialVotePanel({
           <Button
             size="sm"
             variant="destructive"
-            onClick={() => { castVote("guilty"); }}
+            onClick={() => {
+              castVote("guilty");
+            }}
             disabled={action.isPending}
           >
             Guilty
@@ -71,7 +73,9 @@ export function TrialVotePanel({
           <Button
             size="sm"
             variant="outline"
-            onClick={() => { castVote("innocent"); }}
+            onClick={() => {
+              castVote("innocent");
+            }}
             disabled={action.isPending}
           >
             Innocent
@@ -79,7 +83,9 @@ export function TrialVotePanel({
           <Button
             size="sm"
             variant="ghost"
-            onClick={() => { castVote("abstain"); }}
+            onClick={() => {
+              castVote("abstain");
+            }}
             disabled={action.isPending}
           >
             Abstain
