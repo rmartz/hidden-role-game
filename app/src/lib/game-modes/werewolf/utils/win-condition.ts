@@ -7,9 +7,10 @@ import { WerewolfRole, WEREWOLF_ROLES } from "../roles";
  * Returns a Finished status with the winner if a win condition is met,
  * or undefined if the game should continue.
  *
- * Priority:
- * 1. Chupacabra wins: no Bad players alive, Chupacabra alive, ≤1 other player alive
- * 2. Village wins: no Bad players alive
+ * Priority (when badAlive === 0):
+ * 1. Chupacabra wins: no Bad players alive, Chupacabra alive, ≤1 Good player alive
+ * 2. Village wins: no Bad players alive AND no Neutral players alive
+ *    (Chupacabra still alive → game continues until Chupacabra wins or is eliminated)
  * 3. Werewolves win: Bad team count ≥ non-Bad count
  */
 export function checkWinCondition(
@@ -42,11 +43,16 @@ export function checkWinCondition(
   }
 
   if (badAlive === 0) {
-    // Chupacabra wins if it's alive and only ≤1 non-Chupacabra player remains
+    // Chupacabra wins if it's alive and only ≤1 Good player remains
     if (chupacabraAlive && goodAlive <= 1) {
       return { type: GameStatus.Finished, winner: WerewolfWinner.Chupacabra };
     }
-    return { type: GameStatus.Finished, winner: WerewolfWinner.Village };
+    // Village wins only when no Bad and no Neutral players remain
+    if (!chupacabraAlive) {
+      return { type: GameStatus.Finished, winner: WerewolfWinner.Village };
+    }
+    // Chupacabra alive with >1 Good player remaining — game continues
+    return undefined;
   }
 
   // Werewolves win if Bad count ≥ all non-Bad alive (Good + Chupacabra)
