@@ -75,6 +75,7 @@ export function PlayerGameDayScreen({
           activeTrial={gameState.activeTrial}
           players={gameState.players}
           myPlayerId={gameState.myPlayerId}
+          amDead={gameState.amDead}
           votePhaseSeconds={gameState.timerConfig?.votePhaseSeconds}
         />
       )}

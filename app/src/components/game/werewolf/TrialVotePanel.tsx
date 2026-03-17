@@ -14,6 +14,7 @@ interface TrialVotePanelProps {
   activeTrial: NonNullable<PlayerGameState["activeTrial"]>;
   players: PlayerGameState["players"];
   myPlayerId?: string;
+  amDead?: boolean;
   votePhaseSeconds?: number;
 }
 
@@ -22,6 +23,7 @@ export function TrialVotePanel({
   activeTrial,
   players,
   myPlayerId,
+  amDead,
   votePhaseSeconds,
 }: TrialVotePanelProps) {
   const action = useGameAction(gameId);
@@ -42,6 +44,7 @@ export function TrialVotePanel({
       : trial.verdictLabelInnocent
     : undefined;
   const isDefendant = myPlayerId === activeTrial.defendantId;
+  const canVote = !amDead && !isDefendant;
   const hasVoted = !!activeTrial.myVote;
   const trialStartedAt = new Date(activeTrial.startedAt);
   const timer = (
@@ -97,7 +100,7 @@ export function TrialVotePanel({
           {trial.mustVoteGuiltyNote}
         </p>
       )}
-      {!hasVoted && (
+      {canVote && !hasVoted && (
         <div className="flex justify-center gap-4">
           <Button
             size="sm"
