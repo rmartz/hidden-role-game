@@ -24,8 +24,7 @@ import type { PlayerGameState } from "@/server/types";
 import { getPlayerName } from "@/lib/player-utils";
 import { useGameAction } from "@/hooks";
 import { GameTimer } from "@/components/game";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { OwnerAdvanceCard } from "./OwnerAdvanceCard";
 import { OwnerInvestigationConfirm } from "./OwnerInvestigationConfirm";
 import { OwnerNightTargetPanel } from "./OwnerNightTargetPanel";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
@@ -202,51 +201,48 @@ export function OwnerGameNightScreen({
         <GameTimer startedAt={timer.startedAt} resetKey={timer.resetKey} />
       )}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
-        <Card>
-          <CardContent className="pt-4">
-            <p className="mb-4 text-muted-foreground">
-              Currently awake:{" "}
-              <strong className="text-foreground">{activePhaseLabel}</strong>
-              {activePlayerNames.length > 0 && (
-                <span> ({activePlayerNames.join(", ")})</span>
-              )}
-            </p>
-            {!isFirstTurn &&
-              ((activePhaseKey as WerewolfRole) === WerewolfRole.Witch &&
-              turnState.witchAbilityUsed &&
-              !activeTargetConfirmed ? (
-                <p className="mb-4 text-sm text-muted-foreground italic">
-                  {WEREWOLF_COPY.night.witchAbilityUsed}
-                </p>
-              ) : (
-                <OwnerNightTargetPanel
-                  groupAction={!!groupAction}
-                  groupMemberCount={activePlayerNames.length}
-                  resolvedVotes={resolvedVotes}
-                  activeTargetName={activeTargetName}
-                  activeTargetConfirmed={activeTargetConfirmed}
-                  targetablePlayers={targetablePlayers}
-                  activeTarget={activeTarget}
-                  onTargetClick={handleTargetClick}
-                  isPending={action.isPending}
-                  previousTargetId={previousTargetId}
-                />
-              ))}
-            {investigationResult && (
-              <OwnerInvestigationConfirm
-                gameId={gameId}
-                targetName={investigationResult.targetName}
-                isWerewolfTeam={investigationResult.isWerewolfTeam}
-                isResultRevealed={isResultRevealed}
-              />
+        <OwnerAdvanceCard
+          label={isLastPhase ? "Start the Day" : "Next Role"}
+          onAdvance={handleAdvance}
+          disabled={action.isPending}
+        >
+          <p className="mb-4 text-muted-foreground">
+            Currently awake:{" "}
+            <strong className="text-foreground">{activePhaseLabel}</strong>
+            {activePlayerNames.length > 0 && (
+              <span> ({activePlayerNames.join(", ")})</span>
             )}
-            <div className="flex justify-end mt-2">
-              <Button onClick={handleAdvance} disabled={action.isPending}>
-                {isLastPhase ? "Start the Day" : "Next Role"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+          </p>
+          {!isFirstTurn &&
+            ((activePhaseKey as WerewolfRole) === WerewolfRole.Witch &&
+            turnState.witchAbilityUsed &&
+            !activeTargetConfirmed ? (
+              <p className="mb-4 text-sm text-muted-foreground italic">
+                {WEREWOLF_COPY.night.witchAbilityUsed}
+              </p>
+            ) : (
+              <OwnerNightTargetPanel
+                groupAction={!!groupAction}
+                groupMemberCount={activePlayerNames.length}
+                resolvedVotes={resolvedVotes}
+                activeTargetName={activeTargetName}
+                activeTargetConfirmed={activeTargetConfirmed}
+                targetablePlayers={targetablePlayers}
+                activeTarget={activeTarget}
+                onTargetClick={handleTargetClick}
+                isPending={action.isPending}
+                previousTargetId={previousTargetId}
+              />
+            ))}
+          {investigationResult && (
+            <OwnerInvestigationConfirm
+              gameId={gameId}
+              targetName={investigationResult.targetName}
+              isWerewolfTeam={investigationResult.isWerewolfTeam}
+              isResultRevealed={isResultRevealed}
+            />
+          )}
+        </OwnerAdvanceCard>
         <NightPhaseOrderList
           nightPhaseOrder={nightPhaseOrder}
           currentPhaseIndex={currentPhaseIndex}

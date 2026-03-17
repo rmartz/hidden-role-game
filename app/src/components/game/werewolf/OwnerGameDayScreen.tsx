@@ -6,9 +6,9 @@ import { WerewolfPhase, WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
 import { useGameAction } from "@/hooks";
-import { GameRolesList } from "@/components/game";
+import { GameRolesList, GameTimer } from "@/components/game";
+import { OwnerAdvanceCard } from "./OwnerAdvanceCard";
 import { NightOutcomeSummary } from "./NightOutcomeSummary";
-import { OwnerHeader } from "./OwnerHeader";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
 
 interface Props {
@@ -37,31 +37,30 @@ export function OwnerGameDayScreen({ gameId, gameState, turnState }: Props) {
 
   const modeConfig = GAME_MODES[gameState.gameMode];
 
-  const timer =
-    dayPhaseSeconds !== null
-      ? {
-          durationSeconds: dayPhaseSeconds,
-          startedAt: phaseStartedAt,
-          onTimerTrigger: handleAdvance,
-          resetKey: turnState.turn,
-        }
-      : { startedAt: phaseStartedAt, resetKey: turnState.turn };
-
   return (
     <div className="p-5">
-      <OwnerHeader
-        title={`Day — Turn ${String(turnState.turn)}`}
-        advanceLabel="Start Next Night"
+      <h1 className="text-2xl font-bold mb-4">{`Day — Turn ${String(turnState.turn)}`}</h1>
+      {dayPhaseSeconds !== null ? (
+        <GameTimer
+          durationSeconds={dayPhaseSeconds}
+          startedAt={phaseStartedAt}
+          onTimerTrigger={handleAdvance}
+          resetKey={turnState.turn}
+        />
+      ) : (
+        <GameTimer startedAt={phaseStartedAt} resetKey={turnState.turn} />
+      )}
+      <OwnerAdvanceCard
+        label="Start Next Night"
         onAdvance={handleAdvance}
-        isAdvancing={action.isPending}
-        timer={timer}
+        disabled={action.isPending}
       >
         <NightOutcomeSummary
           events={phase.nightResolution ?? []}
           players={gameState.players}
           roles={modeConfig.roles}
         />
-      </OwnerHeader>
+      </OwnerAdvanceCard>
       <OwnerPlayerActionsGrid
         gameId={gameId}
         assignments={gameState.visibleRoleAssignments}
