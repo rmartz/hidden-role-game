@@ -1,6 +1,11 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
+import {
+  BedRegular,
+  ClockWarningRegular,
+  WeatherSunnyLowRegular,
+} from "@fluentui/react-icons";
 import { GAME_MODES } from "@/lib/game-modes";
 import {
   WerewolfPhase,
@@ -23,12 +28,13 @@ import { WEREWOLF_ROLES } from "@/lib/game-modes/werewolf/roles";
 import type { PlayerGameState } from "@/server/types";
 import { getPlayerName } from "@/lib/player-utils";
 import { useGameAction } from "@/hooks";
-import { GameRolesList } from "@/components/game";
-import { OwnerHeader } from "./OwnerHeader";
+import { GameTimer } from "@/components/game";
+import { OwnerAdvanceCard } from "./OwnerAdvanceCard";
 import { OwnerInvestigationConfirm } from "./OwnerInvestigationConfirm";
 import { OwnerNightTargetPanel } from "./OwnerNightTargetPanel";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
 import { NightPhaseOrderList } from "./NightPhaseOrderList";
+import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 
 interface OwnerGameNightScreenProps {
   gameId: string;
@@ -88,19 +94,6 @@ export function OwnerGameNightScreen({
     [action, activePhaseKey],
   );
 
-  const handlePhaseChange = useCallback(
-    (roleId: string) => {
-      const newIndex = nightPhaseOrder.indexOf(roleId);
-      if (newIndex !== -1) {
-        action.mutate({
-          actionId: WerewolfAction.SetNightPhase,
-          payload: { phaseIndex: newIndex },
-        });
-      }
-    },
-    [action, nightPhaseOrder],
-  );
-
   if (!isNighttime) return null;
 
   const modeConfig = GAME_MODES[gameState.gameMode];
@@ -137,6 +130,13 @@ export function OwnerGameNightScreen({
 
   const isFirstTurn = turnState.turn === 1;
 
+  const isActionConfirmed = isGroupPhase
+    ? !!groupAction?.confirmed
+    : activeTargetConfirmed;
+  const isWitchAbilitySkipped =
+    (activePhaseKey as WerewolfRole) === WerewolfRole.Witch &&
+    turnState.witchAbilityUsed;
+
   const activeRoleDef = modeConfig.roles[baseActivePhaseKey] as
     | WerewolfRoleDefinition
     | undefined;
@@ -153,6 +153,21 @@ export function OwnerGameNightScreen({
     activeTargetConfirmed,
     activeTargetName,
     gameState.visibleRoleAssignments,
+  );
+
+  const unconfirmedWarning =
+    !isFirstTurn && !isWitchAbilitySkipped && !isActionConfirmed
+      ? WEREWOLF_COPY.narrator.playerUnconfirmed
+      : investigationResult && !isResultRevealed
+        ? WEREWOLF_COPY.narrator.investigationUnrevealed
+        : undefined;
+
+  const advanceIcon = unconfirmedWarning ? (
+    <ClockWarningRegular />
+  ) : isLastPhase ? (
+    <WeatherSunnyLowRegular />
+  ) : (
+    <BedRegular />
   );
 
   const resolvedVotes = (groupAction?.votes ?? []).map((vote) => ({
@@ -199,66 +214,84 @@ export function OwnerGameNightScreen({
 
   return (
     <div className="p-5">
-      <OwnerHeader
-        title={`Night — Turn ${String(turnState.turn)} (${String(currentPhaseIndex + 1)}/${String(nightPhaseOrder.length)})`}
-        advanceLabel={isLastPhase ? "Start the Day" : "Next Role"}
-        onAdvance={handleAdvance}
-        isAdvancing={action.isPending}
-        timer={timer}
-      >
-        <p className="mb-4 text-muted-foreground">
-          Currently awake:{" "}
-          <strong className="text-foreground">{activePhaseLabel}</strong>
-          {activePlayerNames.length > 0 && (
-            <span> ({activePlayerNames.join(", ")})</span>
-          )}
-        </p>
-        {!isFirstTurn &&
-          ((activePhaseKey as WerewolfRole) === WerewolfRole.Witch &&
-          turnState.witchAbilityUsed &&
-          !activeTargetConfirmed ? (
-            <p className="mb-4 text-sm text-muted-foreground italic">
-              The Witch has already used their special ability this game.
-            </p>
-          ) : (
-            <OwnerNightTargetPanel
-              groupAction={!!groupAction}
-              resolvedVotes={resolvedVotes}
-              activeTargetName={activeTargetName}
-              activeTargetConfirmed={activeTargetConfirmed}
-              targetablePlayers={targetablePlayers}
-              activeTarget={activeTarget}
-              onTargetClick={handleTargetClick}
-              isPending={action.isPending}
-              previousTargetId={previousTargetId}
-            />
-          ))}
-        {investigationResult && (
-          <OwnerInvestigationConfirm
-            gameId={gameId}
-            targetName={investigationResult.targetName}
-            isWerewolfTeam={investigationResult.isWerewolfTeam}
-            isResultRevealed={isResultRevealed}
-          />
+      <h1 className="text-2xl font-bold mb-4">
+        {WEREWOLF_COPY.narrator.nightTitle(
+          turnState.turn,
+          currentPhaseIndex + 1,
+          nightPhaseOrder.length,
         )}
-      </OwnerHeader>
+      </h1>
+      {timer.durationSeconds !== undefined ? (
+        <GameTimer
+          durationSeconds={timer.durationSeconds}
+          startedAt={timer.startedAt}
+          onTimerTrigger={timer.onTimerTrigger}
+          resetKey={timer.resetKey}
+        />
+      ) : (
+        <GameTimer startedAt={timer.startedAt} resetKey={timer.resetKey} />
+      )}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+        <OwnerAdvanceCard
+          label={
+            isLastPhase
+              ? WEREWOLF_COPY.narrator.startDay
+              : WEREWOLF_COPY.narrator.nextRole
+          }
+          onAdvance={handleAdvance}
+          disabled={action.isPending}
+          icon={advanceIcon}
+          unconfirmedWarning={unconfirmedWarning}
+        >
+          <p className="mb-4 text-muted-foreground">
+            {WEREWOLF_COPY.narrator.currentlyAwake}{" "}
+            <strong className="text-foreground">{activePhaseLabel}</strong>
+            {activePlayerNames.length > 0 && (
+              <span> ({activePlayerNames.join(", ")})</span>
+            )}
+          </p>
+          {!isFirstTurn &&
+            ((activePhaseKey as WerewolfRole) === WerewolfRole.Witch &&
+            turnState.witchAbilityUsed &&
+            !activeTargetConfirmed ? (
+              <p className="mb-4 text-sm text-muted-foreground italic">
+                {WEREWOLF_COPY.night.witchAbilityUsed}
+              </p>
+            ) : (
+              <OwnerNightTargetPanel
+                groupAction={!!groupAction}
+                groupMemberCount={activePlayerNames.length}
+                resolvedVotes={resolvedVotes}
+                activeTargetName={activeTargetName}
+                activeTargetConfirmed={activeTargetConfirmed}
+                targetablePlayers={targetablePlayers}
+                activeTarget={activeTarget}
+                onTargetClick={handleTargetClick}
+                isPending={action.isPending}
+                previousTargetId={previousTargetId}
+              />
+            ))}
+          {investigationResult && (
+            <OwnerInvestigationConfirm
+              gameId={gameId}
+              targetName={investigationResult.targetName}
+              isWerewolfTeam={investigationResult.isWerewolfTeam}
+              isResultRevealed={isResultRevealed}
+            />
+          )}
+        </OwnerAdvanceCard>
+        <NightPhaseOrderList
+          nightPhaseOrder={nightPhaseOrder}
+          currentPhaseIndex={currentPhaseIndex}
+          roles={modeConfig.roles}
+        />
+      </div>
       <OwnerPlayerActionsGrid
         gameId={gameId}
         assignments={gameState.visibleRoleAssignments}
         gameMode={gameState.gameMode}
         deadPlayerIds={gameState.deadPlayerIds}
         gameOwnerId={gameState.gameOwner?.id}
-      />
-      <NightPhaseOrderList
-        nightPhaseOrder={nightPhaseOrder}
-        currentPhaseIndex={currentPhaseIndex}
-        roles={modeConfig.roles}
-      />
-      <GameRolesList
-        roles={gameState.rolesInPlay ?? []}
-        gameMode={gameState.gameMode}
-        selectedRoleId={activePhaseKey}
-        onSelectedIdChange={handlePhaseChange}
       />
     </div>
   );

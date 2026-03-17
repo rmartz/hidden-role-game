@@ -4,20 +4,20 @@ import { useMemo } from "react";
 import { WerewolfPhase } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
-import {
-  GameRolesList,
-  GameTimer,
-  PlayersRoleList,
-  RoleLabel,
-} from "@/components/game";
+import { GameTimer } from "@/components/game";
 import { PlayerNightSummary } from "./PlayerNightSummary";
+import { PlayerRoleDisplay } from "./PlayerRoleDisplay";
+import { PlayerStatusLists } from "./PlayerStatusLists";
 
-interface Props {
+interface PlayerGameDayScreenProps {
   gameState: PlayerGameState;
   turnState: WerewolfTurnState;
 }
 
-export function PlayerGameDayScreen({ gameState, turnState }: Props) {
+export function PlayerGameDayScreen({
+  gameState,
+  turnState,
+}: PlayerGameDayScreenProps) {
   const dayPhaseSeconds = gameState.timerConfig?.dayPhaseSeconds ?? null;
   const { phase } = turnState;
   const isDaytime = phase.type === WerewolfPhase.Daytime;
@@ -27,8 +27,16 @@ export function PlayerGameDayScreen({ gameState, turnState }: Props) {
   );
 
   return (
-    <div className="p-5">
-      <h1 className="text-2xl font-bold mb-2">Hidden Role Game</h1>
+    <div className="p-5 max-w-lg mx-auto">
+      <div className="flex items-start justify-between mb-2">
+        <h1 className="text-2xl font-bold">Hidden Role Game</h1>
+        {gameState.myRole && (
+          <PlayerRoleDisplay
+            role={gameState.myRole}
+            gameMode={gameState.gameMode}
+          />
+        )}
+      </div>
       {dayPhaseSeconds !== null ? (
         <GameTimer
           durationSeconds={dayPhaseSeconds}
@@ -51,22 +59,11 @@ export function PlayerGameDayScreen({ gameState, turnState }: Props) {
         </p>
       )}
 
-      {gameState.myRole && (
-        <div className="mb-5">
-          <h2 className="text-lg font-semibold mb-2">Your Role</h2>
-          <RoleLabel role={gameState.myRole} gameMode={gameState.gameMode} />
-        </div>
-      )}
-
-      <PlayersRoleList
-        assignments={gameState.visibleRoleAssignments}
-        gameMode={gameState.gameMode}
-        deadPlayerIds={gameState.deadPlayerIds}
-      />
-
-      <GameRolesList
-        roles={gameState.rolesInPlay ?? []}
-        gameMode={gameState.gameMode}
+      <PlayerStatusLists
+        players={gameState.players}
+        deadPlayerIds={turnState.deadPlayerIds}
+        gameOwnerId={gameState.gameOwner?.id}
+        roleAssignments={gameState.visibleRoleAssignments}
       />
     </div>
   );

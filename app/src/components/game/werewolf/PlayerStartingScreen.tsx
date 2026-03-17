@@ -10,11 +10,11 @@ import {
   RoleLabel,
 } from "@/components/game";
 
-interface Props {
+interface PlayerStartingScreenProps {
   gameState: PlayerGameState;
 }
 
-export function PlayerStartingScreen({ gameState }: Props) {
+export function PlayerStartingScreen({ gameState }: PlayerStartingScreenProps) {
   const durationSeconds = gameState.timerConfig?.startCountdownSeconds ?? null;
   const startedAtMs =
     gameState.status.type === GameStatus.Starting
@@ -26,7 +26,7 @@ export function PlayerStartingScreen({ gameState }: Props) {
   );
 
   return (
-    <div className="p-5">
+    <div className="p-5 max-w-lg mx-auto">
       <h1 className="text-2xl font-bold mb-4">Game Starting</h1>
       {durationSeconds !== null ? (
         <GameTimer

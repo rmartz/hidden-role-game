@@ -3,7 +3,7 @@
 import { getPlayerName } from "@/lib/player-utils";
 import type { PublicLobbyPlayer } from "@/server/types";
 
-interface Props {
+interface WitchInformationPanelProps {
   players: PublicLobbyPlayer[];
   witchAbilityUsed: boolean;
   attackedPlayerIds: string[];
@@ -13,7 +13,7 @@ export function WitchInformationPanel({
   players,
   witchAbilityUsed,
   attackedPlayerIds,
-}: Props) {
+}: WitchInformationPanelProps) {
   if (witchAbilityUsed) {
     return (
       <p className="mb-4 text-sm text-muted-foreground italic">

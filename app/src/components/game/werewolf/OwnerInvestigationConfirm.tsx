@@ -3,6 +3,7 @@
 import { WerewolfAction } from "@/lib/game-modes/werewolf";
 import { Button } from "@/components/ui/button";
 import { useGameAction } from "@/hooks";
+import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 
 interface OwnerInvestigationConfirmProps {
   gameId: string;
@@ -22,21 +23,21 @@ export function OwnerInvestigationConfirm({
   return (
     <div className="mt-3 rounded-md border p-3 text-sm">
       <p className="font-medium mb-2">
-        Investigation result:{" "}
+        {WEREWOLF_COPY.narrator.investigationResultLabel}{" "}
         <strong className="text-foreground">{targetName}</strong> is{" "}
         <strong className="text-foreground">
-          {isWerewolfTeam ? "" : "not "}on the Werewolf team
+          {WEREWOLF_COPY.narrator.teamStatus(isWerewolfTeam)}
         </strong>
         .
       </p>
       {isResultRevealed ? (
         <p className="text-xs text-muted-foreground">
-          Result revealed to Seer.
+          {WEREWOLF_COPY.narrator.investigationResultRevealed}
         </p>
       ) : (
         <Button
           size="sm"
-          variant="outline"
+          variant="default"
           onClick={() => {
             action.mutate({
               actionId: WerewolfAction.RevealInvestigationResult,
@@ -44,7 +45,7 @@ export function OwnerInvestigationConfirm({
           }}
           disabled={action.isPending}
         >
-          Reveal to Seer
+          {WEREWOLF_COPY.narrator.revealToPlayer}
         </Button>
       )}
     </div>

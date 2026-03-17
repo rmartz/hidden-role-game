@@ -7,13 +7,15 @@ import { Button } from "@/components/ui/button";
 import type { PublicLobbyPlayer } from "@/server/types";
 import { ConfirmTargetButton } from "./ConfirmTargetButton";
 import { WitchInformationPanel } from "./WitchInformationPanel";
+import { GroupTargetSuggestion } from "./GroupTargetSuggestion";
+import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 
 interface TeamVoteDisplay {
   playerName: string;
   targetName: string;
 }
 
-interface Props {
+interface PlayerTargetSelectionProps {
   gameId: string;
   players: PublicLobbyPlayer[];
   targets: readonly (readonly [TargetablePlayer, boolean])[];
@@ -47,7 +49,7 @@ export function PlayerTargetSelection({
   witchAbilityUsed,
   attackedPlayerIds,
   previousNightTargetId,
-}: Props) {
+}: PlayerTargetSelectionProps) {
   const action = useGameAction(gameId);
 
   if (
@@ -92,18 +94,27 @@ export function PlayerTargetSelection({
           ) : (
             <p className="text-xs text-muted-foreground">No votes yet.</p>
           )}
+          {suggestedTargetId && (
+            <GroupTargetSuggestion
+              gameId={gameId}
+              players={players}
+              suggestedTargetId={suggestedTargetId}
+              myNightTarget={myNightTarget}
+              isConfirmed={isConfirmed}
+            />
+          )}
         </div>
       )}
 
-      <h2 className="text-lg font-semibold mb-2">
+      <h2 className="text-lg font-semibold mb-2 text-center">
         {isConfirmed && myNightTarget === null
-          ? "You did not perform an action this turn"
+          ? WEREWOLF_COPY.targetSelection.noAction
           : isConfirmed
-            ? "Your target"
-            : "Choose a target"}
+            ? WEREWOLF_COPY.targetSelection.yourTarget
+            : WEREWOLF_COPY.targetSelection.chooseTarget}
       </h2>
       {!(isConfirmed && myNightTarget === null) && (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 max-w-sm mx-auto">
           {targets.map(([player, isSelected]) => (
             <Button
               key={player.id}
@@ -121,10 +132,8 @@ export function PlayerTargetSelection({
                 isConfirmed ||
                 player.id === previousNightTargetId
               }
-              className="justify-start"
             >
               {player.name}
-              {isSelected && " (selected)"}
               {player.id === previousNightTargetId && " (unavailable)"}
             </Button>
           ))}
@@ -140,33 +149,14 @@ export function PlayerTargetSelection({
                 });
               }}
               disabled={action.isPending}
-              className="justify-start"
             >
-              No target
-              {myNightTarget === null && " (selected)"}
+              {myNightTarget === null
+                ? WEREWOLF_COPY.targetSelection.noTarget_selected
+                : WEREWOLF_COPY.targetSelection.noTarget}
             </Button>
           )}
         </div>
       )}
-
-      {isGroupPhase &&
-        suggestedTargetId &&
-        myNightTarget !== suggestedTargetId &&
-        !isConfirmed && (
-          <Button
-            variant="secondary"
-            className="mt-2"
-            onClick={() => {
-              action.mutate({
-                actionId: WerewolfAction.SetNightTarget,
-                payload: { targetPlayerId: suggestedTargetId },
-              });
-            }}
-            disabled={action.isPending}
-          >
-            Approve suggested target
-          </Button>
-        )}
 
       <ConfirmTargetButton
         gameId={gameId}
@@ -175,6 +165,7 @@ export function PlayerTargetSelection({
         hasDecided={isGroupPhase || myNightTarget !== undefined}
         isConfirmed={isConfirmed}
         isGroupPhase={isGroupPhase}
+        hasGroupMembers={hasVisibleTeammates}
         allAgreed={allAgreed}
         witchContext={
           confirmPhaseKey === WerewolfRole.Witch

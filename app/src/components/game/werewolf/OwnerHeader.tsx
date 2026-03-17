@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { ChartPersonRegular } from "@fluentui/react-icons";
 import { GameTimer } from "@/components/game/GameTimer";
 import { Button } from "@/components/ui/button";
 
@@ -18,7 +19,7 @@ type TimerProps = (TimedTimer | ManualTimer) & {
   resetKey?: string | number;
 };
 
-interface Props {
+interface OwnerHeaderProps {
   title: string;
   advanceLabel: string;
   onAdvance: () => void;
@@ -34,7 +35,7 @@ export function OwnerHeader({
   isAdvancing,
   timer,
   children,
-}: Props) {
+}: OwnerHeaderProps) {
   return (
     <>
       <h1 className="text-2xl font-bold mb-4">{title}</h1>
@@ -49,9 +50,12 @@ export function OwnerHeader({
         <GameTimer startedAt={timer.startedAt} resetKey={timer.resetKey} />
       )}
       {children}
-      <Button onClick={onAdvance} disabled={isAdvancing} className="mb-5">
-        {advanceLabel}
-      </Button>
+      <div className="flex justify-center mb-5">
+        <Button onClick={onAdvance} disabled={isAdvancing}>
+          <ChartPersonRegular />
+          {advanceLabel}
+        </Button>
+      </div>
     </>
   );
 }

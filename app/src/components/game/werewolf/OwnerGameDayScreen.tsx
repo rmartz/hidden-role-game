@@ -1,23 +1,28 @@
 "use client";
 
 import { useCallback, useMemo } from "react";
+import { WeatherMoonRegular } from "@fluentui/react-icons";
 import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase, WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
 import { useGameAction } from "@/hooks";
-import { GameRolesList } from "@/components/game";
+import { GameRolesList, GameTimer } from "@/components/game";
+import { OwnerAdvanceCard } from "./OwnerAdvanceCard";
 import { NightOutcomeSummary } from "./NightOutcomeSummary";
-import { OwnerHeader } from "./OwnerHeader";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
 
-interface Props {
+interface OwnerGameDayScreenProps {
   gameId: string;
   gameState: PlayerGameState;
   turnState: WerewolfTurnState;
 }
 
-export function OwnerGameDayScreen({ gameId, gameState, turnState }: Props) {
+export function OwnerGameDayScreen({
+  gameId,
+  gameState,
+  turnState,
+}: OwnerGameDayScreenProps) {
   const dayPhaseSeconds = gameState.timerConfig?.dayPhaseSeconds ?? null;
   const action = useGameAction(gameId);
 
@@ -37,31 +42,32 @@ export function OwnerGameDayScreen({ gameId, gameState, turnState }: Props) {
 
   const modeConfig = GAME_MODES[gameState.gameMode];
 
-  const timer =
-    dayPhaseSeconds !== null
-      ? {
-          durationSeconds: dayPhaseSeconds,
-          startedAt: phaseStartedAt,
-          onTimerTrigger: handleAdvance,
-          resetKey: turnState.turn,
-        }
-      : { startedAt: phaseStartedAt, resetKey: turnState.turn };
-
   return (
     <div className="p-5">
-      <OwnerHeader
-        title={`Day — Turn ${String(turnState.turn)}`}
-        advanceLabel="Start Next Night"
-        onAdvance={handleAdvance}
-        isAdvancing={action.isPending}
-        timer={timer}
-      >
+      <h1 className="text-2xl font-bold mb-4">{`Day — Turn ${String(turnState.turn)}`}</h1>
+      {dayPhaseSeconds !== null ? (
+        <GameTimer
+          durationSeconds={dayPhaseSeconds}
+          startedAt={phaseStartedAt}
+          onTimerTrigger={handleAdvance}
+          resetKey={turnState.turn}
+        />
+      ) : (
+        <GameTimer startedAt={phaseStartedAt} resetKey={turnState.turn} />
+      )}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+        <OwnerAdvanceCard
+          label="Start Next Night"
+          onAdvance={handleAdvance}
+          disabled={action.isPending}
+          icon={<WeatherMoonRegular />}
+        />
         <NightOutcomeSummary
           events={phase.nightResolution ?? []}
           players={gameState.players}
           roles={modeConfig.roles}
         />
-      </OwnerHeader>
+      </div>
       <OwnerPlayerActionsGrid
         gameId={gameId}
         assignments={gameState.visibleRoleAssignments}

@@ -9,8 +9,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 
-interface Props {
+interface ConfirmTargetButtonProps {
   gameId: string;
   roleId?: PhaseKey;
   hasTarget: boolean;
@@ -18,6 +19,7 @@ interface Props {
   hasDecided: boolean;
   isConfirmed: boolean;
   isGroupPhase?: boolean;
+  hasGroupMembers?: boolean;
   allAgreed?: boolean;
   witchContext?: WitchConfirmContext;
 }
@@ -29,49 +31,48 @@ export function ConfirmTargetButton({
   hasDecided,
   isConfirmed,
   isGroupPhase,
+  hasGroupMembers,
   allAgreed,
   witchContext,
-}: Props) {
+}: ConfirmTargetButtonProps) {
   const action = useGameAction(gameId);
 
   if (isConfirmed) {
     return (
       <p className="mt-3 text-sm text-green-600 font-medium">
-        Action confirmed. Wait for the Narrator to continue.
+        {WEREWOLF_COPY.confirmButton.actionConfirmed}
       </p>
     );
   }
 
   // Group phases require all members to agree before confirming.
-  const disabled =
-    !hasDecided || action.isPending || (isGroupPhase && !allAgreed);
+  const needsConsensus = !!(isGroupPhase && hasGroupMembers && !allAgreed);
+  const disabled = !hasDecided || action.isPending || needsConsensus;
   const tooltip = !hasDecided
-    ? "Make a selection first"
-    : isGroupPhase && !allAgreed
-      ? "All group members must agree on the same target"
+    ? WEREWOLF_COPY.confirmButton.makeSelection
+    : needsConsensus
+      ? WEREWOLF_COPY.confirmButton.groupConsensus
       : undefined;
   const label = !hasDecided
-    ? "Confirm"
+    ? WEREWOLF_COPY.confirmButton.confirm
     : hasTarget
       ? getConfirmLabel(roleId, witchContext)
-      : "Skip";
+      : WEREWOLF_COPY.confirmButton.skip;
 
   return (
-    <div className="mt-3">
+    <div className="mt-3 max-w-sm mx-auto flex justify-end">
       <Tooltip>
-        <TooltipTrigger>
-          <span className="inline-block">
-            <Button
-              onClick={() => {
-                action.mutate({
-                  actionId: WerewolfAction.ConfirmNightTarget,
-                });
-              }}
-              disabled={disabled}
-            >
-              {label}
-            </Button>
-          </span>
+        <TooltipTrigger render={<span />}>
+          <Button
+            onClick={() => {
+              action.mutate({
+                actionId: WerewolfAction.ConfirmNightTarget,
+              });
+            }}
+            disabled={disabled}
+          >
+            {label}
+          </Button>
         </TooltipTrigger>
         {tooltip && <TooltipContent>{tooltip}</TooltipContent>}
       </Tooltip>

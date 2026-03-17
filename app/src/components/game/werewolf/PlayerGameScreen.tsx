@@ -10,12 +10,12 @@ import { PlayerGameDayScreen } from "./PlayerGameDayScreen";
 
 const POLL_INTERVAL_MS = 2000;
 
-interface Props {
+interface PlayerGameScreenProps {
   gameId: string;
   gameState: PlayerGameState;
 }
 
-export function PlayerGameScreen({ gameId, gameState }: Props) {
+export function PlayerGameScreen({ gameId, gameState }: PlayerGameScreenProps) {
   const { status } = gameState;
 
   const turnState =

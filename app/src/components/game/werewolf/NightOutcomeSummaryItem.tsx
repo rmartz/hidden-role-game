@@ -1,18 +1,22 @@
 import { getPhaseLabel } from "@/lib/game-modes/werewolf";
 import type { NightResolutionEvent } from "@/lib/game-modes/werewolf";
 
-interface Props {
+interface NightOutcomeSummaryItemProps {
   playerName: string;
   events?: NightResolutionEvent[];
   roles: Record<string, { name: string }>;
 }
 
-export function NightOutcomeSummaryItem({ playerName, events, roles }: Props) {
+export function NightOutcomeSummaryItem({
+  playerName,
+  events,
+  roles,
+}: NightOutcomeSummaryItemProps) {
   const silenced = events?.some((event) => event.type === "silenced");
   const killedEvent = events?.find((event) => event.type === "killed");
 
   return (
-    <li>
+    <>
       <strong className="text-foreground">{playerName}</strong>
       {killedEvent && (
         <>
@@ -47,6 +51,6 @@ export function NightOutcomeSummaryItem({ playerName, events, roles }: Props) {
       {silenced && (
         <span className="ml-1 text-yellow-600 font-medium">(silenced)</span>
       )}
-    </li>
+    </>
   );
 }

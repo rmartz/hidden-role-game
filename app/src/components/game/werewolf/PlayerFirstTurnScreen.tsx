@@ -1,11 +1,14 @@
 "use client";
 
-interface Props {
+interface PlayerFirstTurnScreenProps {
   roleName?: string;
   teammateNames: string[];
 }
 
-export function PlayerFirstTurnScreen({ roleName, teammateNames }: Props) {
+export function PlayerFirstTurnScreen({
+  roleName,
+  teammateNames,
+}: PlayerFirstTurnScreenProps) {
   const hasTeammates = teammateNames.length > 0;
   const teammateLabel = teammateNames.length === 1 ? "teammate" : "teammates";
 

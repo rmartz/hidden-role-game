@@ -25,14 +25,15 @@ export function NightOutcomeSummary({
       <h2 className="text-sm font-semibold mb-2">Night Summary</h2>
       <ul className="space-y-1 text-sm">
         {Object.entries(eventsPerPlayer).map(([targetPlayerId, events]) => (
-          <NightOutcomeSummaryItem
-            key={targetPlayerId}
-            playerName={
-              getPlayerName(players, targetPlayerId) ?? targetPlayerId
-            }
-            events={events}
-            roles={roles}
-          />
+          <li key={targetPlayerId}>
+            <NightOutcomeSummaryItem
+              playerName={
+                getPlayerName(players, targetPlayerId) ?? targetPlayerId
+              }
+              events={events}
+              roles={roles}
+            />
+          </li>
         ))}
       </ul>
     </div>
