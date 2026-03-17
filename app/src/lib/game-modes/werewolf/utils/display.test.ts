@@ -284,6 +284,6 @@ describe("getConfirmLabel", () => {
   });
 
   it("returns 'Confirm' for unknown roleId", () => {
-    expect(getConfirmLabel("unknown-role" as WerewolfRole)).toBe("Confirm");
+    expect(getConfirmLabel("unknown-role")).toBe("Confirm");
   });
 });

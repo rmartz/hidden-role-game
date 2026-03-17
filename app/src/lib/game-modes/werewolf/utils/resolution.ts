@@ -2,7 +2,7 @@ import { Team } from "@/lib/types";
 import type { PlayerRoleAssignment } from "@/lib/types";
 import { TargetCategory } from "../types";
 import type { AnyNightAction, NightResolutionEvent } from "../types";
-import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
+import { WEREWOLF_ROLES, WerewolfRole, isWerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
 import { isGroupPhaseKey } from "./phase-keys";
 
@@ -57,8 +57,8 @@ function collectBaseAttacksAndProtections(
 
   for (const [phaseKey, action] of Object.entries(nightActions)) {
     if (
-      (phaseKey as WerewolfRole) === WerewolfRole.Witch ||
-      (phaseKey as WerewolfRole) === WerewolfRole.Spellcaster
+      (isWerewolfRole(phaseKey) && phaseKey === WerewolfRole.Witch) ||
+      (isWerewolfRole(phaseKey) && phaseKey === WerewolfRole.Spellcaster)
     )
       continue;
 
@@ -86,7 +86,8 @@ function collectBaseAttacksAndProtections(
 
     if (role.targetCategory === TargetCategory.Attack) {
       if (
-        (phaseKey as WerewolfRole) === WerewolfRole.Chupacabra &&
+        isWerewolfRole(phaseKey) &&
+        phaseKey === WerewolfRole.Chupacabra &&
         !chupacabraAttackApplies(tid, roleAssignments, deadPlayerIds)
       ) {
         continue;
