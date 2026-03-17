@@ -16,7 +16,7 @@ export function NightOutcomeSummaryItem({
   const killedEvent = events?.find((event) => event.type === "killed");
 
   return (
-    <li>
+    <>
       <strong className="text-foreground">{playerName}</strong>
       {killedEvent && (
         <>
@@ -51,6 +51,6 @@ export function NightOutcomeSummaryItem({
       {silenced && (
         <span className="ml-1 text-yellow-600 font-medium">(silenced)</span>
       )}
-    </li>
+    </>
   );
 }
