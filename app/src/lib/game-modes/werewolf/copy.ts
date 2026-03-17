@@ -7,9 +7,7 @@ export const WEREWOLF_COPY = {
     yourTurn: "It's Your Turn",
     wakeUp: "Wake up and take your action.",
     stopPeeking: "Stop peeking, you dirty cheater.",
-    youAreEliminated: "You Have Been Eliminated",
-    eliminatedSubtext:
-      "You are no longer in the game. Stay quiet while the night continues.",
+    eliminatedNight: "Respectful spookiness ensues.",
     currentlyAwake: (label: string, players: string) =>
       players
         ? `Currently awake: ${label} (${players})`
@@ -43,6 +41,7 @@ export const WEREWOLF_COPY = {
     showRole: "Show role",
     roleRevealed: (roleName: string, teamLabel: string) =>
       `${roleName} (${teamLabel})`,
+    roleInfoLabel: "Role info",
   },
   playerLists: {
     activePlayers: (count: number) => `Active Players (${String(count)})`,

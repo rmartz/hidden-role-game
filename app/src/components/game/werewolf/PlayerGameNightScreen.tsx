@@ -82,11 +82,8 @@ export function PlayerGameNightScreen({
 
   return gameState.amDead ? (
     <div className="p-5">
-      <h1 className="text-2xl font-bold mb-2 text-muted-foreground">
-        {WEREWOLF_COPY.night.youAreEliminated}
-      </h1>
-      <p className="text-muted-foreground">
-        {WEREWOLF_COPY.night.eliminatedSubtext}
+      <p className="text-muted-foreground italic">
+        {WEREWOLF_COPY.night.eliminatedNight}
       </p>
     </div>
   ) : !isMyTurn ? (

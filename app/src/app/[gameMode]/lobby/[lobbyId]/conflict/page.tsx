@@ -106,7 +106,7 @@ export default function LobbyConflictPage() {
     !storedLobbyId ? (
       <p className="p-5 text-muted-foreground">{LOBBY_PAGE_COPY.loading}</p>
     ) : (
-      <div className="p-5">
+      <div className="p-5 max-w-lg mx-auto">
         <h1 className="text-2xl font-bold mb-4">{LOBBY_PAGE_COPY.title}</h1>
         <LobbyConflictResolution
           conflictLobby={conflictLobbyQuery.data}
