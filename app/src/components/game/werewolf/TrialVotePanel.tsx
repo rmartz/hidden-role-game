@@ -92,7 +92,7 @@ export function TrialVotePanel({
         {trial.votesCast(activeTrial.voteCount, activeTrial.playerCount)}
         {hasVoted && activeTrial.myVote && trial.yourVote(activeTrial.myVote)}
       </p>
-      {activeTrial.mustVoteGuilty && (
+      {activeTrial.mustVoteGuilty && hasVoted && (
         <p className="text-sm text-muted-foreground mb-3">
           {trial.mustVoteGuiltyNote}
         </p>

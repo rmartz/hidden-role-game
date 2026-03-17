@@ -74,7 +74,8 @@ export const WEREWOLF_COPY = {
       `Guilty: ${String(guilty)} · Innocent: ${String(innocent)} · Total votes: ${String(total)}`,
     resolveTrial: "Resolve Trial",
     putToVote: "Put to Vote",
-    mustVoteGuiltyNote: "As the Village Idiot, you must always vote Guilty.",
+    mustVoteGuiltyNote:
+      "As the Village Idiot, your vote was automatically cast as Guilty.",
   },
   narrator: {
     nightTitle: (turn: number, phase: number, total: number) =>
