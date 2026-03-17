@@ -8,13 +8,16 @@ import { GameTimer } from "@/components/game";
 import { PlayerNightSummary } from "./PlayerNightSummary";
 import { PlayerRoleDisplay } from "./PlayerRoleDisplay";
 import { PlayerStatusLists } from "./PlayerStatusLists";
+import { TrialVotePanel } from "./TrialVotePanel";
 
 interface PlayerGameDayScreenProps {
+  gameId: string;
   gameState: PlayerGameState;
   turnState: WerewolfTurnState;
 }
 
 export function PlayerGameDayScreen({
+  gameId,
   gameState,
   turnState,
 }: PlayerGameDayScreenProps) {
@@ -52,6 +55,14 @@ export function PlayerGameDayScreen({
         players={gameState.players}
         nightStatus={gameState.nightStatus}
       />
+
+      {gameState.activeTrial && (
+        <TrialVotePanel
+          gameId={gameId}
+          activeTrial={gameState.activeTrial}
+          players={gameState.players}
+        />
+      )}
 
       {gameState.amDead && (
         <p className="mb-4 font-semibold text-muted-foreground italic">

@@ -7,4 +7,7 @@ export enum WerewolfAction {
   RevealInvestigationResult = "reveal-investigation-result",
   MarkPlayerDead = "mark-player-dead",
   MarkPlayerAlive = "mark-player-alive",
+  StartTrial = "start-trial",
+  CastVote = "cast-vote",
+  ResolveTrial = "resolve-trial",
 }

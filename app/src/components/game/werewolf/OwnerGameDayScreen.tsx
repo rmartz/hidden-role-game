@@ -11,6 +11,7 @@ import { GameRolesList, GameTimer } from "@/components/game";
 import { OwnerAdvanceCard } from "./OwnerAdvanceCard";
 import { NightOutcomeSummary } from "./NightOutcomeSummary";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
+import { OwnerTrialPanel } from "./OwnerTrialPanel";
 
 interface OwnerGameDayScreenProps {
   gameId: string;
@@ -41,6 +42,8 @@ export function OwnerGameDayScreen({
   if (!isDaytime) return null;
 
   const modeConfig = GAME_MODES[gameState.gameMode];
+  const activeTrial = phase.activeTrial;
+  const hasActiveTrial = !!activeTrial && !activeTrial.verdict;
 
   return (
     <div className="p-5">
@@ -68,12 +71,21 @@ export function OwnerGameDayScreen({
           roles={modeConfig.roles}
         />
       </div>
+      {activeTrial && (
+        <OwnerTrialPanel
+          gameId={gameId}
+          activeTrial={activeTrial}
+          players={gameState.players}
+        />
+      )}
       <OwnerPlayerActionsGrid
         gameId={gameId}
         assignments={gameState.visibleRoleAssignments}
         gameMode={gameState.gameMode}
         deadPlayerIds={gameState.deadPlayerIds}
         gameOwnerId={gameState.gameOwner?.id}
+        isDaytime
+        hasActiveTrial={hasActiveTrial}
       />
       <GameRolesList
         roles={gameState.rolesInPlay ?? []}

@@ -1,5 +1,5 @@
 import type { TimerConfig, GameStatusState, Team } from "@/lib/types";
-import type { AnyNightAction } from "@/lib/game-modes/werewolf";
+import type { AnyNightAction, DaytimeVote } from "@/lib/game-modes/werewolf";
 import type {
   PlayerGameState,
   RoleInPlay,
@@ -38,6 +38,13 @@ export interface FirebasePlayerState {
   investigationResult?: { targetPlayerId: string; isWerewolfTeam: boolean };
   witchAbilityUsed?: boolean;
   timerConfig?: TimerConfig;
+  activeTrial?: {
+    defendantId: string;
+    myVote?: DaytimeVote;
+    voteCount: number;
+    playerCount: number;
+    verdict?: "eliminated" | "innocent";
+  };
 }
 
 export function playerStateToFirebase(
@@ -79,6 +86,7 @@ export function playerStateToFirebase(
       : {}),
     ...(state.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
     ...(state.timerConfig ? { timerConfig: state.timerConfig } : {}),
+    ...(state.activeTrial ? { activeTrial: state.activeTrial } : {}),
   };
 }
 
@@ -134,5 +142,6 @@ export function firebaseToPlayerState(
       : {}),
     ...(raw.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
     ...(raw.timerConfig ? { timerConfig: raw.timerConfig } : {}),
+    ...(raw.activeTrial ? { activeTrial: raw.activeTrial } : {}),
   };
 }

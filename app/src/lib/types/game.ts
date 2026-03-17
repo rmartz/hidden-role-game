@@ -155,6 +155,8 @@ export interface TimerConfig {
   nightPhaseSeconds: number | null;
   /** Seconds for day discussion. null = manual only. */
   dayPhaseSeconds: number | null;
+  /** Seconds for a daytime elimination vote. null = no auto-resolve. */
+  votePhaseSeconds?: number | null;
 }
 
 // --- Lobby (top-level entity; game is absent until started) ---

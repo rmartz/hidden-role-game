@@ -63,6 +63,16 @@ export type NightResolutionEvent =
   | AttackNightResolutionEvent
   | SilencedNightResolutionEvent;
 
+export type DaytimeVote = "guilty" | "innocent" | "abstain";
+
+export interface ActiveTrial {
+  defendantId: string;
+  /** Unix epoch ms when the trial started. */
+  startedAt: number;
+  votes: { playerId: string; vote: DaytimeVote }[];
+  verdict?: "eliminated" | "innocent";
+}
+
 export interface WerewolfDaytimePhase {
   type: WerewolfPhase.Daytime;
   /** Unix epoch ms when the day phase began (for elapsed-time display). */
@@ -71,6 +81,8 @@ export interface WerewolfDaytimePhase {
   nightActions: Record<string, AnyNightAction>;
   /** Resolved attack/protect outcomes, computed when transitioning to day. */
   nightResolution?: NightResolutionEvent[];
+  /** Active elimination trial, if one has been called by the narrator. */
+  activeTrial?: ActiveTrial;
 }
 
 export type WerewolfTurnPhase = WerewolfNighttimePhase | WerewolfDaytimePhase;

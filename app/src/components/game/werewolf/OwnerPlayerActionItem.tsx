@@ -8,12 +8,16 @@ interface OwnerPlayerActionItemProps {
   gameId: string;
   playerId: string;
   isDead: boolean;
+  isDaytime?: boolean;
+  hasActiveTrial?: boolean;
 }
 
 export function OwnerPlayerActionItem({
   gameId,
   playerId,
   isDead,
+  isDaytime,
+  hasActiveTrial,
 }: OwnerPlayerActionItemProps) {
   const action = useGameAction(gameId);
 
@@ -35,21 +39,42 @@ export function OwnerPlayerActionItem({
     );
   }
 
+  const handleKill = () => {
+    if (window.confirm("Mark this player as dead?")) {
+      action.mutate({
+        actionId: WerewolfAction.MarkPlayerDead,
+        payload: { playerId },
+      });
+    }
+  };
+
+  const handlePutToVote = () => {
+    action.mutate({
+      actionId: WerewolfAction.StartTrial,
+      payload: { defendantId: playerId },
+    });
+  };
+
   return (
-    <Button
-      variant="destructive"
-      size="xs"
-      onClick={() => {
-        if (window.confirm("Mark this player as dead?")) {
-          action.mutate({
-            actionId: WerewolfAction.MarkPlayerDead,
-            payload: { playerId },
-          });
-        }
-      }}
-      disabled={action.isPending}
-    >
-      Kill
-    </Button>
+    <div className="flex gap-1">
+      {isDaytime && !hasActiveTrial && (
+        <Button
+          variant="outline"
+          size="xs"
+          onClick={handlePutToVote}
+          disabled={action.isPending}
+        >
+          Put to Vote
+        </Button>
+      )}
+      <Button
+        variant="destructive"
+        size="xs"
+        onClick={handleKill}
+        disabled={action.isPending}
+      >
+        Kill
+      </Button>
+    </div>
   );
 }

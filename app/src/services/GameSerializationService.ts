@@ -255,7 +255,10 @@ export class GameSerializationService {
    * nightStatus: killed entries from deaths and silenced entries from the
    * Spellcaster, with attacker/protector info stripped.
    */
-  extractDaytimeNightState(game: Game): Partial<PlayerGameState> {
+  extractDaytimeNightState(
+    game: Game,
+    callerId: string,
+  ): Partial<PlayerGameState> {
     if (game.status.type !== GameStatus.Playing) return {};
     const ts = game.status.turnState as WerewolfTurnState | undefined;
     if (ts?.phase.type !== WerewolfPhase.Daytime) return {};
@@ -271,9 +274,28 @@ export class GameSerializationService {
       return [];
     });
 
-    return {
+    const result: Partial<PlayerGameState> = {
       ...(nightStatus.length > 0 ? { nightStatus } : {}),
     };
+
+    if (phase.activeTrial) {
+      const { activeTrial } = phase;
+      const alivePlayerCount = game.players.filter(
+        (p) => p.id !== game.ownerPlayerId && !ts.deadPlayerIds.includes(p.id),
+      ).length;
+      const myVote = activeTrial.votes.find(
+        (v) => v.playerId === callerId,
+      )?.vote;
+      result.activeTrial = {
+        defendantId: activeTrial.defendantId,
+        ...(myVote !== undefined ? { myVote } : {}),
+        voteCount: activeTrial.votes.length,
+        playerCount: alivePlayerCount,
+        ...(activeTrial.verdict ? { verdict: activeTrial.verdict } : {}),
+      };
+    }
+
+    return result;
   }
 }
 

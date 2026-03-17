@@ -88,7 +88,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
       ownerPlayerId: undefined,
     };
 
-    const result = service.extractDaytimeNightState(game);
+    const result = service.extractDaytimeNightState(game, "player-1");
     expect(result).toEqual({});
   });
 
@@ -105,7 +105,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
       ],
     });
 
-    const result = service.extractDaytimeNightState(game);
+    const result = service.extractDaytimeNightState(game, "player-1");
     expect(result.nightStatus).toBeUndefined();
   });
 
@@ -129,7 +129,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
       ],
     });
 
-    const result = service.extractDaytimeNightState(game);
+    const result = service.extractDaytimeNightState(game, "player-1");
     expect(result.nightStatus).toEqual([
       { targetPlayerId: "p2", effect: "killed" },
     ]);
@@ -140,7 +140,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
       nightResolution: [{ type: "silenced", targetPlayerId: "p3" }],
     });
 
-    const result = service.extractDaytimeNightState(game);
+    const result = service.extractDaytimeNightState(game, "player-1");
     expect(result.nightStatus).toEqual([
       { targetPlayerId: "p3", effect: "silenced" },
     ]);
@@ -159,7 +159,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
       ],
     });
 
-    const result = service.extractDaytimeNightState(game);
+    const result = service.extractDaytimeNightState(game, "player-1");
     const entry = result.nightStatus?.[0];
     expect(entry).not.toHaveProperty("attackedBy");
     expect(entry).not.toHaveProperty("protectedBy");
