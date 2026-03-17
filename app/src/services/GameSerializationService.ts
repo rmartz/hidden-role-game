@@ -291,6 +291,16 @@ export class GameSerializationService {
       )?.vote;
       const playerById = new Map(game.players.map((p) => [p.id, p]));
 
+      const callerAssignment = game.roleAssignments.find(
+        (a) => a.playerId === callerId,
+      );
+      const callerRoleDef = callerAssignment
+        ? (GAME_MODES[game.gameMode].roles[
+            callerAssignment.roleDefinitionId
+          ] as WerewolfRoleDefinition | undefined)
+        : undefined;
+      const mustVoteGuilty = callerRoleDef?.alwaysVotesGuilty === true;
+
       result.activeTrial = {
         defendantId: activeTrial.defendantId,
         startedAt: activeTrial.startedAt,
@@ -298,6 +308,7 @@ export class GameSerializationService {
         voteCount: activeTrial.votes.length,
         playerCount: alivePlayerCount,
         ...(activeTrial.verdict ? { verdict: activeTrial.verdict } : {}),
+        ...(mustVoteGuilty ? { mustVoteGuilty: true } : {}),
       };
 
       if (activeTrial.verdict) {

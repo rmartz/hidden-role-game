@@ -2,6 +2,7 @@ import type { Game, GameAction } from "@/lib/types";
 import type { DaytimeVote } from "../types";
 import { WerewolfPhase } from "../types";
 import { currentTurnState } from "../utils";
+import { WerewolfRole } from "../roles";
 import { applyTrialVerdict } from "./resolve-trial";
 
 const VALID_VOTES: DaytimeVote[] = ["guilty", "innocent"];
@@ -21,9 +22,15 @@ export const castVoteAction: GameAction = {
     if (activeTrial.defendantId === callerId) return false;
     if (activeTrial.votes.some((v) => v.playerId === callerId)) return false;
     const { vote } = payload as { vote?: unknown };
-    return (
-      typeof vote === "string" && VALID_VOTES.includes(vote as DaytimeVote)
-    );
+    if (typeof vote !== "string" || !VALID_VOTES.includes(vote as DaytimeVote))
+      return false;
+    // Village Idiots must always vote guilty
+    const callerRole = game.roleAssignments.find(
+      (a) => a.playerId === callerId,
+    )?.roleDefinitionId;
+    if (callerRole === WerewolfRole.VillageIdiot && vote !== "guilty")
+      return false;
+    return true;
   },
   apply(game: Game, payload: unknown, callerId: string) {
     const ts = currentTurnState(game);
