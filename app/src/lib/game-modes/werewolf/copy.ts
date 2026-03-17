@@ -6,8 +6,18 @@ export const WEREWOLF_COPY = {
   night: {
     yourTurn: "It's Your Turn",
     wakeUp: "Wake up and take your action.",
-    stopPeeking: "Stop peeking, you dirty cheater.",
-    eliminatedNight: "Respectful spookiness ensues.",
+    stopPeeking: [
+      "Stop peeking, you dirty cheater.",
+      "If you can read this your eyes are open.",
+      "Ask your narrator if 'your eyes are open' is right for you.",
+      "Eyes closed means you can't read this. Hmm.",
+    ],
+    eliminatedNight: [
+      "Respectful spookiness ensues.",
+      "It's 10pm, do you know where your kids are?",
+      "Please haunt responsibly.",
+      "Please keep your haunting to the designated haunting areas.",
+    ],
     currentlyAwake: (label: string, players: string) =>
       players
         ? `Currently awake: ${label} (${players})`
