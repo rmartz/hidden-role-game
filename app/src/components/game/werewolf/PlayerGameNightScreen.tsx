@@ -80,7 +80,7 @@ export function PlayerGameNightScreen({
     .filter((e) => e.effect === "attacked")
     .map((e) => e.targetPlayerId);
 
-  const content = gameState.amDead ? (
+  return gameState.amDead ? (
     <div className="p-5">
       <h1 className="text-2xl font-bold mb-2 text-muted-foreground">
         {WEREWOLF_COPY.night.youAreEliminated}
@@ -145,6 +145,4 @@ export function PlayerGameNightScreen({
       </div>
     </div>
   );
-
-  return content;
 }

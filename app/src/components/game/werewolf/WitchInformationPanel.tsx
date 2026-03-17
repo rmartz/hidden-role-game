@@ -14,7 +14,7 @@ export function WitchInformationPanel({
   witchAbilityUsed,
   attackedPlayerIds,
 }: WitchInformationPanelProps) {
-  const content = witchAbilityUsed ? (
+  return witchAbilityUsed ? (
     <p className="mb-4 text-sm text-muted-foreground italic">
       You used your special ability this game.
     </p>
@@ -28,6 +28,4 @@ export function WitchInformationPanel({
       </ul>
     </div>
   ) : null;
-
-  return content;
 }

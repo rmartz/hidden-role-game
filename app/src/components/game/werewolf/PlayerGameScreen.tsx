@@ -30,16 +30,16 @@ export function PlayerGameScreen({ gameId, gameState }: PlayerGameScreenProps) {
 
   if (status.type !== GameStatus.Playing || !turnState) return null;
 
-  const nightPhase =
+  const isNightPhase =
     turnState.phase.type === WerewolfPhase.Nighttime
       ? turnState.phase
       : undefined;
 
-  return nightPhase ? (
+  return isNightPhase ? (
     <PlayerGameNightScreen
       gameId={gameId}
       gameState={gameState}
-      phase={nightPhase}
+      phase={isNightPhase}
       turn={turnState.turn}
       deadPlayerIds={turnState.deadPlayerIds}
     />
