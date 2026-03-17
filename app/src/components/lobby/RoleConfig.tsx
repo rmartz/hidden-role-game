@@ -13,6 +13,7 @@ interface ReadOnlyProps {
   roleConfigMode: RoleConfigMode;
   playerCount: number;
   gameMode: GameMode;
+  roleInfoSrLabel?: string;
   readOnly: true;
 }
 
@@ -21,6 +22,7 @@ interface EditableProps {
   playerCount: number;
   roleConfigMode: RoleConfigMode;
   gameMode: GameMode;
+  roleInfoSrLabel?: string;
   readOnly: false;
   disabled: boolean;
 }
@@ -28,8 +30,14 @@ interface EditableProps {
 type RoleConfigProps = ReadOnlyProps | EditableProps;
 
 export function RoleConfig(props: RoleConfigProps) {
-  const { roleDefinitions, playerCount, gameMode, roleConfigMode, readOnly } =
-    props;
+  const {
+    roleDefinitions,
+    playerCount,
+    gameMode,
+    roleConfigMode,
+    readOnly,
+    roleInfoSrLabel,
+  } = props;
 
   const roleCounts = useAppSelector((s) => s.gameConfig.roleCounts);
   const roleMins = useAppSelector((s) => s.gameConfig.roleMins);
@@ -68,6 +76,7 @@ export function RoleConfig(props: RoleConfigProps) {
                   role={role}
                   gameMode={gameMode}
                   roleConfigMode={roleConfigMode}
+                  roleInfoSrLabel={roleInfoSrLabel}
                   min={readOnlyMin[role.id] ?? 0}
                   max={readOnlyMax[role.id] ?? 0}
                   readOnly={true}
@@ -78,6 +87,7 @@ export function RoleConfig(props: RoleConfigProps) {
                   role={role}
                   gameMode={gameMode}
                   roleConfigMode={roleConfigMode}
+                  roleInfoSrLabel={roleInfoSrLabel}
                   readOnly={false}
                   disabled={props.disabled}
                 />

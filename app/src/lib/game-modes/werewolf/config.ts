@@ -3,11 +3,13 @@ import { Team } from "@/lib/types";
 import type { GameModeConfig } from "@/lib/types";
 import { MIN_PLAYERS, defaultRoleCount, WEREWOLF_ROLES } from "./roles";
 import { WEREWOLF_ACTIONS } from "./actions";
+import { WEREWOLF_COPY } from "./copy";
 
 export const WEREWOLF_CONFIG = {
   name: "Werewolf",
   minPlayers: MIN_PLAYERS,
   ownerTitle: "Narrator",
+  roleInfoSrLabel: WEREWOLF_COPY.glossary.roleInfoLabel,
   teamLabels: {
     [Team.Good]: "Villagers",
     [Team.Bad]: "Werewolves",

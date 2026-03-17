@@ -31,7 +31,10 @@ export function RoleTooltip({ role, srLabel }: RoleTooltipProps) {
           <InfoIcon className="size-3.5" />
           <span className="sr-only">{srLabel}</span>
         </TooltipTrigger>
-        <TooltipContent side="right" className="max-w-64 text-wrap">
+        <TooltipContent
+          side="top"
+          className="max-w-64 text-wrap flex-col items-start"
+        >
           {role.summary && <p className="font-medium">{role.summary}</p>}
           {role.description && (
             <p className="mt-1 opacity-90">{role.description}</p>
