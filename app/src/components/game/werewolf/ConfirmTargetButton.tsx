@@ -62,19 +62,17 @@ export function ConfirmTargetButton({
   return (
     <div className="mt-3 max-w-sm mx-auto flex justify-end">
       <Tooltip>
-        <TooltipTrigger>
-          <span className="inline-block">
-            <Button
-              onClick={() => {
-                action.mutate({
-                  actionId: WerewolfAction.ConfirmNightTarget,
-                });
-              }}
-              disabled={disabled}
-            >
-              {label}
-            </Button>
-          </span>
+        <TooltipTrigger render={<span />}>
+          <Button
+            onClick={() => {
+              action.mutate({
+                actionId: WerewolfAction.ConfirmNightTarget,
+              });
+            }}
+            disabled={disabled}
+          >
+            {label}
+          </Button>
         </TooltipTrigger>
         {tooltip && <TooltipContent>{tooltip}</TooltipContent>}
       </Tooltip>

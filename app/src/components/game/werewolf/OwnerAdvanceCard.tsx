@@ -29,16 +29,14 @@ export function OwnerAdvanceCard({
         {children}
         <div className="flex justify-center mt-2">
           <Tooltip>
-            <TooltipTrigger>
-              <span className="inline-block">
-                <Button
-                  onClick={onAdvance}
-                  disabled={disabled}
-                  variant={unconfirmedWarning ? "destructive" : "default"}
-                >
-                  {label}
-                </Button>
-              </span>
+            <TooltipTrigger render={<span />}>
+              <Button
+                onClick={onAdvance}
+                disabled={disabled}
+                variant={unconfirmedWarning ? "secondary" : "default"}
+              >
+                {label}
+              </Button>
             </TooltipTrigger>
             {unconfirmedWarning && (
               <TooltipContent>{unconfirmedWarning}</TooltipContent>

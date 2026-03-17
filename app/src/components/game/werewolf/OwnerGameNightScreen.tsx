@@ -152,9 +152,9 @@ export function OwnerGameNightScreen({
 
   const unconfirmedWarning =
     !isFirstTurn && !isWitchAbilitySkipped && !isActionConfirmed
-      ? "Player has not confirmed their choice"
+      ? WEREWOLF_COPY.narrator.playerUnconfirmed
       : investigationResult && !isResultRevealed
-        ? "Investigation result has not been revealed to the player"
+        ? WEREWOLF_COPY.narrator.investigationUnrevealed
         : undefined;
 
   const resolvedVotes = (groupAction?.votes ?? []).map((vote) => ({
@@ -202,7 +202,11 @@ export function OwnerGameNightScreen({
   return (
     <div className="p-5">
       <h1 className="text-2xl font-bold mb-4">
-        {`Night — Turn ${String(turnState.turn)} (${String(currentPhaseIndex + 1)}/${String(nightPhaseOrder.length)})`}
+        {WEREWOLF_COPY.narrator.nightTitle(
+          turnState.turn,
+          currentPhaseIndex + 1,
+          nightPhaseOrder.length,
+        )}
       </h1>
       {timer.durationSeconds !== undefined ? (
         <GameTimer
@@ -216,13 +220,17 @@ export function OwnerGameNightScreen({
       )}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
         <OwnerAdvanceCard
-          label={isLastPhase ? "Start the Day" : "Next Role"}
+          label={
+            isLastPhase
+              ? WEREWOLF_COPY.narrator.startDay
+              : WEREWOLF_COPY.narrator.nextRole
+          }
           onAdvance={handleAdvance}
           disabled={action.isPending}
           unconfirmedWarning={unconfirmedWarning}
         >
           <p className="mb-4 text-muted-foreground">
-            Currently awake:{" "}
+            {WEREWOLF_COPY.narrator.currentlyAwake}{" "}
             <strong className="text-foreground">{activePhaseLabel}</strong>
             {activePlayerNames.length > 0 && (
               <span> ({activePlayerNames.join(", ")})</span>

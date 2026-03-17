@@ -50,4 +50,19 @@ export const WEREWOLF_COPY = {
     none: "None",
     noneYet: "None yet",
   },
+  narrator: {
+    nightTitle: (turn: number, phase: number, total: number) =>
+      `Night — Turn ${String(turn)} (${String(phase)}/${String(total)})`,
+    currentlyAwake: "Currently awake:",
+    startDay: "Start the Day",
+    nextRole: "Next Role",
+    playerUnconfirmed: "Player has not confirmed their choice",
+    investigationUnrevealed:
+      "Investigation result has not been revealed to the player",
+    investigationResultLabel: "Investigation result:",
+    teamStatus: (isWerewolfTeam: boolean) =>
+      isWerewolfTeam ? "on the Werewolf team" : "not on the Werewolf team",
+    investigationResultRevealed: "Result revealed to player.",
+    revealToPlayer: "Reveal to player",
+  },
 } as const;
