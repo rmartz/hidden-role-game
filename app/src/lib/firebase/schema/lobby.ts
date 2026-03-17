@@ -132,17 +132,17 @@ export function firebaseToRoleSlot(s: FirebaseRoleSlot): RoleSlot {
 /** Strips null values from a raw Firebase TimerConfig (Firebase may return null for absent fields). */
 export function parseTimerConfig(raw: Record<string, unknown>): TimerConfig {
   return {
-    ...(typeof raw.startCountdownSeconds === "number"
-      ? { startCountdownSeconds: raw.startCountdownSeconds }
+    ...(typeof raw["startCountdownSeconds"] === "number"
+      ? { startCountdownSeconds: raw["startCountdownSeconds"] }
       : {}),
-    ...(typeof raw.nightPhaseSeconds === "number"
-      ? { nightPhaseSeconds: raw.nightPhaseSeconds }
+    ...(typeof raw["nightPhaseSeconds"] === "number"
+      ? { nightPhaseSeconds: raw["nightPhaseSeconds"] }
       : {}),
-    ...(typeof raw.dayPhaseSeconds === "number"
-      ? { dayPhaseSeconds: raw.dayPhaseSeconds }
+    ...(typeof raw["dayPhaseSeconds"] === "number"
+      ? { dayPhaseSeconds: raw["dayPhaseSeconds"] }
       : {}),
-    ...(typeof raw.votePhaseSeconds === "number"
-      ? { votePhaseSeconds: raw.votePhaseSeconds }
+    ...(typeof raw["votePhaseSeconds"] === "number"
+      ? { votePhaseSeconds: raw["votePhaseSeconds"] }
       : {}),
   };
 }
