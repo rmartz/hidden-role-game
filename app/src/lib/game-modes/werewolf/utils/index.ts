@@ -4,3 +4,4 @@ export * from "./game-state";
 export * from "./night-phase";
 export * from "./display";
 export * from "./resolution";
+export * from "./win-condition";

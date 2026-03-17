@@ -9,6 +9,7 @@ import { OwnerStartingScreen } from "./OwnerStartingScreen";
 import { OwnerGameNightScreen } from "./OwnerGameNightScreen";
 import { OwnerGameDayScreen } from "./OwnerGameDayScreen";
 import { OwnerGameScreen } from "./OwnerGameScreen";
+import { GameOverScreen } from "./GameOverScreen";
 
 interface WerewolfOwnerScreenProps {
   gameId: string;
@@ -21,6 +22,10 @@ export function WerewolfOwnerScreen({
 }: WerewolfOwnerScreenProps) {
   const advanceMutation = useAdvanceGame(gameId);
 
+  if (gameState.status.type === GameStatus.Finished) {
+    return <GameOverScreen gameState={gameState} />;
+  }
+
   if (gameState.status.type === GameStatus.Starting) {
     return (
       <OwnerStartingScreen
@@ -32,33 +37,27 @@ export function WerewolfOwnerScreen({
     );
   }
 
-  if (gameState.status.type === GameStatus.Playing) {
-    const turnState = gameState.status.turnState as
-      | WerewolfTurnState
-      | undefined;
+  const turnState = gameState.status.turnState as WerewolfTurnState | undefined;
 
-    if (turnState?.phase.type === WerewolfPhase.Nighttime) {
-      return (
-        <OwnerGameNightScreen
-          gameId={gameId}
-          gameState={gameState}
-          turnState={turnState}
-        />
-      );
-    }
-
-    if (turnState?.phase.type === WerewolfPhase.Daytime) {
-      return (
-        <OwnerGameDayScreen
-          gameId={gameId}
-          gameState={gameState}
-          turnState={turnState}
-        />
-      );
-    }
-
-    return <OwnerGameScreen gameState={gameState} />;
+  if (turnState?.phase.type === WerewolfPhase.Nighttime) {
+    return (
+      <OwnerGameNightScreen
+        gameId={gameId}
+        gameState={gameState}
+        turnState={turnState}
+      />
+    );
   }
 
-  return null;
+  if (turnState?.phase.type === WerewolfPhase.Daytime) {
+    return (
+      <OwnerGameDayScreen
+        gameId={gameId}
+        gameState={gameState}
+        turnState={turnState}
+      />
+    );
+  }
+
+  return <OwnerGameScreen gameState={gameState} />;
 }

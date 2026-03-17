@@ -13,15 +13,20 @@ export function makePlayingGame(
     lobbyId: "lobby-1",
     gameMode: GameMode.Werewolf,
     status: { type: GameStatus.Playing, turnState },
+    // 5 players: 1 Werewolf + 4 Good — keeps game alive after a single kill
     players: [
       { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
       { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
       { id: "p3", name: "Charlie", sessionId: "s3", visibleRoles: [] },
+      { id: "p4", name: "Dave", sessionId: "s4", visibleRoles: [] },
+      { id: "p5", name: "Eve", sessionId: "s5", visibleRoles: [] },
     ],
     roleAssignments: [
       { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
       { playerId: "p2", roleDefinitionId: WerewolfRole.Seer },
       { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+      { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+      { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
     ],
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,

@@ -105,23 +105,34 @@ export class FirebaseGameService {
       ];
     });
 
-    // Reveal dead players' roles to all players.
+    // When game is finished, reveal all roles to every player.
+    const isFinished = game.status.type === GameStatus.Finished;
+    const revealIds = isFinished
+      ? game.roleAssignments.map((a) => a.playerId)
+      : deadPlayerIds;
+
+    // Reveal dead players' (or all players', if game over) roles.
     const visiblePlayerIds = new Set(
       visibleRoleAssignments.map((v) => v.player.id),
     );
-    for (const deadId of deadPlayerIds) {
-      if (deadId === callerId || visiblePlayerIds.has(deadId)) continue;
-      const deadAssignment = game.roleAssignments.find(
-        (a) => a.playerId === deadId,
+    for (const revealId of revealIds) {
+      if (revealId === callerId || visiblePlayerIds.has(revealId)) continue;
+      const revealAssignment = game.roleAssignments.find(
+        (a) => a.playerId === revealId,
       );
-      if (!deadAssignment) continue;
-      const deadPlayer = playerById.get(deadId);
-      const deadRole = roles[deadAssignment.roleDefinitionId];
-      if (!deadPlayer || !deadRole) continue;
+      if (!revealAssignment) continue;
+      const revealPlayer = playerById.get(revealId);
+      const revealRole = roles[revealAssignment.roleDefinitionId];
+      if (!revealPlayer || !revealRole) continue;
       visibleRoleAssignments.push({
-        player: { id: deadPlayer.id, name: deadPlayer.name },
-        role: { id: deadRole.id, name: deadRole.name, team: deadRole.team },
+        player: { id: revealPlayer.id, name: revealPlayer.name },
+        role: {
+          id: revealRole.id,
+          name: revealRole.name,
+          team: revealRole.team,
+        },
       });
+      visiblePlayerIds.add(revealId);
     }
 
     // Include night targeting state.

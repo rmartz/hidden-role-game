@@ -11,6 +11,7 @@ import { markPlayerDeadAction, markPlayerAliveAction } from "./mark-player";
 import { startTrialAction } from "./start-trial";
 import { castVoteAction } from "./cast-vote";
 import { resolveTrialAction } from "./resolve-trial";
+import { endGameAction } from "./end-game";
 
 export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.StartNight]: startNightAction,
@@ -24,4 +25,5 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.StartTrial]: startTrialAction,
   [WerewolfAction.CastVote]: castVoteAction,
   [WerewolfAction.ResolveTrial]: resolveTrialAction,
+  [WerewolfAction.EndGame]: endGameAction,
 };

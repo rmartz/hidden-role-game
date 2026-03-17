@@ -13,6 +13,7 @@ import {
   GameTimer,
   RoleGlossaryDialog,
 } from "@/components/game";
+import { Button } from "@/components/ui/button";
 import { OwnerAdvanceCard } from "./OwnerAdvanceCard";
 import { NightOutcomeSummary } from "./NightOutcomeSummary";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
@@ -37,6 +38,10 @@ export function OwnerGameDayScreen({
     action.mutate({ actionId: WerewolfAction.StartNight });
   }, [action]);
 
+  const handleEndGame = useCallback(() => {
+    action.mutate({ actionId: WerewolfAction.EndGame });
+  }, [action]);
+
   const { phase } = turnState;
   const isDaytime = phase.type === WerewolfPhase.Daytime;
 
@@ -58,7 +63,15 @@ export function OwnerGameDayScreen({
 
   return (
     <div className="p-5">
-      <h1 className="text-2xl font-bold mb-4">{`Day — Turn ${String(turnState.turn)}`}</h1>
+      <div className="flex items-start justify-between mb-4">
+        <h1 className="text-2xl font-bold">{`Day — Turn ${String(turnState.turn)}`}</h1>
+        <RoleGlossaryDialog
+          roles={glossaryRoles}
+          gameMode={gameState.gameMode}
+          title={WEREWOLF_COPY.glossary.dialogTitle}
+          triggerLabel={WEREWOLF_COPY.glossary.openButton}
+        />
+      </div>
       <GameTimer
         durationSeconds={dayPhaseSeconds}
         startedAt={phaseStartedAt}
@@ -101,12 +114,14 @@ export function OwnerGameDayScreen({
         gameMode={gameState.gameMode}
       />
       <div className="mt-3">
-        <RoleGlossaryDialog
-          roles={glossaryRoles}
-          gameMode={gameState.gameMode}
-          title={WEREWOLF_COPY.glossary.dialogTitle}
-          triggerLabel={WEREWOLF_COPY.glossary.openButton}
-        />
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={handleEndGame}
+          disabled={action.isPending}
+        >
+          {WEREWOLF_COPY.gameOver.endGame}
+        </Button>
       </div>
     </div>
   );

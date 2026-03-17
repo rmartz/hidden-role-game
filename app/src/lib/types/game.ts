@@ -26,6 +26,8 @@ export interface PlayingGameStatus {
 
 export interface FinishedGameStatus {
   type: GameStatus.Finished;
+  /** The winning team or role name (e.g. "Werewolves", "Village", "Chupacabra"). */
+  winner?: string;
 }
 
 export type GameStatusState =
