@@ -1,0 +1,162 @@
+import { describe, it, expect } from "vitest";
+import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
+import type { Game } from "@/lib/types";
+import { WerewolfPhase } from "../types";
+import type { WerewolfTurnState, WerewolfNighttimePhase } from "../types";
+import { WerewolfRole } from "../roles";
+import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
+import { makePlayingGame, nightTurnState, dayTurnState } from "./test-helpers";
+
+// ---------------------------------------------------------------------------
+// StartNight
+// ---------------------------------------------------------------------------
+
+describe("WerewolfAction.StartNight", () => {
+  const action = WEREWOLF_ACTIONS[WerewolfAction.StartNight];
+
+  describe("isValid", () => {
+    it("returns true during daytime when called by owner", () => {
+      const game = makePlayingGame(dayTurnState);
+      expect(action.isValid(game, "owner-1", null)).toBe(true);
+    });
+
+    it("returns false during nighttime", () => {
+      const game = makePlayingGame(nightTurnState);
+      expect(action.isValid(game, "owner-1", null)).toBe(false);
+    });
+
+    it("returns false when called by non-owner", () => {
+      const game = makePlayingGame(dayTurnState);
+      expect(action.isValid(game, "player-2", null)).toBe(false);
+    });
+
+    it("returns false when game is not Playing", () => {
+      const game: Game = {
+        id: "game-1",
+        lobbyId: "lobby-1",
+        gameMode: GameMode.Werewolf,
+        status: { type: GameStatus.Starting },
+        players: [],
+        roleAssignments: [],
+        configuredRoleSlots: [],
+        showRolesInPlay: ShowRolesInPlay.None,
+        ownerPlayerId: "owner-1",
+      };
+      expect(action.isValid(game, "owner-1", null)).toBe(false);
+    });
+  });
+
+  describe("apply", () => {
+    it("transitions to nighttime on the next turn", () => {
+      const game = makePlayingGame(dayTurnState);
+      action.apply(game, null, "owner-1");
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      expect(ts.turn).toBe(2);
+      expect(ts.phase.type).toBe(WerewolfPhase.Nighttime);
+    });
+
+    it("builds nightPhaseOrder with a single Werewolf group phase key", () => {
+      const game = makePlayingGame(dayTurnState);
+      action.apply(game, null, "owner-1");
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      const phase = ts.phase as WerewolfNighttimePhase;
+      expect(phase.nightPhaseOrder).toContain(WerewolfRole.Werewolf);
+      expect(phase.nightPhaseOrder).toContain(WerewolfRole.Seer);
+      expect(
+        phase.nightPhaseOrder.filter(
+          (k) => k === (WerewolfRole.Werewolf as string),
+        ),
+      ).toHaveLength(1);
+      expect(phase.currentPhaseIndex).toBe(0);
+    });
+
+    it("sets startedAt to a recent timestamp", () => {
+      const before = Date.now();
+      const game = makePlayingGame(dayTurnState);
+      action.apply(game, null, "owner-1");
+      const after = Date.now();
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      const phase = ts.phase as WerewolfNighttimePhase;
+      expect(phase.startedAt).toBeGreaterThanOrEqual(before);
+      expect(phase.startedAt).toBeLessThanOrEqual(after);
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// StartNight — Wolf Cub bonus phase appears the turn after death, then is gone
+// ---------------------------------------------------------------------------
+
+const WOLF_CUB_BONUS_PHASE_KEY = `${WerewolfRole.Werewolf as string}:2`;
+
+describe("StartNight — Wolf Cub bonus phase lifecycle", () => {
+  const startNight = WEREWOLF_ACTIONS[WerewolfAction.StartNight];
+  const startDay = WEREWOLF_ACTIONS[WerewolfAction.StartDay];
+  const markDead = WEREWOLF_ACTIONS[WerewolfAction.MarkPlayerDead];
+
+  function makeWolfCubGame(): Game {
+    return {
+      id: "game-1",
+      lobbyId: "lobby-1",
+      gameMode: GameMode.Werewolf,
+      status: {
+        type: GameStatus.Playing,
+        turnState: {
+          turn: 1,
+          phase: {
+            type: WerewolfPhase.Daytime,
+            startedAt: 1000,
+            nightActions: {},
+          },
+          deadPlayerIds: [],
+        } satisfies WerewolfTurnState,
+      },
+      players: [
+        { id: "w1", name: "Wolf1", sessionId: "sw1", visibleRoles: [] },
+        { id: "c1", name: "Cub", sessionId: "sc1", visibleRoles: [] },
+        { id: "p3", name: "Seer", sessionId: "s3", visibleRoles: [] },
+      ],
+      roleAssignments: [
+        { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "c1", roleDefinitionId: WerewolfRole.WolfCub },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Seer },
+      ],
+      configuredRoleSlots: [],
+      showRolesInPlay: ShowRolesInPlay.None,
+      ownerPlayerId: "owner-1",
+    };
+  }
+
+  it("bonus phase appears in nightPhaseOrder the turn after Wolf Cub death", () => {
+    const game = makeWolfCubGame();
+    markDead.apply(game, { playerId: "c1" }, "owner-1");
+    startNight.apply(game, null, "owner-1");
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    const phase = ts.phase as WerewolfNighttimePhase;
+    expect(
+      phase.nightPhaseOrder.filter((k) =>
+        k.startsWith(WerewolfRole.Werewolf as string),
+      ),
+    ).toHaveLength(2);
+    expect(phase.nightPhaseOrder).toContain(WOLF_CUB_BONUS_PHASE_KEY);
+  });
+
+  it("bonus phase is NOT present on the subsequent night after it is consumed", () => {
+    const game = makeWolfCubGame();
+    // Turn 1 day: mark Wolf Cub dead, then transition to night (turn 2).
+    markDead.apply(game, { playerId: "c1" }, "owner-1");
+    startNight.apply(game, null, "owner-1");
+    // Turn 2 night → day: wolfCubDied flag is consumed by StartNight, not carried over.
+    startDay.apply(game, null, "owner-1");
+    // Turn 3 night: bonus phase should NOT appear.
+    startNight.apply(game, null, "owner-1");
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    const phase = ts.phase as WerewolfNighttimePhase;
+    expect(
+      phase.nightPhaseOrder.filter((k) =>
+        k.startsWith(WerewolfRole.Werewolf as string),
+      ),
+    ).toHaveLength(1);
+    expect(phase.nightPhaseOrder).not.toContain(WOLF_CUB_BONUS_PHASE_KEY);
+  });
+});
