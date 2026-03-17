@@ -3,7 +3,7 @@ import type { DaytimeVote } from "../types";
 import { WerewolfPhase } from "../types";
 import { currentTurnState } from "../utils";
 
-const VALID_VOTES: DaytimeVote[] = ["guilty", "innocent", "abstain"];
+const VALID_VOTES: DaytimeVote[] = ["guilty", "innocent"];
 
 export const castVoteAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {

@@ -6,7 +6,6 @@ import { WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { PublicLobbyPlayer } from "@/server/types/lobby";
 import { useGameAction } from "@/hooks";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 
 interface OwnerTrialPanelProps {
   gameId: string;
@@ -22,15 +21,13 @@ export function OwnerTrialPanel({
   const action = useGameAction(gameId);
   const defendant = players.find((p) => p.id === activeTrial.defendantId);
   const defendantName = defendant?.name ?? activeTrial.defendantId;
+  const playerById = new Map(players.map((p) => [p.id, p]));
 
   const guiltyCount = activeTrial.votes.filter(
     (v) => v.vote === "guilty",
   ).length;
   const innocentCount = activeTrial.votes.filter(
     (v) => v.vote === "innocent",
-  ).length;
-  const abstainCount = activeTrial.votes.filter(
-    (v) => v.vote === "abstain",
   ).length;
 
   const handleResolve = useCallback(() => {
@@ -41,31 +38,44 @@ export function OwnerTrialPanel({
     const verdictLabel =
       activeTrial.verdict === "eliminated" ? "Eliminated" : "Innocent";
     return (
-      <Card className="p-4 mb-5">
+      <div className="mb-3 pb-3 border-b">
         <p className="font-semibold mb-1">
-          Trial verdict: <span className="font-bold">{defendantName}</span> —{" "}
+          Verdict: <span className="font-bold">{defendantName}</span> —{" "}
           {verdictLabel}
         </p>
         <p className="text-sm text-muted-foreground">
-          Guilty: {guiltyCount} · Innocent: {innocentCount} · Abstain:{" "}
-          {abstainCount}
+          Guilty: {guiltyCount} · Innocent: {innocentCount}
         </p>
-      </Card>
+      </div>
     );
   }
 
   return (
-    <Card className="p-4 mb-5">
+    <div className="mb-3 pb-3 border-b">
       <p className="font-semibold mb-2">
         Trial: <span className="font-bold">{defendantName}</span>
       </p>
       <p className="text-sm text-muted-foreground mb-3">
-        Guilty: {guiltyCount} · Innocent: {innocentCount} · Abstain:{" "}
-        {abstainCount} · Total votes: {activeTrial.votes.length}
+        Guilty: {guiltyCount} · Innocent: {innocentCount} · Total votes:{" "}
+        {activeTrial.votes.length}
       </p>
-      <Button size="sm" onClick={handleResolve} disabled={action.isPending}>
+      {activeTrial.votes.length > 0 && (
+        <ul className="text-sm text-muted-foreground mb-3 space-y-0.5">
+          {activeTrial.votes.map((v) => (
+            <li key={v.playerId}>
+              {playerById.get(v.playerId)?.name ?? v.playerId}: {v.vote}
+            </li>
+          ))}
+        </ul>
+      )}
+      <Button
+        size="sm"
+        className="w-full max-w-xs"
+        onClick={handleResolve}
+        disabled={action.isPending}
+      >
         Resolve Trial
       </Button>
-    </Card>
+    </div>
   );
 }

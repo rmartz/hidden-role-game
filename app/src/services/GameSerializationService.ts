@@ -286,6 +286,8 @@ export class GameSerializationService {
       const myVote = activeTrial.votes.find(
         (v) => v.playerId === callerId,
       )?.vote;
+      const playerById = new Map(game.players.map((p) => [p.id, p]));
+
       result.activeTrial = {
         defendantId: activeTrial.defendantId,
         ...(myVote !== undefined ? { myVote } : {}),
@@ -293,6 +295,29 @@ export class GameSerializationService {
         playerCount: alivePlayerCount,
         ...(activeTrial.verdict ? { verdict: activeTrial.verdict } : {}),
       };
+
+      if (activeTrial.verdict) {
+        result.activeTrial.voteResults = activeTrial.votes.map((v) => ({
+          playerName: playerById.get(v.playerId)?.name ?? v.playerId,
+          vote: v.vote,
+        }));
+
+        if (activeTrial.verdict === "eliminated") {
+          const assignment = game.roleAssignments.find(
+            (a) => a.playerId === activeTrial.defendantId,
+          );
+          const roleDef = assignment
+            ? GAME_MODES[game.gameMode].roles[assignment.roleDefinitionId]
+            : undefined;
+          if (roleDef) {
+            result.activeTrial.eliminatedRole = {
+              id: roleDef.id,
+              name: roleDef.name,
+              team: roleDef.team,
+            };
+          }
+        }
+      }
     }
 
     return result;

@@ -117,5 +117,9 @@ export interface PlayerGameState {
     voteCount: number;
     playerCount: number;
     verdict?: "eliminated" | "innocent";
+    /** Per-player vote results, populated once verdict is set. */
+    voteResults?: { playerName: string; vote: DaytimeVote }[];
+    /** Role of the eliminated player, populated when verdict is "eliminated". */
+    eliminatedRole?: { id: string; name: string; team: Team };
   };
 }

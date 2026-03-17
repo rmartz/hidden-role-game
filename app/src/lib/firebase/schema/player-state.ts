@@ -44,6 +44,8 @@ export interface FirebasePlayerState {
     voteCount: number;
     playerCount: number;
     verdict?: "eliminated" | "innocent";
+    voteResults?: { playerName: string; vote: DaytimeVote }[];
+    eliminatedRole?: { id: string; name: string; team: string };
   };
 }
 
@@ -142,6 +144,10 @@ export function firebaseToPlayerState(
       : {}),
     ...(raw.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
     ...(raw.timerConfig ? { timerConfig: raw.timerConfig } : {}),
-    ...(raw.activeTrial ? { activeTrial: raw.activeTrial } : {}),
+    ...(raw.activeTrial
+      ? {
+          activeTrial: raw.activeTrial as PlayerGameState["activeTrial"],
+        }
+      : {}),
   };
 }

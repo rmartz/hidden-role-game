@@ -35,12 +35,30 @@ export function TrialVotePanel({
       activeTrial.verdict === "eliminated" ? "Eliminated" : "Innocent";
     return (
       <Card className="p-4 mb-4">
-        <p className="font-semibold mb-1">
-          {defendantName} — {verdictLabel}
+        <p className="font-semibold mb-2">
+          Verdict:{" "}
+          <span className="font-bold">
+            {defendantName} — {verdictLabel}
+          </span>
         </p>
-        <p className="text-sm text-muted-foreground">
-          {activeTrial.voteCount} of {activeTrial.playerCount} votes cast
-        </p>
+        {activeTrial.voteResults && activeTrial.voteResults.length > 0 && (
+          <ul className="text-sm text-muted-foreground mb-3 space-y-0.5">
+            {activeTrial.voteResults.map((r) => (
+              <li key={r.playerName}>
+                {r.playerName}: {r.vote}
+              </li>
+            ))}
+          </ul>
+        )}
+        {activeTrial.verdict === "eliminated" && activeTrial.eliminatedRole && (
+          <p className="text-sm text-muted-foreground">
+            {defendantName} was eliminated. They were a{" "}
+            <span className="font-medium">
+              {activeTrial.eliminatedRole.name}
+            </span>
+            .
+          </p>
+        )}
       </Card>
     );
   }
@@ -59,7 +77,7 @@ export function TrialVotePanel({
           ` · Your vote: ${activeTrial.myVote}`}
       </p>
       {!hasVoted && (
-        <div className="flex gap-2">
+        <div className="flex justify-center gap-2">
           <Button
             size="sm"
             variant="destructive"
@@ -79,16 +97,6 @@ export function TrialVotePanel({
             disabled={action.isPending}
           >
             Innocent
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => {
-              castVote("abstain");
-            }}
-            disabled={action.isPending}
-          >
-            Abstain
           </Button>
         </div>
       )}

@@ -64,20 +64,21 @@ export function OwnerGameDayScreen({
           onAdvance={handleAdvance}
           disabled={action.isPending}
           icon={<WeatherMoonRegular />}
-        />
+        >
+          {activeTrial && (
+            <OwnerTrialPanel
+              gameId={gameId}
+              activeTrial={activeTrial}
+              players={gameState.players}
+            />
+          )}
+        </OwnerAdvanceCard>
         <NightOutcomeSummary
           events={phase.nightResolution ?? []}
           players={gameState.players}
           roles={modeConfig.roles}
         />
       </div>
-      {activeTrial && (
-        <OwnerTrialPanel
-          gameId={gameId}
-          activeTrial={activeTrial}
-          players={gameState.players}
-        />
-      )}
       <OwnerPlayerActionsGrid
         gameId={gameId}
         assignments={gameState.visibleRoleAssignments}

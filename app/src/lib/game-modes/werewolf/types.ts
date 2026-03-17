@@ -63,7 +63,7 @@ export type NightResolutionEvent =
   | AttackNightResolutionEvent
   | SilencedNightResolutionEvent;
 
-export type DaytimeVote = "guilty" | "innocent" | "abstain";
+export type DaytimeVote = "guilty" | "innocent";
 
 export interface ActiveTrial {
   defendantId: string;
