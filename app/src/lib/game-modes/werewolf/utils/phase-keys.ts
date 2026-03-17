@@ -1,4 +1,4 @@
-import { WEREWOLF_ROLES } from "../roles";
+import { WEREWOLF_ROLES, isWerewolfRole } from "../roles";
 import type { WerewolfRole, WerewolfRoleDefinition } from "../roles";
 
 /** A valid night phase key: a role ID. Group phases use the primary role's ID. */
@@ -17,6 +17,19 @@ export const GROUP_PHASE_KEY_SEPARATOR = ":";
 export function baseGroupPhaseKey(phaseKey: string): string {
   const idx = phaseKey.lastIndexOf(GROUP_PHASE_KEY_SEPARATOR);
   return idx === -1 ? phaseKey : phaseKey.slice(0, idx);
+}
+
+/**
+ * Returns true if the given phase key corresponds to the specified role (or any
+ * role in the provided list). Combines the `isWerewolfRole` type guard with an
+ * equality check so callers don't need to repeat the guard manually.
+ */
+export function isRoleActive(
+  phaseKey: string,
+  role: WerewolfRole | WerewolfRole[],
+): boolean {
+  if (!isWerewolfRole(phaseKey)) return false;
+  return Array.isArray(role) ? role.includes(phaseKey) : phaseKey === role;
 }
 
 /**

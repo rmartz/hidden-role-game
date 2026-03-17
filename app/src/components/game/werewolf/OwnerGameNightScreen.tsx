@@ -19,7 +19,8 @@ import {
   TargetCategory,
   getInvestigationResultForNarrator,
 } from "@/lib/game-modes/werewolf";
-import { WerewolfRole, isWerewolfRole } from "@/lib/game-modes/werewolf/roles";
+import { WerewolfRole } from "@/lib/game-modes/werewolf/roles";
+import { isRoleActive } from "@/lib/game-modes/werewolf";
 import type {
   WerewolfTurnState,
   WerewolfRoleDefinition,
@@ -133,8 +134,7 @@ export function OwnerGameNightScreen({
     ? !!groupAction?.confirmed
     : activeTargetConfirmed;
   const isWitchAbilitySkipped =
-    isWerewolfRole(activePhaseKey) &&
-    activePhaseKey === WerewolfRole.Witch &&
+    isRoleActive(activePhaseKey, WerewolfRole.Witch) &&
     turnState.witchAbilityUsed;
 
   const activeRoleDef = modeConfig.roles[baseActivePhaseKey] as
@@ -237,8 +237,7 @@ export function OwnerGameNightScreen({
             )}
           </p>
           {!isFirstTurn &&
-            (isWerewolfRole(activePhaseKey) &&
-            activePhaseKey === WerewolfRole.Witch &&
+            (isRoleActive(activePhaseKey, WerewolfRole.Witch) &&
             turnState.witchAbilityUsed &&
             !activeTargetConfirmed ? (
               <p className="mb-4 text-sm text-muted-foreground italic">

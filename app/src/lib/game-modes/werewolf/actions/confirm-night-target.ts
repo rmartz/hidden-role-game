@@ -5,7 +5,8 @@ import {
   validateActiveNightPlayer,
   getGroupPhasePlayerIds,
 } from "../utils";
-import { WerewolfRole, isWerewolfRole } from "../roles";
+import { WerewolfRole } from "../roles";
+import { isRoleActive } from "../utils/phase-keys";
 
 export const confirmNightTargetAction: GameAction = {
   isValid(game: Game, callerId: string) {
@@ -57,10 +58,7 @@ export const confirmNightTargetAction: GameAction = {
       phase.nightActions[activePhaseKey] = { ...action, confirmed: true };
     }
 
-    if (
-      isWerewolfRole(activePhaseKey) &&
-      activePhaseKey === WerewolfRole.Witch
-    ) {
+    if (isRoleActive(activePhaseKey, WerewolfRole.Witch)) {
       ts.witchAbilityUsed = true;
     }
   },

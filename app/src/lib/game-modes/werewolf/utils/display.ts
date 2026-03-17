@@ -1,8 +1,8 @@
 import { TargetCategory } from "../types";
 import type { AnyNightAction } from "../types";
-import { WEREWOLF_ROLES, WerewolfRole, isWerewolfRole } from "../roles";
+import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
-import { isGroupPhaseKey, baseGroupPhaseKey } from "./phase-keys";
+import { isGroupPhaseKey, baseGroupPhaseKey, isRoleActive } from "./phase-keys";
 import type { PhaseKey } from "./phase-keys";
 import { targetPlayerIdOf } from "./targeting";
 import { getPlayerName } from "@/lib/player-utils";
@@ -144,7 +144,7 @@ export function getConfirmLabel(
 ): string {
   if (!phaseKey) return "Confirm";
   if (isGroupPhaseKey(phaseKey)) return "Attack";
-  if (isWerewolfRole(phaseKey) && phaseKey === WerewolfRole.Witch) {
+  if (isRoleActive(phaseKey, WerewolfRole.Witch)) {
     if (!witchContext?.selectedTargetId) return "Use Ability";
     return witchContext.attackedPlayerIds.includes(
       witchContext.selectedTargetId,
@@ -152,8 +152,7 @@ export function getConfirmLabel(
       ? "Protect"
       : "Attack";
   }
-  if (isWerewolfRole(phaseKey) && phaseKey === WerewolfRole.Spellcaster)
-    return "Silence";
+  if (isRoleActive(phaseKey, WerewolfRole.Spellcaster)) return "Silence";
   const roleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
     phaseKey
   ];
