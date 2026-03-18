@@ -570,7 +570,7 @@ describe("SetNightTarget — Priest ward blocking", () => {
       turn: 2,
       nightPhaseOrder: [WerewolfRole.Priest],
     });
-    (nightState).priestWards = { p2: "p1" };
+    nightState.priestWards = { p2: "p1" };
     const game = makePriestGame(nightState);
     expect(action.isValid(game, "p1", { targetPlayerId: "p3" })).toBe(false);
   });
@@ -581,7 +581,7 @@ describe("SetNightTarget — Priest ward blocking", () => {
       nightPhaseOrder: [WerewolfRole.Priest],
       deadPlayerIds: ["p2"],
     });
-    (nightState).priestWards = { p2: "p1" };
+    nightState.priestWards = { p2: "p1" };
     const game = makePriestGame(nightState);
     expect(action.isValid(game, "p1", { targetPlayerId: "p3" })).toBe(true);
   });

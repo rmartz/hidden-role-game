@@ -269,7 +269,7 @@ describe("WerewolfAction.StartDay", () => {
           },
         },
       });
-      (nightState).toughGuyHitIds = ["p2"];
+      nightState.toughGuyHitIds = ["p2"];
       const game = makePlayingGame(nightState, {
         roleAssignments: [
           { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
