@@ -114,6 +114,10 @@ export function firebaseToLobby(
       showConfigToPlayers: pub.config.showConfigToPlayers,
       showRolesInPlay: pub.config
         .showRolesInPlay as LobbyConfig["showRolesInPlay"],
+      // The TypeScript type says TimerConfig, but old Firebase documents may
+      // have partial data (e.g. missing autoAdvance). Cast to raw Record so
+      // parseTimerConfig validates each field and fills defaults, rather than
+      // blindly trusting the cast value.
       timerConfig: parseTimerConfig(
         pub.config.timerConfig as unknown as Record<string, unknown>,
       ),
@@ -176,6 +180,10 @@ export function firebaseToPublicLobby(
       showConfigToPlayers: pub.config.showConfigToPlayers,
       showRolesInPlay: pub.config
         .showRolesInPlay as LobbyConfig["showRolesInPlay"],
+      // The TypeScript type says TimerConfig, but old Firebase documents may
+      // have partial data (e.g. missing autoAdvance). Cast to raw Record so
+      // parseTimerConfig validates each field and fills defaults, rather than
+      // blindly trusting the cast value.
       timerConfig: parseTimerConfig(
         pub.config.timerConfig as unknown as Record<string, unknown>,
       ),
