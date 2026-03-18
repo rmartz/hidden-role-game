@@ -56,7 +56,9 @@ export function useConfigSync(
           const roleSlots = selectRoleSlots(gameConfigRef.current);
           const drainResolvers = () => {
             const resolvers = pendingFlushResolversRef.current.splice(0);
-            resolvers.forEach((r) => { r(); });
+            resolvers.forEach((r) => {
+              r();
+            });
           };
           mutateRef.current(
             {
@@ -66,7 +68,7 @@ export function useConfigSync(
               showRolesInPlay,
               roleSlots,
               timerConfig,
-              nominationThreshold: nominationEnabled ? 2 : undefined,
+              nominationThreshold: nominationEnabled ? 2 : null,
             },
             {
               onSuccess: () => {

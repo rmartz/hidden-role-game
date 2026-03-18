@@ -45,7 +45,7 @@ export interface UpdateLobbyConfigRequest {
   gameMode?: GameMode;
   roleSlots?: RoleSlot[];
   timerConfig?: TimerConfig;
-  nominationThreshold?: number;
+  nominationThreshold?: number | null;
 }
 
 export interface LobbyJoinResponse {

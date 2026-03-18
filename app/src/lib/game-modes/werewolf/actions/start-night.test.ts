@@ -84,6 +84,57 @@ describe("WerewolfAction.StartNight", () => {
 });
 
 // ---------------------------------------------------------------------------
+// StartNight — nominations do not persist across phase transitions
+// ---------------------------------------------------------------------------
+
+describe("StartNight — nominations are not carried into the new night phase", () => {
+  const startNight = WEREWOLF_ACTIONS[WerewolfAction.StartNight];
+  const startDay = WEREWOLF_ACTIONS[WerewolfAction.StartDay];
+
+  it("nominations present in daytime are absent after StartNight", () => {
+    const dayWithNominations: WerewolfTurnState = {
+      turn: 1,
+      phase: {
+        type: WerewolfPhase.Daytime,
+        startedAt: 1000,
+        nightActions: {},
+        nominations: [{ nominatorId: "p2", defendantId: "p3" }],
+      },
+      deadPlayerIds: [],
+    };
+    const game = makePlayingGame(dayWithNominations);
+    startNight.apply(game, null, "owner-1");
+
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.phase.type).toBe(WerewolfPhase.Nighttime);
+    // Nighttime phase has no nominations field
+    expect(
+      (ts.phase as Record<string, unknown>)["nominations"],
+    ).toBeUndefined();
+  });
+
+  it("nominations are absent in the daytime phase that follows the night", () => {
+    const dayWithNominations: WerewolfTurnState = {
+      turn: 1,
+      phase: {
+        type: WerewolfPhase.Daytime,
+        startedAt: 1000,
+        nightActions: {},
+        nominations: [{ nominatorId: "p2", defendantId: "p3" }],
+      },
+      deadPlayerIds: [],
+    };
+    const game = makePlayingGame(dayWithNominations);
+    startNight.apply(game, null, "owner-1");
+    startDay.apply(game, null, "owner-1");
+
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.phase.type).toBe(WerewolfPhase.Daytime);
+    expect((ts.phase as { nominations?: unknown }).nominations).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
 // StartNight — Wolf Cub bonus phase appears the turn after death, then is gone
 // ---------------------------------------------------------------------------
 
