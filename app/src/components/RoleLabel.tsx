@@ -48,11 +48,7 @@ export function RoleLabel({ role, gameMode }: RoleLabelProps) {
     </Badge>
   );
 
-  if (!hasInfo) {
-    return badge;
-  }
-
-  return (
+  return hasInfo ? (
     <TooltipProvider>
       <Tooltip open={open} onOpenChange={setOpen}>
         <TooltipTrigger
@@ -82,5 +78,7 @@ export function RoleLabel({ role, gameMode }: RoleLabelProps) {
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
+  ) : (
+    badge
   );
 }

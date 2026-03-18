@@ -23,6 +23,7 @@ interface PlayerRoleDisplayProps {
 
 export function PlayerRoleDisplay({ role, gameMode }: PlayerRoleDisplayProps) {
   const [revealed, setRevealed] = useState(false);
+  const [tooltipOpen, setTooltipOpen] = useState(false);
 
   useEffect(() => {
     if (!revealed) return;
@@ -34,6 +35,12 @@ export function PlayerRoleDisplay({ role, gameMode }: PlayerRoleDisplayProps) {
     };
   }, [revealed]);
 
+  useEffect(() => {
+    if (!revealed) {
+      setTooltipOpen(false);
+    }
+  }, [revealed]);
+
   const modeConfig = gameMode ? GAME_MODES[gameMode] : undefined;
   const teamLabel = modeConfig?.teamLabels[role.team] ?? role.team;
   const fullRole = modeConfig?.roles[role.id];
@@ -42,7 +49,8 @@ export function PlayerRoleDisplay({ role, gameMode }: PlayerRoleDisplayProps) {
   const revealedButton = (
     <Button
       variant="secondary"
-      onClick={() => {
+      onClick={(e) => {
+        e.stopPropagation();
         setRevealed(false);
       }}
     >
@@ -67,10 +75,15 @@ export function PlayerRoleDisplay({ role, gameMode }: PlayerRoleDisplayProps) {
 
   return (
     <TooltipProvider>
-      <Tooltip>
+      <Tooltip open={tooltipOpen} onOpenChange={setTooltipOpen}>
         <TooltipTrigger
           render={
-            <div className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground cursor-default" />
+            <div
+              className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground cursor-default"
+              onClick={() => {
+                setTooltipOpen((v) => !v);
+              }}
+            />
           }
         >
           {revealedButton}

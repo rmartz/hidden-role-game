@@ -13,6 +13,7 @@
 
 - **No imperative logic inside JSX.** All imperative or conditional logic must be computed in the component body before the `return` statement, or extracted into a dedicated child component.
 - JSX should only contain simple functional expressions: `items.map(item => <Item key={item.id} {...item} />)`.
+- **No spurious variables.** Do not assign a value to a variable only to immediately return it on the next line — return the expression directly instead.
 
 ## User-Facing Text
 

@@ -78,16 +78,12 @@ export function PlayerNightActionScreen({
     .filter((e) => e.effect === "attacked")
     .map((e) => e.targetPlayerId);
 
-  if (isFirstTurn) {
-    return (
-      <PlayerFirstTurnScreen
-        roleName={gameState.myRole?.name}
-        teammateNames={teammateNames}
-      />
-    );
-  }
-
-  return (
+  return isFirstTurn ? (
+    <PlayerFirstTurnScreen
+      roleName={gameState.myRole?.name}
+      teammateNames={teammateNames}
+    />
+  ) : (
     <div className="p-5">
       <div className="max-w-sm mx-auto">
         <h1 className="text-2xl font-bold mb-2">
