@@ -40,7 +40,7 @@ export interface VisibleTeammate {
 /** Night effects visible during the daytime summary. */
 export interface DaytimeNightStatusEntry {
   targetPlayerId: string;
-  effect: "killed" | "silenced";
+  effect: "killed" | "silenced" | "survived";
 }
 
 /** Night effects visible to the Witch during their nighttime phase only. */
@@ -106,6 +106,8 @@ export interface PlayerGameState {
   investigationResult?: { targetPlayerId: string; isWerewolfTeam: boolean };
   /** Whether the Witch has already used their once-per-game special ability. */
   witchAbilityUsed?: boolean;
+  /** Whether the Priest's ward is currently active (cannot target this night). */
+  priestWardActive?: boolean;
   /** Phase timer configuration. */
   timerConfig: TimerConfig;
   /** Active elimination trial. Sanitized view: no raw per-player vote breakdown. */

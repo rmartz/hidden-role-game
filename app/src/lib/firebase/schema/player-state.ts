@@ -38,6 +38,7 @@ export interface FirebasePlayerState {
   previousNightTargetId?: string;
   investigationResult?: { targetPlayerId: string; isWerewolfTeam: boolean };
   witchAbilityUsed?: boolean;
+  priestWardActive?: boolean;
   timerConfig: TimerConfig;
   activeTrial?: {
     defendantId: string;
@@ -89,6 +90,7 @@ export function playerStateToFirebase(
       ? { investigationResult: state.investigationResult }
       : {}),
     ...(state.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
+    ...(state.priestWardActive ? { priestWardActive: true } : {}),
     timerConfig: state.timerConfig,
     ...(state.activeTrial ? { activeTrial: state.activeTrial } : {}),
   };
@@ -145,6 +147,7 @@ export function firebaseToPlayerState(
       ? { investigationResult: raw.investigationResult }
       : {}),
     ...(raw.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
+    ...(raw.priestWardActive ? { priestWardActive: true } : {}),
     // The TypeScript type says TimerConfig, but old Firebase documents may
     // have partial data (e.g. missing autoAdvance). Cast to raw Record so
     // parseTimerConfig validates each field and fills defaults, rather than

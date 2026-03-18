@@ -26,6 +26,13 @@ import {
 } from "@/lib/game-modes/werewolf/roles";
 import { GAME_MODES } from "@/lib/game-modes";
 
+function hasPriestActiveWard(ts: WerewolfTurnState | undefined): boolean {
+  if (!ts?.priestWards) return false;
+  return Object.keys(ts.priestWards).some(
+    (wardedId) => !ts.deadPlayerIds.includes(wardedId),
+  );
+}
+
 /**
  * Stateless serialization/sanitization helpers used by FirebaseGameService
  * to build per-player game state. Exposed as public methods so they can be
@@ -180,6 +187,7 @@ export class GameSerializationService {
           nightActions,
           game.roleAssignments,
           deadPlayerIds,
+          ts?.priestWards,
         );
         if (attacked.length > 0) {
           result.nightStatus = attacked.map(
@@ -205,10 +213,13 @@ export class GameSerializationService {
       const previousNightTargetId = myRoleDefForRepeat?.preventRepeatTarget
         ? ts?.lastTargets?.[myRole.id]
         : undefined;
+      const priestWardActive =
+        isRoleActive(myRole.id, WerewolfRole.Priest) && hasPriestActiveWard(ts);
       return {
         myNightTarget: undefined,
         myNightTargetConfirmed: false,
         ...(previousNightTargetId ? { previousNightTargetId } : {}),
+        ...(priestWardActive ? { priestWardActive } : {}),
       };
     }
 
@@ -222,11 +233,14 @@ export class GameSerializationService {
     const previousNightTargetId = myRoleDef?.preventRepeatTarget
       ? ts?.lastTargets?.[myRole.id]
       : undefined;
+    const priestWardActive =
+      isRoleActive(myRole.id, WerewolfRole.Priest) && hasPriestActiveWard(ts);
 
     const result: Partial<PlayerGameState> = {
       myNightTarget: myAction.skipped ? null : myAction.targetPlayerId,
       myNightTargetConfirmed: myAction.confirmed ?? false,
       ...(previousNightTargetId ? { previousNightTargetId } : {}),
+      ...(priestWardActive ? { priestWardActive } : {}),
     };
 
     // For Investigate roles, include the result once the narrator has revealed it.
@@ -274,6 +288,8 @@ export class GameSerializationService {
     ).flatMap((e): DaytimeNightStatusEntry[] => {
       if (e.type === "killed" && e.died)
         return [{ targetPlayerId: e.targetPlayerId, effect: "killed" }];
+      if (e.type === "tough-guy-absorbed")
+        return [{ targetPlayerId: e.targetPlayerId, effect: "survived" }];
       if (e.type === "silenced")
         return [{ targetPlayerId: e.targetPlayerId, effect: "silenced" }];
       return [];
