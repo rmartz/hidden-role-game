@@ -4,6 +4,9 @@ import type { GameModeConfig } from "@/lib/types";
 import { MIN_PLAYERS, defaultRoleCount, WEREWOLF_ROLES } from "./roles";
 import { WEREWOLF_ACTIONS } from "./actions";
 
+/** Number of nominations required to automatically start an elimination trial. */
+export const NOMINATION_VOTE_THRESHOLD = 2;
+
 export const WEREWOLF_CONFIG = {
   name: "Werewolf",
   minPlayers: MIN_PLAYERS,

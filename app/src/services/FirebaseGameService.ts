@@ -77,9 +77,7 @@ export class FirebaseGameService {
         ...(nightActions ? { nightActions } : {}),
         ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
         ...(game.timerConfig ? { timerConfig: game.timerConfig } : {}),
-        ...(game.nominationThreshold !== undefined
-          ? { nominationThreshold: game.nominationThreshold }
-          : {}),
+        nominationsEnabled: game.nominationThreshold !== undefined,
       };
     }
 
@@ -172,6 +170,7 @@ export class FirebaseGameService {
       myRole: { id: myRole.id, name: myRole.name, team: myRole.team },
       visibleRoleAssignments,
       rolesInPlay: gameInitializationService.buildRolesInPlay(game),
+      nominationsEnabled: game.nominationThreshold !== undefined,
       ...nightTargetState,
       ...daytimeNightState,
       ...(amDead ? { amDead: true } : {}),

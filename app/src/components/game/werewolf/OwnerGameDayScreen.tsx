@@ -111,12 +111,11 @@ export function OwnerGameDayScreen({
           roles={modeConfig.roles}
         />
       </div>
-      {!!gameState.nominationThreshold && (
+      {gameState.nominationsEnabled && (
         <NominationPanel
           gameId={gameId}
           players={gameState.players}
           nominations={nominations}
-          nominationThreshold={gameState.nominationThreshold}
           deadPlayerIds={gameState.deadPlayerIds}
           gameOwnerId={gameState.gameOwner?.id}
           hasActiveTrial={hasActiveTrial}

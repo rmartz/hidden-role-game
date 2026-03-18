@@ -1,7 +1,11 @@
 "use client";
 
 import { useCallback } from "react";
-import { WEREWOLF_COPY, WerewolfAction } from "@/lib/game-modes/werewolf";
+import {
+  WEREWOLF_COPY,
+  WerewolfAction,
+  NOMINATION_VOTE_THRESHOLD,
+} from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
 import { useGameAction } from "@/hooks";
 import { Button } from "@/components/ui/button";
@@ -14,7 +18,6 @@ interface NominationPanelProps {
   amDead?: boolean;
   nominations: NonNullable<PlayerGameState["nominations"]>;
   myNominatedDefendantId?: string;
-  nominationThreshold: number;
   deadPlayerIds?: string[];
   gameOwnerId?: string;
   hasActiveTrial: boolean;
@@ -27,7 +30,6 @@ export function NominationPanel({
   amDead,
   nominations,
   myNominatedDefendantId,
-  nominationThreshold,
   deadPlayerIds,
   gameOwnerId,
   hasActiveTrial,
@@ -67,7 +69,7 @@ export function NominationPanel({
     <Card className="p-4 mb-4">
       <p className="font-semibold mb-1">{nomination.heading}</p>
       <p className="text-sm text-muted-foreground mb-3">
-        {nomination.autoTrialNote(nominationThreshold)}
+        {nomination.autoTrialNote(NOMINATION_VOTE_THRESHOLD)}
       </p>
       <ul className="space-y-2">
         {eligiblePlayers.map((player) => {
@@ -82,7 +84,7 @@ export function NominationPanel({
               <span className="flex-1 text-sm">{player.name}</span>
               {count > 0 && (
                 <span className="text-xs text-muted-foreground">
-                  {nomination.nominationCount(count, nominationThreshold)}
+                  {nomination.nominationCount(count, NOMINATION_VOTE_THRESHOLD)}
                 </span>
               )}
               {isMyTarget ? (

@@ -530,21 +530,19 @@ function makeDaytimeGameWithNominations(
 describe("GameSerializationService.extractDaytimeNightState — nominations", () => {
   const service = new GameSerializationService();
 
-  it("nominations and nominationThreshold are absent when threshold is not set", () => {
+  it("nominations are absent when threshold is not set", () => {
     const game = makeDaytimeGameWithNominations(
       [{ nominatorId: "p2", defendantId: "p3" }],
       undefined,
     );
     const result = service.extractDaytimeNightState(game, "p2");
     expect(result.nominations).toBeUndefined();
-    expect(result.nominationThreshold).toBeUndefined();
   });
 
-  it("returns empty nominations array and threshold when no nominations exist", () => {
+  it("returns empty nominations array when no nominations exist", () => {
     const game = makeDaytimeGameWithNominations([], 2);
     const result = service.extractDaytimeNightState(game, "p2");
     expect(result.nominations).toEqual([]);
-    expect(result.nominationThreshold).toBe(2);
   });
 
   it("aggregates nomination counts by defendant", () => {

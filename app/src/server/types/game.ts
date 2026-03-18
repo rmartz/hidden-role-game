@@ -109,15 +109,15 @@ export interface PlayerGameState {
   witchAbilityUsed?: boolean;
   /** Phase timer configuration. Present when the lobby has timers enabled. */
   timerConfig?: TimerConfig;
+  /** Whether player nominations for trial are enabled in this game. */
+  nominationsEnabled: boolean;
   /**
    * Current nominations for trial (sanitized: no nominator identities visible to players).
-   * Only populated during daytime when nominationThreshold is set.
+   * Only populated during daytime when nominationsEnabled is true.
    */
   nominations?: { defendantId: string; count: number }[];
   /** The defendant this player has nominated, if any. */
   myNominatedDefendantId?: string;
-  /** Number of nominations required to auto-start a trial. */
-  nominationThreshold?: number;
   /** Active elimination trial. Sanitized view: no raw per-player vote breakdown. */
   activeTrial?: {
     defendantId: string;

@@ -300,7 +300,6 @@ export class GameSerializationService {
       if (myNomination) {
         result.myNominatedDefendantId = myNomination.defendantId;
       }
-      result.nominationThreshold = game.nominationThreshold;
     }
 
     if (phase.activeTrial) {

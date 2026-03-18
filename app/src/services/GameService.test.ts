@@ -139,19 +139,19 @@ function makeNarratorGame(nominationThreshold?: number): Game {
   };
 }
 
-describe("GameService.getPlayerGameState — narrator nominationThreshold", () => {
+describe("GameService.getPlayerGameState — narrator nominationsEnabled", () => {
   const service = new GameService();
 
-  it("narrator state includes nominationThreshold when set on game", () => {
+  it("narrator state has nominationsEnabled true when threshold is set on game", () => {
     const game = makeNarratorGame(2);
     const result = service.getPlayerGameState(game, "narrator");
-    expect(result?.nominationThreshold).toBe(2);
+    expect(result?.nominationsEnabled).toBe(true);
   });
 
-  it("narrator state omits nominationThreshold when not set on game", () => {
+  it("narrator state has nominationsEnabled false when threshold is not set on game", () => {
     const game = makeNarratorGame();
     const result = service.getPlayerGameState(game, "narrator");
-    expect(result?.nominationThreshold).toBeUndefined();
+    expect(result?.nominationsEnabled).toBe(false);
   });
 
   it("narrator state has myPlayerId undefined and myRole undefined", () => {
