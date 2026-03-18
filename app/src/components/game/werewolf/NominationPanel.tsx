@@ -10,59 +10,7 @@ import type { PlayerGameState } from "@/server/types";
 import { useGameAction } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-
-interface NominationRowProps {
-  player: { id: string; name: string };
-  count: number;
-  isMyTarget: boolean;
-  canAct: boolean;
-  isPending: boolean;
-  onNominate: (defendantId: string) => void;
-}
-
-function NominationRow({
-  player,
-  count,
-  isMyTarget,
-  canAct,
-  isPending,
-  onNominate,
-}: NominationRowProps) {
-  const { nomination } = WEREWOLF_COPY;
-  const buttonLabel =
-    count > 0
-      ? nomination.secondButton(player.name)
-      : nomination.nominateButton(player.name);
-
-  const actionElement = isMyTarget ? (
-    <span className="text-xs text-muted-foreground italic">
-      {nomination.yourNomination}
-    </span>
-  ) : canAct ? (
-    <Button
-      size="sm"
-      variant="outline"
-      onClick={() => {
-        onNominate(player.id);
-      }}
-      disabled={isPending}
-    >
-      {buttonLabel}
-    </Button>
-  ) : null;
-
-  return (
-    <li className="flex items-center gap-3">
-      <span className="flex-1 text-sm">{player.name}</span>
-      {count > 0 && (
-        <span className="text-xs text-muted-foreground">
-          {nomination.nominationCount(count, NOMINATION_VOTE_THRESHOLD)}
-        </span>
-      )}
-      {actionElement}
-    </li>
-  );
-}
+import { NominationRow } from "./NominationRow";
 
 interface NominationPanelProps {
   gameId: string;

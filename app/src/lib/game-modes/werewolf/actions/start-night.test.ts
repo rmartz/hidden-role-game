@@ -110,7 +110,7 @@ describe("StartNight — nominations are not carried into the new night phase", 
     expect(ts.phase.type).toBe(WerewolfPhase.Nighttime);
     // Nighttime phase has no nominations field
     expect(
-      (ts.phase as Record<string, unknown>)["nominations"],
+      (ts.phase as unknown as Record<string, unknown>)["nominations"],
     ).toBeUndefined();
   });
 
