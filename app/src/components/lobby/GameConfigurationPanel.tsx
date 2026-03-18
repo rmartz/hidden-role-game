@@ -20,7 +20,7 @@ import { ConfigurationToggles } from "./ConfigurationToggles";
 import { RoleConfig } from "./RoleConfig";
 import { GameModePicker } from "./GameModePicker";
 import { ShowRolesInPlayPicker } from "./ShowRolesInPlayPicker";
-import { TimerConfigPanel } from "./TimerConfigPanel";
+import { WerewolfConfigPanel } from "./WerewolfConfigPanel";
 
 interface ReadOnlyProps {
   config: GameConfig;
@@ -77,6 +77,7 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
   const ownerTitle = activeModeConfig.ownerTitle;
   const roleSlotsRequired = getRoleSlotsRequired(activeGameMode, playerCount);
   const disabled = readOnly ? true : props.isPending;
+  const isWerewolf = activeGameMode === GameMode.Werewolf;
 
   const resolved = readOnly
     ? {
@@ -109,6 +110,16 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
       ? `This game has a ${ownerTitle} who can see all roles.`
       : `You will be the ${ownerTitle} and will see all player roles. Role slots are for the remaining ${String(roleSlotsRequired)} players.`
     : null;
+
+  const werewolfConfig = isWerewolf ? (
+    <WerewolfConfigPanel
+      timerConfig={resolved.timerConfig}
+      nominationEnabled={resolved.nominationEnabled}
+      disabled={disabled}
+      onTimerConfigChange={resolved.onTimerConfigChange}
+      onNominationEnabledChange={resolved.onNominationEnabledChange}
+    />
+  ) : null;
 
   return (
     <>
@@ -157,17 +168,11 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
 
           <ConfigurationToggles
             showConfigToPlayers={resolved.showConfigToPlayers}
-            nominationEnabled={resolved.nominationEnabled}
             disabled={disabled}
             onShowConfigToPlayersChange={resolved.onShowConfigToPlayersChange}
-            onNominationEnabledChange={resolved.onNominationEnabledChange}
           />
 
-          <TimerConfigPanel
-            timerConfig={resolved.timerConfig}
-            disabled={disabled}
-            onChange={resolved.onTimerConfigChange}
-          />
+          {werewolfConfig}
 
           {ownerTitleText && (
             <p className="text-sm text-muted-foreground">{ownerTitleText}</p>

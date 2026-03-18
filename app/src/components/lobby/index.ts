@@ -1,4 +1,5 @@
 export * from "./ConfigurationToggles";
+export * from "./copy";
 export * from "./GameConfigurationPanel";
 export * from "./GameModePicker";
 export * from "./JoinPrompt";
@@ -11,3 +12,4 @@ export * from "./RoleConfigModePicker";
 export * from "./ShareLobby";
 export * from "./ShowRolesInPlayPicker";
 export * from "./TimerConfigPanel";
+export * from "./WerewolfConfigPanel";
