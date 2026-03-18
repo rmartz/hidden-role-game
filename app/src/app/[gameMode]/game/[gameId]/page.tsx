@@ -66,7 +66,9 @@ export default function GameModePage() {
     <GameModeContext.Provider value={validatedGameMode}>
       {gameState ? (
         <>
-          <DebugGameStateButton gameState={gameState} />
+          <div className="fixed bottom-4 right-4 z-50">
+            <DebugGameStateButton gameState={gameState} />
+          </div>
           {validatedGameMode === GameMode.Werewolf ? (
             <WerewolfGameScreen gameId={gameId} gameState={gameState} />
           ) : (
