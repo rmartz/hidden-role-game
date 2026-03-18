@@ -64,13 +64,15 @@ export default function GameModePage() {
 
   return (
     <GameModeContext.Provider value={validatedGameMode}>
-      {gameState && <DebugGameStateButton gameState={gameState} />}
       {gameState ? (
-        validatedGameMode === GameMode.Werewolf ? (
-          <WerewolfGameScreen gameId={gameId} gameState={gameState} />
-        ) : (
-          <UnsupportedGameMode />
-        )
+        <>
+          <DebugGameStateButton gameState={gameState} />
+          {validatedGameMode === GameMode.Werewolf ? (
+            <WerewolfGameScreen gameId={gameId} gameState={gameState} />
+          ) : (
+            <UnsupportedGameMode />
+          )}
+        </>
       ) : (
         // Loading
         <div className="p-5 max-w-lg mx-auto">

@@ -60,6 +60,7 @@ function JsonTreeNode({
   return (
     <div>
       <button
+        type="button"
         className="flex gap-1 hover:text-foreground text-left"
         onClick={() => {
           setExpanded((e) => !e);
@@ -101,7 +102,7 @@ export function JsonTree({ data }: JsonTreeProps) {
   return (
     <div className="font-mono text-xs space-y-0.5">
       {entries.map(([k, v]) => (
-        <JsonTreeNode key={k} label={k} value={v} defaultExpanded={false} />
+        <JsonTreeNode key={k} label={k} value={v} />
       ))}
     </div>
   );
