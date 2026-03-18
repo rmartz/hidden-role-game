@@ -25,6 +25,7 @@ interface ExtendedRoleProperties {
   teamTargeting?: boolean;
   wakesWith?: string;
   isWerewolf?: boolean;
+  awareOf?: { werewolves?: boolean };
 }
 
 /**

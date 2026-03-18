@@ -6,6 +6,7 @@ import type {
   GamePlayer,
   LobbyPlayer,
   RoleSlot,
+  VisibilityReason,
 } from "@/lib/types";
 import type { PlayerGameState, VisibleTeammate } from "@/server/types";
 import { GAME_MODES } from "@/lib/game-modes";
@@ -94,16 +95,18 @@ export class FirebaseGameService {
     if (!myRole) return null;
 
     // Start with teammate visibility.
-    const visibleRoleAssignments = caller.visiblePlayers.flatMap((vp) => {
-      const visiblePlayer = playerById.get(vp.playerId);
-      if (!visiblePlayer) return [];
-      return [
-        {
-          player: { id: visiblePlayer.id, name: visiblePlayer.name },
-          reason: vp.reason,
-        },
-      ];
-    }) as VisibleTeammate[];
+    const visibleRoleAssignments: VisibleTeammate[] =
+      caller.visiblePlayers.flatMap((vp) => {
+        const visiblePlayer = playerById.get(vp.playerId);
+        if (!visiblePlayer) return [];
+        return [
+          {
+            player: { id: visiblePlayer.id, name: visiblePlayer.name },
+            reason: vp.reason,
+            role: undefined,
+          },
+        ];
+      });
 
     // When game is finished, reveal all roles to every player.
     const isFinished = game.status.type === GameStatus.Finished;
@@ -274,7 +277,7 @@ export class FirebaseGameService {
         sessionId: playerIdToSession.get(p.id) ?? "",
         visiblePlayers: (p.visiblePlayers ?? []).map((vp) => ({
           playerId: vp.playerId,
-          reason: vp.reason as import("@/lib/types").VisibilityReason,
+          reason: vp.reason as VisibilityReason,
         })),
       }),
     );

@@ -80,7 +80,7 @@ export interface RoleDefinition<
   /** Full description shown in the expanded glossary entry. */
   description?: string;
   /** Players matching these criteria are visible (name only, no role info). */
-  awareOf?: { teams?: T[]; roles?: Role[]; werewolves?: boolean };
+  awareOf?: { teams?: T[]; roles?: Role[] };
 }
 
 export interface GameModeConfig {

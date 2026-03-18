@@ -6,12 +6,20 @@ import {
   Team,
   DEFAULT_TIMER_CONFIG,
 } from "@/lib/types";
-import type { Game, LobbyPlayer, RoleSlot } from "@/lib/types";
+import type { Game, LobbyPlayer, RoleDefinition, RoleSlot } from "@/lib/types";
 import { WerewolfPhase, WerewolfRole } from "@/lib/game-modes/werewolf";
 import { SecretVillainRole } from "@/lib/game-modes/secret-villain";
 import { GameInitializationService } from "./GameInitializationService";
 
 const service = new GameInitializationService();
+
+/** Extended role type for werewolf-specific test fixtures. */
+type TestWerewolfRole = RoleDefinition<string, Team> & {
+  teamTargeting?: boolean;
+  wakesWith?: string;
+  isWerewolf?: boolean;
+  awareOf?: { teams?: Team[]; roles?: string[]; werewolves?: boolean };
+};
 
 // ---------------------------------------------------------------------------
 // Fixtures
@@ -146,7 +154,7 @@ describe("GameInitializationService.buildGamePlayers", () => {
       makeLobbyPlayer("w2"),
       makeLobbyPlayer("p1"),
     ];
-    const wolfRoles = {
+    const wolfRoles: Record<string, TestWerewolfRole> = {
       wolf: {
         id: "wolf",
         name: "Wolf",
@@ -182,7 +190,7 @@ describe("GameInitializationService.buildGamePlayers", () => {
       makeLobbyPlayer("m1"),
       makeLobbyPlayer("p1"),
     ];
-    const minionRoles = {
+    const minionRoles: Record<string, TestWerewolfRole> = {
       wolf: {
         id: "wolf",
         name: "Wolf",
@@ -220,7 +228,7 @@ describe("GameInitializationService.buildGamePlayers", () => {
       makeLobbyPlayer("wc1"),
       makeLobbyPlayer("p1"),
     ];
-    const cubRoles = {
+    const cubRoles: Record<string, TestWerewolfRole> = {
       wolf: {
         id: "wolf",
         name: "Wolf",
