@@ -16,9 +16,14 @@ const DEFAULT_SLOTS: RoleSlot[] = [
 
 function makePlayer(
   id: string,
-  visibleRoles: GamePlayer["visibleRoles"] = [],
+  visiblePlayers: GamePlayer["visiblePlayers"] = [],
 ): GamePlayer {
-  return { id, name: `Player ${id}`, sessionId: `session-${id}`, visibleRoles };
+  return {
+    id,
+    name: `Player ${id}`,
+    sessionId: `session-${id}`,
+    visiblePlayers,
+  };
 }
 
 function makeGameWithPlayers(
@@ -102,9 +107,9 @@ describe("GameService.getPlayerGameState", () => {
     expect(result?.visibleRoleAssignments).toEqual([]);
   });
 
-  it("visibleRoleAssignments lists teammates from caller's visibleRoles", () => {
+  it("visibleRoleAssignments lists teammates from caller's visiblePlayers", () => {
     const p2 = makePlayer("p2");
-    const p1 = makePlayer("p1", [{ playerId: "p2", roleDefinitionId: "bad" }]);
+    const p1 = makePlayer("p1", [{ playerId: "p2", reason: "aware-of" }]);
     const game = makeGameWithPlayers(
       [p1, p2],
       [
@@ -118,7 +123,7 @@ describe("GameService.getPlayerGameState", () => {
     expect(result?.visibleRoleAssignments).toEqual([
       {
         player: { id: "p2", name: "Player p2" },
-        role: { id: "bad", name: "Bad Role", team: Team.Bad },
+        reason: "aware-of",
       },
     ]);
   });

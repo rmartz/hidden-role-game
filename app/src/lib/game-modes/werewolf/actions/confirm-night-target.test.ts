@@ -286,9 +286,9 @@ describe("ConfirmNightTarget — sets witchAbilityUsed for Witch", () => {
     };
     const game = makePlayingGame(ts, {
       players: [
-        { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
-        { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
-        { id: "p3", name: "Charlie", sessionId: "s3", visibleRoles: [] },
+        { id: "p1", name: "Alice", sessionId: "s1", visiblePlayers: [] },
+        { id: "p2", name: "Bob", sessionId: "s2", visiblePlayers: [] },
+        { id: "p3", name: "Charlie", sessionId: "s3", visiblePlayers: [] },
       ],
       roleAssignments: [
         { playerId: "p1", roleDefinitionId: WerewolfRole.Witch },
@@ -327,10 +327,10 @@ describe("ConfirmNightTarget — sets witchAbilityUsed for Witch", () => {
     // Werewolf added to prevent Village win after Witch kills p2
     const game = makePlayingGame(ts, {
       players: [
-        { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
-        { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
-        { id: "p3", name: "Charlie", sessionId: "s3", visibleRoles: [] },
-        { id: "p4", name: "Dan", sessionId: "s4", visibleRoles: [] },
+        { id: "p1", name: "Alice", sessionId: "s1", visiblePlayers: [] },
+        { id: "p2", name: "Bob", sessionId: "s2", visiblePlayers: [] },
+        { id: "p3", name: "Charlie", sessionId: "s3", visiblePlayers: [] },
+        { id: "p4", name: "Dan", sessionId: "s4", visiblePlayers: [] },
       ],
       roleAssignments: [
         { playerId: "p1", roleDefinitionId: WerewolfRole.Witch },

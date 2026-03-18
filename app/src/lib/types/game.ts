@@ -79,8 +79,8 @@ export interface RoleDefinition<
   summary?: string;
   /** Full description shown in the expanded glossary entry. */
   description?: string;
-  canSeeTeam?: T[];
-  canSeeRole?: Role[];
+  /** Players matching these criteria are visible (name only, no role info). */
+  awareOf?: { teams?: T[]; roles?: Role[]; werewolves?: boolean };
 }
 
 export interface GameModeConfig {
@@ -124,8 +124,15 @@ export interface RoleSlot {
   max: number;
 }
 
+export type VisibilityReason = "wake-partner" | "aware-of";
+
+export interface VisiblePlayer {
+  playerId: string;
+  reason: VisibilityReason;
+}
+
 export interface GamePlayer extends LobbyPlayer {
-  visibleRoles: PlayerRoleAssignment[];
+  visiblePlayers: VisiblePlayer[];
 }
 
 // --- Game (exists only after the game has been started) ---

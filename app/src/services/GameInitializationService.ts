@@ -6,6 +6,7 @@ import type {
   PlayerRoleAssignment,
   RoleDefinition,
   Team,
+  VisiblePlayer,
 } from "@/lib/types";
 import type { RoleInPlay } from "@/server/types";
 import { GAME_MODES } from "@/lib/game-modes";
@@ -36,21 +37,82 @@ export class GameInitializationService {
       if (!player) throw new Error(`Player not found: ${assignment.playerId}`);
       const myRole = roles[assignment.roleDefinitionId];
 
-      const visibleRoles: PlayerRoleAssignment[] = [];
-      const visibleTeams = new Set(myRole?.canSeeTeam ?? []);
-      const visibleRoleIds = new Set(myRole?.canSeeRole ?? []);
-      if (visibleTeams.size > 0 || visibleRoleIds.size > 0) {
-        for (const other of roleAssignments) {
-          if (other.playerId === assignment.playerId) continue;
-          const role = roles[other.roleDefinitionId];
-          if (!role) continue;
-          if (visibleTeams.has(role.team) || visibleRoleIds.has(role.id)) {
-            visibleRoles.push(other);
+      const visiblePlayers: VisiblePlayer[] = [];
+      const seenPlayerIds = new Set<string>();
+
+      // 1. Wake-phase partners: for roles with teamTargeting or wakesWith,
+      // find other players who participate in the same group phase.
+      const myWerewolfRole = myRole as
+        | { teamTargeting?: boolean; wakesWith?: string }
+        | undefined;
+      if (myWerewolfRole?.teamTargeting || myWerewolfRole?.wakesWith) {
+        const groupKey =
+          myWerewolfRole.wakesWith ??
+          (myWerewolfRole.teamTargeting
+            ? (myRole as { id: string }).id
+            : undefined);
+        if (groupKey) {
+          for (const other of roleAssignments) {
+            if (other.playerId === assignment.playerId) continue;
+            const otherRole = roles[other.roleDefinitionId] as
+              | {
+                  id: string;
+                  teamTargeting?: boolean;
+                  wakesWith?: string;
+                }
+              | undefined;
+            if (!otherRole) continue;
+            const otherGroupKey =
+              otherRole.wakesWith ??
+              (otherRole.teamTargeting ? otherRole.id : undefined);
+            if (otherGroupKey === groupKey || otherRole.id === groupKey) {
+              if (!seenPlayerIds.has(other.playerId)) {
+                visiblePlayers.push({
+                  playerId: other.playerId,
+                  reason: "wake-partner",
+                });
+                seenPlayerIds.add(other.playerId);
+              }
+            }
           }
         }
       }
 
-      return { ...player, visibleRoles };
+      // 2. Aware-of: from awareOf.teams, awareOf.roles, awareOf.werewolves
+      const awareOf = (
+        myRole as {
+          awareOf?: {
+            teams?: string[];
+            roles?: string[];
+            werewolves?: boolean;
+          };
+        }
+      ).awareOf;
+      if (awareOf) {
+        const awareOfTeams = new Set(awareOf.teams ?? []);
+        const awareOfRoles = new Set(awareOf.roles ?? []);
+        const awareOfWerewolves = awareOf.werewolves === true;
+        for (const other of roleAssignments) {
+          if (other.playerId === assignment.playerId) continue;
+          if (seenPlayerIds.has(other.playerId)) continue;
+          const otherRole = roles[other.roleDefinitionId];
+          if (!otherRole) continue;
+          const otherWerewolfRole = otherRole as { isWerewolf?: boolean };
+          if (
+            awareOfTeams.has(otherRole.team) ||
+            awareOfRoles.has(otherRole.id) ||
+            (awareOfWerewolves && otherWerewolfRole.isWerewolf === true)
+          ) {
+            visiblePlayers.push({
+              playerId: other.playerId,
+              reason: "aware-of",
+            });
+            seenPlayerIds.add(other.playerId);
+          }
+        }
+      }
+
+      return { ...player, visiblePlayers };
     });
   }
 

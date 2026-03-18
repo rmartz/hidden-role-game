@@ -18,7 +18,8 @@ export interface FirebasePlayerState {
   myRole: { id: string; name: string; team: string } | null;
   visibleRoleAssignments?: {
     player: FirebaseLobbyPlayer;
-    role: { id: string; name: string; team: string };
+    reason: string;
+    role?: { id: string; name: string; team: string };
   }[];
   rolesInPlay?: RoleInPlay[] | null;
   nightActions?: Record<string, AnyNightAction>;
@@ -113,11 +114,16 @@ export function firebaseToPlayerState(
     visibleRoleAssignments: (raw.visibleRoleAssignments ?? []).map(
       (v): VisibleTeammate => ({
         player: v.player,
-        role: {
-          id: v.role.id,
-          name: v.role.name,
-          team: v.role.team as Team,
-        },
+        reason: v.reason as VisibleTeammate["reason"],
+        ...(v.role
+          ? {
+              role: {
+                id: v.role.id,
+                name: v.role.name,
+                team: v.role.team as Team,
+              },
+            }
+          : {}),
       }),
     ),
     rolesInPlay: raw.rolesInPlay ?? undefined,

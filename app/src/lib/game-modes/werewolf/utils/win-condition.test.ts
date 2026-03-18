@@ -21,7 +21,7 @@ function makeGame(
       id: a.playerId,
       name: a.playerId,
       sessionId: `s${String(i)}`,
-      visibleRoles: [],
+      visiblePlayers: [],
     })),
     roleAssignments,
     configuredRoleSlots: [],

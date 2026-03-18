@@ -13,6 +13,7 @@ export enum WerewolfRole {
   Chupacabra = "werewolf-chupacabra",
   VillageIdiot = "werewolf-village-idiot",
   Bodyguard = "werewolf-bodyguard",
+  Minion = "werewolf-minion",
 }
 
 export interface WerewolfRoleDefinition extends RoleDefinition<
@@ -32,6 +33,8 @@ export interface WerewolfRoleDefinition extends RoleDefinition<
   wakesWith?: WerewolfRole;
   /** When true, this role must always cast a "guilty" vote during elimination trials. */
   alwaysVotesGuilty?: boolean;
+  /** True for roles that register as "werewolf" for Seer investigation and Minion awareness. */
+  isWerewolf?: boolean;
 }
 
 export const MIN_PLAYERS = 5;
@@ -66,7 +69,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "Each night the Werewolves secretly vote together to eliminate one player. Werewolves can see all other players on the Bad team, including Wolf Cubs.",
     team: Team.Bad,
-    canSeeTeam: [Team.Bad],
+    isWerewolf: true,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Attack,
     teamTargeting: true,
@@ -78,7 +81,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "The Wolf Cub participates in the Werewolf group attack each night. If the Wolf Cub is ever eliminated, the Werewolves gain two attack phases the following night.",
     team: Team.Bad,
-    canSeeTeam: [Team.Bad],
+    isWerewolf: true,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Attack,
     wakesWith: WerewolfRole.Werewolf,
@@ -121,7 +124,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "On the first night, all Masons wake together and identify each other. Masons have no night action after the first night, but they know with certainty that their fellow Masons are on the Good team.",
     team: Team.Good,
-    canSeeRole: [WerewolfRole.Mason],
+    awareOf: { roles: [WerewolfRole.Mason] },
     wakesAtNight: WakesAtNight.FirstNightOnly,
     targetCategory: TargetCategory.None,
   },
@@ -156,6 +159,17 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Protect,
     preventRepeatTarget: true,
+  },
+  [WerewolfRole.Minion]: {
+    id: WerewolfRole.Minion,
+    name: "Minion",
+    summary: "A secret servant of the werewolves",
+    description:
+      "The Minion knows who the Werewolves are but the Werewolves do not know the Minion's identity. The Minion wins with Team Bad. If the Seer investigates the Minion, the result is 'not a Werewolf.'",
+    team: Team.Bad,
+    awareOf: { werewolves: true },
+    wakesAtNight: WakesAtNight.FirstNightOnly,
+    targetCategory: TargetCategory.None,
   },
 };
 

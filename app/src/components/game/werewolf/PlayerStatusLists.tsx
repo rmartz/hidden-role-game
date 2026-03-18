@@ -23,7 +23,12 @@ export function PlayerStatusLists({
   const deadPlayers = filtered.filter((p) => deadSet.has(p.id));
 
   const roleMap = new Map(
-    (roleAssignments ?? []).map((a) => [a.player.id, a.role.name]),
+    (roleAssignments ?? [])
+      .filter(
+        (a): a is typeof a & { role: NonNullable<typeof a.role> } =>
+          a.role !== undefined,
+      )
+      .map((a) => [a.player.id, a.role.name]),
   );
 
   return (

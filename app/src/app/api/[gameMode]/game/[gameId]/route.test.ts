@@ -185,9 +185,8 @@ describe("GET /api/game/[gameId]", () => {
       aliceBody.data.myRole.id === "avalon-bad" ? aliceBody.data : bobBody.data;
 
     expect(specialGoodPlayer.visibleRoleAssignments).toHaveLength(1);
-    expect(specialGoodPlayer.visibleRoleAssignments[0].role.id).toBe(
-      "avalon-bad",
-    );
+    expect(specialGoodPlayer.visibleRoleAssignments[0].reason).toBe("aware-of");
+    expect(specialGoodPlayer.visibleRoleAssignments[0].role).toBeUndefined();
     expect(badPlayer.visibleRoleAssignments).toHaveLength(0);
   });
 });

@@ -49,7 +49,7 @@ export function NarratorPlayerRoleLists({
                   <ItemTitle>{player.name}</ItemTitle>
                 </ItemContent>
                 <ItemActions>
-                  <RoleLabel role={role} gameMode={gameMode} />
+                  {role ? <RoleLabel role={role} gameMode={gameMode} /> : null}
                   {renderActions?.(player.id, false)}
                 </ItemActions>
               </Item>
@@ -71,7 +71,9 @@ export function NarratorPlayerRoleLists({
                     </ItemTitle>
                   </ItemContent>
                   <ItemActions>
-                    <RoleLabel role={role} gameMode={gameMode} />
+                    {role ? (
+                      <RoleLabel role={role} gameMode={gameMode} />
+                    ) : null}
                     {renderActions?.(player.id, true)}
                   </ItemActions>
                 </Item>

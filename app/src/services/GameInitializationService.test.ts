@@ -27,7 +27,7 @@ const MOCK_ROLES = {
     id: "bad",
     name: "Bad Role",
     team: Team.Bad,
-    canSeeTeam: [Team.Bad],
+    awareOf: { teams: [Team.Bad] },
   },
   special: { id: "special", name: "Special Role", team: Team.Bad },
 };
@@ -46,7 +46,7 @@ function makeSecretVillainGame(
     id: a.playerId,
     name: `Player ${a.playerId}`,
     sessionId: `session-${a.playerId}`,
-    visibleRoles: [],
+    visiblePlayers: [],
   }));
   return {
     id: "game-1",
@@ -81,7 +81,7 @@ describe("GameInitializationService.buildGamePlayers", () => {
     expect(result[1]!.id).toBe("p2");
   });
 
-  it("player with no team/role visibility has empty visibleRoles", () => {
+  it("player with no visibility has empty visiblePlayers", () => {
     const players = [makeLobbyPlayer("p1"), makeLobbyPlayer("p2")];
     const assignments = [
       { playerId: "p1", roleDefinitionId: "good" },
@@ -90,10 +90,10 @@ describe("GameInitializationService.buildGamePlayers", () => {
 
     const result = service.buildGamePlayers(players, assignments, MOCK_ROLES);
 
-    expect(result[0]!.visibleRoles).toEqual([]);
+    expect(result[0]!.visiblePlayers).toEqual([]);
   });
 
-  it("bad role (canSeeTeam: Bad) can see other bad players", () => {
+  it("bad role (awareOf teams: Bad) can see other bad players", () => {
     const players = [
       makeLobbyPlayer("p1"),
       makeLobbyPlayer("p2"),
@@ -109,22 +109,23 @@ describe("GameInitializationService.buildGamePlayers", () => {
     const badPlayer = result.find((p) => p.id === "p1")!;
 
     // sees p2 (also bad) but not p3 (good)
-    expect(badPlayer.visibleRoles).toHaveLength(1);
-    expect(badPlayer.visibleRoles[0]!.playerId).toBe("p2");
+    expect(badPlayer.visiblePlayers).toHaveLength(1);
+    expect(badPlayer.visiblePlayers[0]!.playerId).toBe("p2");
+    expect(badPlayer.visiblePlayers[0]!.reason).toBe("aware-of");
   });
 
-  it("player does not see themselves in visibleRoles", () => {
+  it("player does not see themselves in visiblePlayers", () => {
     const players = [makeLobbyPlayer("p1"), makeLobbyPlayer("p2")];
     const assignments = [
       { playerId: "p1", roleDefinitionId: "bad" },
       { playerId: "p2", roleDefinitionId: "special" },
     ];
 
-    // bad has canSeeTeam: [Bad]; special is also Bad
+    // bad has awareOf teams: [Bad]; special is also Bad
     const result = service.buildGamePlayers(players, assignments, MOCK_ROLES);
     const badPlayer = result.find((p) => p.id === "p1")!;
 
-    expect(badPlayer.visibleRoles.every((vr) => vr.playerId !== "p1")).toBe(
+    expect(badPlayer.visiblePlayers.every((vp) => vp.playerId !== "p1")).toBe(
       true,
     );
   });

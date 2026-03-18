@@ -107,6 +107,7 @@ export function OwnerGameNightScreen({
 
   const activePlayerNames = gameState.visibleRoleAssignments
     .filter((a) => {
+      if (!a.role) return false;
       if (a.role.id === baseActivePhaseKey) return true;
       if (isGroupPhase) {
         const roleDef = (

@@ -50,6 +50,7 @@ const mockOwnerGameState: PlayerGameState = {
   visibleRoleAssignments: [
     {
       player: { id: "player-1", name: "Alice" },
+      reason: "revealed",
       role: { id: "villager", name: "Villager", team: Team.Good },
     },
   ],

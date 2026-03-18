@@ -47,7 +47,7 @@ export function PlayersRoleList({
                   <ItemTitle>{player.name}</ItemTitle>
                 </ItemContent>
                 <ItemActions>
-                  <RoleLabel role={role} gameMode={gameMode} />
+                  {role ? <RoleLabel role={role} gameMode={gameMode} /> : null}
                   {renderActions?.(player.id, false)}
                 </ItemActions>
               </Item>
@@ -69,7 +69,9 @@ export function PlayersRoleList({
                     </ItemTitle>
                   </ItemContent>
                   <ItemActions>
-                    <RoleLabel role={role} gameMode={gameMode} />
+                    {role ? (
+                      <RoleLabel role={role} gameMode={gameMode} />
+                    ) : null}
                     {renderActions?.(player.id, true)}
                   </ItemActions>
                 </Item>

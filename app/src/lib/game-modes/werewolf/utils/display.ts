@@ -6,7 +6,6 @@ import { isGroupPhaseKey, baseGroupPhaseKey, isRoleActive } from "./phase-keys";
 import type { PhaseKey } from "./phase-keys";
 import { targetPlayerIdOf } from "./targeting";
 import { getPlayerName } from "@/lib/player-utils";
-import { Team } from "@/lib/types";
 import type { NightStatusEntry, VisibleTeammate } from "@/server/types";
 
 export type { PhaseKey };
@@ -119,10 +118,13 @@ export function getInvestigationResultForNarrator(
   const targetAssignment = visibleRoleAssignments.find(
     (a) => a.player.id === activeTarget,
   );
-  if (!targetAssignment) return undefined;
+  if (!targetAssignment?.role) return undefined;
+  const roleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
+    targetAssignment.role.id
+  ];
   return {
     targetName: activeTargetName ?? activeTarget,
-    isWerewolfTeam: targetAssignment.role.team === Team.Bad,
+    isWerewolfTeam: roleDef?.isWerewolf === true,
   };
 }
 
