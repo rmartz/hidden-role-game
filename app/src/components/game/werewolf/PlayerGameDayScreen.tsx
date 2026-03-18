@@ -23,6 +23,7 @@ export function PlayerGameDayScreen({
   gameState,
   turnState,
 }: PlayerGameDayScreenProps) {
+  const timerConfig = gameState.timerConfig;
   const { phase } = turnState;
   const isDaytime = phase.type === WerewolfPhase.Daytime;
   const phaseStartedAt = useMemo(
@@ -49,7 +50,8 @@ export function PlayerGameDayScreen({
         )}
       </div>
       <GameTimer
-        durationSeconds={gameState.timerConfig?.dayPhaseSeconds}
+        durationSeconds={timerConfig.dayPhaseSeconds}
+        autoAdvance={timerConfig.autoAdvance}
         startedAt={phaseStartedAt}
       />
       <p className="mb-4 text-muted-foreground">
@@ -76,7 +78,8 @@ export function PlayerGameDayScreen({
           players={gameState.players}
           myPlayerId={gameState.myPlayerId}
           amDead={gameState.amDead}
-          votePhaseSeconds={gameState.timerConfig?.votePhaseSeconds}
+          votePhaseSeconds={timerConfig.votePhaseSeconds}
+          autoAdvance={timerConfig.autoAdvance}
         />
       )}
 

@@ -6,6 +6,7 @@ import {
   RoleConfigMode,
   ShowRolesInPlay,
   Team,
+  DEFAULT_TIMER_CONFIG,
 } from "@/lib/types";
 import { ServerResponseStatus } from "@/server/types";
 import type { PlayerGameState, PublicLobby } from "@/server/types";
@@ -39,6 +40,7 @@ const mockGameState: PlayerGameState = {
   myRole: { id: "villager", name: "Villager", team: Team.Good },
   visibleRoleAssignments: [],
   rolesInPlay: undefined,
+  timerConfig: DEFAULT_TIMER_CONFIG,
 };
 
 const mockOwnerGameState: PlayerGameState = {
@@ -71,6 +73,7 @@ describe("useStartGame", () => {
             roleConfigMode: RoleConfigMode.Default,
             showConfigToPlayers: false,
             showRolesInPlay: ShowRolesInPlay.RoleAndCount,
+            timerConfig: DEFAULT_TIMER_CONFIG,
           },
           gameId: "game-1",
         } satisfies PublicLobby,

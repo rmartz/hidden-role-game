@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
+import {
+  GameMode,
+  GameStatus,
+  ShowRolesInPlay,
+  DEFAULT_TIMER_CONFIG,
+} from "@/lib/types";
 import type { Game } from "@/lib/types";
 import { WerewolfPhase } from "../types";
 import type { WerewolfTurnState } from "../types";
@@ -20,6 +25,7 @@ function makePlayingGame(
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner-1",
+    timerConfig: DEFAULT_TIMER_CONFIG,
     ...overrides,
   };
 }
@@ -64,6 +70,7 @@ describe("isOwnerPlaying", () => {
       configuredRoleSlots: [],
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner-1",
+      timerConfig: DEFAULT_TIMER_CONFIG,
     };
     expect(isOwnerPlaying(game, "owner-1")).toBe(false);
   });
@@ -91,6 +98,7 @@ describe("currentTurnState", () => {
       configuredRoleSlots: [],
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner-1",
+      timerConfig: DEFAULT_TIMER_CONFIG,
     };
     expect(currentTurnState(game)).toBeUndefined();
   });
@@ -106,6 +114,7 @@ describe("currentTurnState", () => {
       configuredRoleSlots: [],
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner-1",
+      timerConfig: DEFAULT_TIMER_CONFIG,
     };
     expect(currentTurnState(game)).toBeUndefined();
   });

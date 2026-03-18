@@ -1,4 +1,9 @@
-import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
+import {
+  GameMode,
+  GameStatus,
+  ShowRolesInPlay,
+  DEFAULT_TIMER_CONFIG,
+} from "@/lib/types";
 import type { Game } from "@/lib/types";
 import { WerewolfPhase } from "../types";
 import type { WerewolfTurnState, AnyNightAction } from "../types";
@@ -31,6 +36,7 @@ export function makePlayingGame(
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner-1",
+    timerConfig: DEFAULT_TIMER_CONFIG,
     ...overrides,
   };
 }
@@ -134,6 +140,7 @@ export function makeTeamGame(
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner-1",
+    timerConfig: DEFAULT_TIMER_CONFIG,
     ...overrides,
   };
 }

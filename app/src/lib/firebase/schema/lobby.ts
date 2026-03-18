@@ -5,6 +5,7 @@ import type {
   RoleSlot,
   TimerConfig,
 } from "@/lib/types";
+import { DEFAULT_TIMER_CONFIG } from "@/lib/types";
 import type { PublicLobby } from "@/server/types";
 
 export interface FirebaseLobbyPublic {
@@ -31,7 +32,7 @@ export interface FirebaseLobbyConfig {
   roleSlots?: FirebaseRoleSlot[];
   showConfigToPlayers: boolean;
   showRolesInPlay: string;
-  timerConfig?: TimerConfig;
+  timerConfig: TimerConfig;
 }
 
 export interface FirebaseRoleSlot {
@@ -85,7 +86,7 @@ function lobbyConfigToFirebase(config: LobbyConfig): FirebaseLobbyConfig {
     })),
     showConfigToPlayers: config.showConfigToPlayers,
     showRolesInPlay: config.showRolesInPlay,
-    ...(config.timerConfig ? { timerConfig: config.timerConfig } : {}),
+    timerConfig: config.timerConfig,
   };
 }
 
@@ -113,13 +114,9 @@ export function firebaseToLobby(
       showConfigToPlayers: pub.config.showConfigToPlayers,
       showRolesInPlay: pub.config
         .showRolesInPlay as LobbyConfig["showRolesInPlay"],
-      ...(pub.config.timerConfig
-        ? {
-            timerConfig: parseTimerConfig(
-              pub.config.timerConfig as Record<string, unknown>,
-            ),
-          }
-        : {}),
+      timerConfig: parseTimerConfig(
+        pub.config.timerConfig as unknown as Record<string, unknown>,
+      ),
     },
     ...(pub.gameId ? { gameId: pub.gameId } : {}),
   };
@@ -129,21 +126,29 @@ export function firebaseToRoleSlot(s: FirebaseRoleSlot): RoleSlot {
   return { roleId: s.roleId, min: s.min, max: s.max };
 }
 
-/** Strips null values from a raw Firebase TimerConfig (Firebase may return null for absent fields). */
+/** Parses a raw Firebase TimerConfig, filling missing fields with defaults. */
 export function parseTimerConfig(raw: Record<string, unknown>): TimerConfig {
   return {
-    ...(typeof raw["startCountdownSeconds"] === "number"
-      ? { startCountdownSeconds: raw["startCountdownSeconds"] }
-      : {}),
-    ...(typeof raw["nightPhaseSeconds"] === "number"
-      ? { nightPhaseSeconds: raw["nightPhaseSeconds"] }
-      : {}),
-    ...(typeof raw["dayPhaseSeconds"] === "number"
-      ? { dayPhaseSeconds: raw["dayPhaseSeconds"] }
-      : {}),
-    ...(typeof raw["votePhaseSeconds"] === "number"
-      ? { votePhaseSeconds: raw["votePhaseSeconds"] }
-      : {}),
+    autoAdvance:
+      typeof raw["autoAdvance"] === "boolean"
+        ? raw["autoAdvance"]
+        : DEFAULT_TIMER_CONFIG.autoAdvance,
+    startCountdownSeconds:
+      typeof raw["startCountdownSeconds"] === "number"
+        ? raw["startCountdownSeconds"]
+        : DEFAULT_TIMER_CONFIG.startCountdownSeconds,
+    nightPhaseSeconds:
+      typeof raw["nightPhaseSeconds"] === "number"
+        ? raw["nightPhaseSeconds"]
+        : DEFAULT_TIMER_CONFIG.nightPhaseSeconds,
+    dayPhaseSeconds:
+      typeof raw["dayPhaseSeconds"] === "number"
+        ? raw["dayPhaseSeconds"]
+        : DEFAULT_TIMER_CONFIG.dayPhaseSeconds,
+    votePhaseSeconds:
+      typeof raw["votePhaseSeconds"] === "number"
+        ? raw["votePhaseSeconds"]
+        : DEFAULT_TIMER_CONFIG.votePhaseSeconds,
   };
 }
 
@@ -171,13 +176,9 @@ export function firebaseToPublicLobby(
       showConfigToPlayers: pub.config.showConfigToPlayers,
       showRolesInPlay: pub.config
         .showRolesInPlay as LobbyConfig["showRolesInPlay"],
-      ...(pub.config.timerConfig
-        ? {
-            timerConfig: parseTimerConfig(
-              pub.config.timerConfig as Record<string, unknown>,
-            ),
-          }
-        : {}),
+      timerConfig: parseTimerConfig(
+        pub.config.timerConfig as unknown as Record<string, unknown>,
+      ),
     },
     ...(pub.gameId ? { gameId: pub.gameId } : {}),
   };

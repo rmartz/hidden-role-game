@@ -5,7 +5,7 @@ import type {
   TimerConfig,
 } from "@/lib/types";
 import type { FirebaseLobbyPlayer, FirebaseRoleSlot } from "./lobby";
-import { firebaseToRoleSlot } from "./lobby";
+import { firebaseToRoleSlot, parseTimerConfig } from "./lobby";
 
 export interface FirebaseGamePublic {
   lobbyId: string;
@@ -19,7 +19,7 @@ export interface FirebaseGamePublic {
   configuredRoleSlots?: FirebaseRoleSlot[];
   showRolesInPlay: string;
   ownerPlayerId: string | null;
-  timerConfig?: TimerConfig;
+  timerConfig: TimerConfig;
   /** Unix ms timestamp set server-side at game creation. Used for TTL cleanup. */
   createdAt?: number;
 }
@@ -52,7 +52,7 @@ export function gameToFirebase(game: Game): FirebaseGamePublic {
     })),
     showRolesInPlay: game.showRolesInPlay,
     ownerPlayerId: game.ownerPlayerId ?? null,
-    ...(game.timerConfig ? { timerConfig: game.timerConfig } : {}),
+    timerConfig: game.timerConfig,
   };
 }
 
@@ -77,6 +77,8 @@ export function firebaseToGame(
     ),
     showRolesInPlay: pub.showRolesInPlay as Game["showRolesInPlay"],
     ownerPlayerId: pub.ownerPlayerId ?? undefined,
-    ...(pub.timerConfig ? { timerConfig: pub.timerConfig } : {}),
+    timerConfig: parseTimerConfig(
+      pub.timerConfig as unknown as Record<string, unknown>,
+    ),
   };
 }

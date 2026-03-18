@@ -12,7 +12,8 @@ interface OwnerTrialPanelProps {
   gameId: string;
   activeTrial: ActiveTrial;
   players: PublicLobbyPlayer[];
-  votePhaseSeconds: number | undefined;
+  votePhaseSeconds: number;
+  autoAdvance: boolean;
 }
 
 export function OwnerTrialPanel({
@@ -20,6 +21,7 @@ export function OwnerTrialPanel({
   activeTrial,
   players,
   votePhaseSeconds,
+  autoAdvance,
 }: OwnerTrialPanelProps) {
   const action = useGameAction(gameId);
   const defendant = players.find((p) => p.id === activeTrial.defendantId);
@@ -63,6 +65,7 @@ export function OwnerTrialPanel({
           </p>
           <GameTimer
             durationSeconds={votePhaseSeconds}
+            autoAdvance={autoAdvance}
             startedAt={trialStartedAt}
             onTimerTrigger={handleResolve}
             resetKey={activeTrial.startedAt}

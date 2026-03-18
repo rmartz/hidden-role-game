@@ -38,7 +38,7 @@ export interface FirebasePlayerState {
   previousNightTargetId?: string;
   investigationResult?: { targetPlayerId: string; isWerewolfTeam: boolean };
   witchAbilityUsed?: boolean;
-  timerConfig?: TimerConfig;
+  timerConfig: TimerConfig;
   activeTrial?: {
     defendantId: string;
     startedAt: number;
@@ -89,7 +89,7 @@ export function playerStateToFirebase(
       ? { investigationResult: state.investigationResult }
       : {}),
     ...(state.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
-    ...(state.timerConfig ? { timerConfig: state.timerConfig } : {}),
+    timerConfig: state.timerConfig,
     ...(state.activeTrial ? { activeTrial: state.activeTrial } : {}),
   };
 }
@@ -145,13 +145,9 @@ export function firebaseToPlayerState(
       ? { investigationResult: raw.investigationResult }
       : {}),
     ...(raw.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
-    ...(raw.timerConfig
-      ? {
-          timerConfig: parseTimerConfig(
-            raw.timerConfig as Record<string, unknown>,
-          ),
-        }
-      : {}),
+    timerConfig: parseTimerConfig(
+      raw.timerConfig as unknown as Record<string, unknown>,
+    ),
     ...(raw.activeTrial
       ? {
           activeTrial: raw.activeTrial as PlayerGameState["activeTrial"],

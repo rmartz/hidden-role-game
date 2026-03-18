@@ -9,7 +9,8 @@ function formatTime(totalSeconds: number): string {
 }
 
 interface GameTimerProps {
-  durationSeconds?: number;
+  durationSeconds: number;
+  autoAdvance: boolean;
   onTimerTrigger?: () => void;
   startedAt: Date;
   /** Timer resets whenever this value changes. */
@@ -18,11 +19,11 @@ interface GameTimerProps {
 
 export function GameTimer({
   durationSeconds,
+  autoAdvance,
   startedAt,
   onTimerTrigger,
   resetKey,
 }: GameTimerProps) {
-  const isTimed = durationSeconds !== undefined;
   const rawStartedAtMs = startedAt.getTime();
   const startedAtMs = isNaN(rawStartedAtMs) ? Date.now() : rawStartedAtMs;
 
@@ -37,19 +38,18 @@ export function GameTimer({
     onTriggerRef.current = onTimerTrigger;
   });
 
-  // Reset on resetKey, durationSeconds, or startedAt change.
   const reset = useCallback(() => {
-    const now = Date.now();
     startTimeRef.current = startedAtMs;
     hasTriggeredRef.current = false;
-    setElapsedSeconds(Math.max(0, Math.floor((now - startedAtMs) / 1000)));
+    setElapsedSeconds(
+      Math.max(0, Math.floor((Date.now() - startedAtMs) / 1000)),
+    );
   }, [startedAtMs]);
 
   useEffect(() => {
     reset();
   }, [resetKey, durationSeconds, reset]);
 
-  // Tick every second.
   useEffect(() => {
     const tick = () => {
       const elapsed = Math.max(
@@ -58,9 +58,11 @@ export function GameTimer({
       );
       setElapsedSeconds(elapsed);
 
-      if (isTimed && elapsed >= durationSeconds && !hasTriggeredRef.current) {
+      if (elapsed >= durationSeconds && !hasTriggeredRef.current) {
         hasTriggeredRef.current = true;
-        onTriggerRef.current?.();
+        if (autoAdvance) {
+          onTriggerRef.current?.();
+        }
       }
     };
 
@@ -69,30 +71,32 @@ export function GameTimer({
     return () => {
       clearInterval(interval);
     };
-  }, [durationSeconds, isTimed]);
+  }, [durationSeconds, autoAdvance]);
 
-  const secondsRemaining = isTimed
-    ? Math.max(0, durationSeconds - elapsedSeconds)
-    : null;
-  const hasExpired = isTimed && secondsRemaining === 0;
+  const secondsRemaining = Math.max(0, durationSeconds - elapsedSeconds);
+  const hasExpired = secondsRemaining === 0;
+  const overtimeSeconds = hasExpired ? elapsedSeconds - durationSeconds : 0;
 
   return (
     <div className="flex items-center gap-3">
-      <p className="text-muted-foreground">
-        {hasExpired ? (
+      <p
+        className={
+          hasExpired && !autoAdvance
+            ? "text-red-800/60 dark:text-red-400/60"
+            : "text-muted-foreground"
+        }
+      >
+        {hasExpired && autoAdvance ? (
           "Advancing\u2026"
-        ) : isTimed ? (
+        ) : hasExpired ? (
           <>
-            Time remaining:{" "}
-            <strong className="text-foreground">
-              {formatTime(secondsRemaining ?? 0)}
-            </strong>
+            Time&apos;s up <strong>({formatTime(overtimeSeconds)})</strong>
           </>
         ) : (
           <>
-            Elapsed:{" "}
+            Time remaining:{" "}
             <strong className="text-foreground">
-              {formatTime(elapsedSeconds)}
+              {formatTime(secondsRemaining)}
             </strong>
           </>
         )}
