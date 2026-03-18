@@ -46,6 +46,8 @@ export function NominationPanel({
     action.mutate({ actionId: WerewolfAction.WithdrawNomination });
   }, [action]);
 
+  const playerById = new Map(players.map((p) => [p.id, p]));
+
   const eligiblePlayers = players.filter(
     (p) =>
       p.id !== myPlayerId &&
@@ -66,14 +68,12 @@ export function NominationPanel({
     (p) => (nominationMap.get(p.id)?.length ?? 0) === 0,
   );
 
-  const myNomination = myPlayerId
-    ? nominations.find((n) => n.nominatorIds.includes(myPlayerId))
-    : undefined;
+  // Check if the current player has been nominated by someone.
   const myNominatorId = myPlayerId
     ? nominations.find((n) => n.defendantId === myPlayerId)?.nominatorIds[0]
     : undefined;
   const myNominatorName = myNominatorId
-    ? players.find((p) => p.id === myNominatorId)?.name
+    ? playerById.get(myNominatorId)?.name
     : undefined;
 
   return (
@@ -87,33 +87,52 @@ export function NominationPanel({
           {nomination.youAreNominated(myNominatorName)}
         </p>
       )}
-      <ul className="space-y-2">
-        {nominatedPlayers.map((player) => (
-          <NominationRow
-            key={player.id}
-            player={player}
-            nominatorIds={nominationMap.get(player.id) ?? []}
-            players={players}
-            isMyTarget={myNominatedDefendantId === player.id}
-            canAct={canAct}
-            isPending={action.isPending}
-            onNominate={nominate}
-          />
-        ))}
-        {unnominatedPlayers.map((player) => (
-          <NominationRow
-            key={player.id}
-            player={player}
-            nominatorIds={[]}
-            players={players}
-            isMyTarget={myNominatedDefendantId === player.id}
-            canAct={canAct}
-            isPending={action.isPending}
-            onNominate={nominate}
-          />
-        ))}
-      </ul>
-      {canAct && myNomination && (
+      {nominatedPlayers.length > 0 && (
+        <>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
+            {nomination.secondSectionHeading}
+          </p>
+          <ul className="space-y-2">
+            {nominatedPlayers.map((player) => {
+              const nominatorIds = nominationMap.get(player.id) ?? [];
+              const nominatorName = playerById.get(nominatorIds[0] ?? "")?.name;
+              return (
+                <NominationRow
+                  key={player.id}
+                  player={player}
+                  nominatorName={nominatorName}
+                  isMyTarget={myNominatedDefendantId === player.id}
+                  canAct={canAct}
+                  isNominated
+                  isPending={action.isPending}
+                  onNominate={nominate}
+                />
+              );
+            })}
+          </ul>
+        </>
+      )}
+      {unnominatedPlayers.length > 0 && (
+        <>
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 mt-4">
+            {nomination.nominateSectionHeading}
+          </p>
+          <ul className="space-y-2">
+            {unnominatedPlayers.map((player) => (
+              <NominationRow
+                key={player.id}
+                player={player}
+                isMyTarget={myNominatedDefendantId === player.id}
+                canAct={canAct}
+                isNominated={false}
+                isPending={action.isPending}
+                onNominate={nominate}
+              />
+            ))}
+          </ul>
+        </>
+      )}
+      {canAct && myNominatedDefendantId && (
         <div className="mt-3">
           <Button
             size="sm"

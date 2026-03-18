@@ -187,8 +187,7 @@ export class FirebaseLobbyService {
     }
     if (config.nominationsEnabled !== undefined) {
       updates["public/config/nominationsEnabled"] = config.nominationsEnabled;
-      data.public.config.nominationsEnabled =
-        config.nominationsEnabled || undefined;
+      data.public.config.nominationsEnabled = config.nominationsEnabled;
     }
 
     if (Object.keys(updates).length > 0) {

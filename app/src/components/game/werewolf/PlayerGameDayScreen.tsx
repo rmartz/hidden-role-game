@@ -75,17 +75,10 @@ export function PlayerGameDayScreen({
         nightStatus={gameState.nightStatus}
       />
 
-      {gameState.nominationsEnabled && !hasActiveTrial && (
-        <NominationPanel
-          gameId={gameId}
-          players={gameState.players}
-          myPlayerId={gameState.myPlayerId}
-          amDead={gameState.amDead}
-          nominations={gameState.nominations ?? []}
-          myNominatedDefendantId={gameState.myNominatedDefendantId}
-          deadPlayerIds={gameState.deadPlayerIds}
-          gameOwnerId={gameState.gameOwner?.id}
-        />
+      {gameState.amDead && (
+        <p className="mb-4 font-semibold text-muted-foreground italic">
+          {WEREWOLF_COPY.day.youAreEliminated}
+        </p>
       )}
 
       {gameState.activeTrial && (
@@ -100,10 +93,17 @@ export function PlayerGameDayScreen({
         />
       )}
 
-      {gameState.amDead && (
-        <p className="mb-4 font-semibold text-muted-foreground italic">
-          You have been eliminated.
-        </p>
+      {gameState.nominationsEnabled && !hasActiveTrial && (
+        <NominationPanel
+          gameId={gameId}
+          players={gameState.players}
+          myPlayerId={gameState.myPlayerId}
+          amDead={gameState.amDead}
+          nominations={gameState.nominations ?? []}
+          myNominatedDefendantId={gameState.myNominatedDefendantId}
+          deadPlayerIds={gameState.deadPlayerIds}
+          gameOwnerId={gameState.gameOwner?.id}
+        />
       )}
 
       <PlayerStatusLists

@@ -100,14 +100,16 @@ export const WEREWOLF_COPY = {
   },
   nomination: {
     heading: "Nominate for Trial",
+    subtitle:
+      "Nominate a player to accuse them. A seconded nomination triggers a trial.",
+    secondSectionHeading: "Second a nomination",
+    nominateSectionHeading: "Nominate another player",
     nominateButton: (name: string) => `Nominate ${name}`,
     secondButton: (name: string) => `Second ${name}`,
     withdrawButton: "Withdraw Nomination",
     yourNomination: "Your nomination",
-    subtitle:
-      "Nominate a player to accuse them. A second nomination triggers a trial.",
     nominatedBy: (name: string) => `Nominated by ${name}`,
-    youAreNominated: (name: string) => `You have been nominated by ${name}`,
+    youAreNominated: (name: string) => `You have been nominated by ${name}.`,
   },
   narrator: {
     nightTitle: (turn: number, phase: number, total: number) =>

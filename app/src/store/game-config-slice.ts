@@ -72,7 +72,7 @@ const initialState: GameConfigState = {
   showConfigToPlayers: false,
   showRolesInPlay: ShowRolesInPlay.None,
   timerConfig: DEFAULT_TIMER_CONFIG,
-  nominationEnabled: false,
+  nominationEnabled: true,
   isValid: false,
   syncVersion: 0,
 };

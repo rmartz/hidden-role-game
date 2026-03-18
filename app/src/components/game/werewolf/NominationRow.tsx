@@ -5,32 +5,27 @@ import { Button } from "@/components/ui/button";
 
 interface NominationRowProps {
   player: { id: string; name: string };
-  nominatorIds: string[];
-  players: { id: string; name: string }[];
+  nominatorName?: string;
   isMyTarget: boolean;
   canAct: boolean;
+  isNominated: boolean;
   isPending: boolean;
   onNominate: (defendantId: string) => void;
 }
 
 export function NominationRow({
   player,
-  nominatorIds,
-  players,
+  nominatorName,
   isMyTarget,
   canAct,
+  isNominated,
   isPending,
   onNominate,
 }: NominationRowProps) {
   const { nomination } = WEREWOLF_COPY;
-  const isNominated = nominatorIds.length > 0;
   const buttonLabel = isNominated
     ? nomination.secondButton(player.name)
     : nomination.nominateButton(player.name);
-
-  const playerById = new Map(players.map((p) => [p.id, p]));
-  const nominatorName =
-    playerById.get(nominatorIds[0] ?? "")?.name ?? "Unknown";
 
   const actionElement = isMyTarget ? (
     <span className="text-xs text-muted-foreground italic">
@@ -52,7 +47,7 @@ export function NominationRow({
   return (
     <li className="flex items-center gap-3">
       <span className="flex-1 text-sm">{player.name}</span>
-      {isNominated && (
+      {nominatorName && (
         <span className="text-xs text-muted-foreground">
           {nomination.nominatedBy(nominatorName)}
         </span>

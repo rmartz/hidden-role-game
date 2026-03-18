@@ -111,7 +111,7 @@ export interface PlayerGameState {
   /** Whether player nominations for trial are enabled in this game. */
   nominationsEnabled: boolean;
   /**
-   * Current nominations for trial (sanitized: no nominator identities visible to players).
+   * Current nominations for trial, grouped by defendant with nominator IDs.
    * Only populated during daytime when nominationsEnabled is true.
    */
   nominations?: { defendantId: string; nominatorIds: string[] }[];
