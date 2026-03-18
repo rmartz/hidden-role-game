@@ -12,3 +12,4 @@ export * from "./RoleConfigModePicker";
 export * from "./ShareLobby";
 export * from "./ShowRolesInPlayPicker";
 export * from "./TimerConfigPanel";
+export * from "./TimerConfigPanelRow";
