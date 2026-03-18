@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -33,12 +34,13 @@ function DebugAllStatesButtonContent({
   gameMode,
   players,
 }: DebugAllStatesButtonProps) {
-  const states = useAllPlayersGameStates(gameId, gameMode, players);
-  const { data: fullGameState } = useDebugFullGameState(gameId);
+  const [open, setOpen] = useState(false);
+  const states = useAllPlayersGameStates(gameId, gameMode, players, open);
+  const { data: fullGameState } = useDebugFullGameState(gameId, open);
   const defaultTab = players[0]?.sessionId;
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger render={<Button variant="outline" size="sm" />}>
         {DEBUG_VIEW_COPY.buttonLabel}
       </DialogTrigger>

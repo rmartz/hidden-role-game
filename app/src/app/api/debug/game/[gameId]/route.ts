@@ -6,6 +6,10 @@ export async function GET(
   _request: Request,
   { params }: { params: Promise<{ gameId: string }> },
 ): Promise<Response> {
+  if (process.env["NEXT_PUBLIC_DEBUG_MODE"] !== "true") {
+    return errorResponse("Not found", 404);
+  }
+
   const { gameId } = await params;
 
   const game = await gameService.getGame(gameId);

@@ -98,6 +98,7 @@ export function useAllPlayersGameStates(
   gameId: string,
   gameMode: GameMode,
   players: readonly { sessionId: string }[],
+  enabled: boolean,
 ): Map<string, PlayerGameState> {
   const results = useQueries({
     queries: players.map(({ sessionId }) => ({
@@ -111,7 +112,8 @@ export function useAllPlayersGameStates(
           throw new Error(data.error);
         return data.data;
       },
-      refetchInterval: 2000,
+      enabled,
+      refetchInterval: enabled ? 2000 : false,
     })),
   });
 
@@ -123,7 +125,7 @@ export function useAllPlayersGameStates(
   );
 }
 
-export function useDebugFullGameState(gameId: string) {
+export function useDebugFullGameState(gameId: string, enabled: boolean) {
   return useQuery({
     queryKey: ["debug-full-game", gameId] as const,
     queryFn: async () => {
@@ -133,7 +135,8 @@ export function useDebugFullGameState(gameId: string) {
         throw new Error(data.error);
       return data.data;
     },
-    refetchInterval: 2000,
+    enabled,
+    refetchInterval: enabled ? 2000 : false,
   });
 }
 

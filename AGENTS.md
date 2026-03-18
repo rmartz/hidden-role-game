@@ -3,7 +3,7 @@
 ## File Size
 
 - Keep files under ~200 lines. Large files should be split by logical concern.
-- **Components**: Delegate complex logic to utility functions or sub-components. Each component file should have a single clear responsibility.
+- **Components**: Each component file must contain exactly one component and its associated props interface. Delegate complex logic to utility functions or sub-components.
 - **Type files**: Convert large type files into barrel-exported directories with one file per logical domain (e.g., `lobby.ts`, `game.ts`, `player.ts`).
 - **Utility files**: Split by the type of operation or domain they serve.
 - **Service files**: Extract complex logic areas into focused utility functions or smaller services.
