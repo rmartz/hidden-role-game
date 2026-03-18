@@ -126,8 +126,10 @@ export default function LobbyPage() {
             playerCount={fetchLobby.data.players.length}
             readOnly={false}
             isPending={startGameMutation.isPending}
-            onStartGame={(roleSlots, gameModeArg) => {
-              startGameMutation.mutate({ roleSlots, gameMode: gameModeArg });
+            onStartGame={() => {
+              startGameMutation.mutate({
+                gameMode: fetchLobby.data.config.gameMode,
+              });
             }}
           />
         ) : (

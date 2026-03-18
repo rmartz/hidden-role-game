@@ -83,14 +83,14 @@ describe("useStartGame", () => {
     const { result } = renderHook(() => useStartGame("lobby-1"), { wrapper });
 
     act(() => {
-      result.current.mutate({ roleSlots: [], gameMode: GameMode.Werewolf });
+      result.current.mutate({ gameMode: GameMode.Werewolf });
     });
 
     await waitFor(() => {
       expect(result.current.isSuccess).toBe(true);
     });
 
-    expect(api.startGame).toHaveBeenCalledWith("lobby-1", [], "werewolf");
+    expect(api.startGame).toHaveBeenCalledWith("lobby-1", "werewolf");
     expect(invalidateSpy).toHaveBeenCalledWith({
       queryKey: ["lobby", "lobby-1"],
     });
@@ -108,7 +108,7 @@ describe("useStartGame", () => {
     const { result } = renderHook(() => useStartGame("lobby-1"), { wrapper });
 
     act(() => {
-      result.current.mutate({ roleSlots: [], gameMode: GameMode.Werewolf });
+      result.current.mutate({ gameMode: GameMode.Werewolf });
     });
 
     await waitFor(() => {
