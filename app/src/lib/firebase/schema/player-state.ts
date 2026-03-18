@@ -49,6 +49,9 @@ export interface FirebasePlayerState {
     voteResults?: { playerName: string; vote: DaytimeVote }[];
     eliminatedRole?: { id: string; name: string; team: string };
   };
+  nominations?: { defendantId: string; count: number }[];
+  myNominatedDefendantId?: string;
+  nominationThreshold?: number;
 }
 
 export function playerStateToFirebase(
@@ -91,6 +94,13 @@ export function playerStateToFirebase(
     ...(state.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
     ...(state.timerConfig ? { timerConfig: state.timerConfig } : {}),
     ...(state.activeTrial ? { activeTrial: state.activeTrial } : {}),
+    ...(state.nominations?.length ? { nominations: state.nominations } : {}),
+    ...(state.myNominatedDefendantId
+      ? { myNominatedDefendantId: state.myNominatedDefendantId }
+      : {}),
+    ...(state.nominationThreshold !== undefined
+      ? { nominationThreshold: state.nominationThreshold }
+      : {}),
   };
 }
 
@@ -156,6 +166,13 @@ export function firebaseToPlayerState(
       ? {
           activeTrial: raw.activeTrial as PlayerGameState["activeTrial"],
         }
+      : {}),
+    ...(raw.nominations?.length ? { nominations: raw.nominations } : {}),
+    ...(raw.myNominatedDefendantId
+      ? { myNominatedDefendantId: raw.myNominatedDefendantId }
+      : {}),
+    ...(raw.nominationThreshold !== undefined
+      ? { nominationThreshold: raw.nominationThreshold }
       : {}),
   };
 }

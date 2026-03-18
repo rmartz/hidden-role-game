@@ -283,6 +283,26 @@ export class GameSerializationService {
       ...(nightStatus.length > 0 ? { nightStatus } : {}),
     };
 
+    // Include nomination state when threshold is configured.
+    if (game.nominationThreshold) {
+      const nominations = phase.nominations ?? [];
+      const nominationCounts = nominations.reduce<Record<string, number>>(
+        (acc, n) => {
+          acc[n.defendantId] = (acc[n.defendantId] ?? 0) + 1;
+          return acc;
+        },
+        {},
+      );
+      result.nominations = Object.entries(nominationCounts).map(
+        ([defendantId, count]) => ({ defendantId, count }),
+      );
+      const myNomination = nominations.find((n) => n.nominatorId === callerId);
+      if (myNomination) {
+        result.myNominatedDefendantId = myNomination.defendantId;
+      }
+      result.nominationThreshold = game.nominationThreshold;
+    }
+
     if (phase.activeTrial) {
       const { activeTrial } = phase;
       const alivePlayerCount = game.players.filter(

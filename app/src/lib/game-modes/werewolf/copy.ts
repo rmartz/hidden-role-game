@@ -98,6 +98,16 @@ export const WEREWOLF_COPY = {
     endGame: "End Game",
     rolesRevealHeading: "Final Roles",
   },
+  nomination: {
+    heading: "Nominate for Trial",
+    nominateButton: (name: string) => `Nominate ${name}`,
+    secondButton: (name: string) => `Second ${name}`,
+    withdrawButton: "Withdraw Nomination",
+    nominationCount: (count: number, threshold: number) =>
+      `${String(count)}/${String(threshold)}`,
+    autoTrialNote: (threshold: number) =>
+      `${String(threshold)} nominations triggers an automatic trial.`,
+  },
   narrator: {
     nightTitle: (turn: number, phase: number, total: number) =>
       `Night — Turn ${String(turn)} (${String(phase)}/${String(total)})`,

@@ -7,6 +7,7 @@ import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 import type { PlayerGameState } from "@/server/types";
 import { GameTimer, RoleGlossaryDialog } from "@/components/game";
+import { NominationPanel } from "./NominationPanel";
 import { PlayerNightSummary } from "./PlayerNightSummary";
 import { PlayerRoleDisplay } from "./PlayerRoleDisplay";
 import { PlayerStatusLists } from "./PlayerStatusLists";
@@ -36,6 +37,10 @@ export function PlayerGameDayScreen({
         .map((r) => modeConfig.roles[r.id])
         .filter((r) => r !== undefined)
     : Object.values(modeConfig.roles);
+
+  const hasActiveTrial =
+    !!gameState.activeTrial && !gameState.activeTrial.verdict;
+  const showNominations = !!gameState.nominationThreshold && !hasActiveTrial;
 
   return (
     <div className="p-5 max-w-lg mx-auto">
@@ -68,6 +73,21 @@ export function PlayerGameDayScreen({
         players={gameState.players}
         nightStatus={gameState.nightStatus}
       />
+
+      {showNominations && (
+        <NominationPanel
+          gameId={gameId}
+          players={gameState.players}
+          myPlayerId={gameState.myPlayerId}
+          amDead={gameState.amDead}
+          nominations={gameState.nominations ?? []}
+          myNominatedDefendantId={gameState.myNominatedDefendantId}
+          nominationThreshold={gameState.nominationThreshold ?? 2}
+          deadPlayerIds={gameState.deadPlayerIds}
+          gameOwnerId={gameState.gameOwner?.id}
+          hasActiveTrial={hasActiveTrial}
+        />
+      )}
 
       {gameState.activeTrial && (
         <TrialVotePanel

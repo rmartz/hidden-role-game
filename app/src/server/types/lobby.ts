@@ -18,6 +18,7 @@ export interface GameConfig {
   showRolesInPlay: ShowRolesInPlay;
   roleSlots?: RoleSlot[];
   timerConfig?: TimerConfig;
+  nominationThreshold?: number;
 }
 
 export interface PublicLobby {
@@ -44,6 +45,7 @@ export interface UpdateLobbyConfigRequest {
   gameMode?: GameMode;
   roleSlots?: RoleSlot[];
   timerConfig?: TimerConfig;
+  nominationThreshold?: number;
 }
 
 export interface LobbyJoinResponse {

@@ -99,25 +99,22 @@ export default function LobbyConflictPage() {
 
   if (!validatedGameMode) return null;
 
-  const content =
-    targetLobbyQuery.isLoading ||
+  return targetLobbyQuery.isLoading ||
     conflictLobbyQuery.isLoading ||
     !conflictLobbyQuery.data ||
     !storedLobbyId ? (
-      <p className="p-5 text-muted-foreground">{LOBBY_PAGE_COPY.loading}</p>
-    ) : (
-      <div className="p-5 max-w-lg mx-auto">
-        <h1 className="text-2xl font-bold mb-4">{LOBBY_PAGE_COPY.title}</h1>
-        <LobbyConflictResolution
-          conflictLobby={conflictLobbyQuery.data}
-          conflictLobbyId={storedLobbyId}
-          playerName={playerName}
-          onPlayerNameChange={setPlayerName}
-          isJoining={joinMutation.isPending}
-          onJoin={handleJoin}
-        />
-      </div>
-    );
-
-  return content;
+    <p className="p-5 text-muted-foreground">{LOBBY_PAGE_COPY.loading}</p>
+  ) : (
+    <div className="p-5 max-w-lg mx-auto">
+      <h1 className="text-2xl font-bold mb-4">{LOBBY_PAGE_COPY.title}</h1>
+      <LobbyConflictResolution
+        conflictLobby={conflictLobbyQuery.data}
+        conflictLobbyId={storedLobbyId}
+        playerName={playerName}
+        onPlayerNameChange={setPlayerName}
+        isJoining={joinMutation.isPending}
+        onJoin={handleJoin}
+      />
+    </div>
+  );
 }

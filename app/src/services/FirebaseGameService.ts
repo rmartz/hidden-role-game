@@ -200,6 +200,7 @@ export class FirebaseGameService {
     showRolesInPlay: ShowRolesInPlay,
     ownerPlayerId: string | undefined,
     timerConfig?: import("@/lib/types").TimerConfig,
+    nominationThreshold?: number,
   ): Promise<Game> {
     const { roles } = this.getModeDefinition(gameMode);
     const rolePlayers = ownerPlayerId
@@ -230,6 +231,7 @@ export class FirebaseGameService {
       showRolesInPlay,
       ownerPlayerId,
       ...(timerConfig ? { timerConfig } : {}),
+      ...(nominationThreshold !== undefined ? { nominationThreshold } : {}),
     };
 
     // sessionIndex: { [sessionId]: playerId } — needed to reconstruct Game from Firebase
