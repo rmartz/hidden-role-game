@@ -30,15 +30,6 @@ export function OwnerPlayerActionItem({
     });
   };
 
-  const handleKill = () => {
-    if (window.confirm("Mark this player as dead?")) {
-      action.mutate({
-        actionId: WerewolfAction.MarkPlayerDead,
-        payload: { playerId },
-      });
-    }
-  };
-
   const handlePutToVote = () => {
     action.mutate({
       actionId: WerewolfAction.StartTrial,
@@ -72,24 +63,14 @@ export function OwnerPlayerActionItem({
       {WEREWOLF_COPY.trial.putToVote}
     </Button>
   ) : (
-    <>
-      <Button
-        variant="destructive"
-        size="xs"
-        onClick={handleKill}
-        disabled={action.isPending}
-      >
-        {WEREWOLF_COPY.narrator.kill}
-      </Button>
-      <Button
-        variant="outline"
-        size="xs"
-        onClick={handleSmite}
-        disabled={action.isPending || isSmited}
-      >
-        {WEREWOLF_COPY.narrator.smite}
-      </Button>
-    </>
+    <Button
+      variant="destructive"
+      size="xs"
+      onClick={handleSmite}
+      disabled={action.isPending || isSmited}
+    >
+      {WEREWOLF_COPY.narrator.smite}
+    </Button>
   );
 
   return <div className="flex gap-1">{button}</div>;

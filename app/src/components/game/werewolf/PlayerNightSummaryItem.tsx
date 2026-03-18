@@ -13,9 +13,12 @@ export function PlayerNightSummaryItem({
   silenced,
   smited,
 }: PlayerNightSummaryItemProps) {
-  const effectLabel = smited ? WEREWOLF_COPY.smite.effect : "eliminated";
   const effects = (
-    [killed && effectLabel, silenced && "silenced"] as (string | false)[]
+    [
+      smited && WEREWOLF_COPY.smite.effect,
+      killed && !smited && "eliminated",
+      silenced && "silenced",
+    ] as (string | false)[]
   )
     .filter(Boolean)
     .join(" and ");
