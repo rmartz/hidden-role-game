@@ -103,6 +103,7 @@ export const WEREWOLF_COPY = {
     nominateButton: (name: string) => `Nominate ${name}`,
     secondButton: (name: string) => `Second ${name}`,
     withdrawButton: "Withdraw Nomination",
+    yourNomination: "Your nomination",
     nominationCount: (count: number, threshold: number) =>
       `${String(count)}/${String(threshold)}`,
     autoTrialNote: (threshold: number) =>

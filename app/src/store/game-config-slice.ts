@@ -55,6 +55,7 @@ export interface GameConfigState {
   showConfigToPlayers: boolean;
   showRolesInPlay: ShowRolesInPlay;
   timerConfig?: TimerConfig;
+  nominationEnabled: boolean;
   isValid: boolean;
   /** Increments on every user-initiated action. Used to detect when a sync is needed. */
   syncVersion: number;
@@ -70,6 +71,7 @@ const initialState: GameConfigState = {
   showConfigToPlayers: false,
   showRolesInPlay: ShowRolesInPlay.None,
   timerConfig: undefined,
+  nominationEnabled: false,
   isValid: false,
   syncVersion: 0,
 };
@@ -108,6 +110,7 @@ const gameConfigSlice = createSlice({
       state.showConfigToPlayers = config.showConfigToPlayers;
       state.showRolesInPlay = config.showRolesInPlay;
       state.timerConfig = config.timerConfig;
+      state.nominationEnabled = (config.nominationThreshold ?? 0) > 0;
       state.isValid = recomputeIsValid(state);
     },
 
@@ -240,6 +243,11 @@ const gameConfigSlice = createSlice({
       state.timerConfig = action.payload;
       state.syncVersion++;
     },
+
+    setNominationEnabled(state, action: PayloadAction<boolean>) {
+      state.nominationEnabled = action.payload;
+      state.syncVersion++;
+    },
   },
 });
 
@@ -277,6 +285,7 @@ export const {
   setShowConfigToPlayers,
   setShowRolesInPlay,
   setTimerConfig,
+  setNominationEnabled,
 } = gameConfigSlice.actions;
 
 export default gameConfigSlice.reducer;

@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from "@/store";
 import {
   loadConfig,
   selectRoleSlots,
+  setNominationEnabled,
   setPlayerCount,
   setShowConfigToPlayers,
   setShowRolesInPlay,
@@ -49,6 +50,9 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
   const roleConfigMode = useAppSelector((s) => s.gameConfig.roleConfigMode);
   const roleSlots = useAppSelector((s) => selectRoleSlots(s.gameConfig));
   const timerConfig = useAppSelector((s) => s.gameConfig.timerConfig);
+  const nominationEnabled = useAppSelector(
+    (s) => s.gameConfig.nominationEnabled,
+  );
   const isValid = useAppSelector((s) => s.gameConfig.isValid);
 
   const hasLoadedRef = useRef(false);
@@ -79,20 +83,25 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
         showRolesInPlay: config.showRolesInPlay,
         showConfigToPlayers: config.showConfigToPlayers,
         timerConfig: config.timerConfig,
+        nominationEnabled: (config.nominationThreshold ?? 0) > 0,
         onShowRolesInPlayChange: undefined,
         onShowConfigToPlayersChange: undefined,
         onTimerConfigChange: undefined,
+        onNominationEnabledChange: undefined,
       }
     : {
         showRolesInPlay,
         showConfigToPlayers,
         timerConfig,
+        nominationEnabled,
         onShowRolesInPlayChange: (value: typeof showRolesInPlay) =>
           dispatch(setShowRolesInPlay(value)),
         onShowConfigToPlayersChange: (value: boolean) =>
           dispatch(setShowConfigToPlayers(value)),
         onTimerConfigChange: (value: typeof timerConfig) =>
           dispatch(setTimerConfig(value)),
+        onNominationEnabledChange: (value: boolean) =>
+          dispatch(setNominationEnabled(value)),
       };
 
   const ownerTitleText = ownerTitle
@@ -148,8 +157,10 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
 
           <ConfigurationToggles
             showConfigToPlayers={resolved.showConfigToPlayers}
+            nominationEnabled={resolved.nominationEnabled}
             disabled={disabled}
             onShowConfigToPlayersChange={resolved.onShowConfigToPlayersChange}
+            onNominationEnabledChange={resolved.onNominationEnabledChange}
           />
 
           <TimerConfigPanel

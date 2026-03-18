@@ -48,6 +48,7 @@ export function useConfigSync(
             showConfigToPlayers,
             showRolesInPlay,
             timerConfig,
+            nominationEnabled,
           } = gameConfigRef.current;
           const roleSlots = selectRoleSlots(gameConfigRef.current);
           mutateRef.current(
@@ -58,6 +59,7 @@ export function useConfigSync(
               showRolesInPlay,
               roleSlots,
               timerConfig,
+              nominationThreshold: nominationEnabled ? 2 : undefined,
             },
             {
               onSuccess: () => {

@@ -40,7 +40,6 @@ export function PlayerGameDayScreen({
 
   const hasActiveTrial =
     !!gameState.activeTrial && !gameState.activeTrial.verdict;
-  const showNominations = !!gameState.nominationThreshold && !hasActiveTrial;
 
   return (
     <div className="p-5 max-w-lg mx-auto">
@@ -74,7 +73,7 @@ export function PlayerGameDayScreen({
         nightStatus={gameState.nightStatus}
       />
 
-      {showNominations && (
+      {!!gameState.nominationThreshold && (
         <NominationPanel
           gameId={gameId}
           players={gameState.players}

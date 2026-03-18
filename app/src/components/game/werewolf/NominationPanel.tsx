@@ -60,7 +60,8 @@ export function NominationPanel({
     nominations.map((n) => [n.defendantId, n.count]),
   );
 
-  const canNominate = !!myPlayerId && !amDead && !hasActiveTrial;
+  // Can act = alive, non-owner player, no active trial in progress
+  const canAct = !!myPlayerId && !amDead && !hasActiveTrial;
 
   return (
     <Card className="p-4 mb-4">
@@ -84,23 +85,29 @@ export function NominationPanel({
                   {nomination.nominationCount(count, nominationThreshold)}
                 </span>
               )}
-              {canNominate && !isMyTarget && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    nominate(player.id);
-                  }}
-                  disabled={action.isPending}
-                >
-                  {buttonLabel}
-                </Button>
+              {isMyTarget ? (
+                <span className="text-xs text-muted-foreground italic">
+                  {nomination.yourNomination}
+                </span>
+              ) : (
+                canAct && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      nominate(player.id);
+                    }}
+                    disabled={action.isPending}
+                  >
+                    {buttonLabel}
+                  </Button>
+                )
               )}
             </li>
           );
         })}
       </ul>
-      {canNominate && myNominatedDefendantId && (
+      {canAct && myNominatedDefendantId && (
         <div className="mt-3">
           <Button
             size="sm"
