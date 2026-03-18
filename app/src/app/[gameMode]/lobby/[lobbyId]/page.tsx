@@ -127,9 +127,9 @@ export default function LobbyPage() {
             readOnly={false}
             isPending={startGameMutation.isPending}
             onStartGame={() => {
-              startGameMutation.mutate({
-                gameMode: fetchLobby.data.config.gameMode,
-              });
+              if (actualGameMode) {
+                startGameMutation.mutate({ gameMode: actualGameMode });
+              }
             }}
           />
         ) : (
