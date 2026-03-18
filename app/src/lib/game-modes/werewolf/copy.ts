@@ -89,7 +89,6 @@ export const WEREWOLF_COPY = {
   glossary: {
     dialogTitle: "Role Glossary",
     openButton: "View Glossary",
-    roleInfoLabel: "Role information",
   },
   gameOver: {
     victory: "Victory!",
