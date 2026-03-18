@@ -90,7 +90,8 @@ export function PlayerNightActionScreen({
           {WEREWOLF_COPY.night.yourTurn}
         </h1>
         <GameTimer
-          durationSeconds={gameState.timerConfig?.nightPhaseSeconds}
+          durationSeconds={gameState.timerConfig.nightPhaseSeconds}
+          autoAdvance={gameState.timerConfig.autoAdvance}
           startedAt={phaseStartedAt}
           resetKey={phase.currentPhaseIndex}
         />

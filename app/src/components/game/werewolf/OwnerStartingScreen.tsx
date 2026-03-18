@@ -24,8 +24,10 @@ export function OwnerStartingScreen({
     [startedAtMs],
   );
 
+  const timerConfig = gameState.timerConfig;
   const timer = {
-    durationSeconds: gameState.timerConfig?.startCountdownSeconds,
+    durationSeconds: timerConfig.startCountdownSeconds,
+    autoAdvance: timerConfig.autoAdvance,
     startedAt,
     onTimerTrigger: onStart,
   };

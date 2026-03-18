@@ -17,7 +17,7 @@ export interface GameConfig {
   showConfigToPlayers: boolean;
   showRolesInPlay: ShowRolesInPlay;
   roleSlots?: RoleSlot[];
-  timerConfig?: TimerConfig;
+  timerConfig: TimerConfig;
 }
 
 export interface PublicLobby {

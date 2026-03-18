@@ -6,7 +6,8 @@ import { GameTimer } from "@/components/game/GameTimer";
 import { Button } from "@/components/ui/button";
 
 interface TimerProps {
-  durationSeconds?: number;
+  durationSeconds: number;
+  autoAdvance: boolean;
   onTimerTrigger?: () => void;
   startedAt: Date;
   resetKey?: string | number;

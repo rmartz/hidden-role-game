@@ -43,7 +43,8 @@ export function PlayerStartingScreen({ gameState }: PlayerStartingScreenProps) {
     <div className="p-5 max-w-lg mx-auto">
       <h1 className="text-2xl font-bold mb-4">Game Starting</h1>
       <GameTimer
-        durationSeconds={gameState.timerConfig?.startCountdownSeconds}
+        durationSeconds={gameState.timerConfig.startCountdownSeconds}
+        autoAdvance={gameState.timerConfig.autoAdvance}
         startedAt={startedAt}
       />
 

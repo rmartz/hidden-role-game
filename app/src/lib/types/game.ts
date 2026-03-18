@@ -140,7 +140,7 @@ export interface Game {
   configuredRoleSlots: RoleSlot[];
   showRolesInPlay: ShowRolesInPlay;
   ownerPlayerId?: string;
-  timerConfig?: TimerConfig;
+  timerConfig: TimerConfig;
 }
 
 /**
@@ -155,15 +155,25 @@ export interface GameAction {
 // --- Phase Timer Configuration ---
 
 export interface TimerConfig {
-  /** Seconds for game-start countdown. Absent = no auto-advance (manual skip only). */
-  startCountdownSeconds?: number;
-  /** Seconds per night role phase. Absent = manual only. */
-  nightPhaseSeconds?: number;
-  /** Seconds for day discussion. Absent = manual only. */
-  dayPhaseSeconds?: number;
-  /** Seconds for a daytime elimination vote. Absent = no auto-resolve. */
-  votePhaseSeconds?: number;
+  /** When true, each phase automatically advances when its timer expires. */
+  autoAdvance: boolean;
+  /** Seconds for game-start countdown. */
+  startCountdownSeconds: number;
+  /** Seconds per night role phase. */
+  nightPhaseSeconds: number;
+  /** Seconds for day discussion. */
+  dayPhaseSeconds: number;
+  /** Seconds for a daytime elimination vote. */
+  votePhaseSeconds: number;
 }
+
+export const DEFAULT_TIMER_CONFIG: TimerConfig = {
+  autoAdvance: true,
+  startCountdownSeconds: 10,
+  nightPhaseSeconds: 30,
+  dayPhaseSeconds: 300,
+  votePhaseSeconds: 20,
+};
 
 // --- Lobby (top-level entity; game is absent until started) ---
 
@@ -173,7 +183,7 @@ export interface LobbyConfig {
   roleSlots: RoleSlot[];
   showConfigToPlayers: boolean;
   showRolesInPlay: ShowRolesInPlay;
-  timerConfig?: TimerConfig;
+  timerConfig: TimerConfig;
 }
 
 export interface Lobby {

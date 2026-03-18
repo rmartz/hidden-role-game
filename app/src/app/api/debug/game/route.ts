@@ -12,7 +12,7 @@ interface CreateDebugGameRequest {
   gameMode: GameMode;
   roleSlots: RoleSlot[];
   showRolesInPlay: ShowRolesInPlay;
-  timerConfig?: TimerConfig;
+  timerConfig: TimerConfig;
 }
 
 export interface DebugPlayer {
