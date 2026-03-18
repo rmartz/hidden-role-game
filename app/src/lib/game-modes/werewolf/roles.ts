@@ -160,6 +160,10 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     targetCategory: TargetCategory.Protect,
     preventRepeatTarget: true,
   },
+  // The Minion wakes on the first night so the narrator can prompt Werewolf
+  // players to raise their thumbs while everyone's eyes are closed, allowing
+  // the Minion to identify them. This is handled out-of-game by the narrator,
+  // not in code — the Minion's night phase has no in-app action.
   [WerewolfRole.Minion]: {
     id: WerewolfRole.Minion,
     name: "Minion",

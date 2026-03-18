@@ -7,7 +7,7 @@ import type {
   LobbyPlayer,
   RoleSlot,
 } from "@/lib/types";
-import type { PlayerGameState } from "@/server/types";
+import type { PlayerGameState, VisibleTeammate } from "@/server/types";
 import { GAME_MODES } from "@/lib/game-modes";
 import { getPlayer } from "@/lib/player-utils";
 import { assignRoles, adjustRoleSlots } from "@/server/utils";
@@ -103,7 +103,7 @@ export class FirebaseGameService {
           reason: vp.reason,
         },
       ];
-    }) as import("@/server/types").VisibleTeammate[];
+    }) as VisibleTeammate[];
 
     // When game is finished, reveal all roles to every player.
     const isFinished = game.status.type === GameStatus.Finished;

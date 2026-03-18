@@ -17,6 +17,17 @@ import type {
 } from "@/lib/game-modes/werewolf";
 
 /**
+ * Extended role properties used by buildGamePlayers for wake-phase and
+ * werewolf-detection visibility. Game modes that don't use these features
+ * can pass plain RoleDefinition records — all extended fields are optional.
+ */
+interface ExtendedRoleProperties {
+  teamTargeting?: boolean;
+  wakesWith?: string;
+  isWerewolf?: boolean;
+}
+
+/**
  * Stateless helpers for assembling game data at creation and start time.
  * Extracted from FirebaseGameService so they can be tested directly.
  */
@@ -24,42 +35,38 @@ export class GameInitializationService {
   /**
    * Builds the in-game player list from lobby players and role assignments,
    * computing each player's visible teammates based on role definitions.
+   *
+   * Accepts any role record that extends RoleDefinition. Game modes with
+   * group night phases (e.g. Werewolf) pass role definitions that include
+   * teamTargeting, wakesWith, and isWerewolf.
    */
-  buildGamePlayers(
+  buildGamePlayers<R extends RoleDefinition<string, Team>>(
     players: LobbyPlayer[],
     roleAssignments: PlayerRoleAssignment[],
-    roles: Record<string, RoleDefinition<string, Team>>,
+    roles: Record<string, R>,
   ): GamePlayer[] {
     const playerById = new Map(players.map((p) => [p.id, p]));
 
     return roleAssignments.map((assignment) => {
       const player = playerById.get(assignment.playerId);
       if (!player) throw new Error(`Player not found: ${assignment.playerId}`);
-      const myRole = roles[assignment.roleDefinitionId];
+      const myRole = roles[assignment.roleDefinitionId] as
+        | (R & ExtendedRoleProperties)
+        | undefined;
 
       const visiblePlayers: VisiblePlayer[] = [];
       const seenPlayerIds = new Set<string>();
 
       // 1. Wake-phase partners: for roles with teamTargeting or wakesWith,
       // find other players who participate in the same group phase.
-      const myWerewolfRole = myRole as
-        | { teamTargeting?: boolean; wakesWith?: string }
-        | undefined;
-      if (myWerewolfRole?.teamTargeting || myWerewolfRole?.wakesWith) {
+      if (myRole?.teamTargeting || myRole?.wakesWith) {
         const groupKey =
-          myWerewolfRole.wakesWith ??
-          (myWerewolfRole.teamTargeting
-            ? (myRole as { id: string }).id
-            : undefined);
+          myRole.wakesWith ?? (myRole.teamTargeting ? myRole.id : undefined);
         if (groupKey) {
           for (const other of roleAssignments) {
             if (other.playerId === assignment.playerId) continue;
             const otherRole = roles[other.roleDefinitionId] as
-              | {
-                  id: string;
-                  teamTargeting?: boolean;
-                  wakesWith?: string;
-                }
+              | (R & ExtendedRoleProperties)
               | undefined;
             if (!otherRole) continue;
             const otherGroupKey =
@@ -79,29 +86,21 @@ export class GameInitializationService {
       }
 
       // 2. Aware-of: from awareOf.teams, awareOf.roles, awareOf.werewolves
-      const awareOf = (
-        myRole as {
-          awareOf?: {
-            teams?: string[];
-            roles?: string[];
-            werewolves?: boolean;
-          };
-        }
-      ).awareOf;
-      if (awareOf) {
-        const awareOfTeams = new Set(awareOf.teams ?? []);
-        const awareOfRoles = new Set(awareOf.roles ?? []);
-        const awareOfWerewolves = awareOf.werewolves === true;
+      if (myRole?.awareOf) {
+        const awareOfTeams = new Set(myRole.awareOf.teams ?? []);
+        const awareOfRoles = new Set(myRole.awareOf.roles ?? []);
+        const awareOfWerewolves = myRole.awareOf.werewolves === true;
         for (const other of roleAssignments) {
           if (other.playerId === assignment.playerId) continue;
           if (seenPlayerIds.has(other.playerId)) continue;
-          const otherRole = roles[other.roleDefinitionId];
+          const otherRole = roles[other.roleDefinitionId] as
+            | (R & ExtendedRoleProperties)
+            | undefined;
           if (!otherRole) continue;
-          const otherWerewolfRole = otherRole as { isWerewolf?: boolean };
           if (
             awareOfTeams.has(otherRole.team) ||
             awareOfRoles.has(otherRole.id) ||
-            (awareOfWerewolves && otherWerewolfRole.isWerewolf === true)
+            (awareOfWerewolves && otherRole.isWerewolf === true)
           ) {
             visiblePlayers.push({
               playerId: other.playerId,
