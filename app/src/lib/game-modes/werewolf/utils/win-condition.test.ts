@@ -27,6 +27,7 @@ function makeGame(
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner",
+    nominationsEnabled: false,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }

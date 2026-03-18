@@ -22,6 +22,7 @@ const DEFAULT_CONFIG: GameConfig = {
   roleConfigMode: RoleConfigMode.Default,
   showConfigToPlayers: false,
   showRolesInPlay: ShowRolesInPlay.None,
+  nominationsEnabled: false,
   timerConfig: DEFAULT_TIMER_CONFIG,
 };
 
@@ -34,6 +35,9 @@ export default function DebugPage() {
   const roleSlots = useAppSelector((s) => selectRoleSlots(s.gameConfig));
   const showRolesInPlay = useAppSelector((s) => s.gameConfig.showRolesInPlay);
   const timerConfig = useAppSelector((s) => s.gameConfig.timerConfig);
+  const nominationsEnabled = useAppSelector(
+    (s) => s.gameConfig.nominationEnabled,
+  );
 
   async function handleCreateGame() {
     setIsCreating(true);
@@ -48,6 +52,7 @@ export default function DebugPage() {
           roleSlots,
           showRolesInPlay,
           timerConfig,
+          nominationsEnabled,
         }),
       });
       const body = (await res.json()) as {

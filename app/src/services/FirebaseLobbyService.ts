@@ -141,6 +141,7 @@ export class FirebaseLobbyService {
       gameMode?: GameMode;
       roleSlots?: RoleSlot[];
       timerConfig?: import("@/lib/types").TimerConfig;
+      nominationsEnabled?: boolean;
     },
   ): Promise<Lobby | undefined> {
     const snap = await lobbyRef(lobbyId).once("value");
@@ -183,6 +184,10 @@ export class FirebaseLobbyService {
     if (config.timerConfig !== undefined) {
       updates["public/config/timerConfig"] = config.timerConfig;
       data.public.config.timerConfig = config.timerConfig;
+    }
+    if (config.nominationsEnabled !== undefined) {
+      updates["public/config/nominationsEnabled"] = config.nominationsEnabled;
+      data.public.config.nominationsEnabled = config.nominationsEnabled;
     }
 
     if (Object.keys(updates).length > 0) {

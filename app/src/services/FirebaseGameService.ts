@@ -65,6 +65,8 @@ export class FirebaseGameService {
           ];
         },
       );
+      const daytimeNightState =
+        gameSerializationService.extractDaytimeNightState(game, callerId);
       return {
         status: game.status,
         gameMode: game.gameMode,
@@ -74,7 +76,9 @@ export class FirebaseGameService {
         myRole: undefined,
         visibleRoleAssignments,
         rolesInPlay: gameInitializationService.buildRolesInPlay(game),
+        nominationsEnabled: game.nominationsEnabled,
         ...(nightActions ? { nightActions } : {}),
+        ...daytimeNightState,
         ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
         timerConfig: game.timerConfig,
       };
@@ -169,6 +173,7 @@ export class FirebaseGameService {
       myRole: { id: myRole.id, name: myRole.name, team: myRole.team },
       visibleRoleAssignments,
       rolesInPlay: gameInitializationService.buildRolesInPlay(game),
+      nominationsEnabled: game.nominationsEnabled,
       ...nightTargetState,
       ...daytimeNightState,
       ...(amDead ? { amDead: true } : {}),
@@ -200,6 +205,7 @@ export class FirebaseGameService {
     showRolesInPlay: ShowRolesInPlay,
     ownerPlayerId: string | undefined,
     timerConfig: import("@/lib/types").TimerConfig,
+    nominationsEnabled?: boolean,
   ): Promise<Game> {
     const { roles } = this.getModeDefinition(gameMode);
     const rolePlayers = ownerPlayerId
@@ -230,6 +236,7 @@ export class FirebaseGameService {
       showRolesInPlay,
       ownerPlayerId,
       timerConfig,
+      nominationsEnabled: nominationsEnabled ?? false,
     };
 
     // sessionIndex: { [sessionId]: playerId } — needed to reconstruct Game from Firebase

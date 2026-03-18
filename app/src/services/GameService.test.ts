@@ -37,6 +37,7 @@ function makeGameWithPlayers(
     configuredRoleSlots,
     showRolesInPlay,
     ownerPlayerId: undefined,
+    nominationsEnabled: false,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
@@ -121,5 +122,51 @@ describe("GameService.getPlayerGameState", () => {
         role: { id: "bad", name: "Bad Role", team: Team.Bad },
       },
     ]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getPlayerGameState — narrator nominationsEnabled
+// ---------------------------------------------------------------------------
+
+function makeNarratorGame(nominationsEnabled = false): Game {
+  return {
+    id: "game-1",
+    lobbyId: "lobby-1",
+    gameMode: GameMode.SecretVillain,
+    status: { type: GameStatus.Playing },
+    players: [makePlayer("narrator"), makePlayer("p1"), makePlayer("p2")],
+    roleAssignments: [
+      { playerId: "p1", roleDefinitionId: "good" },
+      { playerId: "p2", roleDefinitionId: "bad" },
+    ],
+    configuredRoleSlots: DEFAULT_SLOTS,
+    showRolesInPlay: ShowRolesInPlay.None,
+    ownerPlayerId: "narrator",
+    nominationsEnabled,
+    timerConfig: DEFAULT_TIMER_CONFIG,
+  };
+}
+
+describe("GameService.getPlayerGameState — narrator nominationsEnabled", () => {
+  const service = new GameService();
+
+  it("narrator state has nominationsEnabled true when enabled on game", () => {
+    const game = makeNarratorGame(true);
+    const result = service.getPlayerGameState(game, "narrator");
+    expect(result?.nominationsEnabled).toBe(true);
+  });
+
+  it("narrator state has nominationsEnabled false when disabled on game", () => {
+    const game = makeNarratorGame(false);
+    const result = service.getPlayerGameState(game, "narrator");
+    expect(result?.nominationsEnabled).toBe(false);
+  });
+
+  it("narrator state has myPlayerId undefined and myRole undefined", () => {
+    const game = makeNarratorGame(true);
+    const result = service.getPlayerGameState(game, "narrator");
+    expect(result?.myPlayerId).toBeUndefined();
+    expect(result?.myRole).toBeUndefined();
   });
 });

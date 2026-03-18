@@ -56,6 +56,7 @@ function makeDaytimeGame(
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner",
+    nominationsEnabled: false,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
@@ -93,6 +94,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
       configuredRoleSlots: [],
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: undefined,
+      nominationsEnabled: false,
       timerConfig: DEFAULT_TIMER_CONFIG,
     };
 
@@ -217,6 +219,7 @@ function makeNighttimeGame(
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: undefined,
+    nominationsEnabled: false,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
@@ -325,6 +328,7 @@ function makeNighttimeGameWithBonusPhase(
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: undefined,
+    nominationsEnabled: false,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
@@ -477,6 +481,7 @@ function makeDaytimeGameWithTrial(callerRoleId: WerewolfRole): Game {
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner",
+    nominationsEnabled: false,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
@@ -494,5 +499,119 @@ describe("GameSerializationService.extractDaytimeNightState — mustVoteGuilty",
     const game = makeDaytimeGameWithTrial(WerewolfRole.Seer);
     const result = service.extractDaytimeNightState(game, "p2");
     expect(result.activeTrial?.mustVoteGuilty).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// extractDaytimeNightState — nominations
+// ---------------------------------------------------------------------------
+
+function makeDaytimeGameWithNominations(
+  nominations: { nominatorId: string; defendantId: string }[],
+  nominationsEnabled = false,
+): Game {
+  const turnState: WerewolfTurnState = {
+    turn: 1,
+    phase: {
+      type: WerewolfPhase.Daytime,
+      startedAt: 1000,
+      nightActions: {},
+      ...(nominations.length > 0 ? { nominations } : {}),
+    },
+    deadPlayerIds: [],
+  };
+  return {
+    id: "game-1",
+    lobbyId: "lobby-1",
+    gameMode: GameMode.Werewolf,
+    status: { type: GameStatus.Playing, turnState },
+    players: [
+      { id: "owner", name: "Owner", sessionId: "s0", visibleRoles: [] },
+      { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
+      { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
+      { id: "p3", name: "Charlie", sessionId: "s3", visibleRoles: [] },
+    ],
+    roleAssignments: [
+      { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "p2", roleDefinitionId: WerewolfRole.Seer },
+      { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+    ],
+    configuredRoleSlots: [],
+    showRolesInPlay: ShowRolesInPlay.None,
+    ownerPlayerId: "owner",
+    nominationsEnabled,
+    timerConfig: DEFAULT_TIMER_CONFIG,
+  };
+}
+
+describe("GameSerializationService.extractDaytimeNightState — nominations", () => {
+  const service = new GameSerializationService();
+
+  it("nominations are absent when nominationsEnabled is false", () => {
+    const game = makeDaytimeGameWithNominations(
+      [{ nominatorId: "p2", defendantId: "p3" }],
+      false,
+    );
+    const result = service.extractDaytimeNightState(game, "p2");
+    expect(result.nominations).toBeUndefined();
+  });
+
+  it("returns empty nominations array when no nominations exist", () => {
+    const game = makeDaytimeGameWithNominations([], true);
+    const result = service.extractDaytimeNightState(game, "p2");
+    expect(result.nominations).toEqual([]);
+  });
+
+  it("aggregates nominator IDs by defendant", () => {
+    const game = makeDaytimeGameWithNominations(
+      [
+        { nominatorId: "p2", defendantId: "p3" },
+        { nominatorId: "p1", defendantId: "p3" },
+      ],
+      true,
+    );
+    const result = service.extractDaytimeNightState(game, "p2");
+    expect(result.nominations).toContainEqual({
+      defendantId: "p3",
+      nominatorIds: ["p2", "p1"],
+    });
+  });
+
+  it("sets myNominatedDefendantId when caller has a nomination", () => {
+    const game = makeDaytimeGameWithNominations(
+      [{ nominatorId: "p2", defendantId: "p3" }],
+      true,
+    );
+    const result = service.extractDaytimeNightState(game, "p2");
+    expect(result.myNominatedDefendantId).toBe("p3");
+  });
+
+  it("myNominatedDefendantId is absent when caller has no nomination", () => {
+    const game = makeDaytimeGameWithNominations(
+      [{ nominatorId: "p1", defendantId: "p3" }],
+      true,
+    );
+    const result = service.extractDaytimeNightState(game, "p2");
+    expect(result.myNominatedDefendantId).toBeUndefined();
+  });
+
+  it("separates counts per defendant across multiple defendants", () => {
+    const game = makeDaytimeGameWithNominations(
+      [
+        { nominatorId: "p1", defendantId: "p3" },
+        { nominatorId: "p2", defendantId: "p1" },
+      ],
+      true,
+    );
+    const result = service.extractDaytimeNightState(game, "p1");
+    expect(result.nominations).toHaveLength(2);
+    expect(result.nominations).toContainEqual({
+      defendantId: "p3",
+      nominatorIds: ["p1"],
+    });
+    expect(result.nominations).toContainEqual({
+      defendantId: "p1",
+      nominatorIds: ["p2"],
+    });
   });
 });
