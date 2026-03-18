@@ -67,7 +67,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     name: "Werewolf",
     summary: "Eliminates a villager each night",
     description:
-      "Each night the Werewolves secretly vote together to eliminate one player. Werewolves can see all other players on the Bad team, including Wolf Cubs.",
+      "Each night the Werewolves wake together to choose their victim. They know which other players share their night phase, but not each other's specific roles.",
     team: Team.Bad,
     isWerewolf: true,
     wakesAtNight: WakesAtNight.EveryNight,
@@ -79,7 +79,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     name: "Wolf Cub",
     summary: "A young werewolf who joins the nightly hunt",
     description:
-      "The Wolf Cub participates in the Werewolf group attack each night. If the Wolf Cub is ever eliminated, the Werewolves gain two attack phases the following night.",
+      "The Wolf Cub wakes with the Werewolves and participates in their nightly attack. If the Wolf Cub is ever eliminated, the Werewolves gain two attack phases the following night.",
     team: Team.Bad,
     isWerewolf: true,
     wakesAtNight: WakesAtNight.EveryNight,
@@ -91,7 +91,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     name: "Seer",
     summary: "Discovers if a player is evil each night",
     description:
-      "Each night the Seer targets one player and the Narrator privately reveals whether that player is on Team Bad. Players who are evil but not allied with the Werewolves are not revealed to the Seer.",
+      "Each night the Seer targets one player and the Narrator privately reveals whether that player is a Werewolf. Only Werewolves and Wolf Cubs are detected — other evil roles such as the Minion are not.",
     team: Team.Good,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Investigate,
@@ -122,7 +122,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     name: "Mason",
     summary: "Knows the identities of all other Masons",
     description:
-      "On the first night, all Masons wake together and identify each other. Masons have no night action after the first night, but they know with certainty that their fellow Masons are on the Good team.",
+      "On the first night, the Masons learn who the other Masons are. Masons have no night action after the first night, but they can trust each other completely.",
     team: Team.Good,
     awareOf: { roles: [WerewolfRole.Mason] },
     wakesAtNight: WakesAtNight.FirstNightOnly,
@@ -131,9 +131,9 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
   [WerewolfRole.Chupacabra]: {
     id: WerewolfRole.Chupacabra,
     name: "Chupacabra",
-    summary: "A neutral predator that hunts only the wicked",
+    summary: "A neutral predator that hunts Werewolves",
     description:
-      "Each night the Chupacabra targets one player. The attack only succeeds if the target is on Team Bad — or if all Team Bad players have already been eliminated. The Chupacabra is on Team Neutral and has its own win condition.",
+      "Each night the Chupacabra targets one player. The attack only succeeds if the target is a Werewolf — once all Werewolves have been eliminated, the Chupacabra can attack anyone. The Chupacabra is neutral and has its own win condition.",
     team: Team.Neutral,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Attack,
@@ -165,7 +165,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     name: "Minion",
     summary: "A secret servant of the werewolves",
     description:
-      "The Minion knows who the Werewolves are but the Werewolves do not know the Minion's identity. The Minion wins with Team Bad. If the Seer investigates the Minion, the result is 'not a Werewolf.'",
+      "The Minion knows who the Werewolves are, but the Werewolves do not know the Minion's identity. The Minion wins with Team Bad. The Seer's investigation reveals the Minion is not a Werewolf.",
     team: Team.Bad,
     awareOf: { werewolves: true },
     wakesAtNight: WakesAtNight.FirstNightOnly,
