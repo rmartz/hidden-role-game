@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { OwnerAdvanceCard } from "./OwnerAdvanceCard";
 import { NightOutcomeSummary } from "./NightOutcomeSummary";
+import { NominationPanel } from "./NominationPanel";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
 import { OwnerTrialPanel } from "./OwnerTrialPanel";
 
@@ -52,9 +53,19 @@ export function OwnerGameDayScreen({
 
   if (!isDaytime) return null;
 
+  const daytimePhase = phase;
   const modeConfig = GAME_MODES[gameState.gameMode];
-  const activeTrial = phase.activeTrial;
+  const activeTrial = daytimePhase.activeTrial;
   const hasActiveTrial = !!activeTrial && !activeTrial.verdict;
+  const nominationCounts = (daytimePhase.nominations ?? []).reduce<
+    Record<string, number>
+  >((acc, n) => {
+    acc[n.defendantId] = (acc[n.defendantId] ?? 0) + 1;
+    return acc;
+  }, {});
+  const nominations = Object.entries(nominationCounts).map(
+    ([defendantId, count]) => ({ defendantId, count }),
+  );
   const glossaryRoles = gameState.rolesInPlay?.length
     ? gameState.rolesInPlay
         .map((r) => modeConfig.roles[r.id])
@@ -95,11 +106,22 @@ export function OwnerGameDayScreen({
           )}
         </OwnerAdvanceCard>
         <NightOutcomeSummary
-          events={phase.nightResolution ?? []}
+          events={daytimePhase.nightResolution ?? []}
           players={gameState.players}
           roles={modeConfig.roles}
         />
       </div>
+      {!!gameState.nominationThreshold && (
+        <NominationPanel
+          gameId={gameId}
+          players={gameState.players}
+          nominations={nominations}
+          nominationThreshold={gameState.nominationThreshold}
+          deadPlayerIds={gameState.deadPlayerIds}
+          gameOwnerId={gameState.gameOwner?.id}
+          hasActiveTrial={hasActiveTrial}
+        />
+      )}
       <OwnerPlayerActionsGrid
         gameId={gameId}
         assignments={gameState.visibleRoleAssignments}

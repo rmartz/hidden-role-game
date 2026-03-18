@@ -485,3 +485,109 @@ describe("GameSerializationService.extractDaytimeNightState — mustVoteGuilty",
     expect(result.activeTrial?.mustVoteGuilty).toBeUndefined();
   });
 });
+
+// ---------------------------------------------------------------------------
+// extractDaytimeNightState — nominations
+// ---------------------------------------------------------------------------
+
+function makeDaytimeGameWithNominations(
+  nominations: { nominatorId: string; defendantId: string }[],
+  nominationThreshold?: number,
+): Game {
+  const turnState: WerewolfTurnState = {
+    turn: 1,
+    phase: {
+      type: WerewolfPhase.Daytime,
+      startedAt: 1000,
+      nightActions: {},
+      ...(nominations.length > 0 ? { nominations } : {}),
+    },
+    deadPlayerIds: [],
+  };
+  return {
+    id: "game-1",
+    lobbyId: "lobby-1",
+    gameMode: GameMode.Werewolf,
+    status: { type: GameStatus.Playing, turnState },
+    players: [
+      { id: "owner", name: "Owner", sessionId: "s0", visibleRoles: [] },
+      { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
+      { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
+      { id: "p3", name: "Charlie", sessionId: "s3", visibleRoles: [] },
+    ],
+    roleAssignments: [
+      { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "p2", roleDefinitionId: WerewolfRole.Seer },
+      { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+    ],
+    configuredRoleSlots: [],
+    showRolesInPlay: ShowRolesInPlay.None,
+    ownerPlayerId: "owner",
+    ...(nominationThreshold !== undefined ? { nominationThreshold } : {}),
+  };
+}
+
+describe("GameSerializationService.extractDaytimeNightState — nominations", () => {
+  const service = new GameSerializationService();
+
+  it("nominations and nominationThreshold are absent when threshold is not set", () => {
+    const game = makeDaytimeGameWithNominations(
+      [{ nominatorId: "p2", defendantId: "p3" }],
+      undefined,
+    );
+    const result = service.extractDaytimeNightState(game, "p2");
+    expect(result.nominations).toBeUndefined();
+    expect(result.nominationThreshold).toBeUndefined();
+  });
+
+  it("returns empty nominations array and threshold when no nominations exist", () => {
+    const game = makeDaytimeGameWithNominations([], 2);
+    const result = service.extractDaytimeNightState(game, "p2");
+    expect(result.nominations).toEqual([]);
+    expect(result.nominationThreshold).toBe(2);
+  });
+
+  it("aggregates nomination counts by defendant", () => {
+    const game = makeDaytimeGameWithNominations(
+      [
+        { nominatorId: "p2", defendantId: "p3" },
+        { nominatorId: "p1", defendantId: "p3" },
+      ],
+      2,
+    );
+    const result = service.extractDaytimeNightState(game, "p2");
+    expect(result.nominations).toContainEqual({ defendantId: "p3", count: 2 });
+  });
+
+  it("sets myNominatedDefendantId when caller has a nomination", () => {
+    const game = makeDaytimeGameWithNominations(
+      [{ nominatorId: "p2", defendantId: "p3" }],
+      2,
+    );
+    const result = service.extractDaytimeNightState(game, "p2");
+    expect(result.myNominatedDefendantId).toBe("p3");
+  });
+
+  it("myNominatedDefendantId is absent when caller has no nomination", () => {
+    const game = makeDaytimeGameWithNominations(
+      [{ nominatorId: "p1", defendantId: "p3" }],
+      2,
+    );
+    const result = service.extractDaytimeNightState(game, "p2");
+    expect(result.myNominatedDefendantId).toBeUndefined();
+  });
+
+  it("separates counts per defendant across multiple defendants", () => {
+    const game = makeDaytimeGameWithNominations(
+      [
+        { nominatorId: "p1", defendantId: "p3" },
+        { nominatorId: "p2", defendantId: "p1" },
+      ],
+      2,
+    );
+    const result = service.extractDaytimeNightState(game, "p1");
+    expect(result.nominations).toHaveLength(2);
+    expect(result.nominations).toContainEqual({ defendantId: "p3", count: 1 });
+    expect(result.nominations).toContainEqual({ defendantId: "p1", count: 1 });
+  });
+});

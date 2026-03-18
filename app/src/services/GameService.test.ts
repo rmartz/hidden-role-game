@@ -116,3 +116,48 @@ describe("GameService.getPlayerGameState", () => {
     ]);
   });
 });
+
+// ---------------------------------------------------------------------------
+// getPlayerGameState — narrator nominationThreshold
+// ---------------------------------------------------------------------------
+
+function makeNarratorGame(nominationThreshold?: number): Game {
+  return {
+    id: "game-1",
+    lobbyId: "lobby-1",
+    gameMode: GameMode.SecretVillain,
+    status: { type: GameStatus.Playing },
+    players: [makePlayer("narrator"), makePlayer("p1"), makePlayer("p2")],
+    roleAssignments: [
+      { playerId: "p1", roleDefinitionId: "good" },
+      { playerId: "p2", roleDefinitionId: "bad" },
+    ],
+    configuredRoleSlots: DEFAULT_SLOTS,
+    showRolesInPlay: ShowRolesInPlay.None,
+    ownerPlayerId: "narrator",
+    ...(nominationThreshold !== undefined ? { nominationThreshold } : {}),
+  };
+}
+
+describe("GameService.getPlayerGameState — narrator nominationThreshold", () => {
+  const service = new GameService();
+
+  it("narrator state includes nominationThreshold when set on game", () => {
+    const game = makeNarratorGame(2);
+    const result = service.getPlayerGameState(game, "narrator");
+    expect(result?.nominationThreshold).toBe(2);
+  });
+
+  it("narrator state omits nominationThreshold when not set on game", () => {
+    const game = makeNarratorGame();
+    const result = service.getPlayerGameState(game, "narrator");
+    expect(result?.nominationThreshold).toBeUndefined();
+  });
+
+  it("narrator state has myPlayerId undefined and myRole undefined", () => {
+    const game = makeNarratorGame(2);
+    const result = service.getPlayerGameState(game, "narrator");
+    expect(result?.myPlayerId).toBeUndefined();
+    expect(result?.myRole).toBeUndefined();
+  });
+});

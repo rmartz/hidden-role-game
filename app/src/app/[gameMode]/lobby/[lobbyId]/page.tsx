@@ -104,7 +104,7 @@ export default function LobbyPage() {
 
   const startGameMutation = useStartGame(lobbyId);
   const transferOwnerMutation = useTransferOwner(lobbyId);
-  const { flush: flushConfigSync } = useConfigSync(
+  const { flushAsync: flushConfigSync } = useConfigSync(
     lobbyId,
     isOwner,
     wsConnected,
@@ -112,6 +112,14 @@ export default function LobbyPage() {
 
   function handleRefetch() {
     void fetchLobby.refetch();
+  }
+
+  async function handleStartGame(
+    roleSlots: Parameters<typeof startGameMutation.mutate>[0]["roleSlots"],
+    gameMode: Parameters<typeof startGameMutation.mutate>[0]["gameMode"],
+  ) {
+    await flushConfigSync();
+    startGameMutation.mutate({ roleSlots, gameMode });
   }
 
   if (!validatedGameMode || storedLobbyId === undefined || hasDifferentLobby)
@@ -127,7 +135,7 @@ export default function LobbyPage() {
             readOnly={false}
             isPending={startGameMutation.isPending}
             onStartGame={(roleSlots, gameModeArg) => {
-              startGameMutation.mutate({ roleSlots, gameMode: gameModeArg });
+              void handleStartGame(roleSlots, gameModeArg);
             }}
           />
         ) : (
@@ -193,7 +201,7 @@ export default function LobbyPage() {
             removeMutation.mutate(playerId);
           }}
           onTransferOwner={(playerId: string) => {
-            flushConfigSync();
+            void flushConfigSync();
             transferOwnerMutation.mutate(playerId);
           }}
         />

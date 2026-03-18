@@ -77,6 +77,9 @@ export class FirebaseGameService {
         ...(nightActions ? { nightActions } : {}),
         ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
         ...(game.timerConfig ? { timerConfig: game.timerConfig } : {}),
+        ...(game.nominationThreshold !== undefined
+          ? { nominationThreshold: game.nominationThreshold }
+          : {}),
       };
     }
 
