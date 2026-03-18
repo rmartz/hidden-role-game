@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import type { RoleDefinition, Team } from "@/lib/types";
 import { InfoIcon } from "lucide-react";
 import {
@@ -12,9 +13,11 @@ import {
 interface RoleTooltipProps {
   role: RoleDefinition<string, Team>;
   srLabel: string;
+  /** Optional content rendered before the info icon, included in the tap target. */
+  children?: ReactNode;
 }
 
-export function RoleTooltip({ role, srLabel }: RoleTooltipProps) {
+export function RoleTooltip({ role, srLabel, children }: RoleTooltipProps) {
   if (!role.summary && !role.description) return null;
 
   return (
@@ -24,11 +27,12 @@ export function RoleTooltip({ role, srLabel }: RoleTooltipProps) {
           render={
             <button
               type="button"
-              className="inline-flex items-center text-muted-foreground hover:text-foreground"
+              className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
             />
           }
         >
-          <InfoIcon className="size-3.5" />
+          {children}
+          <InfoIcon className="size-3.5 shrink-0" />
           <span className="sr-only">{srLabel}</span>
         </TooltipTrigger>
         <TooltipContent

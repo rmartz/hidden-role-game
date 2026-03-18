@@ -57,12 +57,15 @@ export function PlayersRoleList({
                   <ItemTitle>{player.name}</ItemTitle>
                 </ItemContent>
                 <ItemActions>
-                  <RoleLabel role={role} gameMode={gameMode} />
-                  {fullRole && (
+                  {fullRole ? (
                     <RoleTooltip
                       role={fullRole}
                       srLabel={WEREWOLF_COPY.roleDisplay.roleInfoLabel}
-                    />
+                    >
+                      <RoleLabel role={role} gameMode={gameMode} />
+                    </RoleTooltip>
+                  ) : (
+                    <RoleLabel role={role} gameMode={gameMode} />
                   )}
                   {renderActions?.(player.id, false)}
                 </ItemActions>
@@ -85,12 +88,15 @@ export function PlayersRoleList({
                     </ItemTitle>
                   </ItemContent>
                   <ItemActions>
-                    <RoleLabel role={role} gameMode={gameMode} />
-                    {fullRole && (
+                    {fullRole ? (
                       <RoleTooltip
                         role={fullRole}
                         srLabel={WEREWOLF_COPY.roleDisplay.roleInfoLabel}
-                      />
+                      >
+                        <RoleLabel role={role} gameMode={gameMode} />
+                      </RoleTooltip>
+                    ) : (
+                      <RoleLabel role={role} gameMode={gameMode} />
                     )}
                     {renderActions?.(player.id, true)}
                   </ItemActions>
