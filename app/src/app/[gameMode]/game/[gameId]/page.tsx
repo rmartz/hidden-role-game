@@ -5,7 +5,6 @@ import { useParams, useRouter } from "next/navigation";
 import { GameMode, GameStatus } from "@/lib/types";
 import { useGameStateQuery, GameModeContext } from "@/hooks";
 import { WerewolfGameScreen } from "@/components/game";
-import { DebugGameStateButton } from "@/components/debug";
 import { parseGameMode } from "@/lib/game-modes";
 import { GAME_PAGE_COPY } from "../copy";
 import { UnsupportedGameMode } from "../UnsupportedGameMode";
@@ -66,9 +65,6 @@ export default function GameModePage() {
     <GameModeContext.Provider value={validatedGameMode}>
       {gameState ? (
         <>
-          <div className="fixed bottom-4 right-4 z-50">
-            <DebugGameStateButton gameState={gameState} />
-          </div>
           {validatedGameMode === GameMode.Werewolf ? (
             <WerewolfGameScreen gameId={gameId} gameState={gameState} />
           ) : (

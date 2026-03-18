@@ -1,1 +1,1 @@
-export { DebugGameStateButton } from "./DebugGameStateButton";
+export { JsonTree } from "./JsonTree";

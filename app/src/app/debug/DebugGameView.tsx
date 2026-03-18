@@ -4,10 +4,9 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import type { GameMode } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { useGameStateQuery } from "@/hooks";
-import { DebugGameStateButton } from "@/components/debug";
 import type { DebugPlayer } from "@/app/api/debug/game/route";
 import { GameScreenForPlayer } from "./GameScreenForPlayer";
+import { DebugAllStatesButton } from "./DebugAllStatesButton";
 
 export interface GameInfo {
   gameId: string;
@@ -25,8 +24,6 @@ export function DebugGameView({
   const queryClient = useQueryClient();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const { gameId, gameMode, players } = gameInfo;
-
-  const { data: gameState } = useGameStateQuery(gameId, gameMode);
 
   function handleSelectPlayer(index: number) {
     const player = players[index];
@@ -47,7 +44,11 @@ export function DebugGameView({
         </Button>
         <div className="h-4 w-px bg-border" />
         <div className="flex gap-1.5 flex-wrap">
-          {gameState && <DebugGameStateButton gameState={gameState} />}
+          <DebugAllStatesButton
+            gameId={gameId}
+            gameMode={gameMode}
+            players={players}
+          />
           {players.map((player, i) => (
             <Button
               key={player.id}
