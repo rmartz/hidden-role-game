@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { GAME_MODES } from "@/lib/game-modes";
 import type { GameMode } from "@/lib/types";
 import type { PublicRoleInfo } from "@/server/types";
@@ -18,29 +19,50 @@ interface RoleLabelProps {
 }
 
 export function RoleLabel({ role, gameMode }: RoleLabelProps) {
+  const [open, setOpen] = useState(false);
+
   const modeConfig = gameMode ? GAME_MODES[gameMode] : undefined;
   const teamLabel = modeConfig?.teamLabels[role.team] ?? role.team;
   const fullRole = modeConfig?.roles[role.id];
   const hasInfo = !!(fullRole?.summary ?? fullRole?.description);
 
+  // Team label is always visible when tooltip is open (covers tap case);
+  // otherwise revealed by CSS hover alone.
+  const teamRevealClass = open
+    ? "max-w-[10rem] opacity-100"
+    : "max-w-0 opacity-0 group-hover:max-w-[10rem] group-hover:opacity-100";
+
+  const teamReveal = (
+    <span
+      className={`inline-block overflow-hidden whitespace-nowrap transition-all duration-500 ${teamRevealClass}`}
+    >
+      &nbsp;({teamLabel})
+    </span>
+  );
+
   const badge = (
     <Badge variant="secondary" className={hasInfo ? undefined : "group"}>
       {role.name}
-      <span className="inline-block overflow-hidden max-w-0 opacity-0 group-hover:max-w-[10rem] group-hover:opacity-100 transition-all duration-500 whitespace-nowrap">
-        &nbsp;({teamLabel})
-      </span>
+      {teamReveal}
       {hasInfo && <InfoIcon className="opacity-60" />}
     </Badge>
   );
 
-  return hasInfo ? (
+  if (!hasInfo) {
+    return badge;
+  }
+
+  return (
     <TooltipProvider>
-      <Tooltip>
+      <Tooltip open={open} onOpenChange={setOpen}>
         <TooltipTrigger
           render={
             <button
               type="button"
               className="group inline-flex hover:opacity-80"
+              onClick={() => {
+                setOpen((v) => !v);
+              }}
             />
           }
         >
@@ -60,7 +82,5 @@ export function RoleLabel({ role, gameMode }: RoleLabelProps) {
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
-  ) : (
-    badge
   );
 }
