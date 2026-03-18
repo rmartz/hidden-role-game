@@ -114,7 +114,7 @@ export interface PlayerGameState {
    * Current nominations for trial (sanitized: no nominator identities visible to players).
    * Only populated during daytime when nominationsEnabled is true.
    */
-  nominations?: { defendantId: string; count: number }[];
+  nominations?: { defendantId: string; nominatorIds: string[] }[];
   /** The defendant this player has nominated, if any. */
   myNominatedDefendantId?: string;
   /** Active elimination trial. Sanitized view: no raw per-player vote breakdown. */

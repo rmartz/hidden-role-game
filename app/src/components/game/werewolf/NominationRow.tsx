@@ -1,14 +1,12 @@
 "use client";
 
-import {
-  WEREWOLF_COPY,
-  NOMINATION_VOTE_THRESHOLD,
-} from "@/lib/game-modes/werewolf";
+import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 import { Button } from "@/components/ui/button";
 
 interface NominationRowProps {
   player: { id: string; name: string };
-  count: number;
+  nominatorIds: string[];
+  players: { id: string; name: string }[];
   isMyTarget: boolean;
   canAct: boolean;
   isPending: boolean;
@@ -17,17 +15,22 @@ interface NominationRowProps {
 
 export function NominationRow({
   player,
-  count,
+  nominatorIds,
+  players,
   isMyTarget,
   canAct,
   isPending,
   onNominate,
 }: NominationRowProps) {
   const { nomination } = WEREWOLF_COPY;
-  const buttonLabel =
-    count > 0
-      ? nomination.secondButton(player.name)
-      : nomination.nominateButton(player.name);
+  const isNominated = nominatorIds.length > 0;
+  const buttonLabel = isNominated
+    ? nomination.secondButton(player.name)
+    : nomination.nominateButton(player.name);
+
+  const playerById = new Map(players.map((p) => [p.id, p]));
+  const nominatorName =
+    playerById.get(nominatorIds[0] ?? "")?.name ?? "Unknown";
 
   const actionElement = isMyTarget ? (
     <span className="text-xs text-muted-foreground italic">
@@ -49,9 +52,9 @@ export function NominationRow({
   return (
     <li className="flex items-center gap-3">
       <span className="flex-1 text-sm">{player.name}</span>
-      {count > 0 && (
+      {isNominated && (
         <span className="text-xs text-muted-foreground">
-          {nomination.nominationCount(count, NOMINATION_VOTE_THRESHOLD)}
+          {nomination.nominatedBy(nominatorName)}
         </span>
       )}
       {actionElement}

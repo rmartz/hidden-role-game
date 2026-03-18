@@ -105,14 +105,13 @@ export function OwnerGameDayScreen({
           roles={modeConfig.roles}
         />
       </div>
-      {gameState.nominationsEnabled && (
+      {gameState.nominationsEnabled && !hasActiveTrial && (
         <NominationPanel
           gameId={gameId}
           players={gameState.players}
           nominations={gameState.nominations ?? []}
           deadPlayerIds={gameState.deadPlayerIds}
           gameOwnerId={gameState.gameOwner?.id}
-          hasActiveTrial={hasActiveTrial}
         />
       )}
       <OwnerPlayerActionsGrid

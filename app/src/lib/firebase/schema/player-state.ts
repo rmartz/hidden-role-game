@@ -50,7 +50,7 @@ export interface FirebasePlayerState {
     eliminatedRole?: { id: string; name: string; team: string };
   };
   nominationsEnabled?: boolean;
-  nominations?: { defendantId: string; count: number }[];
+  nominations?: { defendantId: string; nominatorIds: string[] }[];
   myNominatedDefendantId?: string;
 }
 

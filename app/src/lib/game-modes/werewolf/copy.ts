@@ -104,10 +104,10 @@ export const WEREWOLF_COPY = {
     secondButton: (name: string) => `Second ${name}`,
     withdrawButton: "Withdraw Nomination",
     yourNomination: "Your nomination",
-    nominationCount: (count: number, threshold: number) =>
-      `${String(count)}/${String(threshold)}`,
-    autoTrialNote: (threshold: number) =>
-      `${String(threshold)} nominations triggers an automatic trial.`,
+    subtitle:
+      "Nominate a player to accuse them. A second nomination triggers a trial.",
+    nominatedBy: (name: string) => `Nominated by ${name}`,
+    youAreNominated: (name: string) => `You have been nominated by ${name}`,
   },
   narrator: {
     nightTitle: (turn: number, phase: number, total: number) =>

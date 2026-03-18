@@ -286,15 +286,14 @@ export class GameSerializationService {
     // Include nomination state when nominations are enabled.
     if (game.nominationsEnabled) {
       const nominations = phase.nominations ?? [];
-      const nominationCounts = nominations.reduce<Record<string, number>>(
-        (acc, n) => {
-          acc[n.defendantId] = (acc[n.defendantId] ?? 0) + 1;
-          return acc;
-        },
-        {},
-      );
-      result.nominations = Object.entries(nominationCounts).map(
-        ([defendantId, count]) => ({ defendantId, count }),
+      const nominatorsByDefendant = nominations.reduce<
+        Record<string, string[]>
+      >((acc, n) => {
+        (acc[n.defendantId] ??= []).push(n.nominatorId);
+        return acc;
+      }, {});
+      result.nominations = Object.entries(nominatorsByDefendant).map(
+        ([defendantId, nominatorIds]) => ({ defendantId, nominatorIds }),
       );
       const myNomination = nominations.find((n) => n.nominatorId === callerId);
       if (myNomination) {

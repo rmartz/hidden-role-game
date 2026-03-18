@@ -75,7 +75,7 @@ export function PlayerGameDayScreen({
         nightStatus={gameState.nightStatus}
       />
 
-      {gameState.nominationsEnabled && (
+      {gameState.nominationsEnabled && !hasActiveTrial && (
         <NominationPanel
           gameId={gameId}
           players={gameState.players}
@@ -85,7 +85,6 @@ export function PlayerGameDayScreen({
           myNominatedDefendantId={gameState.myNominatedDefendantId}
           deadPlayerIds={gameState.deadPlayerIds}
           gameOwnerId={gameState.gameOwner?.id}
-          hasActiveTrial={hasActiveTrial}
         />
       )}
 

@@ -1,11 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import {
-  WEREWOLF_COPY,
-  WerewolfAction,
-  NOMINATION_VOTE_THRESHOLD,
-} from "@/lib/game-modes/werewolf";
+import { WEREWOLF_COPY, WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
 import { useGameAction } from "@/hooks";
 import { Button } from "@/components/ui/button";
@@ -21,7 +17,6 @@ interface NominationPanelProps {
   myNominatedDefendantId?: string;
   deadPlayerIds?: string[];
   gameOwnerId?: string;
-  hasActiveTrial: boolean;
 }
 
 export function NominationPanel({
@@ -33,7 +28,6 @@ export function NominationPanel({
   myNominatedDefendantId,
   deadPlayerIds,
   gameOwnerId,
-  hasActiveTrial,
 }: NominationPanelProps) {
   const action = useGameAction(gameId);
   const { nomination } = WEREWOLF_COPY;
@@ -60,24 +54,58 @@ export function NominationPanel({
   );
 
   const nominationMap = new Map(
-    nominations.map((n) => [n.defendantId, n.count]),
+    nominations.map((n) => [n.defendantId, n.nominatorIds]),
   );
 
-  // Can act = alive, non-owner player, no active trial in progress
-  const canAct = !!myPlayerId && !amDead && !hasActiveTrial;
+  const canAct = !!myPlayerId && !amDead;
+
+  const nominatedPlayers = eligiblePlayers.filter(
+    (p) => (nominationMap.get(p.id)?.length ?? 0) > 0,
+  );
+  const unnominatedPlayers = eligiblePlayers.filter(
+    (p) => (nominationMap.get(p.id)?.length ?? 0) === 0,
+  );
+
+  const myNomination = myPlayerId
+    ? nominations.find((n) => n.nominatorIds.includes(myPlayerId))
+    : undefined;
+  const myNominatorId = myPlayerId
+    ? nominations.find((n) => n.defendantId === myPlayerId)?.nominatorIds[0]
+    : undefined;
+  const myNominatorName = myNominatorId
+    ? players.find((p) => p.id === myNominatorId)?.name
+    : undefined;
 
   return (
     <Card className="p-4 mb-4">
       <p className="font-semibold mb-1">{nomination.heading}</p>
       <p className="text-sm text-muted-foreground mb-3">
-        {nomination.autoTrialNote(NOMINATION_VOTE_THRESHOLD)}
+        {nomination.subtitle}
       </p>
+      {myNominatorName && (
+        <p className="text-sm font-medium text-destructive mb-3">
+          {nomination.youAreNominated(myNominatorName)}
+        </p>
+      )}
       <ul className="space-y-2">
-        {eligiblePlayers.map((player) => (
+        {nominatedPlayers.map((player) => (
           <NominationRow
             key={player.id}
             player={player}
-            count={nominationMap.get(player.id) ?? 0}
+            nominatorIds={nominationMap.get(player.id) ?? []}
+            players={players}
+            isMyTarget={myNominatedDefendantId === player.id}
+            canAct={canAct}
+            isPending={action.isPending}
+            onNominate={nominate}
+          />
+        ))}
+        {unnominatedPlayers.map((player) => (
+          <NominationRow
+            key={player.id}
+            player={player}
+            nominatorIds={[]}
+            players={players}
             isMyTarget={myNominatedDefendantId === player.id}
             canAct={canAct}
             isPending={action.isPending}
@@ -85,7 +113,7 @@ export function NominationPanel({
           />
         ))}
       </ul>
-      {canAct && myNominatedDefendantId && (
+      {canAct && myNomination && (
         <div className="mt-3">
           <Button
             size="sm"

@@ -562,7 +562,7 @@ describe("GameSerializationService.extractDaytimeNightState — nominations", ()
     expect(result.nominations).toEqual([]);
   });
 
-  it("aggregates nomination counts by defendant", () => {
+  it("aggregates nominator IDs by defendant", () => {
     const game = makeDaytimeGameWithNominations(
       [
         { nominatorId: "p2", defendantId: "p3" },
@@ -571,7 +571,10 @@ describe("GameSerializationService.extractDaytimeNightState — nominations", ()
       true,
     );
     const result = service.extractDaytimeNightState(game, "p2");
-    expect(result.nominations).toContainEqual({ defendantId: "p3", count: 2 });
+    expect(result.nominations).toContainEqual({
+      defendantId: "p3",
+      nominatorIds: ["p2", "p1"],
+    });
   });
 
   it("sets myNominatedDefendantId when caller has a nomination", () => {
@@ -602,7 +605,13 @@ describe("GameSerializationService.extractDaytimeNightState — nominations", ()
     );
     const result = service.extractDaytimeNightState(game, "p1");
     expect(result.nominations).toHaveLength(2);
-    expect(result.nominations).toContainEqual({ defendantId: "p3", count: 1 });
-    expect(result.nominations).toContainEqual({ defendantId: "p1", count: 1 });
+    expect(result.nominations).toContainEqual({
+      defendantId: "p3",
+      nominatorIds: ["p1"],
+    });
+    expect(result.nominations).toContainEqual({
+      defendantId: "p1",
+      nominatorIds: ["p2"],
+    });
   });
 });
