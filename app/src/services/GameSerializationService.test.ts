@@ -526,10 +526,10 @@ function makeDaytimeGameWithNominations(
     gameMode: GameMode.Werewolf,
     status: { type: GameStatus.Playing, turnState },
     players: [
-      { id: "owner", name: "Owner", sessionId: "s0", visibleRoles: [] },
-      { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
-      { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
-      { id: "p3", name: "Charlie", sessionId: "s3", visibleRoles: [] },
+      { id: "owner", name: "Owner", sessionId: "s0", visiblePlayers: [] },
+      { id: "p1", name: "Alice", sessionId: "s1", visiblePlayers: [] },
+      { id: "p2", name: "Bob", sessionId: "s2", visiblePlayers: [] },
+      { id: "p3", name: "Charlie", sessionId: "s3", visiblePlayers: [] },
     ],
     roleAssignments: [
       { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },

@@ -107,6 +107,8 @@ export function OwnerGameNightScreen({
 
   const activePlayerNames = gameState.visibleRoleAssignments
     .filter((a) => {
+      // Narrator always receives role info (reason: "revealed"), but the
+      // type allows role to be undefined for player-facing entries.
       if (!a.role) return false;
       if (a.role.id === baseActivePhaseKey) return true;
       if (isGroupPhase) {

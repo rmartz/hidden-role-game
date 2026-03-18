@@ -165,7 +165,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     name: "Minion",
     summary: "A secret servant of the werewolves",
     description:
-      "The Minion knows who the Werewolves are, but the Werewolves do not know the Minion's identity. The Minion wins with Team Bad. The Seer's investigation reveals the Minion is not a Werewolf.",
+      "The Minion knows who the Werewolves are, but the Werewolves do not know the Minion's identity. The Minion wins with the Werewolves. The Seer's investigation reveals the Minion is not a Werewolf.",
     team: Team.Bad,
     awareOf: { werewolves: true },
     wakesAtNight: WakesAtNight.FirstNightOnly,
