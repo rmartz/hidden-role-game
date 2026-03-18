@@ -15,11 +15,13 @@ function JsonTreeNode({
 }: JsonTreeNodeProps) {
   const [expanded, setExpanded] = useState(defaultExpanded);
 
-  if (value === null) {
+  if (value === null || value === undefined) {
     return (
       <div className="flex gap-1">
         <span className="text-muted-foreground">{label}:</span>
-        <span className="text-orange-500">null</span>
+        <span className="text-orange-500">
+          {value === null ? "null" : "undefined"}
+        </span>
       </div>
     );
   }
