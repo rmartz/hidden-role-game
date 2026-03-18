@@ -59,9 +59,15 @@ export interface SilencedNightResolutionEvent {
   targetPlayerId: string;
 }
 
+export interface ToughGuyAbsorbedNightResolutionEvent {
+  type: "tough-guy-absorbed";
+  targetPlayerId: string;
+}
+
 export type NightResolutionEvent =
   | AttackNightResolutionEvent
-  | SilencedNightResolutionEvent;
+  | SilencedNightResolutionEvent
+  | ToughGuyAbsorbedNightResolutionEvent;
 
 export type DaytimeVote = "guilty" | "innocent";
 
@@ -102,6 +108,10 @@ export interface WerewolfTurnState {
   lastTargets?: Record<string, string>;
   /** True if a Wolf Cub died this turn — Werewolves get two phases the following night. */
   wolfCubDied?: boolean;
+  /** Maps warded player ID → Priest player ID. Ward persists until the warded player is attacked. */
+  priestWards?: Record<string, string>;
+  /** Player IDs of Tough Guys who have already survived one attack. */
+  toughGuyHitIds?: string[];
 }
 
 export interface TargetablePlayer {

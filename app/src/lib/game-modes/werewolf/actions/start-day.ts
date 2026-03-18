@@ -1,14 +1,14 @@
 import { GameStatus } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase, isTeamNightAction } from "../types";
-import type { WerewolfNighttimePhase } from "../types";
+import type { NightAction, WerewolfNighttimePhase } from "../types";
 import {
   currentTurnState,
   isOwnerPlaying,
   resolveNightActions,
   checkWinCondition,
 } from "../utils";
-import { WEREWOLF_ROLES } from "../roles";
+import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
 import { didWolfCubDie } from "./helpers";
 
@@ -25,10 +25,45 @@ export const startDayAction: GameAction = {
       nightPhase.nightActions,
       game.roleAssignments,
       ts.deadPlayerIds,
+      {
+        priestWards: ts.priestWards,
+        toughGuyHitIds: ts.toughGuyHitIds,
+      },
     );
     const newDeadIds = nightResolution
       .filter((e) => e.type === "killed" && e.died)
       .map((e) => e.targetPlayerId);
+
+    // Track Tough Guy hits: players who absorbed an attack this night.
+    const newToughGuyHitIds = nightResolution
+      .filter((e) => e.type === "tough-guy-absorbed")
+      .map((e) => e.targetPlayerId);
+    const toughGuyHitIds = [...(ts.toughGuyHitIds ?? []), ...newToughGuyHitIds];
+
+    // Priest wards: consume wards for warded players who were attacked,
+    // then add new wards from this night's Priest action.
+    const attackedPlayerIds = new Set(
+      nightResolution
+        .filter((e) => e.type === "killed")
+        .map((e) => e.targetPlayerId),
+    );
+    const priestWards: Record<string, string> = {};
+    for (const [wardedId, priestId] of Object.entries(ts.priestWards ?? {})) {
+      if (!attackedPlayerIds.has(wardedId)) {
+        priestWards[wardedId] = priestId;
+      }
+    }
+    const priestAction = nightPhase.nightActions[
+      WerewolfRole.Priest as string
+    ] as NightAction | undefined;
+    if (priestAction?.targetPlayerId) {
+      const priestPlayerId = game.roleAssignments.find(
+        (a) => a.roleDefinitionId === (WerewolfRole.Priest as string),
+      )?.playerId;
+      if (priestPlayerId) {
+        priestWards[priestAction.targetPlayerId] = priestPlayerId;
+      }
+    }
 
     // Build lastTargets for roles that prevent consecutive same-player targeting.
     const lastTargets: Record<string, string> = {};
@@ -65,6 +100,8 @@ export const startDayAction: GameAction = {
         ...(ts.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
         ...(Object.keys(lastTargets).length > 0 ? { lastTargets } : {}),
         ...(wolfCubDied ? { wolfCubDied: true } : {}),
+        ...(Object.keys(priestWards).length > 0 ? { priestWards } : {}),
+        ...(toughGuyHitIds.length > 0 ? { toughGuyHitIds } : {}),
       },
     };
   },

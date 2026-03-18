@@ -43,6 +43,10 @@ export const startNightAction: GameAction = {
         deadPlayerIds: ts.deadPlayerIds,
         ...(ts.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
         ...(ts.lastTargets ? { lastTargets: ts.lastTargets } : {}),
+        ...(ts.priestWards ? { priestWards: ts.priestWards } : {}),
+        ...(ts.toughGuyHitIds?.length
+          ? { toughGuyHitIds: ts.toughGuyHitIds }
+          : {}),
       },
     };
   },

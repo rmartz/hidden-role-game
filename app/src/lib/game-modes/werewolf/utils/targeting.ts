@@ -49,7 +49,8 @@ export function getTargetablePlayers(
     ];
     const restrictsSelf =
       role?.targetCategory === TargetCategory.Attack ||
-      role?.targetCategory === TargetCategory.Investigate;
+      role?.targetCategory === TargetCategory.Investigate ||
+      role?.preventSelfTarget === true;
     if (restrictsSelf) {
       if (myPlayerId !== undefined) excludeIds.push(myPlayerId);
       for (const a of visibleRoleAssignments) {

@@ -80,6 +80,14 @@ export const setNightTargetAction: GameAction = {
     )
       return false;
 
+    // Priest cannot target when they have an active ward on a living player.
+    if (isRoleActive(phaseKey, WerewolfRole.Priest) && ts.priestWards) {
+      const hasActiveWard = Object.keys(ts.priestWards).some(
+        (wardedId) => !ts.deadPlayerIds.includes(wardedId),
+      );
+      if (hasActiveWard) return false;
+    }
+
     // Attack and Investigate roles cannot target themselves.
     if (targetPlayerId === callerId) {
       const callerAssignment = game.roleAssignments.find(
@@ -92,7 +100,8 @@ export const setNightTargetAction: GameAction = {
         : undefined;
       if (
         callerRoleDef?.targetCategory === TargetCategory.Attack ||
-        callerRoleDef?.targetCategory === TargetCategory.Investigate
+        callerRoleDef?.targetCategory === TargetCategory.Investigate ||
+        callerRoleDef?.preventSelfTarget === true
       )
         return false;
     }
