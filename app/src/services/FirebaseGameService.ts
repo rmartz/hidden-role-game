@@ -6,8 +6,9 @@ import type {
   GamePlayer,
   LobbyPlayer,
   RoleSlot,
+  VisibilityReason,
 } from "@/lib/types";
-import type { PublicRoleInfo, PlayerGameState } from "@/server/types";
+import type { PlayerGameState, VisibleTeammate } from "@/server/types";
 import { GAME_MODES } from "@/lib/game-modes";
 import { getPlayer } from "@/lib/player-utils";
 import { assignRoles, adjustRoleSlots } from "@/server/utils";
@@ -60,6 +61,7 @@ export class FirebaseGameService {
           return [
             {
               player: { id: player.id, name: player.name },
+              reason: "revealed" as const,
               role: { id: role.id, name: role.name, team: role.team },
             },
           ];
@@ -93,21 +95,18 @@ export class FirebaseGameService {
     if (!myRole) return null;
 
     // Start with teammate visibility.
-    const visibleRoleAssignments = caller.visibleRoles.flatMap((assignment) => {
-      const player = playerById.get(assignment.playerId);
-      const role = roles[assignment.roleDefinitionId];
-      if (!player || !role) return [];
-      return [
-        {
-          player: { id: player.id, name: player.name },
-          role: {
-            id: role.id,
-            name: role.name,
-            team: role.team,
-          } as PublicRoleInfo,
-        },
-      ];
-    });
+    const visibleRoleAssignments: VisibleTeammate[] =
+      caller.visiblePlayers.flatMap((vp) => {
+        const visiblePlayer = playerById.get(vp.playerId);
+        if (!visiblePlayer) return [];
+        return [
+          {
+            player: { id: visiblePlayer.id, name: visiblePlayer.name },
+            reason: vp.reason,
+            role: undefined,
+          },
+        ];
+      });
 
     // When game is finished, reveal all roles to every player.
     const isFinished = game.status.type === GameStatus.Finished;
@@ -130,6 +129,7 @@ export class FirebaseGameService {
       if (!revealPlayer || !revealRole) continue;
       visibleRoleAssignments.push({
         player: { id: revealPlayer.id, name: revealPlayer.name },
+        reason: "revealed",
         role: {
           id: revealRole.id,
           name: revealRole.name,
@@ -222,7 +222,7 @@ export class FirebaseGameService {
         roleAssignments,
         roles,
       ),
-      ...(ownerPlayer ? [{ ...ownerPlayer, visibleRoles: [] }] : []),
+      ...(ownerPlayer ? [{ ...ownerPlayer, visiblePlayers: [] }] : []),
     ];
 
     const game: Game = {
@@ -265,7 +265,7 @@ export class FirebaseGameService {
     if (!data.public) return undefined;
 
     // Reconstruct GamePlayers with sessionIds using the stored sessionIndex.
-    // visibleRoles is omitted — it's only needed at creation time for building playerState.
+    // visiblePlayers is omitted — it's only needed at creation time for building playerState.
     const playerIdToSession = new Map(
       Object.entries(data.sessionIndex ?? {}).map(([sid, pid]) => [pid, sid]),
     );
@@ -275,7 +275,10 @@ export class FirebaseGameService {
         id: p.id,
         name: p.name,
         sessionId: playerIdToSession.get(p.id) ?? "",
-        visibleRoles: p.visibleRoles ?? [],
+        visiblePlayers: (p.visiblePlayers ?? []).map((vp) => ({
+          playerId: vp.playerId,
+          reason: vp.reason as VisibilityReason,
+        })),
       }),
     );
 

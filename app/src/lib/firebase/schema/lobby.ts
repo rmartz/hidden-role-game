@@ -21,8 +21,8 @@ export interface FirebaseLobbyPublic {
 export interface FirebaseLobbyPlayer {
   id: string;
   name: string;
-  /** Role assignments visible to this player (teammates they can see). Absent for the game owner. */
-  visibleRoles?: { playerId: string; roleDefinitionId: string }[];
+  /** Visible players for this player. Absent for the game owner. */
+  visiblePlayers?: { playerId: string; reason: string }[];
 }
 
 export interface FirebaseLobbyConfig {

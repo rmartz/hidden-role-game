@@ -1,4 +1,4 @@
-import { GameStatus, Team } from "@/lib/types";
+import { GameStatus } from "@/lib/types";
 import type { Game, RoleDefinition } from "@/lib/types";
 import type {
   DaytimeNightStatusEntry,
@@ -246,7 +246,7 @@ export class GameSerializationService {
         : undefined;
       result.investigationResult = {
         targetPlayerId: myAction.targetPlayerId,
-        isWerewolfTeam: targetRoleDef?.team === Team.Bad,
+        isWerewolfTeam: targetRoleDef?.isWerewolf === true,
       };
     }
 

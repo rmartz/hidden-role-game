@@ -32,9 +32,13 @@ export interface RoleInPlay {
   count?: number;
 }
 
+export type VisibilityReason = "wake-partner" | "aware-of" | "revealed";
+
 export interface VisibleTeammate {
   player: PublicLobbyPlayer;
-  role: PublicRoleInfo;
+  reason: VisibilityReason;
+  /** Only present when the exact role is known (e.g., dead player reveal by narrator). */
+  role?: PublicRoleInfo;
 }
 
 /** Night effects visible during the daytime summary. */

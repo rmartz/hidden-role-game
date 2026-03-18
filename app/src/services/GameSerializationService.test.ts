@@ -43,10 +43,10 @@ function makeDaytimeGame(
     gameMode: GameMode.Werewolf,
     status: { type: GameStatus.Playing, turnState },
     players: [
-      { id: "owner", name: "Owner", sessionId: "s0", visibleRoles: [] },
-      { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
-      { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
-      { id: "p3", name: "Charlie", sessionId: "s3", visibleRoles: [] },
+      { id: "owner", name: "Owner", sessionId: "s0", visiblePlayers: [] },
+      { id: "p1", name: "Alice", sessionId: "s1", visiblePlayers: [] },
+      { id: "p2", name: "Bob", sessionId: "s2", visiblePlayers: [] },
+      { id: "p3", name: "Charlie", sessionId: "s3", visiblePlayers: [] },
     ],
     roleAssignments: [
       { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -87,7 +87,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
           deadPlayerIds: [],
         } satisfies WerewolfTurnState,
       },
-      players: [{ id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] }],
+      players: [{ id: "p2", name: "Bob", sessionId: "s2", visiblePlayers: [] }],
       roleAssignments: [
         { playerId: "p2", roleDefinitionId: WerewolfRole.Seer },
       ],
@@ -207,9 +207,9 @@ function makeNighttimeGame(
     gameMode: GameMode.Werewolf,
     status: { type: GameStatus.Playing, turnState },
     players: [
-      { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
-      { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
-      { id: "p3", name: "Witch", sessionId: "s3", visibleRoles: [] },
+      { id: "p1", name: "Alice", sessionId: "s1", visiblePlayers: [] },
+      { id: "p2", name: "Bob", sessionId: "s2", visiblePlayers: [] },
+      { id: "p3", name: "Witch", sessionId: "s3", visiblePlayers: [] },
     ],
     roleAssignments: [
       { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -316,9 +316,9 @@ function makeNighttimeGameWithBonusPhase(
     gameMode: GameMode.Werewolf,
     status: { type: GameStatus.Playing, turnState },
     players: [
-      { id: "w1", name: "Wolf1", sessionId: "sw1", visibleRoles: [] },
-      { id: "w2", name: "Wolf2", sessionId: "sw2", visibleRoles: [] },
-      { id: "p3", name: "Villager", sessionId: "s3", visibleRoles: [] },
+      { id: "w1", name: "Wolf1", sessionId: "sw1", visiblePlayers: [] },
+      { id: "w2", name: "Wolf2", sessionId: "sw2", visiblePlayers: [] },
+      { id: "p3", name: "Villager", sessionId: "s3", visiblePlayers: [] },
     ],
     roleAssignments: [
       { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -469,9 +469,9 @@ function makeDaytimeGameWithTrial(callerRoleId: WerewolfRole): Game {
     gameMode: GameMode.Werewolf,
     status: { type: GameStatus.Playing, turnState },
     players: [
-      { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
-      { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
-      { id: "p3", name: "Charlie", sessionId: "s3", visibleRoles: [] },
+      { id: "p1", name: "Alice", sessionId: "s1", visiblePlayers: [] },
+      { id: "p2", name: "Bob", sessionId: "s2", visiblePlayers: [] },
+      { id: "p3", name: "Charlie", sessionId: "s3", visiblePlayers: [] },
     ],
     roleAssignments: [
       { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -526,10 +526,10 @@ function makeDaytimeGameWithNominations(
     gameMode: GameMode.Werewolf,
     status: { type: GameStatus.Playing, turnState },
     players: [
-      { id: "owner", name: "Owner", sessionId: "s0", visibleRoles: [] },
-      { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
-      { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
-      { id: "p3", name: "Charlie", sessionId: "s3", visibleRoles: [] },
+      { id: "owner", name: "Owner", sessionId: "s0", visiblePlayers: [] },
+      { id: "p1", name: "Alice", sessionId: "s1", visiblePlayers: [] },
+      { id: "p2", name: "Bob", sessionId: "s2", visiblePlayers: [] },
+      { id: "p3", name: "Charlie", sessionId: "s3", visiblePlayers: [] },
     ],
     roleAssignments: [
       { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },

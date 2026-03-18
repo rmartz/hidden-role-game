@@ -55,7 +55,7 @@ function makeGame(overrides: Partial<Game> = {}): Game {
       id: "player-1",
       name: "Alice",
       sessionId: "session-alice",
-      visibleRoles: [],
+      visiblePlayers: [],
     },
   ];
   return {

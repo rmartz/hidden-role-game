@@ -122,7 +122,7 @@ export const WEREWOLF_COPY = {
       "Investigation result has not been revealed to the player",
     investigationResultLabel: "Investigation result:",
     teamStatus: (isWerewolfTeam: boolean) =>
-      isWerewolfTeam ? "on the Werewolf team" : "not on the Werewolf team",
+      isWerewolfTeam ? "a Werewolf" : "not a Werewolf",
     investigationResultRevealed: "Result revealed to player.",
     revealToPlayer: "Reveal to player",
   },

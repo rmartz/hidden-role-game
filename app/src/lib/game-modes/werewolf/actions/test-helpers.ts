@@ -20,11 +20,11 @@ export function makePlayingGame(
     status: { type: GameStatus.Playing, turnState },
     // 5 players: 1 Werewolf + 4 Good — keeps game alive after a single kill
     players: [
-      { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
-      { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
-      { id: "p3", name: "Charlie", sessionId: "s3", visibleRoles: [] },
-      { id: "p4", name: "Dave", sessionId: "s4", visibleRoles: [] },
-      { id: "p5", name: "Eve", sessionId: "s5", visibleRoles: [] },
+      { id: "p1", name: "Alice", sessionId: "s1", visiblePlayers: [] },
+      { id: "p2", name: "Bob", sessionId: "s2", visiblePlayers: [] },
+      { id: "p3", name: "Charlie", sessionId: "s3", visiblePlayers: [] },
+      { id: "p4", name: "Dave", sessionId: "s4", visiblePlayers: [] },
+      { id: "p5", name: "Eve", sessionId: "s5", visiblePlayers: [] },
     ],
     roleAssignments: [
       { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -117,20 +117,16 @@ export function makeTeamGame(
         id: "w1",
         name: "Wolf1",
         sessionId: "sw1",
-        visibleRoles: [
-          { playerId: "w2", roleDefinitionId: WerewolfRole.Werewolf },
-        ],
+        visiblePlayers: [{ playerId: "w2", reason: "wake-partner" as const }],
       },
       {
         id: "w2",
         name: "Wolf2",
         sessionId: "sw2",
-        visibleRoles: [
-          { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
-        ],
+        visiblePlayers: [{ playerId: "w1", reason: "wake-partner" as const }],
       },
-      { id: "p3", name: "Seer", sessionId: "s3", visibleRoles: [] },
-      { id: "p4", name: "Villager", sessionId: "s4", visibleRoles: [] },
+      { id: "p3", name: "Seer", sessionId: "s3", visiblePlayers: [] },
+      { id: "p4", name: "Villager", sessionId: "s4", visiblePlayers: [] },
     ],
     roleAssignments: [
       { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },

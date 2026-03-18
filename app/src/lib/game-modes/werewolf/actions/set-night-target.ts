@@ -100,8 +100,8 @@ export const setNightTargetAction: GameAction = {
     // Group phases: cannot target players the caller knows are team members.
     if (isGroupPhaseKey(phaseKey) && !isOwner) {
       const caller = getPlayer(game.players, callerId);
-      const visibleTeammateIds = (caller?.visibleRoles ?? []).map(
-        (vr) => vr.playerId,
+      const visibleTeammateIds = (caller?.visiblePlayers ?? []).map(
+        (vp) => vp.playerId,
       );
       if (visibleTeammateIds.includes(targetPlayerId)) return false;
     }

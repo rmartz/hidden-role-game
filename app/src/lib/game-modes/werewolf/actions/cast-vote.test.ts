@@ -155,9 +155,9 @@ describe("WerewolfAction.CastVote", () => {
         makeDayStateWithTrial({ defendantId: "p1", votes: [] }),
         {
           players: [
-            { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
-            { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
-            { id: "p3", name: "Charlie", sessionId: "s3", visibleRoles: [] },
+            { id: "p1", name: "Alice", sessionId: "s1", visiblePlayers: [] },
+            { id: "p2", name: "Bob", sessionId: "s2", visiblePlayers: [] },
+            { id: "p3", name: "Charlie", sessionId: "s3", visiblePlayers: [] },
           ],
           roleAssignments: [
             { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -187,9 +187,9 @@ describe("WerewolfAction.CastVote", () => {
         }),
         {
           players: [
-            { id: "p1", name: "Wolf", sessionId: "s1", visibleRoles: [] },
-            { id: "p2", name: "Seer", sessionId: "s2", visibleRoles: [] },
-            { id: "p3", name: "Villager", sessionId: "s3", visibleRoles: [] },
+            { id: "p1", name: "Wolf", sessionId: "s1", visiblePlayers: [] },
+            { id: "p2", name: "Seer", sessionId: "s2", visiblePlayers: [] },
+            { id: "p3", name: "Villager", sessionId: "s3", visiblePlayers: [] },
           ],
           roleAssignments: [
             { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
