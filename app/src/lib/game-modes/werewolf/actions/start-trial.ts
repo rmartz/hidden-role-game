@@ -45,6 +45,8 @@ export const startTrialAction: GameAction = {
       votes: precastGuiltyVotes,
     };
     ts.phase.activeTrial = activeTrial;
+    // Clear all nominations when a trial begins
+    ts.phase.nominations = [];
 
     // Auto-resolve if precast votes account for all eligible votes
     const eligibleCount = game.players.filter(

@@ -12,6 +12,8 @@ import { startTrialAction } from "./start-trial";
 import { castVoteAction } from "./cast-vote";
 import { resolveTrialAction } from "./resolve-trial";
 import { endGameAction } from "./end-game";
+import { nominatePlayerAction } from "./nominate-player";
+import { withdrawNominationAction } from "./withdraw-nomination";
 
 export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.StartNight]: startNightAction,
@@ -26,4 +28,6 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.CastVote]: castVoteAction,
   [WerewolfAction.ResolveTrial]: resolveTrialAction,
   [WerewolfAction.EndGame]: endGameAction,
+  [WerewolfAction.NominatePlayer]: nominatePlayerAction,
+  [WerewolfAction.WithdrawNomination]: withdrawNominationAction,
 };

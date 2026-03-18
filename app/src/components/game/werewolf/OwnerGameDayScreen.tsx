@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { OwnerAdvanceCard } from "./OwnerAdvanceCard";
 import { NightOutcomeSummary } from "./NightOutcomeSummary";
+import { NominationPanel } from "./NominationPanel";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
 import { OwnerTrialPanel } from "./OwnerTrialPanel";
 
@@ -53,8 +54,9 @@ export function OwnerGameDayScreen({
 
   if (!isDaytime) return null;
 
+  const daytimePhase = phase;
   const modeConfig = GAME_MODES[gameState.gameMode];
-  const activeTrial = phase.activeTrial;
+  const activeTrial = daytimePhase.activeTrial;
   const hasActiveTrial = !!activeTrial && !activeTrial.verdict;
   const glossaryRoles = gameState.rolesInPlay?.length
     ? gameState.rolesInPlay
@@ -98,11 +100,20 @@ export function OwnerGameDayScreen({
           )}
         </OwnerAdvanceCard>
         <NightOutcomeSummary
-          events={phase.nightResolution ?? []}
+          events={daytimePhase.nightResolution ?? []}
           players={gameState.players}
           roles={modeConfig.roles}
         />
       </div>
+      {gameState.nominationsEnabled && !hasActiveTrial && (
+        <NominationPanel
+          gameId={gameId}
+          players={gameState.players}
+          nominations={gameState.nominations ?? []}
+          deadPlayerIds={gameState.deadPlayerIds}
+          gameOwnerId={gameState.gameOwner?.id}
+        />
+      )}
       <OwnerPlayerActionsGrid
         gameId={gameId}
         assignments={gameState.visibleRoleAssignments}

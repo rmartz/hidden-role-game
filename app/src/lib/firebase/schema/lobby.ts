@@ -33,6 +33,7 @@ export interface FirebaseLobbyConfig {
   showConfigToPlayers: boolean;
   showRolesInPlay: string;
   timerConfig: TimerConfig;
+  nominationsEnabled?: boolean;
 }
 
 export interface FirebaseRoleSlot {
@@ -87,6 +88,7 @@ function lobbyConfigToFirebase(config: LobbyConfig): FirebaseLobbyConfig {
     showConfigToPlayers: config.showConfigToPlayers,
     showRolesInPlay: config.showRolesInPlay,
     timerConfig: config.timerConfig,
+    ...(config.nominationsEnabled ? { nominationsEnabled: true } : {}),
   };
 }
 
@@ -121,6 +123,7 @@ export function firebaseToLobby(
       timerConfig: parseTimerConfig(
         pub.config.timerConfig as unknown as Record<string, unknown>,
       ),
+      nominationsEnabled: pub.config.nominationsEnabled ?? false,
     },
     ...(pub.gameId ? { gameId: pub.gameId } : {}),
   };
@@ -187,6 +190,7 @@ export function firebaseToPublicLobby(
       timerConfig: parseTimerConfig(
         pub.config.timerConfig as unknown as Record<string, unknown>,
       ),
+      nominationsEnabled: pub.config.nominationsEnabled ?? false,
     },
     ...(pub.gameId ? { gameId: pub.gameId } : {}),
   };

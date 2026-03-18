@@ -51,7 +51,7 @@ export function ConfirmTargetButton({
       ? getConfirmLabel(roleId, witchContext)
       : WEREWOLF_COPY.confirmButton.skip;
 
-  const content = isConfirmed ? (
+  return isConfirmed ? (
     <p className="mt-3 text-sm text-green-600 font-medium">
       {WEREWOLF_COPY.confirmButton.actionConfirmed}
     </p>
@@ -74,6 +74,4 @@ export function ConfirmTargetButton({
       </Tooltip>
     </div>
   );
-
-  return content;
 }

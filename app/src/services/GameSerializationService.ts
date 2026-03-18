@@ -283,6 +283,24 @@ export class GameSerializationService {
       ...(nightStatus.length > 0 ? { nightStatus } : {}),
     };
 
+    // Include nomination state when nominations are enabled.
+    if (game.nominationsEnabled) {
+      const nominations = phase.nominations ?? [];
+      const nominatorsByDefendant = nominations.reduce<
+        Record<string, string[]>
+      >((acc, n) => {
+        (acc[n.defendantId] ??= []).push(n.nominatorId);
+        return acc;
+      }, {});
+      result.nominations = Object.entries(nominatorsByDefendant).map(
+        ([defendantId, nominatorIds]) => ({ defendantId, nominatorIds }),
+      );
+      const myNomination = nominations.find((n) => n.nominatorId === callerId);
+      if (myNomination) {
+        result.myNominatedDefendantId = myNomination.defendantId;
+      }
+    }
+
     if (phase.activeTrial) {
       const { activeTrial } = phase;
       const alivePlayerCount = game.players.filter(

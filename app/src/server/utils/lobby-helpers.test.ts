@@ -22,6 +22,7 @@ function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
       roleSlots: [{ roleId: "good", min: 2, max: 2 }],
       showConfigToPlayers: false,
       showRolesInPlay: ShowRolesInPlay.None,
+      nominationsEnabled: false,
       timerConfig: DEFAULT_TIMER_CONFIG,
     },
     ...overrides,
@@ -94,6 +95,7 @@ describe("toPublicLobby", () => {
           roleSlots: [{ roleId: "good", min: 2, max: 2 }],
           showConfigToPlayers: true,
           showRolesInPlay: ShowRolesInPlay.None,
+          nominationsEnabled: false,
           timerConfig: DEFAULT_TIMER_CONFIG,
         },
       });

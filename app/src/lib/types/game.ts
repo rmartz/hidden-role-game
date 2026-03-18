@@ -148,6 +148,8 @@ export interface Game {
   showRolesInPlay: ShowRolesInPlay;
   ownerPlayerId?: string;
   timerConfig: TimerConfig;
+  /** Whether player nominations for trial are enabled. */
+  nominationsEnabled: boolean;
 }
 
 /**
@@ -191,6 +193,8 @@ export interface LobbyConfig {
   showConfigToPlayers: boolean;
   showRolesInPlay: ShowRolesInPlay;
   timerConfig: TimerConfig;
+  /** Whether player nominations for trial are enabled. */
+  nominationsEnabled: boolean;
 }
 
 export interface Lobby {

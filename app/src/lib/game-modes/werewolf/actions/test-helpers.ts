@@ -36,6 +36,7 @@ export function makePlayingGame(
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner-1",
+    nominationsEnabled: false,
     timerConfig: DEFAULT_TIMER_CONFIG,
     ...overrides,
   };
@@ -136,6 +137,7 @@ export function makeTeamGame(
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner-1",
+    nominationsEnabled: false,
     timerConfig: DEFAULT_TIMER_CONFIG,
     ...overrides,
   };
