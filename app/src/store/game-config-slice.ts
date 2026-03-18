@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createSelector } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { sum } from "lodash";
 import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
@@ -243,21 +243,26 @@ const gameConfigSlice = createSlice({
   },
 });
 
-export function selectRoleSlots(state: GameConfigState): RoleSlot[] {
-  const { roleConfigMode, roleCounts, roleMins, roleMaxes } = state;
-  if (roleConfigMode === RoleConfigMode.Advanced) {
-    return Object.keys(roleMins)
-      .filter((id) => (roleMaxes[id] ?? 0) > 0)
-      .map((id) => ({
-        roleId: id,
-        min: roleMins[id] ?? 0,
-        max: roleMaxes[id] ?? 0,
-      }));
-  }
-  return Object.entries(roleCounts)
-    .filter(([, count]) => count > 0)
-    .map(([roleId, count]) => ({ roleId, min: count, max: count }));
-}
+export const selectRoleSlots = createSelector(
+  (state: GameConfigState) => state.roleConfigMode,
+  (state: GameConfigState) => state.roleCounts,
+  (state: GameConfigState) => state.roleMins,
+  (state: GameConfigState) => state.roleMaxes,
+  (roleConfigMode, roleCounts, roleMins, roleMaxes): RoleSlot[] => {
+    if (roleConfigMode === RoleConfigMode.Advanced) {
+      return Object.keys(roleMins)
+        .filter((id) => (roleMaxes[id] ?? 0) > 0)
+        .map((id) => ({
+          roleId: id,
+          min: roleMins[id] ?? 0,
+          max: roleMaxes[id] ?? 0,
+        }));
+    }
+    return Object.entries(roleCounts)
+      .filter(([, count]) => count > 0)
+      .map(([roleId, count]) => ({ roleId, min: count, max: count }));
+  },
+);
 
 export const {
   loadConfig,

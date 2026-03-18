@@ -203,7 +203,7 @@ export function OwnerGameNightScreen({
   );
 
   return (
-    <div className="p-5">
+    <div className="p-5 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-4">
         {WEREWOLF_COPY.narrator.nightTitle(
           turnState.turn,
@@ -217,7 +217,7 @@ export function OwnerGameNightScreen({
         onTimerTrigger={handleAdvance}
         resetKey={currentPhaseIndex}
       />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
         <OwnerAdvanceCard
           label={
             isLastPhase

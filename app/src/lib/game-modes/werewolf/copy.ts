@@ -6,10 +6,18 @@ export const WEREWOLF_COPY = {
   night: {
     yourTurn: "It's Your Turn",
     wakeUp: "Wake up and take your action.",
-    stopPeeking: "Stop peeking, you dirty cheater.",
-    youAreEliminated: "You Have Been Eliminated",
-    eliminatedSubtext:
-      "You are no longer in the game. Stay quiet while the night continues.",
+    stopPeeking: [
+      "Stop peeking, you dirty cheater.",
+      "If you can read this your eyes are open.",
+      "Ask your narrator if 'your eyes are open' is right for you.",
+      '"Good at following instructions", huh?',
+    ],
+    eliminatedNight: [
+      "Respectful spookiness ensues.",
+      "It's 10pm, do you know where your kids are?",
+      "Please haunt responsibly.",
+      "First time?",
+    ],
     currentlyAwake: (label: string, players: string) =>
       players
         ? `Currently awake: ${label} (${players})`
@@ -43,6 +51,7 @@ export const WEREWOLF_COPY = {
     showRole: "Show role",
     roleRevealed: (roleName: string, teamLabel: string) =>
       `${roleName} (${teamLabel})`,
+    roleInfoLabel: "Role info",
   },
   playerLists: {
     activePlayers: (count: number) => `Active Players (${String(count)})`,
@@ -80,7 +89,6 @@ export const WEREWOLF_COPY = {
   glossary: {
     dialogTitle: "Role Glossary",
     openButton: "View Glossary",
-    roleInfoLabel: "Role information",
   },
   gameOver: {
     victory: "Victory!",

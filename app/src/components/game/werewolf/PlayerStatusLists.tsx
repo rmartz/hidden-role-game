@@ -27,7 +27,7 @@ export function PlayerStatusLists({
   );
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
+    <div className="grid grid-cols-2 gap-4 mb-5">
       <Card>
         <CardHeader className="pb-2 pt-4">
           <CardTitle className="text-sm">

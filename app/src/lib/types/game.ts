@@ -88,8 +88,6 @@ export interface GameModeConfig {
   readonly minPlayers: number;
   readonly ownerTitle: string | null;
   readonly roles: Record<string, RoleDefinition<string, Team>>;
-  /** SR label for the role info tooltip icon, if roles have summary/description content. */
-  readonly roleInfoSrLabel?: string;
   readonly teamLabels: Partial<Record<Team, string>>;
   defaultRoleCount(numPlayers: number): RoleSlot[];
   /**

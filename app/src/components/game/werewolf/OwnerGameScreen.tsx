@@ -10,7 +10,7 @@ interface OwnerGameScreenProps {
 
 export function OwnerGameScreen({ gameState }: OwnerGameScreenProps) {
   return (
-    <div className="p-5">
+    <div className="p-5 max-w-lg mx-auto">
       <h1 className="text-2xl font-bold mb-4">Game In Progress</h1>
       <NarratorPlayerRoleLists
         assignments={gameState.visibleRoleAssignments}

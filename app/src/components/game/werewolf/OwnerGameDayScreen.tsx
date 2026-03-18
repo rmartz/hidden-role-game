@@ -62,7 +62,7 @@ export function OwnerGameDayScreen({
     : Object.values(modeConfig.roles);
 
   return (
-    <div className="p-5">
+    <div className="p-5 max-w-4xl mx-auto">
       <div className="flex items-start justify-between mb-4">
         <h1 className="text-2xl font-bold">{`Day — Turn ${String(turnState.turn)}`}</h1>
         <RoleGlossaryDialog
@@ -78,7 +78,7 @@ export function OwnerGameDayScreen({
         onTimerTrigger={handleAdvance}
         resetKey={turnState.turn}
       />
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
         <OwnerAdvanceCard
           label="Start Next Night"
           onAdvance={handleAdvance}

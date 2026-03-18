@@ -71,7 +71,7 @@ export default function GameModePage() {
         )
       ) : (
         // Loading
-        <div className="p-5">
+        <div className="p-5 max-w-lg mx-auto">
           <h1 className="text-2xl font-bold mb-4">{GAME_PAGE_COPY.title}</h1>
           {isLoading && (
             <p className="text-muted-foreground">{GAME_PAGE_COPY.loading}</p>
