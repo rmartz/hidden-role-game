@@ -68,7 +68,7 @@ export function useConfigSync(
               showRolesInPlay,
               roleSlots,
               timerConfig,
-              nominationThreshold: nominationEnabled ? 2 : null,
+              nominationsEnabled: nominationEnabled,
             },
             {
               onSuccess: () => {

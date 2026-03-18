@@ -141,7 +141,7 @@ export class FirebaseLobbyService {
       gameMode?: GameMode;
       roleSlots?: RoleSlot[];
       timerConfig?: import("@/lib/types").TimerConfig;
-      nominationThreshold?: number | null;
+      nominationsEnabled?: boolean;
     },
   ): Promise<Lobby | undefined> {
     const snap = await lobbyRef(lobbyId).once("value");
@@ -185,12 +185,11 @@ export class FirebaseLobbyService {
       updates["public/config/timerConfig"] = config.timerConfig;
       data.public.config.timerConfig = config.timerConfig;
     }
-    if (config.nominationThreshold !== undefined) {
-      // null signals deletion (Firebase RTDB deletes the key when null is written)
-      updates["public/config/nominationThreshold"] =
-        config.nominationThreshold ?? null;
-      data.public.config.nominationThreshold =
-        config.nominationThreshold ?? undefined;
+    if (config.nominationsEnabled !== undefined) {
+      updates["public/config/nominationsEnabled"] =
+        config.nominationsEnabled || null;
+      data.public.config.nominationsEnabled =
+        config.nominationsEnabled || undefined;
     }
 
     if (Object.keys(updates).length > 0) {

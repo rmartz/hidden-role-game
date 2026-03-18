@@ -22,6 +22,7 @@ function makeGame(
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner",
+    nominationsEnabled: false,
   };
 }
 

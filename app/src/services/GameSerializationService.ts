@@ -283,8 +283,8 @@ export class GameSerializationService {
       ...(nightStatus.length > 0 ? { nightStatus } : {}),
     };
 
-    // Include nomination state when threshold is configured.
-    if (game.nominationThreshold) {
+    // Include nomination state when nominations are enabled.
+    if (game.nominationsEnabled) {
       const nominations = phase.nominations ?? [];
       const nominationCounts = nominations.reduce<Record<string, number>>(
         (acc, n) => {

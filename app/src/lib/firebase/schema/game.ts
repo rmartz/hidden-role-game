@@ -20,7 +20,7 @@ export interface FirebaseGamePublic {
   showRolesInPlay: string;
   ownerPlayerId: string | null;
   timerConfig?: TimerConfig;
-  nominationThreshold?: number;
+  nominationsEnabled?: boolean;
   /** Unix ms timestamp set server-side at game creation. Used for TTL cleanup. */
   createdAt?: number;
 }
@@ -54,9 +54,7 @@ export function gameToFirebase(game: Game): FirebaseGamePublic {
     showRolesInPlay: game.showRolesInPlay,
     ownerPlayerId: game.ownerPlayerId ?? null,
     ...(game.timerConfig ? { timerConfig: game.timerConfig } : {}),
-    ...(game.nominationThreshold !== undefined
-      ? { nominationThreshold: game.nominationThreshold }
-      : {}),
+    ...(game.nominationsEnabled ? { nominationsEnabled: true } : {}),
   };
 }
 
@@ -82,8 +80,6 @@ export function firebaseToGame(
     showRolesInPlay: pub.showRolesInPlay as Game["showRolesInPlay"],
     ownerPlayerId: pub.ownerPlayerId ?? undefined,
     ...(pub.timerConfig ? { timerConfig: pub.timerConfig } : {}),
-    ...(pub.nominationThreshold !== undefined
-      ? { nominationThreshold: pub.nominationThreshold }
-      : {}),
+    nominationsEnabled: pub.nominationsEnabled ?? false,
   };
 }

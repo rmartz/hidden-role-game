@@ -63,7 +63,7 @@ export async function POST(
     lobby.config.showRolesInPlay,
     ownerPlayer?.id ?? undefined,
     lobby.config.timerConfig,
-    lobby.config.nominationThreshold,
+    lobby.config.nominationsEnabled,
   );
 
   const updated = await lobbyService.setGameId(lobbyId, game.id);

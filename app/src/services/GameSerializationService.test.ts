@@ -50,6 +50,7 @@ function makeDaytimeGame(
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner",
+    nominationsEnabled: false,
   };
 }
 
@@ -86,6 +87,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
       configuredRoleSlots: [],
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: undefined,
+      nominationsEnabled: false,
     };
 
     const result = service.extractDaytimeNightState(game, "player-1");
@@ -209,6 +211,7 @@ function makeNighttimeGame(
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: undefined,
+    nominationsEnabled: false,
   };
 }
 
@@ -316,6 +319,7 @@ function makeNighttimeGameWithBonusPhase(
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: undefined,
+    nominationsEnabled: false,
   };
 }
 
@@ -467,6 +471,7 @@ function makeDaytimeGameWithTrial(callerRoleId: WerewolfRole): Game {
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner",
+    nominationsEnabled: false,
   };
 }
 
@@ -492,7 +497,7 @@ describe("GameSerializationService.extractDaytimeNightState — mustVoteGuilty",
 
 function makeDaytimeGameWithNominations(
   nominations: { nominatorId: string; defendantId: string }[],
-  nominationThreshold?: number,
+  nominationsEnabled = false,
 ): Game {
   const turnState: WerewolfTurnState = {
     turn: 1,
@@ -523,24 +528,24 @@ function makeDaytimeGameWithNominations(
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner",
-    ...(nominationThreshold !== undefined ? { nominationThreshold } : {}),
+    nominationsEnabled,
   };
 }
 
 describe("GameSerializationService.extractDaytimeNightState — nominations", () => {
   const service = new GameSerializationService();
 
-  it("nominations are absent when threshold is not set", () => {
+  it("nominations are absent when nominationsEnabled is false", () => {
     const game = makeDaytimeGameWithNominations(
       [{ nominatorId: "p2", defendantId: "p3" }],
-      undefined,
+      false,
     );
     const result = service.extractDaytimeNightState(game, "p2");
     expect(result.nominations).toBeUndefined();
   });
 
   it("returns empty nominations array when no nominations exist", () => {
-    const game = makeDaytimeGameWithNominations([], 2);
+    const game = makeDaytimeGameWithNominations([], true);
     const result = service.extractDaytimeNightState(game, "p2");
     expect(result.nominations).toEqual([]);
   });
@@ -551,7 +556,7 @@ describe("GameSerializationService.extractDaytimeNightState — nominations", ()
         { nominatorId: "p2", defendantId: "p3" },
         { nominatorId: "p1", defendantId: "p3" },
       ],
-      2,
+      true,
     );
     const result = service.extractDaytimeNightState(game, "p2");
     expect(result.nominations).toContainEqual({ defendantId: "p3", count: 2 });
@@ -560,7 +565,7 @@ describe("GameSerializationService.extractDaytimeNightState — nominations", ()
   it("sets myNominatedDefendantId when caller has a nomination", () => {
     const game = makeDaytimeGameWithNominations(
       [{ nominatorId: "p2", defendantId: "p3" }],
-      2,
+      true,
     );
     const result = service.extractDaytimeNightState(game, "p2");
     expect(result.myNominatedDefendantId).toBe("p3");
@@ -569,7 +574,7 @@ describe("GameSerializationService.extractDaytimeNightState — nominations", ()
   it("myNominatedDefendantId is absent when caller has no nomination", () => {
     const game = makeDaytimeGameWithNominations(
       [{ nominatorId: "p1", defendantId: "p3" }],
-      2,
+      true,
     );
     const result = service.extractDaytimeNightState(game, "p2");
     expect(result.myNominatedDefendantId).toBeUndefined();
@@ -581,7 +586,7 @@ describe("GameSerializationService.extractDaytimeNightState — nominations", ()
         { nominatorId: "p1", defendantId: "p3" },
         { nominatorId: "p2", defendantId: "p1" },
       ],
-      2,
+      true,
     );
     const result = service.extractDaytimeNightState(game, "p1");
     expect(result.nominations).toHaveLength(2);

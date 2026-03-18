@@ -110,7 +110,7 @@ const gameConfigSlice = createSlice({
       state.showConfigToPlayers = config.showConfigToPlayers;
       state.showRolesInPlay = config.showRolesInPlay;
       state.timerConfig = config.timerConfig;
-      state.nominationEnabled = (config.nominationThreshold ?? 0) > 0;
+      state.nominationEnabled = config.nominationsEnabled;
       state.isValid = recomputeIsValid(state);
     },
 

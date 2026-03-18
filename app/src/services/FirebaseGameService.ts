@@ -77,7 +77,7 @@ export class FirebaseGameService {
         ...(nightActions ? { nightActions } : {}),
         ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
         ...(game.timerConfig ? { timerConfig: game.timerConfig } : {}),
-        nominationsEnabled: game.nominationThreshold !== undefined,
+        nominationsEnabled: game.nominationsEnabled,
       };
     }
 
@@ -170,7 +170,7 @@ export class FirebaseGameService {
       myRole: { id: myRole.id, name: myRole.name, team: myRole.team },
       visibleRoleAssignments,
       rolesInPlay: gameInitializationService.buildRolesInPlay(game),
-      nominationsEnabled: game.nominationThreshold !== undefined,
+      nominationsEnabled: game.nominationsEnabled,
       ...nightTargetState,
       ...daytimeNightState,
       ...(amDead ? { amDead: true } : {}),
@@ -202,7 +202,7 @@ export class FirebaseGameService {
     showRolesInPlay: ShowRolesInPlay,
     ownerPlayerId: string | undefined,
     timerConfig?: import("@/lib/types").TimerConfig,
-    nominationThreshold?: number,
+    nominationsEnabled?: boolean,
   ): Promise<Game> {
     const { roles } = this.getModeDefinition(gameMode);
     const rolePlayers = ownerPlayerId
@@ -233,7 +233,7 @@ export class FirebaseGameService {
       showRolesInPlay,
       ownerPlayerId,
       ...(timerConfig ? { timerConfig } : {}),
-      ...(nominationThreshold !== undefined ? { nominationThreshold } : {}),
+      nominationsEnabled: nominationsEnabled ?? false,
     };
 
     // sessionIndex: { [sessionId]: playerId } — needed to reconstruct Game from Firebase

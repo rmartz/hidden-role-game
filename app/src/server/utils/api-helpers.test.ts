@@ -41,6 +41,7 @@ function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
       roleSlots: [],
       showConfigToPlayers: false,
       showRolesInPlay: ShowRolesInPlay.None,
+      nominationsEnabled: false,
     },
     ...overrides,
   };
@@ -65,6 +66,7 @@ function makeGame(overrides: Partial<Game> = {}): Game {
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: undefined,
+    nominationsEnabled: false,
     ...overrides,
   };
 }

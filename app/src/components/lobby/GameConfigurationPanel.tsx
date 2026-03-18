@@ -82,7 +82,7 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
         showRolesInPlay: config.showRolesInPlay,
         showConfigToPlayers: config.showConfigToPlayers,
         timerConfig: config.timerConfig,
-        nominationEnabled: (config.nominationThreshold ?? 0) > 0,
+        nominationEnabled: config.nominationsEnabled,
         onShowRolesInPlayChange: undefined,
         onShowConfigToPlayersChange: undefined,
         onTimerConfigChange: undefined,

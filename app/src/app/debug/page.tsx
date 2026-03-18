@@ -17,6 +17,7 @@ const DEFAULT_CONFIG: GameConfig = {
   roleConfigMode: RoleConfigMode.Default,
   showConfigToPlayers: false,
   showRolesInPlay: ShowRolesInPlay.None,
+  nominationsEnabled: false,
 };
 
 export default function DebugPage() {

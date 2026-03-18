@@ -10,64 +10,65 @@ function makeBaseLobby(overrides: Partial<Lobby["config"]> = {}): Lobby {
     players: [{ id: "owner", name: "Owner", sessionId: "session-owner" }],
     config: {
       gameMode: GameMode.Werewolf,
-      roleConfigMode: RoleConfigMode.Manual,
+      roleConfigMode: RoleConfigMode.Custom,
       roleSlots: [],
       showConfigToPlayers: false,
       showRolesInPlay: ShowRolesInPlay.None,
+      nominationsEnabled: false,
       ...overrides,
     },
   };
 }
 
-describe("FirebaseLobbyService.updateConfig — nominationThreshold", () => {
-  it("sets nominationThreshold when a value is provided", async () => {
+describe("FirebaseLobbyService.updateConfig — nominationsEnabled", () => {
+  it("sets nominationsEnabled when true is provided", async () => {
     const service = new FirebaseLobbyService();
     await service.addLobby(makeBaseLobby());
 
     const updated = await service.updateConfig("lobby-1", {
-      nominationThreshold: 2,
+      nominationsEnabled: true,
     });
 
-    expect(updated?.config.nominationThreshold).toBe(2);
+    expect(updated?.config.nominationsEnabled).toBe(true);
   });
 
-  it("removing nominationThreshold with null deletes it from Firebase", async () => {
+  it("sets nominationsEnabled to false when false is provided", async () => {
     const service = new FirebaseLobbyService();
-    await service.addLobby(makeBaseLobby({ nominationThreshold: 2 }));
+    await service.addLobby(makeBaseLobby({ nominationsEnabled: true }));
 
     const updated = await service.updateConfig("lobby-1", {
-      nominationThreshold: null,
+      nominationsEnabled: false,
     });
 
-    expect(updated?.config.nominationThreshold).toBeUndefined();
+    expect(updated?.config.nominationsEnabled).toBe(false);
   });
 
-  it("a subsequent getLobby does not return the deleted nominationThreshold", async () => {
+  it("a subsequent getLobby reflects the updated nominationsEnabled", async () => {
     const service = new FirebaseLobbyService();
-    await service.addLobby(makeBaseLobby({ nominationThreshold: 2 }));
-    await service.updateConfig("lobby-1", { nominationThreshold: null });
+    await service.addLobby(makeBaseLobby({ nominationsEnabled: true }));
+    await service.updateConfig("lobby-1", { nominationsEnabled: false });
 
     const fetched = await service.getLobby("lobby-1");
 
-    expect(fetched?.config.nominationThreshold).toBeUndefined();
+    expect(fetched?.config.nominationsEnabled).toBe(false);
   });
 
-  it("omitting nominationThreshold leaves an existing value intact", async () => {
+  it("omitting nominationsEnabled leaves an existing value intact", async () => {
     const service = new FirebaseLobbyService();
-    await service.addLobby(makeBaseLobby({ nominationThreshold: 2 }));
+    await service.addLobby(makeBaseLobby({ nominationsEnabled: true }));
 
     const updated = await service.updateConfig("lobby-1", {
       showConfigToPlayers: true,
     });
 
-    expect(updated?.config.nominationThreshold).toBe(2);
+    expect(updated?.config.nominationsEnabled).toBe(true);
   });
 
   it("returns undefined when the lobby does not exist", async () => {
     const service = new FirebaseLobbyService();
 
     const result = await service.updateConfig("no-such-lobby", {
-      nominationThreshold: 2,
+      nominationsEnabled: true,
     });
 
     expect(result).toBeUndefined();

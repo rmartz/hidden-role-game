@@ -3,10 +3,12 @@ import { WerewolfPhase } from "../types";
 import { currentTurnState } from "../utils";
 import { startTrialAction } from "./start-trial";
 
+const NOMINATION_THRESHOLD = 2;
+
 export const nominatePlayerAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {
     // Only non-owner players can nominate
-    if (!game.nominationThreshold) return false;
+    if (!game.nominationsEnabled) return false;
     if (callerId === game.ownerPlayerId) return false;
     const ts = currentTurnState(game);
     if (!ts) return false;
@@ -40,11 +42,10 @@ export const nominatePlayerAction: GameAction = {
     ts.phase.nominations = nominations;
 
     // Auto-start trial if threshold reached
-    const threshold = game.nominationThreshold ?? 0;
     const count = nominations.filter(
       (n) => n.defendantId === defendantId,
     ).length;
-    if (threshold > 0 && count >= threshold) {
+    if (count >= NOMINATION_THRESHOLD) {
       startTrialAction.apply(game, { defendantId }, callerId);
     }
   },

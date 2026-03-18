@@ -141,8 +141,8 @@ export interface Game {
   showRolesInPlay: ShowRolesInPlay;
   ownerPlayerId?: string;
   timerConfig?: TimerConfig;
-  /** Number of nominations required to auto-start a trial. Absent = nominations disabled. */
-  nominationThreshold?: number;
+  /** Whether player nominations for trial are enabled. */
+  nominationsEnabled: boolean;
 }
 
 /**
@@ -176,8 +176,8 @@ export interface LobbyConfig {
   showConfigToPlayers: boolean;
   showRolesInPlay: ShowRolesInPlay;
   timerConfig?: TimerConfig;
-  /** Number of nominations required to auto-start a trial. Absent = nominations disabled. */
-  nominationThreshold?: number;
+  /** Whether player nominations for trial are enabled. */
+  nominationsEnabled: boolean;
 }
 
 export interface Lobby {

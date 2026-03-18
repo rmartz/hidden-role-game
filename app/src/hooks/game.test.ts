@@ -39,6 +39,7 @@ const mockGameState: PlayerGameState = {
   myRole: { id: "villager", name: "Villager", team: Team.Good },
   visibleRoleAssignments: [],
   rolesInPlay: undefined,
+  nominationsEnabled: false,
 };
 
 const mockOwnerGameState: PlayerGameState = {
@@ -71,6 +72,7 @@ describe("useStartGame", () => {
             roleConfigMode: RoleConfigMode.Default,
             showConfigToPlayers: false,
             showRolesInPlay: ShowRolesInPlay.RoleAndCount,
+            nominationsEnabled: false,
           },
           gameId: "game-1",
         } satisfies PublicLobby,

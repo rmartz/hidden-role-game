@@ -31,6 +31,7 @@ function makeGameWithPlayers(
     configuredRoleSlots,
     showRolesInPlay,
     ownerPlayerId: undefined,
+    nominationsEnabled: false,
   };
 }
 
@@ -118,10 +119,10 @@ describe("GameService.getPlayerGameState", () => {
 });
 
 // ---------------------------------------------------------------------------
-// getPlayerGameState — narrator nominationThreshold
+// getPlayerGameState — narrator nominationsEnabled
 // ---------------------------------------------------------------------------
 
-function makeNarratorGame(nominationThreshold?: number): Game {
+function makeNarratorGame(nominationsEnabled = false): Game {
   return {
     id: "game-1",
     lobbyId: "lobby-1",
@@ -135,27 +136,27 @@ function makeNarratorGame(nominationThreshold?: number): Game {
     configuredRoleSlots: DEFAULT_SLOTS,
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "narrator",
-    ...(nominationThreshold !== undefined ? { nominationThreshold } : {}),
+    nominationsEnabled,
   };
 }
 
 describe("GameService.getPlayerGameState — narrator nominationsEnabled", () => {
   const service = new GameService();
 
-  it("narrator state has nominationsEnabled true when threshold is set on game", () => {
-    const game = makeNarratorGame(2);
+  it("narrator state has nominationsEnabled true when enabled on game", () => {
+    const game = makeNarratorGame(true);
     const result = service.getPlayerGameState(game, "narrator");
     expect(result?.nominationsEnabled).toBe(true);
   });
 
-  it("narrator state has nominationsEnabled false when threshold is not set on game", () => {
-    const game = makeNarratorGame();
+  it("narrator state has nominationsEnabled false when disabled on game", () => {
+    const game = makeNarratorGame(false);
     const result = service.getPlayerGameState(game, "narrator");
     expect(result?.nominationsEnabled).toBe(false);
   });
 
   it("narrator state has myPlayerId undefined and myRole undefined", () => {
-    const game = makeNarratorGame(2);
+    const game = makeNarratorGame(true);
     const result = service.getPlayerGameState(game, "narrator");
     expect(result?.myPlayerId).toBeUndefined();
     expect(result?.myRole).toBeUndefined();

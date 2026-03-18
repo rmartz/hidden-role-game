@@ -20,6 +20,7 @@ function makePlayingGame(
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner-1",
+    nominationsEnabled: false,
     ...overrides,
   };
 }
@@ -64,6 +65,7 @@ describe("isOwnerPlaying", () => {
       configuredRoleSlots: [],
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner-1",
+      nominationsEnabled: false,
     };
     expect(isOwnerPlaying(game, "owner-1")).toBe(false);
   });
@@ -91,6 +93,7 @@ describe("currentTurnState", () => {
       configuredRoleSlots: [],
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner-1",
+      nominationsEnabled: false,
     };
     expect(currentTurnState(game)).toBeUndefined();
   });
@@ -106,6 +109,7 @@ describe("currentTurnState", () => {
       configuredRoleSlots: [],
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner-1",
+      nominationsEnabled: false,
     };
     expect(currentTurnState(game)).toBeUndefined();
   });
