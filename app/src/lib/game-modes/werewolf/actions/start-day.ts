@@ -21,12 +21,31 @@ export const startDayAction: GameAction = {
     const ts = currentTurnState(game);
     if (!ts) return;
     const nightPhase = ts.phase as WerewolfNighttimePhase;
+
+    // Build priest wards: carry forward existing wards and add any new ward
+    // from this night's Priest action BEFORE resolution so the ward protects
+    // the target on the same night it is placed.
+    const priestWardsForResolution: Record<string, string> = {
+      ...(ts.priestWards ?? {}),
+    };
+    const priestAction = nightPhase.nightActions[
+      WerewolfRole.Priest as string
+    ] as NightAction | undefined;
+    if (priestAction?.targetPlayerId) {
+      const priestPlayerId = game.roleAssignments.find(
+        (a) => a.roleDefinitionId === (WerewolfRole.Priest as string),
+      )?.playerId;
+      if (priestPlayerId) {
+        priestWardsForResolution[priestAction.targetPlayerId] = priestPlayerId;
+      }
+    }
+
     const nightResolution = resolveNightActions(
       nightPhase.nightActions,
       game.roleAssignments,
       ts.deadPlayerIds,
       {
-        priestWards: ts.priestWards,
+        priestWards: priestWardsForResolution,
         toughGuyHitIds: ts.toughGuyHitIds,
       },
     );
@@ -40,28 +59,19 @@ export const startDayAction: GameAction = {
       .map((e) => e.targetPlayerId);
     const toughGuyHitIds = [...(ts.toughGuyHitIds ?? []), ...newToughGuyHitIds];
 
-    // Priest wards: consume wards for warded players who were attacked,
-    // then add new wards from this night's Priest action.
+    // Consume priest wards for any warded player who was attacked this night,
+    // regardless of whether other protections also saved them.
     const attackedPlayerIds = new Set(
       nightResolution
         .filter((e) => e.type === "killed")
         .map((e) => e.targetPlayerId),
     );
     const priestWards: Record<string, string> = {};
-    for (const [wardedId, priestId] of Object.entries(ts.priestWards ?? {})) {
+    for (const [wardedId, priestId] of Object.entries(
+      priestWardsForResolution,
+    )) {
       if (!attackedPlayerIds.has(wardedId)) {
         priestWards[wardedId] = priestId;
-      }
-    }
-    const priestAction = nightPhase.nightActions[
-      WerewolfRole.Priest as string
-    ] as NightAction | undefined;
-    if (priestAction?.targetPlayerId) {
-      const priestPlayerId = game.roleAssignments.find(
-        (a) => a.roleDefinitionId === (WerewolfRole.Priest as string),
-      )?.playerId;
-      if (priestPlayerId) {
-        priestWards[priestAction.targetPlayerId] = priestPlayerId;
       }
     }
 

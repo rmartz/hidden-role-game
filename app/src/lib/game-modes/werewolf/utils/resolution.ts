@@ -56,7 +56,15 @@ function collectBaseAttacksAndProtections(
   const protections = new Map<string, string[]>();
 
   for (const [phaseKey, action] of Object.entries(nightActions)) {
-    if (isRoleActive(phaseKey, [WerewolfRole.Witch, WerewolfRole.Spellcaster]))
+    // Witch and Spellcaster are handled separately below.
+    // Priest protection is handled via priestWards, not the generic Protect pipeline.
+    if (
+      isRoleActive(phaseKey, [
+        WerewolfRole.Witch,
+        WerewolfRole.Spellcaster,
+        WerewolfRole.Priest,
+      ])
+    )
       continue;
 
     if (isGroupPhaseKey(phaseKey)) {
