@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
-import type { GameConfig, RoleSlot } from "@/server/types";
+import type { GameConfig } from "@/server/types";
 import { GameConfigurationPanel } from "@/components/lobby";
 import { useAppSelector } from "@/store";
+import { selectRoleSlots } from "@/store/game-config-slice";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import type { DebugPlayer } from "@/app/api/debug/game/route";
@@ -23,10 +24,12 @@ export default function DebugPage() {
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [gameInfo, setGameInfo] = useState<GameInfo | null>(null);
+  const gameMode = useAppSelector((s) => s.gameConfig.gameMode);
+  const roleSlots = useAppSelector((s) => selectRoleSlots(s.gameConfig));
   const showRolesInPlay = useAppSelector((s) => s.gameConfig.showRolesInPlay);
   const timerConfig = useAppSelector((s) => s.gameConfig.timerConfig);
 
-  async function handleCreateGame(roleSlots: RoleSlot[], gameMode: GameMode) {
+  async function handleCreateGame() {
     setIsCreating(true);
     setError(null);
     try {
@@ -122,8 +125,8 @@ export default function DebugPage() {
         playerCount={playerCount}
         readOnly={false}
         isPending={isCreating}
-        onStartGame={(roleSlots, gameMode) => {
-          void handleCreateGame(roleSlots, gameMode);
+        onStartGame={() => {
+          void handleCreateGame();
         }}
       />
     </div>
