@@ -1,4 +1,3 @@
-import { Team } from "@/lib/types";
 import type { PlayerRoleAssignment } from "@/lib/types";
 import { TargetCategory } from "../types";
 import type { AnyNightAction, NightResolutionEvent } from "../types";
@@ -8,7 +7,7 @@ import { isGroupPhaseKey, isRoleActive } from "./phase-keys";
 
 export const SMITE_PHASE_KEY = "__narrator_smite__";
 
-function allTeamBadAreDead(
+function allWerewolvesAreDead(
   roleAssignments: PlayerRoleAssignment[],
   deadPlayerIds: string[],
 ): boolean {
@@ -17,7 +16,7 @@ function allTeamBadAreDead(
       const role = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
         a.roleDefinitionId
       ];
-      return role?.team === Team.Bad;
+      return role?.isWerewolf === true;
     })
     .every((a) => deadPlayerIds.includes(a.playerId));
 }
@@ -36,8 +35,8 @@ function chupacabraAttackApplies(
       ]
     : undefined;
   return (
-    targetRole?.team === Team.Bad ||
-    allTeamBadAreDead(roleAssignments, deadPlayerIds)
+    targetRole?.isWerewolf === true ||
+    allWerewolvesAreDead(roleAssignments, deadPlayerIds)
   );
 }
 

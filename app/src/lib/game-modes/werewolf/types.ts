@@ -75,6 +75,11 @@ export interface ActiveTrial {
   verdict?: "eliminated" | "innocent";
 }
 
+export interface Nomination {
+  nominatorId: string;
+  defendantId: string;
+}
+
 export interface WerewolfDaytimePhase {
   type: WerewolfPhase.Daytime;
   /** Unix epoch ms when the day phase began (for elapsed-time display). */
@@ -87,6 +92,8 @@ export interface WerewolfDaytimePhase {
   smitedPlayerIds?: string[];
   /** Active elimination trial, if one has been called by the narrator. */
   activeTrial?: ActiveTrial;
+  /** Player nominations for trial. Each player holds at most one nomination. */
+  nominations?: Nomination[];
 }
 
 export type WerewolfTurnPhase = WerewolfNighttimePhase | WerewolfDaytimePhase;

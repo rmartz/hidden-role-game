@@ -32,9 +32,13 @@ export interface RoleInPlay {
   count?: number;
 }
 
+export type VisibilityReason = "wake-partner" | "aware-of" | "revealed";
+
 export interface VisibleTeammate {
   player: PublicLobbyPlayer;
-  role: PublicRoleInfo;
+  reason: VisibilityReason;
+  /** Only present when the exact role is known (e.g., dead player reveal by narrator). */
+  role?: PublicRoleInfo;
 }
 
 /** Night effects visible during the daytime summary. */
@@ -108,6 +112,15 @@ export interface PlayerGameState {
   witchAbilityUsed?: boolean;
   /** Phase timer configuration. */
   timerConfig: TimerConfig;
+  /** Whether player nominations for trial are enabled in this game. */
+  nominationsEnabled: boolean;
+  /**
+   * Current nominations for trial, grouped by defendant with nominator IDs.
+   * Only populated during daytime when nominationsEnabled is true.
+   */
+  nominations?: { defendantId: string; nominatorIds: string[] }[];
+  /** The defendant this player has nominated, if any. */
+  myNominatedDefendantId?: string;
   /** Active elimination trial. Sanitized view: no raw per-player vote breakdown. */
   activeTrial?: {
     defendantId: string;

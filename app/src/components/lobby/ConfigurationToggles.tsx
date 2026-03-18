@@ -2,6 +2,7 @@
 
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { LOBBY_CONFIG_COPY } from "./copy";
 
 interface ConfigurationTogglesProps {
   showConfigToPlayers: boolean;
@@ -23,7 +24,7 @@ export function ConfigurationToggles({
         onCheckedChange={onShowConfigToPlayersChange}
       />
       <Label htmlFor="show-config">
-        Show game configuration to all players
+        {LOBBY_CONFIG_COPY.showConfigToPlayers}
       </Label>
     </div>
   );

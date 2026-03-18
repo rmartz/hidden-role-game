@@ -364,9 +364,9 @@ describe("SetNightTarget — Bodyguard self-targeting", () => {
   function makeBodyguardGame(nightState: WerewolfTurnState): Game {
     return makePlayingGame(nightState, {
       players: [
-        { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
-        { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
-        { id: "p3", name: "Charlie", sessionId: "s3", visibleRoles: [] },
+        { id: "p1", name: "Alice", sessionId: "s1", visiblePlayers: [] },
+        { id: "p2", name: "Bob", sessionId: "s2", visiblePlayers: [] },
+        { id: "p3", name: "Charlie", sessionId: "s3", visiblePlayers: [] },
       ],
       roleAssignments: [
         { playerId: "p1", roleDefinitionId: WerewolfRole.Bodyguard },
@@ -429,9 +429,9 @@ describe("SetNightTarget — Witch once-per-game restriction", () => {
     };
     return makePlayingGame(ts, {
       players: [
-        { id: "p1", name: "Alice", sessionId: "s1", visibleRoles: [] },
-        { id: "p2", name: "Bob", sessionId: "s2", visibleRoles: [] },
-        { id: "p3", name: "Charlie", sessionId: "s3", visibleRoles: [] },
+        { id: "p1", name: "Alice", sessionId: "s1", visiblePlayers: [] },
+        { id: "p2", name: "Bob", sessionId: "s2", visiblePlayers: [] },
+        { id: "p3", name: "Charlie", sessionId: "s3", visiblePlayers: [] },
       ],
       roleAssignments: [
         { playerId: "p1", roleDefinitionId: WerewolfRole.Witch },

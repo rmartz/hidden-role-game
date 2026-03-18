@@ -33,7 +33,7 @@ function RoleAssignmentList({
       {assignments.map(({ player, role }) => (
         <li key={player.id} className="flex justify-between gap-4">
           <span>{player.name}</span>
-          <span className="text-muted-foreground">{role.name}</span>
+          {role && <span className="text-muted-foreground">{role.name}</span>}
         </li>
       ))}
     </ul>

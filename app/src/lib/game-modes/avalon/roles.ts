@@ -31,7 +31,7 @@ export const AVALON_ROLES = {
     id: AvalonRole.SpecialGood,
     name: "Special Good Role",
     team: Team.Good,
-    canSeeTeam: [Team.Bad],
+    awareOf: { teams: [Team.Bad] },
   },
   [AvalonRole.Bad]: {
     id: AvalonRole.Bad,

@@ -40,6 +40,7 @@ const mockGameState: PlayerGameState = {
   myRole: { id: "villager", name: "Villager", team: Team.Good },
   visibleRoleAssignments: [],
   rolesInPlay: undefined,
+  nominationsEnabled: false,
   timerConfig: DEFAULT_TIMER_CONFIG,
 };
 
@@ -50,6 +51,7 @@ const mockOwnerGameState: PlayerGameState = {
   visibleRoleAssignments: [
     {
       player: { id: "player-1", name: "Alice" },
+      reason: "revealed",
       role: { id: "villager", name: "Villager", team: Team.Good },
     },
   ],
@@ -73,6 +75,7 @@ describe("useStartGame", () => {
             roleConfigMode: RoleConfigMode.Default,
             showConfigToPlayers: false,
             showRolesInPlay: ShowRolesInPlay.RoleAndCount,
+            nominationsEnabled: false,
             timerConfig: DEFAULT_TIMER_CONFIG,
           },
           gameId: "game-1",

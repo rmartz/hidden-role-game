@@ -31,7 +31,7 @@ export const SECRET_VILLAIN_ROLES = {
     id: SecretVillainRole.Bad,
     name: "Bad Role",
     team: Team.Bad,
-    canSeeTeam: [Team.Bad],
+    awareOf: { teams: [Team.Bad] },
   },
   [SecretVillainRole.SpecialBad]: {
     id: SecretVillainRole.SpecialBad,

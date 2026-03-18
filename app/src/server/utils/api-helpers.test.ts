@@ -42,6 +42,7 @@ function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
       roleSlots: [],
       showConfigToPlayers: false,
       showRolesInPlay: ShowRolesInPlay.None,
+      nominationsEnabled: false,
       timerConfig: DEFAULT_TIMER_CONFIG,
     },
     ...overrides,
@@ -54,7 +55,7 @@ function makeGame(overrides: Partial<Game> = {}): Game {
       id: "player-1",
       name: "Alice",
       sessionId: "session-alice",
-      visibleRoles: [],
+      visiblePlayers: [],
     },
   ];
   return {
@@ -67,6 +68,7 @@ function makeGame(overrides: Partial<Game> = {}): Game {
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: undefined,
+    nominationsEnabled: false,
     timerConfig: DEFAULT_TIMER_CONFIG,
     ...overrides,
   };

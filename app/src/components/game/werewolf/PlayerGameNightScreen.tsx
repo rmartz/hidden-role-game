@@ -26,7 +26,7 @@ export function PlayerGameNightScreen({
 
   const isSnoozing = (gameState.amDead ?? false) || !isMyTurn;
 
-  const content = isSnoozing ? (
+  return isSnoozing ? (
     <PlayerNightSnoozeScreen amDead={gameState.amDead ?? false} />
   ) : (
     <PlayerNightActionScreen
@@ -37,6 +37,4 @@ export function PlayerGameNightScreen({
       deadPlayerIds={deadPlayerIds}
     />
   );
-
-  return content;
 }
