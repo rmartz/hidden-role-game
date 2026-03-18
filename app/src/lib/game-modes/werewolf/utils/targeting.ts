@@ -27,7 +27,7 @@ export function getTargetablePlayers(
   myPlayerId: string | undefined,
   visibleRoleAssignments: {
     player: { id: string };
-    role: { id: string; team: string };
+    role?: { id: string; team: string };
   }[],
 ): TargetablePlayer[] {
   const excludeIds: string[] = [];
@@ -37,10 +37,14 @@ export function getTargetablePlayers(
     const primaryRole = (
       WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
     )[baseGroupPhaseKey(activePhaseKey)];
-    if (primaryRole) {
-      for (const a of visibleRoleAssignments) {
-        if (a.role.team === (primaryRole.team as string))
-          excludeIds.push(a.player.id);
+    for (const a of visibleRoleAssignments) {
+      // When role info is present (narrator view), exclude same-team players.
+      // When role is absent (player view with wake-partner/aware-of), exclude all.
+      if (
+        !a.role ||
+        (primaryRole && a.role.team === (primaryRole.team as string))
+      ) {
+        excludeIds.push(a.player.id);
       }
     }
   } else {
@@ -54,7 +58,7 @@ export function getTargetablePlayers(
     if (restrictsSelf) {
       if (myPlayerId !== undefined) excludeIds.push(myPlayerId);
       for (const a of visibleRoleAssignments) {
-        if (a.role.id === activePhaseKey) excludeIds.push(a.player.id);
+        if (a.role?.id === activePhaseKey) excludeIds.push(a.player.id);
       }
     }
   }

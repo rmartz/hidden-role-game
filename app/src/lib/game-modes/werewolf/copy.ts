@@ -98,6 +98,19 @@ export const WEREWOLF_COPY = {
     endGame: "End Game",
     rolesRevealHeading: "Final Roles",
   },
+  nomination: {
+    heading: "Nominate for Trial",
+    subtitle:
+      "Nominate a player to accuse them. A seconded nomination triggers a trial.",
+    secondSectionHeading: "Second a nomination",
+    nominateSectionHeading: "Nominate another player",
+    nominateButton: (name: string) => `Nominate ${name}`,
+    secondButton: (name: string) => `Second ${name}`,
+    withdrawButton: "Withdraw Nomination",
+    yourNomination: "Your nomination",
+    nominatedBy: (name: string) => `Nominated by ${name}`,
+    youAreNominated: (name: string) => `You have been nominated by ${name}.`,
+  },
   narrator: {
     nightTitle: (turn: number, phase: number, total: number) =>
       `Night — Turn ${String(turn)} (${String(phase)}/${String(total)})`,
@@ -109,7 +122,7 @@ export const WEREWOLF_COPY = {
       "Investigation result has not been revealed to the player",
     investigationResultLabel: "Investigation result:",
     teamStatus: (isWerewolfTeam: boolean) =>
-      isWerewolfTeam ? "on the Werewolf team" : "not on the Werewolf team",
+      isWerewolfTeam ? "a Werewolf" : "not a Werewolf",
     investigationResultRevealed: "Result revealed to player.",
     revealToPlayer: "Reveal to player",
   },

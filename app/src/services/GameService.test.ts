@@ -16,9 +16,14 @@ const DEFAULT_SLOTS: RoleSlot[] = [
 
 function makePlayer(
   id: string,
-  visibleRoles: GamePlayer["visibleRoles"] = [],
+  visiblePlayers: GamePlayer["visiblePlayers"] = [],
 ): GamePlayer {
-  return { id, name: `Player ${id}`, sessionId: `session-${id}`, visibleRoles };
+  return {
+    id,
+    name: `Player ${id}`,
+    sessionId: `session-${id}`,
+    visiblePlayers,
+  };
 }
 
 function makeGameWithPlayers(
@@ -37,6 +42,7 @@ function makeGameWithPlayers(
     configuredRoleSlots,
     showRolesInPlay,
     ownerPlayerId: undefined,
+    nominationsEnabled: false,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
@@ -102,9 +108,9 @@ describe("GameService.getPlayerGameState", () => {
     expect(result?.visibleRoleAssignments).toEqual([]);
   });
 
-  it("visibleRoleAssignments lists teammates from caller's visibleRoles", () => {
+  it("visibleRoleAssignments lists teammates from caller's visiblePlayers", () => {
     const p2 = makePlayer("p2");
-    const p1 = makePlayer("p1", [{ playerId: "p2", roleDefinitionId: "bad" }]);
+    const p1 = makePlayer("p1", [{ playerId: "p2", reason: "aware-of" }]);
     const game = makeGameWithPlayers(
       [p1, p2],
       [
@@ -118,8 +124,54 @@ describe("GameService.getPlayerGameState", () => {
     expect(result?.visibleRoleAssignments).toEqual([
       {
         player: { id: "p2", name: "Player p2" },
-        role: { id: "bad", name: "Bad Role", team: Team.Bad },
+        reason: "aware-of",
       },
     ]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getPlayerGameState — narrator nominationsEnabled
+// ---------------------------------------------------------------------------
+
+function makeNarratorGame(nominationsEnabled = false): Game {
+  return {
+    id: "game-1",
+    lobbyId: "lobby-1",
+    gameMode: GameMode.SecretVillain,
+    status: { type: GameStatus.Playing },
+    players: [makePlayer("narrator"), makePlayer("p1"), makePlayer("p2")],
+    roleAssignments: [
+      { playerId: "p1", roleDefinitionId: "good" },
+      { playerId: "p2", roleDefinitionId: "bad" },
+    ],
+    configuredRoleSlots: DEFAULT_SLOTS,
+    showRolesInPlay: ShowRolesInPlay.None,
+    ownerPlayerId: "narrator",
+    nominationsEnabled,
+    timerConfig: DEFAULT_TIMER_CONFIG,
+  };
+}
+
+describe("GameService.getPlayerGameState — narrator nominationsEnabled", () => {
+  const service = new GameService();
+
+  it("narrator state has nominationsEnabled true when enabled on game", () => {
+    const game = makeNarratorGame(true);
+    const result = service.getPlayerGameState(game, "narrator");
+    expect(result?.nominationsEnabled).toBe(true);
+  });
+
+  it("narrator state has nominationsEnabled false when disabled on game", () => {
+    const game = makeNarratorGame(false);
+    const result = service.getPlayerGameState(game, "narrator");
+    expect(result?.nominationsEnabled).toBe(false);
+  });
+
+  it("narrator state has myPlayerId undefined and myRole undefined", () => {
+    const game = makeNarratorGame(true);
+    const result = service.getPlayerGameState(game, "narrator");
+    expect(result?.myPlayerId).toBeUndefined();
+    expect(result?.myRole).toBeUndefined();
   });
 });

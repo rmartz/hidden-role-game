@@ -46,6 +46,7 @@ describe("WerewolfAction.StartNight", () => {
         configuredRoleSlots: [],
         showRolesInPlay: ShowRolesInPlay.None,
         ownerPlayerId: "owner-1",
+        nominationsEnabled: false,
         timerConfig: DEFAULT_TIMER_CONFIG,
       };
       expect(action.isValid(game, "owner-1", null)).toBe(false);
@@ -90,6 +91,57 @@ describe("WerewolfAction.StartNight", () => {
 });
 
 // ---------------------------------------------------------------------------
+// StartNight — nominations do not persist across phase transitions
+// ---------------------------------------------------------------------------
+
+describe("StartNight — nominations are not carried into the new night phase", () => {
+  const startNight = WEREWOLF_ACTIONS[WerewolfAction.StartNight];
+  const startDay = WEREWOLF_ACTIONS[WerewolfAction.StartDay];
+
+  it("nominations present in daytime are absent after StartNight", () => {
+    const dayWithNominations: WerewolfTurnState = {
+      turn: 1,
+      phase: {
+        type: WerewolfPhase.Daytime,
+        startedAt: 1000,
+        nightActions: {},
+        nominations: [{ nominatorId: "p2", defendantId: "p3" }],
+      },
+      deadPlayerIds: [],
+    };
+    const game = makePlayingGame(dayWithNominations);
+    startNight.apply(game, null, "owner-1");
+
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.phase.type).toBe(WerewolfPhase.Nighttime);
+    // Nighttime phase has no nominations field
+    expect(
+      (ts.phase as unknown as Record<string, unknown>)["nominations"],
+    ).toBeUndefined();
+  });
+
+  it("nominations are absent in the daytime phase that follows the night", () => {
+    const dayWithNominations: WerewolfTurnState = {
+      turn: 1,
+      phase: {
+        type: WerewolfPhase.Daytime,
+        startedAt: 1000,
+        nightActions: {},
+        nominations: [{ nominatorId: "p2", defendantId: "p3" }],
+      },
+      deadPlayerIds: [],
+    };
+    const game = makePlayingGame(dayWithNominations);
+    startNight.apply(game, null, "owner-1");
+    startDay.apply(game, null, "owner-1");
+
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.phase.type).toBe(WerewolfPhase.Daytime);
+    expect((ts.phase as { nominations?: unknown }).nominations).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
 // StartNight — Wolf Cub bonus phase appears the turn after death, then is gone
 // ---------------------------------------------------------------------------
 
@@ -119,10 +171,10 @@ describe("StartNight — Wolf Cub bonus phase lifecycle", () => {
       },
       // Extra Villager keeps game alive after wolf cub is eliminated
       players: [
-        { id: "w1", name: "Wolf1", sessionId: "sw1", visibleRoles: [] },
-        { id: "c1", name: "Cub", sessionId: "sc1", visibleRoles: [] },
-        { id: "p3", name: "Seer", sessionId: "s3", visibleRoles: [] },
-        { id: "p4", name: "Villager", sessionId: "s4", visibleRoles: [] },
+        { id: "w1", name: "Wolf1", sessionId: "sw1", visiblePlayers: [] },
+        { id: "c1", name: "Cub", sessionId: "sc1", visiblePlayers: [] },
+        { id: "p3", name: "Seer", sessionId: "s3", visiblePlayers: [] },
+        { id: "p4", name: "Villager", sessionId: "s4", visiblePlayers: [] },
       ],
       roleAssignments: [
         { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -133,6 +185,7 @@ describe("StartNight — Wolf Cub bonus phase lifecycle", () => {
       configuredRoleSlots: [],
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner-1",
+      nominationsEnabled: false,
       timerConfig: DEFAULT_TIMER_CONFIG,
     };
   }

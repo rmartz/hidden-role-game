@@ -18,7 +18,8 @@ export interface FirebasePlayerState {
   myRole: { id: string; name: string; team: string } | null;
   visibleRoleAssignments?: {
     player: FirebaseLobbyPlayer;
-    role: { id: string; name: string; team: string };
+    reason: string;
+    role?: { id: string; name: string; team: string };
   }[];
   rolesInPlay?: RoleInPlay[] | null;
   nightActions?: Record<string, AnyNightAction>;
@@ -50,6 +51,9 @@ export interface FirebasePlayerState {
     voteResults?: { playerName: string; vote: DaytimeVote }[];
     eliminatedRole?: { id: string; name: string; team: string };
   };
+  nominationsEnabled?: boolean;
+  nominations?: { defendantId: string; nominatorIds: string[] }[];
+  myNominatedDefendantId?: string;
 }
 
 export function playerStateToFirebase(
@@ -93,6 +97,11 @@ export function playerStateToFirebase(
     ...(state.priestWardActive ? { priestWardActive: true } : {}),
     timerConfig: state.timerConfig,
     ...(state.activeTrial ? { activeTrial: state.activeTrial } : {}),
+    ...(state.nominationsEnabled ? { nominationsEnabled: true } : {}),
+    ...(state.nominations?.length ? { nominations: state.nominations } : {}),
+    ...(state.myNominatedDefendantId
+      ? { myNominatedDefendantId: state.myNominatedDefendantId }
+      : {}),
   };
 }
 
@@ -115,11 +124,16 @@ export function firebaseToPlayerState(
     visibleRoleAssignments: (raw.visibleRoleAssignments ?? []).map(
       (v): VisibleTeammate => ({
         player: v.player,
-        role: {
-          id: v.role.id,
-          name: v.role.name,
-          team: v.role.team as Team,
-        },
+        reason: v.reason as VisibleTeammate["reason"],
+        ...(v.role
+          ? {
+              role: {
+                id: v.role.id,
+                name: v.role.name,
+                team: v.role.team as Team,
+              },
+            }
+          : {}),
       }),
     ),
     rolesInPlay: raw.rolesInPlay ?? undefined,
@@ -159,6 +173,11 @@ export function firebaseToPlayerState(
       ? {
           activeTrial: raw.activeTrial as PlayerGameState["activeTrial"],
         }
+      : {}),
+    nominationsEnabled: raw.nominationsEnabled ?? false,
+    ...(raw.nominations?.length ? { nominations: raw.nominations } : {}),
+    ...(raw.myNominatedDefendantId
+      ? { myNominatedDefendantId: raw.myNominatedDefendantId }
       : {}),
   };
 }

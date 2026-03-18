@@ -3,9 +3,11 @@
 import { useEffect, useRef } from "react";
 import { GAME_MODES, getRoleSlotsRequired } from "@/lib/game-modes";
 import type { GameConfig } from "@/server/types";
+import { GameMode } from "@/lib/types";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   loadConfig,
+  setNominationEnabled,
   setPlayerCount,
   setShowConfigToPlayers,
   setShowRolesInPlay,
@@ -17,7 +19,7 @@ import { ConfigurationToggles } from "./ConfigurationToggles";
 import { RoleConfig } from "./RoleConfig";
 import { GameModePicker } from "./GameModePicker";
 import { ShowRolesInPlayPicker } from "./ShowRolesInPlayPicker";
-import { TimerConfigPanel } from "./TimerConfigPanel";
+import { WerewolfConfigPanel } from "./WerewolfConfigPanel";
 
 interface ReadOnlyProps {
   config: GameConfig;
@@ -46,6 +48,9 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
   const showRolesInPlay = useAppSelector((s) => s.gameConfig.showRolesInPlay);
   const roleConfigMode = useAppSelector((s) => s.gameConfig.roleConfigMode);
   const timerConfig = useAppSelector((s) => s.gameConfig.timerConfig);
+  const nominationEnabled = useAppSelector(
+    (s) => s.gameConfig.nominationEnabled,
+  );
   const isValid = useAppSelector((s) => s.gameConfig.isValid);
 
   const hasLoadedRef = useRef(false);
@@ -70,26 +75,32 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
   const ownerTitle = activeModeConfig.ownerTitle;
   const roleSlotsRequired = getRoleSlotsRequired(activeGameMode, playerCount);
   const disabled = readOnly ? true : props.isPending;
+  const isWerewolf = activeGameMode === GameMode.Werewolf;
 
   const resolved = readOnly
     ? {
         showRolesInPlay: config.showRolesInPlay,
         showConfigToPlayers: config.showConfigToPlayers,
         timerConfig: config.timerConfig,
+        nominationEnabled: config.nominationsEnabled,
         onShowRolesInPlayChange: undefined,
         onShowConfigToPlayersChange: undefined,
         onTimerConfigChange: undefined,
+        onNominationEnabledChange: undefined,
       }
     : {
         showRolesInPlay,
         showConfigToPlayers,
         timerConfig,
+        nominationEnabled,
         onShowRolesInPlayChange: (value: typeof showRolesInPlay) =>
           dispatch(setShowRolesInPlay(value)),
         onShowConfigToPlayersChange: (value: boolean) =>
           dispatch(setShowConfigToPlayers(value)),
         onTimerConfigChange: (value: typeof timerConfig) =>
           dispatch(setTimerConfig(value)),
+        onNominationEnabledChange: (value: boolean) =>
+          dispatch(setNominationEnabled(value)),
       };
 
   const ownerTitleText = ownerTitle
@@ -97,6 +108,16 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
       ? `This game has a ${ownerTitle} who can see all roles.`
       : `You will be the ${ownerTitle} and will see all player roles. Role slots are for the remaining ${String(roleSlotsRequired)} players.`
     : null;
+
+  const werewolfConfig = isWerewolf ? (
+    <WerewolfConfigPanel
+      timerConfig={resolved.timerConfig}
+      nominationEnabled={resolved.nominationEnabled}
+      disabled={disabled}
+      onTimerConfigChange={resolved.onTimerConfigChange}
+      onNominationEnabledChange={resolved.onNominationEnabledChange}
+    />
+  ) : null;
 
   return (
     <>
@@ -149,11 +170,7 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
             onShowConfigToPlayersChange={resolved.onShowConfigToPlayersChange}
           />
 
-          <TimerConfigPanel
-            timerConfig={resolved.timerConfig}
-            disabled={disabled}
-            onChange={resolved.onTimerConfigChange}
-          />
+          {werewolfConfig}
 
           {ownerTitleText && (
             <p className="text-sm text-muted-foreground">{ownerTitleText}</p>

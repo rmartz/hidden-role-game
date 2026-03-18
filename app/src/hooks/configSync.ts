@@ -13,13 +13,14 @@ const SYNC_INTERVAL_MS = 1000;
  * Only syncs when the owner makes user-initiated changes (syncVersion > 0).
  * Tracks whether the last sync was acknowledged by the server, and retries
  * any pending change when the WebSocket reconnects.
- * Returns a `flush` function to send any pending update immediately.
+ * Returns a `flushAsync` function that resolves once the in-flight sync
+ * is acknowledged, or immediately if there is no pending change.
  */
 export function useConfigSync(
   lobbyId: string,
   isOwner: boolean,
   isConnected: boolean,
-): { flush: () => void } {
+): { flushAsync: () => Promise<void> } {
   const gameConfig = useAppSelector((s) => s.gameConfig);
   const syncVersion = useAppSelector((s) => s.gameConfig.syncVersion);
   const updateConfig = useUpdateLobbyConfig(lobbyId);
@@ -30,6 +31,8 @@ export function useConfigSync(
   const mutateRef = useRef(updateConfig.mutate);
   // True when there are owner-initiated changes not yet acknowledged by the server.
   const hasPendingChangeRef = useRef(false);
+  // Resolvers waiting for the next sync to settle (success or error).
+  const pendingFlushResolversRef = useRef<(() => void)[]>([]);
 
   useEffect(() => {
     gameConfigRef.current = gameConfig;
@@ -48,8 +51,15 @@ export function useConfigSync(
             showConfigToPlayers,
             showRolesInPlay,
             timerConfig,
+            nominationEnabled,
           } = gameConfigRef.current;
           const roleSlots = selectRoleSlots(gameConfigRef.current);
+          const drainResolvers = () => {
+            const resolvers = pendingFlushResolversRef.current.splice(0);
+            resolvers.forEach((r) => {
+              r();
+            });
+          };
           mutateRef.current(
             {
               gameMode,
@@ -58,10 +68,15 @@ export function useConfigSync(
               showRolesInPlay,
               roleSlots,
               timerConfig,
+              nominationsEnabled: nominationEnabled,
             },
             {
               onSuccess: () => {
                 hasPendingChangeRef.current = false;
+                drainResolvers();
+              },
+              onError: () => {
+                drainResolvers();
               },
             },
           );
@@ -94,8 +109,12 @@ export function useConfigSync(
   }, [isConnected, isOwner, throttledSync]);
 
   return {
-    flush: () => {
-      throttledSync.flush();
+    flushAsync: (): Promise<void> => {
+      if (!hasPendingChangeRef.current) return Promise.resolve();
+      return new Promise((resolve) => {
+        pendingFlushResolversRef.current.push(resolve);
+        throttledSync.flush();
+      });
     },
   };
 }
