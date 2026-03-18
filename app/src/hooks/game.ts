@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueries,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { ref, onValue } from "firebase/database";
 import { getClientDatabase } from "@/lib/firebase/client";
 import {
@@ -11,8 +16,8 @@ import {
   getGameState,
 } from "@/lib/api";
 import { ServerResponseStatus } from "@/server/types";
-import type { PlayerGameState } from "@/server/types";
-import type { GameMode } from "@/lib/types";
+import type { PlayerGameState, ServerResponse } from "@/server/types";
+import type { Game, GameMode } from "@/lib/types";
 import {
   firebaseToPlayerState,
   type FirebasePlayerState,
@@ -86,6 +91,52 @@ export function useGameStateQuery(
     enabled: !!gameMode,
     retry: false,
     refetchInterval,
+  });
+}
+
+export function useAllPlayersGameStates(
+  gameId: string,
+  gameMode: GameMode,
+  players: readonly { sessionId: string }[],
+  enabled: boolean,
+): Map<string, PlayerGameState> {
+  const results = useQueries({
+    queries: players.map(({ sessionId }) => ({
+      queryKey: ["game", gameId, sessionId] as const,
+      queryFn: async () => {
+        const response = await fetch(`/api/${gameMode}/game/${gameId}`, {
+          headers: { "x-session-id": sessionId },
+        });
+        const data = (await response.json()) as ServerResponse<PlayerGameState>;
+        if (data.status === ServerResponseStatus.Error)
+          throw new Error(data.error);
+        return data.data;
+      },
+      enabled,
+      refetchInterval: enabled ? 2000 : false,
+    })),
+  });
+
+  return new Map(
+    players.flatMap(({ sessionId }, i) => {
+      const data = results[i]?.data;
+      return data ? ([[sessionId, data]] as [string, PlayerGameState][]) : [];
+    }),
+  );
+}
+
+export function useDebugFullGameState(gameId: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["debug-full-game", gameId] as const,
+    queryFn: async () => {
+      const response = await fetch(`/api/debug/game/${gameId}`);
+      const data = (await response.json()) as ServerResponse<Game>;
+      if (data.status === ServerResponseStatus.Error)
+        throw new Error(data.error);
+      return data.data;
+    },
+    enabled,
+    refetchInterval: enabled ? 2000 : false,
   });
 }
 

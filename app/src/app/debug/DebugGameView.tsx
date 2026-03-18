@@ -6,6 +6,7 @@ import type { GameMode } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import type { DebugPlayer } from "@/app/api/debug/game/route";
 import { GameScreenForPlayer } from "./GameScreenForPlayer";
+import { DebugAllStatesButton } from "./DebugAllStatesButton";
 
 export interface GameInfo {
   gameId: string;
@@ -43,6 +44,11 @@ export function DebugGameView({
         </Button>
         <div className="h-4 w-px bg-border" />
         <div className="flex gap-1.5 flex-wrap">
+          <DebugAllStatesButton
+            gameId={gameId}
+            gameMode={gameMode}
+            players={players}
+          />
           {players.map((player, i) => (
             <Button
               key={player.id}
