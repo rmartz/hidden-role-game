@@ -115,11 +115,10 @@ export default function LobbyPage() {
   }
 
   async function handleStartGame(
-    roleSlots: Parameters<typeof startGameMutation.mutate>[0]["roleSlots"],
     gameMode: Parameters<typeof startGameMutation.mutate>[0]["gameMode"],
   ) {
     await flushConfigSync();
-    startGameMutation.mutate({ roleSlots, gameMode });
+    startGameMutation.mutate({ gameMode });
   }
 
   if (!validatedGameMode || storedLobbyId === undefined || hasDifferentLobby)
@@ -134,8 +133,10 @@ export default function LobbyPage() {
             playerCount={fetchLobby.data.players.length}
             readOnly={false}
             isPending={startGameMutation.isPending}
-            onStartGame={(roleSlots, gameModeArg) => {
-              void handleStartGame(roleSlots, gameModeArg);
+            onStartGame={() => {
+              if (actualGameMode) {
+                void handleStartGame(actualGameMode);
+              }
             }}
           />
         ) : (

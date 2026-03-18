@@ -9,6 +9,7 @@ import {
 } from "@/app/api/test-utils";
 import { POST as createLobby } from "../../../lobby/create/route";
 import { POST as joinLobby } from "../../../lobby/[lobbyId]/join/route";
+import { PUT as updateConfig } from "../../../lobby/[lobbyId]/config/route";
 import { POST as startGame } from "../create/route";
 
 describe("GET /api/game/[gameId]", () => {
@@ -129,6 +130,23 @@ describe("GET /api/game/[gameId]", () => {
     const { data: joinData } = await joinRes.json();
     const bobSession = joinData.sessionId as string;
 
+    await updateConfig(
+      new Request(`http://localhost/api/lobby/${lobby.id}/config`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "x-session-id": aliceSession,
+        },
+        body: JSON.stringify({
+          roleSlots: [
+            { roleId: "avalon-special-good", min: 1, max: 1 },
+            { roleId: "avalon-bad", min: 1, max: 1 },
+          ],
+        }),
+      }),
+      makeLobbyParams(lobby.id),
+    );
+
     const startRes = await startGame(
       new Request("http://localhost/api/avalon/game/create", {
         method: "POST",
@@ -136,13 +154,7 @@ describe("GET /api/game/[gameId]", () => {
           "Content-Type": "application/json",
           "x-session-id": aliceSession,
         },
-        body: JSON.stringify({
-          lobbyId: lobby.id,
-          roleSlots: [
-            { roleId: "avalon-special-good", min: 1, max: 1 },
-            { roleId: "avalon-bad", min: 1, max: 1 },
-          ],
-        }),
+        body: JSON.stringify({ lobbyId: lobby.id }),
       }),
       makeCreateGameParams("avalon"),
     );

@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { GameMode } from "@/lib/types";
 import { GAME_MODES, getRoleSlotsRequired } from "@/lib/game-modes";
-import type { GameConfig, RoleSlot } from "@/server/types";
+import type { GameConfig } from "@/server/types";
+import { GameMode } from "@/lib/types";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   loadConfig,
-  selectRoleSlots,
   setNominationEnabled,
   setPlayerCount,
   setShowConfigToPlayers,
@@ -33,7 +32,7 @@ interface EditableProps {
   playerCount: number;
   readOnly: false;
   isPending: boolean;
-  onStartGame: (roleSlots: RoleSlot[], gameMode: GameMode) => void;
+  onStartGame: () => void;
 }
 
 type GameConfigurationPanelProps = ReadOnlyProps | EditableProps;
@@ -48,7 +47,6 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
   );
   const showRolesInPlay = useAppSelector((s) => s.gameConfig.showRolesInPlay);
   const roleConfigMode = useAppSelector((s) => s.gameConfig.roleConfigMode);
-  const roleSlots = useAppSelector((s) => selectRoleSlots(s.gameConfig));
   const timerConfig = useAppSelector((s) => s.gameConfig.timerConfig);
   const nominationEnabled = useAppSelector(
     (s) => s.gameConfig.nominationEnabled,
@@ -180,9 +178,7 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
 
           {!readOnly && (
             <Button
-              onClick={() => {
-                props.onStartGame(roleSlots, selectedGameMode);
-              }}
+              onClick={props.onStartGame}
               disabled={props.isPending || !isValid}
             >
               Start Game

@@ -19,7 +19,7 @@ export async function POST(
   if (!gameMode) return errorResponse("Unknown game mode", 400);
 
   const sessionId = request.headers.get("x-session-id") ?? undefined;
-  const { lobbyId, roleSlots } = (await request.json()) as CreateGameRequest;
+  const { lobbyId } = (await request.json()) as CreateGameRequest;
 
   const auth = await authenticateLobby(lobbyId, sessionId, {
     requireOwner: true,
@@ -31,6 +31,8 @@ export async function POST(
   if (lobby.config.gameMode !== gameMode) {
     return errorResponse("Game mode does not match lobby configuration", 409);
   }
+
+  const roleSlots = lobby.config.roleSlots;
 
   const roleSlotsRequired = getRoleSlotsRequired(
     gameMode,
