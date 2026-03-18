@@ -3,7 +3,6 @@ import type {
   ServerResponse,
   PublicLobby,
   LobbyJoinResponse,
-  RoleSlot,
   PlayerGameState,
   UpdateLobbyConfigRequest,
 } from "@/server/types";
@@ -118,7 +117,6 @@ export async function transferOwner(
 
 export async function startGame(
   lobbyId: string,
-  roleSlots: RoleSlot[],
   gameMode: GameMode,
 ): Promise<ServerResponse<{ lobby: PublicLobby }>> {
   const sessionId = getSessionId();
@@ -127,7 +125,7 @@ export async function startGame(
   const response = await fetch(`/api/${gameMode}/game/create`, {
     method: "POST",
     headers,
-    body: JSON.stringify({ lobbyId, roleSlots }),
+    body: JSON.stringify({ lobbyId }),
   });
   return (await response.json()) as ServerResponse<{ lobby: PublicLobby }>;
 }

@@ -13,7 +13,6 @@ import {
 import { ServerResponseStatus } from "@/server/types";
 import type { PlayerGameState } from "@/server/types";
 import type { GameMode } from "@/lib/types";
-import type { RoleSlot } from "@/server/types";
 import {
   firebaseToPlayerState,
   type FirebasePlayerState,
@@ -25,13 +24,8 @@ import { useGameModeContext } from "@/hooks/gameModeContext";
 export function useStartGame(lobbyId: string) {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      roleSlots,
-      gameMode,
-    }: {
-      roleSlots: RoleSlot[];
-      gameMode: GameMode;
-    }) => startGame(lobbyId, roleSlots, gameMode),
+    mutationFn: ({ gameMode }: { gameMode: GameMode }) =>
+      startGame(lobbyId, gameMode),
     onSuccess: (response) => {
       if (response.status === ServerResponseStatus.Error) return;
       void queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
