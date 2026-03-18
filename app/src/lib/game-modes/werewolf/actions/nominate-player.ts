@@ -1,7 +1,7 @@
 import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase } from "../types";
 import { currentTurnState } from "../utils";
-import { NOMINATION_VOTE_THRESHOLD } from "../config";
+import { NOMINATION_VOTE_THRESHOLD } from "../constants";
 import { startTrialAction } from "./start-trial";
 
 export const nominatePlayerAction: GameAction = {
