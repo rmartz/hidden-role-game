@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { GAME_TIMER_COPY } from "./copy";
 
 function formatTime(totalSeconds: number): string {
   const minutes = Math.floor(totalSeconds / 60);
@@ -87,14 +88,15 @@ export function GameTimer({
         }
       >
         {hasExpired && autoAdvance ? (
-          "Advancing\u2026"
+          GAME_TIMER_COPY.advancing
         ) : hasExpired ? (
           <>
-            Time&apos;s up <strong>({formatTime(overtimeSeconds)})</strong>
+            {GAME_TIMER_COPY.overtime}{" "}
+            <strong>({formatTime(overtimeSeconds)})</strong>
           </>
         ) : (
           <>
-            Time remaining:{" "}
+            {GAME_TIMER_COPY.timeRemaining}{" "}
             <strong className="text-foreground">
               {formatTime(secondsRemaining)}
             </strong>
