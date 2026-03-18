@@ -112,5 +112,11 @@ export const WEREWOLF_COPY = {
       isWerewolfTeam ? "on the Werewolf team" : "not on the Werewolf team",
     investigationResultRevealed: "Result revealed to player.",
     revealToPlayer: "Reveal to player",
+    kill: "Kill",
+    smite: "Smite",
+    smiteConfirm: "Smite this player? This bypasses all protections.",
+  },
+  smite: {
+    effect: "attacked by mysterious forces",
   },
 } as const;

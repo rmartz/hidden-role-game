@@ -13,6 +13,7 @@ import {
   getInterimAttackedPlayerIds,
   baseGroupPhaseKey,
   isRoleActive,
+  SMITE_PHASE_KEY,
 } from "@/lib/game-modes/werewolf";
 import type {
   AnyNightAction,
@@ -272,8 +273,12 @@ export class GameSerializationService {
     const nightStatus: DaytimeNightStatusEntry[] = (
       phase.nightResolution ?? []
     ).flatMap((e): DaytimeNightStatusEntry[] => {
-      if (e.type === "killed" && e.died)
-        return [{ targetPlayerId: e.targetPlayerId, effect: "killed" }];
+      if (e.type === "killed" && e.died) {
+        const effect = e.attackedBy.includes(SMITE_PHASE_KEY)
+          ? "smited"
+          : "killed";
+        return [{ targetPlayerId: e.targetPlayerId, effect }];
+      }
       if (e.type === "silenced")
         return [{ targetPlayerId: e.targetPlayerId, effect: "silenced" }];
       return [];

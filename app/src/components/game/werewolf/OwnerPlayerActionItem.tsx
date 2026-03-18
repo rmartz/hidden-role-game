@@ -10,6 +10,7 @@ interface OwnerPlayerActionItemProps {
   isDead: boolean;
   isDaytime?: boolean;
   hasActiveTrial?: boolean;
+  isSmited?: boolean;
 }
 
 export function OwnerPlayerActionItem({
@@ -18,6 +19,7 @@ export function OwnerPlayerActionItem({
   isDead,
   isDaytime,
   hasActiveTrial,
+  isSmited,
 }: OwnerPlayerActionItemProps) {
   const action = useGameAction(gameId);
 
@@ -44,6 +46,13 @@ export function OwnerPlayerActionItem({
     });
   };
 
+  const handleSmite = () => {
+    action.mutate({
+      actionId: WerewolfAction.SmitePlayer,
+      payload: { playerId },
+    });
+  };
+
   const button = isDead ? (
     <Button
       variant="outline"
@@ -63,14 +72,24 @@ export function OwnerPlayerActionItem({
       {WEREWOLF_COPY.trial.putToVote}
     </Button>
   ) : (
-    <Button
-      variant="destructive"
-      size="xs"
-      onClick={handleKill}
-      disabled={action.isPending}
-    >
-      Kill
-    </Button>
+    <>
+      <Button
+        variant="destructive"
+        size="xs"
+        onClick={handleKill}
+        disabled={action.isPending}
+      >
+        {WEREWOLF_COPY.narrator.kill}
+      </Button>
+      <Button
+        variant="outline"
+        size="xs"
+        onClick={handleSmite}
+        disabled={action.isPending || isSmited}
+      >
+        {WEREWOLF_COPY.narrator.smite}
+      </Button>
+    </>
   );
 
   return <div className="flex gap-1">{button}</div>;

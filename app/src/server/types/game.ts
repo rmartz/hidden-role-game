@@ -40,7 +40,7 @@ export interface VisibleTeammate {
 /** Night effects visible during the daytime summary. */
 export interface DaytimeNightStatusEntry {
   targetPlayerId: string;
-  effect: "killed" | "silenced";
+  effect: "killed" | "silenced" | "smited";
 }
 
 /** Night effects visible to the Witch during their nighttime phase only. */

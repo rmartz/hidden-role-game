@@ -25,6 +25,7 @@ export const startDayAction: GameAction = {
       nightPhase.nightActions,
       game.roleAssignments,
       ts.deadPlayerIds,
+      nightPhase.smitedPlayerIds,
     );
     const newDeadIds = nightResolution
       .filter((e) => e.type === "killed" && e.died)
@@ -60,6 +61,9 @@ export const startDayAction: GameAction = {
           startedAt: Date.now(),
           nightActions: nightPhase.nightActions,
           ...(nightResolution.length > 0 ? { nightResolution } : {}),
+          ...(nightPhase.smitedPlayerIds?.length
+            ? { smitedPlayerIds: nightPhase.smitedPlayerIds }
+            : {}),
         },
         deadPlayerIds: updatedDeadIds,
         ...(ts.witchAbilityUsed ? { witchAbilityUsed: true } : {}),

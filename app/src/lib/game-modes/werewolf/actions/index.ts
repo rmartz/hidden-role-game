@@ -12,6 +12,7 @@ import { startTrialAction } from "./start-trial";
 import { castVoteAction } from "./cast-vote";
 import { resolveTrialAction } from "./resolve-trial";
 import { endGameAction } from "./end-game";
+import { smitePlayerAction } from "./smite-player";
 
 export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.StartNight]: startNightAction,
@@ -26,4 +27,5 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.CastVote]: castVoteAction,
   [WerewolfAction.ResolveTrial]: resolveTrialAction,
   [WerewolfAction.EndGame]: endGameAction,
+  [WerewolfAction.SmitePlayer]: smitePlayerAction,
 };

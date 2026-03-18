@@ -41,6 +41,8 @@ export interface WerewolfNighttimePhase {
   currentPhaseIndex: number;
   /** Targets chosen during this night. Key is roleId. */
   nightActions: Record<string, AnyNightAction>;
+  /** Player IDs smited by the narrator this night. */
+  smitedPlayerIds?: string[];
 }
 
 export interface AttackNightResolutionEvent {
@@ -81,6 +83,8 @@ export interface WerewolfDaytimePhase {
   nightActions: Record<string, AnyNightAction>;
   /** Resolved attack/protect outcomes, computed when transitioning to day. */
   nightResolution?: NightResolutionEvent[];
+  /** Player IDs smited by the narrator during the preceding night. */
+  smitedPlayerIds?: string[];
   /** Active elimination trial, if one has been called by the narrator. */
   activeTrial?: ActiveTrial;
 }
