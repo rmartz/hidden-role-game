@@ -1,6 +1,12 @@
 import { describe, it, expect } from "vitest";
 import { GameService } from "./GameService";
-import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
+import {
+  GameMode,
+  GameStatus,
+  ShowRolesInPlay,
+  Team,
+  DEFAULT_TIMER_CONFIG,
+} from "@/lib/types";
 import type { Game, GamePlayer, RoleSlot } from "@/lib/types";
 
 const DEFAULT_SLOTS: RoleSlot[] = [
@@ -32,6 +38,7 @@ function makeGameWithPlayers(
     showRolesInPlay,
     ownerPlayerId: undefined,
     nominationsEnabled: false,
+    timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
 
@@ -137,6 +144,7 @@ function makeNarratorGame(nominationsEnabled = false): Game {
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "narrator",
     nominationsEnabled,
+    timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
 

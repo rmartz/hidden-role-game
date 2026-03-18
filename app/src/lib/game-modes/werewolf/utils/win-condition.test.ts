@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { GameStatus, GameMode, ShowRolesInPlay } from "@/lib/types";
+import {
+  GameStatus,
+  GameMode,
+  ShowRolesInPlay,
+  DEFAULT_TIMER_CONFIG,
+} from "@/lib/types";
 import type { Game } from "@/lib/types";
 import { WerewolfRole } from "../roles";
 import { checkWinCondition, WerewolfWinner } from "./win-condition";
@@ -23,6 +28,7 @@ function makeGame(
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner",
     nominationsEnabled: false,
+    timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
 

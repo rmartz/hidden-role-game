@@ -1,6 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { isValidSession, toPublicLobby } from "./lobby-helpers";
-import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
+import {
+  GameMode,
+  RoleConfigMode,
+  ShowRolesInPlay,
+  DEFAULT_TIMER_CONFIG,
+} from "@/lib/types";
 import type { Lobby } from "@/lib/types";
 
 function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
@@ -18,6 +23,7 @@ function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
       showConfigToPlayers: false,
       showRolesInPlay: ShowRolesInPlay.None,
       nominationsEnabled: false,
+      timerConfig: DEFAULT_TIMER_CONFIG,
     },
     ...overrides,
   };
@@ -90,6 +96,7 @@ describe("toPublicLobby", () => {
           showConfigToPlayers: true,
           showRolesInPlay: ShowRolesInPlay.None,
           nominationsEnabled: false,
+          timerConfig: DEFAULT_TIMER_CONFIG,
         },
       });
       const result = toPublicLobby(lobby, "session-bob");

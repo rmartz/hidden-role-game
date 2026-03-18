@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
+import {
+  GameMode,
+  GameStatus,
+  ShowRolesInPlay,
+  Team,
+  DEFAULT_TIMER_CONFIG,
+} from "@/lib/types";
 import type { Game } from "@/lib/types";
 import { WerewolfPhase, WerewolfRole } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
@@ -51,6 +57,7 @@ function makeDaytimeGame(
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner",
     nominationsEnabled: false,
+    timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
 
@@ -88,6 +95,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: undefined,
       nominationsEnabled: false,
+      timerConfig: DEFAULT_TIMER_CONFIG,
     };
 
     const result = service.extractDaytimeNightState(game, "player-1");
@@ -212,6 +220,7 @@ function makeNighttimeGame(
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: undefined,
     nominationsEnabled: false,
+    timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
 
@@ -320,6 +329,7 @@ function makeNighttimeGameWithBonusPhase(
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: undefined,
     nominationsEnabled: false,
+    timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
 
@@ -472,6 +482,7 @@ function makeDaytimeGameWithTrial(callerRoleId: WerewolfRole): Game {
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner",
     nominationsEnabled: false,
+    timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
 
@@ -529,6 +540,7 @@ function makeDaytimeGameWithNominations(
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner",
     nominationsEnabled,
+    timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
 

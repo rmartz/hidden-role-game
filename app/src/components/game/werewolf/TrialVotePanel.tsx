@@ -15,7 +15,8 @@ interface TrialVotePanelProps {
   players: PlayerGameState["players"];
   myPlayerId?: string;
   amDead?: boolean;
-  votePhaseSeconds?: number;
+  votePhaseSeconds: number;
+  autoAdvance: boolean;
 }
 
 export function TrialVotePanel({
@@ -25,6 +26,7 @@ export function TrialVotePanel({
   myPlayerId,
   amDead,
   votePhaseSeconds,
+  autoAdvance,
 }: TrialVotePanelProps) {
   const action = useGameAction(gameId);
   const defendant = players.find((p) => p.id === activeTrial.defendantId);
@@ -50,6 +52,7 @@ export function TrialVotePanel({
   const timer = (
     <GameTimer
       durationSeconds={votePhaseSeconds}
+      autoAdvance={autoAdvance}
       startedAt={trialStartedAt}
       resetKey={activeTrial.startedAt}
     />

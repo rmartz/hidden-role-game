@@ -5,7 +5,7 @@ import type {
   TimerConfig,
 } from "@/lib/types";
 import type { FirebaseLobbyPlayer, FirebaseRoleSlot } from "./lobby";
-import { firebaseToRoleSlot } from "./lobby";
+import { firebaseToRoleSlot, parseTimerConfig } from "./lobby";
 
 export interface FirebaseGamePublic {
   lobbyId: string;
@@ -19,7 +19,7 @@ export interface FirebaseGamePublic {
   configuredRoleSlots?: FirebaseRoleSlot[];
   showRolesInPlay: string;
   ownerPlayerId: string | null;
-  timerConfig?: TimerConfig;
+  timerConfig: TimerConfig;
   nominationsEnabled?: boolean;
   /** Unix ms timestamp set server-side at game creation. Used for TTL cleanup. */
   createdAt?: number;
@@ -53,7 +53,7 @@ export function gameToFirebase(game: Game): FirebaseGamePublic {
     })),
     showRolesInPlay: game.showRolesInPlay,
     ownerPlayerId: game.ownerPlayerId ?? null,
-    ...(game.timerConfig ? { timerConfig: game.timerConfig } : {}),
+    timerConfig: game.timerConfig,
     ...(game.nominationsEnabled ? { nominationsEnabled: true } : {}),
   };
 }
@@ -79,7 +79,13 @@ export function firebaseToGame(
     ),
     showRolesInPlay: pub.showRolesInPlay as Game["showRolesInPlay"],
     ownerPlayerId: pub.ownerPlayerId ?? undefined,
-    ...(pub.timerConfig ? { timerConfig: pub.timerConfig } : {}),
+    // The TypeScript type says TimerConfig, but old Firebase documents may
+    // have partial data (e.g. missing autoAdvance). Cast to raw Record so
+    // parseTimerConfig validates each field and fills defaults, rather than
+    // blindly trusting the cast value.
+    timerConfig: parseTimerConfig(
+      pub.timerConfig as unknown as Record<string, unknown>,
+    ),
     nominationsEnabled: pub.nominationsEnabled ?? false,
   };
 }

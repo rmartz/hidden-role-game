@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
+import {
+  GameMode,
+  GameStatus,
+  ShowRolesInPlay,
+  Team,
+  DEFAULT_TIMER_CONFIG,
+} from "@/lib/types";
 import type { Game, LobbyPlayer, RoleSlot } from "@/lib/types";
 import { WerewolfPhase, WerewolfRole } from "@/lib/game-modes/werewolf";
 import { SecretVillainRole } from "@/lib/game-modes/secret-villain";
@@ -53,6 +59,7 @@ function makeSecretVillainGame(
     showRolesInPlay,
     ownerPlayerId: undefined,
     nominationsEnabled: false,
+    timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
 

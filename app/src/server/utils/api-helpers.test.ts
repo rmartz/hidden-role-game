@@ -11,6 +11,7 @@ import {
   GameStatus,
   RoleConfigMode,
   ShowRolesInPlay,
+  DEFAULT_TIMER_CONFIG,
 } from "@/lib/types";
 import type { Lobby, Game, GamePlayer } from "@/lib/types";
 
@@ -42,6 +43,7 @@ function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
       showConfigToPlayers: false,
       showRolesInPlay: ShowRolesInPlay.None,
       nominationsEnabled: false,
+      timerConfig: DEFAULT_TIMER_CONFIG,
     },
     ...overrides,
   };
@@ -67,6 +69,7 @@ function makeGame(overrides: Partial<Game> = {}): Game {
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: undefined,
     nominationsEnabled: false,
+    timerConfig: DEFAULT_TIMER_CONFIG,
     ...overrides,
   };
 }

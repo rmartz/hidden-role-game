@@ -50,6 +50,8 @@ export function OwnerGameNightScreen({
 }: OwnerGameNightScreenProps) {
   const action = useGameAction(gameId);
 
+  const timerConfig = gameState.timerConfig;
+
   const { phase } = turnState;
   const isNighttime = phase.type === WerewolfPhase.Nighttime;
   const currentPhaseIndex = isNighttime ? phase.currentPhaseIndex : 0;
@@ -212,7 +214,8 @@ export function OwnerGameNightScreen({
         )}
       </h1>
       <GameTimer
-        durationSeconds={gameState.timerConfig?.nightPhaseSeconds}
+        durationSeconds={timerConfig.nightPhaseSeconds}
+        autoAdvance={timerConfig.autoAdvance}
         startedAt={phaseStartedAt}
         onTimerTrigger={handleAdvance}
         resetKey={currentPhaseIndex}

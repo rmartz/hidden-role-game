@@ -1,6 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { FirebaseLobbyService } from "./FirebaseLobbyService";
-import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
+import {
+  GameMode,
+  RoleConfigMode,
+  ShowRolesInPlay,
+  DEFAULT_TIMER_CONFIG,
+} from "@/lib/types";
 import type { Lobby } from "@/lib/types";
 
 function makeBaseLobby(overrides: Partial<Lobby["config"]> = {}): Lobby {
@@ -15,6 +20,7 @@ function makeBaseLobby(overrides: Partial<Lobby["config"]> = {}): Lobby {
       showConfigToPlayers: false,
       showRolesInPlay: ShowRolesInPlay.None,
       nominationsEnabled: false,
+      timerConfig: DEFAULT_TIMER_CONFIG,
       ...overrides,
     },
   };

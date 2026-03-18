@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
+import {
+  GameMode,
+  RoleConfigMode,
+  ShowRolesInPlay,
+  DEFAULT_TIMER_CONFIG,
+} from "@/lib/types";
 import type { GameConfig } from "@/server/types";
 import { GameConfigurationPanel } from "@/components/lobby";
 import { useAppSelector } from "@/store";
@@ -18,6 +23,7 @@ const DEFAULT_CONFIG: GameConfig = {
   showConfigToPlayers: false,
   showRolesInPlay: ShowRolesInPlay.None,
   nominationsEnabled: false,
+  timerConfig: DEFAULT_TIMER_CONFIG,
 };
 
 export default function DebugPage() {
@@ -42,7 +48,7 @@ export default function DebugPage() {
           gameMode,
           roleSlots,
           showRolesInPlay,
-          ...(timerConfig ? { timerConfig } : {}),
+          timerConfig,
         }),
       });
       const body = (await res.json()) as {

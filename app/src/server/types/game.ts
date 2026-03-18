@@ -106,8 +106,8 @@ export interface PlayerGameState {
   investigationResult?: { targetPlayerId: string; isWerewolfTeam: boolean };
   /** Whether the Witch has already used their once-per-game special ability. */
   witchAbilityUsed?: boolean;
-  /** Phase timer configuration. Present when the lobby has timers enabled. */
-  timerConfig?: TimerConfig;
+  /** Phase timer configuration. */
+  timerConfig: TimerConfig;
   /** Whether player nominations for trial are enabled in this game. */
   nominationsEnabled: boolean;
   /**

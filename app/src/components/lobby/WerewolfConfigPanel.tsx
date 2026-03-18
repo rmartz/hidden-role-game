@@ -7,10 +7,10 @@ import { LOBBY_CONFIG_COPY } from "./copy";
 import { TimerConfigPanel } from "./TimerConfigPanel";
 
 interface WerewolfConfigPanelProps {
-  timerConfig?: TimerConfig;
+  timerConfig: TimerConfig;
   nominationEnabled: boolean;
   disabled?: boolean;
-  onTimerConfigChange?: (config: TimerConfig | undefined) => void;
+  onTimerConfigChange?: (config: TimerConfig) => void;
   onNominationEnabledChange?: (value: boolean) => void;
 }
 

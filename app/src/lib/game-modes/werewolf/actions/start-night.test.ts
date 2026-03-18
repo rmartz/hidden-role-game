@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
+import {
+  GameMode,
+  GameStatus,
+  ShowRolesInPlay,
+  DEFAULT_TIMER_CONFIG,
+} from "@/lib/types";
 import type { Game } from "@/lib/types";
 import { WerewolfPhase } from "../types";
 import type { WerewolfTurnState, WerewolfNighttimePhase } from "../types";
@@ -42,6 +47,7 @@ describe("WerewolfAction.StartNight", () => {
         showRolesInPlay: ShowRolesInPlay.None,
         ownerPlayerId: "owner-1",
         nominationsEnabled: false,
+        timerConfig: DEFAULT_TIMER_CONFIG,
       };
       expect(action.isValid(game, "owner-1", null)).toBe(false);
     });
@@ -180,6 +186,7 @@ describe("StartNight — Wolf Cub bonus phase lifecycle", () => {
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner-1",
       nominationsEnabled: false,
+      timerConfig: DEFAULT_TIMER_CONFIG,
     };
   }
 

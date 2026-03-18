@@ -80,7 +80,7 @@ export class FirebaseGameService {
         ...(nightActions ? { nightActions } : {}),
         ...daytimeNightState,
         ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
-        ...(game.timerConfig ? { timerConfig: game.timerConfig } : {}),
+        timerConfig: game.timerConfig,
       };
     }
 
@@ -178,7 +178,7 @@ export class FirebaseGameService {
       ...daytimeNightState,
       ...(amDead ? { amDead: true } : {}),
       ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
-      ...(game.timerConfig ? { timerConfig: game.timerConfig } : {}),
+      timerConfig: game.timerConfig,
     };
   }
 
@@ -204,7 +204,7 @@ export class FirebaseGameService {
     gameMode: GameMode,
     showRolesInPlay: ShowRolesInPlay,
     ownerPlayerId: string | undefined,
-    timerConfig?: import("@/lib/types").TimerConfig,
+    timerConfig: import("@/lib/types").TimerConfig,
     nominationsEnabled?: boolean,
   ): Promise<Game> {
     const { roles } = this.getModeDefinition(gameMode);
@@ -235,7 +235,7 @@ export class FirebaseGameService {
       configuredRoleSlots: roleSlots,
       showRolesInPlay,
       ownerPlayerId,
-      ...(timerConfig ? { timerConfig } : {}),
+      timerConfig,
       nominationsEnabled: nominationsEnabled ?? false,
     };
 
