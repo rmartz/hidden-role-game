@@ -186,8 +186,7 @@ export class FirebaseLobbyService {
       data.public.config.timerConfig = config.timerConfig;
     }
     if (config.nominationsEnabled !== undefined) {
-      updates["public/config/nominationsEnabled"] =
-        config.nominationsEnabled || null;
+      updates["public/config/nominationsEnabled"] = config.nominationsEnabled;
       data.public.config.nominationsEnabled =
         config.nominationsEnabled || undefined;
     }

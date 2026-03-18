@@ -1,9 +1,8 @@
 import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase } from "../types";
 import { currentTurnState } from "../utils";
+import { NOMINATION_VOTE_THRESHOLD } from "../config";
 import { startTrialAction } from "./start-trial";
-
-const NOMINATION_THRESHOLD = 2;
 
 export const nominatePlayerAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {
@@ -45,7 +44,7 @@ export const nominatePlayerAction: GameAction = {
     const count = nominations.filter(
       (n) => n.defendantId === defendantId,
     ).length;
-    if (count >= NOMINATION_THRESHOLD) {
+    if (count >= NOMINATION_VOTE_THRESHOLD) {
       startTrialAction.apply(game, { defendantId }, callerId);
     }
   },

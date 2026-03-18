@@ -202,8 +202,9 @@ export default function LobbyPage() {
             removeMutation.mutate(playerId);
           }}
           onTransferOwner={(playerId: string) => {
-            void flushConfigSync();
-            transferOwnerMutation.mutate(playerId);
+            void flushConfigSync().then(() => {
+              transferOwnerMutation.mutate(playerId);
+            });
           }}
         />
       )}

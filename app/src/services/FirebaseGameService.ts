@@ -65,6 +65,8 @@ export class FirebaseGameService {
           ];
         },
       );
+      const daytimeNightState =
+        gameSerializationService.extractDaytimeNightState(game, callerId);
       return {
         status: game.status,
         gameMode: game.gameMode,
@@ -74,10 +76,11 @@ export class FirebaseGameService {
         myRole: undefined,
         visibleRoleAssignments,
         rolesInPlay: gameInitializationService.buildRolesInPlay(game),
+        nominationsEnabled: game.nominationsEnabled,
         ...(nightActions ? { nightActions } : {}),
+        ...daytimeNightState,
         ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
         ...(game.timerConfig ? { timerConfig: game.timerConfig } : {}),
-        nominationsEnabled: game.nominationsEnabled,
       };
     }
 

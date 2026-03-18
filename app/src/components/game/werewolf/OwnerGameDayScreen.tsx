@@ -57,15 +57,6 @@ export function OwnerGameDayScreen({
   const modeConfig = GAME_MODES[gameState.gameMode];
   const activeTrial = daytimePhase.activeTrial;
   const hasActiveTrial = !!activeTrial && !activeTrial.verdict;
-  const nominationCounts = (daytimePhase.nominations ?? []).reduce<
-    Record<string, number>
-  >((acc, n) => {
-    acc[n.defendantId] = (acc[n.defendantId] ?? 0) + 1;
-    return acc;
-  }, {});
-  const nominations = Object.entries(nominationCounts).map(
-    ([defendantId, count]) => ({ defendantId, count }),
-  );
   const glossaryRoles = gameState.rolesInPlay?.length
     ? gameState.rolesInPlay
         .map((r) => modeConfig.roles[r.id])
@@ -115,7 +106,7 @@ export function OwnerGameDayScreen({
         <NominationPanel
           gameId={gameId}
           players={gameState.players}
-          nominations={nominations}
+          nominations={gameState.nominations ?? []}
           deadPlayerIds={gameState.deadPlayerIds}
           gameOwnerId={gameState.gameOwner?.id}
           hasActiveTrial={hasActiveTrial}
