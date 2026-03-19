@@ -50,6 +50,13 @@ export function OwnerPlayerActionItem({
     });
   };
 
+  const handleKill = () => {
+    action.mutate({
+      actionId: WerewolfAction.KillPlayer,
+      payload: { playerId },
+    });
+  };
+
   const handleSmite = () => {
     action.mutate({
       actionId: WerewolfAction.SmitePlayer,
@@ -90,6 +97,37 @@ export function OwnerPlayerActionItem({
         >
           {WEREWOLF_COPY.trial.putToVote}
         </Button>
+        <AlertDialog>
+          <AlertDialogTrigger
+            render={
+              <Button
+                variant="destructive"
+                size="xs"
+                disabled={action.isPending}
+              />
+            }
+          >
+            {WEREWOLF_COPY.kill.button}
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {WEREWOLF_COPY.kill.confirmTitle}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {WEREWOLF_COPY.kill.confirmDescription(playerName)}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>
+                {WEREWOLF_COPY.kill.confirmCancel}
+              </AlertDialogCancel>
+              <AlertDialogAction onClick={handleKill}>
+                {WEREWOLF_COPY.kill.confirmAction}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     );
   }

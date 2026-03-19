@@ -198,6 +198,14 @@ export const WEREWOLF_COPY = {
     dayAnnouncement: (altruistName: string, savedName: string) =>
       `${altruistName} sacrificed themselves to save ${savedName}.`,
   },
+  kill: {
+    button: "Kill",
+    confirmTitle: "Kill player?",
+    confirmDescription: (name: string) =>
+      `${name} will be immediately eliminated. This cannot be undone.`,
+    confirmAction: "Kill",
+    confirmCancel: "Cancel",
+  },
   smite: {
     effect: "attacked by mysterious forces",
     confirmTitle: "Smite player?",
