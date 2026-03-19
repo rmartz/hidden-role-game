@@ -76,6 +76,15 @@ export function PlayerGameDayScreen({
         myPlayerId={gameState.myPlayerId}
       />
 
+      {gameState.exposerReveal && (
+        <p className="mb-4 text-sm text-muted-foreground italic">
+          {WEREWOLF_COPY.exposer.publicReveal(
+            gameState.exposerReveal.playerName,
+            gameState.exposerReveal.roleName,
+          )}
+        </p>
+      )}
+
       {gameState.amDead && (
         <p className="mb-4 font-semibold text-muted-foreground italic">
           {WEREWOLF_COPY.day.youAreEliminated}

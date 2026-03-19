@@ -1,7 +1,9 @@
+import { Team } from "@/lib/types";
 import { TargetCategory } from "../types";
 import type { AnyNightAction } from "../types";
 import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
+import { WEREWOLF_COPY } from "../copy";
 import { isGroupPhaseKey, baseGroupPhaseKey, isRoleActive } from "./phase-keys";
 import { SMITE_PHASE_KEY } from "./resolution";
 import type { PhaseKey } from "./phase-keys";
@@ -104,9 +106,20 @@ export function getActionText(
   }
 }
 
+export interface InvestigationResultForNarrator {
+  targetName: string;
+  isWerewolfTeam: boolean;
+  /** Custom label overriding the default "is/is not a Werewolf" display. */
+  resultLabel?: string;
+  /** For Mentalist: the second target's player name. */
+  secondTargetName?: string;
+}
+
 /**
  * Computes the narrator's view of an investigation result.
- * Returns the target name and alignment, or undefined if conditions aren't met.
+ * Returns the target name and alignment (plus optional custom label), or
+ * undefined if conditions aren't met.
+ * Pass `activeRoleDef` to compute role-specific results (Wizard, Mystic Seer, Mentalist).
  */
 export function getInvestigationResultForNarrator(
   isInvestigatePhase: boolean,
@@ -114,7 +127,10 @@ export function getInvestigationResultForNarrator(
   activeTargetConfirmed: boolean | undefined,
   activeTargetName: string | undefined,
   visibleRoleAssignments: VisibleTeammate[],
-): { targetName: string; isWerewolfTeam: boolean } | undefined {
+  activeRoleDef?: WerewolfRoleDefinition,
+  secondTargetId?: string,
+  secondTargetName?: string,
+): InvestigationResultForNarrator | undefined {
   if (!isInvestigatePhase || !activeTarget || !activeTargetConfirmed)
     return undefined;
   const targetAssignment = visibleRoleAssignments.find(
@@ -124,6 +140,49 @@ export function getInvestigationResultForNarrator(
   const roleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
     targetAssignment.role.id
   ];
+
+  if (activeRoleDef?.checksForSeer) {
+    const isSeer = targetAssignment.role.id === (WerewolfRole.Seer as string);
+    return {
+      targetName: activeTargetName ?? activeTarget,
+      isWerewolfTeam: isSeer,
+      resultLabel: isSeer
+        ? WEREWOLF_COPY.wizard.isSeer
+        : WEREWOLF_COPY.wizard.isNotSeer,
+    };
+  }
+
+  if (activeRoleDef?.revealsExactRole) {
+    return {
+      targetName: activeTargetName ?? activeTarget,
+      isWerewolfTeam: roleDef?.isWerewolf === true,
+      resultLabel: targetAssignment.role.name,
+    };
+  }
+
+  if (activeRoleDef?.dualTargetInvestigate && secondTargetId) {
+    const secondAssignment = visibleRoleAssignments.find(
+      (a) => a.player.id === secondTargetId,
+    );
+    if (!secondAssignment?.role) return undefined;
+    const secondRoleDef = (
+      WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
+    )[secondAssignment.role.id];
+    // Neutral players win individually, so treat them as never sharing a team.
+    const sameTeam =
+      roleDef?.team !== Team.Neutral &&
+      secondRoleDef?.team !== Team.Neutral &&
+      roleDef?.team === secondRoleDef?.team;
+    return {
+      targetName: activeTargetName ?? activeTarget,
+      isWerewolfTeam: sameTeam,
+      resultLabel: sameTeam
+        ? WEREWOLF_COPY.narrator.mentalistSameTeam
+        : WEREWOLF_COPY.narrator.mentalistDifferentTeams,
+      secondTargetName: secondTargetName ?? secondTargetId,
+    };
+  }
+
   return {
     targetName: activeTargetName ?? activeTarget,
     isWerewolfTeam: roleDef?.isWerewolf === true,

@@ -20,6 +20,12 @@ export enum WerewolfRole {
   Pacifist = "werewolf-pacifist",
   Mayor = "werewolf-mayor",
   Mummy = "werewolf-mummy",
+  Wizard = "werewolf-wizard",
+  OneEyedSeer = "werewolf-one-eyed-seer",
+  Exposer = "werewolf-exposer",
+  ElusiveSeer = "werewolf-elusive-seer",
+  Mentalist = "werewolf-mentalist",
+  MysticSeer = "werewolf-mystic-seer",
 }
 
 export interface WerewolfRoleDefinition extends RoleDefinition<
@@ -47,6 +53,14 @@ export interface WerewolfRoleDefinition extends RoleDefinition<
   alwaysVotesInnocent?: boolean;
   /** True for roles that register as "werewolf" for Seer investigation and Minion awareness. */
   isWerewolf?: boolean;
+  /** Wizard only: investigation checks if the target is the Seer (not isWerewolf). */
+  checksForSeer?: boolean;
+  /** Mystic Seer only: investigation reveals the target's exact role name. */
+  revealsExactRole?: boolean;
+  /** Mentalist only: investigation checks if two selected targets share the same team. */
+  dualTargetInvestigate?: boolean;
+  /** Exposer only: ability can only be used once per game. */
+  oncePerGame?: boolean;
 }
 
 export const MIN_PLAYERS = 7;
@@ -246,7 +260,71 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Special,
   },
-};
+  [WerewolfRole.Wizard]: {
+    id: WerewolfRole.Wizard,
+    name: "Wizard",
+    summary: "Aligned with the Werewolves, secretly hunts the Seer",
+    description:
+      "The Wizard wins with the Werewolves but operates alone — the wolves don't know the Wizard, and the Wizard doesn't know the wolves. Each night the Wizard targets one player and the Narrator privately reveals whether that player is the Seer. The Seer's own investigation returns 'not a Werewolf' for the Wizard.",
+    team: Team.Bad,
+    wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Investigate,
+    checksForSeer: true,
+  },
+  [WerewolfRole.OneEyedSeer]: {
+    id: WerewolfRole.OneEyedSeer,
+    name: "One-Eyed Seer",
+    summary: "Investigates players but locks onto detected Werewolves",
+    description:
+      "Each night the One-Eyed Seer targets one player and the Narrator privately reveals whether that player is a Werewolf (same check as the Seer). However, if the investigation reveals a Werewolf, the One-Eyed Seer is locked on — they cannot investigate any new players until that Werewolf is eliminated.",
+    team: Team.Good,
+    wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Investigate,
+  },
+  [WerewolfRole.Exposer]: {
+    id: WerewolfRole.Exposer,
+    name: "Exposer",
+    summary: "Once per game, publicly reveals a player's role",
+    description:
+      "Once per game, the Exposer may target a player at night. When confirmed, that player's role is publicly revealed to all players at the start of the following day. This ability can only be used once.",
+    team: Team.Good,
+    wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Special,
+    oncePerGame: true,
+  },
+  [WerewolfRole.ElusiveSeer]: {
+    id: WerewolfRole.ElusiveSeer,
+    name: "Elusive Seer",
+    summary: "On the first night, learns every plain Villager",
+    description:
+      "On the first night only, the Elusive Seer wakes and is shown the identity of every plain Villager in the game. They have no night action on subsequent nights.",
+    team: Team.Good,
+    wakesAtNight: WakesAtNight.FirstNightOnly,
+    targetCategory: TargetCategory.None,
+  },
+  [WerewolfRole.Mentalist]: {
+    id: WerewolfRole.Mentalist,
+    name: "Mentalist",
+    summary: "Learns if two chosen players share the same team",
+    description:
+      "Each night the Mentalist selects two players and the Narrator privately reveals whether those two players are on the same team. The Mentalist does not learn either player's specific role — only whether their teams match.",
+    team: Team.Good,
+    wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Investigate,
+    dualTargetInvestigate: true,
+  },
+  [WerewolfRole.MysticSeer]: {
+    id: WerewolfRole.MysticSeer,
+    name: "Mystic Seer",
+    summary: "Learns a player's exact role each night",
+    description:
+      "Each night the Mystic Seer targets one player and the Narrator privately reveals that player's exact role — not merely whether they are a Werewolf. This is significantly more powerful than the Seer.",
+    team: Team.Good,
+    wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Investigate,
+    revealsExactRole: true,
+  },
+} satisfies Record<WerewolfRole, WerewolfRoleDefinition>;
 
 /** Returns true if the given string is a known WerewolfRole. */
 export function isWerewolfRole(id: string): id is WerewolfRole {

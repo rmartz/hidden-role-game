@@ -105,12 +105,35 @@ export interface PlayerGameState {
    */
   previousNightTargetId?: string;
   /**
-   * Investigation result for the Seer during nighttime.
+   * Investigation result for Investigate-category roles during nighttime.
    * Only populated after the narrator explicitly reveals it.
+   * - Seer / One-Eyed Seer: isWerewolfTeam reflects the isWerewolf flag.
+   * - Wizard: isWerewolfTeam reflects whether target is the Seer; resultLabel overrides display.
+   * - Mystic Seer / Mentalist: resultLabel contains the human-readable result.
    */
-  investigationResult?: { targetPlayerId: string; isWerewolfTeam: boolean };
+  investigationResult?: {
+    targetPlayerId: string;
+    isWerewolfTeam: boolean;
+    /** When present, overrides the default "is/is not a Werewolf" display text. */
+    resultLabel?: string;
+    /** For Mentalist: the second target's player name (used in display). */
+    secondTargetName?: string;
+  };
+  /**
+   * One-Eyed Seer: set when the player is locked onto a detected Werewolf.
+   * The player cannot select a new investigation target until this player is eliminated.
+   */
+  oneEyedSeerLockedTargetId?: string;
+  /** Elusive Seer: player IDs of all Villagers in the game, shown on the first night. */
+  elusiveSeerVillagerIds?: string[];
+  /** Role publicly revealed by the Exposer. Shown to all players once set. */
+  exposerReveal?: { playerName: string; roleName: string; team: Team };
+  /** For Mentalist: the player's second night target. */
+  mySecondNightTarget?: string;
   /** Whether the Witch has already used their once-per-game special ability. */
   witchAbilityUsed?: boolean;
+  /** Whether the Exposer has already used their once-per-game reveal ability. */
+  exposerAbilityUsed?: boolean;
   /** Whether the Priest's ward is currently active (cannot target this night). */
   priestWardActive?: boolean;
   /** Phase timer configuration. */

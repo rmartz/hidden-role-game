@@ -152,13 +152,36 @@ export function OwnerGameNightScreen({
     "resultRevealed" in activeAction &&
     activeAction.resultRevealed
   );
+
+  const secondTargetId =
+    activeAction && !isTeamNightAction(activeAction)
+      ? activeAction.secondTargetPlayerId
+      : undefined;
+  const secondTargetName = secondTargetId
+    ? (getPlayerName(gameState.players, secondTargetId) ?? secondTargetId)
+    : undefined;
+
   const investigationResult = getInvestigationResultForNarrator(
     isInvestigatePhase,
     activeTarget,
     activeTargetConfirmed,
     activeTargetName,
     gameState.visibleRoleAssignments,
+    activeRoleDef,
+    secondTargetId,
+    secondTargetName,
   );
+
+  const exposerRevealData = turnState.exposerReveal;
+  const exposerRevealText = exposerRevealData
+    ? WEREWOLF_COPY.narrator.exposerRevealLabel(
+        getPlayerName(gameState.players, exposerRevealData.playerId) ??
+          exposerRevealData.playerId,
+        gameState.visibleRoleAssignments.find(
+          (a) => a.player.id === exposerRevealData.playerId,
+        )?.role?.name ?? exposerRevealData.roleId,
+      )
+    : undefined;
 
   const unconfirmedWarning =
     !isFirstTurn && !isWitchAbilitySkipped && !isActionConfirmed
@@ -269,7 +292,14 @@ export function OwnerGameNightScreen({
               targetName={investigationResult.targetName}
               isWerewolfTeam={investigationResult.isWerewolfTeam}
               isResultRevealed={isResultRevealed}
+              resultLabel={investigationResult.resultLabel}
+              secondTargetName={investigationResult.secondTargetName}
             />
+          )}
+          {exposerRevealText && (
+            <p className="mt-2 text-xs text-muted-foreground italic">
+              {exposerRevealText}
+            </p>
           )}
         </OwnerAdvanceCard>
         <NightPhaseOrderList

@@ -139,6 +139,32 @@ export const WEREWOLF_COPY = {
     nominatedBy: (name: string) => `Nominated by ${name}`,
     youAreNominated: (name: string) => `You have been nominated by ${name}.`,
   },
+  oneEyedSeer: {
+    locked: (name: string) =>
+      `You are locked onto ${name}. You cannot investigate anyone else until they are eliminated.`,
+  },
+  exposer: {
+    abilityUsed: "You have already used your Exposer ability this game.",
+    publicReveal: (playerName: string, roleName: string) =>
+      `The Exposer has revealed ${playerName}'s role: ${roleName}`,
+  },
+  elusiveSeer: {
+    villagerListHeading: "You see the following Villagers:",
+    noVillagers: "There are no plain Villagers in this game.",
+  },
+  mentalist: {
+    sameTeam: "on the same team",
+    differentTeams: "on different teams",
+    chooseSecondTarget: "Choose a second target",
+    yourTargets: "Your targets",
+  },
+  mysticSeer: {
+    resultPrefix: "is",
+  },
+  wizard: {
+    isSeer: "the Seer",
+    isNotSeer: "not the Seer",
+  },
   narrator: {
     nightTitle: (turn: number, phase: number, total: number) =>
       `Night — Turn ${String(turn)} (${String(phase)}/${String(total)})`,
@@ -154,6 +180,12 @@ export const WEREWOLF_COPY = {
     investigationResultRevealed: "Result revealed to player.",
     revealToPlayer: "Reveal to player",
     smite: "Smite",
+    exposerRevealLabel: (playerName: string, roleName: string) =>
+      `Exposer revealed: ${playerName} is the ${roleName}`,
+    oneEyedSeerLockedLabel: (playerName: string) =>
+      `One-Eyed Seer is locked onto ${playerName}.`,
+    mentalistSameTeam: "on the same team",
+    mentalistDifferentTeams: "on different teams",
   },
   smite: {
     effect: "attacked by mysterious forces",

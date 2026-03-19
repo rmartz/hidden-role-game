@@ -7,6 +7,8 @@ export type NightAction = {
   confirmed?: boolean;
   /** True once the narrator has revealed the investigation result to the player. */
   resultRevealed?: boolean;
+  /** For Mentalist only: the second target player ID. */
+  secondTargetPlayerId?: string;
 } & (
   | { targetPlayerId: string; skipped?: never }
   | { skipped: true; targetPlayerId?: never }
@@ -137,6 +139,15 @@ export interface WerewolfTurnState {
   priestWards?: Record<string, string>;
   /** Player IDs of Tough Guys who have already survived one attack. */
   toughGuyHitIds?: string[];
+  /**
+   * One-Eyed Seer is locked onto this player ID after detecting a Werewolf.
+   * Cleared when the locked target is eliminated.
+   */
+  oneEyedSeerLockedTargetId?: string;
+  /** True once the Exposer has used their once-per-game ability. */
+  exposerAbilityUsed?: boolean;
+  /** The role publicly revealed by the Exposer. Persists for the rest of the game. */
+  exposerReveal?: { playerId: string; roleId: string };
 }
 
 export interface TargetablePlayer {

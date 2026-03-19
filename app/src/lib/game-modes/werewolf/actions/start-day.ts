@@ -76,6 +76,60 @@ export const startDayAction: GameAction = {
       }
     }
 
+    // One-Eyed Seer lock: if the OES investigated a werewolf this night, lock them on.
+    // If the OES's locked target died this night, the lock is cleared (handled below).
+    let oneEyedSeerLockedTargetId = ts.oneEyedSeerLockedTargetId;
+    const oesAction =
+      nightPhase.nightActions[WerewolfRole.OneEyedSeer as string];
+    if (
+      oesAction &&
+      !isTeamNightAction(oesAction) &&
+      oesAction.confirmed &&
+      oesAction.targetPlayerId
+    ) {
+      const oesTargetAssignment = game.roleAssignments.find(
+        (a) => a.playerId === oesAction.targetPlayerId,
+      );
+      const oesTargetRoleDef = oesTargetAssignment
+        ? (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
+            oesTargetAssignment.roleDefinitionId
+          ]
+        : undefined;
+      if (oesTargetRoleDef?.isWerewolf) {
+        oneEyedSeerLockedTargetId = oesAction.targetPlayerId;
+      }
+    }
+    // Clear lock if the locked target died this turn.
+    if (
+      oneEyedSeerLockedTargetId &&
+      newDeadIds.includes(oneEyedSeerLockedTargetId)
+    ) {
+      oneEyedSeerLockedTargetId = undefined;
+    }
+
+    // Exposer reveal: if the Exposer confirmed a target this night, store the reveal.
+    let exposerReveal = ts.exposerReveal;
+    const exposerAction = nightPhase.nightActions[
+      WerewolfRole.Exposer as string
+    ] as NightAction | undefined;
+    if (
+      exposerAction &&
+      !isTeamNightAction(exposerAction) &&
+      exposerAction.confirmed &&
+      exposerAction.targetPlayerId &&
+      !exposerReveal
+    ) {
+      const exposerTargetAssignment = game.roleAssignments.find(
+        (a) => a.playerId === exposerAction.targetPlayerId,
+      );
+      if (exposerTargetAssignment) {
+        exposerReveal = {
+          playerId: exposerAction.targetPlayerId,
+          roleId: exposerTargetAssignment.roleDefinitionId,
+        };
+      }
+    }
+
     // Build lastTargets for roles that prevent consecutive same-player targeting.
     const lastTargets: Record<string, string> = {};
     for (const [phaseKey, action] of Object.entries(nightPhase.nightActions)) {
@@ -116,6 +170,9 @@ export const startDayAction: GameAction = {
         ...(wolfCubDied ? { wolfCubDied: true } : {}),
         ...(Object.keys(priestWards).length > 0 ? { priestWards } : {}),
         ...(toughGuyHitIds.length > 0 ? { toughGuyHitIds } : {}),
+        ...(oneEyedSeerLockedTargetId ? { oneEyedSeerLockedTargetId } : {}),
+        ...(ts.exposerAbilityUsed ? { exposerAbilityUsed: true } : {}),
+        ...(exposerReveal ? { exposerReveal } : {}),
       },
     };
   },

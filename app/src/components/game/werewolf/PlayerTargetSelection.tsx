@@ -31,6 +31,9 @@ interface PlayerTargetSelectionProps {
   witchAbilityUsed?: boolean;
   attackedPlayerIds?: string[];
   previousNightTargetId?: string;
+  secondTargets?: readonly (readonly [TargetablePlayer, boolean])[];
+  mySecondNightTarget?: string;
+  requiresSecondTarget?: boolean;
 }
 
 export function PlayerTargetSelection({
@@ -49,6 +52,9 @@ export function PlayerTargetSelection({
   witchAbilityUsed,
   attackedPlayerIds,
   previousNightTargetId,
+  secondTargets,
+  mySecondNightTarget,
+  requiresSecondTarget = false,
 }: PlayerTargetSelectionProps) {
   const action = useGameAction(gameId);
 
@@ -154,11 +160,44 @@ export function PlayerTargetSelection({
             </div>
           )}
 
+          {requiresSecondTarget && !isConfirmed && myNightTarget != null && (
+            <>
+              <h2 className="text-lg font-semibold mb-2 mt-4 text-center">
+                {WEREWOLF_COPY.mentalist.chooseSecondTarget}
+              </h2>
+              <div className="flex flex-col gap-2 max-w-sm mx-auto">
+                {(secondTargets ?? []).map(([player, isSelected]) => (
+                  <Button
+                    key={player.id}
+                    variant={isSelected ? "default" : "outline"}
+                    onClick={() => {
+                      action.mutate({
+                        actionId: WerewolfAction.SetNightTarget,
+                        payload: {
+                          targetPlayerId: isSelected ? undefined : player.id,
+                          isSecondTarget: true,
+                        },
+                      });
+                    }}
+                    disabled={action.isPending}
+                  >
+                    {player.name}
+                  </Button>
+                ))}
+              </div>
+            </>
+          )}
+
           <ConfirmTargetButton
             gameId={gameId}
             roleId={confirmPhaseKey}
             hasTarget={hasTarget}
-            hasDecided={isGroupPhase || myNightTarget !== undefined}
+            hasDecided={
+              requiresSecondTarget
+                ? myNightTarget !== undefined &&
+                  mySecondNightTarget !== undefined
+                : isGroupPhase || myNightTarget !== undefined
+            }
             isConfirmed={isConfirmed}
             isGroupPhase={isGroupPhase}
             hasGroupMembers={hasVisibleTeammates}

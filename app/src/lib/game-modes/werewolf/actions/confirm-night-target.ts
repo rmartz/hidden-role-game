@@ -6,7 +6,8 @@ import {
   getGroupPhasePlayerIds,
   isRoleActive,
 } from "../utils";
-import { WerewolfRole } from "../roles";
+import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
+import type { WerewolfRoleDefinition } from "../roles";
 
 export const confirmNightTargetAction: GameAction = {
   isValid(game: Game, callerId: string) {
@@ -42,6 +43,17 @@ export const confirmNightTargetAction: GameAction = {
       return targets.size === 1 && !aliveVotes.some((v) => v.skipped);
     }
 
+    // Mentalist requires both targets to be set (unless skipping entirely).
+    const roleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
+      result.activePhaseKey
+    ];
+    if (roleDef?.dualTargetInvestigate) {
+      if (!isTeamNightAction(action) && !action.skipped) {
+        if (!action.targetPlayerId || !action.secondTargetPlayerId)
+          return false;
+      }
+    }
+
     // Solo phase: action must exist (has a target or is an intentional skip).
     return true;
   },
@@ -60,6 +72,10 @@ export const confirmNightTargetAction: GameAction = {
 
     if (isRoleActive(activePhaseKey, WerewolfRole.Witch)) {
       ts.witchAbilityUsed = true;
+    }
+
+    if (isRoleActive(activePhaseKey, WerewolfRole.Exposer)) {
+      ts.exposerAbilityUsed = true;
     }
   },
 };

@@ -5,6 +5,7 @@ import {
   getTargetablePlayers,
   isGroupPhaseKey,
 } from "@/lib/game-modes/werewolf";
+import { WerewolfRole } from "@/lib/game-modes/werewolf/roles";
 import type { WerewolfNighttimePhase } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
 import { getPlayerName } from "@/lib/player-utils";
@@ -80,10 +81,53 @@ export function PlayerNightActionScreen({
     .filter((e) => e.effect === "attacked")
     .map((e) => e.targetPlayerId);
 
+  const isMentalist =
+    !isGroupPhase &&
+    gameState.myRole?.id === (WerewolfRole.Mentalist as string);
+  const allSecondTargets = isMentalist
+    ? getTargetablePlayers(
+        gameState.players,
+        gameState.gameOwner?.id,
+        deadPlayerIds,
+        activePhaseKey ?? "",
+        gameState.myPlayerId,
+        gameState.visibleRoleAssignments,
+      )
+        .filter((player) => player.id !== gameState.myNightTarget)
+        .map(
+          (player) =>
+            [player, gameState.mySecondNightTarget === player.id] as const,
+        )
+    : undefined;
+  const secondTargets =
+    isMentalist && isConfirmed
+      ? (allSecondTargets ?? []).filter(([, isSelected]) => isSelected)
+      : allSecondTargets;
+
+  const isExposerAbilityUsed =
+    !isGroupPhase &&
+    gameState.myRole?.id === (WerewolfRole.Exposer as string) &&
+    (gameState.exposerAbilityUsed ?? false);
+
+  const oesLockedTargetName = gameState.oneEyedSeerLockedTargetId
+    ? (getPlayerName(gameState.players, gameState.oneEyedSeerLockedTargetId) ??
+      gameState.oneEyedSeerLockedTargetId)
+    : undefined;
+
+  const villagerNames =
+    isFirstTurn && gameState.elusiveSeerVillagerIds
+      ? gameState.elusiveSeerVillagerIds.map(
+          (id) => getPlayerName(gameState.players, id) ?? id,
+        )
+      : undefined;
+
+  const investigationResult = gameState.investigationResult;
+
   return isFirstTurn ? (
     <PlayerFirstTurnScreen
       roleName={gameState.myRole?.name}
       teammateNames={teammateNames}
+      villagerNames={villagerNames}
     />
   ) : (
     <div className="p-5">
@@ -102,6 +146,11 @@ export function PlayerNightActionScreen({
             ? WEREWOLF_COPY.night.priestWardActive
             : WEREWOLF_COPY.night.wakeUp}
         </p>
+        {oesLockedTargetName && (
+          <p className="text-sm text-muted-foreground mb-3 italic">
+            {WEREWOLF_COPY.oneEyedSeer.locked(oesLockedTargetName)}
+          </p>
+        )}
         {priestWardActive ? (
           <ConfirmTargetButton
             gameId={gameId}
@@ -110,6 +159,19 @@ export function PlayerNightActionScreen({
             hasDecided
             isConfirmed={isConfirmed}
           />
+        ) : isExposerAbilityUsed ? (
+          <>
+            <p className="text-sm text-muted-foreground mb-3 italic">
+              {WEREWOLF_COPY.exposer.abilityUsed}
+            </p>
+            <ConfirmTargetButton
+              gameId={gameId}
+              roleId={confirmPhaseKey}
+              hasTarget={false}
+              hasDecided
+              isConfirmed={isConfirmed}
+            />
+          </>
         ) : (
           <PlayerTargetSelection
             gameId={gameId}
@@ -127,17 +189,22 @@ export function PlayerNightActionScreen({
             witchAbilityUsed={gameState.witchAbilityUsed}
             attackedPlayerIds={attackedPlayerIds}
             previousNightTargetId={gameState.previousNightTargetId}
+            secondTargets={secondTargets}
+            mySecondNightTarget={gameState.mySecondNightTarget}
+            requiresSecondTarget={isMentalist}
           />
         )}
-        {gameState.investigationResult && (
+        {investigationResult && (
           <PlayerInvestigationResult
             targetName={
               getPlayerName(
                 gameState.players,
-                gameState.investigationResult.targetPlayerId,
-              ) ?? gameState.investigationResult.targetPlayerId
+                investigationResult.targetPlayerId,
+              ) ?? investigationResult.targetPlayerId
             }
-            isWerewolfTeam={gameState.investigationResult.isWerewolfTeam}
+            isWerewolfTeam={investigationResult.isWerewolfTeam}
+            resultLabel={investigationResult.resultLabel}
+            secondTargetName={investigationResult.secondTargetName}
           />
         )}
       </div>
