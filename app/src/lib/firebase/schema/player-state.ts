@@ -42,6 +42,8 @@ export interface FirebasePlayerState {
   witchAbilityUsed?: boolean;
   priestWardActive?: boolean;
   timerConfig: TimerConfig;
+  isSilenced?: boolean;
+  isHypnotized?: boolean;
   activeTrial?: {
     defendantId: string;
     startedAt: number;
@@ -51,6 +53,8 @@ export interface FirebasePlayerState {
     voteCount: number;
     playerCount: number;
     verdict?: "eliminated" | "innocent";
+    mustVoteGuilty?: boolean;
+    mustVoteInnocent?: boolean;
     voteResults?: { playerName: string; vote: DaytimeVote }[];
     eliminatedRole?: { id: string; name: string; team: string };
   };
@@ -100,6 +104,8 @@ export function playerStateToFirebase(
     ...(state.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
     ...(state.priestWardActive ? { priestWardActive: true } : {}),
     timerConfig: state.timerConfig,
+    ...(state.isSilenced ? { isSilenced: true } : {}),
+    ...(state.isHypnotized ? { isHypnotized: true } : {}),
     ...(state.activeTrial ? { activeTrial: state.activeTrial } : {}),
     ...(state.nominationsEnabled ? { nominationsEnabled: true } : {}),
     ...(state.nominations?.length ? { nominations: state.nominations } : {}),
@@ -174,6 +180,8 @@ export function firebaseToPlayerState(
     timerConfig: parseTimerConfig(
       raw.timerConfig as unknown as Record<string, unknown>,
     ),
+    ...(raw.isSilenced ? { isSilenced: true } : {}),
+    ...(raw.isHypnotized ? { isHypnotized: true } : {}),
     ...(raw.activeTrial
       ? {
           activeTrial: raw.activeTrial as PlayerGameState["activeTrial"],

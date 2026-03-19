@@ -13,6 +13,7 @@ interface NominationPanelProps {
   players: PlayerGameState["players"];
   myPlayerId?: string;
   amDead?: boolean;
+  isSilenced?: boolean;
   nominations: NonNullable<PlayerGameState["nominations"]>;
   myNominatedDefendantId?: string;
   deadPlayerIds?: string[];
@@ -24,6 +25,7 @@ export function NominationPanel({
   players,
   myPlayerId,
   amDead,
+  isSilenced,
   nominations,
   myNominatedDefendantId,
   deadPlayerIds,
@@ -59,7 +61,7 @@ export function NominationPanel({
     nominations.map((n) => [n.defendantId, n.nominatorIds]),
   );
 
-  const canAct = !!myPlayerId && !amDead;
+  const canAct = !!myPlayerId && !amDead && !isSilenced;
 
   const nominatedPlayers = eligiblePlayers.filter(
     (p) => (nominationMap.get(p.id)?.length ?? 0) > 0,
@@ -82,6 +84,11 @@ export function NominationPanel({
       <p className="text-sm text-muted-foreground mb-3">
         {nomination.subtitle}
       </p>
+      {isSilenced && !!myPlayerId && !amDead && (
+        <p className="text-sm font-medium text-amber-600 mb-3">
+          {WEREWOLF_COPY.silence.cannotNominate}
+        </p>
+      )}
       {myNominatorName && (
         <p className="text-sm font-medium text-destructive mb-3">
           {nomination.youAreNominated(myNominatorName)}

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { WerewolfPhase } from "../types";
-import type { WerewolfTurnState } from "../types";
+import type { WerewolfTurnState, WerewolfDaytimePhase } from "../types";
 import { WerewolfRole } from "../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
 import { makePlayingGame } from "./test-helpers";
@@ -146,6 +146,15 @@ describe("WerewolfAction.NominatePlayer", () => {
         makeDayState([{ nominatorId: "p2", defendantId: "p3" }]),
         { nominationsEnabled: true },
       );
+      expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(false);
+    });
+
+    it("returns false when caller is silenced", () => {
+      const ts: WerewolfTurnState = { ...makeDayState() };
+      (ts.phase as WerewolfDaytimePhase).nightResolution = [
+        { type: "silenced", targetPlayerId: "p2" },
+      ];
+      const game = makePlayingGame(ts, { nominationsEnabled: true });
       expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(false);
     });
 

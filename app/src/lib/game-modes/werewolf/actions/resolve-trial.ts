@@ -2,6 +2,7 @@ import type { Game, GameAction } from "@/lib/types";
 import type { ActiveTrial, WerewolfTurnState } from "../types";
 import { WerewolfPhase } from "../types";
 import { currentTurnState, isOwnerPlaying, checkWinCondition } from "../utils";
+import { WerewolfRole } from "../roles";
 import { didWolfCubDie } from "./helpers";
 
 export function applyTrialVerdict(
@@ -9,12 +10,21 @@ export function applyTrialVerdict(
   ts: WerewolfTurnState,
   game: Game,
 ) {
-  const guiltyCount = activeTrial.votes.filter(
-    (v) => v.vote === "guilty",
-  ).length;
-  const innocentCount = activeTrial.votes.filter(
+  let guiltyCount = activeTrial.votes.filter((v) => v.vote === "guilty").length;
+  let innocentCount = activeTrial.votes.filter(
     (v) => v.vote === "innocent",
   ).length;
+
+  // Mayor's vote counts double (secret — extra vote added to their side)
+  for (const v of activeTrial.votes) {
+    const roleId = game.roleAssignments.find(
+      (a) => a.playerId === v.playerId,
+    )?.roleDefinitionId;
+    if (roleId === WerewolfRole.Mayor) {
+      if (v.vote === "guilty") guiltyCount++;
+      else innocentCount++;
+    }
+  }
 
   // Strictly more Guilty than Innocent → eliminated; ties/abstentions → innocent
   const eliminated = guiltyCount > innocentCount;

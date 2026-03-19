@@ -61,6 +61,13 @@ export interface SilencedNightResolutionEvent {
   targetPlayerId: string;
 }
 
+export interface HypnotizedNightResolutionEvent {
+  type: "hypnotized";
+  targetPlayerId: string;
+  /** The player ID of the Mummy who cast the hypnosis. Used to lift the effect if the Mummy dies. */
+  mummyPlayerId: string;
+}
+
 export interface ToughGuyAbsorbedNightResolutionEvent {
   type: "tough-guy-absorbed";
   targetPlayerId: string;
@@ -69,6 +76,7 @@ export interface ToughGuyAbsorbedNightResolutionEvent {
 export type NightResolutionEvent =
   | AttackNightResolutionEvent
   | SilencedNightResolutionEvent
+  | HypnotizedNightResolutionEvent
   | ToughGuyAbsorbedNightResolutionEvent;
 
 export type DaytimeVote = "guilty" | "innocent";

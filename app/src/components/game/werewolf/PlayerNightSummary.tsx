@@ -8,11 +8,13 @@ import { PlayerNightSummaryItem } from "./PlayerNightSummaryItem";
 interface PlayerNightSummaryProps {
   players: PlayerGameState["players"];
   nightStatus?: PlayerGameState["nightStatus"];
+  myPlayerId?: string;
 }
 
 export function PlayerNightSummary({
   players,
   nightStatus,
+  myPlayerId,
 }: PlayerNightSummaryProps) {
   const byPlayer = groupBy(nightStatus ?? [], (e) => e.targetPlayerId);
   const playerEntries = Object.entries(byPlayer).map(
@@ -22,6 +24,7 @@ export function PlayerNightSummary({
       killed: entries.some((e) => e.effect === "killed"),
       survived: entries.some((e) => e.effect === "survived"),
       silenced: entries.some((e) => e.effect === "silenced"),
+      hypnotized: entries.some((e) => e.effect === "hypnotized"),
       smited: entries.some((e) => e.effect === "smited"),
     }),
   );
@@ -39,6 +42,7 @@ export function PlayerNightSummary({
             killed,
             survived,
             silenced,
+            hypnotized,
             smited,
           }) => (
             <PlayerNightSummaryItem
@@ -47,7 +51,9 @@ export function PlayerNightSummary({
               killed={killed}
               survived={survived}
               silenced={silenced}
+              hypnotized={hypnotized}
               smited={smited}
+              isMe={myPlayerId === targetPlayerId}
             />
           ),
         )}

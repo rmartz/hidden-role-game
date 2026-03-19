@@ -44,7 +44,7 @@ export interface VisibleTeammate {
 /** Night effects visible during the daytime summary. */
 export interface DaytimeNightStatusEntry {
   targetPlayerId: string;
-  effect: "killed" | "silenced" | "smited" | "survived";
+  effect: "killed" | "silenced" | "hypnotized" | "smited" | "survived";
 }
 
 /** Night effects visible to the Witch during their nighttime phase only. */
@@ -124,6 +124,10 @@ export interface PlayerGameState {
   nominations?: { defendantId: string; nominatorIds: string[] }[];
   /** The defendant this player has nominated, if any. */
   myNominatedDefendantId?: string;
+  /** True if the player is silenced this day (cannot nominate or vote). */
+  isSilenced?: boolean;
+  /** True if the player is hypnotized by the Mummy (vote follows the Mummy). */
+  isHypnotized?: boolean;
   /** Active elimination trial. Sanitized view: no raw per-player vote breakdown. */
   activeTrial?: {
     defendantId: string;
@@ -138,6 +142,8 @@ export interface PlayerGameState {
     verdict?: "eliminated" | "innocent";
     /** When true, this player's role forces them to vote guilty. */
     mustVoteGuilty?: boolean;
+    /** When true, this player's role forces them to vote innocent. */
+    mustVoteInnocent?: boolean;
     /** Per-player vote results, populated once verdict is set. */
     voteResults?: { playerName: string; vote: DaytimeVote }[];
     /** Role of the eliminated player, populated when verdict is "eliminated". */

@@ -13,6 +13,8 @@ import {
   getInterimAttackedPlayerIds,
   baseGroupPhaseKey,
   isRoleActive,
+  getSilencedPlayerIds,
+  getHypnotizedPlayerId,
   SMITE_PHASE_KEY,
 } from "@/lib/game-modes/werewolf";
 import type {
@@ -297,6 +299,8 @@ export class GameSerializationService {
         return [{ targetPlayerId: e.targetPlayerId, effect: "survived" }];
       if (e.type === "silenced")
         return [{ targetPlayerId: e.targetPlayerId, effect: "silenced" }];
+      if (e.type === "hypnotized")
+        return [{ targetPlayerId: e.targetPlayerId, effect: "hypnotized" }];
       return [];
     });
 
@@ -322,13 +326,25 @@ export class GameSerializationService {
       }
     }
 
+    const silencedIds = getSilencedPlayerIds(ts);
+    const callerIsSilenced = silencedIds.includes(callerId);
+    const callerIsHypnotized = getHypnotizedPlayerId(ts) === callerId;
+
+    if (callerIsSilenced) {
+      result.isSilenced = true;
+    }
+    if (callerIsHypnotized) {
+      result.isHypnotized = true;
+    }
+
     if (phase.activeTrial) {
       const { activeTrial } = phase;
       const alivePlayerCount = game.players.filter(
         (p) =>
           p.id !== game.ownerPlayerId &&
           p.id !== activeTrial.defendantId &&
-          !ts.deadPlayerIds.includes(p.id),
+          !ts.deadPlayerIds.includes(p.id) &&
+          !silencedIds.includes(p.id),
       ).length;
       const myVote = activeTrial.votes.find(
         (v) => v.playerId === callerId,
@@ -342,6 +358,10 @@ export class GameSerializationService {
         callerRoleId !== undefined &&
         isWerewolfRole(callerRoleId) &&
         WEREWOLF_ROLES[callerRoleId].alwaysVotesGuilty === true;
+      const mustVoteInnocent =
+        callerRoleId !== undefined &&
+        isWerewolfRole(callerRoleId) &&
+        WEREWOLF_ROLES[callerRoleId].alwaysVotesInnocent === true;
 
       result.activeTrial = {
         defendantId: activeTrial.defendantId,
@@ -355,6 +375,7 @@ export class GameSerializationService {
         playerCount: alivePlayerCount,
         ...(activeTrial.verdict ? { verdict: activeTrial.verdict } : {}),
         ...(mustVoteGuilty ? { mustVoteGuilty: true } : {}),
+        ...(mustVoteInnocent ? { mustVoteInnocent: true } : {}),
       };
 
       if (activeTrial.verdict) {

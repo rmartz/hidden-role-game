@@ -126,6 +126,63 @@ describe("WerewolfAction.ResolveTrial", () => {
       expect(game.status.type).toBe(GameStatus.Playing);
     });
 
+    it("Mayor vote counts double — tips a tie to guilty", () => {
+      // p2 (Mayor) votes guilty, p3 votes innocent → 2 guilty vs 1 innocent → eliminated
+      // Use 5 players so elimination does not trigger a win condition.
+      const game = makePlayingGame(
+        makeDayStateWithPendingTrial("p4", [
+          { playerId: "p2", vote: "guilty" },
+          { playerId: "p3", vote: "innocent" },
+        ]),
+        {
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Mayor },
+            { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+          ],
+        },
+      );
+      action.apply(game, {}, "owner-1");
+      const ts = (
+        game.status as {
+          turnState: {
+            phase: { activeTrial: { verdict?: string } };
+          };
+        }
+      ).turnState.phase;
+      expect(ts.activeTrial.verdict).toBe("eliminated");
+    });
+
+    it("Mayor vote counts double — tips a tie to innocent", () => {
+      // p2 votes guilty, p3 (Mayor) votes innocent → 1 guilty vs 2 innocent → innocent
+      const game = makePlayingGame(
+        makeDayStateWithPendingTrial("p4", [
+          { playerId: "p2", vote: "guilty" },
+          { playerId: "p3", vote: "innocent" },
+        ]),
+        {
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p3", roleDefinitionId: WerewolfRole.Mayor },
+            { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+          ],
+        },
+      );
+      action.apply(game, {}, "owner-1");
+      const ts = (
+        game.status as {
+          turnState: {
+            phase: { activeTrial: { verdict?: string } };
+          };
+        }
+      ).turnState.phase;
+      expect(ts.activeTrial.verdict).toBe("innocent");
+    });
+
     it("does not end game when defendant is found innocent", () => {
       // 1 bad (p1) + 2 good (p2=defendant, p3=voter) — p2 innocent, game continues
       const game = makePlayingGame(

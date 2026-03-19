@@ -98,6 +98,20 @@ export const WEREWOLF_COPY = {
     putToVote: "Put to Vote",
     mustVoteGuiltyNote:
       "As the Village Idiot, your vote was automatically cast as Guilty.",
+    mustVoteInnocentNote:
+      "As the Pacifist, your vote was automatically cast as Innocent.",
+    silencedCannotVote: "You are silenced and cannot vote.",
+    hypnotizedStatus:
+      "You are hypnotized by the Mummy. Your vote will mirror theirs.",
+  },
+  silence: {
+    nightSummary:
+      "You were silenced last night. You cannot speak — at all, in person — or nominate and vote today.",
+    cannotNominate: "You are silenced and cannot nominate.",
+  },
+  hypnotize: {
+    nightSummary:
+      "You were hypnotized by the Mummy last night. Your trial vote will automatically mirror theirs.",
   },
   glossary: {
     dialogTitle: "Role Glossary",
