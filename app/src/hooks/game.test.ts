@@ -34,6 +34,7 @@ import { useStartGame, useGameStateQuery } from "./game";
 const mockGameState: PlayerGameState = {
   status: { type: GameStatus.Playing },
   gameMode: GameMode.SecretVillain,
+  lobbyId: "lobby-1",
   players: [{ id: "player-1", name: "Alice" }],
   gameOwner: undefined,
   myPlayerId: "player-1",

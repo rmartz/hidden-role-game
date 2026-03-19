@@ -12,6 +12,7 @@ import type { FirebaseLobbyPlayer } from "./lobby";
 export interface FirebasePlayerState {
   statusJson: string; // JSON.stringify(GameStatusState)
   gameMode: string;
+  lobbyId: string;
   players?: FirebaseLobbyPlayer[];
   gameOwner: FirebaseLobbyPlayer | null;
   myPlayerId: string | null;
@@ -70,6 +71,7 @@ export function playerStateToFirebase(
   return {
     statusJson: JSON.stringify(state.status),
     gameMode: state.gameMode,
+    lobbyId: state.lobbyId,
     players: state.players,
     gameOwner: state.gameOwner ?? null,
     myPlayerId: state.myPlayerId ?? null,
@@ -121,6 +123,7 @@ export function firebaseToPlayerState(
   return {
     status: JSON.parse(raw.statusJson) as GameStatusState,
     gameMode: raw.gameMode as PlayerGameState["gameMode"],
+    lobbyId: raw.lobbyId,
     players: raw.players ?? [],
     gameOwner: raw.gameOwner ?? undefined,
     myPlayerId: raw.myPlayerId ?? undefined,

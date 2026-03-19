@@ -60,6 +60,8 @@ export type NightStatusEntry =
 export interface PlayerGameState {
   status: GameStatusState;
   gameMode: GameMode;
+  /** The lobby this game was started from. Used for returning to the lobby after the game ends. */
+  lobbyId: string;
   players: PublicLobbyPlayer[];
   gameOwner?: PublicLobbyPlayer;
   /** The current player's own player ID. Undefined for the narrator/owner. */

@@ -6,6 +6,8 @@ import { WerewolfWinner } from "@/lib/game-modes/werewolf/utils/win-condition";
 import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 import type { PlayerGameState, VisibleTeammate } from "@/server/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useReturnToLobby } from "@/hooks";
 
 interface GameOverScreenProps {
   gameState: PlayerGameState;
@@ -41,6 +43,8 @@ function RoleAssignmentList({
 }
 
 export function GameOverScreen({ gameState }: GameOverScreenProps) {
+  const returnToLobbyMutation = useReturnToLobby(gameState.lobbyId);
+
   const finishedStatus = gameState.status as FinishedGameStatus;
   const { winner } = finishedStatus;
   const victory = isVictory(winner, gameState.myRole);
@@ -71,7 +75,7 @@ export function GameOverScreen({ gameState }: GameOverScreenProps) {
         <p className="text-lg text-muted-foreground mb-6">{subheading}</p>
       )}
       {!subheading && <div className="mb-6" />}
-      <Card>
+      <Card className="mb-4">
         <CardHeader className="pb-2 pt-4">
           <CardTitle className="text-sm">
             {WEREWOLF_COPY.gameOver.rolesRevealHeading}
@@ -81,6 +85,16 @@ export function GameOverScreen({ gameState }: GameOverScreenProps) {
           <RoleAssignmentList assignments={gameState.visibleRoleAssignments} />
         </CardContent>
       </Card>
+      <Button
+        className="w-full"
+        variant="outline"
+        onClick={() => {
+          returnToLobbyMutation.mutate();
+        }}
+        disabled={returnToLobbyMutation.isPending}
+      >
+        {WEREWOLF_COPY.gameOver.returnToLobby}
+      </Button>
     </div>
   );
 }
