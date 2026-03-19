@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import type { DaytimeVote } from "@/lib/game-modes/werewolf";
 import { WEREWOLF_COPY, WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
@@ -16,7 +16,9 @@ interface TrialVotePanelProps {
   myPlayerId?: string;
   amDead?: boolean;
   votePhaseSeconds: number;
+  defensePhaseSeconds: number;
   autoAdvance: boolean;
+  isSilenced?: boolean;
 }
 
 export function TrialVotePanel({
@@ -26,7 +28,9 @@ export function TrialVotePanel({
   myPlayerId,
   amDead,
   votePhaseSeconds,
+  defensePhaseSeconds,
   autoAdvance,
+  isSilenced,
 }: TrialVotePanelProps) {
   const action = useGameAction(gameId);
   const defendant = players.find((p) => p.id === activeTrial.defendantId);
@@ -40,6 +44,10 @@ export function TrialVotePanel({
   );
 
   const { trial } = WEREWOLF_COPY;
+  const [silencedDefenseMessage] = useState(() => {
+    const msgs = trial.defenseSilenced;
+    return msgs[Math.floor(Math.random() * msgs.length)];
+  });
   const verdictLabel = activeTrial.verdict
     ? activeTrial.verdict === "eliminated"
       ? trial.verdictLabelEliminated
@@ -49,12 +57,25 @@ export function TrialVotePanel({
   const canVote = !amDead && !isDefendant;
   const hasVoted = !!activeTrial.myVote;
   const trialStartedAt = new Date(activeTrial.startedAt);
-  const timer = (
+  const voteTimerStartedAt = activeTrial.voteStartedAt
+    ? new Date(activeTrial.voteStartedAt)
+    : trialStartedAt;
+
+  const defenseTimer = (
     <GameTimer
-      durationSeconds={votePhaseSeconds}
+      durationSeconds={defensePhaseSeconds}
       autoAdvance={autoAdvance}
       startedAt={trialStartedAt}
       resetKey={activeTrial.startedAt}
+    />
+  );
+
+  const voteTimer = (
+    <GameTimer
+      durationSeconds={votePhaseSeconds}
+      autoAdvance={autoAdvance}
+      startedAt={voteTimerStartedAt}
+      resetKey={activeTrial.voteStartedAt ?? activeTrial.startedAt}
     />
   );
 
@@ -82,18 +103,33 @@ export function TrialVotePanel({
         </p>
       )}
     </>
+  ) : activeTrial.phase === "defense" ? (
+    <>
+      <p className="font-semibold mb-1">
+        {trial.defenseHeading(defendantName)}
+      </p>
+      <p className="text-sm text-muted-foreground mb-2">
+        {trial.defenseSubtext}
+      </p>
+      {isDefendant && isSilenced && (
+        <p className="text-sm italic text-muted-foreground mb-2">
+          {silencedDefenseMessage}
+        </p>
+      )}
+      {defenseTimer}
+    </>
   ) : isDefendant ? (
     <>
       <p className="font-semibold mb-1">{trial.youAreOnTrial}</p>
       <p className="text-sm text-muted-foreground mb-2">
         {trial.youAreOnTrialSubtext}
       </p>
-      {timer}
+      {voteTimer}
     </>
   ) : (
     <>
       <p className="font-semibold mb-1">{trial.voteHeading(defendantName)}</p>
-      {timer}
+      {voteTimer}
       <p className="text-sm text-muted-foreground mb-3 mt-2">
         {trial.votesCast(activeTrial.voteCount, activeTrial.playerCount)}
         {hasVoted && activeTrial.myVote && trial.yourVote(activeTrial.myVote)}

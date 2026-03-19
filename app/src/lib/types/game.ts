@@ -174,14 +174,17 @@ export interface TimerConfig {
   dayPhaseSeconds: number;
   /** Seconds for a daytime elimination vote. */
   votePhaseSeconds: number;
+  /** Seconds for the defense speech before an elimination vote. */
+  defensePhaseSeconds: number;
 }
 
 export const DEFAULT_TIMER_CONFIG: TimerConfig = {
-  autoAdvance: true,
+  autoAdvance: false,
   startCountdownSeconds: 10,
   nightPhaseSeconds: 30,
   dayPhaseSeconds: 300,
   votePhaseSeconds: 20,
+  defensePhaseSeconds: 10,
 };
 
 // --- Lobby (top-level entity; game is absent until started) ---

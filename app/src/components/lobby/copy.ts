@@ -6,6 +6,25 @@ export const LOBBY_CONFIG_COPY = {
   timerManual: "Manual",
 } as const;
 
+export const PLAYER_ROW_COPY = {
+  leaveTitle: "Leave this lobby?",
+  leaveDescription: "You will be removed from the lobby.",
+  leaveConfirm: "Leave",
+  leaveCancel: "Cancel",
+  removeTitle: (name: string) => `Remove ${name} from the lobby?`,
+  removeDescription: "This player will be removed from the lobby.",
+  removeConfirm: "Remove",
+  removeCancel: "Cancel",
+  transferTitle: (name: string) => `Make ${name} the lobby owner?`,
+  transferDescription:
+    "You will lose owner privileges and this player will become the new lobby owner.",
+  transferConfirm: "Transfer",
+  transferCancel: "Cancel",
+  leaveButton: "Leave",
+  removeButton: "Remove",
+  makeOwnerButton: "Make Owner",
+} as const;
+
 export const TIMER_CONFIG_COPY = {
   heading: "Phase Timers",
   autoAdvance: "Automatically advance when timer expires",
@@ -13,4 +32,5 @@ export const TIMER_CONFIG_COPY = {
   nightPhase: "Night phase (per role)",
   dayDiscussion: "Day discussion",
   votingPhase: "Voting phase",
+  defensePhase: "Defense speech",
 } as const;

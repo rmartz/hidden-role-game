@@ -6,7 +6,6 @@ import {
   getSilencedPlayerIds,
 } from "../utils";
 import { WEREWOLF_ROLES, isWerewolfRole } from "../roles";
-import { applyTrialVerdict } from "./resolve-trial";
 
 export const startTrialAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {
@@ -70,23 +69,11 @@ export const startTrialAction: GameAction = {
     const activeTrial = {
       defendantId,
       startedAt: Date.now(),
+      phase: "defense" as const,
       votes: [...precastGuiltyVotes, ...precastInnocentVotes],
     };
     ts.phase.activeTrial = activeTrial;
     // Clear all nominations when a trial begins
     ts.phase.nominations = [];
-
-    // Auto-resolve if precast votes account for all eligible votes.
-    // Silenced players cannot vote and are excluded from the eligible count.
-    const eligibleCount = game.players.filter(
-      (p) =>
-        p.id !== game.ownerPlayerId &&
-        p.id !== defendantId &&
-        !ts.deadPlayerIds.includes(p.id) &&
-        !silencedIds.includes(p.id),
-    ).length;
-    if (activeTrial.votes.length >= eligibleCount) {
-      applyTrialVerdict(activeTrial, ts, game);
-    }
   },
 };

@@ -89,7 +89,13 @@ export function PlayerGameDayScreen({
           myPlayerId={gameState.myPlayerId}
           amDead={gameState.amDead}
           votePhaseSeconds={timerConfig.votePhaseSeconds}
+          defensePhaseSeconds={timerConfig.defensePhaseSeconds}
           autoAdvance={timerConfig.autoAdvance}
+          isSilenced={gameState.nightStatus?.some(
+            (e) =>
+              e.effect === "silenced" &&
+              e.targetPlayerId === gameState.myPlayerId,
+          )}
         />
       )}
 

@@ -73,10 +73,16 @@ export type NightResolutionEvent =
 
 export type DaytimeVote = "guilty" | "innocent";
 
+export type TrialPhase = "defense" | "voting";
+
 export interface ActiveTrial {
   defendantId: string;
   /** Unix epoch ms when the trial started. */
   startedAt: number;
+  /** Current phase of the trial: defense speech or voting. */
+  phase: TrialPhase;
+  /** Unix epoch ms when the voting phase began. Set when transitioning from defense to voting. */
+  voteStartedAt?: number;
   votes: { playerId: string; vote: DaytimeVote }[];
   verdict?: "eliminated" | "innocent";
 }

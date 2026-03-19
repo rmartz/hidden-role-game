@@ -32,7 +32,12 @@ export function OwnerGameDayScreen({
   turnState,
 }: OwnerGameDayScreenProps) {
   const timerConfig = gameState.timerConfig;
-  const { dayPhaseSeconds, votePhaseSeconds, autoAdvance } = timerConfig;
+  const {
+    dayPhaseSeconds,
+    votePhaseSeconds,
+    defensePhaseSeconds,
+    autoAdvance,
+  } = timerConfig;
 
   const action = useGameAction(gameId);
 
@@ -95,6 +100,7 @@ export function OwnerGameDayScreen({
               activeTrial={activeTrial}
               players={gameState.players}
               votePhaseSeconds={votePhaseSeconds}
+              defensePhaseSeconds={defensePhaseSeconds}
               autoAdvance={autoAdvance}
             />
           )}

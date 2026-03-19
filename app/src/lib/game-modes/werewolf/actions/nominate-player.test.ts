@@ -76,6 +76,7 @@ describe("WerewolfAction.NominatePlayer", () => {
           activeTrial: {
             defendantId: "p1",
             startedAt: 2000,
+            phase: "defense",
             votes: [],
           },
         },
@@ -95,6 +96,7 @@ describe("WerewolfAction.NominatePlayer", () => {
           activeTrial: {
             defendantId: "p1",
             startedAt: 2000,
+            phase: "voting",
             votes: [],
             verdict: "innocent",
           },
