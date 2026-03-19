@@ -13,6 +13,9 @@ export enum WerewolfRole {
   Chupacabra = "werewolf-chupacabra",
   VillageIdiot = "werewolf-village-idiot",
   Bodyguard = "werewolf-bodyguard",
+  Doctor = "werewolf-doctor",
+  Priest = "werewolf-priest",
+  ToughGuy = "werewolf-tough-guy",
   Minion = "werewolf-minion",
 }
 
@@ -28,6 +31,8 @@ export interface WerewolfRoleDefinition extends RoleDefinition<
   teamTargeting?: boolean;
   /** When true, the role cannot target the same player on consecutive nights. */
   preventRepeatTarget?: boolean;
+  /** When true, this role cannot target themselves at night. */
+  preventSelfTarget?: boolean;
   /**
    * When set, this role secretly joins the referenced role's night phase
    * instead of having its own. Other players only see the primary role's name.
@@ -161,6 +166,37 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Protect,
     preventRepeatTarget: true,
+  },
+  [WerewolfRole.Doctor]: {
+    id: WerewolfRole.Doctor,
+    name: "Doctor",
+    summary: "Protects a player from elimination each night",
+    description:
+      "Each night the Doctor chooses one player to protect from werewolf attacks. Unlike the Bodyguard, the Doctor can protect the same player on consecutive nights but cannot protect themselves.",
+    team: Team.Good,
+    wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Protect,
+    preventSelfTarget: true,
+  },
+  [WerewolfRole.Priest]: {
+    id: WerewolfRole.Priest,
+    name: "Priest",
+    summary: "Places a permanent ward on a player",
+    description:
+      "The Priest selects a player to place a ward on. The ward persists until the protected player is attacked, at which point the ward is consumed and the Priest selects a new target on the following night.",
+    team: Team.Good,
+    wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Protect,
+  },
+  [WerewolfRole.ToughGuy]: {
+    id: WerewolfRole.ToughGuy,
+    name: "Tough Guy",
+    summary: "Survives the first werewolf attack",
+    description:
+      "The Tough Guy is a resilient villager who can survive one werewolf attack. After surviving the first attack, the Tough Guy becomes vulnerable and will die normally if attacked again.",
+    team: Team.Good,
+    wakesAtNight: WakesAtNight.Never,
+    targetCategory: TargetCategory.None,
   },
   [WerewolfRole.Minion]: {
     id: WerewolfRole.Minion,

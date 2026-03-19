@@ -55,7 +55,15 @@ function collectBaseAttacksAndProtections(
   const protections = new Map<string, string[]>();
 
   for (const [phaseKey, action] of Object.entries(nightActions)) {
-    if (isRoleActive(phaseKey, [WerewolfRole.Witch, WerewolfRole.Spellcaster]))
+    // Witch and Spellcaster are handled separately below.
+    // Priest protection is handled via priestWards, not the generic Protect pipeline.
+    if (
+      isRoleActive(phaseKey, [
+        WerewolfRole.Witch,
+        WerewolfRole.Spellcaster,
+        WerewolfRole.Priest,
+      ])
+    )
       continue;
 
     if (isGroupPhaseKey(phaseKey)) {
@@ -110,21 +118,39 @@ function buildKilledEvents(
   });
 }
 
+/** Adds priest ward protections to the protections map for any warded player under attack. */
+function applyPriestWards(
+  attacks: Map<string, string[]>,
+  protections: Map<string, string[]>,
+  priestWards: Record<string, string>,
+): void {
+  for (const wardedPlayerId of Object.keys(priestWards)) {
+    if (attacks.has(wardedPlayerId)) {
+      protections.set(wardedPlayerId, [
+        ...(protections.get(wardedPlayerId) ?? []),
+        WerewolfRole.Priest,
+      ]);
+    }
+  }
+}
+
 /**
  * Returns player IDs who are currently attacked but not yet protected,
  * excluding the Witch's own action. Used to show the Witch their available
- * targets before they act.
+ * targets before they act. Also considers priest wards.
  */
 export function getInterimAttackedPlayerIds(
   nightActions: Record<string, AnyNightAction>,
   roleAssignments: PlayerRoleAssignment[],
   deadPlayerIds: string[],
+  priestWards?: Record<string, string>,
 ): string[] {
   const { attacks, protections } = collectBaseAttacksAndProtections(
     nightActions,
     roleAssignments,
     deadPlayerIds,
   );
+  if (priestWards) applyPriestWards(attacks, protections, priestWards);
   return Array.from(attacks.keys()).filter((id) => !protections.has(id));
 }
 
@@ -136,16 +162,29 @@ export function getInterimAttackedPlayerIds(
  * Witch conditionally protects (if target is already attacked) or attacks.
  * Spellcaster emits a "silenced" event for their target.
  */
+export interface NightResolutionOptions {
+  /** Active priest wards: maps warded player ID → Priest player ID. */
+  priestWards?: Record<string, string>;
+  /** Player IDs of Tough Guys who have already survived one attack. */
+  toughGuyHitIds?: string[];
+}
+
 export function resolveNightActions(
   nightActions: Record<string, AnyNightAction>,
   roleAssignments: PlayerRoleAssignment[],
   deadPlayerIds: string[],
+  options?: NightResolutionOptions,
 ): NightResolutionEvent[] {
   const { attacks, protections } = collectBaseAttacksAndProtections(
     nightActions,
     roleAssignments,
     deadPlayerIds,
   );
+
+  // Priest wards: warded players count as protected.
+  if (options?.priestWards) {
+    applyPriestWards(attacks, protections, options.priestWards);
+  }
 
   // Witch: if target is already attacked → protect; otherwise → attack.
   const witchAction = nightActions[WerewolfRole.Witch] as
@@ -165,6 +204,26 @@ export function resolveNightActions(
 
   const combatEvents = buildKilledEvents(attacks, protections);
 
+  // Tough Guy: if unprotected and not already hit, absorb the attack.
+  const toughGuyHitIds = new Set(options?.toughGuyHitIds ?? []);
+  const toughGuyEvents: NightResolutionEvent[] = [];
+  for (const event of combatEvents) {
+    if (event.type !== "killed" || !event.died) continue;
+    const assignment = roleAssignments.find(
+      (a) => a.playerId === event.targetPlayerId,
+    );
+    if (
+      assignment?.roleDefinitionId === WerewolfRole.ToughGuy &&
+      !toughGuyHitIds.has(event.targetPlayerId)
+    ) {
+      event.died = false;
+      toughGuyEvents.push({
+        type: "tough-guy-absorbed",
+        targetPlayerId: event.targetPlayerId,
+      });
+    }
+  }
+
   // Spellcaster: emit a silenced event for their target.
   const spellcasterAction = nightActions[WerewolfRole.Spellcaster] as
     | { targetPlayerId?: string }
@@ -174,5 +233,5 @@ export function resolveNightActions(
       ? [{ type: "silenced", targetPlayerId: spellcasterAction.targetPlayerId }]
       : [];
 
-  return [...combatEvents, ...silencedEvents];
+  return [...combatEvents, ...toughGuyEvents, ...silencedEvents];
 }

@@ -10,6 +10,7 @@ import type { PlayerGameState } from "@/server/types";
 import { getPlayerName } from "@/lib/player-utils";
 import { GameTimer } from "@/components/game";
 import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
+import { ConfirmTargetButton } from "./ConfirmTargetButton";
 import { PlayerFirstTurnScreen } from "./PlayerFirstTurnScreen";
 import { PlayerInvestigationResult } from "./PlayerInvestigationResult";
 import { PlayerTargetSelection } from "./PlayerTargetSelection";
@@ -36,6 +37,7 @@ export function PlayerNightActionScreen({
 
   const activePhaseKey = phase.nightPhaseOrder[phase.currentPhaseIndex];
   const isFirstTurn = turn === 1;
+  const priestWardActive = gameState.priestWardActive ?? false;
   const isGroupPhase = !!(activePhaseKey && isGroupPhaseKey(activePhaseKey));
   const teammateNames = gameState.visibleRoleAssignments.map(
     (a) => a.player.name,
@@ -96,25 +98,37 @@ export function PlayerNightActionScreen({
           resetKey={phase.currentPhaseIndex}
         />
         <p className="text-muted-foreground mb-4">
-          {WEREWOLF_COPY.night.wakeUp}
+          {priestWardActive
+            ? WEREWOLF_COPY.night.priestWardActive
+            : WEREWOLF_COPY.night.wakeUp}
         </p>
-        <PlayerTargetSelection
-          gameId={gameId}
-          players={gameState.players}
-          targets={targets}
-          isConfirmed={isConfirmed}
-          isGroupPhase={isGroupPhase}
-          confirmPhaseKey={confirmPhaseKey}
-          hasTarget={!!gameState.myNightTarget}
-          allAgreed={allAgreed}
-          hasVisibleTeammates={hasVisibleTeammates}
-          teamVotes={resolvedTeamVotes}
-          suggestedTargetId={suggestedTargetId}
-          myNightTarget={gameState.myNightTarget}
-          witchAbilityUsed={gameState.witchAbilityUsed}
-          attackedPlayerIds={attackedPlayerIds}
-          previousNightTargetId={gameState.previousNightTargetId}
-        />
+        {priestWardActive ? (
+          <ConfirmTargetButton
+            gameId={gameId}
+            roleId={confirmPhaseKey}
+            hasTarget={false}
+            hasDecided
+            isConfirmed={isConfirmed}
+          />
+        ) : (
+          <PlayerTargetSelection
+            gameId={gameId}
+            players={gameState.players}
+            targets={targets}
+            isConfirmed={isConfirmed}
+            isGroupPhase={isGroupPhase}
+            confirmPhaseKey={confirmPhaseKey}
+            hasTarget={!!gameState.myNightTarget}
+            allAgreed={allAgreed}
+            hasVisibleTeammates={hasVisibleTeammates}
+            teamVotes={resolvedTeamVotes}
+            suggestedTargetId={suggestedTargetId}
+            myNightTarget={gameState.myNightTarget}
+            witchAbilityUsed={gameState.witchAbilityUsed}
+            attackedPlayerIds={attackedPlayerIds}
+            previousNightTargetId={gameState.previousNightTargetId}
+          />
+        )}
         {gameState.investigationResult && (
           <PlayerInvestigationResult
             targetName={
