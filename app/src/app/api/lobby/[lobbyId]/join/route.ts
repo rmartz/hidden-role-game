@@ -3,6 +3,7 @@ import { ServerResponseStatus, type JoinLobbyRequest } from "@/server/types";
 import { lobbyService } from "@/services/LobbyService";
 import {
   errorResponse,
+  normalizePlayerName,
   toPublicLobby,
   validatePlayerName,
 } from "@/server/utils";
@@ -16,7 +17,8 @@ export async function POST(
   const { lobbyId } = await params;
   const body = (await request.json()) as JoinLobbyRequest;
 
-  const nameError = validatePlayerName(body.playerName);
+  const displayName = body.playerName.trim().replace(/\s+/g, " ");
+  const nameError = validatePlayerName(displayName);
   if (nameError) {
     return errorResponse(nameError, 400);
   }
@@ -31,10 +33,21 @@ export async function POST(
     return errorResponse("Lobby is full", 400);
   }
 
+  const normalizedNew = normalizePlayerName(displayName);
+  const isDuplicate = lobby.players.some(
+    (p) => normalizePlayerName(p.name) === normalizedNew,
+  );
+  if (isDuplicate) {
+    return errorResponse(
+      "A player with that name is already in the lobby",
+      400,
+    );
+  }
+
   const sessionId = randomUUID();
   const newPlayer = {
     id: randomUUID(),
-    name: body.playerName,
+    name: displayName,
     sessionId,
   };
 
