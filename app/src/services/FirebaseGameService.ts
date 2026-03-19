@@ -103,7 +103,6 @@ export class FirebaseGameService {
           {
             player: { id: visiblePlayer.id, name: visiblePlayer.name },
             reason: vp.reason,
-            role: undefined,
           },
         ];
       });

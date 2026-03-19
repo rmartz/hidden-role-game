@@ -119,6 +119,18 @@ describe("getTargetablePlayers", () => {
     expect(result.map((p) => p.id)).not.toContain("p1");
   });
 
+  it("Doctor (preventSelfTarget) is excluded from their own targetable list", () => {
+    const result = getTargetablePlayers(
+      players,
+      "owner",
+      [],
+      WerewolfRole.Doctor,
+      "p1",
+      [],
+    );
+    expect(result.map((p) => p.id)).not.toContain("p1");
+  });
+
   it("Narrator view excludes Seer from Seer phase targets", () => {
     const assignments = [
       {

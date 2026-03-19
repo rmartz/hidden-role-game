@@ -14,6 +14,9 @@ export function NightOutcomeSummaryItem({
 }: NightOutcomeSummaryItemProps) {
   const silenced = events?.some((event) => event.type === "silenced");
   const killedEvent = events?.find((event) => event.type === "killed");
+  const toughGuyAbsorbed = events?.some(
+    (event) => event.type === "tough-guy-absorbed",
+  );
 
   return (
     <>
@@ -47,6 +50,11 @@ export function NightOutcomeSummaryItem({
             {killedEvent.died ? "(killed)" : "(survived)"}
           </span>
         </>
+      )}
+      {toughGuyAbsorbed && (
+        <span className="ml-1 text-orange-600 font-medium">
+          (Tough Guy absorbed)
+        </span>
       )}
       {silenced && (
         <span className="ml-1 text-yellow-600 font-medium">(silenced)</span>
