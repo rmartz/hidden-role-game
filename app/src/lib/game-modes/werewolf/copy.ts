@@ -129,5 +129,10 @@ export const WEREWOLF_COPY = {
   },
   smite: {
     effect: "attacked by mysterious forces",
+    confirmTitle: "Smite player?",
+    confirmDescription: (name: string) =>
+      `${name} will be killed by mysterious forces at the start of day. This bypasses all protections.`,
+    confirmAction: "Smite",
+    confirmCancel: "Cancel",
   },
 } as const;

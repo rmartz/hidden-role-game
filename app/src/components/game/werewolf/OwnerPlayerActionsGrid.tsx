@@ -31,11 +31,12 @@ export function OwnerPlayerActionsGrid({
       assignments={assignments}
       gameMode={gameMode}
       deadPlayerIds={deadPlayerIds}
-      renderActions={(playerId, isDead) =>
+      renderActions={(playerId, playerName, isDead) =>
         playerId === gameOwnerId ? null : (
           <OwnerPlayerActionItem
             gameId={gameId}
             playerId={playerId}
+            playerName={playerName}
             isDead={isDead}
             isDaytime={isDaytime}
             hasActiveTrial={hasActiveTrial}
