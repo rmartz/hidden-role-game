@@ -63,7 +63,9 @@ export function PlayerRow({
               </AlertDialogCancel>
               <AlertDialogAction
                 variant="destructive"
-                onClick={() => { onRemovePlayer(player.id); }}
+                onClick={() => {
+                  onRemovePlayer(player.id);
+                }}
               >
                 {PLAYER_ROW_COPY.leaveConfirm}
               </AlertDialogAction>
@@ -95,7 +97,9 @@ export function PlayerRow({
               </AlertDialogCancel>
               <AlertDialogAction
                 variant="destructive"
-                onClick={() => { onRemovePlayer(player.id); }}
+                onClick={() => {
+                  onRemovePlayer(player.id);
+                }}
               >
                 {PLAYER_ROW_COPY.removeConfirm}
               </AlertDialogAction>
@@ -123,7 +127,11 @@ export function PlayerRow({
               <AlertDialogCancel>
                 {PLAYER_ROW_COPY.transferCancel}
               </AlertDialogCancel>
-              <AlertDialogAction onClick={() => { onTransferOwner(player.id); }}>
+              <AlertDialogAction
+                onClick={() => {
+                  onTransferOwner(player.id);
+                }}
+              >
                 {PLAYER_ROW_COPY.transferConfirm}
               </AlertDialogAction>
             </AlertDialogFooter>
