@@ -95,6 +95,12 @@ export const WEREWOLF_COPY = {
     dialogTitle: "Role Glossary",
     openButton: "View Glossary",
   },
+  killConfirm: {
+    title: "Mark this player as dead?",
+    description: "This action will eliminate the player from the game.",
+    confirm: "Kill",
+    cancel: "Cancel",
+  },
   gameOver: {
     victory: "Victory!",
     defeat: "Game Over",

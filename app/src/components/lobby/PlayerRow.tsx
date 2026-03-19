@@ -1,6 +1,18 @@
 import type { PublicLobbyPlayer } from "@/server/types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { PLAYER_ROW_COPY } from "./copy";
 
 interface PlayerRowProps {
   player: PublicLobbyPlayer;
@@ -25,20 +37,6 @@ export function PlayerRow({
   onRemovePlayer,
   onTransferOwner,
 }: PlayerRowProps) {
-  function handleLeave() {
-    if (window.confirm("Leave this lobby?")) onRemovePlayer(player.id);
-  }
-
-  function handleRemove() {
-    if (window.confirm(`Remove ${player.name} from the lobby?`))
-      onRemovePlayer(player.id);
-  }
-
-  function handleTransferOwner() {
-    if (window.confirm(`Make ${player.name} the lobby owner?`))
-      onTransferOwner(player.id);
-  }
-
   return (
     <li className="flex items-center gap-2 py-1">
       <span>{player.name}</span>
@@ -46,34 +44,91 @@ export function PlayerRow({
         <Badge variant="secondary">Lobby owner</Badge>
       )}
       {isCurrentUser && showLeave && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleLeave}
-          disabled={disabled}
-        >
-          Leave
-        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger
+            render={<Button variant="outline" size="sm" disabled={disabled} />}
+          >
+            {PLAYER_ROW_COPY.leaveButton}
+          </AlertDialogTrigger>
+          <AlertDialogContent size="sm">
+            <AlertDialogHeader>
+              <AlertDialogTitle>{PLAYER_ROW_COPY.leaveTitle}</AlertDialogTitle>
+              <AlertDialogDescription>
+                {PLAYER_ROW_COPY.leaveDescription}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>
+                {PLAYER_ROW_COPY.leaveCancel}
+              </AlertDialogCancel>
+              <AlertDialogAction
+                variant="destructive"
+                onClick={() => { onRemovePlayer(player.id); }}
+              >
+                {PLAYER_ROW_COPY.leaveConfirm}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       )}
       {!isCurrentUser && showRemovePlayer && (
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={handleRemove}
-          disabled={disabled}
-        >
-          Remove
-        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger
+            render={
+              <Button variant="destructive" size="sm" disabled={disabled} />
+            }
+          >
+            {PLAYER_ROW_COPY.removeButton}
+          </AlertDialogTrigger>
+          <AlertDialogContent size="sm">
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {PLAYER_ROW_COPY.removeTitle(player.name)}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {PLAYER_ROW_COPY.removeDescription}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>
+                {PLAYER_ROW_COPY.removeCancel}
+              </AlertDialogCancel>
+              <AlertDialogAction
+                variant="destructive"
+                onClick={() => { onRemovePlayer(player.id); }}
+              >
+                {PLAYER_ROW_COPY.removeConfirm}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       )}
       {!isCurrentUser && showMakeOwner && (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleTransferOwner}
-          disabled={disabled}
-        >
-          Make Owner
-        </Button>
+        <AlertDialog>
+          <AlertDialogTrigger
+            render={<Button variant="outline" size="sm" disabled={disabled} />}
+          >
+            {PLAYER_ROW_COPY.makeOwnerButton}
+          </AlertDialogTrigger>
+          <AlertDialogContent size="sm">
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {PLAYER_ROW_COPY.transferTitle(player.name)}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {PLAYER_ROW_COPY.transferDescription}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>
+                {PLAYER_ROW_COPY.transferCancel}
+              </AlertDialogCancel>
+              <AlertDialogAction onClick={() => { onTransferOwner(player.id); }}>
+                {PLAYER_ROW_COPY.transferConfirm}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       )}
     </li>
   );

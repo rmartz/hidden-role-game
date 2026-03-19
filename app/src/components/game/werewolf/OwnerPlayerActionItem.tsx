@@ -3,6 +3,17 @@
 import { WEREWOLF_COPY, WerewolfAction } from "@/lib/game-modes/werewolf";
 import { useGameAction } from "@/hooks";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface OwnerPlayerActionItemProps {
   gameId: string;
@@ -29,12 +40,10 @@ export function OwnerPlayerActionItem({
   };
 
   const handleKill = () => {
-    if (window.confirm("Mark this player as dead?")) {
-      action.mutate({
-        actionId: WerewolfAction.MarkPlayerDead,
-        payload: { playerId },
-      });
-    }
+    action.mutate({
+      actionId: WerewolfAction.MarkPlayerDead,
+      payload: { playerId },
+    });
   };
 
   const handlePutToVote = () => {
@@ -63,14 +72,31 @@ export function OwnerPlayerActionItem({
       {WEREWOLF_COPY.trial.putToVote}
     </Button>
   ) : (
-    <Button
-      variant="destructive"
-      size="xs"
-      onClick={handleKill}
-      disabled={action.isPending}
-    >
-      Kill
-    </Button>
+    <AlertDialog>
+      <AlertDialogTrigger
+        render={
+          <Button variant="destructive" size="xs" disabled={action.isPending} />
+        }
+      >
+        Kill
+      </AlertDialogTrigger>
+      <AlertDialogContent size="sm">
+        <AlertDialogHeader>
+          <AlertDialogTitle>{WEREWOLF_COPY.killConfirm.title}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {WEREWOLF_COPY.killConfirm.description}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>
+            {WEREWOLF_COPY.killConfirm.cancel}
+          </AlertDialogCancel>
+          <AlertDialogAction variant="destructive" onClick={handleKill}>
+            {WEREWOLF_COPY.killConfirm.confirm}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 
   return <div className="flex gap-1">{button}</div>;
