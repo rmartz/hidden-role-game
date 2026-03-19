@@ -1,7 +1,13 @@
+import { GameStatus } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
 import type { ActiveTrial, WerewolfTurnState } from "../types";
 import { WerewolfPhase } from "../types";
-import { currentTurnState, isOwnerPlaying, checkWinCondition } from "../utils";
+import {
+  currentTurnState,
+  isOwnerPlaying,
+  checkWinCondition,
+  WerewolfWinner,
+} from "../utils";
 import { WerewolfRole } from "../roles";
 import { didWolfCubDie, cleanupAfterDaytimeKill } from "./helpers";
 
@@ -60,13 +66,45 @@ export const resolveTrialAction: GameAction = {
     if (!activeTrial) return;
     applyTrialVerdict(activeTrial, ts, game);
 
-    // Hunter revenge: if the eliminated player is the Hunter, defer win check.
     if (activeTrial.verdict === "eliminated") {
+      const { defendantId } = activeTrial;
+
+      // Executioner wins if their target was eliminated and the Executioner is alive.
+      // Check Executioner before Tanner (if target is also the Tanner, Executioner wins).
+      if (ts.executionerTargetId === defendantId) {
+        const executionerAssignment = game.roleAssignments.find(
+          (a) => a.roleDefinitionId === (WerewolfRole.Executioner as string),
+        );
+        const executionerAlive =
+          executionerAssignment !== undefined &&
+          !ts.deadPlayerIds.includes(executionerAssignment.playerId);
+        if (executionerAlive) {
+          game.status = {
+            type: GameStatus.Finished,
+            winner: WerewolfWinner.Executioner,
+          };
+          return;
+        }
+      }
+
+      // Tanner wins immediately if eliminated at trial.
+      const tannerAssignment = game.roleAssignments.find(
+        (a) => a.roleDefinitionId === (WerewolfRole.Tanner as string),
+      );
+      if (tannerAssignment?.playerId === defendantId) {
+        game.status = {
+          type: GameStatus.Finished,
+          winner: WerewolfWinner.Tanner,
+        };
+        return;
+      }
+
+      // Hunter revenge: if the eliminated player is the Hunter, defer win check.
       const eliminatedRole = game.roleAssignments.find(
-        (a) => a.playerId === activeTrial.defendantId,
+        (a) => a.playerId === defendantId,
       )?.roleDefinitionId;
       if (eliminatedRole === (WerewolfRole.Hunter as string)) {
-        ts.hunterRevengePlayerId = activeTrial.defendantId;
+        ts.hunterRevengePlayerId = defendantId;
         return;
       }
     }

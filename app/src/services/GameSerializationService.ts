@@ -295,6 +295,21 @@ export class GameSerializationService {
       return result;
     }
 
+    // Executioner: surface the target player ID so the player knows who to get eliminated.
+    if (isRoleActive(myRole.id, WerewolfRole.Executioner)) {
+      const ts =
+        game.status.type === GameStatus.Playing
+          ? (game.status.turnState as WerewolfTurnState | undefined)
+          : undefined;
+      return {
+        myNightTarget: undefined,
+        myNightTargetConfirmed: false,
+        ...(ts?.executionerTargetId
+          ? { executionerTargetId: ts.executionerTargetId }
+          : {}),
+      };
+    }
+
     // One-Eyed Seer: if locked onto a living player, surface the lock ID.
     if (isRoleActive(myRole.id, WerewolfRole.OneEyedSeer)) {
       const ts =
@@ -524,6 +539,16 @@ export class GameSerializationService {
       if (myNomination) {
         result.myNominatedDefendantId = myNomination.defendantId;
       }
+    }
+
+    // Executioner: surface the target player ID so the Executioner knows who to get eliminated.
+    const callerExecutionerAssignment = game.roleAssignments.find(
+      (a) =>
+        a.playerId === callerId &&
+        a.roleDefinitionId === (WerewolfRole.Executioner as string),
+    );
+    if (callerExecutionerAssignment && ts.executionerTargetId) {
+      result.executionerTargetId = ts.executionerTargetId;
     }
 
     // Exposer reveal: show the publicly revealed role to all players.

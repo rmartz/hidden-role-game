@@ -144,6 +144,8 @@ export interface PlayerGameState {
   morticianAbilityEnded?: boolean;
   /** Whether the Priest's ward is currently active (cannot target this night). */
   priestWardActive?: boolean;
+  /** Executioner: the player ID the Executioner must get eliminated at trial to win. */
+  executionerTargetId?: string;
   /**
    * Altruist sacrifice event: shown to all players at day start when the Altruist
    * intercepted a kill. Both the Altruist and the saved player are identified.

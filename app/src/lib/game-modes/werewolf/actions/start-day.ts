@@ -12,6 +12,7 @@ import {
   isOwnerPlaying,
   resolveNightActions,
   checkWinCondition,
+  WerewolfWinner,
 } from "../utils";
 import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
@@ -78,6 +79,18 @@ export const startDayAction: GameAction = {
         (e): e is AttackNightResolutionEvent => e.type === "killed" && e.died,
       )
       .map((e) => e.targetPlayerId);
+
+    // Tanner wins immediately if killed at night.
+    const tannerAssignment = game.roleAssignments.find(
+      (a) => a.roleDefinitionId === (WerewolfRole.Tanner as string),
+    );
+    if (tannerAssignment && newDeadIds.includes(tannerAssignment.playerId)) {
+      game.status = {
+        type: GameStatus.Finished,
+        winner: WerewolfWinner.Tanner,
+      };
+      return;
+    }
 
     // Track Tough Guy hits: players who absorbed an attack this night.
     const newToughGuyHitIds = nightResolution
@@ -273,6 +286,9 @@ export const startDayAction: GameAction = {
           ? { hunterRevengePlayerId: hunterAssignment.playerId }
           : {}),
         ...(morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),
+        ...(ts.executionerTargetId
+          ? { executionerTargetId: ts.executionerTargetId }
+          : {}),
       },
     };
   },

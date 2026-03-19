@@ -144,6 +144,92 @@ describe("checkWinCondition", () => {
     });
   });
 
+  describe("Lone Wolf", () => {
+    it("Lone Wolf wins when only Lone Wolves remain vs non-Bad (no regular wolves)", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.LoneWolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+      ]);
+      const result = checkWinCondition(game, []);
+      expect(result?.winner).toBe(WerewolfWinner.LoneWolf);
+    });
+
+    it("Lone Wolf wins when multiple Lone Wolves outnumber non-Bad", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.LoneWolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.LoneWolf },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+      ]);
+      const result = checkWinCondition(game, []);
+      expect(result?.winner).toBe(WerewolfWinner.LoneWolf);
+    });
+
+    it("game continues when Lone Wolf alone is outnumbered by non-Bad", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.LoneWolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+      ]);
+      const result = checkWinCondition(game, []);
+      expect(result).toBeUndefined();
+    });
+
+    it("regular Werewolves win when both regular wolf and Lone Wolf are alive and meet threshold", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.LoneWolf },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+      ]);
+      const result = checkWinCondition(game, []);
+      expect(result?.winner).toBe(WerewolfWinner.Werewolves);
+    });
+
+    it("Lone Wolf alone does not trigger regular Werewolves win", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.LoneWolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+      ]);
+      const result = checkWinCondition(game, []);
+      expect(result?.winner).not.toBe(WerewolfWinner.Werewolves);
+    });
+  });
+
+  describe("Spoiler", () => {
+    it("alive Spoiler overrides Village win", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Spoiler },
+      ]);
+      // Werewolf dead → Village would normally win, but Spoiler is alive
+      const result = checkWinCondition(game, ["p1"]);
+      expect(result?.winner).toBe(WerewolfWinner.Spoiler);
+    });
+
+    it("alive Spoiler overrides Werewolf win", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Spoiler },
+      ]);
+      // Werewolves >= non-Bad → Werewolves would normally win, but Spoiler is alive
+      const result = checkWinCondition(game, ["p2"]);
+      expect(result?.winner).toBe(WerewolfWinner.Spoiler);
+    });
+
+    it("dead Spoiler does not affect outcome", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Spoiler },
+      ]);
+      // Spoiler is dead; Werewolf dead → Village wins normally
+      const result = checkWinCondition(game, ["p1", "p3"]);
+      expect(result?.winner).toBe(WerewolfWinner.Village);
+    });
+  });
+
   describe("Draw", () => {
     it("draw when all players are simultaneously eliminated", () => {
       const game = makeGame([

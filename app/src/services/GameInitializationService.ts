@@ -1,11 +1,10 @@
-import { GameMode, ShowRolesInPlay } from "@/lib/types";
+import { GameMode, ShowRolesInPlay, Team } from "@/lib/types";
 import type {
   Game,
   GamePlayer,
   LobbyPlayer,
   PlayerRoleAssignment,
   RoleDefinition,
-  Team,
   VisiblePlayer,
 } from "@/lib/types";
 import type { RoleInPlay } from "@/server/types";
@@ -15,6 +14,7 @@ import type {
   WerewolfTurnState,
   WerewolfNighttimePhase,
 } from "@/lib/game-modes/werewolf";
+import { WEREWOLF_ROLES, WerewolfRole } from "@/lib/game-modes/werewolf/roles";
 
 /**
  * Extended role properties used by buildGamePlayers for wake-phase and
@@ -133,7 +133,34 @@ export class GameInitializationService {
       currentPhaseIndex: 0,
       nightActions: {},
     };
-    return { turn: 1, phase, deadPlayerIds: [] };
+
+    const rolesLookup = WEREWOLF_ROLES as Record<
+      string,
+      (typeof WEREWOLF_ROLES)[WerewolfRole] | undefined
+    >;
+
+    const executionerAssignment = roleAssignments.find(
+      (a) => a.roleDefinitionId === (WerewolfRole.Executioner as string),
+    );
+    let executionerTargetId: string | undefined;
+    if (executionerAssignment) {
+      const goodCandidates = roleAssignments.filter((a) => {
+        if (a.playerId === executionerAssignment.playerId) return false;
+        const role = rolesLookup[a.roleDefinitionId];
+        return role?.team === Team.Good;
+      });
+      if (goodCandidates.length > 0) {
+        const randomIndex = Math.floor(Math.random() * goodCandidates.length);
+        executionerTargetId = goodCandidates[randomIndex]?.playerId;
+      }
+    }
+
+    return {
+      turn: 1,
+      phase,
+      deadPlayerIds: [],
+      ...(executionerTargetId ? { executionerTargetId } : {}),
+    };
   }
 
   /**

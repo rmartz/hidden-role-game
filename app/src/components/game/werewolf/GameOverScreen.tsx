@@ -3,6 +3,7 @@
 import { Team } from "@/lib/types";
 import type { FinishedGameStatus } from "@/lib/types";
 import { WerewolfWinner } from "@/lib/game-modes/werewolf/utils/win-condition";
+import { WerewolfRole } from "@/lib/game-modes/werewolf/roles";
 import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 import type { PlayerGameState, VisibleTeammate } from "@/server/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,6 +22,14 @@ function isVictory(
   if (winner === WerewolfWinner.Village) return myRole.team === Team.Good;
   if (winner === WerewolfWinner.Werewolves) return myRole.team === Team.Bad;
   if (winner === WerewolfWinner.Chupacabra) return myRole.team === Team.Neutral;
+  if (winner === WerewolfWinner.LoneWolf)
+    return myRole.id === (WerewolfRole.LoneWolf as string);
+  if (winner === WerewolfWinner.Tanner)
+    return myRole.id === (WerewolfRole.Tanner as string);
+  if (winner === WerewolfWinner.Spoiler)
+    return myRole.id === (WerewolfRole.Spoiler as string);
+  if (winner === WerewolfWinner.Executioner)
+    return myRole.id === (WerewolfRole.Executioner as string);
   return false;
 }
 
