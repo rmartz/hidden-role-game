@@ -144,7 +144,7 @@ export function PlayerNightActionScreen({
             ? WEREWOLF_COPY.night.priestWardActive
             : WEREWOLF_COPY.night.wakeUp}
         </p>
-        {oesLockedTargetName && !isConfirmed && (
+        {oesLockedTargetName && (
           <p className="text-sm text-muted-foreground mb-3 italic">
             {WEREWOLF_COPY.oneEyedSeer.locked(oesLockedTargetName)}
           </p>

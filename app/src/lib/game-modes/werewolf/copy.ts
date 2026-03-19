@@ -145,8 +145,6 @@ export const WEREWOLF_COPY = {
   },
   exposer: {
     abilityUsed: "You have already used your Exposer ability this game.",
-    revealLabel: (playerName: string, roleName: string) =>
-      `${playerName}'s role was revealed: ${roleName}`,
   },
   elusiveSeer: {
     villagerListHeading: "You see the following Villagers:",

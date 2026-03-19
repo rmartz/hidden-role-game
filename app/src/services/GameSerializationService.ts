@@ -323,8 +323,6 @@ export class GameSerializationService {
             targetAssignment.roleDefinitionId
           ] as WerewolfRoleDefinition | undefined)
         : undefined;
-      const playerById = new Map(game.players.map((p) => [p.id, p]));
-
       if (myRoleDef.checksForSeer) {
         // Wizard: check whether the target is the Seer.
         const isSeer = targetRoleDef?.id === WerewolfRole.Seer;
@@ -356,6 +354,7 @@ export class GameSerializationService {
             ] as WerewolfRoleDefinition | undefined)
           : undefined;
         const sameTeam = targetRoleDef?.team === secondRoleDef?.team;
+        const playerById = new Map(game.players.map((p) => [p.id, p]));
         const secondName =
           playerById.get(myAction.secondTargetPlayerId)?.name ??
           myAction.secondTargetPlayerId;
