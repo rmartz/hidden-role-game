@@ -1,5 +1,7 @@
+import { GameStatus } from "@/lib/types";
 import { ServerResponseStatus } from "@/server/types";
 import { lobbyService } from "@/services/LobbyService";
+import { gameService } from "@/services/GameService";
 import {
   authenticateLobby,
   errorResponse,
@@ -15,6 +17,16 @@ export async function POST(
 
   const auth = await authenticateLobby(lobbyId, sessionId);
   if (auth instanceof Response) return auth;
+
+  const { gameId } = auth.lobby;
+  if (!gameId) {
+    return errorResponse("No active game", 409);
+  }
+
+  const game = await gameService.getGame(gameId);
+  if (game?.status.type !== GameStatus.Finished) {
+    return errorResponse("Game is still in progress", 409);
+  }
 
   const updated = await lobbyService.clearGameId(lobbyId);
   if (!updated) {
