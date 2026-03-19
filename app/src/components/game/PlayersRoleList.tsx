@@ -16,8 +16,12 @@ interface PlayersRoleListProps {
   assignments: VisibleTeammate[];
   gameMode?: GameMode;
   deadPlayerIds?: string[];
-  /** Optional render prop for per-player action buttons (e.g., kill/revive). */
-  renderActions?: (playerId: string, isDead: boolean) => ReactNode;
+  /** Optional render prop for per-player action buttons. */
+  renderActions?: (
+    playerId: string,
+    playerName: string,
+    isDead: boolean,
+  ) => ReactNode;
 }
 
 const REASON_CONFIG: Record<
@@ -99,7 +103,7 @@ export function PlayersRoleList({
                       {role ? (
                         <RoleLabel role={role} gameMode={gameMode} />
                       ) : null}
-                      {renderActions?.(player.id, false)}
+                      {renderActions?.(player.id, player.name, false)}
                     </ItemActions>
                   </Item>
                 ))}
@@ -126,7 +130,7 @@ export function PlayersRoleList({
                     {role ? (
                       <RoleLabel role={role} gameMode={gameMode} />
                     ) : null}
-                    {renderActions?.(player.id, true)}
+                    {renderActions?.(player.id, player.name, true)}
                   </ItemActions>
                 </Item>
               ))}

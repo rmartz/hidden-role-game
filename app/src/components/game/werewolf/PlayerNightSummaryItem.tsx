@@ -5,6 +5,7 @@ interface PlayerNightSummaryItemProps {
   killed: boolean;
   survived: boolean;
   silenced: boolean;
+  smited: boolean;
 }
 
 export function PlayerNightSummaryItem({
@@ -12,6 +13,7 @@ export function PlayerNightSummaryItem({
   killed,
   survived,
   silenced,
+  smited,
 }: PlayerNightSummaryItemProps) {
   // The "survived" effect is only visible to the Tough Guy themselves,
   // so use a personalized second-person message.
@@ -26,7 +28,11 @@ export function PlayerNightSummaryItem({
   }
 
   const effects = (
-    [killed && "eliminated", silenced && "silenced"] as (string | false)[]
+    [
+      smited && WEREWOLF_COPY.smite.effect,
+      killed && !smited && "eliminated",
+      silenced && "silenced",
+    ] as (string | false)[]
   )
     .filter(Boolean)
     .join(" and ");

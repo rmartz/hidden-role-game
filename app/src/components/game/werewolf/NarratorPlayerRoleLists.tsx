@@ -17,8 +17,12 @@ interface NarratorPlayerRoleListsProps {
   assignments: VisibleTeammate[];
   gameMode?: GameMode;
   deadPlayerIds?: string[];
-  /** Optional render prop for per-player action buttons (e.g., kill/revive). */
-  renderActions?: (playerId: string, isDead: boolean) => ReactNode;
+  /** Optional render prop for per-player action buttons (e.g., smite/revive). */
+  renderActions?: (
+    playerId: string,
+    playerName: string,
+    isDead: boolean,
+  ) => ReactNode;
 }
 
 export function NarratorPlayerRoleLists({
@@ -50,7 +54,7 @@ export function NarratorPlayerRoleLists({
                 </ItemContent>
                 <ItemActions>
                   {role ? <RoleLabel role={role} gameMode={gameMode} /> : null}
-                  {renderActions?.(player.id, false)}
+                  {renderActions?.(player.id, player.name, false)}
                 </ItemActions>
               </Item>
             ))}
@@ -74,7 +78,7 @@ export function NarratorPlayerRoleLists({
                     {role ? (
                       <RoleLabel role={role} gameMode={gameMode} />
                     ) : null}
-                    {renderActions?.(player.id, true)}
+                    {renderActions?.(player.id, player.name, true)}
                   </ItemActions>
                 </Item>
               ))}
