@@ -288,7 +288,7 @@ export class GameSerializationService {
     ).flatMap((e): DaytimeNightStatusEntry[] => {
       if (e.type === "killed" && e.died)
         return [{ targetPlayerId: e.targetPlayerId, effect: "killed" }];
-      if (e.type === "tough-guy-absorbed")
+      if (e.type === "tough-guy-absorbed" && e.targetPlayerId === callerId)
         return [{ targetPlayerId: e.targetPlayerId, effect: "survived" }];
       if (e.type === "silenced")
         return [{ targetPlayerId: e.targetPlayerId, effect: "silenced" }];

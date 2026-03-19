@@ -6,6 +6,9 @@ export const WEREWOLF_COPY = {
   night: {
     yourTurn: "It's Your Turn",
     wakeUp: "Wake up and take your action.",
+    priestWardActive:
+      "Your ward is still active. There is nothing for you to do tonight.",
+    priestWardConfirm: "Acknowledge",
     stopPeeking: [
       "Stop peeking, you dirty cheater.",
       "If you can read this your eyes are open.",
