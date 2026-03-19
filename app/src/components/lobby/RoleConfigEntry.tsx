@@ -18,6 +18,7 @@ interface ReadOnlyProps {
   min: number;
   max: number;
   readOnly: true;
+  dimmed?: boolean;
 }
 
 interface EditableProps {
@@ -26,12 +27,13 @@ interface EditableProps {
   roleConfigMode: RoleConfigMode;
   readOnly: false;
   disabled: boolean;
+  dimmed?: boolean;
 }
 
 type RoleConfigEntryProps = ReadOnlyProps | EditableProps;
 
 export function RoleConfigEntry(props: RoleConfigEntryProps) {
-  const { role, gameMode, roleConfigMode, readOnly } = props;
+  const { role, gameMode, roleConfigMode, readOnly, dimmed } = props;
 
   const dispatch = useAppDispatch();
   const count = useAppSelector((s) => s.gameConfig.roleCounts[role.id] ?? 0);
@@ -68,7 +70,7 @@ export function RoleConfigEntry(props: RoleConfigEntryProps) {
 
   return (
     <li
-      className={`py-1 ${isAdvanced ? "flex flex-col gap-1" : "flex items-start gap-2"}`}
+      className={`py-1 ${isAdvanced ? "flex flex-col gap-1" : "flex items-start gap-2"} ${dimmed ? "text-muted-foreground" : ""}`}
     >
       <span className="min-w-40 flex items-center gap-1">
         <RoleLabel role={role} gameMode={gameMode} />
