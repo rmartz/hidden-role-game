@@ -12,6 +12,7 @@ export enum WerewolfAction {
   ResolveTrial = "resolve-trial",
   EndGame = "end-game",
   SmitePlayer = "smite-player",
+  UnsmitePlayer = "unsmite-player",
   NominatePlayer = "nominate-player",
   WithdrawNomination = "withdraw-nomination",
 }

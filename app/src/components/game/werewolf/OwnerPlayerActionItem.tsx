@@ -57,6 +57,13 @@ export function OwnerPlayerActionItem({
     });
   };
 
+  const handleUnsmite = () => {
+    action.mutate({
+      actionId: WerewolfAction.UnsmitePlayer,
+      payload: { playerId },
+    });
+  };
+
   if (isDead) {
     return (
       <div className="flex gap-1">
@@ -87,6 +94,21 @@ export function OwnerPlayerActionItem({
     );
   }
 
+  if (isSmited) {
+    return (
+      <div className="flex gap-1">
+        <Button
+          variant="outline"
+          size="xs"
+          onClick={handleUnsmite}
+          disabled={action.isPending}
+        >
+          {WEREWOLF_COPY.smite.undo}
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="flex gap-1">
       <AlertDialog>
@@ -95,7 +117,7 @@ export function OwnerPlayerActionItem({
             <Button
               variant="destructive"
               size="xs"
-              disabled={action.isPending || isSmited}
+              disabled={action.isPending}
             />
           }
         >

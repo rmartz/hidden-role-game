@@ -61,3 +61,33 @@ describe("WerewolfAction.SmitePlayer", () => {
     });
   });
 });
+
+describe("WerewolfAction.UnsmitePlayer", () => {
+  const unsmiteAction = WEREWOLF_ACTIONS[WerewolfAction.UnsmitePlayer];
+
+  it("isValid returns true for a smited player", () => {
+    const nightState = makeNightState();
+    (nightState.phase as WerewolfNighttimePhase).smitedPlayerIds = ["p2"];
+    const game = makePlayingGame(nightState);
+    expect(unsmiteAction.isValid(game, "owner-1", { playerId: "p2" })).toBe(
+      true,
+    );
+  });
+
+  it("isValid returns false for a non-smited player", () => {
+    const game = makePlayingGame(makeNightState());
+    expect(unsmiteAction.isValid(game, "owner-1", { playerId: "p2" })).toBe(
+      false,
+    );
+  });
+
+  it("removes playerId from smitedPlayerIds", () => {
+    const nightState = makeNightState();
+    (nightState.phase as WerewolfNighttimePhase).smitedPlayerIds = ["p2", "p3"];
+    const game = makePlayingGame(nightState);
+    unsmiteAction.apply(game, { playerId: "p2" }, "owner-1");
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    const phase = ts.phase as WerewolfNighttimePhase;
+    expect(phase.smitedPlayerIds).toEqual(["p3"]);
+  });
+});
