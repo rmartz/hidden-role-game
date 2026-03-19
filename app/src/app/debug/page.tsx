@@ -27,7 +27,7 @@ const DEFAULT_CONFIG: GameConfig = {
 };
 
 export default function DebugPage() {
-  const [playerCount, setPlayerCount] = useState(5);
+  const [playerCount, setPlayerCount] = useState(7);
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [gameInfo, setGameInfo] = useState<GameInfo | null>(null);
