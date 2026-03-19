@@ -139,5 +139,15 @@ export const WEREWOLF_COPY = {
       isWerewolfTeam ? "a Werewolf" : "not a Werewolf",
     investigationResultRevealed: "Result revealed to player.",
     revealToPlayer: "Reveal to player",
+    smite: "Smite",
+  },
+  smite: {
+    effect: "attacked by mysterious forces",
+    confirmTitle: "Smite player?",
+    confirmDescription: (name: string) =>
+      `${name} will be killed by mysterious forces at the start of day. This bypasses all protections.`,
+    confirmAction: "Smite",
+    confirmCancel: "Cancel",
+    undo: "Undo Smite",
   },
 } as const;

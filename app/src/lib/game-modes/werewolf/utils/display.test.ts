@@ -6,6 +6,7 @@ import {
   isPlayersTurn,
   getConfirmLabel,
 } from "./display";
+import { SMITE_PHASE_KEY } from "./resolution";
 import { targetPlayerIdOf, getSoloTarget } from "./targeting";
 
 const players = [
@@ -126,6 +127,10 @@ describe("getPhaseLabel", () => {
 
   it("returns the raw key as fallback for unknown solo role keys", () => {
     expect(getPhaseLabel("unknown-role", labelRoles)).toBe("unknown-role");
+  });
+
+  it('returns "Narrator" for SMITE_PHASE_KEY', () => {
+    expect(getPhaseLabel(SMITE_PHASE_KEY, labelRoles)).toBe("Narrator");
   });
 });
 

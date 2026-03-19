@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import type { WerewolfTurnState } from "../types";
+import type {
+  WerewolfTurnState,
+  WerewolfDaytimePhase,
+  WerewolfNighttimePhase,
+} from "../types";
 import { WerewolfPhase } from "../types";
 import { WerewolfRole } from "../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
@@ -107,7 +111,7 @@ describe("WerewolfAction.StartDay", () => {
       );
       action.apply(game, null, "owner-1");
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-      const phase = ts.phase as import("../types").WerewolfDaytimePhase;
+      const phase = ts.phase as WerewolfDaytimePhase;
       expect(phase.nightResolution).toBeDefined();
       expect(phase.nightResolution).toHaveLength(1);
       expect(phase.nightResolution![0]).toMatchObject({
@@ -121,8 +125,30 @@ describe("WerewolfAction.StartDay", () => {
       const game = makePlayingGame(nightTurnState);
       action.apply(game, null, "owner-1");
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-      const phase = ts.phase as import("../types").WerewolfDaytimePhase;
+      const phase = ts.phase as WerewolfDaytimePhase;
       expect(phase.nightResolution).toBeUndefined();
+    });
+
+    it("smited player appears in deadPlayerIds after start-day", () => {
+      const nightState = makeNightState();
+      (nightState.phase as WerewolfNighttimePhase).smitedPlayerIds = ["p3"];
+      const game = makePlayingGame(nightState);
+      action.apply(game, null, "owner-1");
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      expect(ts.deadPlayerIds).toContain("p3");
+    });
+
+    it("smitedPlayerIds is carried to the daytime phase", () => {
+      const nightState = makeNightState();
+      (nightState.phase as WerewolfNighttimePhase).smitedPlayerIds = [
+        "p3",
+        "p4",
+      ];
+      const game = makePlayingGame(nightState);
+      action.apply(game, null, "owner-1");
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      const phase = ts.phase as WerewolfDaytimePhase;
+      expect(phase.smitedPlayerIds).toEqual(["p3", "p4"]);
     });
 
     it("Doctor protection saves a player through the full start-day flow", () => {

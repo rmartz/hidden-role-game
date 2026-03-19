@@ -5,6 +5,8 @@ import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
 import { isGroupPhaseKey, isRoleActive } from "./phase-keys";
 
+export const SMITE_PHASE_KEY = "__narrator_smite__";
+
 function allWerewolvesAreDead(
   roleAssignments: PlayerRoleAssignment[],
   deadPlayerIds: string[],
@@ -173,6 +175,7 @@ export function resolveNightActions(
   nightActions: Record<string, AnyNightAction>,
   roleAssignments: PlayerRoleAssignment[],
   deadPlayerIds: string[],
+  smitedPlayerIds?: string[],
   options?: NightResolutionOptions,
 ): NightResolutionEvent[] {
   const { attacks, protections } = collectBaseAttacksAndProtections(
@@ -202,7 +205,29 @@ export function resolveNightActions(
     }
   }
 
-  const combatEvents = buildKilledEvents(attacks, protections);
+  let combatEvents = buildKilledEvents(attacks, protections);
+
+  // Narrator smites: force death regardless of protections.
+  for (const smitedId of smitedPlayerIds ?? []) {
+    const existing = combatEvents.find(
+      (e) => e.type === "killed" && e.targetPlayerId === smitedId,
+    );
+    if (existing?.type === "killed") {
+      existing.attackedBy = [...existing.attackedBy, SMITE_PHASE_KEY];
+      existing.died = true;
+    } else {
+      combatEvents = [
+        ...combatEvents,
+        {
+          type: "killed" as const,
+          targetPlayerId: smitedId,
+          attackedBy: [SMITE_PHASE_KEY],
+          protectedBy: [],
+          died: true,
+        },
+      ];
+    }
+  }
 
   // Tough Guy: if unprotected and not already hit, absorb the attack.
   const toughGuyHitIds = new Set(options?.toughGuyHitIds ?? []);
