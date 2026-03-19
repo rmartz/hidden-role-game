@@ -32,6 +32,8 @@ export const WEREWOLF_COPY = {
     title: "Hidden Role Game",
     gameUnderway: "The game is underway.",
     youAreEliminated: "You have been eliminated.",
+    toughGuySurvived:
+      "You were attacked last night but survived because of your Tough Guy ability. You are now vulnerable.",
   },
   targetSelection: {
     chooseTarget: "Choose a target",

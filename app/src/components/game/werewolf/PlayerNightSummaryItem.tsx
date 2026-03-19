@@ -1,3 +1,5 @@
+import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
+
 interface PlayerNightSummaryItemProps {
   playerName: string;
   killed: boolean;
@@ -11,12 +13,20 @@ export function PlayerNightSummaryItem({
   survived,
   silenced,
 }: PlayerNightSummaryItemProps) {
+  // The "survived" effect is only visible to the Tough Guy themselves,
+  // so use a personalized second-person message.
+  if (survived) {
+    const suffix = silenced ? " You have also been silenced." : "";
+    return (
+      <li className="text-sm font-medium text-orange-600">
+        {WEREWOLF_COPY.day.toughGuySurvived}
+        {suffix}
+      </li>
+    );
+  }
+
   const effects = (
-    [
-      killed && "eliminated",
-      survived && "attacked but survived",
-      silenced && "silenced",
-    ] as (string | false)[]
+    [killed && "eliminated", silenced && "silenced"] as (string | false)[]
   )
     .filter(Boolean)
     .join(" and ");
