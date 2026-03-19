@@ -37,6 +37,20 @@ export class FirebaseLobbyService {
     return firebaseToLobby(lobbyId, data.public, data.private);
   }
 
+  async clearGameId(lobbyId: string): Promise<Lobby | undefined> {
+    const snap = await lobbyRef(lobbyId).once("value");
+    if (!snap.exists()) return undefined;
+
+    await lobbyRef(lobbyId).child("public/gameId").remove();
+
+    const data = snap.val() as {
+      public: FirebaseLobbyPublic;
+      private: FirebaseLobbyPrivate;
+    };
+    data.public.gameId = null;
+    return firebaseToLobby(lobbyId, data.public, data.private);
+  }
+
   async setGameId(lobbyId: string, gameId: string): Promise<Lobby | undefined> {
     const ref = lobbyRef(lobbyId);
     const snap = await ref.once("value");

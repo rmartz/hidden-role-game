@@ -6,6 +6,7 @@ import {
   createLobby,
   joinLobby,
   removePlayer,
+  returnToLobby,
   updateLobbyConfig,
   getLobby,
   clearSession,
@@ -68,6 +69,17 @@ export function useLeaveAndJoinLobby(onSuccess: () => void) {
       await joinLobby(lobbyId, playerName);
     },
     onSuccess,
+  });
+}
+
+export function useReturnToLobby(lobbyId: string) {
+  const router = useRouter();
+  return useMutation({
+    mutationFn: () => returnToLobby(lobbyId),
+    onSuccess: (response) => {
+      if (response.status === ServerResponseStatus.Error) return;
+      router.push(`/${response.data.lobby.config.gameMode}/lobby/${lobbyId}`);
+    },
   });
 }
 
