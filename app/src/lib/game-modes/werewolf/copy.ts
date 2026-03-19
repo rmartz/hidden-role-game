@@ -110,6 +110,7 @@ export const WEREWOLF_COPY = {
     winnerLabel: (winner: string) => `${winner} Won`,
     endGame: "End Game",
     rolesRevealHeading: "Final Roles",
+    returnToLobby: "Return to Lobby",
   },
   nomination: {
     heading: "Nominate for Trial",

@@ -72,6 +72,7 @@ export class FirebaseGameService {
       return {
         status: game.status,
         gameMode: game.gameMode,
+        lobbyId: game.lobbyId,
         players: publicPlayers,
         gameOwner: { id: caller.id, name: caller.name },
         myPlayerId: undefined,
@@ -160,6 +161,7 @@ export class FirebaseGameService {
     return {
       status: game.status,
       gameMode: game.gameMode,
+      lobbyId: game.lobbyId,
       players: publicPlayers,
       gameOwner: game.ownerPlayerId
         ? {
