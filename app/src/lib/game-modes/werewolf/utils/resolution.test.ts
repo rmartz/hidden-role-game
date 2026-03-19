@@ -418,6 +418,126 @@ describe("resolveNightActions", () => {
     });
   });
 
+  describe("Altruist", () => {
+    const altruistAssignments = [
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "alt1", roleDefinitionId: WerewolfRole.Altruist },
+      { playerId: "bg1", roleDefinitionId: WerewolfRole.Bodyguard },
+      { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+      { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+    ];
+
+    it("intercept redirects attack: original target survives, Altruist dies", () => {
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
+          [WerewolfRole.Altruist]: { targetPlayerId: "p1" },
+        },
+        altruistAssignments,
+        [],
+      );
+      const p1Event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
+      expect(p1Event).toBeUndefined();
+
+      const altEvent = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "alt1",
+      );
+      expect(altEvent).toMatchObject({ died: true });
+
+      const interceptEvent = events.find(
+        (e) => e.type === "altruist-intercepted",
+      );
+      expect(interceptEvent).toMatchObject({
+        type: "altruist-intercepted",
+        altruistPlayerId: "alt1",
+        savedPlayerId: "p1",
+      });
+    });
+
+    it("skip leaves original kill unaffected", () => {
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
+          [WerewolfRole.Altruist]: { skipped: true },
+        },
+        altruistAssignments,
+        [],
+      );
+      const p1Event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
+      expect(p1Event).toMatchObject({ died: true });
+      expect(
+        events.find((e) => e.type === "altruist-intercepted"),
+      ).toBeUndefined();
+    });
+
+    it("intercept ignored when Altruist is themselves under attack", () => {
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "alt1" },
+          [WerewolfRole.Altruist]: { targetPlayerId: "p1" },
+        },
+        altruistAssignments,
+        [],
+      );
+      // p1 is not attacked — wolves targeted the Altruist
+      const p1Event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
+      expect(p1Event).toBeUndefined();
+
+      const altEvent = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "alt1",
+      );
+      expect(altEvent).toMatchObject({ died: true });
+      expect(
+        events.find((e) => e.type === "altruist-intercepted"),
+      ).toBeUndefined();
+    });
+
+    it("intercept ignored when target is already protected", () => {
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
+          [WerewolfRole.Bodyguard]: { targetPlayerId: "p1" },
+          [WerewolfRole.Altruist]: { targetPlayerId: "p1" },
+        },
+        altruistAssignments,
+        [],
+      );
+      // p1 is protected by Bodyguard — Altruist intercept is a no-op
+      const altEvent = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "alt1",
+      );
+      expect(altEvent).toBeUndefined();
+      expect(
+        events.find((e) => e.type === "altruist-intercepted"),
+      ).toBeUndefined();
+    });
+
+    it("intercept ignored when targeted player is not under attack", () => {
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
+          [WerewolfRole.Altruist]: { targetPlayerId: "p2" },
+        },
+        altruistAssignments,
+        [],
+      );
+      // p2 is not being attacked — intercept has no effect
+      const p1Event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
+      expect(p1Event).toMatchObject({ died: true });
+      expect(
+        events.find((e) => e.type === "altruist-intercepted"),
+      ).toBeUndefined();
+    });
+  });
+
   describe("Chupacabra", () => {
     const chupAssignments = [
       { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },

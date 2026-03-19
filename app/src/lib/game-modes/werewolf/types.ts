@@ -75,11 +75,20 @@ export interface ToughGuyAbsorbedNightResolutionEvent {
   targetPlayerId: string;
 }
 
+export interface AltruistInterceptedNightResolutionEvent {
+  type: "altruist-intercepted";
+  /** The Altruist player who sacrificed themselves. */
+  altruistPlayerId: string;
+  /** The player whose attack was redirected to the Altruist. */
+  savedPlayerId: string;
+}
+
 export type NightResolutionEvent =
   | AttackNightResolutionEvent
   | SilencedNightResolutionEvent
   | HypnotizedNightResolutionEvent
-  | ToughGuyAbsorbedNightResolutionEvent;
+  | ToughGuyAbsorbedNightResolutionEvent
+  | AltruistInterceptedNightResolutionEvent;
 
 export type DaytimeVote = "guilty" | "innocent";
 

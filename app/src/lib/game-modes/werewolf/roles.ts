@@ -65,6 +65,7 @@ export enum WerewolfRole {
   ElusiveSeer = "werewolf-elusive-seer",
   Mentalist = "werewolf-mentalist",
   MysticSeer = "werewolf-mystic-seer",
+  Altruist = "werewolf-altruist",
 }
 
 export interface WerewolfRoleDefinition extends RoleDefinition<
@@ -387,6 +388,17 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     targetCategory: TargetCategory.Investigate,
     revealsExactRole: true,
     category: WerewolfRoleCategory.VillagerInvestigation,
+  },
+  [WerewolfRole.Altruist]: {
+    id: WerewolfRole.Altruist,
+    name: "Altruist",
+    summary: "Sacrifices themselves to save an attacked player",
+    description:
+      "Each night, after the Werewolves have chosen their target, the Altruist learns which players are under attack. They may intercept one attack, saving the original target — but dying in their place. If the Altruist is themselves under attack, their intercept is ignored.",
+    team: Team.Good,
+    wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Special,
+    category: WerewolfRoleCategory.VillagerProtection,
   },
 } satisfies Record<WerewolfRole, WerewolfRoleDefinition>;
 

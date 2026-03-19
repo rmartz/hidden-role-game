@@ -188,6 +188,12 @@ export const WEREWOLF_COPY = {
     mentalistSameTeam: "on the same team",
     mentalistDifferentTeams: "on different teams",
   },
+  altruist: {
+    attackedHeading: "Players under attack:",
+    noAttacks: "No one is under attack tonight.",
+    dayAnnouncement: (altruistName: string, savedName: string) =>
+      `${altruistName} sacrificed themselves to save ${savedName}.`,
+  },
   smite: {
     effect: "attacked by mysterious forces",
     confirmTitle: "Smite player?",
