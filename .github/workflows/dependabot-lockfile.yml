@@ -1,0 +1,33 @@
+name: Regenerate pnpm lockfile for Dependabot
+
+on:
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  regenerate-lockfile:
+    name: Regenerate lockfile
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.head_ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: pnpm/action-setup@v5
+        with:
+          version: 10
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: "pnpm"
+      - run: pnpm install --no-frozen-lockfile
+      - name: Commit updated lockfile
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add pnpm-lock.yaml
+          git diff --staged --quiet || git commit -m "chore: regenerate pnpm-lock.yaml for Dependabot"
+          git push
