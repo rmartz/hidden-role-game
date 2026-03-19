@@ -10,6 +10,8 @@ interface OwnerInvestigationConfirmProps {
   targetName: string;
   isWerewolfTeam: boolean;
   isResultRevealed: boolean;
+  resultLabel?: string;
+  secondTargetName?: string;
 }
 
 export function OwnerInvestigationConfirm({
@@ -17,18 +19,32 @@ export function OwnerInvestigationConfirm({
   targetName,
   isWerewolfTeam,
   isResultRevealed,
+  resultLabel,
+  secondTargetName,
 }: OwnerInvestigationConfirmProps) {
   const action = useGameAction(gameId);
+  const displayLabel =
+    resultLabel ?? WEREWOLF_COPY.narrator.teamStatus(isWerewolfTeam);
 
   return (
     <div className="mt-3 rounded-md border p-3 text-sm">
       <p className="font-medium mb-2">
         {WEREWOLF_COPY.narrator.investigationResultLabel}{" "}
-        <strong className="text-foreground">{targetName}</strong> is{" "}
-        <strong className="text-foreground">
-          {WEREWOLF_COPY.narrator.teamStatus(isWerewolfTeam)}
-        </strong>
-        .
+        <strong className="text-foreground">{targetName}</strong>
+        {secondTargetName ? (
+          <>
+            {" "}
+            and <strong className="text-foreground">
+              {secondTargetName}
+            </strong>{" "}
+            are <strong className="text-foreground">{displayLabel}</strong>.
+          </>
+        ) : (
+          <>
+            {" "}
+            is <strong className="text-foreground">{displayLabel}</strong>.
+          </>
+        )}
       </p>
       {isResultRevealed ? (
         <p className="text-xs text-muted-foreground">

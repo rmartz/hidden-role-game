@@ -47,6 +47,13 @@ export const startNightAction: GameAction = {
         ...(ts.toughGuyHitIds?.length
           ? { toughGuyHitIds: ts.toughGuyHitIds }
           : {}),
+        // One-Eyed Seer: carry forward lock unless the locked target is now dead.
+        ...(ts.oneEyedSeerLockedTargetId &&
+        !ts.deadPlayerIds.includes(ts.oneEyedSeerLockedTargetId)
+          ? { oneEyedSeerLockedTargetId: ts.oneEyedSeerLockedTargetId }
+          : {}),
+        ...(ts.exposerAbilityUsed ? { exposerAbilityUsed: true } : {}),
+        ...(ts.exposerReveal ? { exposerReveal: ts.exposerReveal } : {}),
       },
     };
   },

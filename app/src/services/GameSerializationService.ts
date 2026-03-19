@@ -28,6 +28,7 @@ import {
   isWerewolfRole,
 } from "@/lib/game-modes/werewolf/roles";
 import { GAME_MODES } from "@/lib/game-modes";
+import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 
 function hasPriestActiveWard(ts: WerewolfTurnState | undefined): boolean {
   if (!ts?.priestWards) return false;
@@ -165,6 +166,26 @@ export class GameSerializationService {
       };
     }
 
+    // For the Exposer, surface ability-used state so the player sees "ability used" message.
+    if (isRoleActive(myRole.id, WerewolfRole.Exposer)) {
+      const ts =
+        game.status.type === GameStatus.Playing
+          ? (game.status.turnState as WerewolfTurnState | undefined)
+          : undefined;
+      const exposerAction = nightActions[myRole.id];
+      const exposerSoloAction =
+        exposerAction && !isTeamNightAction(exposerAction)
+          ? exposerAction
+          : undefined;
+      return {
+        myNightTarget: exposerSoloAction?.skipped
+          ? null
+          : exposerSoloAction?.targetPlayerId,
+        myNightTargetConfirmed: exposerSoloAction?.confirmed ?? false,
+        exposerAbilityUsed: ts?.exposerAbilityUsed ?? false,
+      };
+    }
+
     // For the Witch, include attacked-player info and ability-used state.
     // This must run before the early-return below, since the Witch may not
     // have chosen a target yet but still needs to see who is under attack.
@@ -204,6 +225,44 @@ export class GameSerializationService {
       return result;
     }
 
+    // One-Eyed Seer: if locked onto a living player, surface the lock ID.
+    if (isRoleActive(myRole.id, WerewolfRole.OneEyedSeer)) {
+      const ts =
+        game.status.type === GameStatus.Playing
+          ? (game.status.turnState as WerewolfTurnState | undefined)
+          : undefined;
+      if (
+        ts?.oneEyedSeerLockedTargetId &&
+        !ts.deadPlayerIds.includes(ts.oneEyedSeerLockedTargetId)
+      ) {
+        return {
+          myNightTarget: undefined,
+          myNightTargetConfirmed: false,
+          oneEyedSeerLockedTargetId: ts.oneEyedSeerLockedTargetId,
+        };
+      }
+    }
+
+    // Elusive Seer: on turn 1, surface the list of all Villager player IDs.
+    if (isRoleActive(myRole.id, WerewolfRole.ElusiveSeer)) {
+      const ts =
+        game.status.type === GameStatus.Playing
+          ? (game.status.turnState as WerewolfTurnState | undefined)
+          : undefined;
+      if (ts?.turn === 1) {
+        const elusiveSeerVillagerIds = game.roleAssignments
+          .filter(
+            (a) => a.roleDefinitionId === (WerewolfRole.Villager as string),
+          )
+          .map((a) => a.playerId);
+        return {
+          myNightTarget: undefined,
+          myNightTargetConfirmed: false,
+          elusiveSeerVillagerIds,
+        };
+      }
+    }
+
     const myAction = nightActions[myRole.id];
     if (!myAction || isTeamNightAction(myAction)) {
       const ts =
@@ -239,11 +298,14 @@ export class GameSerializationService {
     const priestWardActive =
       isRoleActive(myRole.id, WerewolfRole.Priest) && hasPriestActiveWard(ts);
 
+    const mySecondNightTarget = myAction.secondTargetPlayerId ?? undefined;
+
     const result: Partial<PlayerGameState> = {
       myNightTarget: myAction.skipped ? null : myAction.targetPlayerId,
       myNightTargetConfirmed: myAction.confirmed ?? false,
       ...(previousNightTargetId ? { previousNightTargetId } : {}),
       ...(priestWardActive ? { priestWardActive } : {}),
+      ...(mySecondNightTarget ? { mySecondNightTarget } : {}),
     };
 
     // For Investigate roles, include the result once the narrator has revealed it.
@@ -261,10 +323,57 @@ export class GameSerializationService {
             targetAssignment.roleDefinitionId
           ] as WerewolfRoleDefinition | undefined)
         : undefined;
-      result.investigationResult = {
-        targetPlayerId: myAction.targetPlayerId,
-        isWerewolfTeam: targetRoleDef?.isWerewolf === true,
-      };
+      const playerById = new Map(game.players.map((p) => [p.id, p]));
+
+      if (myRoleDef.checksForSeer) {
+        // Wizard: check whether the target is the Seer.
+        const isSeer = targetRoleDef?.id === WerewolfRole.Seer;
+        result.investigationResult = {
+          targetPlayerId: myAction.targetPlayerId,
+          isWerewolfTeam: isSeer,
+          resultLabel: isSeer
+            ? WEREWOLF_COPY.wizard.isSeer
+            : WEREWOLF_COPY.wizard.isNotSeer,
+        };
+      } else if (myRoleDef.revealsExactRole) {
+        // Mystic Seer: reveal the target's exact role name.
+        result.investigationResult = {
+          targetPlayerId: myAction.targetPlayerId,
+          isWerewolfTeam: targetRoleDef?.isWerewolf === true,
+          resultLabel: targetRoleDef?.name ?? "Unknown",
+        };
+      } else if (
+        myRoleDef.dualTargetInvestigate &&
+        myAction.secondTargetPlayerId
+      ) {
+        // Mentalist: check whether two targets share the same team.
+        const secondAssignment = game.roleAssignments.find(
+          (a) => a.playerId === myAction.secondTargetPlayerId,
+        );
+        const secondRoleDef = secondAssignment
+          ? (GAME_MODES[game.gameMode].roles[
+              secondAssignment.roleDefinitionId
+            ] as WerewolfRoleDefinition | undefined)
+          : undefined;
+        const sameTeam = targetRoleDef?.team === secondRoleDef?.team;
+        const secondName =
+          playerById.get(myAction.secondTargetPlayerId)?.name ??
+          myAction.secondTargetPlayerId;
+        result.investigationResult = {
+          targetPlayerId: myAction.targetPlayerId,
+          isWerewolfTeam: sameTeam,
+          resultLabel: sameTeam
+            ? WEREWOLF_COPY.mentalist.sameTeam
+            : WEREWOLF_COPY.mentalist.differentTeams,
+          secondTargetName: secondName,
+        };
+      } else {
+        // Seer / One-Eyed Seer: standard isWerewolf check.
+        result.investigationResult = {
+          targetPlayerId: myAction.targetPlayerId,
+          isWerewolfTeam: targetRoleDef?.isWerewolf === true,
+        };
+      }
     }
 
     return result;
@@ -323,6 +432,23 @@ export class GameSerializationService {
       const myNomination = nominations.find((n) => n.nominatorId === callerId);
       if (myNomination) {
         result.myNominatedDefendantId = myNomination.defendantId;
+      }
+    }
+
+    // Exposer reveal: show the publicly revealed role to all players.
+    if (ts.exposerReveal) {
+      const exposerReveal = ts.exposerReveal;
+      const revealedPlayer = game.players.find(
+        (p) => p.id === exposerReveal.playerId,
+      );
+      const revealedRoleDef =
+        GAME_MODES[game.gameMode].roles[exposerReveal.roleId];
+      if (revealedPlayer && revealedRoleDef) {
+        result.exposerReveal = {
+          playerName: revealedPlayer.name,
+          roleName: revealedRoleDef.name,
+          team: revealedRoleDef.team,
+        };
       }
     }
 

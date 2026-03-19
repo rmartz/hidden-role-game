@@ -49,6 +49,10 @@ export const setNightTargetAction: GameAction = {
     if (isRoleActive(phaseKey, WerewolfRole.Witch) && ts.witchAbilityUsed)
       return false;
 
+    // Exposer can only use their ability once per game.
+    if (isRoleActive(phaseKey, WerewolfRole.Exposer) && ts.exposerAbilityUsed)
+      return false;
+
     // targetPlayerId undefined = clear; null = intentional skip; string = set target.
     if (targetPlayerId === undefined) return true;
     if (targetPlayerId === null) return true;
@@ -77,6 +81,14 @@ export const setNightTargetAction: GameAction = {
     if (
       phaseRoleDef?.preventRepeatTarget &&
       ts.lastTargets?.[phaseKey] === targetPlayerId
+    )
+      return false;
+
+    // One-Eyed Seer cannot target when locked onto a living player.
+    if (
+      isRoleActive(phaseKey, WerewolfRole.OneEyedSeer) &&
+      ts.oneEyedSeerLockedTargetId &&
+      !ts.deadPlayerIds.includes(ts.oneEyedSeerLockedTargetId)
     )
       return false;
 
@@ -126,9 +138,14 @@ export const setNightTargetAction: GameAction = {
     if (ts?.phase.type !== WerewolfPhase.Nighttime) return;
 
     const phase = ts.phase;
-    const { roleId: explicitPhaseKey, targetPlayerId } = payload as {
+    const {
+      roleId: explicitPhaseKey,
+      targetPlayerId,
+      isSecondTarget,
+    } = payload as {
       roleId?: string;
       targetPlayerId?: string | null;
+      isSecondTarget?: boolean;
     };
 
     const phaseKey =
@@ -198,7 +215,22 @@ export const setNightTargetAction: GameAction = {
       phase.nightActions[phaseKey] = groupAction;
     } else {
       // Solo phase.
-      if (targetPlayerId === undefined) {
+      if (isSecondTarget) {
+        // Mentalist second target: update secondTargetPlayerId on the existing action.
+        const existing = phase.nightActions[phaseKey];
+        if (existing && !("votes" in existing) && !existing.skipped) {
+          if (targetPlayerId === undefined) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { secondTargetPlayerId: _, ...rest } = existing;
+            phase.nightActions[phaseKey] = rest;
+          } else if (typeof targetPlayerId === "string") {
+            phase.nightActions[phaseKey] = {
+              ...existing,
+              secondTargetPlayerId: targetPlayerId,
+            };
+          }
+        }
+      } else if (targetPlayerId === undefined) {
         // Clear: remove the action entirely (back to undecided state).
         phase.nightActions = Object.fromEntries(
           Object.entries(phase.nightActions).filter(([k]) => k !== phaseKey),
@@ -207,7 +239,16 @@ export const setNightTargetAction: GameAction = {
         // Intentional skip.
         phase.nightActions[phaseKey] = { skipped: true };
       } else {
-        phase.nightActions[phaseKey] = { targetPlayerId };
+        // Preserve secondTargetPlayerId if already set.
+        const existing = phase.nightActions[phaseKey];
+        const secondTargetPlayerId =
+          existing && !("votes" in existing) && !existing.skipped
+            ? existing.secondTargetPlayerId
+            : undefined;
+        phase.nightActions[phaseKey] = {
+          targetPlayerId,
+          ...(secondTargetPlayerId ? { secondTargetPlayerId } : {}),
+        };
       }
     }
   },
