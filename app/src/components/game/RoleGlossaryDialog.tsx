@@ -16,6 +16,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { RoleLabel } from "@/components/RoleLabel";
+import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 
 interface RoleGlossaryDialogProps {
   roles: RoleDefinition<string, Team>[];
@@ -104,7 +105,7 @@ export function RoleGlossaryDialog({
             {uncategorized.length > 0 && (
               <div>
                 <p className="text-xs font-semibold text-muted-foreground mt-4 mb-1">
-                  Other
+                  {WEREWOLF_COPY.glossary.otherCategoryLabel}
                 </p>
                 <Accordion>{renderRoleItems(uncategorized)}</Accordion>
               </div>
