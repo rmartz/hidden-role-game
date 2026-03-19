@@ -129,7 +129,7 @@ export interface PlayerGameState {
   /** Role publicly revealed by the Exposer. Shown to all players once set. */
   exposerReveal?: { playerName: string; roleName: string; team: Team };
   /** For Mentalist: the player's second night target. */
-  mySecondNightTarget?: string | null;
+  mySecondNightTarget?: string;
   /** Whether the Witch has already used their once-per-game special ability. */
   witchAbilityUsed?: boolean;
   /** Whether the Exposer has already used their once-per-game reveal ability. */
