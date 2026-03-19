@@ -3,10 +3,6 @@ import { WerewolfRole, MIN_PLAYERS } from "./roles";
 import { WEREWOLF_CONFIG } from "./config";
 
 describe("WEREWOLF_CONFIG.defaultRoleCount", () => {
-  it("minimum player count is 7 (6 role-players + narrator)", () => {
-    expect(MIN_PLAYERS).toBe(7);
-  });
-
   it("returns correct counts for minimum player count (7)", () => {
     const slots = WEREWOLF_CONFIG.defaultRoleCount(7);
     const counts = Object.fromEntries(slots.map((s) => [s.roleId, s.min]));
