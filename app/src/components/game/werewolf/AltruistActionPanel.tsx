@@ -38,12 +38,16 @@ export function AltruistActionPanel({
         </p>
       ) : (
         <>
+          <p className="text-sm text-muted-foreground mb-2">
+            {WEREWOLF_COPY.altruist.attackedIntro}
+          </p>
           <p className="text-sm font-medium mb-2">
             {WEREWOLF_COPY.altruist.attackedHeading}
           </p>
           <div className="flex flex-col gap-2 max-w-sm mx-auto mb-2">
             {attackedPlayerIds.map((id) => {
               const isSelected = myNightTarget === id;
+              const playerName = getPlayerName(players, id) ?? id;
               return (
                 <Button
                   key={id}
@@ -56,7 +60,9 @@ export function AltruistActionPanel({
                   }}
                   disabled={action.isPending || isConfirmed}
                 >
-                  {getPlayerName(players, id) ?? id}
+                  {isSelected
+                    ? WEREWOLF_COPY.altruist.savingButton(playerName)
+                    : WEREWOLF_COPY.altruist.saveButton(playerName)}
                 </Button>
               );
             })}

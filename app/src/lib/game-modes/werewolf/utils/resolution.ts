@@ -231,7 +231,6 @@ export function resolveNightActions(
       attacks.set(altruistPlayerId, attackers);
       altruistInterceptEvent = {
         type: "altruist-intercepted",
-        targetPlayerId: altruistPlayerId,
         altruistPlayerId,
         savedPlayerId: savedId,
       };

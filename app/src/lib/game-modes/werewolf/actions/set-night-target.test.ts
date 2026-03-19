@@ -402,8 +402,10 @@ describe("SetNightTarget — Bodyguard self-targeting", () => {
       [WerewolfRole.Bodyguard]: { targetPlayerId: "p2" },
     };
     const events = resolveNightActions(nightActions, assignments, []);
-    const event = events.find((e) => e.targetPlayerId === "p2");
-    expect(event?.type === "killed" && event.died).toBe(false);
+    const event = events.find(
+      (e) => e.type === "killed" && e.targetPlayerId === "p2",
+    );
+    expect(event).toMatchObject({ died: false });
   });
 });
 

@@ -1,10 +1,21 @@
 import { describe, it, expect } from "vitest";
 import { WerewolfRole } from "../roles";
+import type { AttackNightResolutionEvent } from "../types";
 import {
   resolveNightActions,
   SMITE_PHASE_KEY,
   getInterimAttackedPlayerIds,
 } from "./resolution";
+
+function findKilled(
+  events: ReturnType<typeof resolveNightActions>,
+  targetPlayerId: string,
+): AttackNightResolutionEvent | undefined {
+  return events.find(
+    (e): e is AttackNightResolutionEvent =>
+      e.type === "killed" && e.targetPlayerId === targetPlayerId,
+  );
+}
 
 const assignments = [
   { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -41,7 +52,9 @@ describe("resolveNightActions", () => {
       assignments,
       [],
     );
-    const event = events.find((e) => e.targetPlayerId === "p1");
+    const event = events.find(
+      (e) => e.type === "killed" && e.targetPlayerId === "p1",
+    );
     expect(event).toMatchObject({
       attackedBy: [WerewolfRole.Werewolf],
       protectedBy: [WerewolfRole.Bodyguard],
@@ -73,8 +86,8 @@ describe("resolveNightActions", () => {
       assignments,
       [],
     );
-    const e = events.find((e) => e.targetPlayerId === "w1");
-    expect(e?.type === "killed" && e.died).toBe(true);
+    const e = findKilled(events, "w1");
+    expect(e?.died).toBe(true);
   });
 
   it("Chupacabra attack does not apply when target is not on Team.Bad and werewolves are alive", () => {
@@ -92,8 +105,8 @@ describe("resolveNightActions", () => {
       assignments,
       ["w1"], // w1 is the only werewolf and is dead
     );
-    const e = events.find((e) => e.targetPlayerId === "p1");
-    expect(e?.type === "killed" && e.died).toBe(true);
+    const e = findKilled(events, "p1");
+    expect(e?.died).toBe(true);
   });
 
   it("returns empty array when no night actions set", () => {
@@ -111,7 +124,9 @@ describe("resolveNightActions", () => {
         assignments,
         [],
       );
-      const event = events.find((e) => e.targetPlayerId === "p1");
+      const event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
       expect(event).toMatchObject({
         protectedBy: [WerewolfRole.Witch],
         died: false,
@@ -127,7 +142,9 @@ describe("resolveNightActions", () => {
         assignments,
         [],
       );
-      const event = events.find((e) => e.targetPlayerId === "p2");
+      const event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p2",
+      );
       expect(event).toMatchObject({
         attackedBy: [WerewolfRole.Witch],
         protectedBy: [],
@@ -142,7 +159,7 @@ describe("resolveNightActions", () => {
         [],
       );
       expect(events).toHaveLength(1);
-      expect(events[0]?.targetPlayerId).toBe("p1");
+      expect(events[0]).toMatchObject({ type: "killed", targetPlayerId: "p1" });
     });
   });
 
@@ -157,7 +174,9 @@ describe("resolveNightActions", () => {
         [],
         ["p1"],
       );
-      const event = events.find((e) => e.targetPlayerId === "p1");
+      const event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
       expect(event).toMatchObject({
         attackedBy: expect.arrayContaining([
           WerewolfRole.Werewolf,
@@ -169,7 +188,9 @@ describe("resolveNightActions", () => {
 
     it("creates an attack event with SMITE_PHASE_KEY as attacker", () => {
       const events = resolveNightActions({}, assignments, [], ["p1"]);
-      const event = events.find((e) => e.targetPlayerId === "p1");
+      const event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
       expect(event).toMatchObject({
         type: "killed",
         attackedBy: [SMITE_PHASE_KEY],
@@ -187,7 +208,9 @@ describe("resolveNightActions", () => {
         [],
         ["p1"],
       );
-      const event = events.find((e) => e.targetPlayerId === "p1");
+      const event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
       expect(event).toMatchObject({
         attackedBy: [WerewolfRole.Werewolf, SMITE_PHASE_KEY],
         died: true,
@@ -249,7 +272,9 @@ describe("resolveNightActions", () => {
         doctorAssignments,
         [],
       );
-      const event = events.find((e) => e.targetPlayerId === "p1");
+      const event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
       expect(event).toMatchObject({
         attackedBy: [WerewolfRole.Werewolf],
         protectedBy: [WerewolfRole.Doctor],
@@ -267,16 +292,10 @@ describe("resolveNightActions", () => {
         doctorAssignments,
         [],
       );
-      const event = events.find((e) => e.targetPlayerId === "p1");
-      expect(event).toMatchObject({
-        died: false,
-      });
-      expect(event?.type === "killed" && event.protectedBy).toContain(
-        WerewolfRole.Doctor,
-      );
-      expect(event?.type === "killed" && event.protectedBy).toContain(
-        WerewolfRole.Bodyguard,
-      );
+      const event = findKilled(events, "p1");
+      expect(event).toMatchObject({ died: false });
+      expect(event?.protectedBy).toContain(WerewolfRole.Doctor);
+      expect(event?.protectedBy).toContain(WerewolfRole.Bodyguard);
     });
   });
 
@@ -298,7 +317,9 @@ describe("resolveNightActions", () => {
         undefined,
         { priestWards: { p1: "priest1" } },
       );
-      const event = events.find((e) => e.targetPlayerId === "p1");
+      const event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
       expect(event).toMatchObject({
         attackedBy: [WerewolfRole.Werewolf],
         protectedBy: [WerewolfRole.Priest],
@@ -315,7 +336,9 @@ describe("resolveNightActions", () => {
         priestAssignments,
         [],
       );
-      const event = events.find((e) => e.targetPlayerId === "p1");
+      const event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
       expect(event).toMatchObject({
         protectedBy: [],
         died: true,
@@ -333,14 +356,10 @@ describe("resolveNightActions", () => {
         undefined,
         { priestWards: { p1: "priest1" } },
       );
-      const event = events.find((e) => e.targetPlayerId === "p1");
+      const event = findKilled(events, "p1");
       expect(event).toMatchObject({ died: false });
-      expect(event?.type === "killed" && event.protectedBy).toContain(
-        WerewolfRole.Priest,
-      );
-      expect(event?.type === "killed" && event.protectedBy).toContain(
-        WerewolfRole.Bodyguard,
-      );
+      expect(event?.protectedBy).toContain(WerewolfRole.Priest);
+      expect(event?.protectedBy).toContain(WerewolfRole.Bodyguard);
     });
 
     it("warded player shown as protected via getInterimAttackedPlayerIds", () => {

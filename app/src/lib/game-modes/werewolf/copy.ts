@@ -189,8 +189,12 @@ export const WEREWOLF_COPY = {
     mentalistDifferentTeams: "on different teams",
   },
   altruist: {
-    attackedHeading: "Players under attack:",
+    attackedIntro:
+      "The following players are under attack. You may sacrifice yourself to save one of them.",
+    attackedHeading: "Choose a player to save:",
     noAttacks: "No one is under attack tonight.",
+    saveButton: (name: string) => `Save ${name}`,
+    savingButton: (name: string) => `Saving ${name}`,
     dayAnnouncement: (altruistName: string, savedName: string) =>
       `${altruistName} sacrificed themselves to save ${savedName}.`,
   },
