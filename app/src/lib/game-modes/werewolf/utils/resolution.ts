@@ -262,14 +262,19 @@ export function resolveNightActions(
   const mummyAction = nightActions[WerewolfRole.Mummy] as
     | { targetPlayerId?: string }
     | undefined;
-  const hypnotizedEvents: NightResolutionEvent[] = mummyAction?.targetPlayerId
-    ? [
-        {
-          type: "hypnotized",
-          targetPlayerId: mummyAction.targetPlayerId,
-        },
-      ]
-    : [];
+  const mummyPlayerId = roleAssignments.find(
+    (a) => a.roleDefinitionId === (WerewolfRole.Mummy as string),
+  )?.playerId;
+  const hypnotizedEvents: NightResolutionEvent[] =
+    mummyAction?.targetPlayerId && mummyPlayerId
+      ? [
+          {
+            type: "hypnotized",
+            targetPlayerId: mummyAction.targetPlayerId,
+            mummyPlayerId,
+          },
+        ]
+      : [];
 
   return [
     ...combatEvents,

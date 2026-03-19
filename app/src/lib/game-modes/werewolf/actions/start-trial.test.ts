@@ -179,7 +179,7 @@ describe("WerewolfAction.StartTrial", () => {
     it("does not precast vote for hypnotized player", () => {
       const ts: WerewolfTurnState = makeDayState();
       (ts.phase as WerewolfDaytimePhase).nightResolution = [
-        { type: "hypnotized", targetPlayerId: "p2" },
+        { type: "hypnotized", targetPlayerId: "p2", mummyPlayerId: "p4" },
       ];
       const game = makePlayingGame(ts, {
         roleAssignments: [
@@ -201,6 +201,40 @@ describe("WerewolfAction.StartTrial", () => {
       expect(phase.activeTrial.votes.some((v) => v.playerId === "p2")).toBe(
         false,
       );
+    });
+
+    it("precast vote is applied when Mummy (who hypnotized player) has died", () => {
+      // p4 (Mummy) hypnotized p2 (Village Idiot) but p4 is now dead.
+      // The hypnosis is lifted, so p2's alwaysVotesGuilty precast should fire.
+      const ts: WerewolfTurnState = {
+        ...makeDayState(),
+        deadPlayerIds: ["p4"],
+      };
+      (ts.phase as WerewolfDaytimePhase).nightResolution = [
+        { type: "hypnotized", targetPlayerId: "p2", mummyPlayerId: "p4" },
+      ];
+      const game = makePlayingGame(ts, {
+        roleAssignments: [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.VillageIdiot },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p4", roleDefinitionId: WerewolfRole.Mummy },
+        ],
+      });
+      action.apply(game, { defendantId: "p1" }, "owner-1");
+      const phase = (
+        game.status as {
+          turnState: {
+            phase: {
+              activeTrial: { votes: { playerId: string; vote: string }[] };
+            };
+          };
+        }
+      ).turnState.phase;
+      expect(phase.activeTrial.votes).toContainEqual({
+        playerId: "p2",
+        vote: "guilty",
+      });
     });
 
     it("does not auto-resolve during defense even when all eligible players are Village Idiots", () => {

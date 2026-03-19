@@ -141,6 +141,11 @@ export function TrialVotePanel({
           {trial.mustVoteGuiltyNote}
         </p>
       )}
+      {activeTrial.mustVoteInnocent && hasVoted && (
+        <p className="text-sm text-muted-foreground mb-3">
+          {trial.mustVoteInnocentNote}
+        </p>
+      )}
       {canVote && !hasVoted && isSilenced && (
         <p className="text-sm font-medium text-amber-600">
           {trial.silencedCannotVote}
