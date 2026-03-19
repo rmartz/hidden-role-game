@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import type { DaytimeVote } from "@/lib/game-modes/werewolf";
 import { WEREWOLF_COPY, WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
@@ -18,6 +18,7 @@ interface TrialVotePanelProps {
   votePhaseSeconds: number;
   defensePhaseSeconds: number;
   autoAdvance: boolean;
+  isSilenced?: boolean;
 }
 
 export function TrialVotePanel({
@@ -29,6 +30,7 @@ export function TrialVotePanel({
   votePhaseSeconds,
   defensePhaseSeconds,
   autoAdvance,
+  isSilenced,
 }: TrialVotePanelProps) {
   const action = useGameAction(gameId);
   const defendant = players.find((p) => p.id === activeTrial.defendantId);
@@ -42,6 +44,10 @@ export function TrialVotePanel({
   );
 
   const { trial } = WEREWOLF_COPY;
+  const [silencedDefenseMessage] = useState(() => {
+    const msgs = trial.defenseSilenced;
+    return msgs[Math.floor(Math.random() * msgs.length)];
+  });
   const verdictLabel = activeTrial.verdict
     ? activeTrial.verdict === "eliminated"
       ? trial.verdictLabelEliminated
@@ -105,6 +111,11 @@ export function TrialVotePanel({
       <p className="text-sm text-muted-foreground mb-2">
         {trial.defenseSubtext}
       </p>
+      {isDefendant && isSilenced && (
+        <p className="text-sm italic text-muted-foreground mb-2">
+          {silencedDefenseMessage}
+        </p>
+      )}
       {defenseTimer}
     </>
   ) : isDefendant ? (

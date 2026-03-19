@@ -89,6 +89,11 @@ export const WEREWOLF_COPY = {
     resolveTrial: "Resolve Trial",
     defenseHeading: (name: string) => `${name} has the floor`,
     defenseSubtext: "The accused may speak in their defense.",
+    defenseSilenced: [
+      "Bad time to lose your voice.",
+      "Cat got your tongue?",
+      "Uh, maybe try puppy dog eyes?",
+    ],
     skipDefense: "Skip Defense",
     putToVote: "Put to Vote",
     mustVoteGuiltyNote:
