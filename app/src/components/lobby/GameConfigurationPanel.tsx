@@ -147,6 +147,12 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
                   playerCount={playerCount}
                   gameMode={activeGameMode}
                   readOnly={true}
+                  categoryOrder={
+                    isWerewolf ? WEREWOLF_ROLE_CATEGORY_ORDER : undefined
+                  }
+                  categoryLabels={
+                    isWerewolf ? WEREWOLF_ROLE_CATEGORY_LABELS : undefined
+                  }
                 />
               ) : (
                 <RoleConfig

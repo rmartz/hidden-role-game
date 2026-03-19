@@ -17,6 +17,8 @@ interface ReadOnlyProps {
   playerCount: number;
   gameMode: GameMode;
   readOnly: true;
+  categoryOrder?: string[];
+  categoryLabels?: Record<string, string>;
 }
 
 interface EditableProps {
@@ -66,8 +68,8 @@ export function RoleConfig(props: RoleConfigProps) {
   const disabledRoles = allRoles.filter((r) => !isRoleEnabled(r.id));
   const hasHiddenRoles = disabledRoles.length > 0;
 
-  const categoryOrder = !readOnly ? props.categoryOrder : undefined;
-  const categoryLabels = !readOnly ? props.categoryLabels : undefined;
+  const categoryOrder = props.categoryOrder;
+  const categoryLabels = props.categoryLabels;
   const hasCategoryGrouping = !!categoryOrder;
 
   const disabledByCategory = hasCategoryGrouping
@@ -144,7 +146,7 @@ export function RoleConfig(props: RoleConfigProps) {
               ),
             )}
           </ul>
-          {!readOnly && hasCategoryGrouping && showAll && (
+          {hasCategoryGrouping && showAll && (
             <>
               {disabledByCategory.map(({ category, label, roles }) => (
                 <div key={category} className="mt-4">
@@ -152,16 +154,29 @@ export function RoleConfig(props: RoleConfigProps) {
                     {label}
                   </p>
                   <ul className="space-y-1 list-none p-0">
-                    {roles.map((role) => (
-                      <RoleConfigEntry
-                        key={role.id}
-                        role={role}
-                        gameMode={gameMode}
-                        roleConfigMode={roleConfigMode}
-                        readOnly={false}
-                        disabled={props.disabled}
-                      />
-                    ))}
+                    {roles.map((role) =>
+                      readOnly ? (
+                        <RoleConfigEntry
+                          key={role.id}
+                          role={role}
+                          gameMode={gameMode}
+                          roleConfigMode={roleConfigMode}
+                          min={readOnlyMin[role.id] ?? 0}
+                          max={readOnlyMax[role.id] ?? 0}
+                          readOnly={true}
+                          dimmed
+                        />
+                      ) : (
+                        <RoleConfigEntry
+                          key={role.id}
+                          role={role}
+                          gameMode={gameMode}
+                          roleConfigMode={roleConfigMode}
+                          readOnly={false}
+                          disabled={props.disabled}
+                        />
+                      ),
+                    )}
                   </ul>
                 </div>
               ))}
@@ -171,16 +186,29 @@ export function RoleConfig(props: RoleConfigProps) {
                     Other
                   </p>
                   <ul className="space-y-1 list-none p-0">
-                    {uncategorizedDisabled.map((role) => (
-                      <RoleConfigEntry
-                        key={role.id}
-                        role={role}
-                        gameMode={gameMode}
-                        roleConfigMode={roleConfigMode}
-                        readOnly={false}
-                        disabled={props.disabled}
-                      />
-                    ))}
+                    {uncategorizedDisabled.map((role) =>
+                      readOnly ? (
+                        <RoleConfigEntry
+                          key={role.id}
+                          role={role}
+                          gameMode={gameMode}
+                          roleConfigMode={roleConfigMode}
+                          min={readOnlyMin[role.id] ?? 0}
+                          max={readOnlyMax[role.id] ?? 0}
+                          readOnly={true}
+                          dimmed
+                        />
+                      ) : (
+                        <RoleConfigEntry
+                          key={role.id}
+                          role={role}
+                          gameMode={gameMode}
+                          roleConfigMode={roleConfigMode}
+                          readOnly={false}
+                          disabled={props.disabled}
+                        />
+                      ),
+                    )}
                   </ul>
                 </div>
               )}
