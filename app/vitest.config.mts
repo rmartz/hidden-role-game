@@ -12,7 +12,7 @@ export default defineConfig({
           exclude: ["src/hooks/**/*.test.ts"],
           setupFiles: ["src/test-setup/firebase-admin-mock.ts"],
         },
-        resolve: { alias: { "@": path.resolve(__dirname, "./src") } },
+        resolve: { alias: { "@": path.resolve(import.meta.dirname, "./src") } },
       },
       {
         test: {
@@ -20,7 +20,7 @@ export default defineConfig({
           environment: "happy-dom",
           include: ["src/hooks/**/*.test.ts"],
         },
-        resolve: { alias: { "@": path.resolve(__dirname, "./src") } },
+        resolve: { alias: { "@": path.resolve(import.meta.dirname, "./src") } },
       },
     ],
   },
