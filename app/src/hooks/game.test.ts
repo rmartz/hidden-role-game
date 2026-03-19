@@ -28,6 +28,10 @@ vi.mock("@/lib/firebase/client", () => ({
   getClientDatabase: vi.fn(() => ({})),
 }));
 
+vi.mock("@/hooks/firebaseAuth", () => ({
+  useFirebaseAuth: vi.fn().mockReturnValue({ isReady: true }),
+}));
+
 import * as api from "@/lib/api";
 import { useStartGame, useGameStateQuery } from "./game";
 
