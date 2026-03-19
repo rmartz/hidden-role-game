@@ -12,7 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ROLE_LABEL_COPY } from "@/components/copy";
+import { ROLE_LABEL_COPY } from "@/app/copy";
 
 interface RoleLabelProps {
   role: PublicRoleInfo;

@@ -1,3 +1,9 @@
+export const ROLE_LABEL_COPY = {
+  roleDetailTitle: (roleName: string, teamLabel: string) =>
+    `${roleName} (${teamLabel})`,
+  roleInfoSrLabel: "Role information",
+} as const;
+
 export const HOME_PAGE_COPY = {
   title: "Hidden Role Game",
   activeGame: "You have an active game in progress.",
