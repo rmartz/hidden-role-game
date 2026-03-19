@@ -39,6 +39,7 @@ export const resolveTrialAction: GameAction = {
     if (ts.phase.type !== WerewolfPhase.Daytime) return false;
     const { activeTrial } = ts.phase;
     if (!activeTrial) return false;
+    if (activeTrial.phase !== "voting") return false;
     return !activeTrial.verdict;
   },
   apply(game: Game) {

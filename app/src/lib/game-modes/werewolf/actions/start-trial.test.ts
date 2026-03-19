@@ -30,10 +30,25 @@ describe("WerewolfAction.StartTrial", () => {
       action.apply(game, { defendantId: "p1" }, "owner-1");
       const phase = (
         game.status as {
-          turnState: { phase: { activeTrial: { votes: unknown[] } } };
+          turnState: {
+            phase: { activeTrial: { votes: unknown[]; phase: string } };
+          };
         }
       ).turnState.phase;
       expect(phase.activeTrial.votes).toHaveLength(0);
+    });
+
+    it("starts trial in defense phase", () => {
+      const game = makePlayingGame(makeDayState());
+      action.apply(game, { defendantId: "p1" }, "owner-1");
+      const phase = (
+        game.status as {
+          turnState: {
+            phase: { activeTrial: { phase: string } };
+          };
+        }
+      ).turnState.phase;
+      expect(phase.activeTrial.phase).toBe("defense");
     });
 
     it("auto-casts guilty vote for Village Idiot player", () => {
@@ -108,7 +123,7 @@ describe("WerewolfAction.StartTrial", () => {
       );
     });
 
-    it("auto-resolves when all eligible players are Village Idiots", () => {
+    it("does not auto-resolve during defense even when all eligible players are Village Idiots", () => {
       // 3-player game: p1 is defendant; p2 and p3 are both Village Idiots
       const game = makePlayingGame(makeDayState(), {
         players: [
@@ -127,12 +142,17 @@ describe("WerewolfAction.StartTrial", () => {
         game.status as {
           turnState: {
             phase: {
-              activeTrial: { verdict?: string; votes: unknown[] };
+              activeTrial: {
+                verdict?: string;
+                phase: string;
+                votes: unknown[];
+              };
             };
           };
         }
       ).turnState.phase;
-      expect(phase.activeTrial.verdict).toBe("eliminated");
+      expect(phase.activeTrial.phase).toBe("defense");
+      expect(phase.activeTrial.verdict).toBeUndefined();
     });
   });
 });

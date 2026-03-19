@@ -27,6 +27,7 @@ function makeDayStateWithTrial(
       activeTrial: {
         defendantId: overrides.defendantId ?? "p1",
         startedAt: 2000,
+        phase: "voting" as const,
         votes: overrides.votes ?? [],
         ...(overrides.verdict ? { verdict: overrides.verdict } : {}),
       },
@@ -97,6 +98,26 @@ describe("WerewolfAction.CastVote", () => {
       const game = makePlayingGame(
         makeDayStateWithTrial({ deadPlayerIds: ["p2"] }),
       );
+      expect(action.isValid(game, "p2", { vote: "guilty" })).toBe(false);
+    });
+
+    it("returns false during defense phase", () => {
+      const ts: WerewolfTurnState = {
+        turn: 1,
+        phase: {
+          type: WerewolfPhase.Daytime,
+          startedAt: 1000,
+          nightActions: {},
+          activeTrial: {
+            defendantId: "p1",
+            startedAt: 2000,
+            phase: "defense",
+            votes: [],
+          },
+        },
+        deadPlayerIds: [],
+      };
+      const game = makePlayingGame(ts);
       expect(action.isValid(game, "p2", { vote: "guilty" })).toBe(false);
     });
 

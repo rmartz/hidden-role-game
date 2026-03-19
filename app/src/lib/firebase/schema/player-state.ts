@@ -44,6 +44,8 @@ export interface FirebasePlayerState {
   activeTrial?: {
     defendantId: string;
     startedAt: number;
+    phase: string;
+    voteStartedAt?: number;
     myVote?: DaytimeVote;
     voteCount: number;
     playerCount: number;

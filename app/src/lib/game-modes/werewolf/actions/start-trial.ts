@@ -2,7 +2,6 @@ import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase } from "../types";
 import { currentTurnState, isOwnerPlaying } from "../utils";
 import { WEREWOLF_ROLES, isWerewolfRole } from "../roles";
-import { applyTrialVerdict } from "./resolve-trial";
 
 export const startTrialAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {
@@ -42,21 +41,11 @@ export const startTrialAction: GameAction = {
     const activeTrial = {
       defendantId,
       startedAt: Date.now(),
+      phase: "defense" as const,
       votes: precastGuiltyVotes,
     };
     ts.phase.activeTrial = activeTrial;
     // Clear all nominations when a trial begins
     ts.phase.nominations = [];
-
-    // Auto-resolve if precast votes account for all eligible votes
-    const eligibleCount = game.players.filter(
-      (p) =>
-        p.id !== game.ownerPlayerId &&
-        p.id !== defendantId &&
-        !ts.deadPlayerIds.includes(p.id),
-    ).length;
-    if (activeTrial.votes.length >= eligibleCount) {
-      applyTrialVerdict(activeTrial, ts, game);
-    }
   },
 };

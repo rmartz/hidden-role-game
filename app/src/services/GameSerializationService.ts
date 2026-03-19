@@ -346,6 +346,10 @@ export class GameSerializationService {
       result.activeTrial = {
         defendantId: activeTrial.defendantId,
         startedAt: activeTrial.startedAt,
+        phase: activeTrial.phase,
+        ...(activeTrial.voteStartedAt !== undefined
+          ? { voteStartedAt: activeTrial.voteStartedAt }
+          : {}),
         ...(myVote !== undefined ? { myVote } : {}),
         voteCount: activeTrial.votes.length,
         playerCount: alivePlayerCount,

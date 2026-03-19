@@ -58,6 +58,7 @@ describe("WerewolfAction.WithdrawNomination", () => {
           activeTrial: {
             defendantId: "p3",
             startedAt: 2000,
+            phase: "defense",
             votes: [],
           },
         },

@@ -15,4 +15,5 @@ export enum WerewolfAction {
   UnsmitePlayer = "unsmite-player",
   NominatePlayer = "nominate-player",
   WithdrawNomination = "withdraw-nomination",
+  SkipDefense = "skip-defense",
 }
