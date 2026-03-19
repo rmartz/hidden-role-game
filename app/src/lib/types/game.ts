@@ -179,7 +179,7 @@ export interface TimerConfig {
 }
 
 export const DEFAULT_TIMER_CONFIG: TimerConfig = {
-  autoAdvance: true,
+  autoAdvance: false,
   startCountdownSeconds: 10,
   nightPhaseSeconds: 30,
   dayPhaseSeconds: 300,

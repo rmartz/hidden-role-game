@@ -1,7 +1,7 @@
 "use client";
 
 import type { TimerConfig } from "@/lib/types";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { TIMER_CONFIG_COPY } from "./copy";
 import { TimerConfigPanelRow, TIMER_ROWS } from "./TimerConfigPanelRow";
@@ -41,13 +41,11 @@ export function TimerConfigPanel({
     <div className="space-y-3">
       <p className="text-sm font-medium">{TIMER_CONFIG_COPY.heading}</p>
       <div className="flex items-center gap-2">
-        <Checkbox
+        <Switch
           id="timer-auto-advance"
           checked={timerConfig.autoAdvance}
           disabled={disabled ?? readOnly}
-          onCheckedChange={(checked) => {
-            handleAutoAdvanceChange(checked);
-          }}
+          onCheckedChange={handleAutoAdvanceChange}
         />
         <Label htmlFor="timer-auto-advance" className="text-sm">
           {TIMER_CONFIG_COPY.autoAdvance}
