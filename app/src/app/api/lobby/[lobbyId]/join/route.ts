@@ -32,7 +32,8 @@ export async function POST(
     return errorResponse("Lobby is full", 400);
   }
 
-  const normalizedNew = normalizePlayerName(body.playerName);
+  const displayName = body.playerName.trim().replace(/\s+/g, " ");
+  const normalizedNew = normalizePlayerName(displayName);
   const isDuplicate = lobby.players.some(
     (p) => normalizePlayerName(p.name) === normalizedNew,
   );
@@ -46,7 +47,7 @@ export async function POST(
   const sessionId = randomUUID();
   const newPlayer = {
     id: randomUUID(),
-    name: body.playerName,
+    name: displayName,
     sessionId,
   };
 

@@ -208,6 +208,45 @@ describe("POST /api/lobby/[lobbyId]/join", () => {
     expect(res.status).toBe(400);
   });
 
+  it("should normalize internal whitespace (tab/newline) to spaces in the stored name", async () => {
+    const createRes = await createLobby(
+      postRequest("http://localhost/api/lobby/create", { playerName: "Alice" }),
+    );
+    const { data } = await createRes.json();
+    const lobbyId = data.lobby.id;
+
+    const res = await joinLobby(
+      postRequest(`http://localhost/api/lobby/${lobbyId}/join`, {
+        playerName: "Bob\tSmith",
+      }),
+      makeParams(lobbyId),
+    );
+    expect(res.status).toBe(201);
+    const body = await res.json();
+    const bob = (body.data.lobby.players as { name: string }[]).find(
+      (p) => p.name === "Bob Smith",
+    );
+    expect(bob).toBeDefined();
+  });
+
+  it("should reject a name with a tab that collides with an existing player after normalization", async () => {
+    const createRes = await createLobby(
+      postRequest("http://localhost/api/lobby/create", {
+        playerName: "Bob Smith",
+      }),
+    );
+    const { data } = await createRes.json();
+    const lobbyId = data.lobby.id;
+
+    const res = await joinLobby(
+      postRequest(`http://localhost/api/lobby/${lobbyId}/join`, {
+        playerName: "Bob\tSmith",
+      }),
+      makeParams(lobbyId),
+    );
+    expect(res.status).toBe(400);
+  });
+
   it("should return 404 when joining a lobby that does not exist", async () => {
     const res = await joinLobby(
       postRequest("http://localhost/api/lobby/nonexistent-id/join", {
