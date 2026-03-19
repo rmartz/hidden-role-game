@@ -2,7 +2,7 @@
 
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { LOBBY_CONFIG_COPY } from "./copy";
+import { CONFIGURATION_TOGGLES_COPY } from "./ConfigurationToggles.copy";
 
 interface ConfigurationTogglesProps {
   showConfigToPlayers: boolean;
@@ -24,7 +24,7 @@ export function ConfigurationToggles({
         onCheckedChange={onShowConfigToPlayersChange}
       />
       <Label htmlFor="show-config">
-        {LOBBY_CONFIG_COPY.showConfigToPlayers}
+        {CONFIGURATION_TOGGLES_COPY.showConfigToPlayers}
       </Label>
     </div>
   );

@@ -12,7 +12,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { PLAYER_ROW_COPY } from "./copy";
+import { PLAYER_ROW_COPY } from "./PlayerRow.copy";
 
 interface PlayerRowProps {
   player: PublicLobbyPlayer;

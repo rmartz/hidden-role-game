@@ -21,7 +21,7 @@ import {
   ShareLobby,
   WerewolfLobbyGlossary,
 } from "@/components/lobby";
-import { LOBBY_PAGE_COPY } from "../copy";
+import { LOBBY_PAGE_COPY } from "./page.copy";
 
 export default function LobbyPage() {
   const { lobbyId, gameMode: gameModeParam } = useParams<{

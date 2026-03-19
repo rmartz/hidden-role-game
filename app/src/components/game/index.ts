@@ -1,4 +1,3 @@
-export * from "./copy";
 export * from "./GameRolesList";
 export * from "./GameTimer";
 export * from "./PlayersRoleList";

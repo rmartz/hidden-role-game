@@ -1,11 +1,11 @@
 "use client";
 
-import { GAME_PAGE_COPY } from "./copy";
+import { UNSUPPORTED_GAME_MODE_COPY } from "./UnsupportedGameMode.copy";
 
 export function UnsupportedGameMode() {
   return (
     <p className="p-5 text-muted-foreground">
-      {GAME_PAGE_COPY.unsupportedGameMode}
+      {UNSUPPORTED_GAME_MODE_COPY.message}
     </p>
   );
 }

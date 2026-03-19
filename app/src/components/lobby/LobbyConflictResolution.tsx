@@ -5,6 +5,7 @@ import type { PublicLobby } from "@/server/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { LOBBY_CONFLICT_RESOLUTION_COPY } from "./LobbyConflictResolution.copy";
 
 interface LobbyConflictResolutionProps {
   conflictLobby: PublicLobby;
@@ -28,13 +29,15 @@ export function LobbyConflictResolution({
   return (
     <Card className="mb-5">
       <CardHeader>
-        <CardTitle>Lobby Conflict</CardTitle>
+        <CardTitle>{LOBBY_CONFLICT_RESOLUTION_COPY.cardTitle}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         {conflictLobby.gameId ? (
-          <p>You have an active game in lobby {conflictLobbyId}.</p>
+          <p>{LOBBY_CONFLICT_RESOLUTION_COPY.activeGame(conflictLobbyId)}</p>
         ) : (
-          <p>You are already in lobby {conflictLobbyId}.</p>
+          <p>
+            {LOBBY_CONFLICT_RESOLUTION_COPY.alreadyInLobby(conflictLobbyId)}
+          </p>
         )}
         <div className="flex flex-wrap gap-3 items-center">
           <Button
@@ -49,7 +52,9 @@ export function LobbyConflictResolution({
               }
             }}
           >
-            {conflictLobby.gameId ? "Rejoin Game" : "Stay In Previous Lobby"}
+            {conflictLobby.gameId
+              ? LOBBY_CONFLICT_RESOLUTION_COPY.rejoinGame
+              : LOBBY_CONFLICT_RESOLUTION_COPY.stayInPreviousLobby}
           </Button>
           <form
             className="flex gap-2 items-center"
@@ -64,7 +69,7 @@ export function LobbyConflictResolution({
               onChange={(e) => {
                 onPlayerNameChange(e.target.value);
               }}
-              placeholder="Your name"
+              placeholder={LOBBY_CONFLICT_RESOLUTION_COPY.namePlaceholder}
               disabled={isJoining}
               className="w-48"
             />
@@ -72,7 +77,9 @@ export function LobbyConflictResolution({
               type="submit"
               disabled={isJoining || playerName.trim() === ""}
             >
-              {isJoining ? "Joining..." : "Leave and Join This Lobby"}
+              {isJoining
+                ? LOBBY_CONFLICT_RESOLUTION_COPY.joining
+                : LOBBY_CONFLICT_RESOLUTION_COPY.leaveAndJoin}
             </Button>
           </form>
         </div>

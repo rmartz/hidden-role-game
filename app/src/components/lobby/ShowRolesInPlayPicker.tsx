@@ -11,37 +11,10 @@ import {
   FieldTitle,
 } from "@/components/ui/field";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-
-const SHOW_ROLES_OPTIONS: {
-  value: ShowRolesInPlay;
-  title: string;
-  description: string;
-}[] = [
-  {
-    value: ShowRolesInPlay.None,
-    title: "None",
-    description:
-      "Players cannot see which roles were configured for this game.",
-  },
-  {
-    value: ShowRolesInPlay.ConfiguredOnly,
-    title: "Configured only",
-    description:
-      "Players see which roles were configured, but not if they were assigned or how many are in play.",
-  },
-  {
-    value: ShowRolesInPlay.AssignedRolesOnly,
-    title: "Assigned roles",
-    description:
-      "Players see which roles were assigned, but not how many are in play.",
-  },
-  {
-    value: ShowRolesInPlay.RoleAndCount,
-    title: "Role and count",
-    description:
-      "Players see how many of each roles were assigned for the game.",
-  },
-];
+import {
+  SHOW_ROLES_IN_PLAY_PICKER_COPY,
+  SHOW_ROLES_OPTIONS,
+} from "./ShowRolesInPlayPicker.copy";
 
 interface ShowRolesInPlayPickerProps {
   value: ShowRolesInPlay;
@@ -56,7 +29,7 @@ export function ShowRolesInPlayPicker({
 }: ShowRolesInPlayPickerProps) {
   return (
     <div className="space-y-1">
-      <Label>Show roles in play</Label>
+      <Label>{SHOW_ROLES_IN_PLAY_PICKER_COPY.label}</Label>
       <RadioGroup
         value={value}
         disabled={disabled}

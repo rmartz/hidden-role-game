@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { GAME_TIMER_COPY } from "./copy";
+import { GAME_TIMER_COPY } from "./GameTimer.copy";
 
 function formatTime(totalSeconds: number): string {
   const minutes = Math.floor(totalSeconds / 60);

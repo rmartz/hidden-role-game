@@ -2,7 +2,7 @@
 
 import type { TimerConfig } from "@/lib/types";
 import { Incrementer } from "./Incrementer";
-import { TIMER_CONFIG_COPY } from "./copy";
+import { TIMER_CONFIG_COPY } from "./TimerConfigPanel.copy";
 
 export interface TimerRow {
   label: string;

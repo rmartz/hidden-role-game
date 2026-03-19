@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { JOIN_PROMPT_COPY } from "./JoinPrompt.copy";
 
 interface JoinPromptProps {
   lobbyId: string;
@@ -29,15 +30,14 @@ export function JoinPrompt({ lobbyId, onJoined }: JoinPromptProps) {
   return (
     <Card className="mb-5">
       <CardHeader>
-        <CardTitle>Join Lobby</CardTitle>
+        <CardTitle>{JOIN_PROMPT_COPY.cardTitle}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p className="text-muted-foreground">
-          Enter your name to join this lobby.
-        </p>
+        <p className="text-muted-foreground">{JOIN_PROMPT_COPY.description}</p>
         {joinMutation.error && (
           <p className="text-destructive text-sm">
-            Error: {joinMutation.error.message}
+            {JOIN_PROMPT_COPY.errorPrefix}
+            {joinMutation.error.message}
           </p>
         )}
         <form
@@ -48,7 +48,7 @@ export function JoinPrompt({ lobbyId, onJoined }: JoinPromptProps) {
           }}
         >
           <div className="space-y-1">
-            <Label htmlFor="join-name">Your name</Label>
+            <Label htmlFor="join-name">{JOIN_PROMPT_COPY.nameLabel}</Label>
             <Input
               id="join-name"
               type="text"
@@ -56,14 +56,16 @@ export function JoinPrompt({ lobbyId, onJoined }: JoinPromptProps) {
               onChange={(e) => {
                 setPlayerName(e.target.value);
               }}
-              placeholder="Enter your name"
+              placeholder={JOIN_PROMPT_COPY.namePlaceholder}
             />
           </div>
           <Button
             type="submit"
             disabled={joinMutation.isPending || playerName.trim() === ""}
           >
-            {joinMutation.isPending ? "Joining..." : "Join Lobby"}
+            {joinMutation.isPending
+              ? JOIN_PROMPT_COPY.joining
+              : JOIN_PROMPT_COPY.joinButton}
           </Button>
         </form>
       </CardContent>
