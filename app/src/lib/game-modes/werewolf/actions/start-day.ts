@@ -1,7 +1,12 @@
 import { GameStatus } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase, isTeamNightAction } from "../types";
-import type { NightAction, WerewolfNighttimePhase } from "../types";
+import type {
+  AttackNightResolutionEvent,
+  NightAction,
+  ToughGuyAbsorbedNightResolutionEvent,
+  WerewolfNighttimePhase,
+} from "../types";
 import {
   currentTurnState,
   isOwnerPlaying,
@@ -51,12 +56,17 @@ export const startDayAction: GameAction = {
       },
     );
     const newDeadIds = nightResolution
-      .filter((e) => e.type === "killed" && e.died)
+      .filter(
+        (e): e is AttackNightResolutionEvent => e.type === "killed" && e.died,
+      )
       .map((e) => e.targetPlayerId);
 
     // Track Tough Guy hits: players who absorbed an attack this night.
     const newToughGuyHitIds = nightResolution
-      .filter((e) => e.type === "tough-guy-absorbed")
+      .filter(
+        (e): e is ToughGuyAbsorbedNightResolutionEvent =>
+          e.type === "tough-guy-absorbed",
+      )
       .map((e) => e.targetPlayerId);
     const toughGuyHitIds = [...(ts.toughGuyHitIds ?? []), ...newToughGuyHitIds];
 
@@ -64,7 +74,7 @@ export const startDayAction: GameAction = {
     // regardless of whether other protections also saved them.
     const attackedPlayerIds = new Set(
       nightResolution
-        .filter((e) => e.type === "killed")
+        .filter((e): e is AttackNightResolutionEvent => e.type === "killed")
         .map((e) => e.targetPlayerId),
     );
     const priestWards: Record<string, string> = {};

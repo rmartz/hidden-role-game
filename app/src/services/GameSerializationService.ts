@@ -18,6 +18,7 @@ import {
   SMITE_PHASE_KEY,
 } from "@/lib/game-modes/werewolf";
 import type {
+  AltruistInterceptedNightResolutionEvent,
   AnyNightAction,
   WerewolfRoleDefinition,
   WerewolfTurnState,
@@ -225,6 +226,47 @@ export class GameSerializationService {
       return result;
     }
 
+    // For the Altruist, show players currently under attack (excluding self).
+    // They can choose to intercept one attack, sacrificing themselves.
+    if (isRoleActive(myRole.id, WerewolfRole.Altruist)) {
+      const ts =
+        game.status.type === GameStatus.Playing
+          ? (game.status.turnState as WerewolfTurnState | undefined)
+          : undefined;
+      const altruistAction = nightActions[myRole.id];
+      const altruistSoloAction =
+        altruistAction && !isTeamNightAction(altruistAction)
+          ? altruistAction
+          : undefined;
+      // The Witch acts before the Altruist; exclude any player the Witch has
+      // chosen to protect so the Altruist only sees truly unprotected targets.
+      const witchAction = nightActions[WerewolfRole.Witch] as
+        | { targetPlayerId?: string }
+        | undefined;
+      const witchProtectedId = witchAction?.targetPlayerId;
+      const attacked = getInterimAttackedPlayerIds(
+        nightActions,
+        game.roleAssignments,
+        deadPlayerIds,
+        ts?.priestWards,
+      ).filter((id) => id !== callerId && id !== witchProtectedId);
+      const result: Partial<PlayerGameState> = {
+        myNightTarget: altruistSoloAction?.skipped
+          ? null
+          : altruistSoloAction?.targetPlayerId,
+        myNightTargetConfirmed: altruistSoloAction?.confirmed ?? false,
+      };
+      if (attacked.length > 0) {
+        result.nightStatus = attacked.map(
+          (id): NighttimeNightStatusEntry => ({
+            targetPlayerId: id,
+            effect: "attacked",
+          }),
+        );
+      }
+      return result;
+    }
+
     // One-Eyed Seer: if locked onto a living player, surface the lock ID.
     if (isRoleActive(myRole.id, WerewolfRole.OneEyedSeer)) {
       const ts =
@@ -416,8 +458,21 @@ export class GameSerializationService {
       return [];
     });
 
+    const altruistIntercept = (phase.nightResolution ?? []).find(
+      (e): e is AltruistInterceptedNightResolutionEvent =>
+        e.type === "altruist-intercepted",
+    );
+
     const result: Partial<PlayerGameState> = {
       ...(nightStatus.length > 0 ? { nightStatus } : {}),
+      ...(altruistIntercept
+        ? {
+            altruistSave: {
+              altruistPlayerId: altruistIntercept.altruistPlayerId,
+              savedPlayerId: altruistIntercept.savedPlayerId,
+            },
+          }
+        : {}),
     };
 
     // Include nomination state when nominations are enabled.

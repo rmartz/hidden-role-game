@@ -11,6 +11,7 @@ import type { PlayerGameState } from "@/server/types";
 import { getPlayerName } from "@/lib/player-utils";
 import { GameTimer } from "@/components/game";
 import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
+import { AltruistActionPanel } from "./AltruistActionPanel";
 import { ConfirmTargetButton } from "./ConfirmTargetButton";
 import { PlayerFirstTurnScreen } from "./PlayerFirstTurnScreen";
 import { PlayerInvestigationResult } from "./PlayerInvestigationResult";
@@ -104,6 +105,9 @@ export function PlayerNightActionScreen({
       ? (allSecondTargets ?? []).filter(([, isSelected]) => isSelected)
       : allSecondTargets;
 
+  const isAltruist =
+    !isGroupPhase && gameState.myRole?.id === (WerewolfRole.Altruist as string);
+
   const isExposerAbilityUsed =
     !isGroupPhase &&
     gameState.myRole?.id === (WerewolfRole.Exposer as string) &&
@@ -151,7 +155,16 @@ export function PlayerNightActionScreen({
             {WEREWOLF_COPY.oneEyedSeer.locked(oesLockedTargetName)}
           </p>
         )}
-        {priestWardActive ? (
+        {isAltruist ? (
+          <AltruistActionPanel
+            gameId={gameId}
+            players={gameState.players}
+            attackedPlayerIds={attackedPlayerIds}
+            myNightTarget={gameState.myNightTarget}
+            isConfirmed={isConfirmed}
+            confirmPhaseKey={confirmPhaseKey}
+          />
+        ) : priestWardActive ? (
           <ConfirmTargetButton
             gameId={gameId}
             roleId={confirmPhaseKey}

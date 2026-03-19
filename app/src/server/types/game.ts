@@ -136,6 +136,11 @@ export interface PlayerGameState {
   exposerAbilityUsed?: boolean;
   /** Whether the Priest's ward is currently active (cannot target this night). */
   priestWardActive?: boolean;
+  /**
+   * Altruist sacrifice event: shown to all players at day start when the Altruist
+   * intercepted a kill. Both the Altruist and the saved player are identified.
+   */
+  altruistSave?: { altruistPlayerId: string; savedPlayerId: string };
   /** Phase timer configuration. */
   timerConfig: TimerConfig;
   /** Whether player nominations for trial are enabled in this game. */

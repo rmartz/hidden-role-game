@@ -1,10 +1,21 @@
 import { describe, it, expect } from "vitest";
 import { WerewolfRole } from "../roles";
+import type { AttackNightResolutionEvent } from "../types";
 import {
   resolveNightActions,
   SMITE_PHASE_KEY,
   getInterimAttackedPlayerIds,
 } from "./resolution";
+
+function findKilled(
+  events: ReturnType<typeof resolveNightActions>,
+  targetPlayerId: string,
+): AttackNightResolutionEvent | undefined {
+  return events.find(
+    (e): e is AttackNightResolutionEvent =>
+      e.type === "killed" && e.targetPlayerId === targetPlayerId,
+  );
+}
 
 const assignments = [
   { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -41,7 +52,9 @@ describe("resolveNightActions", () => {
       assignments,
       [],
     );
-    const event = events.find((e) => e.targetPlayerId === "p1");
+    const event = events.find(
+      (e) => e.type === "killed" && e.targetPlayerId === "p1",
+    );
     expect(event).toMatchObject({
       attackedBy: [WerewolfRole.Werewolf],
       protectedBy: [WerewolfRole.Bodyguard],
@@ -73,8 +86,8 @@ describe("resolveNightActions", () => {
       assignments,
       [],
     );
-    const e = events.find((e) => e.targetPlayerId === "w1");
-    expect(e?.type === "killed" && e.died).toBe(true);
+    const e = findKilled(events, "w1");
+    expect(e?.died).toBe(true);
   });
 
   it("Chupacabra attack does not apply when target is not on Team.Bad and werewolves are alive", () => {
@@ -92,8 +105,8 @@ describe("resolveNightActions", () => {
       assignments,
       ["w1"], // w1 is the only werewolf and is dead
     );
-    const e = events.find((e) => e.targetPlayerId === "p1");
-    expect(e?.type === "killed" && e.died).toBe(true);
+    const e = findKilled(events, "p1");
+    expect(e?.died).toBe(true);
   });
 
   it("returns empty array when no night actions set", () => {
@@ -111,7 +124,9 @@ describe("resolveNightActions", () => {
         assignments,
         [],
       );
-      const event = events.find((e) => e.targetPlayerId === "p1");
+      const event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
       expect(event).toMatchObject({
         protectedBy: [WerewolfRole.Witch],
         died: false,
@@ -127,7 +142,9 @@ describe("resolveNightActions", () => {
         assignments,
         [],
       );
-      const event = events.find((e) => e.targetPlayerId === "p2");
+      const event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p2",
+      );
       expect(event).toMatchObject({
         attackedBy: [WerewolfRole.Witch],
         protectedBy: [],
@@ -142,7 +159,7 @@ describe("resolveNightActions", () => {
         [],
       );
       expect(events).toHaveLength(1);
-      expect(events[0]?.targetPlayerId).toBe("p1");
+      expect(events[0]).toMatchObject({ type: "killed", targetPlayerId: "p1" });
     });
   });
 
@@ -157,7 +174,9 @@ describe("resolveNightActions", () => {
         [],
         ["p1"],
       );
-      const event = events.find((e) => e.targetPlayerId === "p1");
+      const event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
       expect(event).toMatchObject({
         attackedBy: expect.arrayContaining([
           WerewolfRole.Werewolf,
@@ -169,7 +188,9 @@ describe("resolveNightActions", () => {
 
     it("creates an attack event with SMITE_PHASE_KEY as attacker", () => {
       const events = resolveNightActions({}, assignments, [], ["p1"]);
-      const event = events.find((e) => e.targetPlayerId === "p1");
+      const event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
       expect(event).toMatchObject({
         type: "killed",
         attackedBy: [SMITE_PHASE_KEY],
@@ -187,7 +208,9 @@ describe("resolveNightActions", () => {
         [],
         ["p1"],
       );
-      const event = events.find((e) => e.targetPlayerId === "p1");
+      const event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
       expect(event).toMatchObject({
         attackedBy: [WerewolfRole.Werewolf, SMITE_PHASE_KEY],
         died: true,
@@ -249,7 +272,9 @@ describe("resolveNightActions", () => {
         doctorAssignments,
         [],
       );
-      const event = events.find((e) => e.targetPlayerId === "p1");
+      const event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
       expect(event).toMatchObject({
         attackedBy: [WerewolfRole.Werewolf],
         protectedBy: [WerewolfRole.Doctor],
@@ -267,16 +292,10 @@ describe("resolveNightActions", () => {
         doctorAssignments,
         [],
       );
-      const event = events.find((e) => e.targetPlayerId === "p1");
-      expect(event).toMatchObject({
-        died: false,
-      });
-      expect(event?.type === "killed" && event.protectedBy).toContain(
-        WerewolfRole.Doctor,
-      );
-      expect(event?.type === "killed" && event.protectedBy).toContain(
-        WerewolfRole.Bodyguard,
-      );
+      const event = findKilled(events, "p1");
+      expect(event).toMatchObject({ died: false });
+      expect(event?.protectedBy).toContain(WerewolfRole.Doctor);
+      expect(event?.protectedBy).toContain(WerewolfRole.Bodyguard);
     });
   });
 
@@ -298,7 +317,9 @@ describe("resolveNightActions", () => {
         undefined,
         { priestWards: { p1: "priest1" } },
       );
-      const event = events.find((e) => e.targetPlayerId === "p1");
+      const event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
       expect(event).toMatchObject({
         attackedBy: [WerewolfRole.Werewolf],
         protectedBy: [WerewolfRole.Priest],
@@ -315,7 +336,9 @@ describe("resolveNightActions", () => {
         priestAssignments,
         [],
       );
-      const event = events.find((e) => e.targetPlayerId === "p1");
+      const event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
       expect(event).toMatchObject({
         protectedBy: [],
         died: true,
@@ -333,14 +356,10 @@ describe("resolveNightActions", () => {
         undefined,
         { priestWards: { p1: "priest1" } },
       );
-      const event = events.find((e) => e.targetPlayerId === "p1");
+      const event = findKilled(events, "p1");
       expect(event).toMatchObject({ died: false });
-      expect(event?.type === "killed" && event.protectedBy).toContain(
-        WerewolfRole.Priest,
-      );
-      expect(event?.type === "killed" && event.protectedBy).toContain(
-        WerewolfRole.Bodyguard,
-      );
+      expect(event?.protectedBy).toContain(WerewolfRole.Priest);
+      expect(event?.protectedBy).toContain(WerewolfRole.Bodyguard);
     });
 
     it("warded player shown as protected via getInterimAttackedPlayerIds", () => {
@@ -415,6 +434,173 @@ describe("resolveNightActions", () => {
       expect(killedEvent).toMatchObject({ died: false });
       const absorbedEvent = events.find((e) => e.type === "tough-guy-absorbed");
       expect(absorbedEvent).toBeUndefined();
+    });
+  });
+
+  describe("Altruist", () => {
+    const altruistAssignments = [
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "alt1", roleDefinitionId: WerewolfRole.Altruist },
+      { playerId: "bg1", roleDefinitionId: WerewolfRole.Bodyguard },
+      { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+      { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+    ];
+
+    it("intercept redirects attack: original target survives, Altruist dies", () => {
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
+          [WerewolfRole.Altruist]: { targetPlayerId: "p1" },
+        },
+        altruistAssignments,
+        [],
+      );
+      const p1Event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
+      expect(p1Event).toBeUndefined();
+
+      const altEvent = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "alt1",
+      );
+      expect(altEvent).toMatchObject({ died: true });
+
+      const interceptEvent = events.find(
+        (e) => e.type === "altruist-intercepted",
+      );
+      expect(interceptEvent).toMatchObject({
+        type: "altruist-intercepted",
+        altruistPlayerId: "alt1",
+        savedPlayerId: "p1",
+      });
+    });
+
+    it("skip leaves original kill unaffected", () => {
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
+          [WerewolfRole.Altruist]: { skipped: true },
+        },
+        altruistAssignments,
+        [],
+      );
+      const p1Event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
+      expect(p1Event).toMatchObject({ died: true });
+      expect(
+        events.find((e) => e.type === "altruist-intercepted"),
+      ).toBeUndefined();
+    });
+
+    it("intercept ignored when Altruist is themselves under attack", () => {
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "alt1" },
+          [WerewolfRole.Altruist]: { targetPlayerId: "p1" },
+        },
+        altruistAssignments,
+        [],
+      );
+      // p1 is not attacked — wolves targeted the Altruist
+      const p1Event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
+      expect(p1Event).toBeUndefined();
+
+      const altEvent = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "alt1",
+      );
+      expect(altEvent).toMatchObject({ died: true });
+      expect(
+        events.find((e) => e.type === "altruist-intercepted"),
+      ).toBeUndefined();
+    });
+
+    it("intercept ignored when target is already protected", () => {
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
+          [WerewolfRole.Bodyguard]: { targetPlayerId: "p1" },
+          [WerewolfRole.Altruist]: { targetPlayerId: "p1" },
+        },
+        altruistAssignments,
+        [],
+      );
+      // p1 is protected by Bodyguard — Altruist intercept is a no-op
+      const altEvent = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "alt1",
+      );
+      expect(altEvent).toBeUndefined();
+      expect(
+        events.find((e) => e.type === "altruist-intercepted"),
+      ).toBeUndefined();
+    });
+
+    it("intercept ignored when targeted player is not under attack", () => {
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
+          [WerewolfRole.Altruist]: { targetPlayerId: "p2" },
+        },
+        altruistAssignments,
+        [],
+      );
+      // p2 is not being attacked — intercept has no effect
+      const p1Event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
+      expect(p1Event).toMatchObject({ died: true });
+      expect(
+        events.find((e) => e.type === "altruist-intercepted"),
+      ).toBeUndefined();
+    });
+
+    it("intercept ignored when Witch has already protected the target", () => {
+      const assignmentsWithWitch = [
+        ...altruistAssignments,
+        { playerId: "witch1", roleDefinitionId: WerewolfRole.Witch },
+      ];
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
+          [WerewolfRole.Witch]: { targetPlayerId: "p1" },
+          [WerewolfRole.Altruist]: { targetPlayerId: "p1" },
+        },
+        assignmentsWithWitch,
+        [],
+      );
+      // Witch protects p1 first — Altruist intercept is a no-op
+      const altEvent = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "alt1",
+      );
+      expect(altEvent).toBeUndefined();
+      const p1Event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
+      expect(p1Event).toMatchObject({ died: false });
+      expect(
+        events.find((e) => e.type === "altruist-intercepted"),
+      ).toBeUndefined();
+    });
+
+    it("intercept ignored when Altruist targets themselves", () => {
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
+          [WerewolfRole.Altruist]: { targetPlayerId: "alt1" },
+        },
+        altruistAssignments,
+        [],
+      );
+      // Self-targeting is a no-op — p1 still dies normally
+      const p1Event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
+      expect(p1Event).toMatchObject({ died: true });
+      expect(
+        events.find((e) => e.type === "altruist-intercepted"),
+      ).toBeUndefined();
     });
   });
 

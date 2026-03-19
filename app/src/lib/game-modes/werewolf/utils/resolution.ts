@@ -64,6 +64,7 @@ function collectBaseAttacksAndProtections(
         WerewolfRole.Witch,
         WerewolfRole.Spellcaster,
         WerewolfRole.Priest,
+        WerewolfRole.Altruist,
       ])
     )
       continue;
@@ -205,6 +206,37 @@ export function resolveNightActions(
     }
   }
 
+  // Altruist intercept: if the Altruist chose a target that is under attack and
+  // not already protected (including by the Witch), redirect the attack onto the
+  // Altruist instead. Ignored if the Altruist is themselves already under attack
+  // or if the target is the Altruist themselves.
+  const altruistAction = nightActions[WerewolfRole.Altruist] as
+    | { targetPlayerId?: string }
+    | undefined;
+  let altruistInterceptEvent: NightResolutionEvent | undefined;
+  if (altruistAction?.targetPlayerId) {
+    const savedId = altruistAction.targetPlayerId;
+    const altruistPlayerId = roleAssignments.find(
+      (a) => a.roleDefinitionId === (WerewolfRole.Altruist as string),
+    )?.playerId;
+    if (
+      altruistPlayerId &&
+      savedId !== altruistPlayerId &&
+      attacks.has(savedId) &&
+      !protections.has(savedId) &&
+      !attacks.has(altruistPlayerId)
+    ) {
+      const attackers = attacks.get(savedId) ?? [];
+      attacks.delete(savedId);
+      attacks.set(altruistPlayerId, attackers);
+      altruistInterceptEvent = {
+        type: "altruist-intercepted",
+        altruistPlayerId,
+        savedPlayerId: savedId,
+      };
+    }
+  }
+
   let combatEvents = buildKilledEvents(attacks, protections);
 
   // Narrator smites: force death regardless of protections.
@@ -279,6 +311,7 @@ export function resolveNightActions(
   return [
     ...combatEvents,
     ...toughGuyEvents,
+    ...(altruistInterceptEvent ? [altruistInterceptEvent] : []),
     ...silencedEvents,
     ...hypnotizedEvents,
   ];

@@ -80,6 +80,7 @@ export function PlayerGameDayScreen({
         players={gameState.players}
         nightStatus={gameState.nightStatus}
         myPlayerId={gameState.myPlayerId}
+        altruistSave={gameState.altruistSave}
       />
 
       {gameState.exposerReveal && (

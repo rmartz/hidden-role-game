@@ -52,6 +52,7 @@ export function buildNightPhaseOrder(
   const phaseKeys: string[] = [];
   const emittedGroupPhases = new Set<string>();
 
+  let altruistPhaseKey: string | undefined;
   let witchPhaseKey: string | undefined;
 
   for (const role of Object.values(WEREWOLF_ROLES)) {
@@ -69,21 +70,28 @@ export function buildNightPhaseOrder(
     } else if (role.id === WerewolfRole.Witch) {
       if (!hasAlivePlayers(role.id as string, roleAssignments, dead)) continue;
       witchPhaseKey = role.id;
+    } else if (role.id === WerewolfRole.Altruist) {
+      // Altruist acts last — after the Witch — so they only see players the Witch
+      // didn't already protect.
+      if (!hasAlivePlayers(role.id as string, roleAssignments, dead)) continue;
+      altruistPhaseKey = role.id;
     } else {
       if (!hasAlivePlayers(role.id as string, roleAssignments, dead)) continue;
       phaseKeys.push(role.id);
     }
   }
 
-  // Extra group phase keys are inserted before the Witch (e.g. Wolf Cub bonus phases).
+  // Extra group phase keys are inserted before the Witch and Altruist (e.g. Wolf Cub bonus phases).
   // Skip any extra phase where all group participants are dead.
   for (const key of extraGroupPhaseKeys) {
     if (!hasAliveGroupParticipants(key, roleAssignments, dead)) continue;
     phaseKeys.push(key);
   }
 
-  // Witch always acts last — they need to see all prior attacks before choosing.
+  // Witch acts second-to-last — they need to see all prior attacks before choosing.
   if (witchPhaseKey !== undefined) phaseKeys.push(witchPhaseKey);
+  // Altruist acts last — after the Witch — so they only see players still unprotected.
+  if (altruistPhaseKey !== undefined) phaseKeys.push(altruistPhaseKey);
 
   return phaseKeys;
 }
