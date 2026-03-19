@@ -1,4 +1,4 @@
-import { GameStatus } from "@/lib/types";
+import { GameStatus, Team } from "@/lib/types";
 import type { Game, RoleDefinition } from "@/lib/types";
 import type {
   DaytimeNightStatusEntry,
@@ -353,7 +353,11 @@ export class GameSerializationService {
               secondAssignment.roleDefinitionId
             ] as WerewolfRoleDefinition | undefined)
           : undefined;
-        const sameTeam = targetRoleDef?.team === secondRoleDef?.team;
+        // Neutral players win individually, so treat them as never sharing a team.
+        const sameTeam =
+          targetRoleDef?.team !== Team.Neutral &&
+          secondRoleDef?.team !== Team.Neutral &&
+          targetRoleDef?.team === secondRoleDef?.team;
         const playerById = new Map(game.players.map((p) => [p.id, p]));
         const secondName =
           playerById.get(myAction.secondTargetPlayerId)?.name ??

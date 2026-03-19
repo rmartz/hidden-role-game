@@ -92,10 +92,12 @@ export function PlayerNightActionScreen({
         activePhaseKey ?? "",
         gameState.myPlayerId,
         gameState.visibleRoleAssignments,
-      ).map(
-        (player) =>
-          [player, gameState.mySecondNightTarget === player.id] as const,
       )
+        .filter((player) => player.id !== gameState.myNightTarget)
+        .map(
+          (player) =>
+            [player, gameState.mySecondNightTarget === player.id] as const,
+        )
     : undefined;
   const secondTargets =
     isMentalist && isConfirmed

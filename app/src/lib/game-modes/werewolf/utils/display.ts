@@ -1,3 +1,4 @@
+import { Team } from "@/lib/types";
 import { TargetCategory } from "../types";
 import type { AnyNightAction } from "../types";
 import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
@@ -167,7 +168,11 @@ export function getInvestigationResultForNarrator(
     const secondRoleDef = (
       WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
     )[secondAssignment.role.id];
-    const sameTeam = roleDef?.team === secondRoleDef?.team;
+    // Neutral players win individually, so treat them as never sharing a team.
+    const sameTeam =
+      roleDef?.team !== Team.Neutral &&
+      secondRoleDef?.team !== Team.Neutral &&
+      roleDef?.team === secondRoleDef?.team;
     return {
       targetName: activeTargetName ?? activeTarget,
       isWerewolfTeam: sameTeam,
