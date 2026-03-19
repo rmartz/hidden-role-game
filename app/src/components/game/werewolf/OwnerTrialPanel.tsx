@@ -13,6 +13,7 @@ interface OwnerTrialPanelProps {
   activeTrial: ActiveTrial;
   players: PublicLobbyPlayer[];
   votePhaseSeconds: number;
+  defensePhaseSeconds: number;
   autoAdvance: boolean;
 }
 
@@ -21,6 +22,7 @@ export function OwnerTrialPanel({
   activeTrial,
   players,
   votePhaseSeconds,
+  defensePhaseSeconds,
   autoAdvance,
 }: OwnerTrialPanelProps) {
   const action = useGameAction(gameId);
@@ -39,6 +41,10 @@ export function OwnerTrialPanel({
     action.mutate({ actionId: WerewolfAction.ResolveTrial });
   }, [action]);
 
+  const handleSkipDefense = useCallback(() => {
+    action.mutate({ actionId: WerewolfAction.SkipDefense });
+  }, [action]);
+
   const { trial } = WEREWOLF_COPY;
   const verdictLabel = activeTrial.verdict
     ? activeTrial.verdict === "eliminated"
@@ -46,6 +52,9 @@ export function OwnerTrialPanel({
       : trial.verdictLabelInnocent
     : undefined;
   const trialStartedAt = new Date(activeTrial.startedAt);
+  const voteTimerStartedAt = activeTrial.voteStartedAt
+    ? new Date(activeTrial.voteStartedAt)
+    : trialStartedAt;
 
   return (
     <div className="mb-3 pb-3 border-b">
@@ -58,6 +67,30 @@ export function OwnerTrialPanel({
             {trial.guiltyInnocentCount(guiltyCount, innocentCount)}
           </p>
         </>
+      ) : activeTrial.phase === "defense" ? (
+        <>
+          <p className="font-semibold mb-2">
+            {trial.defenseHeading(defendantName)}
+          </p>
+          <GameTimer
+            durationSeconds={defensePhaseSeconds}
+            autoAdvance={autoAdvance}
+            startedAt={trialStartedAt}
+            onTimerTrigger={handleSkipDefense}
+            resetKey={activeTrial.startedAt}
+          />
+          <p className="text-sm text-muted-foreground mb-3">
+            {trial.defenseSubtext}
+          </p>
+          <Button
+            size="sm"
+            className="w-full max-w-xs"
+            onClick={handleSkipDefense}
+            disabled={action.isPending}
+          >
+            {trial.skipDefense}
+          </Button>
+        </>
       ) : (
         <>
           <p className="font-semibold mb-2">
@@ -66,9 +99,9 @@ export function OwnerTrialPanel({
           <GameTimer
             durationSeconds={votePhaseSeconds}
             autoAdvance={autoAdvance}
-            startedAt={trialStartedAt}
+            startedAt={voteTimerStartedAt}
             onTimerTrigger={handleResolve}
-            resetKey={activeTrial.startedAt}
+            resetKey={activeTrial.voteStartedAt ?? activeTrial.startedAt}
           />
           <p className="text-sm text-muted-foreground mb-3">
             {trial.guiltyInnocentTotal(

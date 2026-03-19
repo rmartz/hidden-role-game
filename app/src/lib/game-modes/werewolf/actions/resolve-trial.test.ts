@@ -25,6 +25,7 @@ function makeDayStateWithPendingTrial(
       activeTrial: {
         defendantId,
         startedAt: 2000,
+        phase: "voting" as const,
         votes,
       },
     },
@@ -34,6 +35,28 @@ function makeDayStateWithPendingTrial(
 
 describe("WerewolfAction.ResolveTrial", () => {
   const action = WEREWOLF_ACTIONS[WerewolfAction.ResolveTrial];
+
+  describe("isValid", () => {
+    it("returns false during defense phase", () => {
+      const ts: WerewolfTurnState = {
+        turn: 1,
+        phase: {
+          type: WerewolfPhase.Daytime,
+          startedAt: 1000,
+          nightActions: {},
+          activeTrial: {
+            defendantId: "p1",
+            startedAt: 2000,
+            phase: "defense",
+            votes: [],
+          },
+        },
+        deadPlayerIds: [],
+      };
+      const game = makePlayingGame(ts);
+      expect(action.isValid(game, "owner-1", {})).toBe(false);
+    });
+  });
 
   describe("win condition after elimination", () => {
     it("Werewolves win when last non-Bad player is eliminated by trial", () => {

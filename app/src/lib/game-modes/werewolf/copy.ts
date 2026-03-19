@@ -87,6 +87,9 @@ export const WEREWOLF_COPY = {
     guiltyInnocentTotal: (guilty: number, innocent: number, total: number) =>
       `Guilty: ${String(guilty)} · Innocent: ${String(innocent)} · Total votes: ${String(total)}`,
     resolveTrial: "Resolve Trial",
+    defenseHeading: (name: string) => `${name} has the floor`,
+    defenseSubtext: "The accused may speak in their defense.",
+    skipDefense: "Skip Defense",
     putToVote: "Put to Vote",
     mustVoteGuiltyNote:
       "As the Village Idiot, your vote was automatically cast as Guilty.",

@@ -126,6 +126,10 @@ export interface PlayerGameState {
   activeTrial?: {
     defendantId: string;
     startedAt: number;
+    /** Current phase of the trial: defense speech or voting. */
+    phase: "defense" | "voting";
+    /** Unix epoch ms when the voting phase began. */
+    voteStartedAt?: number;
     myVote?: DaytimeVote;
     voteCount: number;
     playerCount: number;

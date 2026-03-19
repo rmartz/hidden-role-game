@@ -41,6 +41,13 @@ export const TIMER_ROWS: TimerRow[] = [
     max: 300,
     step: 15,
   },
+  {
+    label: TIMER_CONFIG_COPY.defensePhase,
+    field: "defensePhaseSeconds",
+    min: 5,
+    max: 60,
+    step: 5,
+  },
 ];
 
 function formatDuration(seconds: number): string {

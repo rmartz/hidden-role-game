@@ -16,6 +16,7 @@ interface TrialVotePanelProps {
   myPlayerId?: string;
   amDead?: boolean;
   votePhaseSeconds: number;
+  defensePhaseSeconds: number;
   autoAdvance: boolean;
 }
 
@@ -26,6 +27,7 @@ export function TrialVotePanel({
   myPlayerId,
   amDead,
   votePhaseSeconds,
+  defensePhaseSeconds,
   autoAdvance,
 }: TrialVotePanelProps) {
   const action = useGameAction(gameId);
@@ -49,12 +51,25 @@ export function TrialVotePanel({
   const canVote = !amDead && !isDefendant;
   const hasVoted = !!activeTrial.myVote;
   const trialStartedAt = new Date(activeTrial.startedAt);
-  const timer = (
+  const voteTimerStartedAt = activeTrial.voteStartedAt
+    ? new Date(activeTrial.voteStartedAt)
+    : trialStartedAt;
+
+  const defenseTimer = (
     <GameTimer
-      durationSeconds={votePhaseSeconds}
+      durationSeconds={defensePhaseSeconds}
       autoAdvance={autoAdvance}
       startedAt={trialStartedAt}
       resetKey={activeTrial.startedAt}
+    />
+  );
+
+  const voteTimer = (
+    <GameTimer
+      durationSeconds={votePhaseSeconds}
+      autoAdvance={autoAdvance}
+      startedAt={voteTimerStartedAt}
+      resetKey={activeTrial.voteStartedAt ?? activeTrial.startedAt}
     />
   );
 
@@ -82,18 +97,28 @@ export function TrialVotePanel({
         </p>
       )}
     </>
+  ) : activeTrial.phase === "defense" ? (
+    <>
+      <p className="font-semibold mb-1">
+        {trial.defenseHeading(defendantName)}
+      </p>
+      <p className="text-sm text-muted-foreground mb-2">
+        {trial.defenseSubtext}
+      </p>
+      {defenseTimer}
+    </>
   ) : isDefendant ? (
     <>
       <p className="font-semibold mb-1">{trial.youAreOnTrial}</p>
       <p className="text-sm text-muted-foreground mb-2">
         {trial.youAreOnTrialSubtext}
       </p>
-      {timer}
+      {voteTimer}
     </>
   ) : (
     <>
       <p className="font-semibold mb-1">{trial.voteHeading(defendantName)}</p>
-      {timer}
+      {voteTimer}
       <p className="text-sm text-muted-foreground mb-3 mt-2">
         {trial.votesCast(activeTrial.voteCount, activeTrial.playerCount)}
         {hasVoted && activeTrial.myVote && trial.yourVote(activeTrial.myVote)}

@@ -156,6 +156,10 @@ export function parseTimerConfig(raw: Record<string, unknown>): TimerConfig {
       typeof raw["votePhaseSeconds"] === "number"
         ? raw["votePhaseSeconds"]
         : DEFAULT_TIMER_CONFIG.votePhaseSeconds,
+    defensePhaseSeconds:
+      typeof raw["defensePhaseSeconds"] === "number"
+        ? raw["defensePhaseSeconds"]
+        : DEFAULT_TIMER_CONFIG.defensePhaseSeconds,
   };
 }
 
