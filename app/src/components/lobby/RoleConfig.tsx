@@ -41,6 +41,7 @@ export function RoleConfig(props: RoleConfigProps) {
   const roleMaxes = useAppSelector((s) => s.gameConfig.roleMaxes);
 
   const isAdvanced = roleConfigMode === RoleConfigMode.Advanced;
+
   const readOnlyMin = readOnly
     ? Object.fromEntries((props.roleSlots ?? []).map((s) => [s.roleId, s.min]))
     : {};
@@ -51,11 +52,28 @@ export function RoleConfig(props: RoleConfigProps) {
   const total = readOnly ? 0 : sum(Object.values(roleCounts));
 
   const allRoles = Object.values(roleDefinitions);
-  const enabledRoles = readOnly
-    ? allRoles.filter((r) => (readOnlyMax[r.id] ?? 0) > 0)
-    : allRoles;
-  const hasHiddenRoles = readOnly && enabledRoles.length < allRoles.length;
-  const visibleRoles = readOnly && !showAll ? enabledRoles : allRoles;
+
+  const enabledRoles = allRoles.filter((r) =>
+    readOnly
+      ? (readOnlyMax[r.id] ?? 0) > 0
+      : roleConfigMode === RoleConfigMode.Advanced
+        ? (roleMaxes[r.id] ?? 0) > 0
+        : (roleCounts[r.id] ?? 0) > 0,
+  );
+
+  const hasHiddenRoles = enabledRoles.length < allRoles.length;
+  const visibleRoles = showAll ? allRoles : enabledRoles;
+
+  function isRoleEnabled(roleId: string): boolean {
+    if (readOnly) return (readOnlyMax[roleId] ?? 0) > 0;
+    if (roleConfigMode === RoleConfigMode.Advanced)
+      return (roleMaxes[roleId] ?? 0) > 0;
+    return (roleCounts[roleId] ?? 0) > 0;
+  }
+
+  function toggleShowAll() {
+    setShowAll((prev) => !prev);
+  }
 
   return (
     <>
@@ -83,6 +101,7 @@ export function RoleConfig(props: RoleConfigProps) {
                   min={readOnlyMin[role.id] ?? 0}
                   max={readOnlyMax[role.id] ?? 0}
                   readOnly={true}
+                  dimmed={showAll && !isRoleEnabled(role.id)}
                 />
               ) : (
                 <RoleConfigEntry
@@ -92,6 +111,7 @@ export function RoleConfig(props: RoleConfigProps) {
                   roleConfigMode={roleConfigMode}
                   readOnly={false}
                   disabled={props.disabled}
+                  dimmed={showAll && !isRoleEnabled(role.id)}
                 />
               ),
             )}
@@ -101,9 +121,7 @@ export function RoleConfig(props: RoleConfigProps) {
               variant="ghost"
               size="sm"
               className="mt-2 w-full"
-              onClick={() => {
-                setShowAll((prev) => !prev);
-              }}
+              onClick={toggleShowAll}
             >
               {showAll
                 ? ROLE_CONFIG_COPY.hideExtraRoles
