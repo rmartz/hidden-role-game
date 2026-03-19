@@ -13,6 +13,7 @@ interface OwnerPlayerActionsGridProps {
   gameOwnerId?: string;
   isDaytime?: boolean;
   hasActiveTrial?: boolean;
+  smitedPlayerIds?: string[];
 }
 
 export function OwnerPlayerActionsGrid({
@@ -23,20 +24,23 @@ export function OwnerPlayerActionsGrid({
   gameOwnerId,
   isDaytime,
   hasActiveTrial,
+  smitedPlayerIds,
 }: OwnerPlayerActionsGridProps) {
   return (
     <NarratorPlayerRoleLists
       assignments={assignments}
       gameMode={gameMode}
       deadPlayerIds={deadPlayerIds}
-      renderActions={(playerId, isDead) =>
+      renderActions={(playerId, playerName, isDead) =>
         playerId === gameOwnerId ? null : (
           <OwnerPlayerActionItem
             gameId={gameId}
             playerId={playerId}
+            playerName={playerName}
             isDead={isDead}
             isDaytime={isDaytime}
             hasActiveTrial={hasActiveTrial}
+            isSmited={smitedPlayerIds?.includes(playerId)}
           />
         )
       }

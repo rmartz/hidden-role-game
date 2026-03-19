@@ -3,6 +3,7 @@ import type { AnyNightAction } from "../types";
 import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
 import { isGroupPhaseKey, baseGroupPhaseKey, isRoleActive } from "./phase-keys";
+import { SMITE_PHASE_KEY } from "./resolution";
 import type { PhaseKey } from "./phase-keys";
 import { targetPlayerIdOf } from "./targeting";
 import { getPlayerName } from "@/lib/player-utils";
@@ -49,6 +50,7 @@ export function getPhaseLabel(
   phaseKey: string,
   roles: Record<string, { name: string }>,
 ): string {
+  if (phaseKey === SMITE_PHASE_KEY) return "Narrator";
   return roles[baseGroupPhaseKey(phaseKey)]?.name ?? phaseKey;
 }
 

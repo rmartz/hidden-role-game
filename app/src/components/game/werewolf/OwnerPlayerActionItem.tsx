@@ -18,30 +18,27 @@ import {
 interface OwnerPlayerActionItemProps {
   gameId: string;
   playerId: string;
+  playerName: string;
   isDead: boolean;
   isDaytime?: boolean;
   hasActiveTrial?: boolean;
+  isSmited?: boolean;
 }
 
 export function OwnerPlayerActionItem({
   gameId,
   playerId,
+  playerName,
   isDead,
   isDaytime,
   hasActiveTrial,
+  isSmited,
 }: OwnerPlayerActionItemProps) {
   const action = useGameAction(gameId);
 
   const handleRevive = () => {
     action.mutate({
       actionId: WerewolfAction.MarkPlayerAlive,
-      payload: { playerId },
-    });
-  };
-
-  const handleKill = () => {
-    action.mutate({
-      actionId: WerewolfAction.MarkPlayerDead,
       payload: { playerId },
     });
   };
@@ -53,51 +50,98 @@ export function OwnerPlayerActionItem({
     });
   };
 
-  const button = isDead ? (
-    <Button
-      variant="outline"
-      size="xs"
-      onClick={handleRevive}
-      disabled={action.isPending}
-    >
-      Revive
-    </Button>
-  ) : isDaytime ? (
-    <Button
-      variant="outline"
-      size="xs"
-      onClick={handlePutToVote}
-      disabled={action.isPending || !!hasActiveTrial}
-    >
-      {WEREWOLF_COPY.trial.putToVote}
-    </Button>
-  ) : (
-    <AlertDialog>
-      <AlertDialogTrigger
-        render={
-          <Button variant="destructive" size="xs" disabled={action.isPending} />
-        }
-      >
-        Kill
-      </AlertDialogTrigger>
-      <AlertDialogContent size="sm">
-        <AlertDialogHeader>
-          <AlertDialogTitle>{WEREWOLF_COPY.killConfirm.title}</AlertDialogTitle>
-          <AlertDialogDescription>
-            {WEREWOLF_COPY.killConfirm.description}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>
-            {WEREWOLF_COPY.killConfirm.cancel}
-          </AlertDialogCancel>
-          <AlertDialogAction variant="destructive" onClick={handleKill}>
-            {WEREWOLF_COPY.killConfirm.confirm}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
+  const handleSmite = () => {
+    action.mutate({
+      actionId: WerewolfAction.SmitePlayer,
+      payload: { playerId },
+    });
+  };
 
-  return <div className="flex gap-1">{button}</div>;
+  const handleUnsmite = () => {
+    action.mutate({
+      actionId: WerewolfAction.UnsmitePlayer,
+      payload: { playerId },
+    });
+  };
+
+  if (isDead) {
+    return (
+      <div className="flex gap-1">
+        <Button
+          variant="outline"
+          size="xs"
+          onClick={handleRevive}
+          disabled={action.isPending}
+        >
+          Revive
+        </Button>
+      </div>
+    );
+  }
+
+  if (isDaytime) {
+    return (
+      <div className="flex gap-1">
+        <Button
+          variant="outline"
+          size="xs"
+          onClick={handlePutToVote}
+          disabled={action.isPending || !!hasActiveTrial}
+        >
+          {WEREWOLF_COPY.trial.putToVote}
+        </Button>
+      </div>
+    );
+  }
+
+  if (isSmited) {
+    return (
+      <div className="flex gap-1">
+        <Button
+          variant="outline"
+          size="xs"
+          onClick={handleUnsmite}
+          disabled={action.isPending}
+        >
+          {WEREWOLF_COPY.smite.undo}
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex gap-1">
+      <AlertDialog>
+        <AlertDialogTrigger
+          render={
+            <Button
+              variant="destructive"
+              size="xs"
+              disabled={action.isPending}
+            />
+          }
+        >
+          {WEREWOLF_COPY.narrator.smite}
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {WEREWOLF_COPY.smite.confirmTitle}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {WEREWOLF_COPY.smite.confirmDescription(playerName)}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              {WEREWOLF_COPY.smite.confirmCancel}
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleSmite}>
+              {WEREWOLF_COPY.smite.confirmAction}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
 }
