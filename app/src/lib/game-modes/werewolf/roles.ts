@@ -270,7 +270,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Good,
     wakesAtNight: WakesAtNight.Never,
     targetCategory: TargetCategory.None,
-    category: WerewolfRoleCategory.VillagerProtection,
+    category: WerewolfRoleCategory.VillagerSupport,
   },
   [WerewolfRole.Minion]: {
     id: WerewolfRole.Minion,

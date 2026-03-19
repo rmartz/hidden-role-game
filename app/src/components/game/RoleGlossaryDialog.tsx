@@ -65,6 +65,23 @@ export function RoleGlossaryDialog({
       )
     : glossaryRoles;
 
+  const renderRoleItems = (roleList: RoleDefinition<string, Team>[]) =>
+    roleList.map((role) => (
+      <AccordionItem key={role.id} value={role.id}>
+        <AccordionTrigger>
+          <span className="flex flex-wrap items-center gap-x-2">
+            <RoleLabel role={role} gameMode={gameMode} />
+            {role.summary && (
+              <span className="font-normal text-muted-foreground">
+                — {role.summary}
+              </span>
+            )}
+          </span>
+        </AccordionTrigger>
+        <AccordionContent>{role.description ?? role.summary}</AccordionContent>
+      </AccordionItem>
+    ));
+
   return (
     <Dialog>
       <DialogTrigger render={<Button variant="outline" size="sm" />}>
@@ -78,77 +95,23 @@ export function RoleGlossaryDialog({
           <>
             {groupedCategories.map(({ category, label, roles: catRoles }) => (
               <div key={category}>
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mt-4 mb-1">
+                <p className="text-xs font-semibold text-muted-foreground mt-4 mb-1">
                   {label}
                 </p>
-                <Accordion>
-                  {catRoles.map((role) => (
-                    <AccordionItem key={role.id} value={role.id}>
-                      <AccordionTrigger>
-                        <span className="flex flex-wrap items-center gap-x-2">
-                          <RoleLabel role={role} gameMode={gameMode} />
-                          {role.summary && (
-                            <span className="font-normal text-muted-foreground">
-                              — {role.summary}
-                            </span>
-                          )}
-                        </span>
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        {role.description ?? role.summary}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
+                <Accordion>{renderRoleItems(catRoles)}</Accordion>
               </div>
             ))}
             {uncategorized.length > 0 && (
               <div>
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mt-4 mb-1">
+                <p className="text-xs font-semibold text-muted-foreground mt-4 mb-1">
                   Other
                 </p>
-                <Accordion>
-                  {uncategorized.map((role) => (
-                    <AccordionItem key={role.id} value={role.id}>
-                      <AccordionTrigger>
-                        <span className="flex flex-wrap items-center gap-x-2">
-                          <RoleLabel role={role} gameMode={gameMode} />
-                          {role.summary && (
-                            <span className="font-normal text-muted-foreground">
-                              — {role.summary}
-                            </span>
-                          )}
-                        </span>
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        {role.description ?? role.summary}
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
+                <Accordion>{renderRoleItems(uncategorized)}</Accordion>
               </div>
             )}
           </>
         ) : (
-          <Accordion>
-            {glossaryRoles.map((role) => (
-              <AccordionItem key={role.id} value={role.id}>
-                <AccordionTrigger>
-                  <span className="flex flex-wrap items-center gap-x-2">
-                    <RoleLabel role={role} gameMode={gameMode} />
-                    {role.summary && (
-                      <span className="font-normal text-muted-foreground">
-                        — {role.summary}
-                      </span>
-                    )}
-                  </span>
-                </AccordionTrigger>
-                <AccordionContent>
-                  {role.description ?? role.summary}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+          <Accordion>{renderRoleItems(glossaryRoles)}</Accordion>
         )}
       </DialogContent>
     </Dialog>
