@@ -504,6 +504,107 @@ describe("GameSerializationService.extractDaytimeNightState — mustVoteGuilty",
 });
 
 // ---------------------------------------------------------------------------
+// extractDaytimeNightState — playerCount excludes silenced players
+// ---------------------------------------------------------------------------
+
+describe("GameSerializationService.extractDaytimeNightState — playerCount excludes silenced", () => {
+  const service = new GameSerializationService();
+
+  it("does not count silenced players in playerCount", () => {
+    // 4-player game (owner excluded): p1=defendant, p2=silenced, p3 and p4 are eligible
+    const activeTrial = {
+      defendantId: "p1",
+      startedAt: 2000,
+      phase: "voting" as const,
+      votes: [] as { playerId: string; vote: "guilty" | "innocent" }[],
+    };
+    const turnState: WerewolfTurnState = {
+      turn: 1,
+      phase: {
+        type: WerewolfPhase.Daytime,
+        startedAt: 1000,
+        nightActions: {},
+        nightResolution: [{ type: "silenced", targetPlayerId: "p2" }],
+        activeTrial,
+      },
+      deadPlayerIds: [],
+    };
+    const game: Game = {
+      id: "game-1",
+      lobbyId: "lobby-1",
+      gameMode: GameMode.Werewolf,
+      status: { type: GameStatus.Playing, turnState },
+      players: [
+        { id: "p1", name: "Alice", sessionId: "s1", visiblePlayers: [] },
+        { id: "p2", name: "Bob", sessionId: "s2", visiblePlayers: [] },
+        { id: "p3", name: "Charlie", sessionId: "s3", visiblePlayers: [] },
+        { id: "p4", name: "Diana", sessionId: "s4", visiblePlayers: [] },
+      ],
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+      ],
+      configuredRoleSlots: [],
+      showRolesInPlay: ShowRolesInPlay.None,
+      ownerPlayerId: "owner",
+      nominationsEnabled: false,
+      timerConfig: DEFAULT_TIMER_CONFIG,
+    };
+    const result = service.extractDaytimeNightState(game, "p3");
+    // p1=defendant, p2=silenced → only p3 and p4 count; playerCount should be 2
+    expect(result.activeTrial?.playerCount).toBe(2);
+  });
+
+  it("does not double-count when the defendant is also silenced", () => {
+    // p1=defendant AND silenced; p2, p3 are eligible → playerCount should be 2
+    const activeTrial = {
+      defendantId: "p1",
+      startedAt: 2000,
+      phase: "voting" as const,
+      votes: [] as { playerId: string; vote: "guilty" | "innocent" }[],
+    };
+    const turnState: WerewolfTurnState = {
+      turn: 1,
+      phase: {
+        type: WerewolfPhase.Daytime,
+        startedAt: 1000,
+        nightActions: {},
+        nightResolution: [{ type: "silenced", targetPlayerId: "p1" }],
+        activeTrial,
+      },
+      deadPlayerIds: [],
+    };
+    const game: Game = {
+      id: "game-1",
+      lobbyId: "lobby-1",
+      gameMode: GameMode.Werewolf,
+      status: { type: GameStatus.Playing, turnState },
+      players: [
+        { id: "p1", name: "Alice", sessionId: "s1", visiblePlayers: [] },
+        { id: "p2", name: "Bob", sessionId: "s2", visiblePlayers: [] },
+        { id: "p3", name: "Charlie", sessionId: "s3", visiblePlayers: [] },
+      ],
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+      ],
+      configuredRoleSlots: [],
+      showRolesInPlay: ShowRolesInPlay.None,
+      ownerPlayerId: "owner",
+      nominationsEnabled: false,
+      timerConfig: DEFAULT_TIMER_CONFIG,
+    };
+    const result = service.extractDaytimeNightState(game, "p2");
+    // p1 excluded as defendant (silenced filter would also exclude them, but no double-count)
+    // → only p2 and p3 count; playerCount should be 2
+    expect(result.activeTrial?.playerCount).toBe(2);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // extractDaytimeNightState — nominations
 // ---------------------------------------------------------------------------
 

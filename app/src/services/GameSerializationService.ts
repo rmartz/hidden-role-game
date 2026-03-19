@@ -343,7 +343,8 @@ export class GameSerializationService {
         (p) =>
           p.id !== game.ownerPlayerId &&
           p.id !== activeTrial.defendantId &&
-          !ts.deadPlayerIds.includes(p.id),
+          !ts.deadPlayerIds.includes(p.id) &&
+          !silencedIds.includes(p.id),
       ).length;
       const myVote = activeTrial.votes.find(
         (v) => v.playerId === callerId,
