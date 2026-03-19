@@ -71,7 +71,7 @@ export function RoleGlossaryDialog({
       <AccordionItem key={role.id} value={role.id}>
         <AccordionTrigger>
           <span className="flex flex-wrap items-center gap-x-2">
-            <RoleLabel role={role} gameMode={gameMode} />
+            <RoleLabel role={role} gameMode={gameMode} disableDialog />
             {role.summary && (
               <span className="font-normal text-muted-foreground">
                 — {role.summary}

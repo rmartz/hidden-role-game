@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { getPlayerId, getLobbyId, getSessionId } from "@/lib/api";
 import { GameMode } from "@/lib/types";
-import { parseGameMode, GAME_MODES } from "@/lib/game-modes";
+import { parseGameMode } from "@/lib/game-modes";
 import {
   useLobbyQuery,
   useLobbyWebSocket,
@@ -19,13 +19,8 @@ import {
   JoinPrompt,
   PlayerList,
   ShareLobby,
+  WerewolfLobbyGlossary,
 } from "@/components/lobby";
-import { RoleGlossaryDialog } from "@/components/game";
-import {
-  WEREWOLF_ROLE_CATEGORY_LABELS,
-  WEREWOLF_ROLE_CATEGORY_ORDER,
-} from "@/lib/game-modes/werewolf/roles";
-import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 import { LOBBY_PAGE_COPY } from "../copy";
 
 export default function LobbyPage() {
@@ -132,8 +127,6 @@ export default function LobbyPage() {
 
   if (!validatedGameMode || !hasReadStorage || hasDifferentLobby) return null;
 
-  const werewolfAllRoles = Object.values(GAME_MODES[GameMode.Werewolf].roles);
-
   const configPanel =
     fetchLobby.data && !gameId ? (
       isOwner || fetchLobby.data.config.showConfigToPlayers ? (
@@ -199,14 +192,7 @@ export default function LobbyPage() {
 
       {actualGameMode === GameMode.Werewolf && !gameId && (
         <div className="mb-4">
-          <RoleGlossaryDialog
-            roles={werewolfAllRoles}
-            gameMode={GameMode.Werewolf}
-            title={WEREWOLF_COPY.glossary.dialogTitle}
-            triggerLabel={WEREWOLF_COPY.glossary.openButton}
-            categoryOrder={WEREWOLF_ROLE_CATEGORY_ORDER}
-            categoryLabels={WEREWOLF_ROLE_CATEGORY_LABELS}
-          />
+          <WerewolfLobbyGlossary />
         </div>
       )}
 
