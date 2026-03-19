@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { POST as createLobby } from "./route";
 import { postRequest } from "@/app/api/test-utils";
+import { ShowRolesInPlay } from "@/lib/types";
 
 describe("POST /api/lobby/create", () => {
   it("should reject an empty player name", async () => {
@@ -78,5 +79,8 @@ describe("POST /api/lobby/create", () => {
     expect(body.data.lobby.players[0].name).toBe("Alice");
     expect(body.data.lobby.players[0].sessionId).toBeUndefined();
     expect(body.data.lobby.ownerPlayerId).toBe(body.data.lobby.players[0].id);
+    expect(body.data.lobby.config.showRolesInPlay).toBe(
+      ShowRolesInPlay.ConfiguredOnly,
+    );
   });
 });

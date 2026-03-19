@@ -12,22 +12,26 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { ROLE_LABEL_COPY } from "@/components/copy";
 
 interface RoleLabelProps {
   role: PublicRoleInfo;
   gameMode?: GameMode;
   showTeam?: boolean;
+  disableDialog?: boolean;
 }
 
 export function RoleLabel({
   role,
   gameMode,
   showTeam = false,
+  disableDialog = false,
 }: RoleLabelProps) {
   const modeConfig = gameMode ? GAME_MODES[gameMode] : undefined;
   const teamLabel = modeConfig?.teamLabels[role.team] ?? role.team;
   const fullRole = modeConfig?.roles[role.id];
-  const hasInfo = !!(fullRole?.summary ?? fullRole?.description);
+  const hasInfo =
+    !disableDialog && !!(fullRole?.summary ?? fullRole?.description);
 
   const teamRevealClass = showTeam
     ? "max-w-[10rem] opacity-100"
@@ -59,12 +63,12 @@ export function RoleLabel({
         }
       >
         {badge}
-        <span className="sr-only">Role information</span>
+        <span className="sr-only">{ROLE_LABEL_COPY.roleInfoSrLabel}</span>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            {role.name} ({teamLabel})
+            {ROLE_LABEL_COPY.roleDetailTitle(role.name, teamLabel)}
           </DialogTitle>
         </DialogHeader>
         {fullRole?.summary && <p className="font-medium">{fullRole.summary}</p>}
