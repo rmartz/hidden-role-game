@@ -17,7 +17,8 @@ export async function POST(
   const { lobbyId } = await params;
   const body = (await request.json()) as JoinLobbyRequest;
 
-  const nameError = validatePlayerName(body.playerName);
+  const displayName = body.playerName.trim().replace(/\s+/g, " ");
+  const nameError = validatePlayerName(displayName);
   if (nameError) {
     return errorResponse(nameError, 400);
   }
@@ -32,7 +33,6 @@ export async function POST(
     return errorResponse("Lobby is full", 400);
   }
 
-  const displayName = body.playerName.trim().replace(/\s+/g, " ");
   const normalizedNew = normalizePlayerName(displayName);
   const isDuplicate = lobby.players.some(
     (p) => normalizePlayerName(p.name) === normalizedNew,

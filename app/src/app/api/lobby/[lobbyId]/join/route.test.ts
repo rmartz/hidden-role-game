@@ -229,6 +229,22 @@ describe("POST /api/lobby/[lobbyId]/join", () => {
     expect(bob).toBeDefined();
   });
 
+  it("should allow players with names that are distinct after normalization", async () => {
+    const createRes = await createLobby(
+      postRequest("http://localhost/api/lobby/create", { playerName: "Alice" }),
+    );
+    const { data } = await createRes.json();
+    const lobbyId = data.lobby.id;
+
+    const res = await joinLobby(
+      postRequest(`http://localhost/api/lobby/${lobbyId}/join`, {
+        playerName: "Alice B",
+      }),
+      makeParams(lobbyId),
+    );
+    expect(res.status).toBe(201);
+  });
+
   it("should reject a name with a tab that collides with an existing player after normalization", async () => {
     const createRes = await createLobby(
       postRequest("http://localhost/api/lobby/create", {

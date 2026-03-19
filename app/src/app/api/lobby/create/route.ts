@@ -17,7 +17,8 @@ import {
 export async function POST(request: Request): Promise<Response> {
   const body = (await request.json()) as CreateLobbyRequest;
 
-  const nameError = validatePlayerName(body.playerName);
+  const displayName = body.playerName.trim().replace(/\s+/g, " ");
+  const nameError = validatePlayerName(displayName);
   if (nameError) {
     return errorResponse(nameError, 400);
   }
@@ -25,7 +26,7 @@ export async function POST(request: Request): Promise<Response> {
   const sessionId = randomUUID();
   const owner = {
     id: randomUUID(),
-    name: body.playerName,
+    name: displayName,
     sessionId,
   };
 

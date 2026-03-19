@@ -43,6 +43,17 @@ describe("POST /api/lobby/create", () => {
     expect(res.status).toBe(200);
   });
 
+  it("should normalize internal whitespace in the creator's name", async () => {
+    const res = await createLobby(
+      postRequest("http://localhost/api/lobby/create", {
+        playerName: "Alice\tSmith",
+      }),
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.data.lobby.players[0].name).toBe("Alice Smith");
+  });
+
   it("should return 400 for an invalid game mode", async () => {
     const res = await createLobby(
       postRequest("http://localhost/api/lobby/create", {
