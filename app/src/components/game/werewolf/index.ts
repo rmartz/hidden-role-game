@@ -1,3 +1,4 @@
+export * from "./AltruistActionPanel";
 export * from "./WerewolfGameScreen";
 export * from "./PlayerRoleDisplay";
 export * from "./PlayerStatusLists";

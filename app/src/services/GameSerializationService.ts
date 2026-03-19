@@ -238,12 +238,18 @@ export class GameSerializationService {
         altruistAction && !isTeamNightAction(altruistAction)
           ? altruistAction
           : undefined;
+      // The Witch acts before the Altruist; exclude any player the Witch has
+      // chosen to protect so the Altruist only sees truly unprotected targets.
+      const witchAction = nightActions[WerewolfRole.Witch] as
+        | { targetPlayerId?: string }
+        | undefined;
+      const witchProtectedId = witchAction?.targetPlayerId;
       const attacked = getInterimAttackedPlayerIds(
         nightActions,
         game.roleAssignments,
         deadPlayerIds,
         ts?.priestWards,
-      ).filter((id) => id !== callerId);
+      ).filter((id) => id !== callerId && id !== witchProtectedId);
       const result: Partial<PlayerGameState> = {
         myNightTarget: altruistSoloAction?.skipped
           ? null

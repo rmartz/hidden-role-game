@@ -536,6 +536,53 @@ describe("resolveNightActions", () => {
         events.find((e) => e.type === "altruist-intercepted"),
       ).toBeUndefined();
     });
+
+    it("intercept ignored when Witch has already protected the target", () => {
+      const assignmentsWithWitch = [
+        ...altruistAssignments,
+        { playerId: "witch1", roleDefinitionId: WerewolfRole.Witch },
+      ];
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
+          [WerewolfRole.Witch]: { targetPlayerId: "p1" },
+          [WerewolfRole.Altruist]: { targetPlayerId: "p1" },
+        },
+        assignmentsWithWitch,
+        [],
+      );
+      // Witch protects p1 first — Altruist intercept is a no-op
+      const altEvent = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "alt1",
+      );
+      expect(altEvent).toBeUndefined();
+      const p1Event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
+      expect(p1Event).toMatchObject({ died: false });
+      expect(
+        events.find((e) => e.type === "altruist-intercepted"),
+      ).toBeUndefined();
+    });
+
+    it("intercept ignored when Altruist targets themselves", () => {
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
+          [WerewolfRole.Altruist]: { targetPlayerId: "alt1" },
+        },
+        altruistAssignments,
+        [],
+      );
+      // Self-targeting is a no-op — p1 still dies normally
+      const p1Event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p1",
+      );
+      expect(p1Event).toMatchObject({ died: true });
+      expect(
+        events.find((e) => e.type === "altruist-intercepted"),
+      ).toBeUndefined();
+    });
   });
 
   describe("Chupacabra", () => {

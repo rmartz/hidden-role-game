@@ -77,10 +77,15 @@ export interface ToughGuyAbsorbedNightResolutionEvent {
 
 export interface AltruistInterceptedNightResolutionEvent {
   type: "altruist-intercepted";
-  /** The Altruist player who sacrificed themselves. */
+  /** The Altruist player who sacrificed themselves (also aliased as targetPlayerId). */
   altruistPlayerId: string;
   /** The player whose attack was redirected to the Altruist. */
   savedPlayerId: string;
+  /**
+   * The Altruist player ID, provided so this event is compatible with
+   * code that iterates NightResolutionEvent by targetPlayerId.
+   */
+  targetPlayerId: string;
 }
 
 export type NightResolutionEvent =
