@@ -17,6 +17,7 @@ import { unsmitePlayerAction } from "./unsmite-player";
 import { nominatePlayerAction } from "./nominate-player";
 import { withdrawNominationAction } from "./withdraw-nomination";
 import { skipDefenseAction } from "./skip-defense";
+import { killPlayerAction } from "./kill-player";
 
 export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.StartNight]: startNightAction,
@@ -36,4 +37,5 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.NominatePlayer]: nominatePlayerAction,
   [WerewolfAction.WithdrawNomination]: withdrawNominationAction,
   [WerewolfAction.SkipDefense]: skipDefenseAction,
+  [WerewolfAction.KillPlayer]: killPlayerAction,
 };

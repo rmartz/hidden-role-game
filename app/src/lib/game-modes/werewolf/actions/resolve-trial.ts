@@ -3,7 +3,7 @@ import type { ActiveTrial, WerewolfTurnState } from "../types";
 import { WerewolfPhase } from "../types";
 import { currentTurnState, isOwnerPlaying, checkWinCondition } from "../utils";
 import { WerewolfRole } from "../roles";
-import { didWolfCubDie } from "./helpers";
+import { didWolfCubDie, cleanupAfterDaytimeKill } from "./helpers";
 
 export function applyTrialVerdict(
   activeTrial: ActiveTrial,
@@ -37,6 +37,7 @@ export function applyTrialVerdict(
       if (didWolfCubDie([defendantId], game)) {
         ts.wolfCubDied = true;
       }
+      cleanupAfterDaytimeKill(defendantId, ts);
     }
   }
 }

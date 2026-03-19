@@ -205,5 +205,31 @@ describe("WerewolfAction.ResolveTrial", () => {
       action.apply(game, {}, "owner-1");
       expect(game.status.type).toBe(GameStatus.Playing);
     });
+
+    it("clears One-Eyed Seer lock when locked target is eliminated by trial", () => {
+      const ts = makeDayStateWithPendingTrial("p3", [
+        { playerId: "p4", vote: "guilty" },
+        { playerId: "p5", vote: "guilty" },
+      ]);
+      ts.oneEyedSeerLockedTargetId = "p3";
+      const game = makePlayingGame(ts);
+      action.apply(game, {}, "owner-1");
+      const result = (game.status as { turnState: WerewolfTurnState })
+        .turnState;
+      expect(result.oneEyedSeerLockedTargetId).toBeUndefined();
+    });
+
+    it("consumes priest ward when warded player is eliminated by trial", () => {
+      const ts = makeDayStateWithPendingTrial("p3", [
+        { playerId: "p4", vote: "guilty" },
+        { playerId: "p5", vote: "guilty" },
+      ]);
+      ts.priestWards = { p3: "p2", p4: "p2" };
+      const game = makePlayingGame(ts);
+      action.apply(game, {}, "owner-1");
+      const result = (game.status as { turnState: WerewolfTurnState })
+        .turnState;
+      expect(result.priestWards).toEqual({ p4: "p2" });
+    });
   });
 });
