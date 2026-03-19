@@ -190,7 +190,7 @@ export default function LobbyPage() {
 
       {configPanel}
 
-      {actualGameMode === GameMode.Werewolf && !gameId && (
+      {validatedGameMode === GameMode.Werewolf && !gameId && (
         <div className="mb-4">
           <WerewolfLobbyGlossary />
         </div>

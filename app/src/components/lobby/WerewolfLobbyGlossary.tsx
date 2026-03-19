@@ -1,5 +1,3 @@
-"use client";
-
 import { GameMode } from "@/lib/types";
 import { GAME_MODES } from "@/lib/game-modes";
 import { RoleGlossaryDialog } from "@/components/game";
