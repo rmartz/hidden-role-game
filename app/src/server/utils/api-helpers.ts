@@ -84,7 +84,7 @@ export function normalizePlayerName(name: string): string {
 }
 
 export function validatePlayerName(name: string): string | undefined {
-  if (!name || name.length === 0) {
+  if (!name || name.trim().length === 0) {
     return "Player name must not be empty";
   }
   if (name.length > MAX_PLAYER_NAME_LENGTH) {

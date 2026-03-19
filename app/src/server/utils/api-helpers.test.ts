@@ -212,6 +212,11 @@ describe("validatePlayerName", () => {
     expect(validatePlayerName("")).toBeDefined();
   });
 
+  it("returns an error for a whitespace-only name", () => {
+    expect(validatePlayerName(" ")).toBeDefined();
+    expect(validatePlayerName("   ")).toBeDefined();
+  });
+
   it("returns an error for a name that is too long", () => {
     expect(validatePlayerName("a".repeat(33))).toBeDefined();
   });
