@@ -53,23 +53,17 @@ export function RoleConfig(props: RoleConfigProps) {
 
   const allRoles = Object.values(roleDefinitions);
 
-  const enabledRoles = allRoles.filter((r) =>
-    readOnly
-      ? (readOnlyMax[r.id] ?? 0) > 0
-      : roleConfigMode === RoleConfigMode.Advanced
-        ? (roleMaxes[r.id] ?? 0) > 0
-        : (roleCounts[r.id] ?? 0) > 0,
-  );
-
-  const hasHiddenRoles = enabledRoles.length < allRoles.length;
-  const visibleRoles = showAll ? allRoles : enabledRoles;
-
   function isRoleEnabled(roleId: string): boolean {
     if (readOnly) return (readOnlyMax[roleId] ?? 0) > 0;
     if (roleConfigMode === RoleConfigMode.Advanced)
       return (roleMaxes[roleId] ?? 0) > 0;
     return (roleCounts[roleId] ?? 0) > 0;
   }
+
+  const enabledRoles = allRoles.filter((r) => isRoleEnabled(r.id));
+  const hasHiddenRoles = enabledRoles.length < allRoles.length;
+  const visibleRoles =
+    showAll || enabledRoles.length === 0 ? allRoles : enabledRoles;
 
   function toggleShowAll() {
     setShowAll((prev) => !prev);
