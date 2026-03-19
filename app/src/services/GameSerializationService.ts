@@ -13,6 +13,7 @@ import {
   getInterimAttackedPlayerIds,
   baseGroupPhaseKey,
   isRoleActive,
+  getSilencedPlayerIds,
 } from "@/lib/game-modes/werewolf";
 import type {
   AnyNightAction,
@@ -317,6 +318,17 @@ export class GameSerializationService {
       }
     }
 
+    const silencedIds = getSilencedPlayerIds(ts);
+    const callerIsSilenced = silencedIds.includes(callerId);
+    const callerIsHypnotized = ts.mummyHypnotizedId === callerId;
+
+    if (callerIsSilenced) {
+      result.isSilenced = true;
+    }
+    if (callerIsHypnotized) {
+      result.isHypnotized = true;
+    }
+
     if (phase.activeTrial) {
       const { activeTrial } = phase;
       const alivePlayerCount = game.players.filter(
@@ -337,6 +349,10 @@ export class GameSerializationService {
         callerRoleId !== undefined &&
         isWerewolfRole(callerRoleId) &&
         WEREWOLF_ROLES[callerRoleId].alwaysVotesGuilty === true;
+      const mustVoteInnocent =
+        callerRoleId !== undefined &&
+        isWerewolfRole(callerRoleId) &&
+        WEREWOLF_ROLES[callerRoleId].alwaysVotesInnocent === true;
 
       result.activeTrial = {
         defendantId: activeTrial.defendantId,
@@ -346,6 +362,9 @@ export class GameSerializationService {
         playerCount: alivePlayerCount,
         ...(activeTrial.verdict ? { verdict: activeTrial.verdict } : {}),
         ...(mustVoteGuilty ? { mustVoteGuilty: true } : {}),
+        ...(mustVoteInnocent ? { mustVoteInnocent: true } : {}),
+        ...(callerIsSilenced ? { isSilenced: true } : {}),
+        ...(callerIsHypnotized ? { isHypnotized: true } : {}),
       };
 
       if (activeTrial.verdict) {

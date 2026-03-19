@@ -17,6 +17,9 @@ export enum WerewolfRole {
   Priest = "werewolf-priest",
   ToughGuy = "werewolf-tough-guy",
   Minion = "werewolf-minion",
+  Pacifist = "werewolf-pacifist",
+  Mayor = "werewolf-mayor",
+  Mummy = "werewolf-mummy",
 }
 
 export interface WerewolfRoleDefinition extends RoleDefinition<
@@ -40,6 +43,8 @@ export interface WerewolfRoleDefinition extends RoleDefinition<
   wakesWith?: WerewolfRole;
   /** When true, this role must always cast a "guilty" vote during elimination trials. */
   alwaysVotesGuilty?: boolean;
+  /** When true, this role must always cast an "innocent" vote during elimination trials. */
+  alwaysVotesInnocent?: boolean;
   /** True for roles that register as "werewolf" for Seer investigation and Minion awareness. */
   isWerewolf?: boolean;
 }
@@ -208,6 +213,37 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     awareOf: { werewolves: true },
     wakesAtNight: WakesAtNight.FirstNightOnly,
     targetCategory: TargetCategory.None,
+  },
+  [WerewolfRole.Pacifist]: {
+    id: WerewolfRole.Pacifist,
+    name: "Pacifist",
+    summary: "Always votes to acquit in daytime trials",
+    description:
+      "The Pacifist is a Good-team member who is compelled to always vote Innocent in daytime elimination trials. Their vote is automatically cast when a trial begins.",
+    team: Team.Good,
+    wakesAtNight: WakesAtNight.Never,
+    targetCategory: TargetCategory.None,
+    alwaysVotesInnocent: true,
+  },
+  [WerewolfRole.Mayor]: {
+    id: WerewolfRole.Mayor,
+    name: "Mayor",
+    summary: "Vote counts double in daytime trials",
+    description:
+      "The Mayor is a Good-team member whose vote secretly counts double in daytime elimination trials. No one else knows the Mayor's identity.",
+    team: Team.Good,
+    wakesAtNight: WakesAtNight.Never,
+    targetCategory: TargetCategory.None,
+  },
+  [WerewolfRole.Mummy]: {
+    id: WerewolfRole.Mummy,
+    name: "Mummy",
+    summary: "Hypnotizes a player whose vote mirrors theirs",
+    description:
+      "Each night the Mummy selects a player to hypnotize. The following day, the hypnotized player's trial vote is automatically cast to match the Mummy's vote. The Mummy selects a new target each night.",
+    team: Team.Good,
+    wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Special,
   },
 };
 

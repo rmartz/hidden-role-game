@@ -105,6 +105,22 @@ describe("WerewolfAction.CastVote", () => {
       expect(action.isValid(game, "p2", { vote: "abstain" })).toBe(false);
     });
 
+    it("returns false when caller is silenced", () => {
+      const ts = makeDayStateWithTrial();
+      (
+        ts.phase as Extract<typeof ts.phase, { type: WerewolfPhase.Daytime }>
+      ).nightResolution = [{ type: "silenced", targetPlayerId: "p2" }];
+      const game = makePlayingGame(ts);
+      expect(action.isValid(game, "p2", { vote: "guilty" })).toBe(false);
+    });
+
+    it("returns false when caller is hypnotized", () => {
+      const ts = makeDayStateWithTrial();
+      ts.mummyHypnotizedId = "p2";
+      const game = makePlayingGame(ts);
+      expect(action.isValid(game, "p2", { vote: "guilty" })).toBe(false);
+    });
+
     describe("Village Idiot", () => {
       it("allows guilty vote", () => {
         const game = makePlayingGame(makeDayStateWithTrial(), {
@@ -126,6 +142,30 @@ describe("WerewolfAction.CastVote", () => {
           ],
         });
         expect(action.isValid(game, "p2", { vote: "innocent" })).toBe(false);
+      });
+    });
+
+    describe("Pacifist", () => {
+      it("allows innocent vote", () => {
+        const game = makePlayingGame(makeDayStateWithTrial(), {
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Pacifist },
+            { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+          ],
+        });
+        expect(action.isValid(game, "p2", { vote: "innocent" })).toBe(true);
+      });
+
+      it("rejects guilty vote", () => {
+        const game = makePlayingGame(makeDayStateWithTrial(), {
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Pacifist },
+            { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+          ],
+        });
+        expect(action.isValid(game, "p2", { vote: "guilty" })).toBe(false);
       });
     });
   });
@@ -174,6 +214,41 @@ describe("WerewolfAction.CastVote", () => {
         }
       ).turnState.phase;
       expect(ts.activeTrial.verdict).toBeDefined();
+    });
+
+    it("auto-casts hypnotized player vote when Mummy votes", () => {
+      const ts = makeDayStateWithTrial({ defendantId: "p1" });
+      ts.mummyHypnotizedId = "p3";
+      const game = makePlayingGame(ts, {
+        players: [
+          { id: "p1", name: "Alice", sessionId: "s1", visiblePlayers: [] },
+          { id: "p2", name: "Bob", sessionId: "s2", visiblePlayers: [] },
+          { id: "p3", name: "Charlie", sessionId: "s3", visiblePlayers: [] },
+          { id: "p4", name: "Dave", sessionId: "s4", visiblePlayers: [] },
+          { id: "p5", name: "Eve", sessionId: "s5", visiblePlayers: [] },
+        ],
+        roleAssignments: [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Mummy },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+        ],
+      });
+      action.apply(game, { vote: "guilty" }, "p2");
+      const phase = (
+        game.status as {
+          turnState: {
+            phase: {
+              activeTrial: { votes: { playerId: string; vote: string }[] };
+            };
+          };
+        }
+      ).turnState.phase;
+      expect(phase.activeTrial.votes).toContainEqual({
+        playerId: "p3",
+        vote: "guilty",
+      });
     });
 
     it("triggers Werewolves win when auto-resolve eliminates last non-Bad player", () => {

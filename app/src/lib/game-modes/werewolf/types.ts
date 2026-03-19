@@ -119,6 +119,8 @@ export interface WerewolfTurnState {
   priestWards?: Record<string, string>;
   /** Player IDs of Tough Guys who have already survived one attack. */
   toughGuyHitIds?: string[];
+  /** Player ID hypnotized by the Mummy this turn. Reset each night. */
+  mummyHypnotizedId?: string;
 }
 
 export interface TargetablePlayer {

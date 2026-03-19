@@ -1,6 +1,10 @@
 import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase } from "../types";
-import { currentTurnState, isOwnerPlaying } from "../utils";
+import {
+  currentTurnState,
+  isOwnerPlaying,
+  getSilencedPlayerIds,
+} from "../utils";
 import { WEREWOLF_ROLES, isWerewolfRole } from "../roles";
 import { applyTrialVerdict } from "./resolve-trial";
 
@@ -21,13 +25,22 @@ export const startTrialAction: GameAction = {
     const ts = currentTurnState(game);
     if (ts?.phase.type !== WerewolfPhase.Daytime) return;
     const { defendantId } = payload as { defendantId: string };
+    const silencedIds = getSilencedPlayerIds(ts);
+
+    /** Check whether a player is eligible for precast votes. */
+    const isPrecastEligible = (p: { id: string }): boolean => {
+      if (p.id === game.ownerPlayerId) return false;
+      if (p.id === defendantId) return false;
+      if (ts.deadPlayerIds.includes(p.id)) return false;
+      if (silencedIds.includes(p.id)) return false;
+      if (ts.mummyHypnotizedId === p.id) return false;
+      return true;
+    };
 
     // Pre-populate guilty votes for roles that must always vote guilty
     const precastGuiltyVotes = game.players
       .filter((p) => {
-        if (p.id === game.ownerPlayerId) return false;
-        if (p.id === defendantId) return false;
-        if (ts.deadPlayerIds.includes(p.id)) return false;
+        if (!isPrecastEligible(p)) return false;
         const roleId = game.roleAssignments.find(
           (a) => a.playerId === p.id,
         )?.roleDefinitionId;
@@ -39,21 +52,38 @@ export const startTrialAction: GameAction = {
       })
       .map((p) => ({ playerId: p.id, vote: "guilty" as const }));
 
+    // Pre-populate innocent votes for roles that must always vote innocent
+    const precastInnocentVotes = game.players
+      .filter((p) => {
+        if (!isPrecastEligible(p)) return false;
+        const roleId = game.roleAssignments.find(
+          (a) => a.playerId === p.id,
+        )?.roleDefinitionId;
+        return (
+          roleId !== undefined &&
+          isWerewolfRole(roleId) &&
+          WEREWOLF_ROLES[roleId].alwaysVotesInnocent === true
+        );
+      })
+      .map((p) => ({ playerId: p.id, vote: "innocent" as const }));
+
     const activeTrial = {
       defendantId,
       startedAt: Date.now(),
-      votes: precastGuiltyVotes,
+      votes: [...precastGuiltyVotes, ...precastInnocentVotes],
     };
     ts.phase.activeTrial = activeTrial;
     // Clear all nominations when a trial begins
     ts.phase.nominations = [];
 
-    // Auto-resolve if precast votes account for all eligible votes
+    // Auto-resolve if precast votes account for all eligible votes.
+    // Silenced players cannot vote and are excluded from the eligible count.
     const eligibleCount = game.players.filter(
       (p) =>
         p.id !== game.ownerPlayerId &&
         p.id !== defendantId &&
-        !ts.deadPlayerIds.includes(p.id),
+        !ts.deadPlayerIds.includes(p.id) &&
+        !silencedIds.includes(p.id),
     ).length;
     if (activeTrial.votes.length >= eligibleCount) {
       applyTrialVerdict(activeTrial, ts, game);

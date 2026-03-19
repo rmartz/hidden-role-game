@@ -1,6 +1,6 @@
 import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase } from "../types";
-import { currentTurnState } from "../utils";
+import { currentTurnState, getSilencedPlayerIds } from "../utils";
 import { NOMINATION_VOTE_THRESHOLD } from "../constants";
 import { startTrialAction } from "./start-trial";
 
@@ -15,6 +15,9 @@ export const nominatePlayerAction: GameAction = {
     // Cannot nominate while a trial is active and unresolved
     if (ts.phase.activeTrial && !ts.phase.activeTrial.verdict) return false;
     if (ts.deadPlayerIds.includes(callerId)) return false;
+    // Silenced players cannot nominate
+    const silencedIds = getSilencedPlayerIds(ts);
+    if (silencedIds.includes(callerId)) return false;
     const { defendantId } = payload as { defendantId?: unknown };
     if (typeof defendantId !== "string") return false;
     // Cannot nominate yourself, the owner, or a dead player
