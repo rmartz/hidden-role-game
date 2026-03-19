@@ -2,13 +2,8 @@ import type { Game, GameAction } from "@/lib/types";
 import type { ActiveTrial, WerewolfTurnState } from "../types";
 import { WerewolfPhase } from "../types";
 import { currentTurnState, isOwnerPlaying, checkWinCondition } from "../utils";
-import { WerewolfRole, isWerewolfRole } from "../roles";
+import { WerewolfRole } from "../roles";
 import { didWolfCubDie } from "./helpers";
-
-const MAYOR_ROLE_ID: string = WerewolfRole.Mayor;
-function isMayor(roleId: string): boolean {
-  return roleId === MAYOR_ROLE_ID;
-}
 
 export function applyTrialVerdict(
   activeTrial: ActiveTrial,
@@ -25,7 +20,7 @@ export function applyTrialVerdict(
     const roleId = game.roleAssignments.find(
       (a) => a.playerId === v.playerId,
     )?.roleDefinitionId;
-    if (roleId !== undefined && isWerewolfRole(roleId) && isMayor(roleId)) {
+    if (roleId === WerewolfRole.Mayor) {
       if (v.vote === "guilty") guiltyCount++;
       else innocentCount++;
     }

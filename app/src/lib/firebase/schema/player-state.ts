@@ -55,8 +55,6 @@ export interface FirebasePlayerState {
     verdict?: "eliminated" | "innocent";
     mustVoteGuilty?: boolean;
     mustVoteInnocent?: boolean;
-    isSilenced?: boolean;
-    isHypnotized?: boolean;
     voteResults?: { playerName: string; vote: DaytimeVote }[];
     eliminatedRole?: { id: string; name: string; team: string };
   };

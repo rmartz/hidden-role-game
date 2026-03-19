@@ -372,8 +372,6 @@ export class GameSerializationService {
         ...(activeTrial.verdict ? { verdict: activeTrial.verdict } : {}),
         ...(mustVoteGuilty ? { mustVoteGuilty: true } : {}),
         ...(mustVoteInnocent ? { mustVoteInnocent: true } : {}),
-        ...(callerIsSilenced ? { isSilenced: true } : {}),
-        ...(callerIsHypnotized ? { isHypnotized: true } : {}),
       };
 
       if (activeTrial.verdict) {
