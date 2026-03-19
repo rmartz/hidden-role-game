@@ -84,6 +84,12 @@ export class FirebaseGameService {
         ...(nightActions ? { nightActions } : {}),
         ...daytimeNightState,
         ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
+        ...(gameSerializationService.extractHunterRevengePlayerId(game)
+          ? {
+              hunterRevengePlayerId:
+                gameSerializationService.extractHunterRevengePlayerId(game),
+            }
+          : {}),
         timerConfig: game.timerConfig,
       };
     }

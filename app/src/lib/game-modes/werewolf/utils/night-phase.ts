@@ -59,6 +59,8 @@ export function buildNightPhaseOrder(
     if (role.wakesAtNight === WakesAtNight.Never) continue;
     if (role.wakesAtNight === WakesAtNight.FirstNightOnly && turn !== 1)
       continue;
+    if (role.wakesAtNight === WakesAtNight.AfterFirstNight && turn <= 1)
+      continue;
     // Roles with wakesWith join another role's phase — skip them here.
     if (role.wakesWith) continue;
 

@@ -141,6 +141,8 @@ export interface PlayerGameState {
    * intercepted a kill. Both the Altruist and the saved player are identified.
    */
   altruistSave?: { altruistPlayerId: string; savedPlayerId: string };
+  /** Hunter revenge pending: the Hunter's player ID. Narrator-only. */
+  hunterRevengePlayerId?: string;
   /** Phase timer configuration. */
   timerConfig: TimerConfig;
   /** Whether player nominations for trial are enabled in this game. */

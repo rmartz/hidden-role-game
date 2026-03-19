@@ -67,6 +67,13 @@ export class GameSerializationService {
     return ts?.deadPlayerIds ?? [];
   }
 
+  /** Extracts the Hunter revenge player ID (narrator-only). */
+  extractHunterRevengePlayerId(game: Game): string | undefined {
+    if (game.status.type !== GameStatus.Playing) return undefined;
+    const ts = game.status.turnState as WerewolfTurnState | undefined;
+    return ts?.hunterRevengePlayerId;
+  }
+
   /**
    * Extracts the night targeting state for a non-owner player.
    * For solo roles: returns myNightTarget/myNightTargetConfirmed.

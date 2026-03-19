@@ -23,6 +23,7 @@ import { NightOutcomeSummary } from "./NightOutcomeSummary";
 import { NominationPanel } from "./NominationPanel";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
 import { OwnerTrialPanel } from "./OwnerTrialPanel";
+import { HunterRevengePanel } from "./HunterRevengePanel";
 
 interface OwnerGameDayScreenProps {
   gameId: string;
@@ -70,6 +71,7 @@ export function OwnerGameDayScreen({
   const trialConcluded = !!activeTrial?.verdict;
   const nominationsBlocked =
     hasActiveTrial || (gameState.singleTrialPerDay && trialConcluded);
+  const hunterRevengePending = !!gameState.hunterRevengePlayerId;
   const glossaryRoles = gameState.rolesInPlay?.length
     ? gameState.rolesInPlay
         .map((r) => modeConfig.roles[r.id])
@@ -100,7 +102,7 @@ export function OwnerGameDayScreen({
         <OwnerAdvanceCard
           label="Start Next Night"
           onAdvance={handleAdvance}
-          disabled={action.isPending}
+          disabled={action.isPending || hunterRevengePending}
           icon={<WeatherMoonRegular />}
         >
           {activeTrial && (
@@ -120,6 +122,16 @@ export function OwnerGameDayScreen({
           roles={modeConfig.roles}
         />
       </div>
+      {gameState.hunterRevengePlayerId && (
+        <div className="mb-5">
+          <HunterRevengePanel
+            gameId={gameId}
+            hunterRevengePlayerId={gameState.hunterRevengePlayerId}
+            players={gameState.players}
+            deadPlayerIds={gameState.deadPlayerIds ?? []}
+          />
+        </div>
+      )}
       {gameState.nominationsEnabled && !nominationsBlocked && (
         <NominationPanel
           gameId={gameId}

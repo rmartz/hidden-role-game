@@ -231,5 +231,143 @@ describe("WerewolfAction.ResolveTrial", () => {
         .turnState;
       expect(result.priestWards).toEqual({ p4: "p2" });
     });
+
+    it("sets hunterRevengePlayerId when Hunter is eliminated by trial", () => {
+      const game = makePlayingGame(
+        makeDayStateWithPendingTrial("p2", [
+          { playerId: "p3", vote: "guilty" },
+          { playerId: "p4", vote: "guilty" },
+        ]),
+        {
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Hunter },
+            { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+          ],
+        },
+      );
+      action.apply(game, {}, "owner-1");
+      expect(game.status.type).toBe(GameStatus.Playing);
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      expect(ts.hunterRevengePlayerId).toBe("p2");
+      expect(ts.deadPlayerIds).toContain("p2");
+    });
+
+    it("defers win condition when Hunter is eliminated at trial (would otherwise trigger win)", () => {
+      // 1 wolf vs hunter + 1 villager → eliminating hunter = 1 wolf vs 1 villager = wolves win
+      // But hunter revenge should defer the check
+      const game = makePlayingGame(
+        makeDayStateWithPendingTrial("p2", [
+          { playerId: "p3", vote: "guilty" },
+        ]),
+        {
+          players: [
+            { id: "p1", name: "Wolf", sessionId: "s1", visiblePlayers: [] },
+            { id: "p2", name: "Hunter", sessionId: "s2", visiblePlayers: [] },
+            { id: "p3", name: "Villager", sessionId: "s3", visiblePlayers: [] },
+          ],
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Hunter },
+            { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+          ],
+        },
+      );
+      action.apply(game, {}, "owner-1");
+      // Game should still be playing — not finished
+      expect(game.status.type).toBe(GameStatus.Playing);
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      expect(ts.hunterRevengePlayerId).toBe("p2");
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// ResolveHunterRevenge
+// ---------------------------------------------------------------------------
+
+describe("WerewolfAction.ResolveHunterRevenge", () => {
+  const resolveRevenge = WEREWOLF_ACTIONS[WerewolfAction.ResolveHunterRevenge];
+
+  function makeDayWithHunterRevenge(): WerewolfTurnState {
+    return {
+      turn: 2,
+      phase: {
+        type: WerewolfPhase.Daytime,
+        startedAt: 1000,
+        nightActions: {},
+      },
+      deadPlayerIds: ["p2"],
+      hunterRevengePlayerId: "p2",
+    };
+  }
+
+  it("isValid returns true when hunterRevengePlayerId is set and target is alive", () => {
+    const game = makePlayingGame(makeDayWithHunterRevenge(), {
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Hunter },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+      ],
+    });
+    expect(
+      resolveRevenge.isValid(game, "owner-1", { targetPlayerId: "p3" }),
+    ).toBe(true);
+  });
+
+  it("isValid returns false when targeting a dead player", () => {
+    const game = makePlayingGame(makeDayWithHunterRevenge(), {
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Hunter },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+      ],
+    });
+    // p2 is already dead
+    expect(
+      resolveRevenge.isValid(game, "owner-1", { targetPlayerId: "p2" }),
+    ).toBe(false);
+  });
+
+  it("kills target, clears hunterRevengePlayerId, and checks win condition", () => {
+    const game = makePlayingGame(makeDayWithHunterRevenge(), {
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Hunter },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+      ],
+    });
+    resolveRevenge.apply(game, { targetPlayerId: "p3" }, "owner-1");
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.deadPlayerIds).toContain("p3");
+    expect(ts.hunterRevengePlayerId).toBeUndefined();
+  });
+
+  it("Hunter revenge on the last wolf triggers Village win", () => {
+    const game = makePlayingGame(makeDayWithHunterRevenge(), {
+      players: [
+        { id: "p1", name: "Wolf", sessionId: "s1", visiblePlayers: [] },
+        { id: "p2", name: "Hunter", sessionId: "s2", visiblePlayers: [] },
+        { id: "p3", name: "Villager", sessionId: "s3", visiblePlayers: [] },
+      ],
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Hunter },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+      ],
+    });
+    resolveRevenge.apply(game, { targetPlayerId: "p1" }, "owner-1");
+    expect(game.status.type).toBe(GameStatus.Finished);
+    expect((game.status as { winner?: string }).winner).toBe(
+      WerewolfWinner.Village,
+    );
   });
 });

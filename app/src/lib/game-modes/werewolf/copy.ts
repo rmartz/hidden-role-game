@@ -198,6 +198,12 @@ export const WEREWOLF_COPY = {
     dayAnnouncement: (altruistName: string, savedName: string) =>
       `${altruistName} sacrificed themselves to save ${savedName}.`,
   },
+  hunter: {
+    revengeTitle: "Hunter's Revenge",
+    revengePrompt: (hunterName: string) =>
+      `${hunterName} has been eliminated and may take one player down with them. Select the revenge target.`,
+    revengeConfirm: "Confirm Revenge Kill",
+  },
   kill: {
     button: "Kill",
     confirmTitle: "Kill player?",
