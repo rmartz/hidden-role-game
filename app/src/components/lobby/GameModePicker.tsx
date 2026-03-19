@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { GAME_MODE_PICKER_COPY } from "./GameModePicker.copy";
 
 const GAME_MODE_VALUES = new Set<string>(Object.values(GameMode));
 function isGameMode(value: string | null): value is GameMode {
@@ -24,7 +25,7 @@ export function GameModePicker() {
 
   return (
     <div className="space-y-1">
-      <Label>Game Mode</Label>
+      <Label>{GAME_MODE_PICKER_COPY.label}</Label>
       <Select
         value={selectedGameMode}
         onValueChange={(value) => {

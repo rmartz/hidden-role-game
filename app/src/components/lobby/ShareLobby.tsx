@@ -12,6 +12,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { SHARE_LOBBY_COPY } from "./ShareLobby.copy";
 
 interface ShareLobbyProps {
   lobbyId: string;
@@ -33,7 +34,7 @@ export function ShareLobby({ lobbyId, gameMode }: ShareLobbyProps) {
   async function handleShare() {
     await navigator.share({
       url: lobbyUrl,
-      title: "Join my Hidden Role Game lobby",
+      title: SHARE_LOBBY_COPY.shareTitle,
     });
   }
 
@@ -43,11 +44,11 @@ export function ShareLobby({ lobbyId, gameMode }: ShareLobbyProps) {
     <Dialog>
       <DialogTrigger render={<Button variant="outline" size="sm" />}>
         <ShareIcon />
-        Invite Players
+        {SHARE_LOBBY_COPY.triggerButton}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Invite Players</DialogTitle>
+          <DialogTitle>{SHARE_LOBBY_COPY.dialogTitle}</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col items-center gap-4">
@@ -55,7 +56,7 @@ export function ShareLobby({ lobbyId, gameMode }: ShareLobbyProps) {
           <div className="relative">
             {copied && (
               <span className="absolute -top-7 left-1/2 -translate-x-1/2 rounded bg-foreground px-2 py-0.5 text-xs text-background animate-in fade-in slide-in-from-bottom-1 duration-150">
-                Copied!
+                {SHARE_LOBBY_COPY.copied}
               </span>
             )}
             <button
@@ -77,7 +78,7 @@ export function ShareLobby({ lobbyId, gameMode }: ShareLobbyProps) {
           <DialogFooter>
             <Button onClick={() => void handleShare()}>
               <ShareIcon />
-              Share
+              {SHARE_LOBBY_COPY.shareButton}
             </Button>
           </DialogFooter>
         )}

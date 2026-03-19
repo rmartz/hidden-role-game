@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RoleConfigEntry } from "./RoleConfigEntry";
 import { RoleConfigModePicker } from "./RoleConfigModePicker";
-import { ROLE_CONFIG_COPY } from "./copy";
+import { ROLE_CONFIG_COPY } from "./RoleConfig.copy";
 
 interface ReadOnlyProps {
   roleDefinitions: Record<string, RoleDefinition<string, Team>>;

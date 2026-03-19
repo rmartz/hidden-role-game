@@ -3,7 +3,7 @@
 import type { TimerConfig } from "@/lib/types";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { LOBBY_CONFIG_COPY } from "./copy";
+import { WEREWOLF_CONFIG_PANEL_COPY } from "./WerewolfConfigPanel.copy";
 import { TimerConfigPanel } from "./TimerConfigPanel";
 
 interface WerewolfConfigPanelProps {
@@ -31,7 +31,7 @@ export function WerewolfConfigPanel({
           onCheckedChange={onNominationEnabledChange}
         />
         <Label htmlFor="nomination-enabled">
-          {LOBBY_CONFIG_COPY.nominationEnabled}
+          {WEREWOLF_CONFIG_PANEL_COPY.nominationEnabled}
         </Label>
       </div>
       <TimerConfigPanel

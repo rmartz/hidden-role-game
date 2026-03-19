@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/item";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RoleLabel } from "@/components/RoleLabel";
+import { NARRATOR_PLAYER_ROLE_LISTS_COPY } from "./NarratorPlayerRoleLists.copy";
 
 interface NarratorPlayerRoleListsProps {
   assignments: VisibleTeammate[];
@@ -40,11 +41,13 @@ export function NarratorPlayerRoleLists({
   return (
     <Card className="mb-5">
       <CardHeader>
-        <CardTitle>Player Roles</CardTitle>
+        <CardTitle>{NARRATOR_PLAYER_ROLE_LISTS_COPY.cardTitle}</CardTitle>
       </CardHeader>
       <CardContent>
         {active.length === 0 ? (
-          <p className="text-sm text-muted-foreground italic">None</p>
+          <p className="text-sm text-muted-foreground italic">
+            {NARRATOR_PLAYER_ROLE_LISTS_COPY.none}
+          </p>
         ) : (
           <ItemGroup>
             {active.map(({ player, role }) => (
@@ -64,7 +67,7 @@ export function NarratorPlayerRoleLists({
           <>
             <div className="border-t my-3" />
             <p className="text-sm font-semibold mb-2 text-muted-foreground">
-              Eliminated
+              {NARRATOR_PLAYER_ROLE_LISTS_COPY.eliminated}
             </p>
             <ItemGroup>
               {eliminated.map(({ player, role }) => (

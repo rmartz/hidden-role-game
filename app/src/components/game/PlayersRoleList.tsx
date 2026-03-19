@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/item";
 import { Card, CardContent } from "@/components/ui/card";
 import { RoleLabel } from "@/components/RoleLabel";
-import { PLAYER_VISIBILITY_COPY } from "@/components/game/copy";
+import { PLAYER_VISIBILITY_COPY } from "@/components/game/PlayersRoleList.copy";
 
 interface PlayersRoleListProps {
   assignments: VisibleTeammate[];

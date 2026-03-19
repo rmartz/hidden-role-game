@@ -3,7 +3,7 @@
 import type { TimerConfig } from "@/lib/types";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { TIMER_CONFIG_COPY } from "./copy";
+import { TIMER_CONFIG_COPY } from "./TimerConfigPanel.copy";
 import { TimerConfigPanelRow, TIMER_ROWS } from "./TimerConfigPanelRow";
 import type { TimerRow } from "./TimerConfigPanelRow";
 

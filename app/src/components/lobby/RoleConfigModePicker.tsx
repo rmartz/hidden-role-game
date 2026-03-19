@@ -5,6 +5,7 @@ import { useAppDispatch, useAppSelector } from "@/store";
 import { setRoleConfigMode } from "@/store/game-config-slice";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ROLE_CONFIG_MODE_PICKER_COPY } from "./RoleConfigModePicker.copy";
 
 interface RoleConfigModePickerProps {
   disabled?: boolean;
@@ -16,7 +17,7 @@ export function RoleConfigModePicker({ disabled }: RoleConfigModePickerProps) {
 
   return (
     <div className="space-y-1">
-      <Label>Role configuration</Label>
+      <Label>{ROLE_CONFIG_MODE_PICKER_COPY.label}</Label>
       <Tabs
         value={roleConfigMode}
         onValueChange={(value) => {

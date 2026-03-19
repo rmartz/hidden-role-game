@@ -10,6 +10,7 @@ import {
 import { RoleLabel } from "@/components/RoleLabel";
 import type { IncrementDirection } from "./Incrementer";
 import { Incrementer } from "./Incrementer";
+import { ROLE_CONFIG_ENTRY_COPY } from "./RoleConfigEntry.copy";
 
 interface ReadOnlyProps {
   role: RoleDefinition<string, Team>;
@@ -86,7 +87,9 @@ export function RoleConfigEntry(props: RoleConfigEntryProps) {
       ) : roleConfigMode === RoleConfigMode.Advanced ? (
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-1.5">
-            <span className="text-sm text-muted-foreground">Min:</span>
+            <span className="text-sm text-muted-foreground">
+              {ROLE_CONFIG_ENTRY_COPY.minLabel}
+            </span>
             <Incrementer
               value={min}
               onChange={handleMinChange}
@@ -95,7 +98,9 @@ export function RoleConfigEntry(props: RoleConfigEntryProps) {
             />
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-sm text-muted-foreground">Max:</span>
+            <span className="text-sm text-muted-foreground">
+              {ROLE_CONFIG_ENTRY_COPY.maxLabel}
+            </span>
             <Incrementer
               value={max}
               onChange={handleMaxChange}

@@ -11,7 +11,7 @@ import {
   useLobbyExistsQuery,
 } from "@/hooks";
 import { LobbyConflictResolution } from "@/components/lobby";
-import { LOBBY_PAGE_COPY } from "../../copy";
+import { LOBBY_CONFLICT_PAGE_COPY } from "./page.copy";
 
 export default function LobbyConflictPage() {
   const { lobbyId, gameMode: gameModeParam } = useParams<{
@@ -103,10 +103,14 @@ export default function LobbyConflictPage() {
     conflictLobbyQuery.isLoading ||
     !conflictLobbyQuery.data ||
     !storedLobbyId ? (
-    <p className="p-5 text-muted-foreground">{LOBBY_PAGE_COPY.loading}</p>
+    <p className="p-5 text-muted-foreground">
+      {LOBBY_CONFLICT_PAGE_COPY.loading}
+    </p>
   ) : (
     <div className="p-5 max-w-lg mx-auto">
-      <h1 className="text-2xl font-bold mb-4">{LOBBY_PAGE_COPY.title}</h1>
+      <h1 className="text-2xl font-bold mb-4">
+        {LOBBY_CONFLICT_PAGE_COPY.title}
+      </h1>
       <LobbyConflictResolution
         conflictLobby={conflictLobbyQuery.data}
         conflictLobbyId={storedLobbyId}

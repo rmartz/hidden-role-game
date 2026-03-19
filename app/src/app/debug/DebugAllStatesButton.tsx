@@ -14,7 +14,7 @@ import { JsonTree } from "@/components/debug";
 import { useAllPlayersGameStates, useDebugFullGameState } from "@/hooks";
 import type { GameMode } from "@/lib/types";
 import type { DebugPlayer } from "@/app/api/debug/game/route";
-import { DEBUG_VIEW_COPY } from "./copy";
+import { DEBUG_VIEW_COPY } from "./DebugAllStatesButton.copy";
 
 const SERVER_TAB = "server";
 

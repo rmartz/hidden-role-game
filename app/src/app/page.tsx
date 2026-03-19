@@ -7,7 +7,7 @@ import { GAME_MODES } from "@/lib/game-modes";
 import { getLobbyId, getPlayerId } from "@/lib/api";
 import { getPlayerName } from "@/lib/player-utils";
 import { useCreateLobby, useJoinLobby, useStoredLobbyQuery } from "@/hooks";
-import { HOME_PAGE_COPY } from "./copy";
+import { HOME_PAGE_COPY } from "./page.copy";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
