@@ -32,7 +32,7 @@ interface PlayerTargetSelectionProps {
   attackedPlayerIds?: string[];
   previousNightTargetId?: string;
   secondTargets?: readonly (readonly [TargetablePlayer, boolean])[];
-  mySecondNightTarget?: string | null;
+  mySecondNightTarget?: string;
   requiresSecondTarget?: boolean;
 }
 
@@ -160,7 +160,7 @@ export function PlayerTargetSelection({
             </div>
           )}
 
-          {requiresSecondTarget && !isConfirmed && (
+          {requiresSecondTarget && !isConfirmed && myNightTarget != null && (
             <>
               <h2 className="text-lg font-semibold mb-2 mt-4 text-center">
                 {WEREWOLF_COPY.mentalist.chooseSecondTarget}
