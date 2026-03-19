@@ -5,6 +5,7 @@ import {
   currentTurnState,
   checkWinCondition,
   getSilencedPlayerIds,
+  getHypnotizedPlayerId,
 } from "../utils";
 import { WEREWOLF_ROLES, WerewolfRole, isWerewolfRole } from "../roles";
 import { applyTrialVerdict } from "./resolve-trial";
@@ -30,7 +31,7 @@ export const castVoteAction: GameAction = {
     const silencedIds = getSilencedPlayerIds(ts);
     if (silencedIds.includes(callerId)) return false;
     // Hypnotized players cannot vote manually (their vote follows the Mummy)
-    if (ts.mummyHypnotizedId === callerId) return false;
+    if (getHypnotizedPlayerId(ts) === callerId) return false;
     const { vote } = payload as { vote?: unknown };
     if (typeof vote !== "string" || !VALID_VOTES.includes(vote as DaytimeVote))
       return false;
@@ -67,15 +68,12 @@ export const castVoteAction: GameAction = {
     const callerRoleId = game.roleAssignments.find(
       (a) => a.playerId === callerId,
     )?.roleDefinitionId;
-    if (
-      callerRoleId === (WerewolfRole.Mummy as string) &&
-      ts.mummyHypnotizedId
-    ) {
-      const hypnotizedId = ts.mummyHypnotizedId;
+    const hypnotizedId = getHypnotizedPlayerId(ts);
+    const silencedIds = getSilencedPlayerIds(ts);
+    if (callerRoleId === (WerewolfRole.Mummy as string) && hypnotizedId) {
       const alreadyVoted = activeTrial.votes.some(
         (v) => v.playerId === hypnotizedId,
       );
-      const silencedIds = getSilencedPlayerIds(ts);
       if (
         !alreadyVoted &&
         !silencedIds.includes(hypnotizedId) &&
@@ -91,7 +89,6 @@ export const castVoteAction: GameAction = {
 
     // Auto-resolve when every eligible player (alive, non-owner, non-defendant,
     // non-silenced) has voted. Silenced players cannot vote at all.
-    const silencedIds = getSilencedPlayerIds(ts);
     const eligibleCount = game.players.filter(
       (p) =>
         p.id !== game.ownerPlayerId &&

@@ -14,6 +14,7 @@ import {
   baseGroupPhaseKey,
   isRoleActive,
   getSilencedPlayerIds,
+  getHypnotizedPlayerId,
   SMITE_PHASE_KEY,
 } from "@/lib/game-modes/werewolf";
 import type {
@@ -298,6 +299,8 @@ export class GameSerializationService {
         return [{ targetPlayerId: e.targetPlayerId, effect: "survived" }];
       if (e.type === "silenced")
         return [{ targetPlayerId: e.targetPlayerId, effect: "silenced" }];
+      if (e.type === "hypnotized")
+        return [{ targetPlayerId: e.targetPlayerId, effect: "hypnotized" }];
       return [];
     });
 
@@ -325,7 +328,7 @@ export class GameSerializationService {
 
     const silencedIds = getSilencedPlayerIds(ts);
     const callerIsSilenced = silencedIds.includes(callerId);
-    const callerIsHypnotized = ts.mummyHypnotizedId === callerId;
+    const callerIsHypnotized = getHypnotizedPlayerId(ts) === callerId;
 
     if (callerIsSilenced) {
       result.isSilenced = true;

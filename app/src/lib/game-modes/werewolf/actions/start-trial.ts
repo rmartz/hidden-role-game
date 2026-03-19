@@ -4,6 +4,7 @@ import {
   currentTurnState,
   isOwnerPlaying,
   getSilencedPlayerIds,
+  getHypnotizedPlayerId,
 } from "../utils";
 import { WEREWOLF_ROLES, isWerewolfRole } from "../roles";
 
@@ -25,6 +26,7 @@ export const startTrialAction: GameAction = {
     if (ts?.phase.type !== WerewolfPhase.Daytime) return;
     const { defendantId } = payload as { defendantId: string };
     const silencedIds = getSilencedPlayerIds(ts);
+    const hypnotizedId = getHypnotizedPlayerId(ts);
 
     /** Check whether a player is eligible for precast votes. */
     const isPrecastEligible = (p: { id: string }): boolean => {
@@ -32,7 +34,7 @@ export const startTrialAction: GameAction = {
       if (p.id === defendantId) return false;
       if (ts.deadPlayerIds.includes(p.id)) return false;
       if (silencedIds.includes(p.id)) return false;
-      if (ts.mummyHypnotizedId === p.id) return false;
+      if (hypnotizedId === p.id) return false;
       return true;
     };
 

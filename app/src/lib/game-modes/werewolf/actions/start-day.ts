@@ -95,12 +95,6 @@ export const startDayAction: GameAction = {
       return;
     }
 
-    // Extract the Mummy's hypnotized target for this day phase.
-    const mummyAction = nightPhase.nightActions[
-      WerewolfRole.Mummy as string
-    ] as NightAction | undefined;
-    const mummyHypnotizedId = mummyAction?.targetPlayerId;
-
     const wolfCubDied =
       ts.wolfCubDied === true || didWolfCubDie(newDeadIds, game);
     game.status = {
@@ -122,7 +116,6 @@ export const startDayAction: GameAction = {
         ...(wolfCubDied ? { wolfCubDied: true } : {}),
         ...(Object.keys(priestWards).length > 0 ? { priestWards } : {}),
         ...(toughGuyHitIds.length > 0 ? { toughGuyHitIds } : {}),
-        ...(mummyHypnotizedId ? { mummyHypnotizedId } : {}),
       },
     };
   },

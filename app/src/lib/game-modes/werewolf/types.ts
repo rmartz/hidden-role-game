@@ -61,6 +61,11 @@ export interface SilencedNightResolutionEvent {
   targetPlayerId: string;
 }
 
+export interface HypnotizedNightResolutionEvent {
+  type: "hypnotized";
+  targetPlayerId: string;
+}
+
 export interface ToughGuyAbsorbedNightResolutionEvent {
   type: "tough-guy-absorbed";
   targetPlayerId: string;
@@ -69,6 +74,7 @@ export interface ToughGuyAbsorbedNightResolutionEvent {
 export type NightResolutionEvent =
   | AttackNightResolutionEvent
   | SilencedNightResolutionEvent
+  | HypnotizedNightResolutionEvent
   | ToughGuyAbsorbedNightResolutionEvent;
 
 export type DaytimeVote = "guilty" | "innocent";
@@ -129,8 +135,6 @@ export interface WerewolfTurnState {
   priestWards?: Record<string, string>;
   /** Player IDs of Tough Guys who have already survived one attack. */
   toughGuyHitIds?: string[];
-  /** Player ID hypnotized by the Mummy this turn. Reset each night. */
-  mummyHypnotizedId?: string;
 }
 
 export interface TargetablePlayer {

@@ -21,3 +21,12 @@ export function getSilencedPlayerIds(ts: WerewolfTurnState): string[] {
     .filter((e) => e.type === "silenced")
     .map((e) => e.targetPlayerId);
 }
+
+/** Returns the player ID hypnotized by the Mummy during the preceding night, if any. */
+export function getHypnotizedPlayerId(
+  ts: WerewolfTurnState,
+): string | undefined {
+  if (ts.phase.type !== WerewolfPhase.Daytime) return undefined;
+  return (ts.phase.nightResolution ?? []).find((e) => e.type === "hypnotized")
+    ?.targetPlayerId;
+}

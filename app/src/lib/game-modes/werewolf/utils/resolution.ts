@@ -258,5 +258,23 @@ export function resolveNightActions(
       ? [{ type: "silenced", targetPlayerId: spellcasterAction.targetPlayerId }]
       : [];
 
-  return [...combatEvents, ...toughGuyEvents, ...silencedEvents];
+  // Mummy: emit a hypnotized event for their target.
+  const mummyAction = nightActions[WerewolfRole.Mummy] as
+    | { targetPlayerId?: string }
+    | undefined;
+  const hypnotizedEvents: NightResolutionEvent[] = mummyAction?.targetPlayerId
+    ? [
+        {
+          type: "hypnotized",
+          targetPlayerId: mummyAction.targetPlayerId,
+        },
+      ]
+    : [];
+
+  return [
+    ...combatEvents,
+    ...toughGuyEvents,
+    ...silencedEvents,
+    ...hypnotizedEvents,
+  ];
 }

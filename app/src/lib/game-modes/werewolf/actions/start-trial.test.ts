@@ -177,10 +177,10 @@ describe("WerewolfAction.StartTrial", () => {
     });
 
     it("does not precast vote for hypnotized player", () => {
-      const ts: WerewolfTurnState = {
-        ...makeDayState(),
-        mummyHypnotizedId: "p2",
-      };
+      const ts: WerewolfTurnState = makeDayState();
+      (ts.phase as WerewolfDaytimePhase).nightResolution = [
+        { type: "hypnotized", targetPlayerId: "p2" },
+      ];
       const game = makePlayingGame(ts, {
         roleAssignments: [
           { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },

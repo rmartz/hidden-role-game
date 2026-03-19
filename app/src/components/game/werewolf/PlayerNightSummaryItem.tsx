@@ -5,7 +5,9 @@ interface PlayerNightSummaryItemProps {
   killed: boolean;
   survived: boolean;
   silenced: boolean;
+  hypnotized: boolean;
   smited: boolean;
+  isMe: boolean;
 }
 
 export function PlayerNightSummaryItem({
@@ -13,8 +15,27 @@ export function PlayerNightSummaryItem({
   killed,
   survived,
   silenced,
+  hypnotized,
   smited,
+  isMe,
 }: PlayerNightSummaryItemProps) {
+  // Personal messages for silenced/hypnotized player (only visible to themselves).
+  if (isMe && silenced) {
+    return (
+      <li className="text-sm font-medium text-amber-600">
+        {WEREWOLF_COPY.silence.nightSummary}
+      </li>
+    );
+  }
+
+  if (isMe && hypnotized) {
+    return (
+      <li className="text-sm font-medium text-amber-600">
+        {WEREWOLF_COPY.hypnotize.nightSummary}
+      </li>
+    );
+  }
+
   // The "survived" effect is only visible to the Tough Guy themselves,
   // so use a personalized second-person message.
   if (survived) {
@@ -32,6 +53,7 @@ export function PlayerNightSummaryItem({
       smited && WEREWOLF_COPY.smite.effect,
       killed && !smited && "eliminated",
       silenced && "silenced",
+      hypnotized && "hypnotized",
     ] as (string | false)[]
   )
     .filter(Boolean)

@@ -73,6 +73,7 @@ export function PlayerGameDayScreen({
       <PlayerNightSummary
         players={gameState.players}
         nightStatus={gameState.nightStatus}
+        myPlayerId={gameState.myPlayerId}
       />
 
       {gameState.amDead && (
@@ -91,11 +92,8 @@ export function PlayerGameDayScreen({
           votePhaseSeconds={timerConfig.votePhaseSeconds}
           defensePhaseSeconds={timerConfig.defensePhaseSeconds}
           autoAdvance={timerConfig.autoAdvance}
-          isSilenced={gameState.nightStatus?.some(
-            (e) =>
-              e.effect === "silenced" &&
-              e.targetPlayerId === gameState.myPlayerId,
-          )}
+          isSilenced={gameState.isSilenced}
+          isHypnotized={gameState.isHypnotized}
         />
       )}
 
@@ -105,6 +103,7 @@ export function PlayerGameDayScreen({
           players={gameState.players}
           myPlayerId={gameState.myPlayerId}
           amDead={gameState.amDead}
+          isSilenced={gameState.isSilenced}
           nominations={gameState.nominations ?? []}
           myNominatedDefendantId={gameState.myNominatedDefendantId}
           deadPlayerIds={gameState.deadPlayerIds}

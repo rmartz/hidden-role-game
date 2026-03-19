@@ -137,7 +137,9 @@ describe("WerewolfAction.CastVote", () => {
 
     it("returns false when caller is hypnotized", () => {
       const ts = makeDayStateWithTrial();
-      ts.mummyHypnotizedId = "p2";
+      (
+        ts.phase as Extract<typeof ts.phase, { type: WerewolfPhase.Daytime }>
+      ).nightResolution = [{ type: "hypnotized", targetPlayerId: "p2" }];
       const game = makePlayingGame(ts);
       expect(action.isValid(game, "p2", { vote: "guilty" })).toBe(false);
     });
@@ -239,7 +241,9 @@ describe("WerewolfAction.CastVote", () => {
 
     it("auto-casts hypnotized player vote when Mummy votes", () => {
       const ts = makeDayStateWithTrial({ defendantId: "p1" });
-      ts.mummyHypnotizedId = "p3";
+      (
+        ts.phase as Extract<typeof ts.phase, { type: WerewolfPhase.Daytime }>
+      ).nightResolution = [{ type: "hypnotized", targetPlayerId: "p3" }];
       const game = makePlayingGame(ts, {
         players: [
           { id: "p1", name: "Alice", sessionId: "s1", visiblePlayers: [] },

@@ -19,6 +19,7 @@ interface TrialVotePanelProps {
   defensePhaseSeconds: number;
   autoAdvance: boolean;
   isSilenced?: boolean;
+  isHypnotized?: boolean;
 }
 
 export function TrialVotePanel({
@@ -31,6 +32,7 @@ export function TrialVotePanel({
   defensePhaseSeconds,
   autoAdvance,
   isSilenced,
+  isHypnotized,
 }: TrialVotePanelProps) {
   const action = useGameAction(gameId);
   const defendant = players.find((p) => p.id === activeTrial.defendantId);
@@ -139,7 +141,17 @@ export function TrialVotePanel({
           {trial.mustVoteGuiltyNote}
         </p>
       )}
-      {canVote && !hasVoted && (
+      {canVote && !hasVoted && isSilenced && (
+        <p className="text-sm font-medium text-amber-600">
+          {trial.silencedCannotVote}
+        </p>
+      )}
+      {canVote && !hasVoted && isHypnotized && !isSilenced && (
+        <p className="text-sm font-medium text-amber-600">
+          {trial.hypnotizedStatus}
+        </p>
+      )}
+      {canVote && !hasVoted && !isSilenced && !isHypnotized && (
         <div className="flex justify-center gap-4">
           <Button
             size="sm"
