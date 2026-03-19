@@ -44,12 +44,13 @@ export interface WerewolfRoleDefinition extends RoleDefinition<
   isWerewolf?: boolean;
 }
 
-export const MIN_PLAYERS = 5;
+export const MIN_PLAYERS = 7;
 
 export function defaultRoleCount(numPlayers: number): RoleSlot[] {
   // Subtract 1 for the Narrator, who is a player but receives no role.
+  // Werewolf count: 6-8 role-players → 1, 9-11 → 2, 12-14 → 3, etc.
   const n = Math.max(numPlayers, MIN_PLAYERS) - 1;
-  const werewolves = Math.floor(n / 3);
+  const werewolves = Math.max(1, Math.floor((n - 3) / 3));
   const villagers = n - werewolves - 1;
   return [
     { roleId: WerewolfRole.Werewolf, min: werewolves, max: werewolves },
