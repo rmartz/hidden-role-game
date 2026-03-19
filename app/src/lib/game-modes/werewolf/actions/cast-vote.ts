@@ -16,6 +16,7 @@ export const castVoteAction: GameAction = {
     if (ts.phase.type !== WerewolfPhase.Daytime) return false;
     const { activeTrial } = ts.phase;
     if (!activeTrial) return false;
+    if (activeTrial.phase !== "voting") return false;
     if (activeTrial.verdict) return false;
     if (ts.deadPlayerIds.includes(callerId)) return false;
     if (!game.players.some((p) => p.id === callerId)) return false;

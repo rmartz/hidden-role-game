@@ -451,6 +451,7 @@ function makeDaytimeGameWithTrial(callerRoleId: WerewolfRole): Game {
   const activeTrial = {
     defendantId: "p1",
     startedAt: 2000,
+    phase: "voting" as const,
     votes: [] as { playerId: string; vote: "guilty" | "innocent" }[],
   };
   const turnState: WerewolfTurnState = {
