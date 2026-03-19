@@ -47,7 +47,7 @@ export async function POST(request: Request): Promise<Response> {
       roleConfigMode: RoleConfigMode.Default,
       roleSlots: getDefaultRoleSlots(selectedGameMode, 1),
       showConfigToPlayers: false,
-      showRolesInPlay: ShowRolesInPlay.None,
+      showRolesInPlay: ShowRolesInPlay.ConfiguredOnly,
       nominationsEnabled: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
     },

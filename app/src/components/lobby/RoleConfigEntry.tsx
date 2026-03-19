@@ -73,7 +73,7 @@ export function RoleConfigEntry(props: RoleConfigEntryProps) {
       className={`py-1 ${isAdvanced ? "flex flex-col gap-1" : "flex items-start gap-2"} ${dimmed ? "text-muted-foreground" : ""}`}
     >
       <span className="min-w-40 flex items-center gap-1">
-        <RoleLabel role={role} gameMode={gameMode} />
+        <RoleLabel role={role} gameMode={gameMode} showTeam />
       </span>
       {readOnly ? (
         roleConfigMode === RoleConfigMode.Advanced ? (
