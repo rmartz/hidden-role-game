@@ -1,7 +1,7 @@
 import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase } from "../types";
 import { currentTurnState, isOwnerPlaying, checkWinCondition } from "../utils";
-import { didWolfCubDie } from "./helpers";
+import { didWolfCubDie, cleanupAfterDaytimeKill } from "./helpers";
 
 export const killPlayerAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {
@@ -23,6 +23,7 @@ export const killPlayerAction: GameAction = {
     if (didWolfCubDie([playerId], game)) {
       ts.wolfCubDied = true;
     }
+    cleanupAfterDaytimeKill(playerId, ts);
     const winResult = checkWinCondition(game, ts.deadPlayerIds);
     if (winResult) {
       game.status = winResult;

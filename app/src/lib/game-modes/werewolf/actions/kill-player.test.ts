@@ -130,5 +130,62 @@ describe("WerewolfAction.KillPlayer", () => {
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
       expect(ts.wolfCubDied).toBe(true);
     });
+
+    it("clears One-Eyed Seer lock when locked target is killed", () => {
+      const ds = freshDayState();
+      ds.oneEyedSeerLockedTargetId = "p3";
+      const game = makePlayingGame(ds);
+      action.apply(game, { playerId: "p3" }, "owner-1");
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      expect(ts.oneEyedSeerLockedTargetId).toBeUndefined();
+    });
+
+    it("preserves One-Eyed Seer lock when a different player is killed", () => {
+      const ds = freshDayState();
+      ds.oneEyedSeerLockedTargetId = "p4";
+      const game = makePlayingGame(ds);
+      action.apply(game, { playerId: "p3" }, "owner-1");
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      expect(ts.oneEyedSeerLockedTargetId).toBe("p4");
+    });
+
+    it("consumes priest ward when warded player is killed", () => {
+      const ds = freshDayState();
+      ds.priestWards = { p3: "priest1", p4: "priest1" };
+      const game = makePlayingGame(ds);
+      action.apply(game, { playerId: "p3" }, "owner-1");
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      expect(ts.priestWards).toEqual({ p4: "priest1" });
+    });
+
+    it("clears priestWards entirely when last ward is consumed", () => {
+      const ds = freshDayState();
+      ds.priestWards = { p3: "priest1" };
+      const game = makePlayingGame(ds);
+      action.apply(game, { playerId: "p3" }, "owner-1");
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      expect(ts.priestWards).toBeUndefined();
+    });
+  });
+
+  describe("isValid during active trial", () => {
+    it("allows kill even when a trial is active", () => {
+      const ds: WerewolfTurnState = {
+        ...freshDayState(),
+        phase: {
+          type: WerewolfPhase.Daytime,
+          startedAt: 1000,
+          nightActions: {},
+          activeTrial: {
+            defendantId: "p2",
+            startedAt: 2000,
+            phase: "voting",
+            votes: [],
+          },
+        },
+      };
+      const game = makePlayingGame(ds);
+      expect(action.isValid(game, "owner-1", { playerId: "p3" })).toBe(true);
+    });
   });
 });
