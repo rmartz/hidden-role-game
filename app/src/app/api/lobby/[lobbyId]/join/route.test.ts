@@ -140,6 +140,74 @@ describe("POST /api/lobby/[lobbyId]/join", () => {
     expect(body.error).toBe("Lobby is full");
   });
 
+  it("should reject a player name that exactly matches an existing player", async () => {
+    const createRes = await createLobby(
+      postRequest("http://localhost/api/lobby/create", { playerName: "Alice" }),
+    );
+    const { data } = await createRes.json();
+    const lobbyId = data.lobby.id;
+
+    const res = await joinLobby(
+      postRequest(`http://localhost/api/lobby/${lobbyId}/join`, {
+        playerName: "Alice",
+      }),
+      makeParams(lobbyId),
+    );
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.status).toBe("error");
+  });
+
+  it("should reject a player name that matches an existing player case-insensitively", async () => {
+    const createRes = await createLobby(
+      postRequest("http://localhost/api/lobby/create", { playerName: "Alice" }),
+    );
+    const { data } = await createRes.json();
+    const lobbyId = data.lobby.id;
+
+    const res = await joinLobby(
+      postRequest(`http://localhost/api/lobby/${lobbyId}/join`, {
+        playerName: "alice",
+      }),
+      makeParams(lobbyId),
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it("should reject a player name that matches an existing player with extra whitespace", async () => {
+    const createRes = await createLobby(
+      postRequest("http://localhost/api/lobby/create", { playerName: "Alice" }),
+    );
+    const { data } = await createRes.json();
+    const lobbyId = data.lobby.id;
+
+    const res = await joinLobby(
+      postRequest(`http://localhost/api/lobby/${lobbyId}/join`, {
+        playerName: " Alice ",
+      }),
+      makeParams(lobbyId),
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it("should reject a player name with collapsed internal whitespace matching an existing player", async () => {
+    const createRes = await createLobby(
+      postRequest("http://localhost/api/lobby/create", {
+        playerName: "Alice Bob",
+      }),
+    );
+    const { data } = await createRes.json();
+    const lobbyId = data.lobby.id;
+
+    const res = await joinLobby(
+      postRequest(`http://localhost/api/lobby/${lobbyId}/join`, {
+        playerName: "Alice  Bob",
+      }),
+      makeParams(lobbyId),
+    );
+    expect(res.status).toBe(400);
+  });
+
   it("should return 404 when joining a lobby that does not exist", async () => {
     const res = await joinLobby(
       postRequest("http://localhost/api/lobby/nonexistent-id/join", {
