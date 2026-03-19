@@ -53,8 +53,10 @@ export enum WerewolfRole {
   Mayor = "werewolf-mayor",
   Mentalist = "werewolf-mentalist",
   Minion = "werewolf-minion",
+  Mortician = "werewolf-mortician",
   Mummy = "werewolf-mummy",
   MysticSeer = "werewolf-mystic-seer",
+  OldMan = "werewolf-old-man",
   OneEyedSeer = "werewolf-one-eyed-seer",
   Pacifist = "werewolf-pacifist",
   Priest = "werewolf-priest",
@@ -250,6 +252,18 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     targetCategory: TargetCategory.None,
     category: WerewolfRoleCategory.EvilSupport,
   },
+  [WerewolfRole.Mortician]: {
+    id: WerewolfRole.Mortician,
+    name: "Mortician",
+    summary: "Kills a player each night and learns their role",
+    description:
+      "Each night, the Mortician targets one player and kills them. Upon a successful kill, the Mortician learns the victim's exact role at the start of the next day. If the target is protected by another player, the attack is blocked and the Mortician learns nothing (receiving a 'not a Werewolf' result, even if the target was a Werewolf).",
+    team: Team.Good,
+    wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Attack,
+    preventSelfTarget: true,
+    category: WerewolfRoleCategory.VillagerKilling,
+  },
   [WerewolfRole.Mummy]: {
     id: WerewolfRole.Mummy,
     name: "Mummy",
@@ -272,6 +286,17 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     targetCategory: TargetCategory.Investigate,
     revealsExactRole: true,
     category: WerewolfRoleCategory.VillagerInvestigation,
+  },
+  [WerewolfRole.OldMan]: {
+    id: WerewolfRole.OldMan,
+    name: "Old Man",
+    summary: "Dies peacefully after a set number of nights",
+    description:
+      "The Old Man has no special protections — wolves can attack and kill them normally. However, if the Old Man is still alive after (#Werewolves + 1) nights, they die peacefully in their sleep at the start of day.",
+    team: Team.Good,
+    wakesAtNight: WakesAtNight.Never,
+    targetCategory: TargetCategory.None,
+    category: WerewolfRoleCategory.VillagerSupport,
   },
   [WerewolfRole.OneEyedSeer]: {
     id: WerewolfRole.OneEyedSeer,

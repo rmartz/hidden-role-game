@@ -204,6 +204,10 @@ export const WEREWOLF_COPY = {
       `${hunterName} has been eliminated and may take one player down with them. Select the revenge target.`,
     revengeConfirm: "Confirm Revenge Kill",
   },
+  oldMan: {
+    peacefulDeath: (playerName: string) =>
+      `${playerName} died peacefully in their sleep.`,
+  },
   kill: {
     button: "Kill",
     confirmTitle: "Kill player?",

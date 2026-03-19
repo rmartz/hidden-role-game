@@ -29,6 +29,7 @@ export function PlayerNightSummary({
       silenced: entries.some((e) => e.effect === "silenced"),
       hypnotized: entries.some((e) => e.effect === "hypnotized"),
       smited: entries.some((e) => e.effect === "smited"),
+      peaceful: entries.some((e) => e.effect === "peaceful"),
     }),
   );
 
@@ -56,6 +57,7 @@ export function PlayerNightSummary({
             silenced,
             hypnotized,
             smited,
+            peaceful,
           }) => (
             <PlayerNightSummaryItem
               key={targetPlayerId}
@@ -65,6 +67,7 @@ export function PlayerNightSummary({
               silenced={silenced}
               hypnotized={hypnotized}
               smited={smited}
+              peaceful={peaceful}
               isMe={myPlayerId === targetPlayerId}
             />
           ),

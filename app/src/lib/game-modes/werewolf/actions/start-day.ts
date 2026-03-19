@@ -45,6 +45,23 @@ export const startDayAction: GameAction = {
       }
     }
 
+    // Old Man timer: fires after (#werewolves + 1) nights.
+    const werewolfCount = game.roleAssignments.filter((a) => {
+      const roleDef = (
+        WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
+      )[a.roleDefinitionId];
+      return roleDef?.isWerewolf === true;
+    }).length;
+    const oldManAssignment = game.roleAssignments.find(
+      (a) => a.roleDefinitionId === (WerewolfRole.OldMan as string),
+    );
+    const oldManTimerPlayerId =
+      oldManAssignment &&
+      !ts.deadPlayerIds.includes(oldManAssignment.playerId) &&
+      ts.turn >= werewolfCount + 1
+        ? oldManAssignment.playerId
+        : undefined;
+
     const nightResolution = resolveNightActions(
       nightPhase.nightActions,
       game.roleAssignments,
@@ -53,6 +70,7 @@ export const startDayAction: GameAction = {
       {
         priestWards: priestWardsForResolution,
         toughGuyHitIds: ts.toughGuyHitIds,
+        ...(oldManTimerPlayerId ? { oldManTimerPlayerId } : {}),
       },
     );
     const newDeadIds: string[] = nightResolution
