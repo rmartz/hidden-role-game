@@ -6,6 +6,11 @@ export const LOBBY_CONFIG_COPY = {
   timerManual: "Manual",
 } as const;
 
+export const ROLE_CONFIG_COPY = {
+  showAllRoles: "Show all roles",
+  hideExtraRoles: "Show fewer roles",
+} as const;
+
 export const PLAYER_ROW_COPY = {
   leaveTitle: "Leave this lobby?",
   leaveDescription: "You will be removed from the lobby.",
