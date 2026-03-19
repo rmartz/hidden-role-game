@@ -31,9 +31,10 @@ export default function LobbyPage() {
 
   const validatedGameMode = parseGameMode(gameModeParam);
 
-  // undefined = not yet read from localStorage (avoid SSR mismatch)
-  const [storedLobbyId, setStoredLobbyId] = useState<string | undefined>(
-    undefined,
+  // null = not yet read from localStorage (avoid SSR mismatch)
+  // undefined = read but no lobby stored
+  const [storedLobbyId, setStoredLobbyId] = useState<string | undefined | null>(
+    null,
   );
   const [sessionId, setSessionId] = useState<string | undefined>(undefined);
   useEffect(() => {
@@ -41,13 +42,14 @@ export default function LobbyPage() {
     setSessionId(getSessionId());
   }, []);
 
+  const hasReadStorage = storedLobbyId !== null;
   const hasDifferentLobby =
-    storedLobbyId !== undefined && storedLobbyId !== lobbyId;
+    hasReadStorage && storedLobbyId !== undefined && storedLobbyId !== lobbyId;
 
   const { isConnected: wsConnected } = useLobbyWebSocket(lobbyId, sessionId);
 
   const fetchLobby = useLobbyQuery(lobbyId, {
-    enabled: storedLobbyId !== undefined && !hasDifferentLobby,
+    enabled: hasReadStorage && !hasDifferentLobby,
     disablePolling: wsConnected,
   });
 
@@ -121,8 +123,7 @@ export default function LobbyPage() {
     startGameMutation.mutate({ gameMode });
   }
 
-  if (!validatedGameMode || storedLobbyId === undefined || hasDifferentLobby)
-    return null;
+  if (!validatedGameMode || !hasReadStorage || hasDifferentLobby) return null;
 
   const configPanel =
     fetchLobby.data && !gameId ? (
