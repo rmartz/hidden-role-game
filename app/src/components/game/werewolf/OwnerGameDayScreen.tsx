@@ -6,6 +6,10 @@ import { GAME_MODES } from "@/lib/game-modes";
 import { WerewolfPhase, WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
+import {
+  WEREWOLF_ROLE_CATEGORY_LABELS,
+  WEREWOLF_ROLE_CATEGORY_ORDER,
+} from "@/lib/game-modes/werewolf/roles";
 import type { PlayerGameState } from "@/server/types";
 import { useGameAction } from "@/hooks";
 import {
@@ -78,6 +82,8 @@ export function OwnerGameDayScreen({
           gameMode={gameState.gameMode}
           title={WEREWOLF_COPY.glossary.dialogTitle}
           triggerLabel={WEREWOLF_COPY.glossary.openButton}
+          categoryOrder={WEREWOLF_ROLE_CATEGORY_ORDER}
+          categoryLabels={WEREWOLF_ROLE_CATEGORY_LABELS}
         />
       </div>
       <GameTimer

@@ -81,6 +81,8 @@ export interface RoleDefinition<
   description?: string;
   /** Players matching these criteria are visible (name only, no role info). */
   awareOf?: { teams?: T[]; roles?: Role[] };
+  /** Used to group roles in the role config UI and glossary. */
+  category?: string;
 }
 
 export interface GameModeConfig {

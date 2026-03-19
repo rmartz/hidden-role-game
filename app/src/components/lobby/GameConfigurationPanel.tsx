@@ -4,6 +4,10 @@ import { useEffect, useRef } from "react";
 import { GAME_MODES, getRoleSlotsRequired } from "@/lib/game-modes";
 import type { GameConfig } from "@/server/types";
 import { GameMode } from "@/lib/types";
+import {
+  WEREWOLF_ROLE_CATEGORY_LABELS,
+  WEREWOLF_ROLE_CATEGORY_ORDER,
+} from "@/lib/game-modes/werewolf/roles";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   loadConfig,
@@ -152,6 +156,12 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
                   gameMode={selectedGameMode}
                   readOnly={false}
                   disabled={props.isPending}
+                  categoryOrder={
+                    isWerewolf ? WEREWOLF_ROLE_CATEGORY_ORDER : undefined
+                  }
+                  categoryLabels={
+                    isWerewolf ? WEREWOLF_ROLE_CATEGORY_LABELS : undefined
+                  }
                 />
               )}
             </div>

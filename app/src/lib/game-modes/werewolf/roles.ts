@@ -2,6 +2,45 @@ import { Team } from "@/lib/types";
 import type { RoleDefinition, RoleSlot } from "@/lib/types";
 import { WakesAtNight, TargetCategory } from "./types";
 
+export enum WerewolfRoleCategory {
+  EvilKilling = "evil-killing",
+  EvilSupport = "evil-support",
+  NeutralKilling = "neutral-killing",
+  NeutralManipulation = "neutral-manipulation",
+  VillagerInvestigation = "villager-investigation",
+  VillagerProtection = "villager-protection",
+  VillagerKilling = "villager-killing",
+  VillagerSupport = "villager-support",
+  VillagerHandicap = "villager-handicap",
+}
+
+export const WEREWOLF_ROLE_CATEGORY_ORDER: WerewolfRoleCategory[] = [
+  WerewolfRoleCategory.EvilKilling,
+  WerewolfRoleCategory.EvilSupport,
+  WerewolfRoleCategory.NeutralKilling,
+  WerewolfRoleCategory.NeutralManipulation,
+  WerewolfRoleCategory.VillagerInvestigation,
+  WerewolfRoleCategory.VillagerProtection,
+  WerewolfRoleCategory.VillagerKilling,
+  WerewolfRoleCategory.VillagerSupport,
+  WerewolfRoleCategory.VillagerHandicap,
+];
+
+export const WEREWOLF_ROLE_CATEGORY_LABELS: Record<
+  WerewolfRoleCategory,
+  string
+> = {
+  [WerewolfRoleCategory.EvilKilling]: "Evil — Killing",
+  [WerewolfRoleCategory.EvilSupport]: "Evil — Support",
+  [WerewolfRoleCategory.NeutralKilling]: "Neutral — Killing",
+  [WerewolfRoleCategory.NeutralManipulation]: "Neutral — Manipulation",
+  [WerewolfRoleCategory.VillagerInvestigation]: "Villager — Investigation",
+  [WerewolfRoleCategory.VillagerProtection]: "Villager — Protection",
+  [WerewolfRoleCategory.VillagerKilling]: "Villager — Killing",
+  [WerewolfRoleCategory.VillagerSupport]: "Villager — Support",
+  [WerewolfRoleCategory.VillagerHandicap]: "Villager — Handicap",
+};
+
 export enum WerewolfRole {
   Villager = "werewolf-villager",
   Werewolf = "werewolf-werewolf",
@@ -61,6 +100,8 @@ export interface WerewolfRoleDefinition extends RoleDefinition<
   dualTargetInvestigate?: boolean;
   /** Exposer only: ability can only be used once per game. */
   oncePerGame?: boolean;
+  /** Used for grouping in the role config UI. */
+  category: WerewolfRoleCategory;
 }
 
 export const MIN_PLAYERS = 7;
@@ -88,6 +129,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Good,
     wakesAtNight: WakesAtNight.Never,
     targetCategory: TargetCategory.None,
+    category: WerewolfRoleCategory.VillagerSupport,
   },
   [WerewolfRole.Werewolf]: {
     id: WerewolfRole.Werewolf,
@@ -100,6 +142,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Attack,
     teamTargeting: true,
+    category: WerewolfRoleCategory.EvilKilling,
   },
   [WerewolfRole.WolfCub]: {
     id: WerewolfRole.WolfCub,
@@ -112,6 +155,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Attack,
     wakesWith: WerewolfRole.Werewolf,
+    category: WerewolfRoleCategory.EvilKilling,
   },
   [WerewolfRole.Seer]: {
     id: WerewolfRole.Seer,
@@ -122,6 +166,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Good,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Investigate,
+    category: WerewolfRoleCategory.VillagerInvestigation,
   },
   [WerewolfRole.Witch]: {
     id: WerewolfRole.Witch,
@@ -132,6 +177,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Good,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Special,
+    category: WerewolfRoleCategory.VillagerProtection,
   },
   [WerewolfRole.Spellcaster]: {
     id: WerewolfRole.Spellcaster,
@@ -143,6 +189,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Special,
     preventRepeatTarget: true,
+    category: WerewolfRoleCategory.VillagerSupport,
   },
   [WerewolfRole.Mason]: {
     id: WerewolfRole.Mason,
@@ -154,6 +201,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     awareOf: { roles: [WerewolfRole.Mason] },
     wakesAtNight: WakesAtNight.FirstNightOnly,
     targetCategory: TargetCategory.None,
+    category: WerewolfRoleCategory.VillagerSupport,
   },
   [WerewolfRole.Chupacabra]: {
     id: WerewolfRole.Chupacabra,
@@ -164,6 +212,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Neutral,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Attack,
+    category: WerewolfRoleCategory.NeutralKilling,
   },
   [WerewolfRole.VillageIdiot]: {
     id: WerewolfRole.VillageIdiot,
@@ -175,6 +224,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.Never,
     targetCategory: TargetCategory.None,
     alwaysVotesGuilty: true,
+    category: WerewolfRoleCategory.VillagerHandicap,
   },
   [WerewolfRole.Bodyguard]: {
     id: WerewolfRole.Bodyguard,
@@ -186,6 +236,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Protect,
     preventRepeatTarget: true,
+    category: WerewolfRoleCategory.VillagerProtection,
   },
   [WerewolfRole.Doctor]: {
     id: WerewolfRole.Doctor,
@@ -197,6 +248,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Protect,
     preventSelfTarget: true,
+    category: WerewolfRoleCategory.VillagerProtection,
   },
   [WerewolfRole.Priest]: {
     id: WerewolfRole.Priest,
@@ -207,6 +259,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Good,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Protect,
+    category: WerewolfRoleCategory.VillagerProtection,
   },
   [WerewolfRole.ToughGuy]: {
     id: WerewolfRole.ToughGuy,
@@ -217,6 +270,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Good,
     wakesAtNight: WakesAtNight.Never,
     targetCategory: TargetCategory.None,
+    category: WerewolfRoleCategory.VillagerProtection,
   },
   [WerewolfRole.Minion]: {
     id: WerewolfRole.Minion,
@@ -228,6 +282,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     awareOf: { werewolves: true },
     wakesAtNight: WakesAtNight.FirstNightOnly,
     targetCategory: TargetCategory.None,
+    category: WerewolfRoleCategory.EvilSupport,
   },
   [WerewolfRole.Pacifist]: {
     id: WerewolfRole.Pacifist,
@@ -239,6 +294,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.Never,
     targetCategory: TargetCategory.None,
     alwaysVotesInnocent: true,
+    category: WerewolfRoleCategory.VillagerHandicap,
   },
   [WerewolfRole.Mayor]: {
     id: WerewolfRole.Mayor,
@@ -249,6 +305,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Good,
     wakesAtNight: WakesAtNight.Never,
     targetCategory: TargetCategory.None,
+    category: WerewolfRoleCategory.VillagerSupport,
   },
   [WerewolfRole.Mummy]: {
     id: WerewolfRole.Mummy,
@@ -259,6 +316,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Good,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Special,
+    category: WerewolfRoleCategory.VillagerSupport,
   },
   [WerewolfRole.Wizard]: {
     id: WerewolfRole.Wizard,
@@ -270,6 +328,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Investigate,
     checksForSeer: true,
+    category: WerewolfRoleCategory.EvilSupport,
   },
   [WerewolfRole.OneEyedSeer]: {
     id: WerewolfRole.OneEyedSeer,
@@ -280,6 +339,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Good,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Investigate,
+    category: WerewolfRoleCategory.VillagerInvestigation,
   },
   [WerewolfRole.Exposer]: {
     id: WerewolfRole.Exposer,
@@ -291,6 +351,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Special,
     oncePerGame: true,
+    category: WerewolfRoleCategory.VillagerInvestigation,
   },
   [WerewolfRole.ElusiveSeer]: {
     id: WerewolfRole.ElusiveSeer,
@@ -301,6 +362,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Good,
     wakesAtNight: WakesAtNight.FirstNightOnly,
     targetCategory: TargetCategory.None,
+    category: WerewolfRoleCategory.VillagerInvestigation,
   },
   [WerewolfRole.Mentalist]: {
     id: WerewolfRole.Mentalist,
@@ -312,6 +374,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Investigate,
     dualTargetInvestigate: true,
+    category: WerewolfRoleCategory.VillagerInvestigation,
   },
   [WerewolfRole.MysticSeer]: {
     id: WerewolfRole.MysticSeer,
@@ -323,6 +386,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Investigate,
     revealsExactRole: true,
+    category: WerewolfRoleCategory.VillagerInvestigation,
   },
 } satisfies Record<WerewolfRole, WerewolfRoleDefinition>;
 
