@@ -314,206 +314,214 @@ describe("WerewolfAction.StartDay — protection roles", () => {
     action.apply(game, null, "owner-1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
     expect(ts.deadPlayerIds).toContain("p2");
+  });
+});
 
-    describe("Hunter", () => {
-      const hunterRoleAssignments = [
-        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
-        { playerId: "p2", roleDefinitionId: WerewolfRole.Hunter },
-        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
-        { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
-        { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
-      ];
+// ---------------------------------------------------------------------------
+// StartDay — Hunter and Vigilante
+// ---------------------------------------------------------------------------
 
-      it("sets hunterRevengePlayerId when the Hunter dies at night", () => {
-        const game = makePlayingGame(
-          makeNightState({
-            nightActions: {
-              [WerewolfRole.Werewolf]: {
-                votes: [],
-                suggestedTargetId: "p2",
-              },
+describe("WerewolfAction.StartDay — Hunter and Vigilante", () => {
+  const action = WEREWOLF_ACTIONS[WerewolfAction.StartDay];
+
+  describe("Hunter", () => {
+    const hunterRoleAssignments = [
+      { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "p2", roleDefinitionId: WerewolfRole.Hunter },
+      { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+      { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+      { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+    ];
+
+    it("sets hunterRevengePlayerId when the Hunter dies at night", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          nightActions: {
+            [WerewolfRole.Werewolf]: {
+              votes: [],
+              suggestedTargetId: "p2",
             },
-          }),
-          { roleAssignments: hunterRoleAssignments },
-        );
-        action.apply(game, null, "owner-1");
-        const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-        expect(ts.hunterRevengePlayerId).toBe("p2");
-        expect(ts.deadPlayerIds).toContain("p2");
-      });
-
-      it("defers win condition check when Hunter dies", () => {
-        // 2 wolves + 2 villagers + hunter: killing hunter makes
-        // 2 wolves vs 2 villagers — tie = wolves win.
-        // But with hunter revenge pending, the game should NOT end yet.
-        const game = makePlayingGame(
-          makeNightState({
-            nightActions: {
-              [WerewolfRole.Werewolf]: {
-                votes: [],
-                suggestedTargetId: "p2",
-              },
-            },
-          }),
-          {
-            roleAssignments: [
-              { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
-              { playerId: "p6", roleDefinitionId: WerewolfRole.Werewolf },
-              { playerId: "p2", roleDefinitionId: WerewolfRole.Hunter },
-              { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
-              { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
-            ],
-            players: [
-              { id: "p1", name: "W1", sessionId: "s1", visiblePlayers: [] },
-              { id: "p6", name: "W2", sessionId: "s6", visiblePlayers: [] },
-              { id: "p2", name: "Hunter", sessionId: "s2", visiblePlayers: [] },
-              { id: "p3", name: "V1", sessionId: "s3", visiblePlayers: [] },
-              { id: "p4", name: "V2", sessionId: "s4", visiblePlayers: [] },
-            ],
           },
-        );
-        action.apply(game, null, "owner-1");
-        const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-        // Game should still be playing (not finished), pending Hunter revenge
-        expect(ts.phase.type).toBe(WerewolfPhase.Daytime);
-        expect(ts.hunterRevengePlayerId).toBe("p2");
-      });
-
-      it("does not set hunterRevengePlayerId when Hunter is not killed", () => {
-        const game = makePlayingGame(
-          makeNightState({
-            nightActions: {
-              [WerewolfRole.Werewolf]: {
-                votes: [],
-                suggestedTargetId: "p3",
-              },
-            },
-          }),
-          { roleAssignments: hunterRoleAssignments },
-        );
-        action.apply(game, null, "owner-1");
-        const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-        expect(ts.hunterRevengePlayerId).toBeUndefined();
-      });
+        }),
+        { roleAssignments: hunterRoleAssignments },
+      );
+      action.apply(game, null, "owner-1");
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      expect(ts.hunterRevengePlayerId).toBe("p2");
+      expect(ts.deadPlayerIds).toContain("p2");
     });
 
-    describe("Vigilante", () => {
-      const vigilanteRoleAssignments = [
-        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
-        { playerId: "p2", roleDefinitionId: WerewolfRole.Vigilante },
-        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
-        { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
-        { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
-      ];
-
-      it("Vigilante kills target normally", () => {
-        const game = makePlayingGame(
-          makeNightState({
-            turn: 2,
-            nightActions: {
-              [WerewolfRole.Vigilante]: { targetPlayerId: "p3" },
+    it("defers win condition check when Hunter dies", () => {
+      // 2 wolves + 2 villagers + hunter: killing hunter makes
+      // 2 wolves vs 2 villagers — tie = wolves win.
+      // But with hunter revenge pending, the game should NOT end yet.
+      const game = makePlayingGame(
+        makeNightState({
+          nightActions: {
+            [WerewolfRole.Werewolf]: {
+              votes: [],
+              suggestedTargetId: "p2",
             },
-          }),
-          { roleAssignments: vigilanteRoleAssignments },
-        );
-        action.apply(game, null, "owner-1");
-        const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-        expect(ts.deadPlayerIds).toContain("p3");
-        // Vigilante killed a Good player → also dies
-        expect(ts.deadPlayerIds).toContain("p2");
-      });
-
-      it("Vigilante survives when killing a Bad-team player", () => {
-        const game = makePlayingGame(
-          makeNightState({
-            turn: 2,
-            nightActions: {
-              [WerewolfRole.Vigilante]: { targetPlayerId: "p1" },
-            },
-          }),
-          {
-            roleAssignments: [
-              { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
-              { playerId: "p6", roleDefinitionId: WerewolfRole.Werewolf },
-              { playerId: "p2", roleDefinitionId: WerewolfRole.Vigilante },
-              { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
-              { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
-              { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
-            ],
-            players: [
-              { id: "p1", name: "W1", sessionId: "s1", visiblePlayers: [] },
-              { id: "p6", name: "W2", sessionId: "s6", visiblePlayers: [] },
-              { id: "p2", name: "Vig", sessionId: "s2", visiblePlayers: [] },
-              { id: "p3", name: "V1", sessionId: "s3", visiblePlayers: [] },
-              { id: "p4", name: "V2", sessionId: "s4", visiblePlayers: [] },
-              { id: "p5", name: "V3", sessionId: "s5", visiblePlayers: [] },
-            ],
           },
-        );
-        action.apply(game, null, "owner-1");
-        const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-        expect(ts.deadPlayerIds).toContain("p1");
-        expect(ts.deadPlayerIds).not.toContain("p2");
-      });
+        }),
+        {
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+            { playerId: "p6", roleDefinitionId: WerewolfRole.Werewolf },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Hunter },
+            { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+          ],
+          players: [
+            { id: "p1", name: "W1", sessionId: "s1", visiblePlayers: [] },
+            { id: "p6", name: "W2", sessionId: "s6", visiblePlayers: [] },
+            { id: "p2", name: "Hunter", sessionId: "s2", visiblePlayers: [] },
+            { id: "p3", name: "V1", sessionId: "s3", visiblePlayers: [] },
+            { id: "p4", name: "V2", sessionId: "s4", visiblePlayers: [] },
+          ],
+        },
+      );
+      action.apply(game, null, "owner-1");
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      // Game should still be playing (not finished), pending Hunter revenge
+      expect(ts.phase.type).toBe(WerewolfPhase.Daytime);
+      expect(ts.hunterRevengePlayerId).toBe("p2");
+    });
 
-      it("Vigilante does not self-die when target is protected", () => {
-        const game = makePlayingGame(
-          makeNightState({
-            turn: 2,
-            nightActions: {
-              [WerewolfRole.Vigilante]: { targetPlayerId: "p3" },
-              [WerewolfRole.Bodyguard]: { targetPlayerId: "p3" },
+    it("does not set hunterRevengePlayerId when Hunter is not killed", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          nightActions: {
+            [WerewolfRole.Werewolf]: {
+              votes: [],
+              suggestedTargetId: "p3",
             },
-          }),
-          {
-            roleAssignments: [
-              { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
-              { playerId: "p2", roleDefinitionId: WerewolfRole.Vigilante },
-              { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
-              { playerId: "p4", roleDefinitionId: WerewolfRole.Bodyguard },
-              { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
-            ],
           },
-        );
-        action.apply(game, null, "owner-1");
-        const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-        expect(ts.deadPlayerIds).not.toContain("p3");
-        expect(ts.deadPlayerIds).not.toContain("p2");
-      });
+        }),
+        { roleAssignments: hunterRoleAssignments },
+      );
+      action.apply(game, null, "owner-1");
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      expect(ts.hunterRevengePlayerId).toBeUndefined();
+    });
+  });
 
-      it("Vigilante still self-dies when protected but kills a Good player", () => {
-        // Wolves attack Vigilante, Bodyguard protects Vigilante,
-        // Vigilante kills a Good player → Vigilante survives wolf attack
-        // but still self-dies from killing Good
-        const game = makePlayingGame(
-          makeNightState({
-            turn: 2,
-            nightActions: {
-              [WerewolfRole.Werewolf]: {
-                votes: [],
-                suggestedTargetId: "p2",
-              },
-              [WerewolfRole.Vigilante]: { targetPlayerId: "p5" },
-              [WerewolfRole.Bodyguard]: { targetPlayerId: "p2" },
-            },
-          }),
-          {
-            roleAssignments: [
-              { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
-              { playerId: "p2", roleDefinitionId: WerewolfRole.Vigilante },
-              { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
-              { playerId: "p4", roleDefinitionId: WerewolfRole.Bodyguard },
-              { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
-            ],
+  describe("Vigilante", () => {
+    const vigilanteRoleAssignments = [
+      { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "p2", roleDefinitionId: WerewolfRole.Vigilante },
+      { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+      { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+      { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+    ];
+
+    it("Vigilante kills target normally", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightActions: {
+            [WerewolfRole.Vigilante]: { targetPlayerId: "p3" },
           },
-        );
-        action.apply(game, null, "owner-1");
-        const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-        // p5 killed by Vigilante
-        expect(ts.deadPlayerIds).toContain("p5");
-        // Vigilante self-dies (killed Good player)
-        expect(ts.deadPlayerIds).toContain("p2");
-      });
+        }),
+        { roleAssignments: vigilanteRoleAssignments },
+      );
+      action.apply(game, null, "owner-1");
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      expect(ts.deadPlayerIds).toContain("p3");
+      // Vigilante killed a Good player → also dies
+      expect(ts.deadPlayerIds).toContain("p2");
+    });
+
+    it("Vigilante survives when killing a Bad-team player", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightActions: {
+            [WerewolfRole.Vigilante]: { targetPlayerId: "p1" },
+          },
+        }),
+        {
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+            { playerId: "p6", roleDefinitionId: WerewolfRole.Werewolf },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Vigilante },
+            { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+          ],
+          players: [
+            { id: "p1", name: "W1", sessionId: "s1", visiblePlayers: [] },
+            { id: "p6", name: "W2", sessionId: "s6", visiblePlayers: [] },
+            { id: "p2", name: "Vig", sessionId: "s2", visiblePlayers: [] },
+            { id: "p3", name: "V1", sessionId: "s3", visiblePlayers: [] },
+            { id: "p4", name: "V2", sessionId: "s4", visiblePlayers: [] },
+            { id: "p5", name: "V3", sessionId: "s5", visiblePlayers: [] },
+          ],
+        },
+      );
+      action.apply(game, null, "owner-1");
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      expect(ts.deadPlayerIds).toContain("p1");
+      expect(ts.deadPlayerIds).not.toContain("p2");
+    });
+
+    it("Vigilante does not self-die when target is protected", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightActions: {
+            [WerewolfRole.Vigilante]: { targetPlayerId: "p3" },
+            [WerewolfRole.Bodyguard]: { targetPlayerId: "p3" },
+          },
+        }),
+        {
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Vigilante },
+            { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p4", roleDefinitionId: WerewolfRole.Bodyguard },
+            { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+          ],
+        },
+      );
+      action.apply(game, null, "owner-1");
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      expect(ts.deadPlayerIds).not.toContain("p3");
+      expect(ts.deadPlayerIds).not.toContain("p2");
+    });
+
+    it("Vigilante still self-dies when protected but kills a Good player", () => {
+      // Wolves attack Vigilante, Bodyguard protects Vigilante,
+      // Vigilante kills a Good player → Vigilante survives wolf attack
+      // but still self-dies from killing Good
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightActions: {
+            [WerewolfRole.Werewolf]: {
+              votes: [],
+              suggestedTargetId: "p2",
+            },
+            [WerewolfRole.Vigilante]: { targetPlayerId: "p5" },
+            [WerewolfRole.Bodyguard]: { targetPlayerId: "p2" },
+          },
+        }),
+        {
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Vigilante },
+            { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p4", roleDefinitionId: WerewolfRole.Bodyguard },
+            { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+          ],
+        },
+      );
+      action.apply(game, null, "owner-1");
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      // p5 killed by Vigilante
+      expect(ts.deadPlayerIds).toContain("p5");
+      // Vigilante self-dies (killed Good player)
+      expect(ts.deadPlayerIds).toContain("p2");
     });
   });
 });
