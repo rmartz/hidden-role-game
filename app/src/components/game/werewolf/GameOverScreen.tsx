@@ -95,6 +95,11 @@ export function GameOverScreen({ gameState }: GameOverScreenProps) {
       >
         {WEREWOLF_COPY.gameOver.returnToLobby}
       </Button>
+      {returnToLobbyMutation.isError && (
+        <p className="text-destructive text-sm mt-2 text-center">
+          {WEREWOLF_COPY.gameOver.returnToLobbyError}
+        </p>
+      )}
     </div>
   );
 }

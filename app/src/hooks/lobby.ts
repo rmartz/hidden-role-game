@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import {
+  clearGameId,
   createLobby,
   joinLobby,
   removePlayer,
@@ -78,6 +79,7 @@ export function useReturnToLobby(lobbyId: string) {
     mutationFn: () => returnToLobby(lobbyId),
     onSuccess: (response) => {
       if (response.status === ServerResponseStatus.Error) return;
+      clearGameId();
       router.push(`/${response.data.lobby.config.gameMode}/lobby/${lobbyId}`);
     },
   });
