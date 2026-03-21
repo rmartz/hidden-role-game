@@ -260,16 +260,19 @@ interface TeamNightAction {
 6. Applies Smite: any smited player is killed regardless of protections.
 7. Applies Spellcaster action: emits a `silenced` event.
 8. Applies Mummy action: emits a `hypnotized` event for the target.
-9. Checks Old Man timer (`oldManTimerPlayerId` option): if the timer has reached zero **and** the Old Man was not attacked this night, emits a `"peaceful"` killed event and adds the Old Man to `deadPlayerIds`.
-10. Resolves Mortician attack: if the Mortician's target died, the Mortician learns their role; if the target was protected, the Mortician receives "not a Werewolf" regardless of the target's actual team.
-11. Returns `NightResolutionEvent[]`:
+9. Checks Old Man timer (`oldManTimerPlayerId` option): if the timer has fired **and** the Old Man was not attacked this night, emits a killed event with `attackedBy: [OLD_MAN_TIMER_KEY]`, `died: true`. This bypasses protections (applied after `buildKilledEvents`, like smite). If the Old Man was attacked, the attack takes precedence.
+10. Returns `NightResolutionEvent[]`:
 
 - `{ type: "killed", targetPlayerId, attackedBy, protectedBy, died }`
 - `{ type: "silenced", targetPlayerId }`
 - `{ type: "hypnotized", targetPlayerId }`
 - `{ type: "tough-guy-absorbed", targetPlayerId }`
 - `{ type: "altruist-intercepted", targetPlayerId }`
-- `{ type: "killed", targetPlayerId, effect: "peaceful" }` (Old Man timer)
+
+After resolution, `start-day` performs additional checks:
+
+- **Mortician ability end**: if the Mortician's target died and was a Werewolf (`isWerewolf`), sets `morticianAbilityEnded: true` on the turn state. The Mortician can no longer target players on subsequent nights.
+- **Old Man peaceful death**: `GameSerializationService` detects `attackedBy: [OLD_MAN_TIMER_KEY]` and maps it to `DaytimeNightStatusEntry.effect: "peaceful"`, which renders as a special death message for all players.
 
 ```mermaid
 flowchart TD
@@ -305,15 +308,9 @@ flowchart TD
     Mummy -->|no| Resolve
     Hypnotize --> Resolve
     Resolve[For each collected attack:\nif protected → died = false\nelse → died = true\nemit killed event]
-    Resolve --> OldMan{Old Man timer expired?}
-    OldMan -->|yes, not attacked| Peaceful[Emit peaceful killed event\nfor Old Man]
-    OldMan -->|no or attacked| Mortician
-    Peaceful --> Mortician
-    Mortician{Mortician attacked?}
-    Mortician -->|target died| LearnRole[Mortician learns target role]
-    Mortician -->|target protected| FalseResult[Mortician receives\n'not a Werewolf']
-    Mortician -->|skipped| Return
-    LearnRole --> Return
-    FalseResult --> Return
+    Resolve --> OldMan{Old Man timer expired\nand not attacked?}
+    OldMan -->|yes| Peaceful[Emit killed event\nattackedBy: OLD_MAN_TIMER_KEY\ndied: true]
+    OldMan -->|no| Return
+    Peaceful --> Return
     Return([Return NightResolutionEvent array])
 ```
