@@ -14,6 +14,7 @@ interface CreateDebugGameRequest {
   showRolesInPlay: ShowRolesInPlay;
   timerConfig: TimerConfig;
   nominationsEnabled: boolean;
+  singleTrialPerDay: boolean;
 }
 
 export interface DebugPlayer {
@@ -31,6 +32,7 @@ export async function POST(request: Request): Promise<Response> {
     showRolesInPlay,
     timerConfig,
     nominationsEnabled,
+    singleTrialPerDay,
   } = (await request.json()) as CreateDebugGameRequest;
 
   if (!Object.values(GameMode).includes(gameMode)) {
@@ -76,6 +78,7 @@ export async function POST(request: Request): Promise<Response> {
     ownerPlayer?.id ?? undefined,
     timerConfig,
     nominationsEnabled,
+    singleTrialPerDay,
   );
 
   const debugPlayers: DebugPlayer[] = players.map((p) => ({
