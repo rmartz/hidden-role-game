@@ -244,16 +244,6 @@ export function resolveNightActions(
     }
   }
 
-  // Old Man timer: if the timer fires and the Old Man was not attacked by any
-  // player this night, they die peacefully. If they were attacked, the attack
-  // takes precedence and they die normally (no timer event added).
-  if (
-    options?.oldManTimerPlayerId &&
-    !attacks.has(options.oldManTimerPlayerId)
-  ) {
-    attacks.set(options.oldManTimerPlayerId, [OLD_MAN_TIMER_KEY]);
-  }
-
   let combatEvents = buildKilledEvents(attacks, protections);
 
   // Narrator smites: force death regardless of protections.
@@ -271,6 +261,28 @@ export function resolveNightActions(
           type: "killed" as const,
           targetPlayerId: smitedId,
           attackedBy: [SMITE_PHASE_KEY],
+          protectedBy: [],
+          died: true,
+        },
+      ];
+    }
+  }
+
+  // Old Man timer: if the timer fires and the Old Man was not attacked by any
+  // player this night, they die peacefully (unblockable, like smite).
+  // If they were attacked, the attack takes precedence (no timer event added).
+  if (options?.oldManTimerPlayerId) {
+    const existing = combatEvents.find(
+      (e) =>
+        e.type === "killed" && e.targetPlayerId === options.oldManTimerPlayerId,
+    );
+    if (!existing) {
+      combatEvents = [
+        ...combatEvents,
+        {
+          type: "killed" as const,
+          targetPlayerId: options.oldManTimerPlayerId,
+          attackedBy: [OLD_MAN_TIMER_KEY],
           protectedBy: [],
           died: true,
         },

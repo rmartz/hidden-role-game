@@ -53,6 +53,25 @@ describe("resolveNightActions", () => {
       expect(findKilled(events, "om1")).toMatchObject({ died: false });
     });
 
+    it("timer death is not blocked by Bodyguard protection", () => {
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
+          [WerewolfRole.Bodyguard]: { targetPlayerId: "om1" },
+        },
+        oldManAssignments,
+        [],
+        undefined,
+        { oldManTimerPlayerId: "om1" },
+      );
+      const killEvent = findKilled(events, "om1");
+      expect(killEvent).toMatchObject({
+        died: true,
+        attackedBy: [OLD_MAN_TIMER_KEY],
+        protectedBy: [],
+      });
+    });
+
     it("no timer: Old Man is not added to kill events", () => {
       const events = resolveNightActions(
         { [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" } },
