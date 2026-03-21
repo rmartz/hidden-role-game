@@ -1,5 +1,24 @@
 # Contributing
 
+See `AGENTS.md` (root and `app/`) for the authoritative coding standards consumed by AI agents. This file provides the same rules in a more readable format with examples.
+
+## Package Manager
+
+Always use `pnpm`. Never `npm` or `yarn`.
+
+## Common Commands
+
+```bash
+pnpm dev              # Start dev server (from app/)
+pnpm build            # Production build (from app/)
+pnpm lint             # Lint (from app/)
+pnpm format           # Format (from app/)
+pnpm test             # Run tests with Vitest (from app/ or root)
+pnpm tsc --noEmit     # Type check (from app/)
+```
+
+---
+
 ## Code Style
 
 ### File size
@@ -14,17 +33,32 @@ Keep files under ~200 lines. When a file grows beyond that, split it by logical 
 
 ### TypeScript
 
-- Strict mode throughout. No `any` types.
+- Strict mode throughout. No `any` types. No `@ts-ignore`.
+- Use `async/await`, not `.then()` chains.
 - Prefer `undefined` for absent or optional values. Only use `null` when required by an external API, or when you explicitly need to distinguish "intentionally empty" from "not yet set" — and document why.
 - Name interfaces after their component or usage context: `interface OwnerAdvanceCardProps`, not `interface Props`.
 
+### Exports
+
+Use named exports, not default exports (except for Next.js pages and Redux slices).
+
+### No spurious variables
+
+Do not assign a value to a variable only to immediately return it on the next line — return the expression directly instead.
+
 ### User-facing text
 
-All strings shown to the user must live in a `copy.ts` constants file — not inline in components. This keeps the codebase i18n-ready and makes it easy to find and audit copy changes.
+All strings shown to the user must live in a co-located copy file (`ComponentName.copy.ts` or `copy.ts`) — not inline in components. This keeps the codebase i18n-ready and makes it easy to find and audit copy changes.
 
 ---
 
 ## React and Next.js
+
+### Framework constraints
+
+- Next.js with App Router (not Pages Router).
+- UI components: ShadCN UI. Do not install other component libraries.
+- Styling: Tailwind CSS (comes with ShadCN). No CSS modules or styled-components.
 
 ### Client components
 
@@ -83,9 +117,3 @@ return (
 ### Barrel exports
 
 Every component or module directory should have an `index.ts` that re-exports its public surface. Consumers import from the directory, not individual files.
-
----
-
-## Package manager
-
-Always use `pnpm`. Never `npm` or `yarn`.
