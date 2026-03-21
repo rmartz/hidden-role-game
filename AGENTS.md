@@ -36,6 +36,7 @@ pnpm tsc --noEmit     # Type check (from app/)
 ## Code Conventions
 
 - **No spurious variables.** Do not assign a value to a variable only to immediately return it on the next line — return the expression directly instead.
+- **Role enums and definitions** in game mode files (e.g., `WerewolfRole` enum and `WEREWOLF_ROLES` object) must be kept in alphabetical order to minimize merge conflicts.
 
 ## User-Facing Text
 
