@@ -1,29 +1,16 @@
 import { describe, it, expect } from "vitest";
-import {
-  GameMode,
-  GameStatus,
-  ShowRolesInPlay,
-  Team,
-  DEFAULT_TIMER_CONFIG,
-} from "@/lib/types";
-import type { Game, LobbyPlayer, RoleDefinition, RoleSlot } from "@/lib/types";
-import { WerewolfPhase, WerewolfRole } from "@/lib/game-modes/werewolf";
-import { SecretVillainRole } from "@/lib/game-modes/secret-villain";
+import { Team } from "@/lib/types";
+import type { LobbyPlayer, RoleDefinition } from "@/lib/types";
 import { GameInitializationService } from "./GameInitializationService";
 
 const service = new GameInitializationService();
 
-/** Extended role type for werewolf-specific test fixtures. */
 type TestWerewolfRole = RoleDefinition<string, Team> & {
   teamTargeting?: boolean;
   wakesWith?: string;
   isWerewolf?: boolean;
   awareOf?: { teams?: Team[]; roles?: string[]; werewolves?: boolean };
 };
-
-// ---------------------------------------------------------------------------
-// Fixtures
-// ---------------------------------------------------------------------------
 
 function makeLobbyPlayer(id: string): LobbyPlayer {
   return { id, name: `Player ${id}`, sessionId: `session-${id}` };
@@ -39,42 +26,6 @@ const MOCK_ROLES = {
   },
   special: { id: "special", name: "Special Role", team: Team.Bad },
 };
-
-const DEFAULT_SLOTS: RoleSlot[] = [
-  { roleId: SecretVillainRole.Good, min: 1, max: 1 },
-  { roleId: SecretVillainRole.Bad, min: 1, max: 1 },
-];
-
-function makeSecretVillainGame(
-  roleAssignments: Game["roleAssignments"],
-  showRolesInPlay: ShowRolesInPlay = ShowRolesInPlay.RoleAndCount,
-  configuredRoleSlots: RoleSlot[] = DEFAULT_SLOTS,
-): Game {
-  const players = roleAssignments.map((a) => ({
-    id: a.playerId,
-    name: `Player ${a.playerId}`,
-    sessionId: `session-${a.playerId}`,
-    visiblePlayers: [],
-  }));
-  return {
-    id: "game-1",
-    lobbyId: "lobby-1",
-    gameMode: GameMode.SecretVillain,
-    status: { type: GameStatus.Playing },
-    players,
-    roleAssignments,
-    configuredRoleSlots,
-    showRolesInPlay,
-    ownerPlayerId: undefined,
-    nominationsEnabled: false,
-    singleTrialPerDay: true,
-    timerConfig: DEFAULT_TIMER_CONFIG,
-  };
-}
-
-// ---------------------------------------------------------------------------
-// buildGamePlayers
-// ---------------------------------------------------------------------------
 
 describe("GameInitializationService.buildGamePlayers", () => {
   it("returns a GamePlayer for each role assignment", () => {
@@ -118,7 +69,6 @@ describe("GameInitializationService.buildGamePlayers", () => {
     const result = service.buildGamePlayers(players, assignments, MOCK_ROLES);
     const badPlayer = result.find((p) => p.id === "p1")!;
 
-    // sees p2 (also bad) but not p3 (good)
     expect(badPlayer.visiblePlayers).toHaveLength(1);
     expect(badPlayer.visiblePlayers[0]!.playerId).toBe("p2");
     expect(badPlayer.visiblePlayers[0]!.reason).toBe("aware-of");
@@ -131,7 +81,6 @@ describe("GameInitializationService.buildGamePlayers", () => {
       { playerId: "p2", roleDefinitionId: "special" },
     ];
 
-    // bad has awareOf teams: [Bad]; special is also Bad
     const result = service.buildGamePlayers(players, assignments, MOCK_ROLES);
     const badPlayer = result.find((p) => p.id === "p1")!;
 
@@ -262,163 +211,5 @@ describe("GameInitializationService.buildGamePlayers", () => {
     expect(cub.visiblePlayers).toEqual([
       { playerId: "w1", reason: "wake-partner" },
     ]);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// buildInitialTurnState
-// ---------------------------------------------------------------------------
-
-describe("GameInitializationService.buildInitialTurnState", () => {
-  it("returns undefined for non-Werewolf modes", () => {
-    expect(
-      service.buildInitialTurnState(GameMode.SecretVillain, []),
-    ).toBeUndefined();
-    expect(service.buildInitialTurnState(GameMode.Avalon, [])).toBeUndefined();
-  });
-
-  it("returns a WerewolfTurnState for Werewolf mode", () => {
-    const assignments = [
-      { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
-      { playerId: "p2", roleDefinitionId: WerewolfRole.Seer },
-    ];
-
-    const result = service.buildInitialTurnState(
-      GameMode.Werewolf,
-      assignments,
-    );
-
-    expect(result).toBeDefined();
-    expect(result?.turn).toBe(1);
-    expect(result?.deadPlayerIds).toEqual([]);
-    expect(result?.phase.type).toBe(WerewolfPhase.Nighttime);
-  });
-
-  it("nightPhaseOrder is built from the role assignments", () => {
-    const assignments = [
-      { playerId: "p1", roleDefinitionId: WerewolfRole.Seer },
-      { playerId: "p2", roleDefinitionId: WerewolfRole.Werewolf },
-    ];
-
-    const result = service.buildInitialTurnState(
-      GameMode.Werewolf,
-      assignments,
-    );
-
-    expect(
-      result?.phase.type === WerewolfPhase.Nighttime &&
-        result.phase.nightPhaseOrder.length,
-    ).toBeGreaterThan(0);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// buildRolesInPlay
-// ---------------------------------------------------------------------------
-
-describe("GameInitializationService.buildRolesInPlay", () => {
-  it("returns undefined when showRolesInPlay is None", () => {
-    const game = makeSecretVillainGame(
-      [{ playerId: "p1", roleDefinitionId: SecretVillainRole.Good }],
-      ShowRolesInPlay.None,
-    );
-
-    expect(service.buildRolesInPlay(game)).toBeUndefined();
-  });
-
-  it("returns roles with count when showRolesInPlay is RoleAndCount", () => {
-    const game = makeSecretVillainGame(
-      [
-        { playerId: "p1", roleDefinitionId: SecretVillainRole.Good },
-        { playerId: "p2", roleDefinitionId: SecretVillainRole.Good },
-        { playerId: "p3", roleDefinitionId: SecretVillainRole.Bad },
-      ],
-      ShowRolesInPlay.RoleAndCount,
-      [
-        { roleId: SecretVillainRole.Good, min: 2, max: 2 },
-        { roleId: SecretVillainRole.Bad, min: 1, max: 1 },
-      ],
-    );
-
-    const result = service.buildRolesInPlay(game);
-
-    expect(result).toBeDefined();
-    expect(result).toContainEqual(
-      expect.objectContaining({
-        id: SecretVillainRole.Good,
-        count: 2,
-      }),
-    );
-    expect(result).toContainEqual(
-      expect.objectContaining({
-        id: SecretVillainRole.Bad,
-        count: 1,
-      }),
-    );
-  });
-
-  it("returns unique roles without count for AssignedRolesOnly", () => {
-    const slots: RoleSlot[] = [
-      { roleId: SecretVillainRole.Good, min: 1, max: 3 },
-    ];
-    const game = makeSecretVillainGame(
-      [
-        { playerId: "p1", roleDefinitionId: SecretVillainRole.Good },
-        { playerId: "p2", roleDefinitionId: SecretVillainRole.Good },
-      ],
-      ShowRolesInPlay.AssignedRolesOnly,
-      slots,
-    );
-
-    const result = service.buildRolesInPlay(game);
-
-    expect(result).toHaveLength(1);
-    expect(result?.[0]).toEqual({
-      id: SecretVillainRole.Good,
-      name: "Good Role",
-      team: Team.Good,
-      min: 1,
-      max: 3,
-    });
-    expect(result?.[0]).not.toHaveProperty("count");
-  });
-
-  it("returns configured slots for ConfiguredOnly", () => {
-    const slots: RoleSlot[] = [
-      { roleId: SecretVillainRole.Good, min: 2, max: 4 },
-      { roleId: SecretVillainRole.Bad, min: 0, max: 2 },
-    ];
-    const game = makeSecretVillainGame(
-      [{ playerId: "p1", roleDefinitionId: SecretVillainRole.Good }],
-      ShowRolesInPlay.ConfiguredOnly,
-      slots,
-    );
-
-    const result = service.buildRolesInPlay(game);
-
-    expect(result).toHaveLength(2);
-    expect(result).toContainEqual(
-      expect.objectContaining({ id: SecretVillainRole.Good, min: 2, max: 4 }),
-    );
-    expect(result).toContainEqual(
-      expect.objectContaining({ id: SecretVillainRole.Bad, min: 0, max: 2 }),
-    );
-  });
-
-  it("ConfiguredOnly excludes slots with max === 0", () => {
-    const slots: RoleSlot[] = [
-      { roleId: SecretVillainRole.Good, min: 1, max: 3 },
-      { roleId: SecretVillainRole.Bad, min: 0, max: 0 },
-    ];
-    const game = makeSecretVillainGame(
-      [{ playerId: "p1", roleDefinitionId: SecretVillainRole.Good }],
-      ShowRolesInPlay.ConfiguredOnly,
-      slots,
-    );
-
-    const result = service.buildRolesInPlay(game);
-
-    expect(result).toHaveLength(1);
-    expect(result?.[0]!.id).toBe(SecretVillainRole.Good);
   });
 });
