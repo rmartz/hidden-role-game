@@ -224,7 +224,7 @@ Additional resolution steps:
 ## Night Action Types
 
 ```typescript
-// Solo role action (Seer, Bodyguard, Witch, Spellcaster, Chupacabra, Doctor, Priest, Mummy, Wizard, One-Eyed Seer, Exposer, Mystic Seer, Altruist)
+// Solo role action (Seer, Bodyguard, Witch, Spellcaster, Chupacabra, Doctor, Priest, Mummy, Wizard, One-Eyed Seer, Exposer, Mystic Seer, Altruist, Mortician)
 interface NightAction {
   targetPlayerId?: string; // absent when skipped
   skipped?: true; // set when the player intentionally chose "Skip"
@@ -260,12 +260,15 @@ interface TeamNightAction {
 6. Applies Smite: any smited player is killed regardless of protections.
 7. Applies Spellcaster action: emits a `silenced` event.
 8. Applies Mummy action: emits a `hypnotized` event for the target.
-9. Returns `NightResolutionEvent[]`:
+9. Checks Old Man timer (`oldManTimerPlayerId` option): if the timer has reached zero **and** the Old Man was not attacked this night, emits a `"peaceful"` killed event and adds the Old Man to `deadPlayerIds`.
+10. Resolves Mortician attack: if the Mortician's target died, the Mortician learns their role; if the target was protected, the Mortician receives "not a Werewolf" regardless of the target's actual team.
+11. Returns `NightResolutionEvent[]`:
    - `{ type: "killed", targetPlayerId, attackedBy, protectedBy, died }`
    - `{ type: "silenced", targetPlayerId }`
    - `{ type: "hypnotized", targetPlayerId }`
    - `{ type: "tough-guy-absorbed", targetPlayerId }`
    - `{ type: "altruist-intercepted", targetPlayerId }`
+   - `{ type: "killed", targetPlayerId, effect: "peaceful" }` (Old Man timer)
 
 ```mermaid
 flowchart TD
@@ -301,5 +304,15 @@ flowchart TD
     Mummy -->|no| Resolve
     Hypnotize --> Resolve
     Resolve[For each collected attack:\nif protected → died = false\nelse → died = true\nemit killed event]
-    Resolve --> Return([Return NightResolutionEvent array])
+    Resolve --> OldMan{Old Man timer expired?}
+    OldMan -->|yes, not attacked| Peaceful[Emit peaceful killed event\nfor Old Man]
+    OldMan -->|no or attacked| Mortician
+    Peaceful --> Mortician
+    Mortician{Mortician attacked?}
+    Mortician -->|target died| LearnRole[Mortician learns target role]
+    Mortician -->|target protected| FalseResult[Mortician receives\n'not a Werewolf']
+    Mortician -->|skipped| Return
+    LearnRole --> Return
+    FalseResult --> Return
+    Return([Return NightResolutionEvent array])
 ```
