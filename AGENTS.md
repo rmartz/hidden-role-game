@@ -24,12 +24,12 @@ pnpm tsc --noEmit     # Type check (from app/)
 
 ## File Organization
 
-- Keep files under ~200 lines. Large files should be split by logical concern.
+- **Source files**: Keep under ~200 lines (split at ~240). Large files should be split by logical concern.
+- **Test files**: Keep under ~300 lines (split at ~360). When splitting, organize into a `{module}-tests/` directory with domain-specific files (e.g., `resolution-tests/altruist.test.ts`).
 - **Components**: Each component file must contain exactly one component and its associated props interface. Delegate complex logic to utility functions or sub-components.
 - **Type files**: Convert large type files into barrel-exported directories with one file per logical domain (e.g., `lobby.ts`, `game.ts`, `player.ts`).
 - **Utility files**: Split by the type of operation or domain they serve.
 - **Service files**: Extract complex logic areas into focused utility functions or smaller services.
-- **Test files**: When the primary file is split, create a corresponding test file for each split portion.
 - Barrel `index.ts` exports for all component/module directories.
 - Use named exports, not default exports (except for Next.js pages and Redux slices).
 
