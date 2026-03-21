@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/item";
 import { Card, CardContent } from "@/components/ui/card";
 import { RoleLabel } from "@/components/RoleLabel";
+import { WerewolfRole } from "@/lib/game-modes/werewolf/roles";
 import {
   PLAYER_VISIBILITY_COPY,
   ROLE_VISIBILITY_OVERRIDES,
@@ -115,7 +116,7 @@ export function PlayersRoleList({
           reason === "wake-partner" &&
           myRoleId !== undefined &&
           LONE_WOLF_WARNING_ROLES.has(myRoleId) &&
-          rolesInPlay?.some((r) => r.id === "werewolf-lone-wolf");
+          rolesInPlay?.some((r) => r.id === (WerewolfRole.LoneWolf as string));
         const baseDescription =
           reason === "wake-partner"
             ? (overrides?.wakePartnerDescription ?? baseConfig.description)
