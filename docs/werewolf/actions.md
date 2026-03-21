@@ -67,8 +67,8 @@ Actions are the mechanism by which the Narrator and players mutate game state. E
 ### `reveal-investigation-result`
 
 **Who:** Narrator only
-**When:** During Nighttime, active phase is an Investigate role (Seer), action is confirmed
-**Effect:** Sets `resultRevealed: true` on the night action. This causes `GameSerializationService` to include the `investigationResult` in the Seer's `PlayerGameState`.
+**When:** During Nighttime, active phase is an Investigate role (Seer, Wizard, One-Eyed Seer, Mystic Seer, Mentalist), action is confirmed
+**Effect:** Sets `resultRevealed: true` on the night action. This causes `GameSerializationService` to include the `investigationResult` in the investigating player's `PlayerGameState`.
 
 ---
 
@@ -88,6 +88,98 @@ Actions are the mechanism by which the Narrator and players mutate game state. E
 
 ---
 
+### `start-trial`
+
+**Who:** Narrator only
+**When:** During Daytime
+**Effect:** Starts a trial against a defendant. Pre-populates forced votes (Village Idiot = guilty, Pacifist = innocent). Clears nominations. Blocked by `singleTrialPerDay` if a trial has already concluded this day.
+
+**Payload:** `{ defendantId: string }`
+
+---
+
+### `cast-vote`
+
+**Who:** Player
+**When:** During Daytime (voting phase of an active trial)
+**Effect:** Casts a guilty or innocent vote. Silenced and dead players cannot vote. Hypnotized players' votes mirror the Mummy's vote.
+
+**Payload:** `{ vote: "guilty" | "innocent" }`
+
+---
+
+### `resolve-trial`
+
+**Who:** Narrator only
+**When:** During Daytime (after voting completes)
+**Effect:** Resolves the trial verdict — guilty votes exceeding innocent votes results in elimination. The Mayor's vote counts double. Clears One-Eyed Seer lock and Priest wards for a killed player.
+
+---
+
+### `end-game`
+
+**Who:** Narrator only
+**When:** Any
+**Effect:** Ends the game immediately.
+
+---
+
+### `smite-player`
+
+**Who:** Narrator only
+**When:** During Nighttime
+**Effect:** Marks a player for death by mysterious forces. Smite bypasses all protections (Bodyguard, Doctor, Priest ward, Witch).
+
+**Payload:** `{ playerId: string }`
+
+---
+
+### `unsmite-player`
+
+**Who:** Narrator only
+**When:** During Nighttime
+**Effect:** Removes a pending smite from a player.
+
+**Payload:** `{ playerId: string }`
+
+---
+
+### `nominate-player`
+
+**Who:** Player
+**When:** During Daytime
+**Effect:** Nominates a defendant for trial. When the nomination count reaches the threshold, a trial is automatically started. Blocked by `singleTrialPerDay` if a trial has already concluded this day.
+
+**Payload:** `{ defendantId: string }`
+
+---
+
+### `withdraw-nomination`
+
+**Who:** Player
+**When:** During Daytime
+**Effect:** Withdraws the player's own nomination.
+
+---
+
+### `skip-defense`
+
+**Who:** Narrator only
+**When:** During Daytime (defense phase of an active trial)
+**Effect:** Skips the defense phase and moves the trial directly to voting.
+
+---
+
+### `kill-player`
+
+**Who:** Narrator only
+**When:** During Daytime
+**Effect:** Immediately kills a player (for in-person trials). Checks win condition. Clears One-Eyed Seer lock and Priest wards for the killed player.
+
+**Payload:** `{ playerId: string }`
+
+---
+
 ## Action Payload Summary
 
 | Action                        | Caller                    | Payload                                                |
@@ -100,16 +192,27 @@ Actions are the mechanism by which the Narrator and players mutate game state. E
 | `reveal-investigation-result` | Narrator                  | none                                                   |
 | `mark-player-dead`            | Narrator                  | `{ playerId: string }`                                 |
 | `mark-player-alive`           | Narrator                  | `{ playerId: string }`                                 |
+| `start-trial`                 | Narrator                  | `{ defendantId: string }`                              |
+| `cast-vote`                   | Player                    | `{ vote: "guilty" \| "innocent" }`                     |
+| `resolve-trial`               | Narrator                  | none                                                   |
+| `end-game`                    | Narrator                  | none                                                   |
+| `smite-player`                | Narrator                  | `{ playerId: string }`                                 |
+| `unsmite-player`              | Narrator                  | `{ playerId: string }`                                 |
+| `nominate-player`             | Player                    | `{ defendantId: string }`                              |
+| `withdraw-nomination`         | Player                    | none                                                   |
+| `skip-defense`                | Narrator                  | none                                                   |
+| `kill-player`                 | Narrator                  | `{ playerId: string }`                                 |
 
 ## Night Action Types
 
 ```typescript
-// Solo role action (Seer, Bodyguard, Witch, Spellcaster, Chupacabra)
+// Solo role action (Seer, Bodyguard, Witch, Spellcaster, Chupacabra, Doctor, Priest, Mummy, Wizard, One-Eyed Seer, Exposer, Mystic Seer, Altruist)
 interface NightAction {
   targetPlayerId?: string; // absent when skipped
   skipped?: true; // set when the player intentionally chose "Skip"
   confirmed?: boolean;
-  resultRevealed?: boolean; // Seer only
+  resultRevealed?: boolean; // Seer, Wizard, One-Eyed Seer, Mystic Seer
+  secondTargetPlayerId?: string; // Mentalist dual-target
 }
 
 // Individual vote within a group phase
@@ -131,26 +234,54 @@ interface TeamNightAction {
 
 `resolveNightActions()` runs when `start-day` is called:
 
-1. Collects base attacks and protections from all roles except Witch and Spellcaster.
-2. Applies Witch action: if target is already under attack → protect; otherwise → attack.
-3. Applies Spellcaster action: emits a `silenced` event.
-4. Returns `NightResolutionEvent[]`:
+1. Collects base attacks and protections from all roles except Witch, Altruist, Spellcaster, and Mummy.
+2. Applies Priest ward protection: any player with an active ward has the ward consume the attack (ward is removed, player survives).
+3. Applies Witch action: if target is already under attack → protect; otherwise → attack.
+4. Applies Altruist action (last): if the Altruist's target is under attack, the attack is redirected onto the Altruist (the Altruist dies instead).
+5. Applies Tough Guy absorption: if a Tough Guy is attacked for the first time, the attack is absorbed (survives this night, dies on the next attack).
+6. Applies Smite: any smited player is killed regardless of protections.
+7. Applies Spellcaster action: emits a `silenced` event.
+8. Applies Mummy action: emits a `hypnotized` event for the target.
+9. Returns `NightResolutionEvent[]`:
    - `{ type: "killed", targetPlayerId, attackedBy, protectedBy, died }`
    - `{ type: "silenced", targetPlayerId }`
+   - `{ type: "hypnotized", targetPlayerId }`
+   - `{ type: "tough-guy-absorbed", targetPlayerId }`
+   - `{ type: "altruist-intercepted", targetPlayerId }`
 
 ```mermaid
 flowchart TD
-    Start([start-day called]) --> Collect[Collect attacks and protections\nfrom Werewolves, Bodyguard, Chupacabra]
-    Collect --> Witch{Witch used ability?}
+    Start([start-day called]) --> Collect[Collect attacks and protections\nfrom Werewolves, Bodyguard, Doctor, Chupacabra]
+    Collect --> Priest{Priest ward active\non target?}
+    Priest -->|yes| WardAbsorb[Ward absorbs attack\nremove ward]
+    Priest -->|no| Witch
+    WardAbsorb --> Witch
+    Witch{Witch used ability?}
     Witch -->|protect target| Protect[Remove pending attack on target]
     Witch -->|attack target| NewAttack[Add new attack on target]
-    Witch -->|skipped| Spellcaster
-    Protect --> Spellcaster
-    NewAttack --> Spellcaster
+    Witch -->|skipped| Altruist
+    Protect --> Altruist
+    NewAttack --> Altruist
+    Altruist{Altruist target\nunder attack?}
+    Altruist -->|yes| Intercept[Redirect attack onto Altruist\nemit altruist-intercepted]
+    Altruist -->|no| ToughGuy
+    Intercept --> ToughGuy
+    ToughGuy{Tough Guy attacked\nfor first time?}
+    ToughGuy -->|yes| Absorb[Absorb attack\nemit tough-guy-absorbed]
+    ToughGuy -->|no| Smite
+    Absorb --> Smite
+    Smite{Player smited?}
+    Smite -->|yes| ForceDeath[Force death regardless\nof protections]
+    Smite -->|no| Spellcaster
+    ForceDeath --> Spellcaster
     Spellcaster{Spellcaster acted?}
     Spellcaster -->|yes| Silence[Emit silenced event for target]
-    Spellcaster -->|no| Resolve
-    Silence --> Resolve
+    Spellcaster -->|no| Mummy
+    Silence --> Mummy
+    Mummy{Mummy acted?}
+    Mummy -->|yes| Hypnotize[Emit hypnotized event for target]
+    Mummy -->|no| Resolve
+    Hypnotize --> Resolve
     Resolve[For each collected attack:\nif protected → died = false\nelse → died = true\nemit killed event]
     Resolve --> Return([Return NightResolutionEvent array])
 ```
