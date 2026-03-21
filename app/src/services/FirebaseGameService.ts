@@ -80,6 +80,7 @@ export class FirebaseGameService {
         visibleRoleAssignments,
         rolesInPlay: gameInitializationService.buildRolesInPlay(game),
         nominationsEnabled: game.nominationsEnabled,
+        singleTrialPerDay: game.singleTrialPerDay,
         ...(nightActions ? { nightActions } : {}),
         ...daytimeNightState,
         ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
@@ -175,6 +176,7 @@ export class FirebaseGameService {
       visibleRoleAssignments,
       rolesInPlay: gameInitializationService.buildRolesInPlay(game),
       nominationsEnabled: game.nominationsEnabled,
+      singleTrialPerDay: game.singleTrialPerDay,
       ...nightTargetState,
       ...daytimeNightState,
       ...(amDead ? { amDead: true } : {}),
@@ -206,7 +208,8 @@ export class FirebaseGameService {
     showRolesInPlay: ShowRolesInPlay,
     ownerPlayerId: string | undefined,
     timerConfig: import("@/lib/types").TimerConfig,
-    nominationsEnabled?: boolean,
+    nominationsEnabled: boolean,
+    singleTrialPerDay: boolean,
   ): Promise<Game> {
     const { roles } = this.getModeDefinition(gameMode);
     const rolePlayers = ownerPlayerId
@@ -237,7 +240,8 @@ export class FirebaseGameService {
       showRolesInPlay,
       ownerPlayerId,
       timerConfig,
-      nominationsEnabled: nominationsEnabled ?? false,
+      nominationsEnabled,
+      singleTrialPerDay,
     };
 
     // sessionIndex: { [sessionId]: playerId } — needed to reconstruct Game from Firebase

@@ -23,6 +23,7 @@ function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
       showConfigToPlayers: false,
       showRolesInPlay: ShowRolesInPlay.None,
       nominationsEnabled: false,
+      singleTrialPerDay: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
     },
     ...overrides,
@@ -96,6 +97,7 @@ describe("toPublicLobby", () => {
           showConfigToPlayers: true,
           showRolesInPlay: ShowRolesInPlay.None,
           nominationsEnabled: false,
+          singleTrialPerDay: true,
           timerConfig: DEFAULT_TIMER_CONFIG,
         },
       });

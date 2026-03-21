@@ -19,6 +19,7 @@ export interface GameConfig {
   roleSlots?: RoleSlot[];
   timerConfig: TimerConfig;
   nominationsEnabled: boolean;
+  singleTrialPerDay: boolean;
 }
 
 export interface PublicLobby {
@@ -46,6 +47,7 @@ export interface UpdateLobbyConfigRequest {
   roleSlots?: RoleSlot[];
   timerConfig?: TimerConfig;
   nominationsEnabled?: boolean;
+  singleTrialPerDay?: boolean;
 }
 
 export interface LobbyJoinResponse {

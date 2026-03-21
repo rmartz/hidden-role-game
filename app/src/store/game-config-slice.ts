@@ -57,6 +57,7 @@ export interface GameConfigState {
   showRolesInPlay: ShowRolesInPlay;
   timerConfig: TimerConfig;
   nominationEnabled: boolean;
+  singleTrialPerDay: boolean;
   isValid: boolean;
   /** Increments on every user-initiated action. Used to detect when a sync is needed. */
   syncVersion: number;
@@ -73,6 +74,7 @@ const initialState: GameConfigState = {
   showRolesInPlay: ShowRolesInPlay.None,
   timerConfig: DEFAULT_TIMER_CONFIG,
   nominationEnabled: true,
+  singleTrialPerDay: true,
   isValid: false,
   syncVersion: 0,
 };
@@ -112,6 +114,7 @@ const gameConfigSlice = createSlice({
       state.showRolesInPlay = config.showRolesInPlay;
       state.timerConfig = config.timerConfig;
       state.nominationEnabled = config.nominationsEnabled;
+      state.singleTrialPerDay = config.singleTrialPerDay;
       state.isValid = recomputeIsValid(state);
     },
 
@@ -249,6 +252,11 @@ const gameConfigSlice = createSlice({
       state.nominationEnabled = action.payload;
       state.syncVersion++;
     },
+
+    setSingleTrialPerDay(state, action: PayloadAction<boolean>) {
+      state.singleTrialPerDay = action.payload;
+      state.syncVersion++;
+    },
   },
 });
 
@@ -287,6 +295,7 @@ export const {
   setShowRolesInPlay,
   setTimerConfig,
   setNominationEnabled,
+  setSingleTrialPerDay,
 } = gameConfigSlice.actions;
 
 export default gameConfigSlice.reducer;

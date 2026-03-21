@@ -57,6 +57,7 @@ function makeDaytimeGame(
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner",
     nominationsEnabled: false,
+    singleTrialPerDay: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
@@ -95,6 +96,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: undefined,
       nominationsEnabled: false,
+      singleTrialPerDay: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
     };
 
@@ -220,6 +222,7 @@ function makeNighttimeGame(
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: undefined,
     nominationsEnabled: false,
+    singleTrialPerDay: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
@@ -329,6 +332,7 @@ function makeNighttimeGameWithBonusPhase(
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: undefined,
     nominationsEnabled: false,
+    singleTrialPerDay: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
@@ -483,6 +487,7 @@ function makeDaytimeGameWithTrial(callerRoleId: WerewolfRole): Game {
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner",
     nominationsEnabled: false,
+    singleTrialPerDay: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
@@ -550,6 +555,7 @@ describe("GameSerializationService.extractDaytimeNightState — playerCount excl
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner",
       nominationsEnabled: false,
+      singleTrialPerDay: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
     };
     const result = service.extractDaytimeNightState(game, "p3");
@@ -595,6 +601,7 @@ describe("GameSerializationService.extractDaytimeNightState — playerCount excl
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner",
       nominationsEnabled: false,
+      singleTrialPerDay: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
     };
     const result = service.extractDaytimeNightState(game, "p2");
@@ -642,6 +649,7 @@ function makeDaytimeGameWithNominations(
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner",
     nominationsEnabled,
+    singleTrialPerDay: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }

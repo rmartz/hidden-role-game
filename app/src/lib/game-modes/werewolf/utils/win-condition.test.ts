@@ -28,6 +28,7 @@ function makeGame(
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner",
     nominationsEnabled: false,
+    singleTrialPerDay: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }

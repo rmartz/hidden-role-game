@@ -23,6 +23,7 @@ const DEFAULT_CONFIG: GameConfig = {
   showConfigToPlayers: false,
   showRolesInPlay: ShowRolesInPlay.None,
   nominationsEnabled: false,
+  singleTrialPerDay: true,
   timerConfig: DEFAULT_TIMER_CONFIG,
 };
 
@@ -37,6 +38,9 @@ export default function DebugPage() {
   const timerConfig = useAppSelector((s) => s.gameConfig.timerConfig);
   const nominationsEnabled = useAppSelector(
     (s) => s.gameConfig.nominationEnabled,
+  );
+  const singleTrialPerDay = useAppSelector(
+    (s) => s.gameConfig.singleTrialPerDay,
   );
 
   async function handleCreateGame() {
@@ -53,6 +57,7 @@ export default function DebugPage() {
           showRolesInPlay,
           timerConfig,
           nominationsEnabled,
+          singleTrialPerDay,
         }),
       });
       const body = (await res.json()) as {

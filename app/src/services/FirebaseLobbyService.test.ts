@@ -20,6 +20,7 @@ function makeBaseLobby(overrides: Partial<Lobby["config"]> = {}): Lobby {
       showConfigToPlayers: false,
       showRolesInPlay: ShowRolesInPlay.None,
       nominationsEnabled: false,
+      singleTrialPerDay: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
       ...overrides,
     },

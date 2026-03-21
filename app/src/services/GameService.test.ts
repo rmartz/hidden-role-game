@@ -43,6 +43,7 @@ function makeGameWithPlayers(
     showRolesInPlay,
     ownerPlayerId: undefined,
     nominationsEnabled: false,
+    singleTrialPerDay: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
@@ -149,6 +150,7 @@ function makeNarratorGame(nominationsEnabled = false): Game {
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "narrator",
     nominationsEnabled,
+    singleTrialPerDay: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }

@@ -145,6 +145,8 @@ export interface PlayerGameState {
   timerConfig: TimerConfig;
   /** Whether player nominations for trial are enabled in this game. */
   nominationsEnabled: boolean;
+  /** When true, only one trial is allowed per day phase. */
+  singleTrialPerDay: boolean;
   /**
    * Current nominations for trial, grouped by defendant with nominator IDs.
    * Only populated during daytime when nominationsEnabled is true.

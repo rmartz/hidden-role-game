@@ -22,6 +22,7 @@ export function toPublicLobby(
       showConfigToPlayers: lobby.config.showConfigToPlayers,
       showRolesInPlay: lobby.config.showRolesInPlay,
       nominationsEnabled: lobby.config.nominationsEnabled,
+      singleTrialPerDay: lobby.config.singleTrialPerDay,
       timerConfig: lobby.config.timerConfig,
       ...(showRoleSlots && { roleSlots: lobby.config.roleSlots }),
     },

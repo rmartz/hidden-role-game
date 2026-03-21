@@ -45,6 +45,9 @@ export function PlayerGameDayScreen({
 
   const hasActiveTrial =
     !!gameState.activeTrial && !gameState.activeTrial.verdict;
+  const trialConcluded = !!gameState.activeTrial?.verdict;
+  const nominationsBlocked =
+    hasActiveTrial || (gameState.singleTrialPerDay && trialConcluded);
 
   return (
     <div className="p-5 max-w-lg mx-auto">
@@ -113,7 +116,7 @@ export function PlayerGameDayScreen({
         />
       )}
 
-      {gameState.nominationsEnabled && !hasActiveTrial && (
+      {gameState.nominationsEnabled && !nominationsBlocked && (
         <NominationPanel
           gameId={gameId}
           players={gameState.players}

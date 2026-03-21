@@ -14,6 +14,8 @@ export const nominatePlayerAction: GameAction = {
     if (ts.phase.type !== WerewolfPhase.Daytime) return false;
     // Cannot nominate while a trial is active and unresolved
     if (ts.phase.activeTrial && !ts.phase.activeTrial.verdict) return false;
+    // Single trial per day: cannot nominate after a trial has concluded
+    if (game.singleTrialPerDay && ts.phase.activeTrial?.verdict) return false;
     if (ts.deadPlayerIds.includes(callerId)) return false;
     // Silenced players cannot nominate
     const silencedIds = getSilencedPlayerIds(ts);

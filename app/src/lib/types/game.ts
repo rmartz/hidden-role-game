@@ -152,6 +152,8 @@ export interface Game {
   timerConfig: TimerConfig;
   /** Whether player nominations for trial are enabled. */
   nominationsEnabled: boolean;
+  /** When true, only one trial is allowed per day phase. */
+  singleTrialPerDay: boolean;
 }
 
 /**
@@ -200,6 +202,8 @@ export interface LobbyConfig {
   timerConfig: TimerConfig;
   /** Whether player nominations for trial are enabled. */
   nominationsEnabled: boolean;
+  /** When true, only one trial is allowed per day phase. */
+  singleTrialPerDay: boolean;
 }
 
 export interface Lobby {
