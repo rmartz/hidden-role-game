@@ -195,6 +195,26 @@ export class GameSerializationService {
       };
     }
 
+    // For the Mortician, surface ability-ended state.
+    if (isRoleActive(myRole.id, WerewolfRole.Mortician)) {
+      const ts =
+        game.status.type === GameStatus.Playing
+          ? (game.status.turnState as WerewolfTurnState | undefined)
+          : undefined;
+      const morticianAction = nightActions[myRole.id];
+      const morticianSoloAction =
+        morticianAction && !isTeamNightAction(morticianAction)
+          ? morticianAction
+          : undefined;
+      return {
+        myNightTarget: morticianSoloAction?.skipped
+          ? null
+          : morticianSoloAction?.targetPlayerId,
+        myNightTargetConfirmed: morticianSoloAction?.confirmed ?? false,
+        morticianAbilityEnded: ts?.morticianAbilityEnded ?? false,
+      };
+    }
+
     // For the Witch, include attacked-player info and ability-used state.
     // This must run before the early-return below, since the Witch may not
     // have chosen a target yet but still needs to see who is under attack.

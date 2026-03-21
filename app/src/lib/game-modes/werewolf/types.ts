@@ -159,6 +159,8 @@ export interface WerewolfTurnState {
   exposerAbilityUsed?: boolean;
   /** The role publicly revealed by the Exposer. Persists for the rest of the game. */
   exposerReveal?: { playerId: string; roleId: string };
+  /** True once the Mortician has successfully killed a Werewolf. */
+  morticianAbilityEnded?: boolean;
 }
 
 export interface TargetablePlayer {

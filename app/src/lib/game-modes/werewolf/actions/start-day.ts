@@ -45,7 +45,7 @@ export const startDayAction: GameAction = {
       }
     }
 
-    // Old Man timer: fires after (#werewolves + 1) nights.
+    // Old Man timer: fires after (#werewolves + 2) nights.
     const werewolfCount = game.roleAssignments.filter((a) => {
       const roleDef = (
         WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
@@ -58,7 +58,7 @@ export const startDayAction: GameAction = {
     const oldManTimerPlayerId =
       oldManAssignment &&
       !ts.deadPlayerIds.includes(oldManAssignment.playerId) &&
-      ts.turn >= werewolfCount + 1
+      ts.turn >= werewolfCount + 2
         ? oldManAssignment.playerId
         : undefined;
 
@@ -200,6 +200,32 @@ export const startDayAction: GameAction = {
       }
     }
 
+    // Mortician ability: check if the Mortician killed a Werewolf this night.
+    let morticianAbilityEnded = ts.morticianAbilityEnded === true;
+    if (!morticianAbilityEnded) {
+      const morticianAction = nightPhase.nightActions[
+        WerewolfRole.Mortician as string
+      ] as NightAction | undefined;
+      if (morticianAction?.targetPlayerId) {
+        const morticianKilled = newDeadIds.includes(
+          morticianAction.targetPlayerId,
+        );
+        if (morticianKilled) {
+          const targetAssignment = game.roleAssignments.find(
+            (a) => a.playerId === morticianAction.targetPlayerId,
+          );
+          const targetRole = targetAssignment
+            ? (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
+                targetAssignment.roleDefinitionId
+              ]
+            : undefined;
+          if (targetRole?.isWerewolf) {
+            morticianAbilityEnded = true;
+          }
+        }
+      }
+    }
+
     // Hunter revenge: if the Hunter died this night, defer win-condition check
     // until the narrator resolves the Hunter's revenge target.
     const hunterAssignment = game.roleAssignments.find(
@@ -208,6 +234,7 @@ export const startDayAction: GameAction = {
     const hunterDiedThisNight =
       hunterAssignment !== undefined &&
       newDeadIds.includes(hunterAssignment.playerId);
+
 
     const updatedDeadIds = [...ts.deadPlayerIds, ...newDeadIds];
 
@@ -246,6 +273,7 @@ export const startDayAction: GameAction = {
         ...(hunterDiedThisNight
           ? { hunterRevengePlayerId: hunterAssignment.playerId }
           : {}),
+        ...(morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),
       },
     };
   },

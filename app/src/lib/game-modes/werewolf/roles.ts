@@ -255,9 +255,9 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
   [WerewolfRole.Mortician]: {
     id: WerewolfRole.Mortician,
     name: "Mortician",
-    summary: "Kills a player each night and learns their role",
+    summary: "Attacks each night until they kill a Werewolf",
     description:
-      "Each night, the Mortician targets one player and kills them. Upon a successful kill, the Mortician learns the victim's exact role at the start of the next day. If the target is protected by another player, the attack is blocked and the Mortician learns nothing (receiving a 'not a Werewolf' result, even if the target was a Werewolf).",
+      "Each night, the Mortician targets one player to attack. If the target is protected, the attack fails and the Mortician receives a 'not a Werewolf' result regardless of the target's actual role. Once the Mortician successfully kills a Werewolf, their ability ends and they no longer wake at night.",
     team: Team.Good,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Attack,
@@ -292,11 +292,11 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     name: "Old Man",
     summary: "Dies peacefully after a set number of nights",
     description:
-      "The Old Man has no special protections — wolves can attack and kill them normally. However, if the Old Man is still alive after (#Werewolves + 1) nights, they die peacefully in their sleep at the start of day.",
+      "The Old Man has no special protections — wolves can attack and kill them normally. However, if the Old Man is still alive after (#Werewolves + 2) nights, they die peacefully in their sleep at the start of day.",
     team: Team.Good,
     wakesAtNight: WakesAtNight.Never,
     targetCategory: TargetCategory.None,
-    category: WerewolfRoleCategory.VillagerSupport,
+    category: WerewolfRoleCategory.VillagerHandicap,
   },
   [WerewolfRole.OneEyedSeer]: {
     id: WerewolfRole.OneEyedSeer,

@@ -140,6 +140,8 @@ export interface PlayerGameState {
   witchAbilityUsed?: boolean;
   /** Whether the Exposer has already used their once-per-game reveal ability. */
   exposerAbilityUsed?: boolean;
+  /** Whether the Mortician has completed their mission (killed a Werewolf). */
+  morticianAbilityEnded?: boolean;
   /** Whether the Priest's ward is currently active (cannot target this night). */
   priestWardActive?: boolean;
   /**
