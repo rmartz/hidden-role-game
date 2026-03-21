@@ -59,6 +59,7 @@ These fields are only populated when the active phase matches the player's role.
 | `mySecondNightTarget`       | Mentalist                                           | The Mentalist's second target for dual-target investigation                                                                                                                               |
 | `elusiveSeerVillagerIds`    | Elusive Seer                                        | List of player IDs who have the Villager role (shown on first night only)                                                                                                                 |
 | `oneEyedSeerLockedTargetId` | One-Eyed Seer                                       | Player ID the One-Eyed Seer is locked onto after detecting a werewolf                                                                                                                     |
+| `executionerTargetId`       | Executioner                                         | The player ID of the Executioner's assigned Good-team target; visible only to the Executioner                                                                                             |
 
 ### Player Fields — Daytime (day start)
 
@@ -230,3 +231,14 @@ The `wolfCubDied` flag is cleared when `start-night` consumes it to generate the
 ## Old Man Timer
 
 When the Old Man role is in play, `start-day` checks whether the Old Man's timer has fired. The timer fires on turn `#werewolves + 2` (where `#werewolves` counts all roles with `isWerewolf`, including Wolf Cub). If the Old Man is still alive and was **not** attacked that same night, they die peacefully — the resolution emits a kill event with `attackedBy: [OLD_MAN_TIMER_KEY]`. If the Old Man was attacked and killed by wolves (or any other attacker), the attack takes precedence and no timer event is emitted.
+
+## WerewolfWinner Values
+
+The `WerewolfWinner` enum determines the outcome of the game. In addition to the standard team-based outcomes, the following individual-win values exist:
+
+| Value         | Condition                                                                                       |
+| ------------- | ----------------------------------------------------------------------------------------------- |
+| `LoneWolf`    | The Lone Wolf is the last wolf-aligned player alive when wolves would win                       |
+| `Tanner`      | The Tanner is killed (by wolves at night or voted out at trial); triggers immediate game end    |
+| `Spoiler`     | The Spoiler is alive when the game ends; wins instead of the team that would otherwise have won |
+| `Executioner` | The Executioner's assigned Good-team target is voted out at trial                               |

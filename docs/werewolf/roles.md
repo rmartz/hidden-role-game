@@ -36,6 +36,10 @@ Each player is secretly assigned one role. The Narrator has no role and runs the
 | Altruist      | `werewolf-altruist`      | Good    | Every Night (last)        | Special (intercept)  | Acts after the Witch (last in night order); intercepts an attack on the target and dies in their place                                                                                  |
 | Mortician     | `werewolf-mortician`     | Good    | Every Night               | Attack               | Attacks each night until they kill a Werewolf, then ability ends. If target is protected, receives "not a Werewolf" regardless of actual role. `preventSelfTarget`.                     |
 | Old Man       | `werewolf-old-man`       | Good    | Never                     | —                    | Dies peacefully after (#werewolves + 2) nights via a timer. No special protection — wolves kill normally. Peaceful death only if the timer is the sole cause (not attacked same night). |
+| Lone Wolf     | `werewolf-lone-wolf`     | Bad     | Every Night               | Attack (group vote)  | `isWerewolf`; `wakesWith: Werewolf`. Wins only if they are the last wolf-aligned player alive                                                                                           |
+| Tanner        | `werewolf-tanner`        | Neutral | Never                     | —                    | Wins if killed (by wolves or trial). Death triggers immediate game end                                                                                                                  |
+| Spoiler       | `werewolf-spoiler`       | Neutral | Never                     | —                    | Wins instead of the winning team if alive when game ends                                                                                                                                |
+| Executioner   | `werewolf-executioner`   | Neutral | Never                     | —                    | Assigned a random Good-team target. Wins if that target is voted out at trial                                                                                                           |
 
 ## Role Properties
 
