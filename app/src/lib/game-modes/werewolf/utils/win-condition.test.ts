@@ -251,5 +251,40 @@ describe("checkWinCondition", () => {
       const result = checkWinCondition(game, ["p3", "p1", "p2"]);
       expect(result?.winner).toBe(WerewolfWinner.Draw);
     });
+
+    it("alive Spoiler overrides Draw result", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Spoiler },
+      ]);
+      // Wolf and Villager both dead — would be Draw, but Spoiler is alive
+      const result = checkWinCondition(game, ["p1", "p2"]);
+      expect(result?.winner).toBe(WerewolfWinner.Spoiler);
+    });
+  });
+
+  describe("Neutral roles in wolf-vs-village balance", () => {
+    it("Tanner alive prevents wolves from winning by being uncounted", () => {
+      // 1 wolf + 1 villager + 1 tanner: without counting Tanner, wolves would win (1v1)
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Tanner },
+      ]);
+      const result = checkWinCondition(game, []);
+      expect(result).toBeUndefined();
+    });
+
+    it("Executioner alive prevents wolves from winning by being uncounted", () => {
+      // 1 wolf + 1 villager + 1 executioner: without counting Executioner, wolves would win (1v1)
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Executioner },
+      ]);
+      const result = checkWinCondition(game, []);
+      expect(result).toBeUndefined();
+    });
   });
 });

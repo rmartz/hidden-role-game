@@ -281,5 +281,69 @@ describe("WerewolfAction.ResolveTrial", () => {
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
       expect(ts.hunterRevengePlayerId).toBe("p2");
     });
+
+    it("Tanner voted out at trial ends game with Tanner winner", () => {
+      const game = makePlayingGame(
+        makeDayStateWithPendingTrial("p3", [
+          { playerId: "p2", vote: "guilty" },
+          { playerId: "p4", vote: "guilty" },
+        ]),
+        {
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p3", roleDefinitionId: WerewolfRole.Tanner },
+            { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+          ],
+        },
+      );
+      action.apply(game, {}, "owner-1");
+      expect(game.status.type).toBe(GameStatus.Finished);
+      expect((game.status as { winner?: string }).winner).toBe(
+        WerewolfWinner.Tanner,
+      );
+    });
+
+    it("Executioner wins when their target is voted out", () => {
+      const ts = makeDayStateWithPendingTrial("p2", [
+        { playerId: "p3", vote: "guilty" },
+        { playerId: "p4", vote: "guilty" },
+      ]);
+      ts.executionerTargetId = "p2";
+      const game = makePlayingGame(ts, {
+        roleAssignments: [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Executioner },
+          { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+        ],
+      });
+      action.apply(game, {}, "owner-1");
+      expect(game.status.type).toBe(GameStatus.Finished);
+      expect((game.status as { winner?: string }).winner).toBe(
+        WerewolfWinner.Executioner,
+      );
+    });
+
+    it("non-target player voted out does not trigger Executioner win", () => {
+      const ts = makeDayStateWithPendingTrial("p4", [
+        { playerId: "p2", vote: "guilty" },
+        { playerId: "p3", vote: "guilty" },
+      ]);
+      ts.executionerTargetId = "p2";
+      const game = makePlayingGame(ts, {
+        roleAssignments: [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Executioner },
+          { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+        ],
+      });
+      action.apply(game, {}, "owner-1");
+      expect(game.status.type).toBe(GameStatus.Playing);
+    });
   });
 });
