@@ -37,6 +37,7 @@ export function makePlayingGame(
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner-1",
     nominationsEnabled: false,
+    singleTrialPerDay: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
     ...overrides,
   };
@@ -138,6 +139,7 @@ export function makeTeamGame(
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner-1",
     nominationsEnabled: false,
+    singleTrialPerDay: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
     ...overrides,
   };

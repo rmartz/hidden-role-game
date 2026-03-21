@@ -49,6 +49,7 @@ export async function POST(request: Request): Promise<Response> {
       showConfigToPlayers: false,
       showRolesInPlay: ShowRolesInPlay.ConfiguredOnly,
       nominationsEnabled: true,
+      singleTrialPerDay: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
     },
   };

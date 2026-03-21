@@ -12,6 +12,7 @@ import { useAppDispatch, useAppSelector } from "@/store";
 import {
   loadConfig,
   setNominationEnabled,
+  setSingleTrialPerDay,
   setPlayerCount,
   setShowConfigToPlayers,
   setShowRolesInPlay,
@@ -55,6 +56,9 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
   const nominationEnabled = useAppSelector(
     (s) => s.gameConfig.nominationEnabled,
   );
+  const singleTrialPerDay = useAppSelector(
+    (s) => s.gameConfig.singleTrialPerDay,
+  );
   const isValid = useAppSelector((s) => s.gameConfig.isValid);
 
   const hasLoadedRef = useRef(false);
@@ -87,16 +91,19 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
         showConfigToPlayers: config.showConfigToPlayers,
         timerConfig: config.timerConfig,
         nominationEnabled: config.nominationsEnabled,
+        singleTrialPerDay: config.singleTrialPerDay,
         onShowRolesInPlayChange: undefined,
         onShowConfigToPlayersChange: undefined,
         onTimerConfigChange: undefined,
         onNominationEnabledChange: undefined,
+        onSingleTrialPerDayChange: undefined,
       }
     : {
         showRolesInPlay,
         showConfigToPlayers,
         timerConfig,
         nominationEnabled,
+        singleTrialPerDay,
         onShowRolesInPlayChange: (value: typeof showRolesInPlay) =>
           dispatch(setShowRolesInPlay(value)),
         onShowConfigToPlayersChange: (value: boolean) =>
@@ -105,6 +112,8 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
           dispatch(setTimerConfig(value)),
         onNominationEnabledChange: (value: boolean) =>
           dispatch(setNominationEnabled(value)),
+        onSingleTrialPerDayChange: (value: boolean) =>
+          dispatch(setSingleTrialPerDay(value)),
       };
 
   const ownerTitleText = ownerTitle
@@ -117,9 +126,11 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
     <WerewolfConfigPanel
       timerConfig={resolved.timerConfig}
       nominationEnabled={resolved.nominationEnabled}
+      singleTrialPerDay={resolved.singleTrialPerDay}
       disabled={disabled}
       onTimerConfigChange={resolved.onTimerConfigChange}
       onNominationEnabledChange={resolved.onNominationEnabledChange}
+      onSingleTrialPerDayChange={resolved.onSingleTrialPerDayChange}
     />
   ) : null;
 

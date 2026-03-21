@@ -64,6 +64,7 @@ export async function POST(
     ownerPlayer?.id ?? undefined,
     lobby.config.timerConfig,
     lobby.config.nominationsEnabled,
+    lobby.config.singleTrialPerDay,
   );
 
   const updated = await lobbyService.setGameId(lobbyId, game.id);

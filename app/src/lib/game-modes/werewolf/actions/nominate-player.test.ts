@@ -86,7 +86,7 @@ describe("WerewolfAction.NominatePlayer", () => {
       expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(false);
     });
 
-    it("returns true when trial has a verdict (resolved)", () => {
+    it("returns true when trial has a verdict (resolved) and singleTrialPerDay is off", () => {
       const ts: WerewolfTurnState = {
         turn: 1,
         phase: {
@@ -103,7 +103,10 @@ describe("WerewolfAction.NominatePlayer", () => {
         },
         deadPlayerIds: [],
       };
-      const game = makePlayingGame(ts, { nominationsEnabled: true });
+      const game = makePlayingGame(ts, {
+        nominationsEnabled: true,
+        singleTrialPerDay: false,
+      });
       expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(true);
     });
 
@@ -248,6 +251,40 @@ describe("WerewolfAction.NominatePlayer", () => {
         { type: WerewolfPhase.Daytime }
       >;
       expect(phase.activeTrial).toBeUndefined();
+    });
+  });
+
+  describe("singleTrialPerDay", () => {
+    it("blocks nomination after a trial has concluded", () => {
+      const ds = makeDayState();
+      (ds.phase as WerewolfDaytimePhase).activeTrial = {
+        defendantId: "p3",
+        startedAt: 2000,
+        phase: "voting",
+        votes: [{ playerId: "p4", vote: "guilty" }],
+        verdict: "eliminated",
+      };
+      const game = makePlayingGame(ds, {
+        nominationsEnabled: true,
+        singleTrialPerDay: true,
+      });
+      expect(action.isValid(game, "p2", { defendantId: "p4" })).toBe(false);
+    });
+
+    it("allows nomination after a trial has concluded when singleTrialPerDay is false", () => {
+      const ds = makeDayState();
+      (ds.phase as WerewolfDaytimePhase).activeTrial = {
+        defendantId: "p3",
+        startedAt: 2000,
+        phase: "voting",
+        votes: [{ playerId: "p4", vote: "guilty" }],
+        verdict: "eliminated",
+      };
+      const game = makePlayingGame(ds, {
+        nominationsEnabled: true,
+        singleTrialPerDay: false,
+      });
+      expect(action.isValid(game, "p2", { defendantId: "p4" })).toBe(true);
     });
   });
 });

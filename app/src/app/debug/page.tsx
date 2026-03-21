@@ -23,6 +23,7 @@ const DEFAULT_CONFIG: GameConfig = {
   showConfigToPlayers: false,
   showRolesInPlay: ShowRolesInPlay.None,
   nominationsEnabled: false,
+  singleTrialPerDay: true,
   timerConfig: DEFAULT_TIMER_CONFIG,
 };
 

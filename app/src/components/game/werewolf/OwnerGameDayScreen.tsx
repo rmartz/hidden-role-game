@@ -67,6 +67,9 @@ export function OwnerGameDayScreen({
   const modeConfig = GAME_MODES[gameState.gameMode];
   const activeTrial = daytimePhase.activeTrial;
   const hasActiveTrial = !!activeTrial && !activeTrial.verdict;
+  const trialConcluded = !!activeTrial?.verdict;
+  const nominationsBlocked =
+    hasActiveTrial || (gameState.singleTrialPerDay && trialConcluded);
   const glossaryRoles = gameState.rolesInPlay?.length
     ? gameState.rolesInPlay
         .map((r) => modeConfig.roles[r.id])
@@ -117,7 +120,7 @@ export function OwnerGameDayScreen({
           roles={modeConfig.roles}
         />
       </div>
-      {gameState.nominationsEnabled && !hasActiveTrial && (
+      {gameState.nominationsEnabled && !nominationsBlocked && (
         <NominationPanel
           gameId={gameId}
           players={gameState.players}
@@ -133,7 +136,7 @@ export function OwnerGameDayScreen({
         deadPlayerIds={gameState.deadPlayerIds}
         gameOwnerId={gameState.gameOwner?.id}
         isDaytime
-        hasActiveTrial={hasActiveTrial}
+        hasActiveTrial={nominationsBlocked}
       />
       <GameRolesList
         roles={gameState.rolesInPlay ?? []}

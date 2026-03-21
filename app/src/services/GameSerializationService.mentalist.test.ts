@@ -65,6 +65,7 @@ function makeMentalistGame(
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: undefined,
     nominationsEnabled: false,
+    singleTrialPerDay: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }

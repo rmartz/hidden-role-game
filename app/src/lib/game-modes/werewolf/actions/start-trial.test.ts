@@ -269,4 +269,34 @@ describe("WerewolfAction.StartTrial", () => {
       expect(phase.activeTrial.verdict).toBeUndefined();
     });
   });
+
+  describe("singleTrialPerDay", () => {
+    it("blocks starting a trial after one has concluded", () => {
+      const ds = makeDayState();
+      (ds.phase as WerewolfDaytimePhase).activeTrial = {
+        defendantId: "p3",
+        startedAt: 2000,
+        phase: "voting",
+        votes: [{ playerId: "p4", vote: "guilty" }],
+        verdict: "eliminated",
+      };
+      const game = makePlayingGame(ds, { singleTrialPerDay: true });
+      expect(action.isValid(game, "owner-1", { defendantId: "p4" })).toBe(
+        false,
+      );
+    });
+
+    it("allows starting a trial after one has concluded when singleTrialPerDay is false", () => {
+      const ds = makeDayState();
+      (ds.phase as WerewolfDaytimePhase).activeTrial = {
+        defendantId: "p3",
+        startedAt: 2000,
+        phase: "voting",
+        votes: [{ playerId: "p4", vote: "guilty" }],
+        verdict: "eliminated",
+      };
+      const game = makePlayingGame(ds, { singleTrialPerDay: false });
+      expect(action.isValid(game, "owner-1", { defendantId: "p4" })).toBe(true);
+    });
+  });
 });

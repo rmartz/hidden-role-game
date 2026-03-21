@@ -47,6 +47,7 @@ const mockLobby: PublicLobby = {
     showConfigToPlayers: false,
     showRolesInPlay: ShowRolesInPlay.RoleAndCount,
     nominationsEnabled: false,
+    singleTrialPerDay: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
   },
 };

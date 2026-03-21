@@ -67,6 +67,7 @@ function makeSecretVillainGame(
     showRolesInPlay,
     ownerPlayerId: undefined,
     nominationsEnabled: false,
+    singleTrialPerDay: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
