@@ -115,4 +115,22 @@ describe("buildNightPhaseOrder", () => {
     const order = buildNightPhaseOrder(2, multiWolf, ["w1"], [BONUS_PHASE_KEY]);
     expect(order).toContain(BONUS_PHASE_KEY); // w2 is still alive
   });
+
+  it("excludes AfterFirstNight roles on turn 1", () => {
+    const withVigilante = [
+      ...assignments,
+      { playerId: "p5", roleDefinitionId: WerewolfRole.Vigilante },
+    ];
+    const order = buildNightPhaseOrder(1, withVigilante);
+    expect(order).not.toContain(WerewolfRole.Vigilante);
+  });
+
+  it("includes AfterFirstNight roles on turn 2+", () => {
+    const withVigilante = [
+      ...assignments,
+      { playerId: "p5", roleDefinitionId: WerewolfRole.Vigilante },
+    ];
+    const order = buildNightPhaseOrder(2, withVigilante);
+    expect(order).toContain(WerewolfRole.Vigilante);
+  });
 });

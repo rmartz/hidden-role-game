@@ -18,6 +18,11 @@ Actions are the mechanism by which the Narrator and players mutate game state. E
 **When:** During Nighttime
 **Effect:** Resolves all night actions, adds killed players to `deadPlayerIds`, and transitions to Daytime. Stores the `nightResolution` events in the new daytime phase for day-start display.
 
+Additional resolution steps:
+
+- **Vigilante self-death:** If the Vigilante's target is a Good-team player and was killed, the Vigilante also dies.
+- **Hunter revenge detection:** If a killed player is the Hunter, sets `hunterRevengePlayerId` on the Narrator's state and defers the win-condition check until revenge is resolved.
+
 ---
 
 ### `set-night-phase`
@@ -108,11 +113,23 @@ Actions are the mechanism by which the Narrator and players mutate game state. E
 
 ---
 
+### `resolve-hunter-revenge`
+
+**Who:** Narrator only
+**When:** During Daytime, when `hunterRevengePlayerId` is set
+**Effect:** Selects the Hunter's revenge target. Kills the target (unblockable), clears `hunterRevengePlayerId`, and checks the win condition.
+
+**Payload:** `{ targetPlayerId: string }`
+
+---
+
 ### `resolve-trial`
 
 **Who:** Narrator only
 **When:** During Daytime (after voting completes)
 **Effect:** Resolves the trial verdict — guilty votes exceeding innocent votes results in elimination. The Mayor's vote counts double. Clears One-Eyed Seer lock and Priest wards for a killed player.
+
+- **Hunter revenge detection:** If the condemned player is the Hunter, sets `hunterRevengePlayerId` on the Narrator's state and defers the win-condition check until revenge is resolved.
 
 ---
 
@@ -194,6 +211,7 @@ Actions are the mechanism by which the Narrator and players mutate game state. E
 | `mark-player-alive`           | Narrator                  | `{ playerId: string }`                                 |
 | `start-trial`                 | Narrator                  | `{ defendantId: string }`                              |
 | `cast-vote`                   | Player                    | `{ vote: "guilty" \| "innocent" }`                     |
+| `resolve-hunter-revenge`      | Narrator                  | `{ targetPlayerId: string }`                           |
 | `resolve-trial`               | Narrator                  | none                                                   |
 | `end-game`                    | Narrator                  | none                                                   |
 | `smite-player`                | Narrator                  | `{ playerId: string }`                                 |

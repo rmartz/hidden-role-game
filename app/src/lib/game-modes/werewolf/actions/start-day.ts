@@ -1,4 +1,4 @@
-import { GameStatus } from "@/lib/types";
+import { GameStatus, Team } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase, isTeamNightAction } from "../types";
 import type {
@@ -55,7 +55,7 @@ export const startDayAction: GameAction = {
         toughGuyHitIds: ts.toughGuyHitIds,
       },
     );
-    const newDeadIds = nightResolution
+    const newDeadIds: string[] = nightResolution
       .filter(
         (e): e is AttackNightResolutionEvent => e.type === "killed" && e.died,
       )
@@ -152,11 +152,53 @@ export const startDayAction: GameAction = {
       }
     }
 
+    // Vigilante self-death: if the Vigilante killed a Good-team player, they die too.
+    // Skip if the Vigilante was already killed this night (e.g. by wolves).
+    const vigilanteAssignment = game.roleAssignments.find(
+      (a) =>
+        a.roleDefinitionId === (WerewolfRole.Vigilante as string) &&
+        !ts.deadPlayerIds.includes(a.playerId) &&
+        !newDeadIds.includes(a.playerId),
+    );
+    if (vigilanteAssignment) {
+      const vigilanteAction = nightPhase.nightActions[
+        WerewolfRole.Vigilante as string
+      ] as NightAction | undefined;
+      if (vigilanteAction?.targetPlayerId) {
+        const targetDied = newDeadIds.includes(vigilanteAction.targetPlayerId);
+        if (targetDied) {
+          const targetAssignment = game.roleAssignments.find(
+            (a) => a.playerId === vigilanteAction.targetPlayerId,
+          );
+          const targetRole = targetAssignment
+            ? (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
+                targetAssignment.roleDefinitionId
+              ]
+            : undefined;
+          if (targetRole?.team === Team.Good) {
+            newDeadIds.push(vigilanteAssignment.playerId);
+          }
+        }
+      }
+    }
+
+    // Hunter revenge: if the Hunter died this night, defer win-condition check
+    // until the narrator resolves the Hunter's revenge target.
+    const hunterAssignment = game.roleAssignments.find(
+      (a) => a.roleDefinitionId === (WerewolfRole.Hunter as string),
+    );
+    const hunterDiedThisNight =
+      hunterAssignment !== undefined &&
+      newDeadIds.includes(hunterAssignment.playerId);
+
     const updatedDeadIds = [...ts.deadPlayerIds, ...newDeadIds];
-    const winResult = checkWinCondition(game, updatedDeadIds);
-    if (winResult) {
-      game.status = winResult;
-      return;
+
+    if (!hunterDiedThisNight) {
+      const winResult = checkWinCondition(game, updatedDeadIds);
+      if (winResult) {
+        game.status = winResult;
+        return;
+      }
     }
 
     const wolfCubDied =
@@ -183,6 +225,9 @@ export const startDayAction: GameAction = {
         ...(oneEyedSeerLockedTargetId ? { oneEyedSeerLockedTargetId } : {}),
         ...(ts.exposerAbilityUsed ? { exposerAbilityUsed: true } : {}),
         ...(exposerReveal ? { exposerReveal } : {}),
+        ...(hunterDiedThisNight
+          ? { hunterRevengePlayerId: hunterAssignment.playerId }
+          : {}),
       },
     };
   },

@@ -51,6 +51,8 @@ export class FirebaseGameService {
 
     // Extract deadPlayerIds from Werewolf turn state.
     const deadPlayerIds = gameSerializationService.extractDeadPlayerIds(game);
+    const hunterRevengePlayerId =
+      gameSerializationService.extractHunterRevengePlayerId(game);
 
     if (callerId === game.ownerPlayerId) {
       const visibleRoleAssignments = game.roleAssignments.flatMap(
@@ -84,6 +86,7 @@ export class FirebaseGameService {
         ...(nightActions ? { nightActions } : {}),
         ...daytimeNightState,
         ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
+        ...(hunterRevengePlayerId ? { hunterRevengePlayerId } : {}),
         timerConfig: game.timerConfig,
       };
     }

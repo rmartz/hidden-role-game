@@ -59,6 +59,18 @@ export const resolveTrialAction: GameAction = {
     const { activeTrial } = ts.phase;
     if (!activeTrial) return;
     applyTrialVerdict(activeTrial, ts, game);
+
+    // Hunter revenge: if the eliminated player is the Hunter, defer win check.
+    if (activeTrial.verdict === "eliminated") {
+      const eliminatedRole = game.roleAssignments.find(
+        (a) => a.playerId === activeTrial.defendantId,
+      )?.roleDefinitionId;
+      if (eliminatedRole === (WerewolfRole.Hunter as string)) {
+        ts.hunterRevengePlayerId = activeTrial.defendantId;
+        return;
+      }
+    }
+
     const winResult = checkWinCondition(game, ts.deadPlayerIds);
     if (winResult) {
       game.status = winResult;

@@ -66,6 +66,8 @@ export enum WerewolfRole {
   Mentalist = "werewolf-mentalist",
   MysticSeer = "werewolf-mystic-seer",
   Altruist = "werewolf-altruist",
+  Hunter = "werewolf-hunter",
+  Vigilante = "werewolf-vigilante",
 }
 
 export interface WerewolfRoleDefinition extends RoleDefinition<
@@ -399,6 +401,30 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Special,
     category: WerewolfRoleCategory.VillagerProtection,
+  },
+  [WerewolfRole.Hunter]: {
+    id: WerewolfRole.Hunter,
+    name: "Hunter",
+    summary: "When killed, eliminates one player of their choice",
+    description:
+      "When the Hunter dies — whether by wolf attack or village trial — they immediately take one player down with them. The narrator selects the Hunter's revenge target. This revenge kill cannot be blocked by any protection.",
+    team: Team.Good,
+    wakesAtNight: WakesAtNight.Never,
+    targetCategory: TargetCategory.None,
+    category: WerewolfRoleCategory.VillagerKilling,
+  },
+  [WerewolfRole.Vigilante]: {
+    id: WerewolfRole.Vigilante,
+    name: "Vigilante",
+    summary:
+      "Kills a player each night starting night 2; dies if target is Good",
+    description:
+      "Starting on the second night, the Vigilante may choose one player to eliminate. If the target is protected, the kill is blocked. If the Vigilante successfully kills a Good-team player, the Vigilante also dies at the start of the following day.",
+    team: Team.Good,
+    wakesAtNight: WakesAtNight.AfterFirstNight,
+    targetCategory: TargetCategory.Attack,
+    preventSelfTarget: true,
+    category: WerewolfRoleCategory.VillagerKilling,
   },
 } satisfies Record<WerewolfRole, WerewolfRoleDefinition>;
 

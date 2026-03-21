@@ -35,9 +35,10 @@ The Narrator's session is stored separately and receives a different (fuller) `P
 
 ### Narrator-Only (Nighttime)
 
-| Field          | Description                                         |
-| -------------- | --------------------------------------------------- |
-| `nightActions` | Full record of all night actions keyed by phase key |
+| Field                   | Description                                                               |
+| ----------------------- | ------------------------------------------------------------------------- |
+| `nightActions`          | Full record of all night actions keyed by phase key                       |
+| `hunterRevengePlayerId` | Player ID of the Hunter awaiting revenge resolution; set when Hunter dies |
 
 ### Player Fields — Nighttime (own turn only)
 

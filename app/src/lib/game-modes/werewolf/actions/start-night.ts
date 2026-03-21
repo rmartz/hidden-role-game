@@ -12,7 +12,11 @@ import { WerewolfRole } from "../roles";
 export const startNightAction: GameAction = {
   isValid(game: Game, callerId: string) {
     if (!isOwnerPlaying(game, callerId)) return false;
-    return currentTurnState(game)?.phase.type === WerewolfPhase.Daytime;
+    const ts = currentTurnState(game);
+    if (ts?.phase.type !== WerewolfPhase.Daytime) return false;
+    // Cannot advance to night while Hunter revenge is pending
+    if (ts.hunterRevengePlayerId) return false;
+    return true;
   },
   apply(game: Game) {
     const ts = currentTurnState(game);

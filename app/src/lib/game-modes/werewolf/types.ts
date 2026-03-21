@@ -153,6 +153,8 @@ export interface WerewolfTurnState {
    * Cleared when the locked target is eliminated.
    */
   oneEyedSeerLockedTargetId?: string;
+  /** Set when the Hunter dies — blocks win-condition checks and game advancement until resolved. */
+  hunterRevengePlayerId?: string;
   /** True once the Exposer has used their once-per-game ability. */
   exposerAbilityUsed?: boolean;
   /** The role publicly revealed by the Exposer. Persists for the rest of the game. */
@@ -167,6 +169,7 @@ export interface TargetablePlayer {
 export enum WakesAtNight {
   Never = "Never",
   FirstNightOnly = "FirstNightOnly",
+  AfterFirstNight = "AfterFirstNight",
   EveryNight = "EveryNight",
 }
 
