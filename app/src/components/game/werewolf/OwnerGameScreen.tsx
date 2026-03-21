@@ -16,6 +16,7 @@ export function OwnerGameScreen({ gameState }: OwnerGameScreenProps) {
         assignments={gameState.visibleRoleAssignments}
         gameMode={gameState.gameMode}
         deadPlayerIds={gameState.deadPlayerIds ?? []}
+        executionerTargetId={gameState.executionerTargetId}
       />
       <GameRolesList
         roles={gameState.rolesInPlay ?? []}

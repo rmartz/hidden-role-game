@@ -22,6 +22,7 @@ export interface FirebaseGamePublic {
   timerConfig: TimerConfig;
   nominationsEnabled?: boolean;
   singleTrialPerDay?: boolean;
+  executionerTargetId?: string;
   /** Unix ms timestamp set server-side at game creation. Used for TTL cleanup. */
   createdAt?: number;
 }
@@ -59,6 +60,9 @@ export function gameToFirebase(game: Game): FirebaseGamePublic {
     timerConfig: game.timerConfig,
     nominationsEnabled: game.nominationsEnabled,
     singleTrialPerDay: game.singleTrialPerDay,
+    ...(game.executionerTargetId
+      ? { executionerTargetId: game.executionerTargetId }
+      : {}),
   };
 }
 
@@ -92,5 +96,8 @@ export function firebaseToGame(
     ),
     nominationsEnabled: pub.nominationsEnabled ?? false,
     singleTrialPerDay: pub.singleTrialPerDay ?? false,
+    ...(pub.executionerTargetId
+      ? { executionerTargetId: pub.executionerTargetId }
+      : {}),
   };
 }

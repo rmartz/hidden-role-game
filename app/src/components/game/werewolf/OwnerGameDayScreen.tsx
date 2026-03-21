@@ -149,6 +149,7 @@ export function OwnerGameDayScreen({
         gameOwnerId={gameState.gameOwner?.id}
         isDaytime
         trialBlocked={nominationsBlocked}
+        executionerTargetId={gameState.executionerTargetId}
       />
       <GameRolesList
         roles={gameState.rolesInPlay ?? []}
