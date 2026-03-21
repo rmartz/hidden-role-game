@@ -9,7 +9,7 @@ Each player is secretly assigned one role. The Narrator has no role and runs the
 | Role          | ID                       | Team    | Wakes at Night            | Night Action         | Notes                                                                                                                                                                                   |
 | ------------- | ------------------------ | ------- | ------------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Villager      | `werewolf-villager`      | Good    | Never                     | —                    | Baseline good-team role                                                                                                                                                                 |
-| Werewolf      | `werewolf-werewolf`      | Bad     | Every Night               | Attack (group vote)  | Sees all Bad-team players; votes jointly with other Werewolves and Wolf Cubs; `teamTargeting`, `isWerewolf`                                                                             |
+| Werewolf      | `werewolf-werewolf`      | Bad     | Every Night               | Attack (group vote)  | Sees wake-phase partners (other Werewolves, Wolf Cubs, Lone Wolves); `teamTargeting`, `isWerewolf`                                                                                      |
 | Wolf Cub      | `werewolf-wolf-cub`      | Bad     | Every Night               | Attack (group vote)  | Wakes with Werewolves (`wakesWith`); when killed, Werewolves receive two attack phases the following night; `isWerewolf`                                                                |
 | Seer          | `werewolf-seer`          | Good    | Every Night               | Investigate          | Learns whether the target is on Team Bad; Narrator reveals result                                                                                                                       |
 | Witch         | `werewolf-witch`         | Good    | Every Night (2nd-to-last) | Special (once)       | After all other roles act (except Altruist), may protect the attacked player **or** attack any other player; one-time ability                                                           |
@@ -47,8 +47,7 @@ interface WerewolfRoleDefinition {
   wakesAtNight: WakesAtNight; // Never | FirstNightOnly | AfterFirstNight | EveryNight
   targetCategory: TargetCategory; // None | Attack | Protect | Investigate | Special
   category?: string; // Display category for role selection UI
-  canSeeTeam?: Team[]; // Teams whose members this role can see
-  canSeeRole?: WerewolfRole[]; // Specific roles this role can identify
+  awareOf?: { teams?: Team[]; roles?: WerewolfRole[]; werewolves?: boolean }; // Players this role can see
   teamTargeting?: boolean; // True = primary role for a group phase (Werewolves vote together)
   preventRepeatTarget?: boolean; // True = cannot target the same player on consecutive nights (Bodyguard, Spellcaster)
   preventSelfTarget?: boolean; // True = cannot target self (Doctor)
@@ -88,18 +87,29 @@ Additional roles (Bodyguard, Witch, etc.) are configured per game in the lobby.
 
 ## Visibility Rules
 
-- **Werewolves** see all other Team Bad players (`canSeeTeam: [Team.Bad]`), including Wolf Cubs and Minion.
-- **Wolf Cubs** see all other Team Bad players (`canSeeTeam: [Team.Bad]`), including Werewolves.
-- **Minion** sees all werewolf players (`awareOf: werewolves`) on the first night. Werewolves do **not** see the Minion (the Minion is Team Bad but awareness is one-directional).
-- **Masons** see all other Masons (`canSeeRole: [Mason]`).
-- **Dead players** have their roles revealed to all living players automatically.
-- All other roles see only their own identity.
+Visibility is determined by two mechanisms:
+
+1. **Wake-phase partners** (`teamTargeting` / `wakesWith`): Roles that share a group night phase see each other's identities. This is how Werewolves, Wolf Cubs, and Lone Wolves know each other — they wake together, not because of team membership.
+2. **Aware-of** (`awareOf`): Explicit one-directional awareness of specific teams, roles, or werewolf-flagged players.
+
+| Role      | Sees                                     | Mechanism                                                                    |
+| --------- | ---------------------------------------- | ---------------------------------------------------------------------------- |
+| Werewolf  | Other Werewolves, Wolf Cubs, Lone Wolves | Wake-phase partners (`teamTargeting`)                                        |
+| Wolf Cub  | All Werewolf wake-phase participants     | `wakesWith: Werewolf`                                                        |
+| Lone Wolf | All Werewolf wake-phase participants     | `wakesWith: Werewolf`, `awareOf: { werewolves: true }`                       |
+| Minion    | All `isWerewolf` players                 | `awareOf: { werewolves: true }` (one-directional — wolves do NOT see Minion) |
+| Mason     | Other Masons                             | `awareOf: { roles: [Mason] }`                                                |
+| Dead      | Roles revealed to all players            | Automatic on death                                                           |
+| Narrator  | All role assignments                     | Always                                                                       |
+
+Note: Werewolves do **not** see the Minion or Wizard. Those roles are Team Bad but have no wake-phase connection to the Werewolf group.
 
 ```mermaid
 graph LR
-    WW[Werewolf] -->|sees all| Bad[Team Bad players]
-    Minion -->|sees all| WWs[Werewolf players]
-    Mason -->|sees all| Masons[Other Masons]
+    WW[Werewolf] -->|wake partners| Group[Werewolves + Wolf Cubs + Lone Wolves]
+    Minion -->|awareOf werewolves| WWs[Werewolf players]
+    LW[Lone Wolf] -->|awareOf werewolves| WWs
+    Mason -->|awareOf roles| Masons[Other Masons]
     All[All players] -->|see roles of| Dead[Dead players]
     Narrator -->|sees all| Assignments[All role assignments]
 ```
