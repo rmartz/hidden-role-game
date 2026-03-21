@@ -263,12 +263,13 @@ interface TeamNightAction {
 9. Checks Old Man timer (`oldManTimerPlayerId` option): if the timer has reached zero **and** the Old Man was not attacked this night, emits a `"peaceful"` killed event and adds the Old Man to `deadPlayerIds`.
 10. Resolves Mortician attack: if the Mortician's target died, the Mortician learns their role; if the target was protected, the Mortician receives "not a Werewolf" regardless of the target's actual team.
 11. Returns `NightResolutionEvent[]`:
-   - `{ type: "killed", targetPlayerId, attackedBy, protectedBy, died }`
-   - `{ type: "silenced", targetPlayerId }`
-   - `{ type: "hypnotized", targetPlayerId }`
-   - `{ type: "tough-guy-absorbed", targetPlayerId }`
-   - `{ type: "altruist-intercepted", targetPlayerId }`
-   - `{ type: "killed", targetPlayerId, effect: "peaceful" }` (Old Man timer)
+
+- `{ type: "killed", targetPlayerId, attackedBy, protectedBy, died }`
+- `{ type: "silenced", targetPlayerId }`
+- `{ type: "hypnotized", targetPlayerId }`
+- `{ type: "tough-guy-absorbed", targetPlayerId }`
+- `{ type: "altruist-intercepted", targetPlayerId }`
+- `{ type: "killed", targetPlayerId, effect: "peaceful" }` (Old Man timer)
 
 ```mermaid
 flowchart TD

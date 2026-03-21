@@ -63,16 +63,16 @@ These fields are only populated when the active phase matches the player's role.
 
 ### Player Fields — Daytime (day start)
 
-| Field                    | Description                                                                                                                                                                                                              |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Field                    | Description                                                                                                                                                                                                             |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `nightStatus`            | `{ targetPlayerId, effect }[]` — outcome of the previous night. Effects: `"killed"`, `"silenced"`, `"hypnotized"`, `"smited"`, `"survived"`, `"peaceful"` (`"peaceful"` indicates the Old Man died from timer expiring) |
-| `nominations`            | Current nominations for trial defendants                                                                                                                                                                                 |
-| `myNominatedDefendantId` | The defendant this player has nominated (if any)                                                                                                                                                                         |
-| `activeTrial`            | Active trial state (defendant, phase, votes) if a trial is in progress                                                                                                                                                   |
-| `isSilenced`             | Whether this player is silenced (cannot vote or nominate)                                                                                                                                                                |
-| `isHypnotized`           | Whether this player is hypnotized (vote mirrors the Mummy)                                                                                                                                                               |
-| `exposerReveal`          | Publicly revealed role from the Exposer's ability (if any)                                                                                                                                                               |
-| `altruistSave`           | Information about an Altruist intercept that saved a player                                                                                                                                                              |
+| `nominations`            | Current nominations for trial defendants                                                                                                                                                                                |
+| `myNominatedDefendantId` | The defendant this player has nominated (if any)                                                                                                                                                                        |
+| `activeTrial`            | Active trial state (defendant, phase, votes) if a trial is in progress                                                                                                                                                  |
+| `isSilenced`             | Whether this player is silenced (cannot vote or nominate)                                                                                                                                                               |
+| `isHypnotized`           | Whether this player is hypnotized (vote mirrors the Mummy)                                                                                                                                                              |
+| `exposerReveal`          | Publicly revealed role from the Exposer's ability (if any)                                                                                                                                                              |
+| `altruistSave`           | Information about an Altruist intercept that saved a player                                                                                                                                                             |
 
 ## Game Phase State Machine
 
