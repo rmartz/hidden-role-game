@@ -2,3 +2,4 @@ node_modules
 dist
 .next
 app/src/components/ui
+pnpm-lock.yaml
