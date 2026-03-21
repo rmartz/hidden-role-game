@@ -11,14 +11,11 @@ jobs:
     # Only run on commits co-authored by Claude to avoid unnecessary runs
     # and prevent loops (this workflow's own commits have no co-author)
     if: "contains(github.event.head_commit.message, 'Co-Authored-By: Claude')"
-    permissions:
-      contents: write
-      actions: write
     steps:
       - uses: actions/checkout@v6
         with:
           ref: ${{ github.ref }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.CI_PAT_TOKEN }}
 
       - uses: pnpm/action-setup@v5
         with:
@@ -47,9 +44,3 @@ jobs:
           git add -A
           git commit -m "style: auto-format"
           git push
-
-      - name: Re-trigger CI
-        if: steps.diff.outputs.changed == 'true'
-        run: gh workflow run ci-actions.yml --ref "${{ github.ref_name }}"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
