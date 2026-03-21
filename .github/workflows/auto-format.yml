@@ -1,0 +1,48 @@
+name: Auto-format
+
+on:
+  push:
+    branches-ignore: ["main"]
+
+jobs:
+  auto-format:
+    name: Auto-format
+    runs-on: ubuntu-latest
+    # Only run on commits co-authored by Claude to avoid unnecessary runs
+    # and prevent loops (this workflow's own commits have no co-author)
+    if: "contains(github.event.head_commit.message, 'Co-Authored-By: Claude')"
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.ref }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: pnpm/action-setup@v5
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.x
+          cache: "pnpm"
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Run Prettier
+        run: pnpm prettier --write .
+
+      - name: Check for changes
+        id: diff
+        run: |
+          git diff --quiet && echo "changed=false" >> "$GITHUB_OUTPUT" || echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push formatting fixes
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "style: auto-format"
+          git push
