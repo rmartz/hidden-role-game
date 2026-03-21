@@ -11,7 +11,10 @@ import {
 } from "@/components/ui/item";
 import { Card, CardContent } from "@/components/ui/card";
 import { RoleLabel } from "@/components/RoleLabel";
-import { PLAYER_VISIBILITY_COPY } from "@/components/game/PlayersRoleList.copy";
+import {
+  PLAYER_VISIBILITY_COPY,
+  ROLE_VISIBILITY_OVERRIDES,
+} from "@/components/game/PlayersRoleList.copy";
 
 interface PlayersRoleListProps {
   assignments: VisibleTeammate[];
@@ -19,6 +22,8 @@ interface PlayersRoleListProps {
   deadPlayerIds?: string[];
   /** Player ID of the Executioner's target. Shows a target icon when set. */
   executionerTargetId?: string;
+  /** The current player's role ID. Used to customize visibility section text. */
+  myRoleId?: string;
   /** Optional render prop for per-player action buttons. */
   renderActions?: (
     playerId: string,
@@ -73,6 +78,7 @@ export function PlayersRoleList({
   gameMode,
   deadPlayerIds,
   executionerTargetId,
+  myRoleId,
   renderActions,
 }: PlayersRoleListProps) {
   if (assignments.length === 0) return null;
@@ -85,16 +91,29 @@ export function PlayersRoleList({
   return (
     <div className="space-y-4 mb-5">
       {activeGroups.map(({ reason, entries }) => {
-        const config = REASON_CONFIG[reason];
+        const baseConfig = REASON_CONFIG[reason];
+        const overrides = myRoleId
+          ? ROLE_VISIBILITY_OVERRIDES[myRoleId]
+          : undefined;
+        const heading =
+          reason === "wake-partner"
+            ? (overrides?.wakePartnerHeading ?? baseConfig.heading)
+            : reason === "aware-of"
+              ? (overrides?.awareOfHeading ?? baseConfig.heading)
+              : baseConfig.heading;
+        const description =
+          reason === "wake-partner"
+            ? (overrides?.wakePartnerDescription ?? baseConfig.description)
+            : reason === "aware-of"
+              ? (overrides?.awareOfDescription ?? baseConfig.description)
+              : baseConfig.description;
         return (
           <Card key={reason}>
             <CardContent className="pt-4">
               <div className="mb-2">
-                <p className="text-sm font-semibold">{config.heading}</p>
-                {config.description && (
-                  <p className="text-xs text-muted-foreground">
-                    {config.description}
-                  </p>
+                <p className="text-sm font-semibold">{heading}</p>
+                {description && (
+                  <p className="text-xs text-muted-foreground">{description}</p>
                 )}
               </div>
               <ItemGroup>
