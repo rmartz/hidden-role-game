@@ -56,7 +56,9 @@ export function HunterRevengePanel({
               key={p.id}
               size="sm"
               variant={selectedTargetId === p.id ? "default" : "outline"}
-              onClick={() => { setSelectedTargetId(p.id); }}
+              onClick={() => {
+                setSelectedTargetId(p.id);
+              }}
             >
               {p.name}
             </Button>
