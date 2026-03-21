@@ -109,7 +109,7 @@ export function playerStateToFirebase(
     ...(state.isHypnotized ? { isHypnotized: true } : {}),
     ...(state.activeTrial ? { activeTrial: state.activeTrial } : {}),
     ...(state.nominationsEnabled ? { nominationsEnabled: true } : {}),
-    ...(state.singleTrialPerDay ? { singleTrialPerDay: true } : {}),
+    ...(!state.singleTrialPerDay ? { singleTrialPerDay: false } : {}),
     ...(state.nominations?.length ? { nominations: state.nominations } : {}),
     ...(state.myNominatedDefendantId
       ? { myNominatedDefendantId: state.myNominatedDefendantId }
@@ -190,7 +190,7 @@ export function firebaseToPlayerState(
         }
       : {}),
     nominationsEnabled: raw.nominationsEnabled ?? false,
-    singleTrialPerDay: raw.singleTrialPerDay ?? true,
+    singleTrialPerDay: raw.singleTrialPerDay ?? false,
     ...(raw.nominations?.length ? { nominations: raw.nominations } : {}),
     ...(raw.myNominatedDefendantId
       ? { myNominatedDefendantId: raw.myNominatedDefendantId }

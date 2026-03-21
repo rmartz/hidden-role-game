@@ -90,7 +90,7 @@ function lobbyConfigToFirebase(config: LobbyConfig): FirebaseLobbyConfig {
     showRolesInPlay: config.showRolesInPlay,
     timerConfig: config.timerConfig,
     ...(config.nominationsEnabled ? { nominationsEnabled: true } : {}),
-    ...(config.singleTrialPerDay ? { singleTrialPerDay: true } : {}),
+    ...(!config.singleTrialPerDay ? { singleTrialPerDay: false } : {}),
   };
 }
 
@@ -126,7 +126,7 @@ export function firebaseToLobby(
         pub.config.timerConfig as unknown as Record<string, unknown>,
       ),
       nominationsEnabled: pub.config.nominationsEnabled ?? false,
-      singleTrialPerDay: pub.config.singleTrialPerDay ?? true,
+      singleTrialPerDay: pub.config.singleTrialPerDay ?? false,
     },
     ...(pub.gameId ? { gameId: pub.gameId } : {}),
   };
@@ -198,7 +198,7 @@ export function firebaseToPublicLobby(
         pub.config.timerConfig as unknown as Record<string, unknown>,
       ),
       nominationsEnabled: pub.config.nominationsEnabled ?? false,
-      singleTrialPerDay: pub.config.singleTrialPerDay ?? true,
+      singleTrialPerDay: pub.config.singleTrialPerDay ?? false,
     },
     ...(pub.gameId ? { gameId: pub.gameId } : {}),
   };

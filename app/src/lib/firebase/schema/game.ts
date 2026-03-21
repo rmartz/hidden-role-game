@@ -58,7 +58,7 @@ export function gameToFirebase(game: Game): FirebaseGamePublic {
     ownerPlayerId: game.ownerPlayerId ?? null,
     timerConfig: game.timerConfig,
     ...(game.nominationsEnabled ? { nominationsEnabled: true } : {}),
-    ...(game.singleTrialPerDay ? { singleTrialPerDay: true } : {}),
+    ...(!game.singleTrialPerDay ? { singleTrialPerDay: false } : {}),
   };
 }
 
@@ -91,6 +91,6 @@ export function firebaseToGame(
       pub.timerConfig as unknown as Record<string, unknown>,
     ),
     nominationsEnabled: pub.nominationsEnabled ?? false,
-    singleTrialPerDay: pub.singleTrialPerDay ?? true,
+    singleTrialPerDay: pub.singleTrialPerDay ?? false,
   };
 }
