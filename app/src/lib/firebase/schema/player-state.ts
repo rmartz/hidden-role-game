@@ -40,6 +40,7 @@ export interface FirebasePlayerState {
   previousNightTargetId?: string;
   investigationResult?: { targetPlayerId: string; isWerewolfTeam: boolean };
   witchAbilityUsed?: boolean;
+  morticianAbilityEnded?: boolean;
   priestWardActive?: boolean;
   timerConfig: TimerConfig;
   isSilenced?: boolean;
@@ -103,6 +104,7 @@ export function playerStateToFirebase(
       ? { investigationResult: state.investigationResult }
       : {}),
     ...(state.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
+    ...(state.morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),
     ...(state.priestWardActive ? { priestWardActive: true } : {}),
     timerConfig: state.timerConfig,
     ...(state.isSilenced ? { isSilenced: true } : {}),
@@ -174,6 +176,7 @@ export function firebaseToPlayerState(
       ? { investigationResult: raw.investigationResult }
       : {}),
     ...(raw.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
+    ...(raw.morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),
     ...(raw.priestWardActive ? { priestWardActive: true } : {}),
     // The TypeScript type says TimerConfig, but old Firebase documents may
     // have partial data (e.g. missing autoAdvance). Cast to raw Record so

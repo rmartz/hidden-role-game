@@ -44,7 +44,13 @@ export interface VisibleTeammate {
 /** Night effects visible during the daytime summary. */
 export interface DaytimeNightStatusEntry {
   targetPlayerId: string;
-  effect: "killed" | "silenced" | "hypnotized" | "smited" | "survived";
+  effect:
+    | "killed"
+    | "silenced"
+    | "hypnotized"
+    | "smited"
+    | "survived"
+    | "peaceful";
 }
 
 /** Night effects visible to the Witch during their nighttime phase only. */
@@ -134,6 +140,8 @@ export interface PlayerGameState {
   witchAbilityUsed?: boolean;
   /** Whether the Exposer has already used their once-per-game reveal ability. */
   exposerAbilityUsed?: boolean;
+  /** Whether the Mortician has completed their mission (killed a Werewolf). */
+  morticianAbilityEnded?: boolean;
   /** Whether the Priest's ward is currently active (cannot target this night). */
   priestWardActive?: boolean;
   /**

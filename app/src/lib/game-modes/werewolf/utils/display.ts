@@ -5,7 +5,7 @@ import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
 import { WEREWOLF_COPY } from "../copy";
 import { isGroupPhaseKey, baseGroupPhaseKey, isRoleActive } from "./phase-keys";
-import { SMITE_PHASE_KEY } from "./resolution";
+import { SMITE_PHASE_KEY, OLD_MAN_TIMER_KEY } from "./resolution";
 import type { PhaseKey } from "./phase-keys";
 import { targetPlayerIdOf } from "./targeting";
 import { getPlayerName } from "@/lib/player-utils";
@@ -53,6 +53,7 @@ export function getPhaseLabel(
   roles: Record<string, { name: string }>,
 ): string {
   if (phaseKey === SMITE_PHASE_KEY) return "Narrator";
+  if (phaseKey === OLD_MAN_TIMER_KEY) return "Old Man (role timer)";
   return roles[baseGroupPhaseKey(phaseKey)]?.name ?? phaseKey;
 }
 

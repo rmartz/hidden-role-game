@@ -16,6 +16,7 @@ import {
   getSilencedPlayerIds,
   getHypnotizedPlayerId,
   SMITE_PHASE_KEY,
+  OLD_MAN_TIMER_KEY,
 } from "@/lib/game-modes/werewolf";
 import type {
   AltruistInterceptedNightResolutionEvent,
@@ -191,6 +192,26 @@ export class GameSerializationService {
           : exposerSoloAction?.targetPlayerId,
         myNightTargetConfirmed: exposerSoloAction?.confirmed ?? false,
         exposerAbilityUsed: ts?.exposerAbilityUsed ?? false,
+      };
+    }
+
+    // For the Mortician, surface ability-ended state.
+    if (isRoleActive(myRole.id, WerewolfRole.Mortician)) {
+      const ts =
+        game.status.type === GameStatus.Playing
+          ? (game.status.turnState as WerewolfTurnState | undefined)
+          : undefined;
+      const morticianAction = nightActions[myRole.id];
+      const morticianSoloAction =
+        morticianAction && !isTeamNightAction(morticianAction)
+          ? morticianAction
+          : undefined;
+      return {
+        myNightTarget: morticianSoloAction?.skipped
+          ? null
+          : morticianSoloAction?.targetPlayerId,
+        myNightTargetConfirmed: morticianSoloAction?.confirmed ?? false,
+        morticianAbilityEnded: ts?.morticianAbilityEnded ?? false,
       };
     }
 
@@ -451,9 +472,14 @@ export class GameSerializationService {
       phase.nightResolution ?? []
     ).flatMap((e): DaytimeNightStatusEntry[] => {
       if (e.type === "killed" && e.died) {
-        const effect = e.attackedBy.includes(SMITE_PHASE_KEY)
-          ? "smited"
-          : "killed";
+        if (e.attackedBy.includes(SMITE_PHASE_KEY)) {
+          return [{ targetPlayerId: e.targetPlayerId, effect: "smited" }];
+        }
+        // Old Man timer death: attackedBy contains only the timer key.
+        const effect =
+          e.attackedBy.length === 1 && e.attackedBy[0] === OLD_MAN_TIMER_KEY
+            ? "peaceful"
+            : "killed";
         return [{ targetPlayerId: e.targetPlayerId, effect }];
       }
       if (e.type === "tough-guy-absorbed" && e.targetPlayerId === callerId)

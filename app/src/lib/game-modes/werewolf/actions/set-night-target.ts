@@ -53,6 +53,13 @@ export const setNightTargetAction: GameAction = {
     if (isRoleActive(phaseKey, WerewolfRole.Exposer) && ts.exposerAbilityUsed)
       return false;
 
+    // Mortician ability ends after killing a Werewolf.
+    if (
+      isRoleActive(phaseKey, WerewolfRole.Mortician) &&
+      ts.morticianAbilityEnded
+    )
+      return false;
+
     // targetPlayerId undefined = clear; null = intentional skip; string = set target.
     if (targetPlayerId === undefined) return true;
     if (targetPlayerId === null) return true;

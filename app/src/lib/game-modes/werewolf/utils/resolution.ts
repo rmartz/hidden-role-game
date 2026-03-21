@@ -6,6 +6,7 @@ import type { WerewolfRoleDefinition } from "../roles";
 import { isGroupPhaseKey, isRoleActive } from "./phase-keys";
 
 export const SMITE_PHASE_KEY = "__narrator_smite__";
+export const OLD_MAN_TIMER_KEY = "__old_man_timer__";
 
 function allWerewolvesAreDead(
   roleAssignments: PlayerRoleAssignment[],
@@ -170,6 +171,12 @@ export interface NightResolutionOptions {
   priestWards?: Record<string, string>;
   /** Player IDs of Tough Guys who have already survived one attack. */
   toughGuyHitIds?: string[];
+  /**
+   * If set, the Old Man's role timer has fired this night. If they were not
+   * attacked by any player, they die peacefully (attackedBy: [OLD_MAN_TIMER_KEY]).
+   * If they were attacked, the attack takes precedence and they die normally.
+   */
+  oldManTimerPlayerId?: string;
 }
 
 export function resolveNightActions(
@@ -254,6 +261,28 @@ export function resolveNightActions(
           type: "killed" as const,
           targetPlayerId: smitedId,
           attackedBy: [SMITE_PHASE_KEY],
+          protectedBy: [],
+          died: true,
+        },
+      ];
+    }
+  }
+
+  // Old Man timer: if the timer fires and the Old Man was not attacked by any
+  // player this night, they die peacefully (unblockable, like smite).
+  // If they were attacked, the attack takes precedence (no timer event added).
+  if (options?.oldManTimerPlayerId) {
+    const existing = combatEvents.find(
+      (e) =>
+        e.type === "killed" && e.targetPlayerId === options.oldManTimerPlayerId,
+    );
+    if (!existing) {
+      combatEvents = [
+        ...combatEvents,
+        {
+          type: "killed" as const,
+          targetPlayerId: options.oldManTimerPlayerId,
+          attackedBy: [OLD_MAN_TIMER_KEY],
           protectedBy: [],
           died: true,
         },

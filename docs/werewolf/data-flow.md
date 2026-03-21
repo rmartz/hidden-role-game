@@ -62,16 +62,16 @@ These fields are only populated when the active phase matches the player's role.
 
 ### Player Fields — Daytime (day start)
 
-| Field                    | Description                                                                                                                                 |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nightStatus`            | `{ targetPlayerId, effect }[]` — outcome of the previous night. Effects: `"killed"`, `"silenced"`, `"hypnotized"`, `"smited"`, `"survived"` |
-| `nominations`            | Current nominations for trial defendants                                                                                                    |
-| `myNominatedDefendantId` | The defendant this player has nominated (if any)                                                                                            |
-| `activeTrial`            | Active trial state (defendant, phase, votes) if a trial is in progress                                                                      |
-| `isSilenced`             | Whether this player is silenced (cannot vote or nominate)                                                                                   |
-| `isHypnotized`           | Whether this player is hypnotized (vote mirrors the Mummy)                                                                                  |
-| `exposerReveal`          | Publicly revealed role from the Exposer's ability (if any)                                                                                  |
-| `altruistSave`           | Information about an Altruist intercept that saved a player                                                                                 |
+| Field                    | Description                                                                                                                                                                                                             |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nightStatus`            | `{ targetPlayerId, effect }[]` — outcome of the previous night. Effects: `"killed"`, `"silenced"`, `"hypnotized"`, `"smited"`, `"survived"`, `"peaceful"` (`"peaceful"` indicates the Old Man died from timer expiring) |
+| `nominations`            | Current nominations for trial defendants                                                                                                                                                                                |
+| `myNominatedDefendantId` | The defendant this player has nominated (if any)                                                                                                                                                                        |
+| `activeTrial`            | Active trial state (defendant, phase, votes) if a trial is in progress                                                                                                                                                  |
+| `isSilenced`             | Whether this player is silenced (cannot vote or nominate)                                                                                                                                                               |
+| `isHypnotized`           | Whether this player is hypnotized (vote mirrors the Mummy)                                                                                                                                                              |
+| `exposerReveal`          | Publicly revealed role from the Exposer's ability (if any)                                                                                                                                                              |
+| `altruistSave`           | Information about an Altruist intercept that saved a player                                                                                                                                                             |
 
 ## Game Phase State Machine
 
@@ -222,3 +222,7 @@ When the Wolf Cub is killed (via `start-day` resolution or `mark-player-dead`), 
 The second phase cannot target the same player that was the `suggestedTargetId` of the first phase (within-night exclusion). This is distinct from the cross-night `preventRepeatTarget` mechanism used by Bodyguard and Spellcaster, which prevents targeting the same player on consecutive nights (tracked via `lastTargets` in `WerewolfTurnState`).
 
 The `wolfCubDied` flag is cleared when `start-night` consumes it to generate the bonus phase.
+
+## Old Man Timer
+
+When the Old Man role is in play, `start-day` checks whether the Old Man's timer has fired. The timer fires on turn `#werewolves + 2` (where `#werewolves` counts all roles with `isWerewolf`, including Wolf Cub). If the Old Man is still alive and was **not** attacked that same night, they die peacefully — the resolution emits a kill event with `attackedBy: [OLD_MAN_TIMER_KEY]`. If the Old Man was attacked and killed by wolves (or any other attacker), the attack takes precedence and no timer event is emitted.

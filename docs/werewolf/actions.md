@@ -224,7 +224,7 @@ Additional resolution steps:
 ## Night Action Types
 
 ```typescript
-// Solo role action (Seer, Bodyguard, Witch, Spellcaster, Chupacabra, Doctor, Priest, Mummy, Wizard, One-Eyed Seer, Exposer, Mystic Seer, Altruist)
+// Solo role action (Seer, Bodyguard, Witch, Spellcaster, Chupacabra, Doctor, Priest, Mummy, Wizard, One-Eyed Seer, Exposer, Mystic Seer, Altruist, Mortician)
 interface NightAction {
   targetPlayerId?: string; // absent when skipped
   skipped?: true; // set when the player intentionally chose "Skip"
@@ -260,12 +260,19 @@ interface TeamNightAction {
 6. Applies Smite: any smited player is killed regardless of protections.
 7. Applies Spellcaster action: emits a `silenced` event.
 8. Applies Mummy action: emits a `hypnotized` event for the target.
-9. Returns `NightResolutionEvent[]`:
-   - `{ type: "killed", targetPlayerId, attackedBy, protectedBy, died }`
-   - `{ type: "silenced", targetPlayerId }`
-   - `{ type: "hypnotized", targetPlayerId }`
-   - `{ type: "tough-guy-absorbed", targetPlayerId }`
-   - `{ type: "altruist-intercepted", targetPlayerId }`
+9. Checks Old Man timer (`oldManTimerPlayerId` option): if the timer has fired **and** the Old Man was not attacked this night, emits a killed event with `attackedBy: [OLD_MAN_TIMER_KEY]`, `died: true`. This bypasses protections (applied after `buildKilledEvents`, like smite). If the Old Man was attacked, the attack takes precedence.
+10. Returns `NightResolutionEvent[]`:
+
+- `{ type: "killed", targetPlayerId, attackedBy, protectedBy, died }`
+- `{ type: "silenced", targetPlayerId }`
+- `{ type: "hypnotized", targetPlayerId }`
+- `{ type: "tough-guy-absorbed", targetPlayerId }`
+- `{ type: "altruist-intercepted", targetPlayerId }`
+
+After resolution, `start-day` performs additional checks:
+
+- **Mortician ability end**: if the Mortician's target died and was a Werewolf (`isWerewolf`), sets `morticianAbilityEnded: true` on the turn state. The Mortician can no longer target players on subsequent nights.
+- **Old Man peaceful death**: `GameSerializationService` detects `attackedBy: [OLD_MAN_TIMER_KEY]` and maps it to `DaytimeNightStatusEntry.effect: "peaceful"`, which renders as a special death message for all players.
 
 ```mermaid
 flowchart TD
@@ -301,5 +308,9 @@ flowchart TD
     Mummy -->|no| Resolve
     Hypnotize --> Resolve
     Resolve[For each collected attack:\nif protected → died = false\nelse → died = true\nemit killed event]
-    Resolve --> Return([Return NightResolutionEvent array])
+    Resolve --> OldMan{Old Man timer expired\nand not attacked?}
+    OldMan -->|yes| Peaceful[Emit killed event\nattackedBy: OLD_MAN_TIMER_KEY\ndied: true]
+    OldMan -->|no| Return
+    Peaceful --> Return
+    Return([Return NightResolutionEvent array])
 ```
