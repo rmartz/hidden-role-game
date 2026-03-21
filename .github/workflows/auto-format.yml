@@ -46,3 +46,9 @@ jobs:
           git add -A
           git commit -m "style: auto-format"
           git push
+
+      - name: Re-trigger CI
+        if: steps.diff.outputs.changed == 'true'
+        run: gh workflow run ci-actions.yml --ref "${{ github.ref_name }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
