@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import type { GameMode } from "@/lib/types";
 import type { VisibleTeammate } from "@/server/types";
+import { TargetRegular } from "@fluentui/react-icons";
 import {
   Item,
   ItemActions,
@@ -18,6 +19,8 @@ interface NarratorPlayerRoleListsProps {
   assignments: VisibleTeammate[];
   gameMode?: GameMode;
   deadPlayerIds?: string[];
+  /** The player ID that the Executioner must get eliminated at trial. */
+  executionerTargetId?: string;
   /** Optional render prop for per-player action buttons (e.g., smite/revive). */
   renderActions?: (
     playerId: string,
@@ -30,6 +33,7 @@ export function NarratorPlayerRoleLists({
   assignments,
   gameMode,
   deadPlayerIds,
+  executionerTargetId,
   renderActions,
 }: NarratorPlayerRoleListsProps) {
   if (assignments.length === 0) return null;
@@ -53,7 +57,20 @@ export function NarratorPlayerRoleLists({
             {active.map(({ player, role }) => (
               <Item key={player.id} size="sm">
                 <ItemContent>
-                  <ItemTitle>{player.name}</ItemTitle>
+                  <ItemTitle>
+                    {player.name}
+                    {executionerTargetId === player.id && (
+                      <TargetRegular
+                        className="inline-block ml-1.5 text-amber-600 dark:text-amber-400"
+                        title={
+                          NARRATOR_PLAYER_ROLE_LISTS_COPY.executionerTarget
+                        }
+                        aria-label={
+                          NARRATOR_PLAYER_ROLE_LISTS_COPY.executionerTarget
+                        }
+                      />
+                    )}
+                  </ItemTitle>
                 </ItemContent>
                 <ItemActions>
                   {role ? <RoleLabel role={role} gameMode={gameMode} /> : null}
@@ -75,6 +92,17 @@ export function NarratorPlayerRoleLists({
                   <ItemContent>
                     <ItemTitle className="italic text-muted-foreground line-through">
                       {player.name}
+                      {executionerTargetId === player.id && (
+                        <TargetRegular
+                          className="inline-block ml-1.5 text-amber-600 dark:text-amber-400"
+                          title={
+                            NARRATOR_PLAYER_ROLE_LISTS_COPY.executionerTarget
+                          }
+                          aria-label={
+                            NARRATOR_PLAYER_ROLE_LISTS_COPY.executionerTarget
+                          }
+                        />
+                      )}
                     </ItemTitle>
                   </ItemContent>
                   <ItemActions>

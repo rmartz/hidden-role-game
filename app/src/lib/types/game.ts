@@ -154,6 +154,8 @@ export interface Game {
   nominationsEnabled: boolean;
   /** When true, only one trial is allowed per day phase. */
   singleTrialPerDay: boolean;
+  /** Executioner: the player ID the Executioner must get eliminated at trial. */
+  executionerTargetId?: string;
 }
 
 /**

@@ -209,6 +209,10 @@ export const WEREWOLF_COPY = {
     peacefulDeath: (playerName: string) =>
       `${playerName} died peacefully in their sleep.`,
   },
+  executioner: {
+    yourTarget: (name: string) =>
+      `Your target: ${name}. Convince the village to put them on trial.`,
+  },
   kill: {
     button: "Kill",
     confirmTitle: "Kill player?",

@@ -43,6 +43,7 @@ export function OwnerStartingScreen({
       <PlayersRoleList
         assignments={gameState.visibleRoleAssignments}
         gameMode={gameState.gameMode}
+        executionerTargetId={gameState.executionerTargetId}
       />
       <GameRolesList
         roles={gameState.rolesInPlay ?? []}

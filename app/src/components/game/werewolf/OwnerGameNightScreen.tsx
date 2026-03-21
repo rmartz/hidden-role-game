@@ -315,6 +315,7 @@ export function OwnerGameNightScreen({
         deadPlayerIds={gameState.deadPlayerIds}
         gameOwnerId={gameState.gameOwner?.id}
         smitedPlayerIds={phase.smitedPlayerIds}
+        executionerTargetId={gameState.executionerTargetId}
       />
     </div>
   );

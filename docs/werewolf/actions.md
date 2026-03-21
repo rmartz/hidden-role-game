@@ -16,7 +16,7 @@ Actions are the mechanism by which the Narrator and players mutate game state. E
 
 **Who:** Narrator only
 **When:** During Nighttime
-**Effect:** Resolves all night actions, adds killed players to `deadPlayerIds`, and transitions to Daytime. Stores the `nightResolution` events in the new daytime phase for day-start display.
+**Effect:** Resolves all night actions, adds killed players to `deadPlayerIds`, and transitions to Daytime. Stores the `nightResolution` events in the new daytime phase for day-start display. If the Tanner is among the killed players, the game ends immediately with a Tanner win.
 
 Additional resolution steps:
 
@@ -314,3 +314,20 @@ flowchart TD
     Peaceful --> Return
     Return([Return NightResolutionEvent array])
 ```
+
+## Trial Resolution
+
+When a player is voted out at trial (via `mark-player-dead` during Daytime), the following checks run in order:
+
+1. **Tanner check:** If the killed player is the Tanner, the game ends immediately with a Tanner win.
+2. **Executioner target check:** If the killed player is the Executioner's assigned target, the Executioner wins. (The Executioner win is independent of the overall game outcome — the game may continue.)
+
+## Win Condition Logic
+
+Win conditions are evaluated after each death (night resolution or trial). The checks run in the following priority order:
+
+1. **Tanner instant win** — If the Tanner dies (at night or at trial), the game ends immediately with a Tanner win.
+2. **Lone Wolf check** (before general wolf win) — When wolves would win (all Good-team players eliminated), if the Lone Wolf is the only surviving wolf-aligned player, the Lone Wolf wins instead of Team Bad.
+3. **Standard team win** — Good wins if all Bad-team players are dead. Bad wins if wolves equal or outnumber Good-team players.
+4. **Spoiler override** (after team win determined) — If a standard team win is detected and the Spoiler is still alive, the Spoiler wins instead of the winning team.
+5. **Executioner win** — Evaluated independently at trial: if the Executioner's assigned target is voted out, the Executioner wins regardless of overall game state.

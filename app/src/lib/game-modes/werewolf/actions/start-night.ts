@@ -58,6 +58,9 @@ export const startNightAction: GameAction = {
           : {}),
         ...(ts.exposerAbilityUsed ? { exposerAbilityUsed: true } : {}),
         ...(ts.exposerReveal ? { exposerReveal: ts.exposerReveal } : {}),
+        ...(ts.executionerTargetId
+          ? { executionerTargetId: ts.executionerTargetId }
+          : {}),
       },
     };
   },

@@ -12,6 +12,7 @@ import {
   isOwnerPlaying,
   resolveNightActions,
   checkWinCondition,
+  WerewolfWinner,
 } from "../utils";
 import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
@@ -237,14 +238,6 @@ export const startDayAction: GameAction = {
 
     const updatedDeadIds = [...ts.deadPlayerIds, ...newDeadIds];
 
-    if (!hunterDiedThisNight) {
-      const winResult = checkWinCondition(game, updatedDeadIds);
-      if (winResult) {
-        game.status = winResult;
-        return;
-      }
-    }
-
     const wolfCubDied =
       ts.wolfCubDied === true || didWolfCubDie(newDeadIds, game);
     game.status = {
@@ -273,7 +266,30 @@ export const startDayAction: GameAction = {
           ? { hunterRevengePlayerId: hunterAssignment.playerId }
           : {}),
         ...(morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),
+        ...(ts.executionerTargetId
+          ? { executionerTargetId: ts.executionerTargetId }
+          : {}),
       },
     };
+
+    // Tanner wins immediately if killed at night — checked after turn state
+    // is built so all deaths and night resolution are recorded.
+    const tannerAssignment = game.roleAssignments.find(
+      (a) => a.roleDefinitionId === (WerewolfRole.Tanner as string),
+    );
+    if (tannerAssignment && newDeadIds.includes(tannerAssignment.playerId)) {
+      game.status = {
+        type: GameStatus.Finished,
+        winner: WerewolfWinner.Tanner,
+      };
+      return;
+    }
+
+    if (!hunterDiedThisNight) {
+      const winResult = checkWinCondition(game, updatedDeadIds);
+      if (winResult) {
+        game.status = winResult;
+      }
+    }
   },
 };

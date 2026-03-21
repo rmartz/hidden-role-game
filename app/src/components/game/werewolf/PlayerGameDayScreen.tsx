@@ -10,6 +10,7 @@ import {
   WEREWOLF_ROLE_CATEGORY_ORDER,
 } from "@/lib/game-modes/werewolf/roles";
 import type { PlayerGameState } from "@/server/types";
+import { getPlayerName } from "@/lib/player-utils";
 import { GameTimer, RoleGlossaryDialog } from "@/components/game";
 import { NominationPanel } from "./NominationPanel";
 import { PlayerNightSummary } from "./PlayerNightSummary";
@@ -34,6 +35,10 @@ export function PlayerGameDayScreen({
   const phaseStartedAt = useMemo(
     () => new Date(isDaytime ? phase.startedAt : Date.now()),
     [isDaytime, phase.startedAt],
+  );
+  const executionerTargetName = getPlayerName(
+    gameState.players,
+    gameState.executionerTargetId,
   );
 
   const modeConfig = GAME_MODES[gameState.gameMode];
@@ -92,6 +97,12 @@ export function PlayerGameDayScreen({
             gameState.exposerReveal.playerName,
             gameState.exposerReveal.roleName,
           )}
+        </p>
+      )}
+
+      {executionerTargetName && (
+        <p className="mb-4 text-sm text-muted-foreground italic">
+          {WEREWOLF_COPY.executioner.yourTarget(executionerTargetName)}
         </p>
       )}
 

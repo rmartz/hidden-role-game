@@ -87,6 +87,9 @@ export class FirebaseGameService {
         ...daytimeNightState,
         ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
         ...(hunterRevengePlayerId ? { hunterRevengePlayerId } : {}),
+        ...(game.executionerTargetId
+          ? { executionerTargetId: game.executionerTargetId }
+          : {}),
         timerConfig: game.timerConfig,
       };
     }
@@ -162,6 +165,24 @@ export class FirebaseGameService {
       callerId,
     );
 
+    // Executioner: add target to visibleRoleAssignments (name only, no role)
+    // and include executionerTargetId for UI indicators.
+    const executionerTargetId =
+      myAssignment.roleDefinitionId === "werewolf-executioner"
+        ? game.executionerTargetId
+        : undefined;
+    if (executionerTargetId && !visiblePlayerIds.has(executionerTargetId)) {
+      const targetPlayer = playerById.get(executionerTargetId);
+      if (targetPlayer) {
+        visibleRoleAssignments.push({
+          player: { id: targetPlayer.id, name: targetPlayer.name },
+          reason: "aware-of",
+        });
+        visiblePlayerIds.add(targetPlayer.id);
+      }
+    }
+    const executionerState = executionerTargetId ? { executionerTargetId } : {};
+
     return {
       status: game.status,
       gameMode: game.gameMode,
@@ -180,6 +201,7 @@ export class FirebaseGameService {
       rolesInPlay: gameInitializationService.buildRolesInPlay(game),
       nominationsEnabled: game.nominationsEnabled,
       singleTrialPerDay: game.singleTrialPerDay,
+      ...executionerState,
       ...nightTargetState,
       ...daytimeNightState,
       ...(amDead ? { amDead: true } : {}),
@@ -232,6 +254,9 @@ export class FirebaseGameService {
       ...(ownerPlayer ? [{ ...ownerPlayer, visiblePlayers: [] }] : []),
     ];
 
+    const executionerTargetId =
+      gameInitializationService.selectExecutionerTarget(roleAssignments);
+
     const game: Game = {
       id: randomUUID(),
       lobbyId,
@@ -245,6 +270,7 @@ export class FirebaseGameService {
       timerConfig,
       nominationsEnabled,
       singleTrialPerDay,
+      ...(executionerTargetId ? { executionerTargetId } : {}),
     };
 
     // sessionIndex: { [sessionId]: playerId } — needed to reconstruct Game from Firebase
@@ -313,6 +339,7 @@ export class FirebaseGameService {
       turnState: gameInitializationService.buildInitialTurnState(
         game.gameMode,
         game.roleAssignments,
+        game.executionerTargetId,
       ),
     };
 

@@ -161,6 +161,8 @@ export interface WerewolfTurnState {
   exposerReveal?: { playerId: string; roleId: string };
   /** True once the Mortician has successfully killed a Werewolf. */
   morticianAbilityEnded?: boolean;
+  /** The player ID that the Executioner must get eliminated at trial to win. */
+  executionerTargetId?: string;
 }
 
 export interface TargetablePlayer {
