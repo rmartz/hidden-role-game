@@ -265,7 +265,6 @@ describe("normalizePlayerName", () => {
   });
 
   it("applies Unicode NFC normalization", () => {
-    // café composed (NFC) vs decomposed (NFD) — both should normalize to the same string
     const composed = "\u00e9"; // é as single codepoint
     const decomposed = "e\u0301"; // e + combining accent
     expect(normalizePlayerName(`caf${composed}`)).toBe(

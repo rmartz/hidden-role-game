@@ -10,7 +10,7 @@ const players = [
   { id: "p3", name: "Charlie" },
 ];
 
-describe("getTargetablePlayers", () => {
+describe("getTargetablePlayers — basic filtering", () => {
   it("excludes the game owner", () => {
     const result = getTargetablePlayers(
       players,
@@ -150,11 +150,6 @@ describe("getTargetablePlayers", () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// Solo phase targeting — narrator vs player parity
-// ---------------------------------------------------------------------------
-
-// Narrator sees all assignments including the acting player's own role.
 const seerNarratorAssignments = [
   { player: { id: "p1" }, role: { id: WerewolfRole.Seer, team: Team.Good } },
   {
@@ -166,8 +161,6 @@ const seerNarratorAssignments = [
     role: { id: WerewolfRole.Villager, team: Team.Good },
   },
 ];
-
-// Player p1 does not see their own assignment (mirrors buildGamePlayers).
 const seerPlayerAssignments: typeof seerNarratorAssignments = [];
 
 describe("getTargetablePlayers — solo phase", () => {
@@ -216,15 +209,12 @@ describe("getTargetablePlayers — solo phase", () => {
 // Team phase targeting
 // ---------------------------------------------------------------------------
 
-// Narrator sees all assignments (no self-skip).
 const narratorAssignments = [
   { player: { id: "p1" }, role: { id: WerewolfRole.Werewolf, team: "Bad" } },
   { player: { id: "p2" }, role: { id: WerewolfRole.Werewolf, team: "Bad" } },
   { player: { id: "p3" }, role: { id: WerewolfRole.Villager, team: "Good" } },
 ];
 
-// Player p1 sees only other team members — their own assignment is absent
-// (mirrors buildGamePlayers which skips `other.playerId === assignment.playerId`).
 const p1Assignments = [
   { player: { id: "p2" }, role: { id: WerewolfRole.Werewolf, team: "Bad" } },
 ];

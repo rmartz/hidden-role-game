@@ -6,7 +6,7 @@ import {
   makeLobbyParams as makeParams,
 } from "@/app/api/test-utils";
 
-describe("POST /api/lobby/[lobbyId]/join", () => {
+describe("POST /api/lobby/[lobbyId]/join — basic operations", () => {
   it("should allow a player to join a lobby and return sessionId", async () => {
     const createRes = await createLobby(
       postRequest("http://localhost/api/lobby/create", { playerName: "Alice" }),
@@ -140,6 +140,21 @@ describe("POST /api/lobby/[lobbyId]/join", () => {
     expect(body.error).toBe("Lobby is full");
   });
 
+  it("should return 404 when joining a lobby that does not exist", async () => {
+    const res = await joinLobby(
+      postRequest("http://localhost/api/lobby/nonexistent-id/join", {
+        playerName: "Alice",
+      }),
+      makeParams("nonexistent-id"),
+    );
+    expect(res.status).toBe(404);
+    const body = await res.json();
+    expect(body.status).toBe("error");
+    expect(body.error).toBe("Lobby not found");
+  });
+});
+
+describe("POST /api/lobby/[lobbyId]/join — name validation", () => {
   it("should reject a player name that exactly matches an existing player", async () => {
     const createRes = await createLobby(
       postRequest("http://localhost/api/lobby/create", { playerName: "Alice" }),
@@ -261,18 +276,5 @@ describe("POST /api/lobby/[lobbyId]/join", () => {
       makeParams(lobbyId),
     );
     expect(res.status).toBe(400);
-  });
-
-  it("should return 404 when joining a lobby that does not exist", async () => {
-    const res = await joinLobby(
-      postRequest("http://localhost/api/lobby/nonexistent-id/join", {
-        playerName: "Alice",
-      }),
-      makeParams("nonexistent-id"),
-    );
-    expect(res.status).toBe(404);
-    const body = await res.json();
-    expect(body.status).toBe("error");
-    expect(body.error).toBe("Lobby not found");
   });
 });

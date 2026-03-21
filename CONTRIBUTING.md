@@ -23,13 +23,13 @@ pnpm tsc --noEmit     # Type check (from app/)
 
 ### File size
 
-Keep files under ~200 lines. When a file grows beyond that, split it by logical concern:
+Source files should stay under ~200 lines; consider splitting at ~240. Test files have more room — aim for ~300 lines, split at ~360. When a file grows beyond its threshold, split by logical concern:
 
 - **Components** — delegate complex logic to utility functions or sub-components. Each component file should have one clear responsibility.
 - **Type files** — split into a barrel-exported directory with one file per domain (`lobby.ts`, `game.ts`, `player.ts`, etc.).
 - **Utilities** — split by operation type or domain.
 - **Services** — extract complex logic areas into focused utility functions or smaller services.
-- **Tests** — when you split a file, create a corresponding test file for each part.
+- **Tests** — when splitting, organize into a `{module}-tests/` directory with domain-specific files (e.g., `resolution-tests/altruist.test.ts`).
 
 ### TypeScript
 
