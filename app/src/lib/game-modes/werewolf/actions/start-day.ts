@@ -235,7 +235,6 @@ export const startDayAction: GameAction = {
       hunterAssignment !== undefined &&
       newDeadIds.includes(hunterAssignment.playerId);
 
-
     const updatedDeadIds = [...ts.deadPlayerIds, ...newDeadIds];
 
     if (!hunterDiedThisNight) {
