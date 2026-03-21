@@ -60,6 +60,7 @@ export function PlayerStartingScreen({ gameState }: PlayerStartingScreenProps) {
         assignments={gameState.visibleRoleAssignments}
         gameMode={gameState.gameMode}
         myRoleId={gameState.myRole?.id}
+        rolesInPlay={gameState.rolesInPlay}
       />
 
       <GameRolesList

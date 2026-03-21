@@ -14,6 +14,7 @@ import { RoleLabel } from "@/components/RoleLabel";
 import {
   PLAYER_VISIBILITY_COPY,
   ROLE_VISIBILITY_OVERRIDES,
+  LONE_WOLF_WARNING,
 } from "@/components/game/PlayersRoleList.copy";
 
 interface PlayersRoleListProps {
@@ -24,6 +25,8 @@ interface PlayersRoleListProps {
   executionerTargetId?: string;
   /** The current player's role ID. Used to customize visibility section text. */
   myRoleId?: string;
+  /** Roles configured in the game. Used to check if Lone Wolf could be present. */
+  rolesInPlay?: { id: string }[];
   /** Optional render prop for per-player action buttons. */
   renderActions?: (
     playerId: string,
@@ -79,6 +82,7 @@ export function PlayersRoleList({
   deadPlayerIds,
   executionerTargetId,
   myRoleId,
+  rolesInPlay,
   renderActions,
 }: PlayersRoleListProps) {
   if (assignments.length === 0) return null;
@@ -101,12 +105,19 @@ export function PlayersRoleList({
             : reason === "aware-of"
               ? (overrides?.awareOfHeading ?? baseConfig.heading)
               : baseConfig.heading;
-        const description =
+        const loneWolfVisible =
+          reason === "wake-partner" &&
+          rolesInPlay?.some((r) => r.id === "werewolf-lone-wolf");
+        const baseDescription =
           reason === "wake-partner"
             ? (overrides?.wakePartnerDescription ?? baseConfig.description)
             : reason === "aware-of"
               ? (overrides?.awareOfDescription ?? baseConfig.description)
               : baseConfig.description;
+        const description =
+          loneWolfVisible && baseDescription
+            ? baseDescription + LONE_WOLF_WARNING
+            : baseDescription;
         return (
           <Card key={reason}>
             <CardContent className="pt-4">

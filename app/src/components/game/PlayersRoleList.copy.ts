@@ -23,13 +23,11 @@ export const ROLE_VISIBILITY_OVERRIDES: Record<
 > = {
   "werewolf-werewolf": {
     wakePartnerHeading: "Your pack",
-    wakePartnerDescription:
-      "These players hunt with you at night. Not all may be committed to the pack.",
+    wakePartnerDescription: "These players hunt with you at night.",
   },
   "werewolf-wolf-cub": {
     wakePartnerHeading: "Your pack",
-    wakePartnerDescription:
-      "These players hunt with you at night. Not all may be committed to the pack.",
+    wakePartnerDescription: "These players hunt with you at night.",
   },
   "werewolf-mason": {
     awareOfHeading: "Your fellow Masons",
@@ -52,3 +50,6 @@ export const ROLE_VISIBILITY_OVERRIDES: Record<
       "Convince the village to vote this player out at trial to win.",
   },
 };
+
+/** Appended to the wolf pack description when a Lone Wolf could be in the game. */
+export const LONE_WOLF_WARNING = " Not all may be committed to the pack.";
