@@ -1,22 +1,28 @@
 name: Auto-format
 
 on:
-  push:
-    branches-ignore: ["main"]
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
 
 jobs:
   auto-format:
     name: Auto-format
     runs-on: ubuntu-latest
-    # Only run on commits co-authored by Claude to avoid unnecessary runs
-    # and prevent loops (this workflow's own commits have no co-author)
-    if: "contains(github.event.head_commit.message, 'Co-Authored-By: Claude')"
+    # Only run when CI's format job failed, on non-main branches,
+    # and on Claude-authored commits (prevents loops since the fix
+    # commit has no co-author)
+    if: >-
+      github.event.workflow_run.conclusion == 'failure' &&
+      github.event.workflow_run.head_branch != 'main' &&
+      contains(github.event.workflow_run.head_commit.message, 'Co-Authored-By: Claude')
     permissions:
       contents: write
+      actions: write
     steps:
       - uses: actions/checkout@v6
         with:
-          ref: ${{ github.ref }}
+          ref: ${{ github.event.workflow_run.head_branch }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: pnpm/action-setup@v5
@@ -49,6 +55,6 @@ jobs:
 
       - name: Re-trigger CI
         if: steps.diff.outputs.changed == 'true'
-        run: gh workflow run ci-actions.yml --ref "${{ github.ref_name }}"
+        run: gh workflow run ci-actions.yml --ref "${{ github.event.workflow_run.head_branch }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
