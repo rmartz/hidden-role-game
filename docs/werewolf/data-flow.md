@@ -30,6 +30,8 @@ The Narrator's session is stored separately and receives a different (fuller) `P
 | `rolesInPlay`            | ✓               | ✓                               |
 | `deadPlayerIds`          | ✓               | ✓                               |
 | `timerConfig`            | ✓ (if set)      | ✓ (if set)                      |
+| `nominationsEnabled`     | ✓               | ✓                               |
+| `singleTrialPerDay`      | ✓               | ✓                               |
 
 ### Narrator-Only (Nighttime)
 
@@ -41,23 +43,34 @@ The Narrator's session is stored separately and receives a different (fuller) `P
 
 These fields are only populated when the active phase matches the player's role.
 
-| Field                    | Roles                                           | Description                                                                                                                                                                               |
-| ------------------------ | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `myNightTarget`          | All night-waking roles                          | Selected target player ID (`string`), intentional skip (`null`), or undecided (`undefined`)                                                                                               |
-| `myNightTargetConfirmed` | All night-waking roles                          | Whether the selection is locked in                                                                                                                                                        |
-| `teamVotes`              | Werewolf (group phase)                          | `({ playerName, targetPlayerId } \| { playerName, skipped: true })[]` — all alive group members' current votes                                                                            |
-| `suggestedTargetId`      | Werewolf (group phase)                          | The plurality vote target (undefined if tie or all skipped)                                                                                                                               |
-| `allAgreed`              | Werewolf (group phase)                          | `true` when all alive members have voted for the same target or all have skipped                                                                                                          |
-| `investigationResult`    | Seer                                            | `{ targetPlayerId, isWerewolfTeam }` — only after Narrator calls `reveal-investigation-result`                                                                                            |
-| `witchAbilityUsed`       | Witch                                           | `false` when ability is available; `true` once used                                                                                                                                       |
-| `nightStatus`            | Witch (ability available)                       | `{ targetPlayerId, effect: "attacked" }[]` — players currently under attack this night                                                                                                    |
-| `previousNightTargetId`  | Bodyguard, Spellcaster; Werewolf (second phase) | Player ID unavailable this turn: previous night's target for `preventRepeatTarget` roles; first phase's `suggestedTargetId` for the second Werewolf attack phase (within-night exclusion) |
+| Field                       | Roles                                               | Description                                                                                                                                                                               |
+| --------------------------- | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `myNightTarget`             | All night-waking roles                              | Selected target player ID (`string`), intentional skip (`null`), or undecided (`undefined`)                                                                                               |
+| `myNightTargetConfirmed`    | All night-waking roles                              | Whether the selection is locked in                                                                                                                                                        |
+| `teamVotes`                 | Werewolf (group phase)                              | `({ playerName, targetPlayerId } \| { playerName, skipped: true })[]` — all alive group members' current votes                                                                            |
+| `suggestedTargetId`         | Werewolf (group phase)                              | The plurality vote target (undefined if tie or all skipped)                                                                                                                               |
+| `allAgreed`                 | Werewolf (group phase)                              | `true` when all alive members have voted for the same target or all have skipped                                                                                                          |
+| `investigationResult`       | Seer, Wizard, One-Eyed Seer, Mystic Seer, Mentalist | `{ targetPlayerId, isWerewolfTeam }` (or exact role for Mystic Seer, or same-team result for Mentalist) — only after Narrator calls `reveal-investigation-result`                         |
+| `witchAbilityUsed`          | Witch                                               | `false` when ability is available; `true` once used                                                                                                                                       |
+| `nightStatus`               | Witch (ability available)                           | `{ targetPlayerId, effect: "attacked" }[]` — players currently under attack this night                                                                                                    |
+| `previousNightTargetId`     | Bodyguard, Spellcaster; Werewolf (second phase)     | Player ID unavailable this turn: previous night's target for `preventRepeatTarget` roles; first phase's `suggestedTargetId` for the second Werewolf attack phase (within-night exclusion) |
+| `priestWardActive`          | Priest                                              | Whether the Priest's ward is currently active on a player                                                                                                                                 |
+| `mySecondNightTarget`       | Mentalist                                           | The Mentalist's second target for dual-target investigation                                                                                                                               |
+| `elusiveSeerVillagerIds`    | Elusive Seer                                        | List of player IDs who have the Villager role (shown on first night only)                                                                                                                 |
+| `oneEyedSeerLockedTargetId` | One-Eyed Seer                                       | Player ID the One-Eyed Seer is locked onto after detecting a werewolf                                                                                                                     |
 
 ### Player Fields — Daytime (day start)
 
-| Field         | Description                                                                            |
-| ------------- | -------------------------------------------------------------------------------------- |
-| `nightStatus` | `{ targetPlayerId, effect: "killed" \| "silenced" }[]` — outcome of the previous night |
+| Field                    | Description                                                                                                                                 |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nightStatus`            | `{ targetPlayerId, effect }[]` — outcome of the previous night. Effects: `"killed"`, `"silenced"`, `"hypnotized"`, `"smited"`, `"survived"` |
+| `nominations`            | Current nominations for trial defendants                                                                                                    |
+| `myNominatedDefendantId` | The defendant this player has nominated (if any)                                                                                            |
+| `activeTrial`            | Active trial state (defendant, phase, votes) if a trial is in progress                                                                      |
+| `isSilenced`             | Whether this player is silenced (cannot vote or nominate)                                                                                   |
+| `isHypnotized`           | Whether this player is hypnotized (vote mirrors the Mummy)                                                                                  |
+| `exposerReveal`          | Publicly revealed role from the Exposer's ability (if any)                                                                                  |
+| `altruistSave`           | Information about an Altruist intercept that saved a player                                                                                 |
 
 ## Game Phase State Machine
 
@@ -124,10 +137,18 @@ Player confirms (confirm-night-target)
 
 Narrator reveals investigation (reveal-investigation-result)
   → nightActions[phaseKey].resultRevealed = true
-  → Seer's PlayerGameState gains investigationResult
+  → Investigator's PlayerGameState gains investigationResult (Seer, Wizard, One-Eyed Seer, Mystic Seer, Mentalist)
 
 Narrator starts day (start-day)
-  → resolveNightActions() runs
+  → resolveNightActions() runs:
+    1. Collect attacks/protections (Werewolves, Bodyguard, Doctor, Chupacabra)
+    2. Apply Priest wards (ward absorbs attack, ward is consumed)
+    3. Apply Witch action (protect or attack)
+    4. Apply Altruist intercept (redirects attack onto self)
+    5. Apply Tough Guy absorption (survives first attack)
+    6. Apply Smite (forced death regardless of protections)
+    7. Apply Spellcaster silence and Mummy hypnotize
+    8. Resolve remaining attacks (protected → survived, else → killed)
   → Killed players added to deadPlayerIds
   → nightResolution stored in daytime phase
   → PlayerGameState rebuilt: nightStatus and myLastNightAction populated
@@ -136,10 +157,27 @@ Narrator starts day (start-day)
 ### Day Phase
 
 ```
-Players discuss and vote (outside the app)
-Narrator marks players dead (mark-player-dead / mark-player-alive)
-  → deadPlayerIds updated
-  → Dead player's role revealed in visibleRoleAssignments for all
+Players discuss and may nominate defendants (nominate-player / withdraw-nomination)
+  → nominations updated for all players
+  → When nomination threshold is reached, trial starts automatically
+
+Trial flow (if nominations are enabled):
+  1. Nominations → threshold reached or Narrator calls start-trial
+  2. Defense phase → defendant speaks (Narrator may skip-defense)
+  3. Voting phase → players cast-vote (guilty/innocent)
+     - Village Idiot votes are forced guilty
+     - Pacifist votes are forced innocent
+     - Hypnotized votes mirror the Mummy
+     - Silenced/dead players cannot vote
+     - Mayor's vote counts double
+  4. Narrator calls resolve-trial → guilty > innocent = eliminated
+     - Clears OES lock and Priest wards for killed player
+
+Narrator may also:
+  - kill-player → immediately kills a player (for in-person trials)
+  - mark-player-dead / mark-player-alive → manual dead state management
+    → deadPlayerIds updated
+    → Dead player's role revealed in visibleRoleAssignments for all
 
 Narrator starts next night (start-night)
   → New turn begins; nightPhaseOrder rebuilt

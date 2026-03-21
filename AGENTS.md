@@ -41,3 +41,8 @@ pnpm tsc --noEmit     # Type check (from app/)
 
 - All user-facing strings must be stored in a co-located copy file (e.g., `ComponentName.copy.ts` or `copy.ts`) for internationalization (i18n) readiness.
 - Do not hardcode display strings inline in components.
+
+## Documentation
+
+- When adding or modifying roles, actions, game settings, or data flow in a game mode, update the corresponding docs in `docs/<game-mode>/` (`roles.md`, `actions.md`, `data-flow.md`).
+- Keep documentation in sync with the code — outdated docs are worse than no docs.
