@@ -47,6 +47,7 @@ export function checkWinCondition(
     } else if (role.id === WerewolfRole.Spoiler) {
       spoilerAlive = true;
     } else if (role.id === WerewolfRole.LoneWolf) {
+      // Lone Wolf is Team.Neutral but wolf-aligned for win condition purposes
       badAlive++;
       loneWolfAlive++;
     } else if (role.team === Team.Bad) {
@@ -55,7 +56,7 @@ export function checkWinCondition(
     } else if (role.team === Team.Good) {
       goodAlive++;
     } else {
-      // Remaining roles (e.g. Tanner, Executioner) are Team.Neutral
+      // Remaining neutral roles (Tanner, Executioner) oppose wolves
       neutralAlive++;
     }
   }

@@ -17,13 +17,16 @@ interface GameOverScreenProps {
 function isVictory(
   winner: string | undefined,
   myRole: PlayerGameState["myRole"],
+  amDead?: boolean,
 ): boolean {
   if (!winner || !myRole) return false;
   if (winner === WerewolfWinner.Village) return myRole.team === Team.Good;
   if (winner === WerewolfWinner.Werewolves) return myRole.team === Team.Bad;
-  if (winner === WerewolfWinner.Chupacabra) return myRole.team === Team.Neutral;
+  if (winner === WerewolfWinner.Chupacabra)
+    return myRole.id === (WerewolfRole.Chupacabra as string);
+  // Only the sole surviving Lone Wolf wins — eliminated Lone Wolves don't share the victory
   if (winner === WerewolfWinner.LoneWolf)
-    return myRole.id === (WerewolfRole.LoneWolf as string);
+    return myRole.id === (WerewolfRole.LoneWolf as string) && !amDead;
   if (winner === WerewolfWinner.Tanner)
     return myRole.id === (WerewolfRole.Tanner as string);
   if (winner === WerewolfWinner.Spoiler)
@@ -56,7 +59,7 @@ export function GameOverScreen({ gameState }: GameOverScreenProps) {
 
   const finishedStatus = gameState.status as FinishedGameStatus;
   const { winner } = finishedStatus;
-  const victory = isVictory(winner, gameState.myRole);
+  const victory = isVictory(winner, gameState.myRole, gameState.amDead);
 
   const isDraw = winner === WerewolfWinner.Draw;
   const heading =
