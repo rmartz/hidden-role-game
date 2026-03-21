@@ -189,11 +189,15 @@ Narrator starts next night (start-night)
 
 `visibleRoleAssignments` is built per-player from:
 
-1. **Own teammates** — players whose role matches a `canSeeTeam` entry.
-   - Werewolves see all Team Bad players.
-   - Masons see all other Masons.
-2. **Dead players** — roles of all dead players are revealed to everyone.
-3. **Narrator** — sees all role assignments always.
+1. **Wake-phase partners** — roles sharing a group night phase via `teamTargeting` or `wakesWith`.
+   - Werewolves see other Werewolves, Wolf Cubs, and Lone Wolves (shared group phase).
+   - Wolf Cubs and Lone Wolves see all Werewolf wake-phase participants.
+2. **Aware-of** — explicit one-directional awareness via the `awareOf` property.
+   - Minion sees all `isWerewolf` players (`awareOf: { werewolves: true }`). Werewolves do NOT see the Minion.
+   - Lone Wolf sees all `isWerewolf` players (`awareOf: { werewolves: true }`).
+   - Masons see all other Masons (`awareOf: { roles: [Mason] }`).
+3. **Dead players** — roles of all dead players are revealed to everyone.
+4. **Narrator** — sees all role assignments always.
 
 Players never see their own role in `visibleRoleAssignments` (their role is in `myRole`).
 
