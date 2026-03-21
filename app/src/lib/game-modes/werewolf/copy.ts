@@ -126,6 +126,7 @@ export const WEREWOLF_COPY = {
     endGame: "End Game",
     rolesRevealHeading: "Final Roles",
     returnToLobby: "Return to Lobby",
+    returnToLobbyError: "Failed to return to lobby. Please try again.",
   },
   nomination: {
     heading: "Nominate for Trial",

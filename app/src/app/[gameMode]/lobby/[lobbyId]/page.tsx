@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { getPlayerId, getLobbyId, getSessionId } from "@/lib/api";
+import { getPlayerId, getLobbyId, getSessionId, saveGameId } from "@/lib/api";
 import { GameMode } from "@/lib/types";
 import { parseGameMode } from "@/lib/game-modes";
 import {
@@ -83,9 +83,16 @@ export default function LobbyPage() {
   }, [actualGameMode, validatedGameMode, lobbyId, router]);
 
   // Once the game starts, redirect all players to the game mode page.
+  // Only redirect when gameId transitions from absent to present (game just
+  // started), not when the page loads with gameId already set (e.g. returning
+  // from a finished game before clearGameId propagates).
+  const prevGameIdRef = useRef<string | undefined>(undefined);
   useEffect(() => {
-    if (gameId && actualGameMode)
+    if (gameId && !prevGameIdRef.current && actualGameMode) {
+      saveGameId(gameId);
       router.push(`/${actualGameMode}/game/${gameId}`);
+    }
+    prevGameIdRef.current = gameId;
   }, [gameId, actualGameMode, router]);
 
   // If the lobby doesn't exist or the session is invalid, return to the home page.

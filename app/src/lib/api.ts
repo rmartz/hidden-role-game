@@ -11,6 +11,7 @@ import { ServerResponseStatus } from "@/server/types";
 const SESSION_KEY = "x-session-id";
 const PLAYER_ID_KEY = "player-id";
 const LOBBY_ID_KEY = "lobby-id";
+const GAME_ID_KEY = "game-id";
 
 export function getSessionId(): string | undefined {
   if (typeof window === "undefined") return undefined;
@@ -39,10 +40,24 @@ function saveLobbyId(lobbyId: string): void {
   localStorage.setItem(LOBBY_ID_KEY, lobbyId);
 }
 
+export function getGameId(): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  return localStorage.getItem(GAME_ID_KEY) ?? undefined;
+}
+
+export function saveGameId(gameId: string): void {
+  localStorage.setItem(GAME_ID_KEY, gameId);
+}
+
+export function clearGameId(): void {
+  localStorage.removeItem(GAME_ID_KEY);
+}
+
 export function clearSession(): void {
   localStorage.removeItem(SESSION_KEY);
   localStorage.removeItem(PLAYER_ID_KEY);
   localStorage.removeItem(LOBBY_ID_KEY);
+  localStorage.removeItem(GAME_ID_KEY);
 }
 
 function saveJoinData(
