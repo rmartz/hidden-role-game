@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { TargetRegular } from "@fluentui/react-icons";
 import type { GameMode } from "@/lib/types";
 import type { VisibilityReason, VisibleTeammate } from "@/server/types";
 import {
@@ -16,6 +17,8 @@ interface PlayersRoleListProps {
   assignments: VisibleTeammate[];
   gameMode?: GameMode;
   deadPlayerIds?: string[];
+  /** Player ID of the Executioner's target. Shows a target icon when set. */
+  executionerTargetId?: string;
   /** Optional render prop for per-player action buttons. */
   renderActions?: (
     playerId: string,
@@ -69,6 +72,7 @@ export function PlayersRoleList({
   assignments,
   gameMode,
   deadPlayerIds,
+  executionerTargetId,
   renderActions,
 }: PlayersRoleListProps) {
   if (assignments.length === 0) return null;
@@ -97,7 +101,12 @@ export function PlayersRoleList({
                 {entries.map(({ player, role }) => (
                   <Item key={player.id} size="sm">
                     <ItemContent>
-                      <ItemTitle>{player.name}</ItemTitle>
+                      <ItemTitle>
+                        {player.name}
+                        {executionerTargetId === player.id && (
+                          <TargetRegular className="inline ml-1 text-amber-500" />
+                        )}
+                      </ItemTitle>
                     </ItemContent>
                     <ItemActions>
                       {role ? (

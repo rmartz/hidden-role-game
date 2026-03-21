@@ -165,14 +165,23 @@ export class FirebaseGameService {
       callerId,
     );
 
-    // Executioner: include target ID from the game-level field.
-    // During Starting phase, nightTargetState/daytimeNightState won't have it yet.
-    const isExecutioner =
-      game.executionerTargetId !== undefined &&
-      myAssignment.roleDefinitionId === "werewolf-executioner";
-    const executionerState = isExecutioner
-      ? { executionerTargetId: game.executionerTargetId }
-      : {};
+    // Executioner: add target to visibleRoleAssignments (name only, no role)
+    // and include executionerTargetId for UI indicators.
+    const executionerTargetId =
+      myAssignment.roleDefinitionId === "werewolf-executioner"
+        ? game.executionerTargetId
+        : undefined;
+    if (executionerTargetId && !visiblePlayerIds.has(executionerTargetId)) {
+      const targetPlayer = playerById.get(executionerTargetId);
+      if (targetPlayer) {
+        visibleRoleAssignments.push({
+          player: { id: targetPlayer.id, name: targetPlayer.name },
+          reason: "aware-of",
+        });
+        visiblePlayerIds.add(targetPlayer.id);
+      }
+    }
+    const executionerState = executionerTargetId ? { executionerTargetId } : {};
 
     return {
       status: game.status,

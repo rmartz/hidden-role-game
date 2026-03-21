@@ -10,7 +10,6 @@ import {
   PlayersRoleList,
   RoleLabel,
 } from "@/components/game";
-import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 
 interface PlayerStartingScreenProps {
   gameState: PlayerGameState;
@@ -40,11 +39,6 @@ export function PlayerStartingScreen({ gameState }: PlayerStartingScreenProps) {
       </div>
     ) : null;
 
-  const executionerTargetName = gameState.executionerTargetId
-    ? gameState.players.find((p) => p.id === gameState.executionerTargetId)
-        ?.name
-    : undefined;
-
   return (
     <div className="p-5 max-w-lg mx-auto">
       <h1 className="text-2xl font-bold mb-4">Game Starting</h1>
@@ -59,11 +53,6 @@ export function PlayerStartingScreen({ gameState }: PlayerStartingScreenProps) {
           <h2 className="text-lg font-semibold mb-2">Your Role</h2>
           <RoleLabel role={gameState.myRole} gameMode={gameState.gameMode} />
           {roleDescription}
-          {executionerTargetName && (
-            <p className="mt-2 text-sm font-medium text-amber-600 dark:text-amber-400">
-              {WEREWOLF_COPY.executioner.yourTarget(executionerTargetName)}
-            </p>
-          )}
         </div>
       )}
 
