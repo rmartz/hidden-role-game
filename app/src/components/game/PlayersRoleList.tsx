@@ -15,6 +15,7 @@ import {
   PLAYER_VISIBILITY_COPY,
   ROLE_VISIBILITY_OVERRIDES,
   LONE_WOLF_WARNING,
+  LONE_WOLF_WARNING_ROLES,
 } from "@/components/game/PlayersRoleList.copy";
 
 interface PlayersRoleListProps {
@@ -97,7 +98,12 @@ export function PlayersRoleList({
       {activeGroups.map(({ reason, entries }) => {
         const baseConfig = REASON_CONFIG[reason];
         const overrides = myRoleId
-          ? ROLE_VISIBILITY_OVERRIDES[myRoleId]
+          ? (
+              ROLE_VISIBILITY_OVERRIDES as Record<
+                string,
+                (typeof ROLE_VISIBILITY_OVERRIDES)[keyof typeof ROLE_VISIBILITY_OVERRIDES]
+              >
+            )[myRoleId]
           : undefined;
         const heading =
           reason === "wake-partner"
@@ -107,6 +113,8 @@ export function PlayersRoleList({
               : baseConfig.heading;
         const loneWolfVisible =
           reason === "wake-partner" &&
+          myRoleId !== undefined &&
+          LONE_WOLF_WARNING_ROLES.has(myRoleId) &&
           rolesInPlay?.some((r) => r.id === "werewolf-lone-wolf");
         const baseDescription =
           reason === "wake-partner"

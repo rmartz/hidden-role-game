@@ -1,3 +1,5 @@
+import { WerewolfRole } from "@/lib/game-modes/werewolf/roles";
+
 export const PLAYER_VISIBILITY_COPY = {
   wakePartnerHeading: "Players who wake with you",
   wakePartnerDescription:
@@ -12,44 +14,52 @@ export const PLAYER_VISIBILITY_COPY = {
  * Role-specific overrides for visibility section headings and descriptions.
  * Keyed by WerewolfRole enum value.
  */
-export const ROLE_VISIBILITY_OVERRIDES: Record<
-  string,
-  Partial<{
-    wakePartnerHeading: string;
-    wakePartnerDescription: string;
-    awareOfHeading: string;
-    awareOfDescription: string;
-  }>
+export const ROLE_VISIBILITY_OVERRIDES: Partial<
+  Record<
+    WerewolfRole,
+    Partial<{
+      wakePartnerHeading: string;
+      wakePartnerDescription: string;
+      awareOfHeading: string;
+      awareOfDescription: string;
+    }>
+  >
 > = {
-  "werewolf-werewolf": {
+  [WerewolfRole.Werewolf]: {
     wakePartnerHeading: "Your pack",
     wakePartnerDescription: "These players hunt with you at night.",
   },
-  "werewolf-wolf-cub": {
+  [WerewolfRole.WolfCub]: {
     wakePartnerHeading: "Your pack",
     wakePartnerDescription: "These players hunt with you at night.",
   },
-  "werewolf-mason": {
+  [WerewolfRole.Mason]: {
     awareOfHeading: "Your fellow Masons",
     awareOfDescription:
       "You trust these players completely — they are on your side.",
   },
-  "werewolf-minion": {
+  [WerewolfRole.Minion]: {
     awareOfHeading: "Those whom you serve",
     awareOfDescription:
       "You know who the werewolves are, but they do not know you.",
   },
-  "werewolf-lone-wolf": {
+  [WerewolfRole.LoneWolf]: {
     wakePartnerHeading: "The pack",
     wakePartnerDescription:
       "These players hunt with you at night, but you walk alone.",
   },
-  "werewolf-executioner": {
+  [WerewolfRole.Executioner]: {
     awareOfHeading: "Your target",
     awareOfDescription:
       "Convince the village to vote this player out at trial to win.",
   },
 };
+
+/** Roles that see the Lone Wolf warning when a Lone Wolf is in the game. */
+export const LONE_WOLF_WARNING_ROLES: ReadonlySet<string> = new Set([
+  WerewolfRole.Werewolf,
+  WerewolfRole.WolfCub,
+]);
 
 /** Appended to the wolf pack description when a Lone Wolf could be in the game. */
 export const LONE_WOLF_WARNING = " Not all may be committed to the pack.";
