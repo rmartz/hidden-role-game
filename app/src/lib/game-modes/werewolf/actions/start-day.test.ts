@@ -480,6 +480,40 @@ describe("WerewolfAction.StartDay — protection roles", () => {
         expect(ts.deadPlayerIds).not.toContain("p3");
         expect(ts.deadPlayerIds).not.toContain("p2");
       });
+
+      it("Vigilante still self-dies when protected but kills a Good player", () => {
+        // Wolves attack Vigilante, Bodyguard protects Vigilante,
+        // Vigilante kills a Good player → Vigilante survives wolf attack
+        // but still self-dies from killing Good
+        const game = makePlayingGame(
+          makeNightState({
+            turn: 2,
+            nightActions: {
+              [WerewolfRole.Werewolf]: {
+                votes: [],
+                suggestedTargetId: "p2",
+              },
+              [WerewolfRole.Vigilante]: { targetPlayerId: "p5" },
+              [WerewolfRole.Bodyguard]: { targetPlayerId: "p2" },
+            },
+          }),
+          {
+            roleAssignments: [
+              { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+              { playerId: "p2", roleDefinitionId: WerewolfRole.Vigilante },
+              { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+              { playerId: "p4", roleDefinitionId: WerewolfRole.Bodyguard },
+              { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+            ],
+          },
+        );
+        action.apply(game, null, "owner-1");
+        const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+        // p5 killed by Vigilante
+        expect(ts.deadPlayerIds).toContain("p5");
+        // Vigilante self-dies (killed Good player)
+        expect(ts.deadPlayerIds).toContain("p2");
+      });
     });
   });
 });

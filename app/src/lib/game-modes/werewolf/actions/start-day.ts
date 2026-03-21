@@ -153,10 +153,12 @@ export const startDayAction: GameAction = {
     }
 
     // Vigilante self-death: if the Vigilante killed a Good-team player, they die too.
+    // Skip if the Vigilante was already killed this night (e.g. by wolves).
     const vigilanteAssignment = game.roleAssignments.find(
       (a) =>
         a.roleDefinitionId === (WerewolfRole.Vigilante as string) &&
-        !ts.deadPlayerIds.includes(a.playerId),
+        !ts.deadPlayerIds.includes(a.playerId) &&
+        !newDeadIds.includes(a.playerId),
     );
     if (vigilanteAssignment) {
       const vigilanteAction = nightPhase.nightActions[
