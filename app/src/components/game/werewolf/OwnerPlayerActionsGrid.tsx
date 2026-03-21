@@ -12,7 +12,7 @@ interface OwnerPlayerActionsGridProps {
   deadPlayerIds?: string[];
   gameOwnerId?: string;
   isDaytime?: boolean;
-  hasActiveTrial?: boolean;
+  trialBlocked?: boolean;
   smitedPlayerIds?: string[];
 }
 
@@ -23,7 +23,7 @@ export function OwnerPlayerActionsGrid({
   deadPlayerIds,
   gameOwnerId,
   isDaytime,
-  hasActiveTrial,
+  trialBlocked,
   smitedPlayerIds,
 }: OwnerPlayerActionsGridProps) {
   return (
@@ -39,7 +39,7 @@ export function OwnerPlayerActionsGrid({
             playerName={playerName}
             isDead={isDead}
             isDaytime={isDaytime}
-            hasActiveTrial={hasActiveTrial}
+            trialBlocked={trialBlocked}
             isSmited={smitedPlayerIds?.includes(playerId)}
           />
         )

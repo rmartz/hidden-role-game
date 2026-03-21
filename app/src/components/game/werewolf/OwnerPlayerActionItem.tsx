@@ -21,7 +21,7 @@ interface OwnerPlayerActionItemProps {
   playerName: string;
   isDead: boolean;
   isDaytime?: boolean;
-  hasActiveTrial?: boolean;
+  trialBlocked?: boolean;
   isSmited?: boolean;
 }
 
@@ -31,7 +31,7 @@ export function OwnerPlayerActionItem({
   playerName,
   isDead,
   isDaytime,
-  hasActiveTrial,
+  trialBlocked,
   isSmited,
 }: OwnerPlayerActionItemProps) {
   const action = useGameAction(gameId);
@@ -93,7 +93,7 @@ export function OwnerPlayerActionItem({
           variant="outline"
           size="xs"
           onClick={handlePutToVote}
-          disabled={action.isPending || !!hasActiveTrial}
+          disabled={action.isPending || !!trialBlocked}
         >
           {WEREWOLF_COPY.trial.putToVote}
         </Button>

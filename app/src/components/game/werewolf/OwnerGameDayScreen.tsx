@@ -136,7 +136,7 @@ export function OwnerGameDayScreen({
         deadPlayerIds={gameState.deadPlayerIds}
         gameOwnerId={gameState.gameOwner?.id}
         isDaytime
-        hasActiveTrial={nominationsBlocked}
+        trialBlocked={nominationsBlocked}
       />
       <GameRolesList
         roles={gameState.rolesInPlay ?? []}
