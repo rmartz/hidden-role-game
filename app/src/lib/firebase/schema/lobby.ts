@@ -89,8 +89,8 @@ function lobbyConfigToFirebase(config: LobbyConfig): FirebaseLobbyConfig {
     showConfigToPlayers: config.showConfigToPlayers,
     showRolesInPlay: config.showRolesInPlay,
     timerConfig: config.timerConfig,
-    ...(config.nominationsEnabled ? { nominationsEnabled: true } : {}),
-    ...(!config.singleTrialPerDay ? { singleTrialPerDay: false } : {}),
+    nominationsEnabled: config.nominationsEnabled,
+    singleTrialPerDay: config.singleTrialPerDay,
   };
 }
 

@@ -108,8 +108,8 @@ export function playerStateToFirebase(
     ...(state.isSilenced ? { isSilenced: true } : {}),
     ...(state.isHypnotized ? { isHypnotized: true } : {}),
     ...(state.activeTrial ? { activeTrial: state.activeTrial } : {}),
-    ...(state.nominationsEnabled ? { nominationsEnabled: true } : {}),
-    ...(!state.singleTrialPerDay ? { singleTrialPerDay: false } : {}),
+    nominationsEnabled: state.nominationsEnabled,
+    singleTrialPerDay: state.singleTrialPerDay,
     ...(state.nominations?.length ? { nominations: state.nominations } : {}),
     ...(state.myNominatedDefendantId
       ? { myNominatedDefendantId: state.myNominatedDefendantId }

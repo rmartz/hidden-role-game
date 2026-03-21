@@ -57,8 +57,8 @@ export function gameToFirebase(game: Game): FirebaseGamePublic {
     showRolesInPlay: game.showRolesInPlay,
     ownerPlayerId: game.ownerPlayerId ?? null,
     timerConfig: game.timerConfig,
-    ...(game.nominationsEnabled ? { nominationsEnabled: true } : {}),
-    ...(!game.singleTrialPerDay ? { singleTrialPerDay: false } : {}),
+    nominationsEnabled: game.nominationsEnabled,
+    singleTrialPerDay: game.singleTrialPerDay,
   };
 }
 
