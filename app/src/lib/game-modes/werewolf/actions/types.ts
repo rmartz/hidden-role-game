@@ -18,4 +18,5 @@ export enum WerewolfAction {
   SkipDefense = "skip-defense",
   KillPlayer = "kill-player",
   ResolveHunterRevenge = "resolve-hunter-revenge",
+  CancelTrial = "cancel-trial",
 }
