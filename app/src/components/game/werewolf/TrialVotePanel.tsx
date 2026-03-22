@@ -108,10 +108,12 @@ export function TrialVotePanel({
   ) : activeTrial.phase === "defense" ? (
     <>
       <p className="font-semibold mb-1">
-        {trial.defenseHeading(defendantName)}
+        {isDefendant
+          ? trial.defenseHeadingSelf
+          : trial.defenseHeading(defendantName)}
       </p>
       <p className="text-sm text-muted-foreground mb-2">
-        {trial.defenseSubtext}
+        {isDefendant ? trial.defenseSubtextSelf : trial.defenseSubtext}
       </p>
       {isDefendant && isSilenced && (
         <p className="text-sm italic text-muted-foreground mb-2">
