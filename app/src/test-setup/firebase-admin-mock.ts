@@ -73,6 +73,10 @@ function makeRef(path: string): Record<string, unknown> {
       }
       return Promise.resolve();
     }),
+    remove: vi.fn(() => {
+      setNestedValue(path, null);
+      return Promise.resolve();
+    }),
     child: (childPath: string) =>
       makeRef(path ? `${path}/${childPath}` : childPath),
     ref: (childPath?: string) => (childPath ? makeRef(childPath) : makeRef("")),

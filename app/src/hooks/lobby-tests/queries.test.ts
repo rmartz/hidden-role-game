@@ -42,6 +42,7 @@ const mockLobby: PublicLobby = {
     singleTrialPerDay: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
   },
+  readyPlayerIds: [],
 };
 
 beforeEach(() => {

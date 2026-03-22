@@ -146,6 +146,36 @@ export class FirebaseLobbyService {
     return firebaseToLobby(lobbyId, data.public, data.private);
   }
 
+  async toggleReady(
+    lobbyId: string,
+    playerId: string,
+  ): Promise<Lobby | undefined> {
+    const snap = await lobbyRef(lobbyId).once("value");
+    if (!snap.exists()) return undefined;
+
+    const data = snap.val() as {
+      public: FirebaseLobbyPublic;
+      private: FirebaseLobbyPrivate;
+    };
+
+    const current: string[] = data.public.readyPlayerIds ?? [];
+    const isReady = current.includes(playerId);
+    const updated = isReady
+      ? current.filter((id) => id !== playerId)
+      : [...current, playerId];
+
+    await lobbyRef(lobbyId)
+      .child("public/readyPlayerIds")
+      .set(updated.length > 0 ? updated : null);
+
+    data.public.readyPlayerIds = updated.length > 0 ? updated : undefined;
+    return firebaseToLobby(lobbyId, data.public, data.private);
+  }
+
+  async clearReadyPlayerIds(lobbyId: string): Promise<void> {
+    await lobbyRef(lobbyId).child("public/readyPlayerIds").remove();
+  }
+
   async updateConfig(
     lobbyId: string,
     config: {

@@ -52,6 +52,7 @@ export async function POST(request: Request): Promise<Response> {
       singleTrialPerDay: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
     },
+    readyPlayerIds: [] as string[],
   };
 
   await lobbyService.addLobby(lobby);

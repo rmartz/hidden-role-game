@@ -1,4 +1,5 @@
 import type { PublicLobbyPlayer } from "@/server/types";
+import { CheckmarkCircleRegular } from "@fluentui/react-icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -18,6 +19,7 @@ interface PlayerRowProps {
   player: PublicLobbyPlayer;
   ownerPlayerId: string;
   isCurrentUser: boolean;
+  isReady: boolean;
   showLeave: boolean;
   showRemovePlayer: boolean;
   showMakeOwner: boolean;
@@ -30,6 +32,7 @@ export function PlayerRow({
   player,
   ownerPlayerId,
   isCurrentUser,
+  isReady,
   showLeave,
   showRemovePlayer,
   showMakeOwner,
@@ -39,6 +42,9 @@ export function PlayerRow({
 }: PlayerRowProps) {
   return (
     <li className="flex items-center gap-2 py-1">
+      {isReady && (
+        <CheckmarkCircleRegular className="text-green-600 h-5 w-5 shrink-0" />
+      )}
       <span>{player.name}</span>
       {player.id === ownerPlayerId && (
         <Badge variant="secondary">Lobby owner</Badge>

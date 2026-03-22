@@ -86,6 +86,7 @@ describe("useStartGame", () => {
             timerConfig: DEFAULT_TIMER_CONFIG,
           },
           gameId: "game-1",
+          readyPlayerIds: [],
         } satisfies PublicLobby,
       },
     });

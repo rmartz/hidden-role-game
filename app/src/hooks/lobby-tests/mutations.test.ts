@@ -44,6 +44,7 @@ const mockLobby: PublicLobby = {
     singleTrialPerDay: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
   },
+  readyPlayerIds: [],
 };
 const mockJoinResponse: LobbyJoinResponse = {
   lobby: mockLobby,

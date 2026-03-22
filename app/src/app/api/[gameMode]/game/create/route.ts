@@ -67,6 +67,7 @@ export async function POST(
     lobby.config.singleTrialPerDay,
   );
 
+  await lobbyService.clearReadyPlayerIds(lobbyId);
   const updated = await lobbyService.setGameId(lobbyId, game.id);
   if (!updated) {
     return errorResponse("Failed to start game", 500);

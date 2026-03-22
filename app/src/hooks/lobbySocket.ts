@@ -51,7 +51,9 @@ export function useLobbyWebSocket(
           const sameStructure =
             JSON.stringify(cached.players) === JSON.stringify(lobby.players) &&
             cached.gameId === lobby.gameId &&
-            cached.ownerPlayerId === lobby.ownerPlayerId;
+            cached.ownerPlayerId === lobby.ownerPlayerId &&
+            JSON.stringify(cached.readyPlayerIds) ===
+              JSON.stringify(lobby.readyPlayerIds);
           if (sameStructure) return;
         }
 

@@ -11,6 +11,7 @@ import {
   useLobbyWebSocket,
   useRemovePlayer,
   useStartGame,
+  useToggleReady,
   useTransferOwner,
   useConfigSync,
 } from "@/hooks";
@@ -114,6 +115,7 @@ export default function LobbyPage() {
   });
 
   const startGameMutation = useStartGame(lobbyId);
+  const toggleReadyMutation = useToggleReady(lobbyId);
   const transferOwnerMutation = useTransferOwner(lobbyId);
   const { flushAsync: flushConfigSync } = useConfigSync(
     lobbyId,
@@ -209,12 +211,14 @@ export default function LobbyPage() {
         <PlayerList
           lobby={fetchLobby.data}
           userPlayerId={myPlayerId}
+          isOwner={isOwner}
           showLeave={!isOwner}
           showRemovePlayer={isOwner}
           showMakeOwner={isOwner}
           showRefresh={!wsConnected}
           isFetching={fetchLobby.isFetching}
           disabled={startGameMutation.isPending || gameId !== undefined}
+          isReadyPending={toggleReadyMutation.isPending}
           onRefetch={handleRefetch}
           onRemovePlayer={(playerId: string) => {
             removeMutation.mutate(playerId);
@@ -223,6 +227,9 @@ export default function LobbyPage() {
             void flushConfigSync().then(() => {
               transferOwnerMutation.mutate(playerId);
             });
+          }}
+          onToggleReady={() => {
+            toggleReadyMutation.mutate();
           }}
         />
       )}
