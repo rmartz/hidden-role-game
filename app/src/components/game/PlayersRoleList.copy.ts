@@ -1,3 +1,5 @@
+import { WerewolfRole } from "@/lib/game-modes/werewolf/roles";
+
 export const PLAYER_VISIBILITY_COPY = {
   wakePartnerHeading: "Players who wake with you",
   wakePartnerDescription:
@@ -7,3 +9,57 @@ export const PLAYER_VISIBILITY_COPY = {
     "You know these players share your allegiance, but not their specific roles.",
   revealedHeading: "Revealed roles",
 } as const;
+
+/**
+ * Role-specific overrides for visibility section headings and descriptions.
+ * Keyed by WerewolfRole enum value.
+ */
+export const ROLE_VISIBILITY_OVERRIDES: Partial<
+  Record<
+    WerewolfRole,
+    Partial<{
+      wakePartnerHeading: string;
+      wakePartnerDescription: string;
+      awareOfHeading: string;
+      awareOfDescription: string;
+    }>
+  >
+> = {
+  [WerewolfRole.Werewolf]: {
+    wakePartnerHeading: "Your pack",
+    wakePartnerDescription: "These players hunt with you at night.",
+  },
+  [WerewolfRole.WolfCub]: {
+    wakePartnerHeading: "Your pack",
+    wakePartnerDescription: "These players hunt with you at night.",
+  },
+  [WerewolfRole.Mason]: {
+    awareOfHeading: "Your fellow Masons",
+    awareOfDescription:
+      "You trust these players completely — they are on your side.",
+  },
+  [WerewolfRole.Minion]: {
+    awareOfHeading: "Those whom you serve",
+    awareOfDescription:
+      "You know who the werewolves are, but they do not know you.",
+  },
+  [WerewolfRole.LoneWolf]: {
+    wakePartnerHeading: "The pack",
+    wakePartnerDescription:
+      "These players hunt with you at night, but you walk alone.",
+  },
+  [WerewolfRole.Executioner]: {
+    awareOfHeading: "Your target",
+    awareOfDescription:
+      "Convince the village to vote this player out at trial to win.",
+  },
+};
+
+/** Roles that see the Lone Wolf warning when a Lone Wolf is in the game. */
+export const LONE_WOLF_WARNING_ROLES: ReadonlySet<string> = new Set([
+  WerewolfRole.Werewolf,
+  WerewolfRole.WolfCub,
+]);
+
+/** Appended to the wolf pack description when a Lone Wolf could be in the game. */
+export const LONE_WOLF_WARNING = " Not all may be committed to the pack.";
