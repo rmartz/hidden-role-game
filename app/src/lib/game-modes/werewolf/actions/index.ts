@@ -19,6 +19,7 @@ import { withdrawNominationAction } from "./withdraw-nomination";
 import { skipDefenseAction } from "./skip-defense";
 import { killPlayerAction } from "./kill-player";
 import { resolveHunterRevengeAction } from "./resolve-hunter-revenge";
+import { cancelTrialAction } from "./cancel-trial";
 
 export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.StartNight]: startNightAction,
@@ -40,4 +41,5 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.SkipDefense]: skipDefenseAction,
   [WerewolfAction.KillPlayer]: killPlayerAction,
   [WerewolfAction.ResolveHunterRevenge]: resolveHunterRevengeAction,
+  [WerewolfAction.CancelTrial]: cancelTrialAction,
 };

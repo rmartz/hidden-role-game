@@ -97,6 +97,7 @@ export const WEREWOLF_COPY = {
       "Uh, maybe try puppy dog eyes?",
     ],
     skipDefense: "Skip Defense",
+    cancelTrial: "Cancel Trial",
     putToVote: "Put to Vote",
     mustVoteGuiltyNote:
       "As the Village Idiot, your vote was automatically cast as Guilty.",

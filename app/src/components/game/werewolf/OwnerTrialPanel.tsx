@@ -45,6 +45,10 @@ export function OwnerTrialPanel({
     action.mutate({ actionId: WerewolfAction.SkipDefense });
   }, [action]);
 
+  const handleCancelTrial = useCallback(() => {
+    action.mutate({ actionId: WerewolfAction.CancelTrial });
+  }, [action]);
+
   const { trial } = WEREWOLF_COPY;
   const verdictLabel = activeTrial.verdict
     ? activeTrial.verdict === "eliminated"
@@ -82,14 +86,24 @@ export function OwnerTrialPanel({
           <p className="text-sm text-muted-foreground mb-3">
             {trial.defenseSubtext}
           </p>
-          <Button
-            size="sm"
-            className="w-full max-w-xs"
-            onClick={handleSkipDefense}
-            disabled={action.isPending}
-          >
-            {trial.skipDefense}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              className="flex-1"
+              onClick={handleSkipDefense}
+              disabled={action.isPending}
+            >
+              {trial.skipDefense}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleCancelTrial}
+              disabled={action.isPending}
+            >
+              {trial.cancelTrial}
+            </Button>
+          </div>
         </>
       ) : (
         <>
@@ -119,14 +133,24 @@ export function OwnerTrialPanel({
               ))}
             </ul>
           )}
-          <Button
-            size="sm"
-            className="w-full max-w-xs"
-            onClick={handleResolve}
-            disabled={action.isPending}
-          >
-            {trial.resolveTrial}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              size="sm"
+              className="flex-1"
+              onClick={handleResolve}
+              disabled={action.isPending}
+            >
+              {trial.resolveTrial}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleCancelTrial}
+              disabled={action.isPending}
+            >
+              {trial.cancelTrial}
+            </Button>
+          </div>
         </>
       )}
     </div>
