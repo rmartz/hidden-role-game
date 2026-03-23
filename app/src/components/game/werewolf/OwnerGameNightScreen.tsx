@@ -266,29 +266,30 @@ export function OwnerGameNightScreen({
               <span> ({activePlayerNames.join(", ")})</span>
             )}
           </p>
-          {!isFirstTurn &&
-            (isRoleActive(activePhaseKey, WerewolfRole.Witch) &&
-            turnState.witchAbilityUsed &&
-            !activeTargetConfirmed ? (
-              <div className="mb-4">
-                <p className="text-sm text-muted-foreground italic mb-2">
-                  {WEREWOLF_COPY.night.witchAbilityUsed}
-                </p>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    action.mutate({
-                      actionId: WerewolfAction.ResetAbility,
-                      payload: { roleId: WerewolfRole.Witch },
-                    });
-                  }}
-                  disabled={action.isPending}
-                >
-                  {WEREWOLF_COPY.narrator.restoreAbility}
-                </Button>
-              </div>
-            ) : (
+          {!isFirstTurn && (
+            <>
+              {isRoleActive(activePhaseKey, WerewolfRole.Witch) &&
+                turnState.witchAbilityUsed &&
+                !activeTargetConfirmed && (
+                  <div className="mb-4">
+                    <p className="text-sm text-muted-foreground italic mb-2">
+                      {WEREWOLF_COPY.night.witchAbilityUsed}
+                    </p>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        action.mutate({
+                          actionId: WerewolfAction.ResetAbility,
+                          payload: { roleId: WerewolfRole.Witch },
+                        });
+                      }}
+                      disabled={action.isPending}
+                    >
+                      {WEREWOLF_COPY.narrator.restoreAbility}
+                    </Button>
+                  </div>
+                )}
               <OwnerNightTargetPanel
                 groupAction={!!groupAction}
                 groupMemberCount={activePlayerNames.length}
@@ -301,7 +302,8 @@ export function OwnerGameNightScreen({
                 isPending={action.isPending}
                 previousTargetId={previousTargetId}
               />
-            ))}
+            </>
+          )}
           {investigationResult && (
             <OwnerInvestigationConfirm
               gameId={gameId}
