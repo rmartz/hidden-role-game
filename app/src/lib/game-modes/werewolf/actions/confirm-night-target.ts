@@ -4,9 +4,8 @@ import {
   currentTurnState,
   validateActiveNightPlayer,
   getGroupPhasePlayerIds,
-  isRoleActive,
 } from "../utils";
-import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
+import { WEREWOLF_ROLES } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
 
 export const confirmNightTargetAction: GameAction = {
@@ -70,12 +69,7 @@ export const confirmNightTargetAction: GameAction = {
       phase.nightActions[activePhaseKey] = { ...action, confirmed: true };
     }
 
-    if (isRoleActive(activePhaseKey, WerewolfRole.Witch)) {
-      ts.witchAbilityUsed = true;
-    }
-
-    if (isRoleActive(activePhaseKey, WerewolfRole.Exposer)) {
-      ts.exposerAbilityUsed = true;
-    }
+    // witchAbilityUsed and exposerAbilityUsed are set in start-day
+    // during night resolution, so both player and narrator paths are handled.
   },
 };

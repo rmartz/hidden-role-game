@@ -13,7 +13,8 @@ describe("ConfirmNightTarget — sets witchAbilityUsed for Witch", () => {
   const confirmAction = WEREWOLF_ACTIONS[WerewolfAction.ConfirmNightTarget];
   const setTargetAction = WEREWOLF_ACTIONS[WerewolfAction.SetNightTarget];
 
-  it("sets witchAbilityUsed on the turn state after Witch confirms", () => {
+  it("sets witchAbilityUsed after start-day resolves the Witch's action", () => {
+    const startDay = WEREWOLF_ACTIONS[WerewolfAction.StartDay];
     const ts: WerewolfTurnState = {
       turn: 2,
       phase: {
@@ -26,21 +27,18 @@ describe("ConfirmNightTarget — sets witchAbilityUsed for Witch", () => {
       deadPlayerIds: [],
     };
     const game = makePlayingGame(ts, {
-      players: [
-        { id: "p1", name: "Alice", sessionId: "s1", visiblePlayers: [] },
-        { id: "p2", name: "Bob", sessionId: "s2", visiblePlayers: [] },
-        { id: "p3", name: "Charlie", sessionId: "s3", visiblePlayers: [] },
-      ],
       roleAssignments: [
         { playerId: "p1", roleDefinitionId: WerewolfRole.Witch },
-        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Werewolf },
         { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
       ],
     });
 
-    setTargetAction.apply(game, { targetPlayerId: "p2" }, "p1");
-    expect(confirmAction.isValid(game, "p1", undefined)).toBe(true);
+    setTargetAction.apply(game, { targetPlayerId: "p3" }, "p1");
     confirmAction.apply(game, null, "p1");
+    startDay.apply(game, null, "owner-1");
 
     const resultTs = (game.status as { turnState: WerewolfTurnState })
       .turnState;
