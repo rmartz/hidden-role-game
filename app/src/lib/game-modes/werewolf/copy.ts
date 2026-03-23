@@ -192,6 +192,7 @@ export const WEREWOLF_COPY = {
     mentalistSameTeam: "on the same team",
     mentalistDifferentTeams: "on different teams",
     restoreAbility: "Restore Ability",
+    bypassAbility: "Override",
   },
   altruist: {
     attackedIntro:

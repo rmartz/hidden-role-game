@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   BedRegular,
   ClockWarningRegular,
@@ -50,6 +50,7 @@ export function OwnerGameNightScreen({
   turnState,
 }: OwnerGameNightScreenProps) {
   const action = useGameAction(gameId);
+  const [abilityBypass, setAbilityBypass] = useState(false);
 
   const timerConfig = gameState.timerConfig;
 
@@ -80,6 +81,9 @@ export function OwnerGameNightScreen({
 
   const nightActions = phase.nightActions;
   const activePhaseKey = nightPhaseOrder[currentPhaseIndex] ?? "";
+  useEffect(() => {
+    setAbilityBypass(false);
+  }, [activePhaseKey]);
   const activeAction = nightActions[activePhaseKey];
   const { targetPlayerId: activeTarget, confirmed: activeTargetConfirmed } =
     getSoloTarget(activeAction);
@@ -268,13 +272,12 @@ export function OwnerGameNightScreen({
           </p>
           {!isFirstTurn && (
             <>
-              {isRoleActive(activePhaseKey, WerewolfRole.Witch) &&
-                turnState.witchAbilityUsed &&
-                !activeTargetConfirmed && (
-                  <div className="mb-4">
-                    <p className="text-sm text-muted-foreground italic mb-2">
-                      {WEREWOLF_COPY.night.witchAbilityUsed}
-                    </p>
+              {isWitchAbilitySkipped && !activeTargetConfirmed && (
+                <div className="mb-4">
+                  <p className="text-sm text-muted-foreground italic mb-2">
+                    {WEREWOLF_COPY.night.witchAbilityUsed}
+                  </p>
+                  <div className="flex gap-2">
                     <Button
                       size="sm"
                       variant="outline"
@@ -288,20 +291,34 @@ export function OwnerGameNightScreen({
                     >
                       {WEREWOLF_COPY.narrator.restoreAbility}
                     </Button>
+                    {!abilityBypass && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setAbilityBypass(true);
+                        }}
+                      >
+                        {WEREWOLF_COPY.narrator.bypassAbility}
+                      </Button>
+                    )}
                   </div>
-                )}
-              <OwnerNightTargetPanel
-                groupAction={!!groupAction}
-                groupMemberCount={activePlayerNames.length}
-                resolvedVotes={resolvedVotes}
-                activeTargetName={activeTargetName}
-                activeTargetConfirmed={activeTargetConfirmed}
-                targetablePlayers={targetablePlayers}
-                activeTarget={activeTarget}
-                onTargetClick={handleTargetClick}
-                isPending={action.isPending}
-                previousTargetId={previousTargetId}
-              />
+                </div>
+              )}
+              {(!isWitchAbilitySkipped || abilityBypass) && (
+                <OwnerNightTargetPanel
+                  groupAction={!!groupAction}
+                  groupMemberCount={activePlayerNames.length}
+                  resolvedVotes={resolvedVotes}
+                  activeTargetName={activeTargetName}
+                  activeTargetConfirmed={activeTargetConfirmed}
+                  targetablePlayers={targetablePlayers}
+                  activeTarget={activeTarget}
+                  onTargetClick={handleTargetClick}
+                  isPending={action.isPending}
+                  previousTargetId={previousTargetId}
+                />
+              )}
             </>
           )}
           {investigationResult && (
