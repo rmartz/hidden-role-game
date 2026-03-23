@@ -98,7 +98,12 @@ export default function Home() {
 
   return (
     <div className="p-5 max-w-lg mx-auto">
-      <h1 className="text-2xl font-bold mb-4">{HOME_PAGE_COPY.title}</h1>
+      <div className="text-center mb-6">
+        <h1 className="text-2xl font-bold mb-1">{HOME_PAGE_COPY.title}</h1>
+        <p className="text-sm text-muted-foreground">
+          {HOME_PAGE_COPY.subtitle}
+        </p>
+      </div>
 
       {activeLobbyPanel}
 
@@ -109,8 +114,8 @@ export default function Home() {
         </p>
       )}
 
-      <div className="space-y-3 mb-4">
-        <div className="space-y-1">
+      <div className="flex flex-col items-center mb-6">
+        <div className="w-full max-w-xs space-y-1">
           <Label htmlFor="player-name">{HOME_PAGE_COPY.playerNameLabel}</Label>
           <Input
             id="player-name"
@@ -120,69 +125,76 @@ export default function Home() {
               setPlayerName(e.target.value);
             }}
             placeholder={HOME_PAGE_COPY.playerNamePlaceholder}
-            className="max-w-xs"
           />
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor="lobby-id">{HOME_PAGE_COPY.lobbyIdLabel}</Label>
-          <Input
-            id="lobby-id"
-            type="text"
-            value={lobbyIdInput}
-            onChange={(e) => {
-              setLobbyIdInput(e.target.value);
-            }}
-            placeholder={HOME_PAGE_COPY.lobbyIdPlaceholder}
-            className="max-w-xs"
-          />
-        </div>
-        <div className="space-y-1">
-          <Label htmlFor="game-mode">{HOME_PAGE_COPY.gameModeLabel}</Label>
-          <Select
-            value={selectedGameMode}
-            onValueChange={(v) => {
-              const match = GAME_MODE_OPTIONS.find((opt) => opt.value === v);
-              if (match) setSelectedGameMode(match.value);
-            }}
-          >
-            <SelectTrigger id="game-mode" className="max-w-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {GAME_MODE_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
         </div>
       </div>
 
-      <div className="flex gap-2">
-        <Button
-          onClick={() => {
-            createMutation.mutate(playerName);
-          }}
-          disabled={loading || playerName.trim() === ""}
-        >
-          {createMutation.isPending
-            ? HOME_PAGE_COPY.creating
-            : HOME_PAGE_COPY.createLobby}
-        </Button>
-        <Button
-          variant="outline"
-          onClick={() => {
-            joinMutation.mutate({ lobbyId: lobbyIdInput, playerName });
-          }}
-          disabled={
-            loading || playerName.trim() === "" || lobbyIdInput.trim() === ""
-          }
-        >
-          {joinMutation.isPending
-            ? HOME_PAGE_COPY.joining
-            : HOME_PAGE_COPY.joinLobby}
-        </Button>
+      <div className="grid grid-cols-[1fr_auto_1fr] gap-4">
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <Label htmlFor="game-mode">{HOME_PAGE_COPY.gameModeLabel}</Label>
+            <Select
+              value={selectedGameMode}
+              onValueChange={(v) => {
+                const match = GAME_MODE_OPTIONS.find((opt) => opt.value === v);
+                if (match) setSelectedGameMode(match.value);
+              }}
+            >
+              <SelectTrigger id="game-mode">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {GAME_MODE_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <Button
+            className="w-full"
+            onClick={() => {
+              createMutation.mutate(playerName);
+            }}
+            disabled={loading || playerName.trim() === ""}
+          >
+            {createMutation.isPending
+              ? HOME_PAGE_COPY.creating
+              : HOME_PAGE_COPY.createLobby}
+          </Button>
+        </div>
+
+        <div className="border-l" />
+
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <Label htmlFor="lobby-id">{HOME_PAGE_COPY.lobbyIdLabel}</Label>
+            <Input
+              id="lobby-id"
+              type="text"
+              value={lobbyIdInput}
+              onChange={(e) => {
+                setLobbyIdInput(e.target.value);
+              }}
+              placeholder={HOME_PAGE_COPY.lobbyIdPlaceholder}
+            />
+          </div>
+          <Button
+            className="w-full"
+            variant="outline"
+            onClick={() => {
+              joinMutation.mutate({ lobbyId: lobbyIdInput, playerName });
+            }}
+            disabled={
+              loading || playerName.trim() === "" || lobbyIdInput.trim() === ""
+            }
+          >
+            {joinMutation.isPending
+              ? HOME_PAGE_COPY.joining
+              : HOME_PAGE_COPY.joinLobby}
+          </Button>
+        </div>
       </div>
     </div>
   );

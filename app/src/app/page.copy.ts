@@ -1,5 +1,7 @@
 export const HOME_PAGE_COPY = {
   title: "Hidden Role Game",
+  subtitle:
+    "Host and play social deduction games with friends — no cards needed.",
   activeGame: "You have an active game in progress.",
   rejoinGame: "Rejoin Game",
   activeLobby: (lobbyId: string) => `You are already in lobby: ${lobbyId}`,
