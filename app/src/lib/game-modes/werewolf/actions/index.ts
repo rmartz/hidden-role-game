@@ -20,6 +20,7 @@ import { skipDefenseAction } from "./skip-defense";
 import { killPlayerAction } from "./kill-player";
 import { resolveHunterRevengeAction } from "./resolve-hunter-revenge";
 import { cancelTrialAction } from "./cancel-trial";
+import { resetAbilityAction } from "./reset-ability";
 
 export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.StartNight]: startNightAction,
@@ -42,4 +43,5 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.KillPlayer]: killPlayerAction,
   [WerewolfAction.ResolveHunterRevenge]: resolveHunterRevengeAction,
   [WerewolfAction.CancelTrial]: cancelTrialAction,
+  [WerewolfAction.ResetAbility]: resetAbilityAction,
 };

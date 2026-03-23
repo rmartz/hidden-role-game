@@ -27,6 +27,7 @@ import type {
 } from "@/lib/game-modes/werewolf";
 import { WEREWOLF_ROLES } from "@/lib/game-modes/werewolf/roles";
 import type { PlayerGameState } from "@/server/types";
+import { Button } from "@/components/ui/button";
 import { getPlayerName } from "@/lib/player-utils";
 import { useGameAction } from "@/hooks";
 import { GameTimer } from "@/components/game";
@@ -269,9 +270,24 @@ export function OwnerGameNightScreen({
             (isRoleActive(activePhaseKey, WerewolfRole.Witch) &&
             turnState.witchAbilityUsed &&
             !activeTargetConfirmed ? (
-              <p className="mb-4 text-sm text-muted-foreground italic">
-                {WEREWOLF_COPY.night.witchAbilityUsed}
-              </p>
+              <div className="mb-4">
+                <p className="text-sm text-muted-foreground italic mb-2">
+                  {WEREWOLF_COPY.night.witchAbilityUsed}
+                </p>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    action.mutate({
+                      actionId: WerewolfAction.ResetAbility,
+                      payload: { roleId: WerewolfRole.Witch },
+                    });
+                  }}
+                  disabled={action.isPending}
+                >
+                  {WEREWOLF_COPY.narrator.restoreAbility}
+                </Button>
+              </div>
             ) : (
               <OwnerNightTargetPanel
                 groupAction={!!groupAction}
