@@ -71,10 +71,10 @@ export function RoleConfigEntry(props: RoleConfigEntryProps) {
 
   return (
     <li
-      className={`py-1 ${isAdvanced ? "flex flex-col gap-1" : "flex items-start gap-2"} ${dimmed ? "text-muted-foreground" : ""}`}
+      className={`py-1 ${isAdvanced ? "flex flex-col gap-1" : "grid grid-cols-[1fr_auto] items-center gap-2"} ${dimmed ? "text-muted-foreground" : ""}`}
     >
-      <span className="min-w-40 flex items-center gap-1">
-        <RoleLabel role={role} gameMode={gameMode} showTeam />
+      <span className="flex items-center gap-1">
+        <RoleLabel role={role} gameMode={gameMode} />
       </span>
       {readOnly ? (
         roleConfigMode === RoleConfigMode.Advanced ? (
@@ -110,12 +110,14 @@ export function RoleConfigEntry(props: RoleConfigEntryProps) {
           </div>
         </div>
       ) : roleConfigMode === RoleConfigMode.Custom ? (
-        <Incrementer
-          value={count}
-          onChange={handleCountChange}
-          disabled={props.disabled}
-          minValue={0}
-        />
+        <div className="flex items-center gap-1">
+          <Incrementer
+            value={count}
+            onChange={handleCountChange}
+            disabled={props.disabled}
+            minValue={0}
+          />
+        </div>
       ) : (
         <span className="text-sm text-muted-foreground">{count}</span>
       )}

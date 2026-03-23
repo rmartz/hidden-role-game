@@ -160,7 +160,7 @@ export default function LobbyPage() {
     ) : null;
 
   return (
-    <div className="p-5 max-w-lg mx-auto">
+    <div className="p-5 max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">{LOBBY_PAGE_COPY.title}</h1>
         <ShareLobby lobbyId={lobbyId} gameMode={validatedGameMode} />
