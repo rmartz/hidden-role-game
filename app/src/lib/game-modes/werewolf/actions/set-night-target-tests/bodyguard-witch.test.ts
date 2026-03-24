@@ -161,3 +161,58 @@ describe("SetNightTarget — suffixed repeat group phase", () => {
     expect(action.isValid(game, "w1", { targetPlayerId: "p4" })).toBe(true);
   });
 });
+
+// ---------------------------------------------------------------------------
+// SetNightTarget — Witch self-targeting
+// ---------------------------------------------------------------------------
+
+describe("SetNightTarget — Witch cannot self-attack", () => {
+  const action = WEREWOLF_ACTIONS[WerewolfAction.SetNightTarget];
+
+  function makeWitchSelfTargetGame(nightActions: Record<string, unknown> = {}) {
+    const ts: WerewolfTurnState = {
+      turn: 2,
+      phase: {
+        type: WerewolfPhase.Nighttime,
+        startedAt: 1000,
+        nightPhaseOrder: [WerewolfRole.Werewolf, WerewolfRole.Witch],
+        currentPhaseIndex: 1,
+        nightActions: nightActions as Record<
+          string,
+          import("../../types").AnyNightAction
+        >,
+      },
+      deadPlayerIds: [],
+    };
+    return makePlayingGame(ts, {
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Witch },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+      ],
+    });
+  }
+
+  it("blocks Witch from self-targeting when NOT under attack", () => {
+    const game = makeWitchSelfTargetGame({
+      [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p3" },
+    });
+    expect(action.isValid(game, "p2", { targetPlayerId: "p2" })).toBe(false);
+  });
+
+  it("allows Witch to self-target when under attack (self-protect)", () => {
+    const game = makeWitchSelfTargetGame({
+      [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p2" },
+    });
+    expect(action.isValid(game, "p2", { targetPlayerId: "p2" })).toBe(true);
+  });
+
+  it("allows Witch to target other players normally", () => {
+    const game = makeWitchSelfTargetGame({
+      [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p3" },
+    });
+    expect(action.isValid(game, "p2", { targetPlayerId: "p4" })).toBe(true);
+  });
+});

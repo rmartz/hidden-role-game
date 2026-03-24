@@ -10,6 +10,7 @@ import {
   getGroupPhaseMemberIds,
   computeSuggestedTarget,
   isRoleActive,
+  getInterimAttackedPlayerIds,
 } from "../utils";
 import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
@@ -121,6 +122,21 @@ export const setNightTargetAction: GameAction = {
         callerRoleDef?.preventSelfTarget === true
       )
         return false;
+    }
+
+    // Witch cannot self-target unless under attack (self-protect is OK,
+    // self-attack is not).
+    if (
+      isRoleActive(phaseKey, WerewolfRole.Witch) &&
+      targetPlayerId === callerId
+    ) {
+      const attacked = getInterimAttackedPlayerIds(
+        phase.nightActions,
+        game.roleAssignments,
+        ts.deadPlayerIds,
+        ts.priestWards,
+      );
+      if (!attacked.includes(callerId)) return false;
     }
 
     // Group phases: cannot target players the caller knows are team members.
