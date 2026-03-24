@@ -483,10 +483,20 @@ export class GameSerializationService {
     if (ts?.phase.type !== WerewolfPhase.Daytime) return {};
     const phase = ts.phase;
 
+    const altruistIntercept = (phase.nightResolution ?? []).find(
+      (e): e is AltruistInterceptedNightResolutionEvent =>
+        e.type === "altruist-intercepted",
+    );
+
     const nightStatus: DaytimeNightStatusEntry[] = (
       phase.nightResolution ?? []
     ).flatMap((e): DaytimeNightStatusEntry[] => {
       if (e.type === "killed" && e.died) {
+        // Altruist death is covered by the altruistSave announcement.
+        if (
+          e.targetPlayerId === altruistIntercept?.altruistPlayerId
+        )
+          return [];
         if (e.attackedBy.includes(SMITE_PHASE_KEY)) {
           return [{ targetPlayerId: e.targetPlayerId, effect: "smited" }];
         }
@@ -514,11 +524,6 @@ export class GameSerializationService {
         return [{ targetPlayerId: e.targetPlayerId, effect: "hypnotized" }];
       return [];
     });
-
-    const altruistIntercept = (phase.nightResolution ?? []).find(
-      (e): e is AltruistInterceptedNightResolutionEvent =>
-        e.type === "altruist-intercepted",
-    );
 
     const result: Partial<PlayerGameState> = {
       ...(nightStatus.length > 0 ? { nightStatus } : {}),

@@ -207,7 +207,7 @@ export const WEREWOLF_COPY = {
     saveButton: (name: string) => `Save ${name}`,
     savingButton: (name: string) => `Saving ${name}`,
     dayAnnouncement: (altruistName: string, savedName: string) =>
-      `${altruistName} sacrificed themselves to save ${savedName}.`,
+      `${altruistName} was killed saving ${savedName} from attack.`,
   },
   hunter: {
     revengeTitle: "Hunter's Revenge",
