@@ -27,6 +27,7 @@ function makePlayingGame(
     ownerPlayerId: "owner-1",
     nominationsEnabled: false,
     singleTrialPerDay: true,
+    revealProtections: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
     ...overrides,
   };
@@ -74,6 +75,7 @@ describe("isOwnerPlaying", () => {
       ownerPlayerId: "owner-1",
       nominationsEnabled: false,
       singleTrialPerDay: true,
+      revealProtections: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
     };
     expect(isOwnerPlaying(game, "owner-1")).toBe(false);
@@ -104,6 +106,7 @@ describe("currentTurnState", () => {
       ownerPlayerId: "owner-1",
       nominationsEnabled: false,
       singleTrialPerDay: true,
+      revealProtections: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
     };
     expect(currentTurnState(game)).toBeUndefined();
@@ -122,6 +125,7 @@ describe("currentTurnState", () => {
       ownerPlayerId: "owner-1",
       nominationsEnabled: false,
       singleTrialPerDay: true,
+      revealProtections: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
     };
     expect(currentTurnState(game)).toBeUndefined();

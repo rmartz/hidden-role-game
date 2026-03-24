@@ -73,6 +73,7 @@ describe("extractDaytimePlayerState — playerCount excludes silenced", () => {
       ownerPlayerId: "owner",
       nominationsEnabled: false,
       singleTrialPerDay: true,
+      revealProtections: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
     };
     const result = extractDaytimeState(game, "p3");
@@ -117,6 +118,7 @@ describe("extractDaytimePlayerState — playerCount excludes silenced", () => {
       ownerPlayerId: "owner",
       nominationsEnabled: false,
       singleTrialPerDay: true,
+      revealProtections: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
     };
     const result = extractDaytimeState(game, "p2");

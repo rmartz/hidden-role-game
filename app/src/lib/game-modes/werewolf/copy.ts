@@ -36,6 +36,8 @@ export const WEREWOLF_COPY = {
     youAreEliminated: "You have been eliminated.",
     toughGuySurvived:
       "You were attacked last night but survived because of your Tough Guy ability. You are now vulnerable.",
+    protected: (name: string) =>
+      `${name} was attacked last night but was saved by a protector.`,
   },
   targetSelection: {
     chooseTarget: "Choose a target",
@@ -205,7 +207,7 @@ export const WEREWOLF_COPY = {
     saveButton: (name: string) => `Save ${name}`,
     savingButton: (name: string) => `Saving ${name}`,
     dayAnnouncement: (altruistName: string, savedName: string) =>
-      `${altruistName} sacrificed themselves to save ${savedName}.`,
+      `${altruistName} was killed saving ${savedName} from attack.`,
   },
   hunter: {
     revengeTitle: "Hunter's Revenge",

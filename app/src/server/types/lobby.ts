@@ -20,6 +20,7 @@ export interface GameConfig {
   timerConfig: TimerConfig;
   nominationsEnabled: boolean;
   singleTrialPerDay: boolean;
+  revealProtections: boolean;
 }
 
 export interface PublicLobby {
@@ -49,6 +50,7 @@ export interface UpdateLobbyConfigRequest {
   timerConfig?: TimerConfig;
   nominationsEnabled?: boolean;
   singleTrialPerDay?: boolean;
+  revealProtections?: boolean;
 }
 
 export interface LobbyJoinResponse {

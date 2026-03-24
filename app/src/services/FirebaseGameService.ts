@@ -74,6 +74,7 @@ export class FirebaseGameService {
         rolesInPlay: gameInitializationService.buildRolesInPlay(game),
         nominationsEnabled: game.nominationsEnabled,
         singleTrialPerDay: game.singleTrialPerDay,
+        revealProtections: game.revealProtections,
         timerConfig: game.timerConfig,
         ...modeState,
       } as PlayerGameState;
@@ -172,6 +173,7 @@ export class FirebaseGameService {
       rolesInPlay: gameInitializationService.buildRolesInPlay(game),
       nominationsEnabled: game.nominationsEnabled,
       singleTrialPerDay: game.singleTrialPerDay,
+      revealProtections: game.revealProtections,
       timerConfig: game.timerConfig,
       ...modeStateClean,
     } as PlayerGameState;
@@ -202,6 +204,7 @@ export class FirebaseGameService {
     timerConfig: import("@/lib/types").TimerConfig,
     nominationsEnabled: boolean,
     singleTrialPerDay: boolean,
+    revealProtections: boolean,
   ): Promise<Game> {
     const { roles } = this.getModeDefinition(gameMode);
     const rolePlayers = ownerPlayerId
@@ -237,6 +240,7 @@ export class FirebaseGameService {
       timerConfig,
       nominationsEnabled,
       singleTrialPerDay,
+      revealProtections,
       ...specialTargets,
     };
 

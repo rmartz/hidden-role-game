@@ -10,20 +10,24 @@ interface WerewolfConfigPanelProps {
   timerConfig: TimerConfig;
   nominationEnabled: boolean;
   singleTrialPerDay: boolean;
+  revealProtections: boolean;
   disabled?: boolean;
   onTimerConfigChange?: (config: TimerConfig) => void;
   onNominationEnabledChange?: (value: boolean) => void;
   onSingleTrialPerDayChange?: (value: boolean) => void;
+  onRevealProtectionsChange?: (value: boolean) => void;
 }
 
 export function WerewolfConfigPanel({
   timerConfig,
   nominationEnabled,
   singleTrialPerDay,
+  revealProtections,
   disabled,
   onTimerConfigChange,
   onNominationEnabledChange,
   onSingleTrialPerDayChange,
+  onRevealProtectionsChange,
 }: WerewolfConfigPanelProps) {
   return (
     <div className="space-y-3">
@@ -47,6 +51,17 @@ export function WerewolfConfigPanel({
         />
         <Label htmlFor="single-trial-per-day">
           {WEREWOLF_CONFIG_PANEL_COPY.singleTrialPerDay}
+        </Label>
+      </div>
+      <div className="flex items-center gap-2">
+        <Switch
+          id="reveal-protections"
+          checked={revealProtections}
+          disabled={disabled ?? !onRevealProtectionsChange}
+          onCheckedChange={onRevealProtectionsChange}
+        />
+        <Label htmlFor="reveal-protections">
+          {WEREWOLF_CONFIG_PANEL_COPY.revealProtections}
         </Label>
       </div>
       <TimerConfigPanel

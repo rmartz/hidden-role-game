@@ -52,6 +52,7 @@ export function makeNighttimeGame(
     ownerPlayerId: undefined,
     nominationsEnabled: false,
     singleTrialPerDay: true,
+    revealProtections: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
@@ -100,6 +101,7 @@ export function makeNighttimeGameWithBonusPhase(
     ownerPlayerId: undefined,
     nominationsEnabled: false,
     singleTrialPerDay: true,
+    revealProtections: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }

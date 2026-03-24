@@ -13,6 +13,7 @@ import {
   loadConfig,
   setNominationEnabled,
   setSingleTrialPerDay,
+  setRevealProtections,
   setPlayerCount,
   setShowConfigToPlayers,
   setShowRolesInPlay,
@@ -59,6 +60,9 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
   const singleTrialPerDay = useAppSelector(
     (s) => s.gameConfig.singleTrialPerDay,
   );
+  const revealProtections = useAppSelector(
+    (s) => s.gameConfig.revealProtections,
+  );
   const isValid = useAppSelector((s) => s.gameConfig.isValid);
 
   const hasLoadedRef = useRef(false);
@@ -92,11 +96,13 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
         timerConfig: config.timerConfig,
         nominationEnabled: config.nominationsEnabled,
         singleTrialPerDay: config.singleTrialPerDay,
+        revealProtections: config.revealProtections,
         onShowRolesInPlayChange: undefined,
         onShowConfigToPlayersChange: undefined,
         onTimerConfigChange: undefined,
         onNominationEnabledChange: undefined,
         onSingleTrialPerDayChange: undefined,
+        onRevealProtectionsChange: undefined,
       }
     : {
         showRolesInPlay,
@@ -104,6 +110,7 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
         timerConfig,
         nominationEnabled,
         singleTrialPerDay,
+        revealProtections,
         onShowRolesInPlayChange: (value: typeof showRolesInPlay) =>
           dispatch(setShowRolesInPlay(value)),
         onShowConfigToPlayersChange: (value: boolean) =>
@@ -114,6 +121,8 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
           dispatch(setNominationEnabled(value)),
         onSingleTrialPerDayChange: (value: boolean) =>
           dispatch(setSingleTrialPerDay(value)),
+        onRevealProtectionsChange: (value: boolean) =>
+          dispatch(setRevealProtections(value)),
       };
 
   const ownerTitleText = ownerTitle
@@ -127,10 +136,12 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
       timerConfig={resolved.timerConfig}
       nominationEnabled={resolved.nominationEnabled}
       singleTrialPerDay={resolved.singleTrialPerDay}
+      revealProtections={resolved.revealProtections}
       disabled={disabled}
       onTimerConfigChange={resolved.onTimerConfigChange}
       onNominationEnabledChange={resolved.onNominationEnabledChange}
       onSingleTrialPerDayChange={resolved.onSingleTrialPerDayChange}
+      onRevealProtectionsChange={resolved.onRevealProtectionsChange}
     />
   ) : null;
 

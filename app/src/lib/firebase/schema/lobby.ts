@@ -37,6 +37,7 @@ export interface FirebaseLobbyConfig {
   timerConfig: TimerConfig;
   nominationsEnabled?: boolean;
   singleTrialPerDay?: boolean;
+  revealProtections?: boolean;
 }
 
 export interface FirebaseRoleSlot {
@@ -96,6 +97,7 @@ function lobbyConfigToFirebase(config: LobbyConfig): FirebaseLobbyConfig {
     timerConfig: config.timerConfig,
     nominationsEnabled: config.nominationsEnabled,
     singleTrialPerDay: config.singleTrialPerDay,
+    revealProtections: config.revealProtections,
   };
 }
 
@@ -132,6 +134,7 @@ export function firebaseToLobby(
       ),
       nominationsEnabled: pub.config.nominationsEnabled ?? false,
       singleTrialPerDay: pub.config.singleTrialPerDay ?? false,
+      revealProtections: pub.config.revealProtections ?? false,
     },
     readyPlayerIds: pub.readyPlayerIds ?? [],
     ...(pub.gameId ? { gameId: pub.gameId } : {}),
@@ -205,6 +208,7 @@ export function firebaseToPublicLobby(
       ),
       nominationsEnabled: pub.config.nominationsEnabled ?? false,
       singleTrialPerDay: pub.config.singleTrialPerDay ?? false,
+      revealProtections: pub.config.revealProtections ?? false,
     },
     readyPlayerIds: pub.readyPlayerIds ?? [],
     ...(pub.gameId ? { gameId: pub.gameId } : {}),

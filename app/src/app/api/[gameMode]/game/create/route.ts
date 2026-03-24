@@ -65,6 +65,7 @@ export async function POST(
     lobby.config.timerConfig,
     lobby.config.nominationsEnabled,
     lobby.config.singleTrialPerDay,
+    lobby.config.revealProtections,
   );
 
   await lobbyService.clearReadyPlayerIds(lobbyId);

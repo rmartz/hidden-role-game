@@ -74,6 +74,7 @@ export function makeDaytimeGame(
     ownerPlayerId: "owner",
     nominationsEnabled: false,
     singleTrialPerDay: true,
+    revealProtections: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
@@ -119,6 +120,7 @@ export function makeDaytimeGameWithTrial(callerRoleId: WerewolfRole): Game {
     ownerPlayerId: "owner",
     nominationsEnabled: false,
     singleTrialPerDay: true,
+    revealProtections: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
@@ -162,6 +164,7 @@ export function makeDaytimeGameWithNominations(
     ownerPlayerId: "owner",
     nominationsEnabled,
     singleTrialPerDay: true,
+    revealProtections: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }

@@ -39,6 +39,7 @@ describe("extractDaytimeNightSummary", () => {
       ownerPlayerId: undefined,
       nominationsEnabled: false,
       singleTrialPerDay: true,
+      revealProtections: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
     };
 
@@ -46,7 +47,7 @@ describe("extractDaytimeNightSummary", () => {
     expect(result).toEqual({});
   });
 
-  it("nightStatus is absent when no players died or were silenced", () => {
+  it("nightStatus contains protected entry when revealProtections is true", () => {
     const game = makeDaytimeGame({
       nightResolution: [
         {
@@ -60,10 +61,12 @@ describe("extractDaytimeNightSummary", () => {
     });
 
     const result = extractDaytimeState(game, "player-1");
-    expect(result.nightStatus).toBeUndefined();
+    expect(result.nightStatus).toEqual([
+      { targetPlayerId: "p2", effect: "protected" },
+    ]);
   });
 
-  it("nightStatus contains killed entry for each player who died", () => {
+  it("nightStatus contains killed and protected entries", () => {
     const game = makeDaytimeGame({
       nightResolution: [
         {
@@ -86,7 +89,26 @@ describe("extractDaytimeNightSummary", () => {
     const result = extractDaytimeState(game, "player-1");
     expect(result.nightStatus).toEqual([
       { targetPlayerId: "p2", effect: "killed" },
+      { targetPlayerId: "p3", effect: "protected" },
     ]);
+  });
+
+  it("nightStatus omits protected entry when revealProtections is false", () => {
+    const game = makeDaytimeGame({
+      nightResolution: [
+        {
+          type: "killed" as const,
+          targetPlayerId: "p2",
+          attackedBy: ["p1"],
+          protectedBy: ["p3"],
+          died: false,
+        },
+      ],
+    });
+    game.revealProtections = false;
+
+    const result = extractDaytimeState(game, "player-1");
+    expect(result.nightStatus).toBeUndefined();
   });
 
   it("nightStatus contains silenced entry for each silenced player", () => {
