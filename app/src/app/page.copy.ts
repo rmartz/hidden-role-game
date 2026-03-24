@@ -10,7 +10,7 @@ export const HOME_PAGE_COPY = {
   playerNameLabel: "Your name",
   playerNamePlaceholder: "Enter your name",
   lobbyIdLabel: "Lobby ID",
-  lobbyIdPlaceholder: "Leave blank to create a new lobby",
+  lobbyIdPlaceholder: "Enter a lobby ID",
   gameModeLabel: "Game",
   creating: "Creating\u2026",
   createLobby: "Create Lobby",
