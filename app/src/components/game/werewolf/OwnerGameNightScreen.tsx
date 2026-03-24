@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   BedRegular,
   ClockWarningRegular,
@@ -27,6 +27,7 @@ import type {
 } from "@/lib/game-modes/werewolf";
 import { WEREWOLF_ROLES } from "@/lib/game-modes/werewolf/roles";
 import type { PlayerGameState } from "@/server/types";
+import { Button } from "@/components/ui/button";
 import { getPlayerName } from "@/lib/player-utils";
 import { useGameAction } from "@/hooks";
 import { GameTimer } from "@/components/game";
@@ -49,6 +50,7 @@ export function OwnerGameNightScreen({
   turnState,
 }: OwnerGameNightScreenProps) {
   const action = useGameAction(gameId);
+  const [abilityBypass, setAbilityBypass] = useState(false);
 
   const timerConfig = gameState.timerConfig;
 
@@ -79,6 +81,9 @@ export function OwnerGameNightScreen({
 
   const nightActions = phase.nightActions;
   const activePhaseKey = nightPhaseOrder[currentPhaseIndex] ?? "";
+  useEffect(() => {
+    setAbilityBypass(false);
+  }, [activePhaseKey]);
   const activeAction = nightActions[activePhaseKey];
   const { targetPlayerId: activeTarget, confirmed: activeTargetConfirmed } =
     getSoloTarget(activeAction);
@@ -265,27 +270,57 @@ export function OwnerGameNightScreen({
               <span> ({activePlayerNames.join(", ")})</span>
             )}
           </p>
-          {!isFirstTurn &&
-            (isRoleActive(activePhaseKey, WerewolfRole.Witch) &&
-            turnState.witchAbilityUsed &&
-            !activeTargetConfirmed ? (
-              <p className="mb-4 text-sm text-muted-foreground italic">
-                {WEREWOLF_COPY.night.witchAbilityUsed}
-              </p>
-            ) : (
-              <OwnerNightTargetPanel
-                groupAction={!!groupAction}
-                groupMemberCount={activePlayerNames.length}
-                resolvedVotes={resolvedVotes}
-                activeTargetName={activeTargetName}
-                activeTargetConfirmed={activeTargetConfirmed}
-                targetablePlayers={targetablePlayers}
-                activeTarget={activeTarget}
-                onTargetClick={handleTargetClick}
-                isPending={action.isPending}
-                previousTargetId={previousTargetId}
-              />
-            ))}
+          {!isFirstTurn && (
+            <>
+              {isWitchAbilitySkipped && !activeTargetConfirmed && (
+                <div className="mb-4">
+                  <p className="text-sm text-muted-foreground italic mb-2">
+                    {WEREWOLF_COPY.night.witchAbilityUsed}
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        action.mutate({
+                          actionId: WerewolfAction.ResetAbility,
+                          payload: { roleId: WerewolfRole.Witch },
+                        });
+                      }}
+                      disabled={action.isPending}
+                    >
+                      {WEREWOLF_COPY.narrator.restoreAbility}
+                    </Button>
+                    {!abilityBypass && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setAbilityBypass(true);
+                        }}
+                      >
+                        {WEREWOLF_COPY.narrator.bypassAbility}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+              {(!isWitchAbilitySkipped || abilityBypass) && (
+                <OwnerNightTargetPanel
+                  groupAction={!!groupAction}
+                  groupMemberCount={activePlayerNames.length}
+                  resolvedVotes={resolvedVotes}
+                  activeTargetName={activeTargetName}
+                  activeTargetConfirmed={activeTargetConfirmed}
+                  targetablePlayers={targetablePlayers}
+                  activeTarget={activeTarget}
+                  onTargetClick={handleTargetClick}
+                  isPending={action.isPending}
+                  previousTargetId={previousTargetId}
+                />
+              )}
+            </>
+          )}
           {investigationResult && (
             <OwnerInvestigationConfirm
               gameId={gameId}

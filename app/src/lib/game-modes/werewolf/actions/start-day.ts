@@ -236,6 +236,24 @@ export const startDayAction: GameAction = {
       hunterAssignment !== undefined &&
       newDeadIds.includes(hunterAssignment.playerId);
 
+    // Once-per-game ability tracking: detect if a once-per-game role acted
+    // this night (has a targetPlayerId, not skipped). This handles all paths
+    // (player confirm, narrator override) in one place.
+    const witchAction = nightPhase.nightActions[WerewolfRole.Witch as string];
+    const witchAbilityUsed =
+      ts.witchAbilityUsed === true ||
+      (witchAction !== undefined &&
+        !isTeamNightAction(witchAction) &&
+        witchAction.targetPlayerId !== undefined);
+
+    const exposerNightAction =
+      nightPhase.nightActions[WerewolfRole.Exposer as string];
+    const exposerAbilityUsed =
+      ts.exposerAbilityUsed === true ||
+      (exposerNightAction !== undefined &&
+        !isTeamNightAction(exposerNightAction) &&
+        exposerNightAction.targetPlayerId !== undefined);
+
     const updatedDeadIds = [...ts.deadPlayerIds, ...newDeadIds];
 
     const wolfCubDied =
@@ -254,13 +272,13 @@ export const startDayAction: GameAction = {
             : {}),
         },
         deadPlayerIds: updatedDeadIds,
-        ...(ts.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
+        ...(witchAbilityUsed ? { witchAbilityUsed: true } : {}),
         ...(Object.keys(lastTargets).length > 0 ? { lastTargets } : {}),
         ...(wolfCubDied ? { wolfCubDied: true } : {}),
         ...(Object.keys(priestWards).length > 0 ? { priestWards } : {}),
         ...(toughGuyHitIds.length > 0 ? { toughGuyHitIds } : {}),
         ...(oneEyedSeerLockedTargetId ? { oneEyedSeerLockedTargetId } : {}),
-        ...(ts.exposerAbilityUsed ? { exposerAbilityUsed: true } : {}),
+        ...(exposerAbilityUsed ? { exposerAbilityUsed: true } : {}),
         ...(exposerReveal ? { exposerReveal } : {}),
         ...(hunterDiedThisNight
           ? { hunterRevengePlayerId: hunterAssignment.playerId }

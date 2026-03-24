@@ -45,20 +45,18 @@ export const setNightTargetAction: GameAction = {
       if (existing?.confirmed) return false;
     }
 
-    // Witch can only use her ability once per game.
-    if (isRoleActive(phaseKey, WerewolfRole.Witch) && ts.witchAbilityUsed)
-      return false;
-
-    // Exposer can only use their ability once per game.
-    if (isRoleActive(phaseKey, WerewolfRole.Exposer) && ts.exposerAbilityUsed)
-      return false;
-
-    // Mortician ability ends after killing a Werewolf.
-    if (
-      isRoleActive(phaseKey, WerewolfRole.Mortician) &&
-      ts.morticianAbilityEnded
-    )
-      return false;
+    // Once-per-game ability restrictions — narrator can bypass these.
+    if (!isOwner) {
+      if (isRoleActive(phaseKey, WerewolfRole.Witch) && ts.witchAbilityUsed)
+        return false;
+      if (isRoleActive(phaseKey, WerewolfRole.Exposer) && ts.exposerAbilityUsed)
+        return false;
+      if (
+        isRoleActive(phaseKey, WerewolfRole.Mortician) &&
+        ts.morticianAbilityEnded
+      )
+        return false;
+    }
 
     // targetPlayerId undefined = clear; null = intentional skip; string = set target.
     if (targetPlayerId === undefined) return true;

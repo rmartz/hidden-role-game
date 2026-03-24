@@ -191,6 +191,8 @@ export const WEREWOLF_COPY = {
       `One-Eyed Seer is locked onto ${playerName}.`,
     mentalistSameTeam: "on the same team",
     mentalistDifferentTeams: "on different teams",
+    restoreAbility: "Restore Ability",
+    bypassAbility: "Override",
   },
   altruist: {
     attackedIntro:
