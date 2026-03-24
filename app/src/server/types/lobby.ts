@@ -28,6 +28,7 @@ export interface PublicLobby {
   players: PublicLobbyPlayer[];
   config: GameConfig;
   gameId?: string;
+  readyPlayerIds: string[];
 }
 
 export interface CreateLobbyRequest {

@@ -14,6 +14,8 @@ export interface FirebaseLobbyPublic {
   players?: Record<string, FirebaseLobbyPlayer>;
   config: FirebaseLobbyConfig;
   gameId: string | null;
+  /** Player IDs that have readied up. Firebase omits empty arrays. */
+  readyPlayerIds?: string[];
   /** Unix ms timestamp set server-side at lobby creation. Used for TTL cleanup. */
   createdAt?: number;
 }
@@ -69,6 +71,9 @@ export function lobbyToFirebase(lobby: Lobby): {
       players,
       config: lobbyConfigToFirebase(lobby.config),
       gameId: lobby.gameId ?? null,
+      ...(lobby.readyPlayerIds.length > 0
+        ? { readyPlayerIds: lobby.readyPlayerIds }
+        : {}),
     },
     private: {
       ownerSessionId: lobby.ownerSessionId,
@@ -128,6 +133,7 @@ export function firebaseToLobby(
       nominationsEnabled: pub.config.nominationsEnabled ?? false,
       singleTrialPerDay: pub.config.singleTrialPerDay ?? false,
     },
+    readyPlayerIds: pub.readyPlayerIds ?? [],
     ...(pub.gameId ? { gameId: pub.gameId } : {}),
   };
 }
@@ -200,6 +206,7 @@ export function firebaseToPublicLobby(
       nominationsEnabled: pub.config.nominationsEnabled ?? false,
       singleTrialPerDay: pub.config.singleTrialPerDay ?? false,
     },
+    readyPlayerIds: pub.readyPlayerIds ?? [],
     ...(pub.gameId ? { gameId: pub.gameId } : {}),
   };
 }

@@ -214,4 +214,5 @@ export interface Lobby {
   players: LobbyPlayer[];
   config: LobbyConfig;
   gameId?: string;
+  readyPlayerIds: string[];
 }

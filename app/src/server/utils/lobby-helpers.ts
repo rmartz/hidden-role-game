@@ -26,6 +26,7 @@ export function toPublicLobby(
       timerConfig: lobby.config.timerConfig,
       ...(showRoleSlots && { roleSlots: lobby.config.roleSlots }),
     },
+    readyPlayerIds: lobby.readyPlayerIds,
     ...(lobby.gameId && { gameId: lobby.gameId }),
   };
 }

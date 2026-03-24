@@ -47,6 +47,7 @@ function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
       singleTrialPerDay: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
     },
+    readyPlayerIds: [],
     ...overrides,
   };
 }
