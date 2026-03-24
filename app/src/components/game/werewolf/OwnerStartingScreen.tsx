@@ -33,7 +33,7 @@ export function OwnerStartingScreen({
   };
 
   return (
-    <div className="p-5 max-w-lg mx-auto">
+    <div className="p-5 max-w-4xl mx-auto">
       <OwnerHeader
         title="Game Starting"
         advanceLabel="Start Now"

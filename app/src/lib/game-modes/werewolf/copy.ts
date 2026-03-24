@@ -1,3 +1,5 @@
+import { WerewolfWinner } from "./utils/win-condition";
+
 /**
  * User-facing copy strings for the Werewolf game mode.
  * Interpolated strings are expressed as functions returning strings.
@@ -125,7 +127,8 @@ export const WEREWOLF_COPY = {
     victory: "Victory!",
     defeat: "Game Over",
     draw: "Draw",
-    winnerLabel: (winner: string) => `${winner} Won`,
+    winnerLabel: (winner: string) =>
+      `${winner === (WerewolfWinner.Werewolves as string) ? "Evil" : winner} Won`,
     endGame: "End Game",
     rolesRevealHeading: "Final Roles",
     returnToLobby: "Return to Lobby",
@@ -181,7 +184,7 @@ export const WEREWOLF_COPY = {
       "Investigation result has not been revealed to the player",
     investigationResultLabel: "Investigation result:",
     teamStatus: (isWerewolfTeam: boolean) =>
-      isWerewolfTeam ? "a Werewolf" : "not a Werewolf",
+      isWerewolfTeam ? "Evil" : "not Evil",
     investigationResultRevealed: "Result revealed to player.",
     revealToPlayer: "Reveal to player",
     smite: "Smite",

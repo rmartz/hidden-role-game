@@ -10,7 +10,7 @@ export const WEREWOLF_CONFIG = {
   ownerTitle: "Narrator",
   teamLabels: {
     [Team.Good]: "Villagers",
-    [Team.Bad]: "Werewolves",
+    [Team.Bad]: "Evil",
     [Team.Neutral]: "Neutral",
   },
   roles: WEREWOLF_ROLES,
