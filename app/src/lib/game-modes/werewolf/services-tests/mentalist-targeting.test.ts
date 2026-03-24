@@ -1,11 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { WerewolfRole } from "@/lib/game-modes/werewolf";
-import { GameSerializationService } from "../GameSerializationService";
+import { extractPlayerNightState } from "../services/player-night-state";
 import { mentalistRole, makeMentalistGame } from "./mentalist-helpers";
 
-describe("GameSerializationService.extractPlayerNightState (Mentalist targeting)", () => {
-  const service = new GameSerializationService();
-
+describe("extractPlayerNightState (Mentalist targeting)", () => {
   it("returns myNightTarget and mySecondNightTarget when both are set", () => {
     const nightActions = {
       [WerewolfRole.Mentalist]: {
@@ -18,13 +16,7 @@ describe("GameSerializationService.extractPlayerNightState (Mentalist targeting)
       WerewolfRole.Villager,
       nightActions,
     );
-    const result = service.extractPlayerNightState(
-      nightActions as Parameters<typeof service.extractPlayerNightState>[0],
-      game,
-      "p1",
-      mentalistRole,
-      [],
-    );
+    const result = extractPlayerNightState(game, "p1", mentalistRole, []);
     expect(result.myNightTarget).toBe("p2");
     expect(result.mySecondNightTarget).toBe("p3");
   });
@@ -38,13 +30,7 @@ describe("GameSerializationService.extractPlayerNightState (Mentalist targeting)
       WerewolfRole.Villager,
       nightActions,
     );
-    const result = service.extractPlayerNightState(
-      nightActions as Parameters<typeof service.extractPlayerNightState>[0],
-      game,
-      "p1",
-      mentalistRole,
-      [],
-    );
+    const result = extractPlayerNightState(game, "p1", mentalistRole, []);
     expect(result.myNightTarget).toBe("p2");
     expect(result.mySecondNightTarget).toBeUndefined();
   });
@@ -63,13 +49,7 @@ describe("GameSerializationService.extractPlayerNightState (Mentalist targeting)
       WerewolfRole.Villager,
       nightActions,
     );
-    const result = service.extractPlayerNightState(
-      nightActions as Parameters<typeof service.extractPlayerNightState>[0],
-      game,
-      "p1",
-      mentalistRole,
-      [],
-    );
+    const result = extractPlayerNightState(game, "p1", mentalistRole, []);
     expect(result.investigationResult).toBeUndefined();
   });
 
@@ -86,13 +66,7 @@ describe("GameSerializationService.extractPlayerNightState (Mentalist targeting)
       WerewolfRole.Villager,
       nightActions,
     );
-    const result = service.extractPlayerNightState(
-      nightActions as Parameters<typeof service.extractPlayerNightState>[0],
-      game,
-      "p1",
-      mentalistRole,
-      [],
-    );
+    const result = extractPlayerNightState(game, "p1", mentalistRole, []);
     expect(result.investigationResult).toEqual({
       targetPlayerId: "p2",
       isWerewolfTeam: false,

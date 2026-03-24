@@ -8,36 +8,31 @@ import {
 import type { Game } from "@/lib/types";
 import { WerewolfPhase, WerewolfRole } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
-import { GameSerializationService } from "../GameSerializationService";
-import { makeDaytimeGameWithTrial } from "./helpers";
+import { extractDaytimeState, makeDaytimeGameWithTrial } from "./helpers";
 
 // ---------------------------------------------------------------------------
-// extractDaytimeNightState — mustVoteGuilty (Village Idiot)
+// extractDaytimePlayerState — mustVoteGuilty (Village Idiot)
 // ---------------------------------------------------------------------------
 
-describe("GameSerializationService.extractDaytimeNightState — mustVoteGuilty", () => {
-  const service = new GameSerializationService();
-
+describe("extractDaytimePlayerState — mustVoteGuilty", () => {
   it("sets mustVoteGuilty for a Village Idiot caller during an active trial", () => {
     const game = makeDaytimeGameWithTrial(WerewolfRole.VillageIdiot);
-    const result = service.extractDaytimeNightState(game, "p2");
+    const result = extractDaytimeState(game, "p2");
     expect(result.activeTrial?.mustVoteGuilty).toBe(true);
   });
 
   it("does not set mustVoteGuilty for a non-Village-Idiot caller", () => {
     const game = makeDaytimeGameWithTrial(WerewolfRole.Seer);
-    const result = service.extractDaytimeNightState(game, "p2");
+    const result = extractDaytimeState(game, "p2");
     expect(result.activeTrial?.mustVoteGuilty).toBeUndefined();
   });
 });
 
 // ---------------------------------------------------------------------------
-// extractDaytimeNightState — playerCount excludes silenced players
+// extractDaytimePlayerState — playerCount excludes silenced players
 // ---------------------------------------------------------------------------
 
-describe("GameSerializationService.extractDaytimeNightState — playerCount excludes silenced", () => {
-  const service = new GameSerializationService();
-
+describe("extractDaytimePlayerState — playerCount excludes silenced", () => {
   it("does not count silenced players in playerCount", () => {
     const activeTrial = {
       defendantId: "p1",
@@ -80,7 +75,7 @@ describe("GameSerializationService.extractDaytimeNightState — playerCount excl
       singleTrialPerDay: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
     };
-    const result = service.extractDaytimeNightState(game, "p3");
+    const result = extractDaytimeState(game, "p3");
     expect(result.activeTrial?.playerCount).toBe(2);
   });
 
@@ -124,7 +119,7 @@ describe("GameSerializationService.extractDaytimeNightState — playerCount excl
       singleTrialPerDay: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
     };
-    const result = service.extractDaytimeNightState(game, "p2");
+    const result = extractDaytimeState(game, "p2");
     expect(result.activeTrial?.playerCount).toBe(2);
   });
 });

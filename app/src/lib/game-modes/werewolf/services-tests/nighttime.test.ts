@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { WerewolfRole } from "@/lib/game-modes/werewolf";
-import { GameSerializationService } from "../GameSerializationService";
+import { extractPlayerNightState } from "../services/player-night-state";
 import {
   makeNighttimeGame,
   makeNighttimeGameWithBonusPhase,
@@ -13,21 +13,13 @@ import {
 // extractPlayerNightState — Witch
 // ---------------------------------------------------------------------------
 
-describe("GameSerializationService.extractPlayerNightState (Witch)", () => {
-  const service = new GameSerializationService();
-
+describe("extractPlayerNightState (Witch)", () => {
   it("returns witchAbilityUsed and nightStatus even when Witch has not acted yet", () => {
     const nightActions = {
       [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p2" },
     };
     const game = makeNighttimeGame(nightActions);
-    const result = service.extractPlayerNightState(
-      nightActions as Parameters<typeof service.extractPlayerNightState>[0],
-      game,
-      "p3",
-      witchRole,
-      [],
-    );
+    const result = extractPlayerNightState(game, "p3", witchRole, []);
     expect(result.witchAbilityUsed).toBe(false);
     expect(result.nightStatus).toEqual([
       { targetPlayerId: "p2", effect: "attacked" },
@@ -41,13 +33,7 @@ describe("GameSerializationService.extractPlayerNightState (Witch)", () => {
       [WerewolfRole.Witch]: { targetPlayerId: "p1" },
     };
     const game = makeNighttimeGame(nightActions);
-    const result = service.extractPlayerNightState(
-      nightActions as Parameters<typeof service.extractPlayerNightState>[0],
-      game,
-      "p3",
-      witchRole,
-      [],
-    );
+    const result = extractPlayerNightState(game, "p3", witchRole, []);
     expect(result.myNightTarget).toBe("p1");
     expect(result.witchAbilityUsed).toBe(false);
   });
@@ -57,13 +43,7 @@ describe("GameSerializationService.extractPlayerNightState (Witch)", () => {
       [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p2" },
     };
     const game = makeNighttimeGame(nightActions, true);
-    const result = service.extractPlayerNightState(
-      nightActions as Parameters<typeof service.extractPlayerNightState>[0],
-      game,
-      "p3",
-      witchRole,
-      [],
-    );
+    const result = extractPlayerNightState(game, "p3", witchRole, []);
     expect(result.witchAbilityUsed).toBe(true);
     expect(result.nightStatus).toBeUndefined();
   });
@@ -73,9 +53,7 @@ describe("GameSerializationService.extractPlayerNightState (Witch)", () => {
 // extractPlayerNightState — suffixed group phase key (Wolf Cub bonus attack)
 // ---------------------------------------------------------------------------
 
-describe("GameSerializationService.extractPlayerNightState (suffixed group phase)", () => {
-  const service = new GameSerializationService();
-
+describe("extractPlayerNightState (suffixed group phase)", () => {
   it("myNightTargetConfirmed is false for the second phase even when the first phase is confirmed", () => {
     const nightActions = {
       [WerewolfRole.Werewolf]: {
@@ -92,13 +70,7 @@ describe("GameSerializationService.extractPlayerNightState (suffixed group phase
       },
     };
     const game = makeNighttimeGameWithBonusPhase(nightActions);
-    const result = service.extractPlayerNightState(
-      nightActions as Parameters<typeof service.extractPlayerNightState>[0],
-      game,
-      "w1",
-      werewolfRole,
-      [],
-    );
+    const result = extractPlayerNightState(game, "w1", werewolfRole, []);
     expect(result.myNightTargetConfirmed).toBe(false);
   });
 
@@ -117,13 +89,7 @@ describe("GameSerializationService.extractPlayerNightState (suffixed group phase
       },
     };
     const game = makeNighttimeGameWithBonusPhase(nightActions);
-    const result = service.extractPlayerNightState(
-      nightActions as Parameters<typeof service.extractPlayerNightState>[0],
-      game,
-      "w1",
-      werewolfRole,
-      [],
-    );
+    const result = extractPlayerNightState(game, "w1", werewolfRole, []);
     expect(result.previousNightTargetId).toBe("p3");
   });
 
@@ -139,13 +105,7 @@ describe("GameSerializationService.extractPlayerNightState (suffixed group phase
       },
     };
     const game = makeNighttimeGameWithBonusPhase(nightActions);
-    const result = service.extractPlayerNightState(
-      nightActions as Parameters<typeof service.extractPlayerNightState>[0],
-      game,
-      "w1",
-      werewolfRole,
-      [],
-    );
+    const result = extractPlayerNightState(game, "w1", werewolfRole, []);
     expect(result.previousNightTargetId).toBe("p3");
     expect(result.myNightTarget).toBeUndefined();
     expect(result.myNightTargetConfirmed).toBe(false);
@@ -166,13 +126,7 @@ describe("GameSerializationService.extractPlayerNightState (suffixed group phase
       },
     };
     const game = makeNighttimeGameWithBonusPhase(nightActions);
-    const result = service.extractPlayerNightState(
-      nightActions as Parameters<typeof service.extractPlayerNightState>[0],
-      game,
-      "w1",
-      werewolfRole,
-      [],
-    );
+    const result = extractPlayerNightState(game, "w1", werewolfRole, []);
     expect(result.myNightTarget).toBeUndefined();
   });
 });

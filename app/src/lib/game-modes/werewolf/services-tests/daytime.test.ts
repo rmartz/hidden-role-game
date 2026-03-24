@@ -8,12 +8,9 @@ import {
 import type { Game } from "@/lib/types";
 import { WerewolfPhase, WerewolfRole } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
-import { GameSerializationService } from "../GameSerializationService";
-import { makeDaytimeGame } from "./helpers";
+import { extractDaytimeState, makeDaytimeGame } from "./helpers";
 
-describe("GameSerializationService.extractDaytimeNightState", () => {
-  const service = new GameSerializationService();
-
+describe("extractDaytimeNightSummary", () => {
   it("returns empty when game is not in a daytime phase", () => {
     const game: Game = {
       id: "game-1",
@@ -45,7 +42,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
       timerConfig: DEFAULT_TIMER_CONFIG,
     };
 
-    const result = service.extractDaytimeNightState(game, "player-1");
+    const result = extractDaytimeState(game, "player-1");
     expect(result).toEqual({});
   });
 
@@ -62,7 +59,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
       ],
     });
 
-    const result = service.extractDaytimeNightState(game, "player-1");
+    const result = extractDaytimeState(game, "player-1");
     expect(result.nightStatus).toBeUndefined();
   });
 
@@ -86,7 +83,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
       ],
     });
 
-    const result = service.extractDaytimeNightState(game, "player-1");
+    const result = extractDaytimeState(game, "player-1");
     expect(result.nightStatus).toEqual([
       { targetPlayerId: "p2", effect: "killed" },
     ]);
@@ -97,7 +94,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
       nightResolution: [{ type: "silenced", targetPlayerId: "p3" }],
     });
 
-    const result = service.extractDaytimeNightState(game, "player-1");
+    const result = extractDaytimeState(game, "player-1");
     expect(result.nightStatus).toEqual([
       { targetPlayerId: "p3", effect: "silenced" },
     ]);
@@ -116,7 +113,7 @@ describe("GameSerializationService.extractDaytimeNightState", () => {
       ],
     });
 
-    const result = service.extractDaytimeNightState(game, "player-1");
+    const result = extractDaytimeState(game, "player-1");
     const entry = result.nightStatus?.[0];
     expect(entry).not.toHaveProperty("attackedBy");
     expect(entry).not.toHaveProperty("protectedBy");
