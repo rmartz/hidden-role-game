@@ -30,6 +30,7 @@ interface PlayerTargetSelectionProps {
   myNightTarget?: string | null;
   witchAbilityUsed?: boolean;
   attackedPlayerIds?: string[];
+  myPlayerId?: string;
   previousNightTargetId?: string;
   secondTargets?: readonly (readonly [TargetablePlayer, boolean])[];
   mySecondNightTarget?: string;
@@ -51,6 +52,7 @@ export function PlayerTargetSelection({
   myNightTarget,
   witchAbilityUsed,
   attackedPlayerIds,
+  myPlayerId,
   previousNightTargetId,
   secondTargets,
   mySecondNightTarget,
@@ -60,6 +62,11 @@ export function PlayerTargetSelection({
 
   const isWitchAbilityUsedOnly =
     confirmPhaseKey === WerewolfRole.Witch && witchAbilityUsed && !isConfirmed;
+
+  const isWitchSelfDisabled =
+    confirmPhaseKey === WerewolfRole.Witch &&
+    myPlayerId !== undefined &&
+    !(attackedPlayerIds ?? []).includes(myPlayerId);
 
   return (
     <div>
@@ -131,11 +138,14 @@ export function PlayerTargetSelection({
                   disabled={
                     action.isPending ||
                     isConfirmed ||
-                    player.id === previousNightTargetId
+                    player.id === previousNightTargetId ||
+                    (isWitchSelfDisabled && player.id === myPlayerId)
                   }
                 >
                   {player.name}
-                  {player.id === previousNightTargetId && " (unavailable)"}
+                  {(player.id === previousNightTargetId ||
+                    (isWitchSelfDisabled && player.id === myPlayerId)) &&
+                    " (unavailable)"}
                 </Button>
               ))}
               {!isConfirmed && (

@@ -201,6 +201,7 @@ export function PlayerNightActionScreen({
             myNightTarget={gameState.myNightTarget}
             witchAbilityUsed={gameState.witchAbilityUsed}
             attackedPlayerIds={attackedPlayerIds}
+            myPlayerId={gameState.myPlayerId}
             previousNightTargetId={gameState.previousNightTargetId}
             secondTargets={secondTargets}
             mySecondNightTarget={gameState.mySecondNightTarget}
