@@ -1,4 +1,4 @@
-import { GameMode, ShowRolesInPlay, Team } from "@/lib/types";
+import { ShowRolesInPlay, Team } from "@/lib/types";
 import type {
   Game,
   GamePlayer,
@@ -9,12 +9,6 @@ import type {
 } from "@/lib/types";
 import type { RoleInPlay } from "@/server/types";
 import { GAME_MODES } from "@/lib/game-modes";
-import { WerewolfPhase, buildNightPhaseOrder } from "@/lib/game-modes/werewolf";
-import type {
-  WerewolfTurnState,
-  WerewolfNighttimePhase,
-} from "@/lib/game-modes/werewolf";
-import { WEREWOLF_ROLES, WerewolfRole } from "@/lib/game-modes/werewolf/roles";
 
 /**
  * Extended role properties used by buildGamePlayers for wake-phase and
@@ -114,61 +108,6 @@ export class GameInitializationService {
 
       return { ...player, visiblePlayers };
     });
-  }
-
-  /**
-   * Builds the initial turn state when a game moves from Starting to Playing.
-   * Returns undefined for non-Werewolf modes that have no turn state.
-   */
-  /**
-   * Selects the Executioner's target from the Good team players.
-   * Returns undefined if no Executioner is in the game or no valid targets exist.
-   */
-  selectExecutionerTarget(
-    roleAssignments: PlayerRoleAssignment[],
-  ): string | undefined {
-    const rolesLookup = WEREWOLF_ROLES as Record<
-      string,
-      (typeof WEREWOLF_ROLES)[WerewolfRole] | undefined
-    >;
-
-    const executionerAssignment = roleAssignments.find(
-      (a) => a.roleDefinitionId === (WerewolfRole.Executioner as string),
-    );
-    if (!executionerAssignment) return undefined;
-
-    const goodCandidates = roleAssignments.filter((a) => {
-      if (a.playerId === executionerAssignment.playerId) return false;
-      const role = rolesLookup[a.roleDefinitionId];
-      return role?.team === Team.Good;
-    });
-    if (goodCandidates.length === 0) return undefined;
-
-    const randomIndex = Math.floor(Math.random() * goodCandidates.length);
-    return goodCandidates[randomIndex]?.playerId;
-  }
-
-  buildInitialTurnState(
-    gameMode: GameMode,
-    roleAssignments: PlayerRoleAssignment[],
-    executionerTargetId?: string,
-  ): WerewolfTurnState | undefined {
-    if (gameMode !== GameMode.Werewolf) return undefined;
-    const nightPhaseOrder = buildNightPhaseOrder(1, roleAssignments);
-    const phase: WerewolfNighttimePhase = {
-      type: WerewolfPhase.Nighttime,
-      startedAt: Date.now(),
-      nightPhaseOrder,
-      currentPhaseIndex: 0,
-      nightActions: {},
-    };
-
-    return {
-      turn: 1,
-      phase,
-      deadPlayerIds: [],
-      ...(executionerTargetId ? { executionerTargetId } : {}),
-    };
   }
 
   /**

@@ -85,6 +85,48 @@ export interface RoleDefinition<
   category?: string;
 }
 
+/**
+ * Game-mode-specific service methods for state extraction and initialization.
+ * Each game mode implements this interface to handle its own turn state
+ * structure, phases, and per-player state serialization.
+ *
+ * Return types use `Record<string, unknown>` to avoid circular imports with
+ * PlayerGameState (defined in @/server/types). Implementations cast to the
+ * concrete Partial<PlayerGameState> type.
+ */
+export interface GameModeServices {
+  /** Build initial turn state when transitioning from Starting → Playing. */
+  buildInitialTurnState(
+    roleAssignments: PlayerRoleAssignment[],
+    options?: Record<string, unknown>,
+  ): unknown;
+
+  /**
+   * Select mode-specific targets at game creation time.
+   * Returns a record of target fields to merge into the Game object
+   * (e.g. `{ executionerTargetId: "player-1" }`).
+   */
+  selectSpecialTargets(
+    roleAssignments: PlayerRoleAssignment[],
+  ): Record<string, string>;
+
+  /**
+   * Extract mode-specific state for the owner/narrator view.
+   * Returns partial PlayerGameState fields to spread into the owner's state.
+   */
+  extractOwnerState(game: Game): Record<string, unknown>;
+
+  /**
+   * Extract mode-specific state for a non-owner player.
+   * Returns partial PlayerGameState fields to spread into the player's state.
+   */
+  extractPlayerState(
+    game: Game,
+    callerId: string,
+    myRole: RoleDefinition,
+  ): Record<string, unknown>;
+}
+
 export interface GameModeConfig {
   readonly name: string;
   readonly minPlayers: number;
@@ -113,6 +155,7 @@ export interface GameModeConfig {
     roleCounts: Record<string, number>,
   ): boolean;
   readonly actions: Record<string, GameAction>;
+  readonly services: GameModeServices;
 }
 
 export interface PlayerRoleAssignment {
