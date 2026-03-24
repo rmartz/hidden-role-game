@@ -14,14 +14,9 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
           token: ${{ secrets.CI_PAT_TOKEN }}
-      - uses: pnpm/action-setup@v5
+      - uses: ./.github/actions/setup
         with:
-          version: 10
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24.x
-          cache: "pnpm"
-      - run: pnpm install --no-frozen-lockfile
+          frozen-lockfile: "false"
       - name: Commit updated lockfile
         run: |
           git config user.name "github-actions[bot]"
