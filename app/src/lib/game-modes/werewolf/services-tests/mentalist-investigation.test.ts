@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { WerewolfRole } from "@/lib/game-modes/werewolf";
-import { GameSerializationService } from "../GameSerializationService";
+import { extractPlayerNightState } from "../services/player-night-state";
 import { mentalistRole, makeMentalistGame } from "./mentalist-helpers";
 
 const REVEALED_ACTIONS = {
@@ -10,19 +10,11 @@ const REVEALED_ACTIONS = {
   resultRevealed: true,
 };
 
-describe("GameSerializationService.extractPlayerNightState (Mentalist investigation)", () => {
-  const service = new GameSerializationService();
-
+describe("extractPlayerNightState (Mentalist investigation)", () => {
   function investigate(p2Role: WerewolfRole, p3Role: WerewolfRole) {
     const nightActions = { [WerewolfRole.Mentalist]: { ...REVEALED_ACTIONS } };
     const game = makeMentalistGame(p2Role, p3Role, nightActions);
-    return service.extractPlayerNightState(
-      nightActions as Parameters<typeof service.extractPlayerNightState>[0],
-      game,
-      "p1",
-      mentalistRole,
-      [],
-    );
+    return extractPlayerNightState(game, "p1", mentalistRole, []);
   }
 
   it("returns 'different teams' when targets are on Good and Bad team", () => {

@@ -3,6 +3,7 @@ import { Team } from "@/lib/types";
 import type { GameModeConfig } from "@/lib/types";
 import { MIN_PLAYERS, defaultRoleCount, WEREWOLF_ROLES } from "./roles";
 import { WEREWOLF_ACTIONS } from "./actions";
+import { werewolfServices } from "./services";
 
 export const WEREWOLF_CONFIG = {
   name: "Werewolf",
@@ -16,6 +17,7 @@ export const WEREWOLF_CONFIG = {
   roles: WEREWOLF_ROLES,
   defaultRoleCount,
   actions: WEREWOLF_ACTIONS,
+  services: werewolfServices,
   // The Narrator is a player but doesn't receive a role.
   roleSlotsRequired(numPlayers: number) {
     return numPlayers - 1;

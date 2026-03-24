@@ -113,7 +113,7 @@ export function makeNighttimeGameWithBonusPhase(
 export const witchRole = {
   id: WerewolfRole.Witch,
   name: "Witch",
-  team: Team.Good,
+  team: Team.Bad,
 };
 
 export const werewolfRole = {

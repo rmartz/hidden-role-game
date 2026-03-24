@@ -22,7 +22,6 @@ import {
   type FirebaseGamePublic,
   type FirebasePlayerState,
 } from "@/lib/firebase/schema";
-import { gameSerializationService } from "./GameSerializationService";
 import { gameInitializationService } from "./GameInitializationService";
 
 function gameRef(gameId: string) {
@@ -38,21 +37,14 @@ export class FirebaseGameService {
     game: Game,
     callerId: string,
   ): PlayerGameState | null {
-    const { roles } = this.getModeDefinition(game.gameMode);
+    const config = this.getModeDefinition(game.gameMode);
+    const { roles, services } = config;
 
     const caller = getPlayer(game.players, callerId);
     if (!caller) return null;
 
     const playerById = new Map(game.players.map((p) => [p.id, p]));
     const publicPlayers = game.players.map((p) => ({ id: p.id, name: p.name }));
-
-    // Extract nightActions from turnState for the current phase.
-    const nightActions = gameSerializationService.extractNightActions(game);
-
-    // Extract deadPlayerIds from Werewolf turn state.
-    const deadPlayerIds = gameSerializationService.extractDeadPlayerIds(game);
-    const hunterRevengePlayerId =
-      gameSerializationService.extractHunterRevengePlayerId(game);
 
     if (callerId === game.ownerPlayerId) {
       const visibleRoleAssignments = game.roleAssignments.flatMap(
@@ -69,8 +61,7 @@ export class FirebaseGameService {
           ];
         },
       );
-      const daytimeNightState =
-        gameSerializationService.extractDaytimeNightState(game, callerId);
+      const modeState = services.extractPlayerState(game, callerId, undefined);
       return {
         status: game.status,
         gameMode: game.gameMode,
@@ -84,15 +75,9 @@ export class FirebaseGameService {
         nominationsEnabled: game.nominationsEnabled,
         singleTrialPerDay: game.singleTrialPerDay,
         revealProtections: game.revealProtections,
-        ...(nightActions ? { nightActions } : {}),
-        ...daytimeNightState,
-        ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
-        ...(hunterRevengePlayerId ? { hunterRevengePlayerId } : {}),
-        ...(game.executionerTargetId
-          ? { executionerTargetId: game.executionerTargetId }
-          : {}),
         timerConfig: game.timerConfig,
-      };
+        ...modeState,
+      } as PlayerGameState;
     }
 
     const myAssignment = game.roleAssignments.find(
@@ -117,6 +102,11 @@ export class FirebaseGameService {
       });
 
     // When game is finished, reveal all roles to every player.
+    // For dead player reveals during play, the mode services include
+    // deadPlayerIds — use those for role reveals.
+    const modeState = services.extractPlayerState(game, callerId, myRole);
+    const deadPlayerIds =
+      (modeState["deadPlayerIds"] as string[] | undefined) ?? [];
     const isFinished = game.status.type === GameStatus.Finished;
     const revealIds = isFinished
       ? game.roleAssignments.map((a) => a.playerId)
@@ -147,42 +137,23 @@ export class FirebaseGameService {
       visiblePlayerIds.add(revealId);
     }
 
-    // Include night targeting state.
-    const nightTargetState = nightActions
-      ? gameSerializationService.extractPlayerNightState(
-          nightActions,
-          game,
-          callerId,
-          myRole,
-          deadPlayerIds,
-        )
-      : {};
-
-    const amDead = deadPlayerIds.includes(callerId);
-
-    // Daytime-only: sanitized night outcomes and personal action confirmation.
-    const daytimeNightState = gameSerializationService.extractDaytimeNightState(
-      game,
-      callerId,
-    );
-
-    // Executioner: add target to visibleRoleAssignments (name only, no role)
-    // and include executionerTargetId for UI indicators.
-    const executionerTargetId =
-      myAssignment.roleDefinitionId === "werewolf-executioner"
-        ? game.executionerTargetId
-        : undefined;
-    if (executionerTargetId && !visiblePlayerIds.has(executionerTargetId)) {
-      const targetPlayer = playerById.get(executionerTargetId);
-      if (targetPlayer) {
+    // Mode-specific additional visibility (e.g. Executioner target).
+    // Strip modeVisiblePlayerIds from the state before spreading — it's
+    // a transient directive for visibility, not a serialized field.
+    const { modeVisiblePlayerIds: modeVisibleRaw, ...modeStateClean } =
+      modeState;
+    const modeVisiblePlayerIds = (modeVisibleRaw as string[] | undefined) ?? [];
+    for (const pid of modeVisiblePlayerIds) {
+      if (pid === callerId || visiblePlayerIds.has(pid)) continue;
+      const visiblePlayer = playerById.get(pid);
+      if (visiblePlayer) {
         visibleRoleAssignments.push({
-          player: { id: targetPlayer.id, name: targetPlayer.name },
+          player: { id: visiblePlayer.id, name: visiblePlayer.name },
           reason: "aware-of",
         });
-        visiblePlayerIds.add(targetPlayer.id);
+        visiblePlayerIds.add(pid);
       }
     }
-    const executionerState = executionerTargetId ? { executionerTargetId } : {};
 
     return {
       status: game.status,
@@ -203,13 +174,9 @@ export class FirebaseGameService {
       nominationsEnabled: game.nominationsEnabled,
       singleTrialPerDay: game.singleTrialPerDay,
       revealProtections: game.revealProtections,
-      ...executionerState,
-      ...nightTargetState,
-      ...daytimeNightState,
-      ...(amDead ? { amDead: true } : {}),
-      ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
       timerConfig: game.timerConfig,
-    };
+      ...modeStateClean,
+    } as PlayerGameState;
   }
 
   /** Writes pre-computed PlayerGameState for every player in the game. */
@@ -257,8 +224,8 @@ export class FirebaseGameService {
       ...(ownerPlayer ? [{ ...ownerPlayer, visiblePlayers: [] }] : []),
     ];
 
-    const executionerTargetId =
-      gameInitializationService.selectExecutionerTarget(roleAssignments);
+    const { services } = this.getModeDefinition(gameMode);
+    const specialTargets = services.selectSpecialTargets(roleAssignments);
 
     const game: Game = {
       id: randomUUID(),
@@ -274,7 +241,7 @@ export class FirebaseGameService {
       nominationsEnabled,
       singleTrialPerDay,
       revealProtections,
-      ...(executionerTargetId ? { executionerTargetId } : {}),
+      ...specialTargets,
     };
 
     // sessionIndex: { [sessionId]: playerId } — needed to reconstruct Game from Firebase
@@ -338,13 +305,12 @@ export class FirebaseGameService {
     const game = await this.getGame(gameId);
     if (game?.status.type !== GameStatus.Starting) return null;
 
+    const { services } = this.getModeDefinition(game.gameMode);
     game.status = {
       type: GameStatus.Playing,
-      turnState: gameInitializationService.buildInitialTurnState(
-        game.gameMode,
-        game.roleAssignments,
-        game.executionerTargetId,
-      ),
+      turnState: services.buildInitialTurnState(game.roleAssignments, {
+        executionerTargetId: game.executionerTargetId,
+      }),
     };
 
     await gameRef(gameId)
