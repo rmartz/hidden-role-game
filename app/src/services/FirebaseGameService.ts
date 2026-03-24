@@ -61,7 +61,7 @@ export class FirebaseGameService {
           ];
         },
       );
-      const modeState = services.extractOwnerState(game);
+      const modeState = services.extractPlayerState(game, callerId, undefined);
       return {
         status: game.status,
         gameMode: game.gameMode,

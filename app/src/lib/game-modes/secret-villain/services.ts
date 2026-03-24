@@ -10,10 +10,6 @@ export const secretVillainServices: GameModeServices = {
     return {};
   },
 
-  extractOwnerState() {
-    return {};
-  },
-
   extractPlayerState() {
     return {};
   },

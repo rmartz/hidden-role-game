@@ -10,10 +10,6 @@ export const avalonServices: GameModeServices = {
     return {};
   },
 
-  extractOwnerState() {
-    return {};
-  },
-
   extractPlayerState() {
     return {};
   },

@@ -18,6 +18,32 @@ import {
 } from "./owner-state";
 import { extractPlayerNightState } from "./player-night-state";
 
+function extractNonOwnerState(
+  game: Game,
+  callerId: string,
+  myRole: RoleDefinition,
+): Partial<PlayerGameState> {
+  const deadPlayerIds = extractDeadPlayerIds(game);
+  const nightActions = extractNightActions(game);
+
+  const nightTargetState = nightActions
+    ? extractPlayerNightState(game, callerId, myRole, deadPlayerIds)
+    : {};
+
+  const daytimeNightState = extractDaytimeNightSummary(game, callerId);
+  const daytimePlayerState = extractDaytimePlayerState(game, callerId);
+
+  const amDead = deadPlayerIds.includes(callerId);
+
+  return {
+    ...nightTargetState,
+    ...daytimeNightState,
+    ...daytimePlayerState,
+    ...(amDead ? { amDead: true } : {}),
+    ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
+  };
+}
+
 export const werewolfServices: GameModeServices = {
   buildInitialTurnState(
     roleAssignments: PlayerRoleAssignment[],
@@ -34,36 +60,18 @@ export const werewolfServices: GameModeServices = {
     return { executionerTargetId };
   },
 
-  extractOwnerState(game: Game): Record<string, unknown> {
-    return extractOwnerState(game) as Record<string, unknown>;
-  },
-
   extractPlayerState(
     game: Game,
     callerId: string,
-    myRole: RoleDefinition,
+    myRole: RoleDefinition | undefined,
   ): Record<string, unknown> {
-    const deadPlayerIds = extractDeadPlayerIds(game);
-    const nightActions = extractNightActions(game);
-
-    const nightTargetState = nightActions
-      ? extractPlayerNightState(game, callerId, myRole, deadPlayerIds)
-      : {};
-
-    const daytimeNightState = extractDaytimeNightSummary(game, callerId);
-    const daytimePlayerState = extractDaytimePlayerState(game, callerId);
-
-    const amDead = deadPlayerIds.includes(callerId);
-
-    const result: Partial<PlayerGameState> = {
-      ...nightTargetState,
-      ...daytimeNightState,
-      ...daytimePlayerState,
-      ...(amDead ? { amDead: true } : {}),
-      ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
-    };
-
-    return result as Record<string, unknown>;
+    if (!myRole) {
+      return extractOwnerState(game) as Record<string, unknown>;
+    }
+    return extractNonOwnerState(game, callerId, myRole) as Record<
+      string,
+      unknown
+    >;
   },
 };
 

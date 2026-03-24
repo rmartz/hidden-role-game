@@ -111,19 +111,15 @@ export interface GameModeServices {
   ): Record<string, string>;
 
   /**
-   * Extract mode-specific state for the owner/narrator view.
-   * Returns partial PlayerGameState fields to spread into the owner's state.
-   */
-  extractOwnerState(game: Game): Record<string, unknown>;
-
-  /**
-   * Extract mode-specific state for a non-owner player.
+   * Extract mode-specific state for any player (owner or non-owner).
+   * The implementation determines what to return based on the caller's role
+   * in the game. `myRole` is undefined for the owner/narrator.
    * Returns partial PlayerGameState fields to spread into the player's state.
    */
   extractPlayerState(
     game: Game,
     callerId: string,
-    myRole: RoleDefinition,
+    myRole: RoleDefinition | undefined,
   ): Record<string, unknown>;
 }
 
