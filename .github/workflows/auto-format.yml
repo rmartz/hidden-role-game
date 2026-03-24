@@ -21,16 +21,7 @@ jobs:
           ref: ${{ github.event.workflow_run.head_branch }}
           token: ${{ secrets.CI_PAT_TOKEN }}
 
-      - uses: pnpm/action-setup@v5
-        with:
-          version: 10
-
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24.x
-          cache: "pnpm"
-
-      - run: pnpm install --frozen-lockfile
+      - uses: ./.github/actions/setup
 
       - name: Run Prettier
         run: pnpm prettier --write .
