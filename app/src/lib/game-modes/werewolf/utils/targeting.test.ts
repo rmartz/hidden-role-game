@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { Team } from "@/lib/types";
 import { WerewolfRole } from "../roles";
-import { getTargetablePlayers } from "./targeting";
+import { getTargetablePlayers, getGroupPhaseMemberIds } from "./targeting";
 
 const players = [
   { id: "owner", name: "Owner" },
@@ -326,5 +326,45 @@ describe("getTargetablePlayers — group phase (suffixed key)", () => {
       p1Assignments,
     );
     expect(result.map((p) => p.id)).toContain("p3");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getGroupPhaseMemberIds — hidden allies are targetable
+// ---------------------------------------------------------------------------
+
+describe("getGroupPhaseMemberIds", () => {
+  it("includes Werewolves and Wolf Cubs (wake-phase participants)", () => {
+    const assignments = [
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "wc1", roleDefinitionId: WerewolfRole.WolfCub },
+      { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+    ];
+    const result = getGroupPhaseMemberIds(assignments, WerewolfRole.Werewolf);
+    expect(result).toContain("w1");
+    expect(result).toContain("wc1");
+    expect(result).not.toContain("p1");
+  });
+
+  it("does NOT include Wizard (Team.Bad but no wakesWith)", () => {
+    const assignments = [
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "wiz1", roleDefinitionId: WerewolfRole.Wizard },
+      { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+    ];
+    const result = getGroupPhaseMemberIds(assignments, WerewolfRole.Werewolf);
+    expect(result).toContain("w1");
+    expect(result).not.toContain("wiz1");
+  });
+
+  it("does NOT include Minion (Team.Bad but no wakesWith Werewolf)", () => {
+    const assignments = [
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "min1", roleDefinitionId: WerewolfRole.Minion },
+      { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+    ];
+    const result = getGroupPhaseMemberIds(assignments, WerewolfRole.Werewolf);
+    expect(result).toContain("w1");
+    expect(result).not.toContain("min1");
   });
 });
