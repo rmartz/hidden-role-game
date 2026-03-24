@@ -24,7 +24,7 @@ export const DECK_GOOD_CARDS = 6;
 export const DECK_BAD_CARDS = 11;
 
 /** Consecutive failed elections before auto-play triggers. */
-export const FAILED_ELECTION_THRESHOLD = 4;
+export const FAILED_ELECTION_THRESHOLD = 3;
 
 /** Number of Bad cards that must be played before the Special Bad chancellor win condition activates. */
 export const BAD_CARDS_FOR_SPECIAL_BAD_WIN = 3;
