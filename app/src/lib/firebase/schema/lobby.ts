@@ -71,8 +71,9 @@ export function lobbyToFirebase(lobby: Lobby): {
       players,
       config: lobbyConfigToFirebase(lobby.config),
       gameId: lobby.gameId ?? null,
-      readyPlayerIds:
-        lobby.readyPlayerIds.length > 0 ? lobby.readyPlayerIds : undefined,
+      ...(lobby.readyPlayerIds.length > 0
+        ? { readyPlayerIds: lobby.readyPlayerIds }
+        : {}),
     },
     private: {
       ownerSessionId: lobby.ownerSessionId,
