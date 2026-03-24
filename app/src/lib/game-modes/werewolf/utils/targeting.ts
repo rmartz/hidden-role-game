@@ -94,23 +94,23 @@ export function getGroupPhasePlayerIds(
 }
 
 /**
- * Returns all player IDs on the same team as the group phase primary role
- * (alive or dead) so they can be excluded from targeting.
+ * Returns all player IDs who participate in the group phase (alive or dead),
+ * based on matching the primary role ID or wakesWith. Hidden allies (e.g.
+ * Wizard, Minion) who share the team but don't wake with the group are NOT
+ * included — they can be targeted by the group.
  */
 export function getGroupPhaseMemberIds(
   roleAssignments: PlayerRoleAssignment[],
   phaseKey: string,
 ): string[] {
-  const primaryRole = (
-    WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
-  )[baseGroupPhaseKey(phaseKey)];
-  if (!primaryRole) return [];
+  const baseKey = baseGroupPhaseKey(phaseKey);
   return roleAssignments
     .filter((a) => {
+      if (a.roleDefinitionId === baseKey) return true;
       const role = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
         a.roleDefinitionId
       ];
-      return role?.team === primaryRole.team;
+      return (role?.wakesWith as string | undefined) === baseKey;
     })
     .map((a) => a.playerId);
 }
