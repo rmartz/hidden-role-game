@@ -181,7 +181,7 @@ function extractRoleSpecificState(
   }
 
   if (isRoleActive(myRole.id, WerewolfRole.Witch)) {
-    return extractWitchState(nightActions, myRole, deadPlayerIds, ts);
+    return extractWitchState(game, nightActions, myRole, deadPlayerIds, ts);
   }
 
   if (isRoleActive(myRole.id, WerewolfRole.Altruist)) {
@@ -234,6 +234,7 @@ function extractRoleSpecificState(
   return undefined;
 }
 function extractWitchState(
+  game: Game,
   nightActions: Record<string, AnyNightAction>,
   myRole: RoleDefinition,
   deadPlayerIds: string[],
@@ -250,7 +251,7 @@ function extractWitchState(
   if (!ts?.witchAbilityUsed) {
     const attacked = getInterimAttackedPlayerIds(
       nightActions,
-      [],
+      game.roleAssignments,
       deadPlayerIds,
       ts?.priestWards,
     );

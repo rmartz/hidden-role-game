@@ -5,6 +5,7 @@ import type {
   RoleDefinition,
 } from "@/lib/types";
 import type { PlayerGameState } from "@/server/types";
+import { WerewolfRole } from "../roles";
 import {
   selectExecutionerTarget,
   buildInitialTurnState,
@@ -22,7 +23,7 @@ function extractNonOwnerState(
   game: Game,
   callerId: string,
   myRole: RoleDefinition,
-): Partial<PlayerGameState> {
+): Partial<PlayerGameState> & { modeVisiblePlayerIds?: string[] } {
   const deadPlayerIds = extractDeadPlayerIds(game);
   const nightActions = extractNightActions(game);
 
@@ -35,12 +36,26 @@ function extractNonOwnerState(
 
   const amDead = deadPlayerIds.includes(callerId);
 
+  // Executioner: surface the target so the player knows who to get eliminated,
+  // and mark the target as visible (name only, no role).
+  const executionerTargetId =
+    myRole.id === (WerewolfRole.Executioner as string)
+      ? game.executionerTargetId
+      : undefined;
+  const executionerState = executionerTargetId
+    ? {
+        executionerTargetId,
+        modeVisiblePlayerIds: [executionerTargetId],
+      }
+    : {};
+
   return {
     ...nightTargetState,
     ...daytimeNightState,
     ...daytimePlayerState,
     ...(amDead ? { amDead: true } : {}),
     ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
+    ...executionerState,
   };
 }
 

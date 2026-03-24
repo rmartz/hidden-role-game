@@ -136,20 +136,21 @@ export class FirebaseGameService {
       visiblePlayerIds.add(revealId);
     }
 
-    // Executioner: add target to visibleRoleAssignments (name only, no role)
-    // and include executionerTargetId for UI indicators.
-    const executionerTargetId =
-      myAssignment.roleDefinitionId === "werewolf-executioner"
-        ? game.executionerTargetId
-        : undefined;
-    if (executionerTargetId && !visiblePlayerIds.has(executionerTargetId)) {
-      const targetPlayer = playerById.get(executionerTargetId);
-      if (targetPlayer) {
+    // Mode-specific additional visibility (e.g. Executioner target).
+    // Strip modeVisiblePlayerIds from the state before spreading — it's
+    // a transient directive for visibility, not a serialized field.
+    const { modeVisiblePlayerIds: modeVisibleRaw, ...modeStateClean } =
+      modeState;
+    const modeVisiblePlayerIds = (modeVisibleRaw as string[] | undefined) ?? [];
+    for (const pid of modeVisiblePlayerIds) {
+      if (pid === callerId || visiblePlayerIds.has(pid)) continue;
+      const visiblePlayer = playerById.get(pid);
+      if (visiblePlayer) {
         visibleRoleAssignments.push({
-          player: { id: targetPlayer.id, name: targetPlayer.name },
+          player: { id: visiblePlayer.id, name: visiblePlayer.name },
           reason: "aware-of",
         });
-        visiblePlayerIds.add(targetPlayer.id);
+        visiblePlayerIds.add(pid);
       }
     }
 
@@ -172,7 +173,7 @@ export class FirebaseGameService {
       nominationsEnabled: game.nominationsEnabled,
       singleTrialPerDay: game.singleTrialPerDay,
       timerConfig: game.timerConfig,
-      ...modeState,
+      ...modeStateClean,
     } as PlayerGameState;
   }
 
