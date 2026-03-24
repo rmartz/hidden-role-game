@@ -154,6 +154,8 @@ export interface Game {
   nominationsEnabled: boolean;
   /** When true, only one trial is allowed per day phase. */
   singleTrialPerDay: boolean;
+  /** When true, the night summary reveals players who were attacked but saved by protection. */
+  revealProtections: boolean;
   /** Executioner: the player ID the Executioner must get eliminated at trial. */
   executionerTargetId?: string;
 }
@@ -206,6 +208,8 @@ export interface LobbyConfig {
   nominationsEnabled: boolean;
   /** When true, only one trial is allowed per day phase. */
   singleTrialPerDay: boolean;
+  /** When true, the night summary reveals players who were attacked but saved by protection. */
+  revealProtections: boolean;
 }
 
 export interface Lobby {

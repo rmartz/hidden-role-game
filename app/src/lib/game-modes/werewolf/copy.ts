@@ -36,6 +36,8 @@ export const WEREWOLF_COPY = {
     youAreEliminated: "You have been eliminated.",
     toughGuySurvived:
       "You were attacked last night but survived because of your Tough Guy ability. You are now vulnerable.",
+    protected: (name: string) =>
+      `${name} was attacked last night but was saved by a protector.`,
   },
   targetSelection: {
     chooseTarget: "Choose a target",

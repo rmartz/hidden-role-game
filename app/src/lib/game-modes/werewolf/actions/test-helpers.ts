@@ -38,6 +38,7 @@ export function makePlayingGame(
     ownerPlayerId: "owner-1",
     nominationsEnabled: false,
     singleTrialPerDay: true,
+    revealProtections: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
     ...overrides,
   };
@@ -140,6 +141,7 @@ export function makeTeamGame(
     ownerPlayerId: "owner-1",
     nominationsEnabled: false,
     singleTrialPerDay: true,
+    revealProtections: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
     ...overrides,
   };

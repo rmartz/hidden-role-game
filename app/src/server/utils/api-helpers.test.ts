@@ -45,6 +45,7 @@ function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
       showRolesInPlay: ShowRolesInPlay.None,
       nominationsEnabled: false,
       singleTrialPerDay: true,
+      revealProtections: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
     },
     readyPlayerIds: [],
@@ -73,6 +74,7 @@ function makeGame(overrides: Partial<Game> = {}): Game {
     ownerPlayerId: undefined,
     nominationsEnabled: false,
     singleTrialPerDay: true,
+    revealProtections: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
     ...overrides,
   };

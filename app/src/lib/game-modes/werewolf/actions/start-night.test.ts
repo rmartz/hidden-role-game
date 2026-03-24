@@ -48,6 +48,7 @@ describe("WerewolfAction.StartNight", () => {
         ownerPlayerId: "owner-1",
         nominationsEnabled: false,
         singleTrialPerDay: true,
+        revealProtections: true,
         timerConfig: DEFAULT_TIMER_CONFIG,
       };
       expect(action.isValid(game, "owner-1", null)).toBe(false);
@@ -188,6 +189,7 @@ describe("StartNight — Wolf Cub bonus phase lifecycle", () => {
       ownerPlayerId: "owner-1",
       nominationsEnabled: false,
       singleTrialPerDay: true,
+      revealProtections: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
     };
   }

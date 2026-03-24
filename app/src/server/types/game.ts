@@ -46,6 +46,7 @@ export interface DaytimeNightStatusEntry {
   targetPlayerId: string;
   effect:
     | "killed"
+    | "protected"
     | "silenced"
     | "hypnotized"
     | "smited"
@@ -159,6 +160,8 @@ export interface PlayerGameState {
   nominationsEnabled: boolean;
   /** When true, only one trial is allowed per day phase. */
   singleTrialPerDay: boolean;
+  /** When true, the night summary reveals players who were attacked but saved by protection. */
+  revealProtections: boolean;
   /**
    * Current nominations for trial, grouped by defendant with nominator IDs.
    * Only populated during daytime when nominationsEnabled is true.

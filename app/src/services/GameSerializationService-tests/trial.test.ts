@@ -78,6 +78,7 @@ describe("GameSerializationService.extractDaytimeNightState — playerCount excl
       ownerPlayerId: "owner",
       nominationsEnabled: false,
       singleTrialPerDay: true,
+      revealProtections: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
     };
     const result = service.extractDaytimeNightState(game, "p3");
@@ -122,6 +123,7 @@ describe("GameSerializationService.extractDaytimeNightState — playerCount excl
       ownerPlayerId: "owner",
       nominationsEnabled: false,
       singleTrialPerDay: true,
+      revealProtections: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
     };
     const result = service.extractDaytimeNightState(game, "p2");

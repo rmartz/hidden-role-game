@@ -61,6 +61,7 @@ export interface FirebasePlayerState {
   };
   nominationsEnabled?: boolean;
   singleTrialPerDay?: boolean;
+  revealProtections?: boolean;
   executionerTargetId?: string;
   nominations?: { defendantId: string; nominatorIds: string[] }[];
   myNominatedDefendantId?: string;
@@ -113,6 +114,7 @@ export function playerStateToFirebase(
     ...(state.activeTrial ? { activeTrial: state.activeTrial } : {}),
     nominationsEnabled: state.nominationsEnabled,
     singleTrialPerDay: state.singleTrialPerDay,
+    revealProtections: state.revealProtections,
     ...(state.executionerTargetId
       ? { executionerTargetId: state.executionerTargetId }
       : {}),
@@ -198,6 +200,7 @@ export function firebaseToPlayerState(
       : {}),
     nominationsEnabled: raw.nominationsEnabled ?? false,
     singleTrialPerDay: raw.singleTrialPerDay ?? false,
+    revealProtections: raw.revealProtections ?? false,
     ...(raw.executionerTargetId
       ? { executionerTargetId: raw.executionerTargetId }
       : {}),

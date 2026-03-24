@@ -50,6 +50,7 @@ export async function POST(request: Request): Promise<Response> {
       showRolesInPlay: ShowRolesInPlay.ConfiguredOnly,
       nominationsEnabled: true,
       singleTrialPerDay: true,
+      revealProtections: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
     },
     readyPlayerIds: [] as string[],

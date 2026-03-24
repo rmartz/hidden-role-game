@@ -25,6 +25,7 @@ export function PlayerNightSummary({
       targetPlayerId,
       playerName: getPlayerName(players, targetPlayerId) ?? targetPlayerId,
       killed: entries.some((e) => e.effect === "killed"),
+      protected: entries.some((e) => e.effect === "protected"),
       survived: entries.some((e) => e.effect === "survived"),
       silenced: entries.some((e) => e.effect === "silenced"),
       hypnotized: entries.some((e) => e.effect === "hypnotized"),
@@ -53,6 +54,7 @@ export function PlayerNightSummary({
             targetPlayerId,
             playerName,
             killed,
+            protected: wasProtected,
             survived,
             silenced,
             hypnotized,
@@ -63,6 +65,7 @@ export function PlayerNightSummary({
               key={targetPlayerId}
               playerName={playerName}
               killed={killed}
+              protected={wasProtected}
               survived={survived}
               silenced={silenced}
               hypnotized={hypnotized}

@@ -187,6 +187,7 @@ export class FirebaseLobbyService {
       timerConfig?: import("@/lib/types").TimerConfig;
       nominationsEnabled?: boolean;
       singleTrialPerDay?: boolean;
+      revealProtections?: boolean;
     },
   ): Promise<Lobby | undefined> {
     const snap = await lobbyRef(lobbyId).once("value");
@@ -237,6 +238,10 @@ export class FirebaseLobbyService {
     if (config.singleTrialPerDay !== undefined) {
       updates["public/config/singleTrialPerDay"] = config.singleTrialPerDay;
       data.public.config.singleTrialPerDay = config.singleTrialPerDay;
+    }
+    if (config.revealProtections !== undefined) {
+      updates["public/config/revealProtections"] = config.revealProtections;
+      data.public.config.revealProtections = config.revealProtections;
     }
 
     if (Object.keys(updates).length > 0) {

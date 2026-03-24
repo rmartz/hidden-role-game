@@ -497,6 +497,15 @@ export class GameSerializationService {
             : "killed";
         return [{ targetPlayerId: e.targetPlayerId, effect }];
       }
+      // Attacked but saved by protection — visible to all when setting is on.
+      if (
+        e.type === "killed" &&
+        !e.died &&
+        e.protectedBy.length > 0 &&
+        game.revealProtections
+      ) {
+        return [{ targetPlayerId: e.targetPlayerId, effect: "protected" }];
+      }
       if (e.type === "tough-guy-absorbed" && e.targetPlayerId === callerId)
         return [{ targetPlayerId: e.targetPlayerId, effect: "survived" }];
       if (e.type === "silenced")

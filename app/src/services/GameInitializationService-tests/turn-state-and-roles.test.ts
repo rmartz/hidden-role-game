@@ -40,6 +40,7 @@ function makeSecretVillainGame(
     ownerPlayerId: undefined,
     nominationsEnabled: false,
     singleTrialPerDay: true,
+    revealProtections: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
