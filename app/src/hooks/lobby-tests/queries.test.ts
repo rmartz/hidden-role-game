@@ -40,6 +40,7 @@ const mockLobby: PublicLobby = {
     showRolesInPlay: ShowRolesInPlay.RoleAndCount,
     nominationsEnabled: false,
     singleTrialPerDay: true,
+    revealProtections: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
   },
   readyPlayerIds: [],

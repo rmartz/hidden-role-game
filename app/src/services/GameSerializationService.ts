@@ -483,10 +483,26 @@ export class GameSerializationService {
     if (ts?.phase.type !== WerewolfPhase.Daytime) return {};
     const phase = ts.phase;
 
+    const altruistIntercept = (phase.nightResolution ?? []).find(
+      (e): e is AltruistInterceptedNightResolutionEvent =>
+        e.type === "altruist-intercepted",
+    );
+
     const nightStatus: DaytimeNightStatusEntry[] = (
       phase.nightResolution ?? []
     ).flatMap((e): DaytimeNightStatusEntry[] => {
       if (e.type === "killed" && e.died) {
+        // Altruist death: emit altruist-sacrifice with savedPlayerId instead
+        // of a generic killed entry.
+        if (e.targetPlayerId === altruistIntercept?.altruistPlayerId) {
+          return [
+            {
+              targetPlayerId: e.targetPlayerId,
+              effect: "altruist-sacrifice",
+              savedPlayerId: altruistIntercept.savedPlayerId,
+            },
+          ];
+        }
         if (e.attackedBy.includes(SMITE_PHASE_KEY)) {
           return [{ targetPlayerId: e.targetPlayerId, effect: "smited" }];
         }
@@ -497,6 +513,15 @@ export class GameSerializationService {
             : "killed";
         return [{ targetPlayerId: e.targetPlayerId, effect }];
       }
+      // Attacked but saved by protection — visible to all when setting is on.
+      if (
+        e.type === "killed" &&
+        !e.died &&
+        e.protectedBy.length > 0 &&
+        game.revealProtections
+      ) {
+        return [{ targetPlayerId: e.targetPlayerId, effect: "protected" }];
+      }
       if (e.type === "tough-guy-absorbed" && e.targetPlayerId === callerId)
         return [{ targetPlayerId: e.targetPlayerId, effect: "survived" }];
       if (e.type === "silenced")
@@ -506,21 +531,8 @@ export class GameSerializationService {
       return [];
     });
 
-    const altruistIntercept = (phase.nightResolution ?? []).find(
-      (e): e is AltruistInterceptedNightResolutionEvent =>
-        e.type === "altruist-intercepted",
-    );
-
     const result: Partial<PlayerGameState> = {
       ...(nightStatus.length > 0 ? { nightStatus } : {}),
-      ...(altruistIntercept
-        ? {
-            altruistSave: {
-              altruistPlayerId: altruistIntercept.altruistPlayerId,
-              savedPlayerId: altruistIntercept.savedPlayerId,
-            },
-          }
-        : {}),
     };
 
     // Include nomination state when nominations are enabled.

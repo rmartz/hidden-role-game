@@ -24,6 +24,7 @@ const DEFAULT_CONFIG: GameConfig = {
   showRolesInPlay: ShowRolesInPlay.None,
   nominationsEnabled: false,
   singleTrialPerDay: true,
+  revealProtections: true,
   timerConfig: DEFAULT_TIMER_CONFIG,
 };
 
@@ -42,6 +43,9 @@ export default function DebugPage() {
   const singleTrialPerDay = useAppSelector(
     (s) => s.gameConfig.singleTrialPerDay,
   );
+  const revealProtections = useAppSelector(
+    (s) => s.gameConfig.revealProtections,
+  );
 
   async function handleCreateGame() {
     setIsCreating(true);
@@ -58,6 +62,7 @@ export default function DebugPage() {
           timerConfig,
           nominationsEnabled,
           singleTrialPerDay,
+          revealProtections,
         }),
       });
       const body = (await res.json()) as {

@@ -22,6 +22,7 @@ export interface FirebaseGamePublic {
   timerConfig: TimerConfig;
   nominationsEnabled?: boolean;
   singleTrialPerDay?: boolean;
+  revealProtections?: boolean;
   executionerTargetId?: string;
   /** Unix ms timestamp set server-side at game creation. Used for TTL cleanup. */
   createdAt?: number;
@@ -60,6 +61,7 @@ export function gameToFirebase(game: Game): FirebaseGamePublic {
     timerConfig: game.timerConfig,
     nominationsEnabled: game.nominationsEnabled,
     singleTrialPerDay: game.singleTrialPerDay,
+    revealProtections: game.revealProtections,
     ...(game.executionerTargetId
       ? { executionerTargetId: game.executionerTargetId }
       : {}),
@@ -96,6 +98,7 @@ export function firebaseToGame(
     ),
     nominationsEnabled: pub.nominationsEnabled ?? false,
     singleTrialPerDay: pub.singleTrialPerDay ?? false,
+    revealProtections: pub.revealProtections ?? false,
     ...(pub.executionerTargetId
       ? { executionerTargetId: pub.executionerTargetId }
       : {}),

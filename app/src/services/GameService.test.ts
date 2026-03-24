@@ -44,6 +44,7 @@ function makeGameWithPlayers(
     ownerPlayerId: undefined,
     nominationsEnabled: false,
     singleTrialPerDay: true,
+    revealProtections: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
@@ -151,6 +152,7 @@ function makeNarratorGame(nominationsEnabled = false): Game {
     ownerPlayerId: "narrator",
     nominationsEnabled,
     singleTrialPerDay: true,
+    revealProtections: true,
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }

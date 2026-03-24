@@ -47,6 +47,7 @@ const mockGameState: PlayerGameState = {
   rolesInPlay: undefined,
   nominationsEnabled: false,
   singleTrialPerDay: true,
+  revealProtections: true,
   timerConfig: DEFAULT_TIMER_CONFIG,
 };
 
@@ -83,6 +84,7 @@ describe("useStartGame", () => {
             showRolesInPlay: ShowRolesInPlay.RoleAndCount,
             nominationsEnabled: false,
             singleTrialPerDay: true,
+            revealProtections: true,
             timerConfig: DEFAULT_TIMER_CONFIG,
           },
           gameId: "game-1",

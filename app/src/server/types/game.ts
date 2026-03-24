@@ -46,11 +46,15 @@ export interface DaytimeNightStatusEntry {
   targetPlayerId: string;
   effect:
     | "killed"
+    | "protected"
     | "silenced"
     | "hypnotized"
     | "smited"
     | "survived"
-    | "peaceful";
+    | "peaceful"
+    | "altruist-sacrifice";
+  /** For altruist-sacrifice: the player who was saved. */
+  savedPlayerId?: string;
 }
 
 /** Night effects visible to the Witch during their nighttime phase only. */
@@ -146,11 +150,6 @@ export interface PlayerGameState {
   priestWardActive?: boolean;
   /** Executioner: the player ID the Executioner must get eliminated at trial to win. */
   executionerTargetId?: string;
-  /**
-   * Altruist sacrifice event: shown to all players at day start when the Altruist
-   * intercepted a kill. Both the Altruist and the saved player are identified.
-   */
-  altruistSave?: { altruistPlayerId: string; savedPlayerId: string };
   /** Hunter revenge pending: the Hunter's player ID. Narrator-only. */
   hunterRevengePlayerId?: string;
   /** Phase timer configuration. */
@@ -159,6 +158,8 @@ export interface PlayerGameState {
   nominationsEnabled: boolean;
   /** When true, only one trial is allowed per day phase. */
   singleTrialPerDay: boolean;
+  /** When true, the night summary reveals players who were attacked but saved by protection. */
+  revealProtections: boolean;
   /**
    * Current nominations for trial, grouped by defendant with nominator IDs.
    * Only populated during daytime when nominationsEnabled is true.

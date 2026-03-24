@@ -24,6 +24,7 @@ function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
       showRolesInPlay: ShowRolesInPlay.None,
       nominationsEnabled: false,
       singleTrialPerDay: true,
+      revealProtections: true,
       timerConfig: DEFAULT_TIMER_CONFIG,
     },
     readyPlayerIds: [],
@@ -99,6 +100,7 @@ describe("toPublicLobby", () => {
           showRolesInPlay: ShowRolesInPlay.None,
           nominationsEnabled: false,
           singleTrialPerDay: true,
+          revealProtections: true,
           timerConfig: DEFAULT_TIMER_CONFIG,
         },
       });

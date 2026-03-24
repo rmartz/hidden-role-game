@@ -3,6 +3,9 @@ import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 interface PlayerNightSummaryItemProps {
   playerName: string;
   killed: boolean;
+  altruistSacrifice: boolean;
+  savedPlayerName?: string;
+  protected: boolean;
   survived: boolean;
   silenced: boolean;
   hypnotized: boolean;
@@ -14,6 +17,9 @@ interface PlayerNightSummaryItemProps {
 export function PlayerNightSummaryItem({
   playerName,
   killed,
+  altruistSacrifice,
+  savedPlayerName,
+  protected: wasProtected,
   survived,
   silenced,
   hypnotized,
@@ -46,6 +52,25 @@ export function PlayerNightSummaryItem({
       <li className="text-sm font-medium text-orange-600">
         {WEREWOLF_COPY.day.toughGuySurvived}
         {suffix}
+      </li>
+    );
+  }
+
+  if (altruistSacrifice) {
+    return (
+      <li className="text-sm font-medium text-blue-600">
+        {WEREWOLF_COPY.altruist.dayAnnouncement(
+          playerName,
+          savedPlayerName ?? "a player",
+        )}
+      </li>
+    );
+  }
+
+  if (wasProtected) {
+    return (
+      <li className="text-sm font-medium text-green-600">
+        {WEREWOLF_COPY.day.protected(playerName)}
       </li>
     );
   }
