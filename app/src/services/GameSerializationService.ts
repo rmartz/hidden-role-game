@@ -492,8 +492,17 @@ export class GameSerializationService {
       phase.nightResolution ?? []
     ).flatMap((e): DaytimeNightStatusEntry[] => {
       if (e.type === "killed" && e.died) {
-        // Altruist death is covered by the altruistSave announcement.
-        if (e.targetPlayerId === altruistIntercept?.altruistPlayerId) return [];
+        // Altruist death: emit altruist-sacrifice with savedPlayerId instead
+        // of a generic killed entry.
+        if (e.targetPlayerId === altruistIntercept?.altruistPlayerId) {
+          return [
+            {
+              targetPlayerId: e.targetPlayerId,
+              effect: "altruist-sacrifice",
+              savedPlayerId: altruistIntercept.savedPlayerId,
+            },
+          ];
+        }
         if (e.attackedBy.includes(SMITE_PHASE_KEY)) {
           return [{ targetPlayerId: e.targetPlayerId, effect: "smited" }];
         }
@@ -524,14 +533,6 @@ export class GameSerializationService {
 
     const result: Partial<PlayerGameState> = {
       ...(nightStatus.length > 0 ? { nightStatus } : {}),
-      ...(altruistIntercept
-        ? {
-            altruistSave: {
-              altruistPlayerId: altruistIntercept.altruistPlayerId,
-              savedPlayerId: altruistIntercept.savedPlayerId,
-            },
-          }
-        : {}),
     };
 
     // Include nomination state when nominations are enabled.
