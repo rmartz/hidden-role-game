@@ -493,10 +493,7 @@ export class GameSerializationService {
     ).flatMap((e): DaytimeNightStatusEntry[] => {
       if (e.type === "killed" && e.died) {
         // Altruist death is covered by the altruistSave announcement.
-        if (
-          e.targetPlayerId === altruistIntercept?.altruistPlayerId
-        )
-          return [];
+        if (e.targetPlayerId === altruistIntercept?.altruistPlayerId) return [];
         if (e.attackedBy.includes(SMITE_PHASE_KEY)) {
           return [{ targetPlayerId: e.targetPlayerId, effect: "smited" }];
         }
