@@ -1,16 +1,32 @@
 import type { GameAction } from "@/lib/types";
-import { nominateChancellorAction } from "./nominate-chancellor";
+import { callSpecialElectionAction } from "./call-special-election";
 import { castElectionVoteAction } from "./cast-election-vote";
+import { consentInvestigationAction } from "./investigate-player";
+import { nominateChancellorAction } from "./nominate-chancellor";
 import { resolveElectionAction } from "./resolve-election";
+import { resolveInvestigationAction } from "./investigate-player";
+import { selectInvestigationTargetAction } from "./investigate-player";
+import { shootPlayerAction } from "./shoot-player";
 
 export enum SecretVillainAction {
-  NominateChancellor = "nominate-chancellor",
+  CallSpecialElection = "call-special-election",
   CastElectionVote = "cast-election-vote",
+  ConsentInvestigation = "consent-investigation",
+  NominateChancellor = "nominate-chancellor",
   ResolveElection = "resolve-election",
+  ResolveInvestigation = "resolve-investigation",
+  SelectInvestigationTarget = "select-investigation-target",
+  ShootPlayer = "shoot-player",
 }
 
 export const SECRET_VILLAIN_ACTIONS: Record<SecretVillainAction, GameAction> = {
-  [SecretVillainAction.NominateChancellor]: nominateChancellorAction,
+  [SecretVillainAction.CallSpecialElection]: callSpecialElectionAction,
   [SecretVillainAction.CastElectionVote]: castElectionVoteAction,
+  [SecretVillainAction.ConsentInvestigation]: consentInvestigationAction,
+  [SecretVillainAction.NominateChancellor]: nominateChancellorAction,
   [SecretVillainAction.ResolveElection]: resolveElectionAction,
+  [SecretVillainAction.ResolveInvestigation]: resolveInvestigationAction,
+  [SecretVillainAction.SelectInvestigationTarget]:
+    selectInvestigationTargetAction,
+  [SecretVillainAction.ShootPlayer]: shootPlayerAction,
 };
