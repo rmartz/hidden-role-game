@@ -267,6 +267,19 @@ describe("resolveElectionAction", () => {
       expect(ts.turn).toBe(2);
     });
 
+    it("failed: clears specialPresidentId so rotation resumes normally", () => {
+      const game = makeResolveGame(allVotes("no"), {
+        specialPresidentId: "p4",
+        currentPresidentIndex: 2,
+      });
+      resolveElectionAction.apply(game, {}, "p1");
+
+      const ts = getTurnState(game);
+      expect(ts.specialPresidentId).toBeUndefined();
+      // Rotation resumes from the saved index (p3), not the special president
+      expect(ts.phase.type).toBe(SecretVillainPhase.ElectionNomination);
+    });
+
     it("failed at threshold: auto-plays top card, resets counter, clears previous administration", () => {
       const game = makeResolveGame(allVotes("no"), {
         failedElectionCount: FAILED_ELECTION_THRESHOLD - 1,

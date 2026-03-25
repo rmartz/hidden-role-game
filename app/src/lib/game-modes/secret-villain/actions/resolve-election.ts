@@ -108,7 +108,9 @@ export const resolveElectionAction: GameAction = {
         }
       }
 
-      // Advance to next president.
+      // Advance to next president. Clear special president — whether they
+      // just served (failed) or were skipped by chaos, the override is consumed.
+      ts.specialPresidentId = undefined;
       const { presidentId, nextIndex } = getNextPresidentId(ts);
       ts.currentPresidentIndex = nextIndex;
 
