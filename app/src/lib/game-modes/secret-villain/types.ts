@@ -38,9 +38,13 @@ export const CARDS_TO_WIN = 5;
 
 export enum SpecialActionType {
   InvestigateTeam = "investigate-team",
+  PolicyPeek = "policy-peek",
   SpecialElection = "special-election",
   Shoot = "shoot",
 }
+
+/** Number of Bad cards that must be played before veto power is unlocked. */
+export const VETO_UNLOCK_THRESHOLD = 4;
 
 // ---------------------------------------------------------------------------
 // Election types
@@ -92,6 +96,10 @@ export interface PolicyChancellorPhase {
   remainingCards: [PolicyCard, PolicyCard];
   /** The card played by the chancellor. Set once the chancellor decides. */
   playedCard?: PolicyCard;
+  /** True when the chancellor has proposed a veto (awaiting president decision). */
+  vetoProposed?: boolean;
+  /** Set by the president: true = veto accepted, false = veto rejected. */
+  vetoResponse?: boolean;
 }
 
 /** A special action triggered by a Bad card being played. */
@@ -106,6 +114,8 @@ export interface SpecialActionPhase {
   targetConsented?: boolean;
   /** For InvestigateTeam: the revealed team, visible only to the president. */
   revealedTeam?: "Good" | "Bad";
+  /** For PolicyPeek: the top 3 cards of the deck, visible only to the president. */
+  peekedCards?: [PolicyCard, PolicyCard, PolicyCard];
   /** True once the action has been fully resolved. */
   resolved?: boolean;
 }

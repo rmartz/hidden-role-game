@@ -8,7 +8,9 @@ import {
   selectInvestigationTargetAction,
 } from "./investigate-player";
 import { nominateChancellorAction } from "./nominate-chancellor";
+import { policyPeekAction, resolvePolicyPeekAction } from "./policy-peek";
 import { presidentDiscardAction } from "./president-discard";
+import { proposeVetoAction, respondVetoAction } from "./veto";
 import { resolveElectionAction } from "./resolve-election";
 import { shootPlayerAction } from "./shoot-player";
 
@@ -18,9 +20,13 @@ export enum SecretVillainAction {
   ChancellorPlay = "chancellor-play",
   ConsentInvestigation = "consent-investigation",
   NominateChancellor = "nominate-chancellor",
+  PolicyPeek = "policy-peek",
   PresidentDiscard = "president-discard",
+  ProposeVeto = "propose-veto",
   ResolveElection = "resolve-election",
   ResolveInvestigation = "resolve-investigation",
+  ResolvePolicyPeek = "resolve-policy-peek",
+  RespondVeto = "respond-veto",
   SelectInvestigationTarget = "select-investigation-target",
   ShootPlayer = "shoot-player",
 }
@@ -31,9 +37,13 @@ export const SECRET_VILLAIN_ACTIONS: Record<SecretVillainAction, GameAction> = {
   [SecretVillainAction.ChancellorPlay]: chancellorPlayAction,
   [SecretVillainAction.ConsentInvestigation]: consentInvestigationAction,
   [SecretVillainAction.NominateChancellor]: nominateChancellorAction,
+  [SecretVillainAction.PolicyPeek]: policyPeekAction,
   [SecretVillainAction.PresidentDiscard]: presidentDiscardAction,
+  [SecretVillainAction.ProposeVeto]: proposeVetoAction,
   [SecretVillainAction.ResolveElection]: resolveElectionAction,
   [SecretVillainAction.ResolveInvestigation]: resolveInvestigationAction,
+  [SecretVillainAction.ResolvePolicyPeek]: resolvePolicyPeekAction,
+  [SecretVillainAction.RespondVeto]: respondVetoAction,
   [SecretVillainAction.SelectInvestigationTarget]:
     selectInvestigationTargetAction,
   [SecretVillainAction.ShootPlayer]: shootPlayerAction,
