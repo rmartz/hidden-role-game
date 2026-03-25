@@ -1,6 +1,7 @@
 import { Team } from "@/lib/types";
 import type { GameModeConfig } from "@/lib/types";
 import { MIN_PLAYERS, defaultRoleCount, SECRET_VILLAIN_ROLES } from "./roles";
+import { SECRET_VILLAIN_ACTIONS } from "./actions";
 import { secretVillainServices } from "./services";
 
 export const SECRET_VILLAIN_CONFIG = {
@@ -13,6 +14,6 @@ export const SECRET_VILLAIN_CONFIG = {
   },
   roles: SECRET_VILLAIN_ROLES,
   defaultRoleCount,
-  actions: {},
+  actions: SECRET_VILLAIN_ACTIONS,
   services: secretVillainServices,
 } satisfies GameModeConfig;
