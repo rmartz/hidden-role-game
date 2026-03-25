@@ -4,3 +4,4 @@ export {
   getNextPresidentId,
   getEligibleChancellorIds,
 } from "./turn-state";
+export { getSpecialAction } from "./special-actions";
