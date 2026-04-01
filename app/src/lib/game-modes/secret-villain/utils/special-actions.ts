@@ -8,7 +8,7 @@ import { SpecialActionType } from "../types";
 const POWERS_5_6: (SpecialActionType | undefined)[] = [
   undefined, // 1st Bad card
   undefined, // 2nd Bad card
-  SpecialActionType.InvestigateTeam, // 3rd
+  SpecialActionType.PolicyPeek, // 3rd
   SpecialActionType.Shoot, // 4th
   SpecialActionType.Shoot, // 5th
 ];

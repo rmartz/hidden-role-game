@@ -12,10 +12,8 @@ describe("getSpecialAction", () => {
       expect(getSpecialAction(2, count)).toBeUndefined();
     });
 
-    it.each([5, 6])("InvestigateTeam at bad card 3 (%i players)", (count) => {
-      expect(getSpecialAction(3, count)).toBe(
-        SpecialActionType.InvestigateTeam,
-      );
+    it.each([5, 6])("PolicyPeek at bad card 3 (%i players)", (count) => {
+      expect(getSpecialAction(3, count)).toBe(SpecialActionType.PolicyPeek);
     });
 
     it.each([5, 6])("Shoot at bad card 4 (%i players)", (count) => {
