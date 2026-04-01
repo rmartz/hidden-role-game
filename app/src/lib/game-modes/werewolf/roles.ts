@@ -55,6 +55,7 @@ export enum WerewolfRole {
   Mayor = "werewolf-mayor",
   Mentalist = "werewolf-mentalist",
   Minion = "werewolf-minion",
+  Mirrorcaster = "werewolf-mirrorcaster",
   Mortician = "werewolf-mortician",
   Mummy = "werewolf-mummy",
   MysticSeer = "werewolf-mystic-seer",
@@ -280,6 +281,19 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.FirstNightOnly,
     targetCategory: TargetCategory.None,
     category: WerewolfRoleCategory.EvilSupport,
+  },
+  [WerewolfRole.Mirrorcaster]: {
+    id: WerewolfRole.Mirrorcaster,
+    name: "Mirrorcaster",
+    summary:
+      "Protects players; gains an attack charge when protection succeeds",
+    description:
+      "The Mirrorcaster starts in Protect mode, choosing a player to shield each night. When the protected player is attacked, the Mirrorcaster gains a charge and switches to Attack mode. Their next night action is an attack (blockable by protections). After attacking, the charge is consumed and they return to Protect mode.",
+    team: Team.Good,
+    wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Special,
+    preventSelfTarget: true,
+    category: WerewolfRoleCategory.VillagerProtection,
   },
   [WerewolfRole.Mortician]: {
     id: WerewolfRole.Mortician,

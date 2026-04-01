@@ -50,6 +50,7 @@ function collectBaseAttacksAndProtections(
   nightActions: Record<string, AnyNightAction>,
   roleAssignments: PlayerRoleAssignment[],
   deadPlayerIds: string[],
+  mirrorcasterCharged?: boolean,
 ): {
   attacks: Map<string, string[]>;
   protections: Map<string, string[]>;
@@ -100,6 +101,16 @@ function collectBaseAttacksAndProtections(
         continue;
       }
       attacks.set(tid, [...(attacks.get(tid) ?? []), phaseKey]);
+      continue;
+    }
+
+    // Mirrorcaster: acts as Protect when uncharged, Attack when charged.
+    if (isRoleActive(phaseKey, WerewolfRole.Mirrorcaster)) {
+      if (mirrorcasterCharged) {
+        attacks.set(tid, [...(attacks.get(tid) ?? []), phaseKey]);
+      } else {
+        protections.set(tid, [...(protections.get(tid) ?? []), phaseKey]);
+      }
     }
   }
 
@@ -148,11 +159,13 @@ export function getInterimAttackedPlayerIds(
   roleAssignments: PlayerRoleAssignment[],
   deadPlayerIds: string[],
   priestWards?: Record<string, string>,
+  mirrorcasterCharged?: boolean,
 ): string[] {
   const { attacks, protections } = collectBaseAttacksAndProtections(
     nightActions,
     roleAssignments,
     deadPlayerIds,
+    mirrorcasterCharged,
   );
   if (priestWards) applyPriestWards(attacks, protections, priestWards);
   return Array.from(attacks.keys()).filter((id) => !protections.has(id));
@@ -177,6 +190,8 @@ export interface NightResolutionOptions {
    * If they were attacked, the attack takes precedence and they die normally.
    */
   oldManTimerPlayerId?: string;
+  /** When true, the Mirrorcaster is in Attack mode (charged from a prior protection). */
+  mirrorcasterCharged?: boolean;
 }
 
 export function resolveNightActions(
@@ -190,6 +205,7 @@ export function resolveNightActions(
     nightActions,
     roleAssignments,
     deadPlayerIds,
+    options?.mirrorcasterCharged,
   );
 
   // Priest wards: warded players count as protected.

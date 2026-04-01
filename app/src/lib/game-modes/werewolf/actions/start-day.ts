@@ -72,6 +72,7 @@ export const startDayAction: GameAction = {
         priestWards: priestWardsForResolution,
         toughGuyHitIds: ts.toughGuyHitIds,
         ...(oldManTimerPlayerId ? { oldManTimerPlayerId } : {}),
+        ...(ts.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
       },
     );
     const newDeadIds: string[] = nightResolution
@@ -254,6 +255,40 @@ export const startDayAction: GameAction = {
         !isTeamNightAction(exposerNightAction) &&
         exposerNightAction.targetPlayerId !== undefined);
 
+    // Mirrorcaster charge tracking:
+    // - If uncharged and the protected target was attacked → gain charge
+    // - If charged → charge is consumed (attack was used this night)
+    let mirrorcasterCharged = false;
+    if (ts.mirrorcasterCharged) {
+      // Charge is consumed by attacking this night.
+      const mcAction =
+        nightPhase.nightActions[WerewolfRole.Mirrorcaster as string];
+      mirrorcasterCharged =
+        mcAction === undefined ||
+        isTeamNightAction(mcAction) ||
+        mcAction.targetPlayerId === undefined;
+    } else {
+      // Check if the Mirrorcaster's protection target was attacked.
+      const mcAction =
+        nightPhase.nightActions[WerewolfRole.Mirrorcaster as string];
+      if (
+        mcAction !== undefined &&
+        !isTeamNightAction(mcAction) &&
+        mcAction.targetPlayerId !== undefined
+      ) {
+        const protectedId = mcAction.targetPlayerId;
+        // A "killed" event for the protected player with protectedBy including
+        // the Mirrorcaster means the protection was triggered.
+        const protectionTriggered = nightResolution.some(
+          (e) =>
+            e.type === "killed" &&
+            e.targetPlayerId === protectedId &&
+            e.protectedBy.includes(WerewolfRole.Mirrorcaster as string),
+        );
+        mirrorcasterCharged = protectionTriggered;
+      }
+    }
+
     const updatedDeadIds = [...ts.deadPlayerIds, ...newDeadIds];
 
     const wolfCubDied =
@@ -287,6 +322,7 @@ export const startDayAction: GameAction = {
         ...(ts.executionerTargetId
           ? { executionerTargetId: ts.executionerTargetId }
           : {}),
+        ...(mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
       },
     };
 

@@ -148,6 +148,8 @@ export interface PlayerGameState {
   morticianAbilityEnded?: boolean;
   /** Whether the Priest's ward is currently active (cannot target this night). */
   priestWardActive?: boolean;
+  /** Whether the Mirrorcaster is charged (next action is Attack instead of Protect). */
+  mirrorcasterCharged?: boolean;
   /** Executioner: the player ID the Executioner must get eliminated at trial to win. */
   executionerTargetId?: string;
   /** Hunter revenge pending: the Hunter's player ID. Narrator-only. */
