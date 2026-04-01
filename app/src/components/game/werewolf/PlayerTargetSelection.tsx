@@ -35,6 +35,7 @@ interface PlayerTargetSelectionProps {
   secondTargets?: readonly (readonly [TargetablePlayer, boolean])[];
   mySecondNightTarget?: string;
   requiresSecondTarget?: boolean;
+  mirrorcasterCharged?: boolean;
 }
 
 export function PlayerTargetSelection({
@@ -57,6 +58,7 @@ export function PlayerTargetSelection({
   secondTargets,
   mySecondNightTarget,
   requiresSecondTarget = false,
+  mirrorcasterCharged,
 }: PlayerTargetSelectionProps) {
   const action = useGameAction(gameId);
 
@@ -84,6 +86,14 @@ export function PlayerTargetSelection({
               witchAbilityUsed={false}
               attackedPlayerIds={attackedPlayerIds ?? []}
             />
+          )}
+
+          {confirmPhaseKey === WerewolfRole.Mirrorcaster && (
+            <p className="mb-3 text-sm font-medium text-muted-foreground italic">
+              {mirrorcasterCharged
+                ? WEREWOLF_COPY.mirrorcaster.attackMode
+                : WEREWOLF_COPY.mirrorcaster.protectMode}
+            </p>
           )}
 
           {isGroupPhase && !isConfirmed && hasVisibleTeammates && (
@@ -220,6 +230,7 @@ export function PlayerTargetSelection({
                   }
                 : undefined
             }
+            mirrorcasterCharged={mirrorcasterCharged}
           />
         </>
       )}

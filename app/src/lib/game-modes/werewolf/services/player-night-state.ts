@@ -301,6 +301,7 @@ function extractAltruistState(
     game.roleAssignments,
     deadPlayerIds,
     ts?.priestWards,
+    ts?.mirrorcasterCharged,
   ).filter((id) => id !== callerId && id !== witchProtectedId);
   const result: Partial<PlayerGameState> = {
     myNightTarget: soloAction?.skipped ? null : soloAction?.targetPlayerId,

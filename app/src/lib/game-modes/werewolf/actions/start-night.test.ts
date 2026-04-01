@@ -227,3 +227,26 @@ describe("StartNight — Wolf Cub bonus phase lifecycle", () => {
     expect(phase.nightPhaseOrder).not.toContain(WOLF_CUB_BONUS_PHASE_KEY);
   });
 });
+
+describe("StartNight — Mirrorcaster charge persistence", () => {
+  const startNightAction = WEREWOLF_ACTIONS[WerewolfAction.StartNight];
+
+  it("carries mirrorcasterCharged forward to the next night", () => {
+    const game = makePlayingGame({
+      ...dayTurnState,
+      mirrorcasterCharged: true,
+    });
+    startNightAction.apply(game, null, "owner-1");
+
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.mirrorcasterCharged).toBe(true);
+  });
+
+  it("does not carry mirrorcasterCharged when it is false/undefined", () => {
+    const game = makePlayingGame(dayTurnState);
+    startNightAction.apply(game, null, "owner-1");
+
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.mirrorcasterCharged).toBeUndefined();
+  });
+});

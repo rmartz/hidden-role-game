@@ -22,6 +22,7 @@ interface ConfirmTargetButtonProps {
   hasGroupMembers?: boolean;
   allAgreed?: boolean;
   witchContext?: WitchConfirmContext;
+  mirrorcasterCharged?: boolean;
 }
 
 export function ConfirmTargetButton({
@@ -34,6 +35,7 @@ export function ConfirmTargetButton({
   hasGroupMembers,
   allAgreed,
   witchContext,
+  mirrorcasterCharged,
 }: ConfirmTargetButtonProps) {
   const action = useGameAction(gameId);
 
@@ -48,7 +50,7 @@ export function ConfirmTargetButton({
   const label = !hasDecided
     ? WEREWOLF_COPY.confirmButton.confirm
     : hasTarget
-      ? getConfirmLabel(roleId, witchContext)
+      ? getConfirmLabel(roleId, witchContext, mirrorcasterCharged)
       : WEREWOLF_COPY.confirmButton.skip;
 
   return isConfirmed ? (

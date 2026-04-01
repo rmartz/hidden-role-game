@@ -284,6 +284,24 @@ describe("getConfirmLabel", () => {
     expect(getConfirmLabel(WerewolfRole.Villager)).toBe("Confirm");
   });
 
+  it("returns 'Protect' for Mirrorcaster when uncharged", () => {
+    expect(getConfirmLabel(WerewolfRole.Mirrorcaster, undefined, false)).toBe(
+      "Protect",
+    );
+  });
+
+  it("returns 'Protect' for Mirrorcaster when mirrorcasterCharged is undefined", () => {
+    expect(
+      getConfirmLabel(WerewolfRole.Mirrorcaster, undefined, undefined),
+    ).toBe("Protect");
+  });
+
+  it("returns 'Attack' for Mirrorcaster when charged", () => {
+    expect(getConfirmLabel(WerewolfRole.Mirrorcaster, undefined, true)).toBe(
+      "Attack",
+    );
+  });
+
   it("returns 'Confirm' for undefined roleId", () => {
     expect(getConfirmLabel(undefined)).toBe("Confirm");
   });
