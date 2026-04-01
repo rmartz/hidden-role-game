@@ -29,9 +29,7 @@ export default function Home() {
   const router = useRouter();
   const [playerName, setPlayerName] = useState("");
   const [lobbyIdInput, setLobbyIdInput] = useState("");
-  const [selectedGameMode, setSelectedGameMode] = useState<GameMode>(
-    GameMode.Werewolf,
-  );
+  const [selectedGameMode, setSelectedGameMode] = useState(GameMode.Werewolf);
 
   const createMutation = useCreateLobby(selectedGameMode);
   const joinMutation = useJoinLobby((data) => {
