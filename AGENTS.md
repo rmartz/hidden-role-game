@@ -77,4 +77,13 @@ pnpm build-storybook  # Build static Storybook
 - Story files are co-located with their component: `ComponentName.stories.tsx`.
 - When adding or modifying a UI component, add or update its Storybook story to cover key visual states.
 - Stories should use mock data fixtures — never import from Firebase or depend on runtime providers (QueryClient, Redux store, Next.js router).
-- Components that are too hook-dependent to render in isolation should be noted but not storied until a decorator or presentational extraction is in place.
+- Components that are too hook-dependent to render in isolation should use a presentational split: extract rendering into a `ComponentNameView` that accepts callbacks, and keep the original as a thin wrapper that wires up hooks.
+
+## Component Tests
+
+- Test files are co-located with their component: `ComponentName.test.tsx`.
+- When adding or modifying a UI component, add or update its test to verify rendering behavior and key prop-driven states.
+- Use `@testing-library/react` with `vitest`. Always call `afterEach(cleanup)`.
+- Do not use `.toBeInTheDocument()` — use `.toBeDefined()` or check `.textContent` instead.
+- Assert against copy constants (e.g., `WEREWOLF_COPY`) rather than hardcoded strings.
+- Test presentational view components directly; avoid mocking hooks in tests where possible.
