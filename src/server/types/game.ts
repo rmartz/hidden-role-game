@@ -173,6 +173,56 @@ export interface PlayerGameState {
   isSilenced?: boolean;
   /** True if the player is hypnotized by the Mummy (vote follows the Mummy). */
   isHypnotized?: boolean;
+  // --- Secret Villain fields ---
+
+  /** Current Secret Villain phase info (type, presidentId, etc.). */
+  svPhase?: {
+    type: string;
+    presidentId: string;
+    chancellorNomineeId?: string;
+    chancellorId?: string;
+    actionType?: string;
+  };
+  /** Board state: Good and Bad cards played, failed election count. */
+  svBoard?: {
+    goodCardsPlayed: number;
+    badCardsPlayed: number;
+    failedElectionCount: number;
+  };
+  /** President's drawn cards, chancellor's remaining cards, or peeked cards. */
+  policyCards?: {
+    drawnCards?: string[];
+    remainingCards?: string[];
+    discardedCard?: string;
+    peekedCards?: string[];
+    vetoProposed?: boolean;
+    vetoResponse?: boolean;
+  };
+  /** Veto proposal visible to the president. */
+  vetoProposal?: {
+    vetoProposed: boolean;
+    vetoResponse?: boolean;
+  };
+  /** Eligible chancellor IDs (president only, nomination phase). */
+  eligibleChancellorIds?: string[];
+  /** The player's own election vote (during or after voting). */
+  myElectionVote?: string;
+  /** All election votes (after resolution). */
+  electionVotes?: { playerId: string; vote: string }[];
+  /** Whether the election passed. */
+  electionPassed?: boolean;
+  /** Whether veto power is unlocked (4+ Bad cards). */
+  vetoUnlocked?: boolean;
+  /** Secret Villain investigation result (president only). */
+  svInvestigationResult?: {
+    targetPlayerId: string;
+    team: string;
+  };
+  /** True when this player is the investigation target and needs to consent. */
+  svInvestigationConsent?: boolean;
+
+  // --- Werewolf trial fields ---
+
   /** Active elimination trial. Sanitized view: no raw per-player vote breakdown. */
   activeTrial?: {
     defendantId: string;
