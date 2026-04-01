@@ -12,8 +12,8 @@ import { useFirebaseAuth } from "@/hooks/firebaseAuth";
 
 /**
  * Subscribes to the lobby's public Firebase RTDB node and updates the
- * TanStack Query cache directly, replacing both the PartyKit WebSocket and
- * HTTP polling for lobby updates.
+ * TanStack Query cache directly, providing real-time lobby updates without
+ * HTTP polling.
  */
 export function useLobbyWebSocket(
   lobbyId: string,
