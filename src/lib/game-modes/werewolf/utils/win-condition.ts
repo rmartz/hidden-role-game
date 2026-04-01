@@ -21,7 +21,7 @@ import { WerewolfRole, WEREWOLF_ROLES } from "../roles";
 export function checkWinCondition(
   game: Game,
   deadPlayerIds: string[],
-): { type: GameStatus.Finished; winner: string } | undefined {
+): { type: GameStatus.Finished; winner: WerewolfWinner } | undefined {
   const deadSet = new Set(deadPlayerIds);
   const aliveAssignments = game.roleAssignments.filter(
     (a) => !deadSet.has(a.playerId),
@@ -61,7 +61,9 @@ export function checkWinCondition(
     }
   }
 
-  let winResult: { type: GameStatus.Finished; winner: string } | undefined;
+  let winResult:
+    | { type: GameStatus.Finished; winner: WerewolfWinner }
+    | undefined;
 
   if (badAlive === 0) {
     if (chupacabraAlive) {

@@ -3,8 +3,6 @@ import type { Game, GameAction } from "@/lib/types";
 import {
   SecretVillainPhase,
   FAILED_ELECTION_THRESHOLD,
-  BAD_CARDS_FOR_SPECIAL_BAD_WIN,
-  CARDS_TO_WIN,
   PolicyCard,
 } from "../types";
 import {
@@ -12,8 +10,9 @@ import {
   getNextPresidentId,
   drawCards,
   reshuffleIfNeeded,
+  checkBoardWinCondition,
+  checkChancellorElectionWinCondition,
 } from "../utils";
-import { SecretVillainRole } from "../roles";
 
 export const resolveElectionAction: GameAction = {
   isValid(game: Game) {
@@ -42,17 +41,17 @@ export const resolveElectionAction: GameAction = {
 
     if (passed) {
       // Check Special Bad chancellor win condition.
-      if (ts.badCardsPlayed >= BAD_CARDS_FOR_SPECIAL_BAD_WIN) {
-        const chancellorRole = game.roleAssignments.find(
-          (a) => a.playerId === votePhase.chancellorNomineeId,
-        );
-        if (
-          chancellorRole?.roleDefinitionId ===
-          (SecretVillainRole.SpecialBad as string)
-        ) {
-          game.status = { type: GameStatus.Finished, winner: "Bad" };
-          return;
-        }
+      const chancellorWin = checkChancellorElectionWinCondition(
+        votePhase.chancellorNomineeId,
+        game.roleAssignments,
+        ts.badCardsPlayed,
+      );
+      if (chancellorWin) {
+        game.status = {
+          type: GameStatus.Finished,
+          winner: chancellorWin.winner,
+        };
+        return;
       }
 
       // Successful election → transition to policy phase.
@@ -98,12 +97,12 @@ export const resolveElectionAction: GameAction = {
         }
 
         // Check win after auto-play.
-        if (ts.goodCardsPlayed >= CARDS_TO_WIN) {
-          game.status = { type: GameStatus.Finished, winner: "Good" };
-          return;
-        }
-        if (ts.badCardsPlayed >= CARDS_TO_WIN) {
-          game.status = { type: GameStatus.Finished, winner: "Bad" };
+        const boardWin = checkBoardWinCondition(ts);
+        if (boardWin) {
+          game.status = {
+            type: GameStatus.Finished,
+            winner: boardWin.winner,
+          };
           return;
         }
       }
