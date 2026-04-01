@@ -1,10 +1,11 @@
 import { GameStatus } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
-import { SecretVillainPhase, PolicyCard, CARDS_TO_WIN } from "../types";
+import { SecretVillainPhase, PolicyCard } from "../types";
 import {
   currentTurnState,
   getNextPresidentId,
   getSpecialAction,
+  checkBoardWinCondition,
 } from "../utils";
 
 export const chancellorPlayAction: GameAction = {
@@ -45,12 +46,9 @@ export const chancellorPlayAction: GameAction = {
     ts.previousChancellorId = ts.phase.chancellorId;
 
     // Check win condition.
-    if (ts.goodCardsPlayed >= CARDS_TO_WIN) {
-      game.status = { type: GameStatus.Finished, winner: "Good" };
-      return;
-    }
-    if (ts.badCardsPlayed >= CARDS_TO_WIN) {
-      game.status = { type: GameStatus.Finished, winner: "Bad" };
+    const boardWin = checkBoardWinCondition(ts);
+    if (boardWin) {
+      game.status = { type: GameStatus.Finished, winner: boardWin.winner };
       return;
     }
 

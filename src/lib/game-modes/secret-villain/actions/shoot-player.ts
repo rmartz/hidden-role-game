@@ -1,8 +1,7 @@
 import { GameStatus } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
 import { SecretVillainPhase, SpecialActionType } from "../types";
-import { currentTurnState } from "../utils";
-import { SecretVillainRole } from "../roles";
+import { currentTurnState, checkShootWinCondition } from "../utils";
 import { advanceToNextElection } from "./advance-to-election";
 
 /**
@@ -33,13 +32,12 @@ export const shootPlayerAction: GameAction = {
     ts.eliminatedPlayerIds = [...ts.eliminatedPlayerIds, targetPlayerId];
 
     // Check if the Special Bad was shot — Good team wins.
-    const targetRole = game.roleAssignments.find(
-      (a) => a.playerId === targetPlayerId,
+    const shootWin = checkShootWinCondition(
+      targetPlayerId,
+      game.roleAssignments,
     );
-    if (
-      targetRole?.roleDefinitionId === (SecretVillainRole.SpecialBad as string)
-    ) {
-      game.status = { type: GameStatus.Finished, winner: "Good" };
+    if (shootWin) {
+      game.status = { type: GameStatus.Finished, winner: shootWin.winner };
       return;
     }
 
