@@ -38,6 +38,11 @@ export const ROLE_VISIBILITY_OVERRIDES: Partial<
     awareOfDescription:
       "You trust these players completely — they are on your side.",
   },
+  [WerewolfRole.Sentinel]: {
+    awareOfHeading: "The Seer",
+    awareOfDescription:
+      "You know who the Seer is. Protect their identity at all costs.",
+  },
   [WerewolfRole.Minion]: {
     awareOfHeading: "Those whom you serve",
     awareOfDescription:

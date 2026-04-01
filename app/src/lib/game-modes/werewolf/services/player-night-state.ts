@@ -265,6 +265,7 @@ function extractWitchState(
       game.roleAssignments,
       deadPlayerIds,
       ts?.priestWards,
+      ts?.mirrorcasterCharged,
     );
     if (attacked.length > 0) {
       result.nightStatus = attacked.map(
