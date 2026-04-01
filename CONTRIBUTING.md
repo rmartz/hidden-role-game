@@ -15,6 +15,8 @@ pnpm lint             # Lint
 pnpm format           # Format
 pnpm test             # Run tests with Vitest
 pnpm tsc              # Type check
+pnpm storybook        # Start Storybook dev server (port 6006)
+pnpm build-storybook  # Build static Storybook
 ```
 
 ---
@@ -117,3 +119,16 @@ return (
 ### Barrel exports
 
 Every component or module directory should have an `index.ts` that re-exports its public surface. Consumers import from the directory, not individual files.
+
+---
+
+## Storybook
+
+Stories are co-located with their component as `ComponentName.stories.tsx`. When adding or modifying a UI component, update its story to cover key visual states (default, empty, error, role-specific variants).
+
+Stories must render in isolation — use mock data fixtures, not Firebase or runtime providers. If a component is too tightly coupled to hooks (e.g., `useGameAction`, `useRouter`), note it as a gap rather than adding a fragile story.
+
+```bash
+pnpm storybook        # Dev server at http://localhost:6006
+pnpm build-storybook  # Static build to storybook-static/
+```

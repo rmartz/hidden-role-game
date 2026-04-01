@@ -10,6 +10,7 @@ A multiplayer social deduction game platform. Players join a lobby, are secretly
 - **TanStack Query** — server state management
 - **[Firebase Realtime Database](https://firebase.google.com/docs/database)** — persistent storage and real-time push updates
 - **Vitest** — test runner
+- **Storybook** — component development and visual documentation
 
 ## Project Structure
 
@@ -37,6 +38,7 @@ hidden-role-game/
 │       ├── lobbySocket.ts  # Firebase RTDB real-time lobby subscription
 │       └── game.ts         # Firebase RTDB real-time game state subscription
 ├── docs/                   # Game mode documentation
+├── .storybook/          # Storybook configuration
 ├── package.json
 ├── tsconfig.json
 ├── next.config.ts
@@ -136,6 +138,10 @@ pnpm format
 
 # Type check
 pnpm tsc
+
+# Storybook
+pnpm storybook        # Dev server at http://localhost:6006
+pnpm build-storybook  # Static build
 ```
 
 CI runs on every PR: **Tests**, **Lint**, **Format**, and **Build**.
