@@ -1,15 +1,9 @@
 "use client";
 
-import { WerewolfAction, getConfirmLabel } from "@/lib/game-modes/werewolf";
+import { WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { PhaseKey, WitchConfirmContext } from "@/lib/game-modes/werewolf";
 import { useGameAction } from "@/hooks";
-import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
+import { ConfirmTargetButtonView } from "./ConfirmTargetButtonView";
 
 interface ConfirmTargetButtonProps {
   gameId: string;
@@ -39,41 +33,21 @@ export function ConfirmTargetButton({
 }: ConfirmTargetButtonProps) {
   const action = useGameAction(gameId);
 
-  // Group phases require all members to agree before confirming.
-  const needsConsensus = !!(isGroupPhase && hasGroupMembers && !allAgreed);
-  const disabled = !hasDecided || action.isPending || needsConsensus;
-  const tooltip = !hasDecided
-    ? WEREWOLF_COPY.confirmButton.makeSelection
-    : needsConsensus
-      ? WEREWOLF_COPY.confirmButton.groupConsensus
-      : undefined;
-  const label = !hasDecided
-    ? WEREWOLF_COPY.confirmButton.confirm
-    : hasTarget
-      ? getConfirmLabel(roleId, witchContext, mirrorcasterCharged)
-      : WEREWOLF_COPY.confirmButton.skip;
-
-  return isConfirmed ? (
-    <p className="mt-3 text-sm text-green-600 font-medium">
-      {WEREWOLF_COPY.confirmButton.actionConfirmed}
-    </p>
-  ) : (
-    <div className="mt-3 max-w-sm mx-auto flex justify-end">
-      <Tooltip>
-        <TooltipTrigger render={<span />}>
-          <Button
-            onClick={() => {
-              action.mutate({
-                actionId: WerewolfAction.ConfirmNightTarget,
-              });
-            }}
-            disabled={disabled}
-          >
-            {label}
-          </Button>
-        </TooltipTrigger>
-        {tooltip && <TooltipContent>{tooltip}</TooltipContent>}
-      </Tooltip>
-    </div>
+  return (
+    <ConfirmTargetButtonView
+      roleId={roleId}
+      hasTarget={hasTarget}
+      hasDecided={hasDecided}
+      isConfirmed={isConfirmed}
+      isGroupPhase={isGroupPhase}
+      hasGroupMembers={hasGroupMembers}
+      allAgreed={allAgreed}
+      witchContext={witchContext}
+      mirrorcasterCharged={mirrorcasterCharged}
+      isPending={action.isPending}
+      onConfirm={() => {
+        action.mutate({ actionId: WerewolfAction.ConfirmNightTarget });
+      }}
+    />
   );
 }
