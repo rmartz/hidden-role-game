@@ -1,6 +1,6 @@
 # Contributing
 
-See `AGENTS.md` (root and `app/`) for the authoritative coding standards consumed by AI agents. This file provides the same rules in a more readable format with examples.
+See `AGENTS.md` for the authoritative coding standards consumed by AI agents. This file provides the same rules in a more readable format with examples.
 
 ## Package Manager
 
@@ -9,12 +9,12 @@ Always use `pnpm`. Never `npm` or `yarn`.
 ## Common Commands
 
 ```bash
-pnpm dev              # Start dev server (from app/)
-pnpm build            # Production build (from app/)
-pnpm lint             # Lint (from app/)
-pnpm format           # Format (from app/)
-pnpm test             # Run tests with Vitest (from app/ or root)
-pnpm tsc --noEmit     # Type check (from app/)
+pnpm dev              # Start dev server
+pnpm build            # Production build
+pnpm lint             # Lint
+pnpm format           # Format
+pnpm test             # Run tests with Vitest
+pnpm tsc              # Type check
 ```
 
 ---

@@ -10,13 +10,13 @@ export default tseslint.config(
       "**/node_modules/**",
       "**/.next/**",
       "**/next-env.d.ts",
-      "app/vitest.config.ts",
-      "app/src/components/ui/**",
+      "vitest.config.mts",
+      "src/components/ui/**",
     ],
   },
   js.configs.recommended,
   {
-    files: ["app/**/*.{ts,tsx}"],
+    files: ["src/**/*.{ts,tsx}", "*.{ts,tsx}"],
     extends: [
       ...tseslint.configs.strictTypeChecked,
       ...tseslint.configs.stylisticTypeChecked,
@@ -27,13 +27,13 @@ export default tseslint.config(
         ...globals.node,
       },
       parserOptions: {
-        project: ["./app/tsconfig.json"],
+        project: ["./tsconfig.json"],
         tsconfigRootDir: import.meta.dirname,
       },
     },
   },
   {
-    files: ["app/**/*.{ts,tsx}"],
+    files: ["src/**/*.{ts,tsx}", "*.{ts,tsx}"],
     plugins: {
       "react-hooks": reactHooks,
     },
@@ -54,7 +54,7 @@ export default tseslint.config(
   },
   // Test files use Response.json() which inherently returns `any`; relax unsafe rules
   {
-    files: ["app/**/*.test.ts"],
+    files: ["src/**/*.test.ts"],
     rules: {
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",

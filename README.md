@@ -4,9 +4,9 @@ A multiplayer social deduction game platform. Players join a lobby, are secretly
 
 ## Tech Stack
 
-- **[Next.js 15](https://nextjs.org/)** — fullstack React framework (App Router)
+- **[Next.js](https://nextjs.org/)** — fullstack React framework (App Router)
 - **TypeScript** — strict mode throughout
-- **pnpm** — package manager with workspaces
+- **pnpm** — package manager
 - **TanStack Query** — server state management
 - **[Firebase Realtime Database](https://firebase.google.com/docs/database)** — persistent storage and real-time push updates
 - **Vitest** — test runner
@@ -15,32 +15,32 @@ A multiplayer social deduction game platform. Players join a lobby, are secretly
 
 ```
 hidden-role-game/
-├── app/                        # Next.js app (frontend + backend in one)
-│   └── src/
-│       ├── app/
-│       │   ├── page.tsx               # Home — create or join a lobby
-│       │   ├── lobby/[lobbyId]/       # Lobby UI (role config, waiting room)
-│       │   ├── game/[gameId]/         # Player game view
-│       │   │   ├── werewolf/          # Werewolf mode screen components
-│       │   │   └── owner/             # Owner game view
-│       │   └── api/
-│       │       ├── lobby/             # Lobby API routes
-│       │       └── game/              # Game API routes
-│       ├── lib/
-│       │   ├── firebase/       # Firebase Admin + client SDK wrappers and RTDB schema
-│       │   ├── types/          # Core domain types
-│       │   └── game-modes/     # Per-mode role definitions (Werewolf, Avalon, …)
-│       ├── server/
-│       │   ├── types/          # API response types (public-facing)
-│       │   └── utils/          # Server-only helpers (auth, role slots, role assignment)
-│       ├── services/
-│       │   ├── FirebaseLobbyService.ts  # Firebase-backed lobby store
-│       │   └── FirebaseGameService.ts   # Firebase-backed game store
-│       └── hooks/
-│           ├── lobbySocket.ts  # Firebase RTDB real-time lobby subscription
-│           └── game.ts         # Firebase RTDB real-time game state subscription
-├── package.json                # Workspace root (tooling: ESLint, Prettier, Husky)
-└── pnpm-workspace.yaml
+├── src/
+│   ├── app/
+│   │   ├── page.tsx               # Home — create or join a lobby
+│   │   ├── [gameMode]/lobby/      # Lobby UI (role config, waiting room)
+│   │   ├── [gameMode]/game/       # Player game view
+│   │   └── api/
+│   │       ├── lobby/             # Lobby API routes
+│   │       └── [gameMode]/game/   # Game API routes
+│   ├── lib/
+│   │   ├── firebase/       # Firebase Admin + client SDK wrappers and RTDB schema
+│   │   ├── types/          # Core domain types
+│   │   └── game-modes/     # Per-mode role definitions (Werewolf, Avalon, Secret Villain)
+│   ├── server/
+│   │   ├── types/          # API response types (public-facing)
+│   │   └── utils/          # Server-only helpers (auth, role slots, role assignment)
+│   ├── services/
+│   │   ├── FirebaseLobbyService.ts  # Firebase-backed lobby store
+│   │   └── FirebaseGameService.ts   # Firebase-backed game store
+│   └── hooks/
+│       ├── lobbySocket.ts  # Firebase RTDB real-time lobby subscription
+│       └── game.ts         # Firebase RTDB real-time game state subscription
+├── docs/                   # Game mode documentation
+├── package.json
+├── tsconfig.json
+├── next.config.ts
+└── vitest.config.mts
 ```
 
 ## Game Modes
@@ -69,7 +69,7 @@ The Firebase schema separates public and private data. Private data (session IDs
 
 ## Environment Variables
 
-Copy `app/.env.example` to `app/.env.local` and fill in your Firebase project values.
+Copy `.env.example` to `.env.local` and fill in your Firebase project values.
 
 | Variable                            | Description                                |
 | ----------------------------------- | ------------------------------------------ |
@@ -135,8 +135,7 @@ pnpm lint
 pnpm format
 
 # Type check
-pnpm --filter @hidden-role/app exec tsc --noEmit
-
+pnpm tsc
 ```
 
 CI runs on every PR: **Tests**, **Lint**, **Format**, and **Build**.
