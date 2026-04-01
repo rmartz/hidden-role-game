@@ -24,10 +24,27 @@ export interface PlayingGameStatus {
   turnState?: unknown;
 }
 
+/**
+ * Union of all valid winner identifiers across game modes.
+ * Werewolf: "Village", "Werewolves", "Chupacabra", "Draw", "LoneWolf", "Tanner", "Spoiler", "Executioner"
+ * Secret Villain: "Good", "Bad"
+ */
+export type GameWinner =
+  | "Village"
+  | "Werewolves"
+  | "Chupacabra"
+  | "Draw"
+  | "LoneWolf"
+  | "Tanner"
+  | "Spoiler"
+  | "Executioner"
+  | "Good"
+  | "Bad";
+
 export interface FinishedGameStatus {
   type: GameStatus.Finished;
-  /** The winning team or role name (e.g. "Werewolves", "Village", "Chupacabra"). */
-  winner?: string;
+  /** The winning team or role identifier. */
+  winner?: GameWinner;
 }
 
 export type GameStatusState =
