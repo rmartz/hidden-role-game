@@ -194,9 +194,9 @@ Narrator starts next night (start-night)
    - Werewolves see other Werewolves, Wolf Cubs, and Lone Wolves (shared group phase).
    - Wolf Cubs and Lone Wolves see all Werewolf wake-phase participants.
 2. **Aware-of** — explicit one-directional awareness via the `awareOf` property.
-   - Minion sees all `isWerewolf` players (`awareOf: { werewolves: true }`). Werewolves do NOT see the Minion.
    - Lone Wolf sees all `isWerewolf` players (`awareOf: { werewolves: true }`).
    - Masons see all other Masons (`awareOf: { roles: [Mason] }`).
+   - Minion sees all `isWerewolf` players (`awareOf: { werewolves: true }`). Werewolves do NOT see the Minion.
    - Sentinel sees the Seer (`awareOf: { roles: [Seer] }`).
 3. **Dead players** — roles of all dead players are revealed to everyone.
 4. **Narrator** — sees all role assignments always.
