@@ -22,6 +22,14 @@ export default defineConfig({
         },
         resolve: { alias: { "@": path.resolve(import.meta.dirname, "./src") } },
       },
+      {
+        test: {
+          name: "components",
+          environment: "happy-dom",
+          include: ["src/**/*.test.tsx"],
+        },
+        resolve: { alias: { "@": path.resolve(import.meta.dirname, "./src") } },
+      },
     ],
   },
 });

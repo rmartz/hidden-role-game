@@ -126,9 +126,23 @@ Every component or module directory should have an `index.ts` that re-exports it
 
 Stories are co-located with their component as `ComponentName.stories.tsx`. When adding or modifying a UI component, update its story to cover key visual states (default, empty, error, role-specific variants).
 
-Stories must render in isolation — use mock data fixtures, not Firebase or runtime providers. If a component is too tightly coupled to hooks (e.g., `useGameAction`, `useRouter`), note it as a gap rather than adding a fragile story.
+Stories must render in isolation — use mock data fixtures, not Firebase or runtime providers. If a component is too tightly coupled to hooks (e.g., `useGameAction`, `useRouter`), use a **presentational split**: extract rendering into a `ComponentNameView` that accepts callbacks, and keep the original as a thin wrapper that wires up hooks. Story and test the view component directly.
 
 ```bash
 pnpm storybook        # Dev server at http://localhost:6006
 pnpm build-storybook  # Static build to storybook-static/
 ```
+
+---
+
+## Component Tests
+
+Component tests are co-located as `ComponentName.test.tsx`. When adding or modifying a UI component, add tests that verify:
+
+- Correct rendering for key prop combinations
+- Conditional rendering (shows/hides sections based on props)
+- Text content matches copy constants (assert against `WEREWOLF_COPY` etc., not hardcoded strings)
+
+Use `@testing-library/react` with `vitest`. Always call `afterEach(cleanup)` — the component test project does not auto-cleanup. Do not use `.toBeInTheDocument()` (no jest-dom); use `.toBeDefined()` or check `.textContent` instead.
+
+Test presentational view components directly rather than mocking hooks. This keeps tests fast and focused on rendering behavior.
