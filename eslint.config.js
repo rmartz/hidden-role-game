@@ -10,6 +10,7 @@ export default tseslint.config(
       "**/node_modules/**",
       "**/.next/**",
       "**/next-env.d.ts",
+      "storybook-static/**",
       "vitest.config.mts",
       "src/components/ui/**",
     ],
@@ -61,6 +62,16 @@ export default tseslint.config(
       "@typescript-eslint/no-unsafe-argument": "off",
       "@typescript-eslint/restrict-template-expressions": "off",
       "@typescript-eslint/no-non-null-assertion": "off",
+    },
+  },
+  // Storybook stories use loose patterns; skip strict type checking
+  {
+    files: ["src/**/*.stories.tsx"],
+    rules: {
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
+      "@typescript-eslint/restrict-template-expressions": "off",
     },
   },
 );
