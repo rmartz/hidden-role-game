@@ -6,6 +6,11 @@ import type {
   TimerConfig,
 } from "@/lib/types";
 import type { AnyNightAction, DaytimeVote } from "@/lib/game-modes/werewolf";
+import type { SecretVillainPhase } from "@/lib/game-modes/secret-villain/types";
+import type {
+  SpecialActionType,
+  ElectionVote,
+} from "@/lib/game-modes/secret-villain/types";
 import type { PublicLobbyPlayer } from "./lobby";
 
 export type { RoleSlot };
@@ -177,11 +182,11 @@ export interface PlayerGameState {
 
   /** Current Secret Villain phase info (type, presidentId, etc.). */
   svPhase?: {
-    type: string;
+    type: SecretVillainPhase;
     presidentId: string;
     chancellorNomineeId?: string;
     chancellorId?: string;
-    actionType?: string;
+    actionType?: SpecialActionType;
   };
   /** Board state: Good and Bad cards played, failed election count. */
   svBoard?: {
@@ -206,9 +211,9 @@ export interface PlayerGameState {
   /** Eligible chancellor IDs (president only, nomination phase). */
   eligibleChancellorIds?: string[];
   /** The player's own election vote (during or after voting). */
-  myElectionVote?: string;
+  myElectionVote?: ElectionVote;
   /** All election votes (after resolution). */
-  electionVotes?: { playerId: string; vote: string }[];
+  electionVotes?: { playerId: string; vote: ElectionVote }[];
   /** Whether the election passed. */
   electionPassed?: boolean;
   /** Whether veto power is unlocked (4+ Bad cards). */

@@ -1,9 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { GameStatus } from "@/lib/types";
+import type { StartingGameStatus } from "@/lib/types";
 import type { PlayerGameState } from "@/server/types";
 import { useGameAction, useReturnToLobby } from "@/hooks";
 import { SecretVillainGameScreenView } from "./SecretVillainGameScreenView";
+
+/** How long the Starting phase lasts before auto-advancing to Playing (seconds). */
+const STARTING_DURATION_SECONDS = 15;
 
 interface SecretVillainGameScreenProps {
   gameState: PlayerGameState;
@@ -26,6 +31,35 @@ export function SecretVillainGameScreen({
   const [selectedTargetId, setSelectedTargetId] = useState<
     string | undefined
   >();
+
+  // Starting phase countdown.
+  const isStarting = gameState.status.type === GameStatus.Starting;
+  const startedAt = isStarting
+    ? (gameState.status as StartingGameStatus).startedAt
+    : undefined;
+  const [startingSecondsRemaining, setStartingSecondsRemaining] = useState<
+    number | undefined
+  >();
+
+  useEffect(() => {
+    if (!isStarting || !startedAt) return;
+
+    const tick = () => {
+      const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+      const remaining = Math.max(0, STARTING_DURATION_SECONDS - elapsed);
+      setStartingSecondsRemaining(remaining);
+
+      if (remaining <= 0) {
+        action.mutate({ actionId: "advance-game" });
+      }
+    };
+
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [isStarting, startedAt, action]);
 
   return (
     <SecretVillainGameScreenView
@@ -96,6 +130,7 @@ export function SecretVillainGameScreen({
       onReturnToLobby={() => {
         returnToLobby.mutate();
       }}
+      startingSecondsRemaining={startingSecondsRemaining}
       isPending={action.isPending}
       isReturning={returnToLobby.isPending}
       returnError={returnToLobby.isError}

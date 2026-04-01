@@ -7,5 +7,6 @@ export { PolicyPresidentView } from "./PolicyPresidentView";
 export { SecretVillainGameOverView } from "./SecretVillainGameOverView";
 export { SecretVillainGameScreen } from "./SecretVillainGameScreen";
 export { SecretVillainGameScreenView } from "./SecretVillainGameScreenView";
+export { SecretVillainStartingView } from "./SecretVillainStartingView";
 export { SpecialActionView } from "./SpecialActionView";
 export { VetoPromptView } from "./VetoPromptView";

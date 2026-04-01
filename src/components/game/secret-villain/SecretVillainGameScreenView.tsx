@@ -14,6 +14,7 @@ import { PolicyChancellorView } from "./PolicyChancellorView";
 import { VetoPromptView } from "./VetoPromptView";
 import { SpecialActionView } from "./SpecialActionView";
 import { SecretVillainGameOverView } from "./SecretVillainGameOverView";
+import { SecretVillainStartingView } from "./SecretVillainStartingView";
 
 function getPlayerName(
   players: PlayerGameState["players"],
@@ -45,6 +46,8 @@ export interface SecretVillainGameScreenViewProps {
   onConsent: () => void;
   // Game over
   onReturnToLobby: () => void;
+  // Starting
+  startingSecondsRemaining?: number;
   // Shared
   isPending?: boolean;
   isReturning?: boolean;
@@ -69,10 +72,20 @@ export function SecretVillainGameScreenView({
   onConfirmAction,
   onConsent,
   onReturnToLobby,
+  startingSecondsRemaining,
   isPending,
   isReturning,
   returnError,
 }: SecretVillainGameScreenViewProps) {
+  if (gameState.status.type === GameStatus.Starting) {
+    return (
+      <SecretVillainStartingView
+        gameState={gameState}
+        secondsRemaining={startingSecondsRemaining}
+      />
+    );
+  }
+
   if (gameState.status.type === GameStatus.Finished) {
     return (
       <SecretVillainGameOverView
@@ -149,7 +162,7 @@ export function SecretVillainGameScreenView({
               passed={gameState.electionPassed}
               votes={(gameState.electionVotes ?? []).map((v) => ({
                 playerName: getPlayerName(players, v.playerId),
-                vote: v.vote as "aye" | "no",
+                vote: v.vote,
               }))}
             />
           );
@@ -161,7 +174,7 @@ export function SecretVillainGameScreenView({
               players,
               phase.chancellorNomineeId ?? "",
             )}
-            myVote={gameState.myElectionVote as "aye" | "no" | undefined}
+            myVote={gameState.myElectionVote}
             onVote={onVote}
             isPending={isPending}
             isEliminated={isEliminated}
@@ -212,6 +225,7 @@ export function SecretVillainGameScreenView({
         );
       }
       case SecretVillainPhase.SpecialAction: {
+        if (!phase.actionType) return null;
         const alivePlayers = players.filter(
           (p) =>
             !(gameState.deadPlayerIds ?? []).includes(p.id) &&
@@ -219,7 +233,7 @@ export function SecretVillainGameScreenView({
         );
         return (
           <SpecialActionView
-            actionType={phase.actionType ?? ""}
+            actionType={phase.actionType}
             isPresident={phase.presidentId === myPlayerId}
             presidentName={getPlayerName(players, phase.presidentId)}
             players={alivePlayers}

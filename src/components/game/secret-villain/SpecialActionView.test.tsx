@@ -2,6 +2,7 @@ import { afterEach, describe, it, expect, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import { SpecialActionView } from "./SpecialActionView";
 import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
+import { SpecialActionType } from "@/lib/game-modes/secret-villain/types";
 
 afterEach(cleanup);
 
@@ -11,7 +12,7 @@ const players = [
 ];
 
 const defaultProps = {
-  actionType: "investigate-team",
+  actionType: SpecialActionType.InvestigateTeam,
   isPresident: true,
   presidentName: "Alice",
   players,
@@ -29,7 +30,10 @@ describe("SpecialActionView", () => {
 
   it("shows special election heading for special-election action", () => {
     render(
-      <SpecialActionView {...defaultProps} actionType="special-election" />,
+      <SpecialActionView
+        {...defaultProps}
+        actionType={SpecialActionType.SpecialElection}
+      />,
     );
     expect(
       screen.getByText(
@@ -39,7 +43,12 @@ describe("SpecialActionView", () => {
   });
 
   it("shows shoot heading for shoot action", () => {
-    render(<SpecialActionView {...defaultProps} actionType="shoot" />);
+    render(
+      <SpecialActionView
+        {...defaultProps}
+        actionType={SpecialActionType.Shoot}
+      />,
+    );
     expect(
       screen.getByText(SECRET_VILLAIN_COPY.specialAction.shootHeading),
     ).toBeDefined();
@@ -66,7 +75,7 @@ describe("SpecialActionView", () => {
     render(
       <SpecialActionView
         {...defaultProps}
-        actionType="policy-peek"
+        actionType={SpecialActionType.PolicyPeek}
         peekedCards={["good", "bad", "bad"]}
       />,
     );

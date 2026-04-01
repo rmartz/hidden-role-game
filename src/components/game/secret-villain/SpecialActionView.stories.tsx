@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { fn } from "storybook/test";
 import { SpecialActionView } from "./SpecialActionView";
+import { SpecialActionType } from "@/lib/game-modes/secret-villain/types";
 
 const players = [
   { id: "p1", name: "Alice" },
@@ -24,14 +25,14 @@ type Story = StoryObj<typeof meta>;
 
 export const InvestigateSelectTarget: Story = {
   args: {
-    actionType: "investigate-team",
+    actionType: SpecialActionType.InvestigateTeam,
     isPresident: true,
   },
 };
 
 export const InvestigateResult: Story = {
   args: {
-    actionType: "investigate-team",
+    actionType: SpecialActionType.InvestigateTeam,
     isPresident: true,
     investigationResult: { targetPlayerId: "p2", team: "bad" },
   },
@@ -39,21 +40,21 @@ export const InvestigateResult: Story = {
 
 export const SpecialElection: Story = {
   args: {
-    actionType: "special-election",
+    actionType: SpecialActionType.SpecialElection,
     isPresident: true,
   },
 };
 
 export const Shoot: Story = {
   args: {
-    actionType: "shoot",
+    actionType: SpecialActionType.Shoot,
     isPresident: true,
   },
 };
 
 export const PolicyPeek: Story = {
   args: {
-    actionType: "policy-peek",
+    actionType: SpecialActionType.PolicyPeek,
     isPresident: true,
     peekedCards: ["bad", "good", "bad"],
   },
@@ -61,14 +62,14 @@ export const PolicyPeek: Story = {
 
 export const NonPresidentWaiting: Story = {
   args: {
-    actionType: "shoot",
+    actionType: SpecialActionType.Shoot,
     isPresident: false,
   },
 };
 
 export const InvestigationConsent: Story = {
   args: {
-    actionType: "investigate-team",
+    actionType: SpecialActionType.InvestigateTeam,
     isPresident: false,
     investigationConsent: true,
   },

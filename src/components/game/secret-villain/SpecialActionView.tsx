@@ -3,10 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
+import { SpecialActionType } from "@/lib/game-modes/secret-villain/types";
 import { cn } from "@/lib/utils";
 
 interface SpecialActionViewProps {
-  actionType: string;
+  actionType: SpecialActionType;
   isPresident: boolean;
   presidentName: string;
   players: { id: string; name: string }[];
@@ -201,7 +202,7 @@ export function SpecialActionView({
 
   if (!isPresident) {
     if (
-      actionType === "investigate-team" &&
+      actionType === SpecialActionType.InvestigateTeam &&
       investigationConsent &&
       onConsent
     ) {
@@ -231,7 +232,7 @@ export function SpecialActionView({
     return null;
   }
 
-  if (actionType === "policy-peek" && peekedCards) {
+  if (actionType === SpecialActionType.PolicyPeek && peekedCards) {
     return (
       <PolicyPeekContent
         peekedCards={peekedCards}

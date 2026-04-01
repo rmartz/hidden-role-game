@@ -81,6 +81,19 @@ export const SECRET_VILLAIN_COPY = {
     returnToLobby: "Return to Lobby",
     returnToLobbyError: "Failed to return to lobby. Please try again.",
   },
+  starting: {
+    heading: "Game Starting",
+    yourRole: (roleName: string) => `You are ${roleName}.`,
+    badTeamHeading: "Your Allies",
+    badTeamDescription:
+      "These players are on the Bad team. One of them is the Special Bad — they raised their thumb but kept their eyes closed.",
+    specialBadMarker: "(Special Bad)",
+    goodTeamMessage:
+      "Close your eyes and wait. The Bad team is identifying each other.",
+    specialBadMessage:
+      "Close your eyes and raise your thumb. The other Bad players will see you.",
+    gameStartsIn: "Game begins in",
+  },
   eliminated: "You have been eliminated.",
   spectating: "You are spectating.",
 } as const;
