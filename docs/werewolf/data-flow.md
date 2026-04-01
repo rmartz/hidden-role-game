@@ -197,6 +197,7 @@ Narrator starts next night (start-night)
    - Minion sees all `isWerewolf` players (`awareOf: { werewolves: true }`). Werewolves do NOT see the Minion.
    - Lone Wolf sees all `isWerewolf` players (`awareOf: { werewolves: true }`).
    - Masons see all other Masons (`awareOf: { roles: [Mason] }`).
+   - Sentinel sees the Seer (`awareOf: { roles: [Seer] }`).
 3. **Dead players** — roles of all dead players are revealed to everyone.
 4. **Narrator** — sees all role assignments always.
 

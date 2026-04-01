@@ -63,6 +63,7 @@ export enum WerewolfRole {
   Pacifist = "werewolf-pacifist",
   Priest = "werewolf-priest",
   Seer = "werewolf-seer",
+  Sentinel = "werewolf-sentinel",
   Spellcaster = "werewolf-spellcaster",
   Spoiler = "werewolf-spoiler",
   Tanner = "werewolf-tanner",
@@ -371,6 +372,18 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Investigate,
     category: WerewolfRoleCategory.VillagerInvestigation,
+  },
+  [WerewolfRole.Sentinel]: {
+    id: WerewolfRole.Sentinel,
+    name: "Sentinel",
+    summary: "Knows who the Seer is and can protect their identity",
+    description:
+      "The Sentinel wakes on the first night and learns the identity of the Seer. They have no night action — their role is to use this knowledge to protect the Seer during daytime discussion without revealing them to the Werewolves.",
+    team: Team.Good,
+    awareOf: { roles: [WerewolfRole.Seer] },
+    wakesAtNight: WakesAtNight.FirstNightOnly,
+    targetCategory: TargetCategory.None,
+    category: WerewolfRoleCategory.VillagerSupport,
   },
   [WerewolfRole.Spellcaster]: {
     id: WerewolfRole.Spellcaster,
