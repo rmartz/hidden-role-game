@@ -56,6 +56,7 @@ export const EmptyVisibility: Story = {
   args: {
     assignments: [],
     gameMode: GameMode.Werewolf,
+    myRoleId: "werewolf-villager",
   },
 };
 
