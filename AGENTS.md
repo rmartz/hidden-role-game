@@ -13,6 +13,8 @@ pnpm lint             # Lint
 pnpm format           # Format
 pnpm test             # Run tests with Vitest
 pnpm tsc              # Type check
+pnpm storybook        # Start Storybook dev server (port 6006)
+pnpm build-storybook  # Build static Storybook
 ```
 
 ## TypeScript
@@ -69,3 +71,10 @@ pnpm tsc              # Type check
 ### Component Structure
 
 - Components should have a single JSX return statement. Invalid states should be prevented by the type system or guarded against by the calling component. An early `return null` can be acceptable if the invalid state is infeasible for the parent component to detect, but the component itself should be returned as a single JSX block.
+
+## Storybook
+
+- Story files are co-located with their component: `ComponentName.stories.tsx`.
+- When adding or modifying a UI component, add or update its Storybook story to cover key visual states.
+- Stories should use mock data fixtures — never import from Firebase or depend on runtime providers (QueryClient, Redux store, Next.js router).
+- Components that are too hook-dependent to render in isolation should be noted but not storied until a decorator or presentational extraction is in place.

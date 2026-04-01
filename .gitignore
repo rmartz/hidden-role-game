@@ -8,3 +8,4 @@ tsconfig.tsbuildinfo
 .env.local
 .env*.local
 .env.sentry-build-plugin
+storybook-static
