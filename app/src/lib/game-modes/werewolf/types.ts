@@ -163,6 +163,8 @@ export interface WerewolfTurnState {
   morticianAbilityEnded?: boolean;
   /** The player ID that the Executioner must get eliminated at trial to win. */
   executionerTargetId?: string;
+  /** True when the Mirrorcaster has gained a charge from a successful protection. */
+  mirrorcasterCharged?: boolean;
 }
 
 export interface TargetablePlayer {

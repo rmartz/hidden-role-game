@@ -199,6 +199,13 @@ export const WEREWOLF_COPY = {
     restoreAbility: "Restore Ability",
     bypassAbility: "Override",
   },
+  mirrorcaster: {
+    protectMode: "Protect Mode — Choose a player to shield.",
+    attackMode:
+      "Attack Mode — Your charge is ready. Choose a player to attack.",
+    narratorProtectMode: "Mirrorcaster is in Protect mode.",
+    narratorAttackMode: "Mirrorcaster is charged — Attack mode.",
+  },
   altruist: {
     attackedIntro:
       "The following players are under attack. You may sacrifice yourself to save one of them.",

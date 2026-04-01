@@ -270,6 +270,13 @@ export function OwnerGameNightScreen({
               <span> ({activePlayerNames.join(", ")})</span>
             )}
           </p>
+          {isRoleActive(activePhaseKey, WerewolfRole.Mirrorcaster) && (
+            <p className="mb-3 text-sm text-muted-foreground italic">
+              {turnState.mirrorcasterCharged
+                ? WEREWOLF_COPY.mirrorcaster.narratorAttackMode
+                : WEREWOLF_COPY.mirrorcaster.narratorProtectMode}
+            </p>
+          )}
           {!isFirstTurn && (
             <>
               {isWitchAbilitySkipped && !activeTargetConfirmed && (

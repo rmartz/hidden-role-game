@@ -205,6 +205,7 @@ export interface WitchConfirmContext {
 export function getConfirmLabel(
   phaseKey?: PhaseKey,
   witchContext?: WitchConfirmContext,
+  mirrorcasterCharged?: boolean,
 ): string {
   if (!phaseKey) return "Confirm";
   if (isGroupPhaseKey(phaseKey)) return "Attack";
@@ -217,6 +218,9 @@ export function getConfirmLabel(
       : "Attack";
   }
   if (isRoleActive(phaseKey, WerewolfRole.Spellcaster)) return "Silence";
+  if (isRoleActive(phaseKey, WerewolfRole.Mirrorcaster)) {
+    return mirrorcasterCharged ? "Attack" : "Protect";
+  }
   const roleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
     phaseKey
   ];

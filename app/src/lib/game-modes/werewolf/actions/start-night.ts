@@ -61,6 +61,7 @@ export const startNightAction: GameAction = {
         ...(ts.executionerTargetId
           ? { executionerTargetId: ts.executionerTargetId }
           : {}),
+        ...(ts.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
       },
     };
   },
