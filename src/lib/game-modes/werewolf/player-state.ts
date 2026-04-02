@@ -8,6 +8,12 @@ import type { AnyNightAction, DaytimeVote } from "./types";
  * should type their props as WerewolfPlayerGameState.
  */
 export interface WerewolfPlayerGameState extends PlayerGameState {
+  /** Whether player nominations for trial are enabled in this game. */
+  nominationsEnabled: boolean;
+  /** When true, only one trial is allowed per day phase. */
+  singleTrialPerDay: boolean;
+  /** When true, the night summary reveals players who were attacked but saved by protection. */
+  revealProtections: boolean;
   /** All night targets keyed by phase key. Only populated for the narrator/owner. */
   nightActions?: Record<string, AnyNightAction>;
   /** The current player's night target. null = intentional skip; undefined = no decision. */

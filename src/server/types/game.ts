@@ -84,10 +84,4 @@ export interface PlayerGameState {
   deadPlayerIds?: string[];
   /** Phase timer configuration. */
   timerConfig: TimerConfig;
-  /** Whether player nominations for trial are enabled in this game. */
-  nominationsEnabled: boolean;
-  /** When true, only one trial is allowed per day phase. */
-  singleTrialPerDay: boolean;
-  /** When true, the night summary reveals players who were attacked but saved by protection. */
-  revealProtections: boolean;
 }

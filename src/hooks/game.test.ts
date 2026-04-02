@@ -10,6 +10,7 @@ import {
 } from "@/lib/types";
 import { ServerResponseStatus } from "@/server/types";
 import type { PlayerGameState, PublicLobby } from "@/server/types";
+import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 import { createWrapper } from "./test-utils";
 
 vi.mock("@/lib/api", () => ({
@@ -35,7 +36,7 @@ vi.mock("@/hooks/firebaseAuth", () => ({
 import * as api from "@/lib/api";
 import { useStartGame, useGameStateQuery } from "./game";
 
-const mockGameState: PlayerGameState = {
+const mockGameState: WerewolfPlayerGameState = {
   status: { type: GameStatus.Playing },
   gameMode: GameMode.SecretVillain,
   lobbyId: "lobby-1",

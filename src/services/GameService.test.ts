@@ -8,6 +8,7 @@ import {
   DEFAULT_TIMER_CONFIG,
 } from "@/lib/types";
 import type { Game, GamePlayer, RoleSlot } from "@/lib/types";
+import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 
 const DEFAULT_SLOTS: RoleSlot[] = [
   { roleId: "good", min: 1, max: 1 },
@@ -162,13 +163,19 @@ describe("GameService.getPlayerGameState — narrator nominationsEnabled", () =>
 
   it("narrator state has nominationsEnabled true when enabled on game", () => {
     const game = makeNarratorGame(true);
-    const result = service.getPlayerGameState(game, "narrator");
+    const result = service.getPlayerGameState(
+      game,
+      "narrator",
+    ) as WerewolfPlayerGameState | null;
     expect(result?.nominationsEnabled).toBe(true);
   });
 
   it("narrator state has nominationsEnabled false when disabled on game", () => {
     const game = makeNarratorGame(false);
-    const result = service.getPlayerGameState(game, "narrator");
+    const result = service.getPlayerGameState(
+      game,
+      "narrator",
+    ) as WerewolfPlayerGameState | null;
     expect(result?.nominationsEnabled).toBe(false);
   });
 

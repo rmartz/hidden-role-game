@@ -9,6 +9,7 @@ import type {
   VisibilityReason,
 } from "@/lib/types";
 import type { PlayerGameState, VisibleTeammate } from "@/server/types";
+import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 import { GAME_MODES } from "@/lib/game-modes";
 import { getPlayer } from "@/lib/player-utils";
 import { assignRoles, adjustRoleSlots } from "@/server/utils";
@@ -186,7 +187,7 @@ export class FirebaseGameService {
       const state = this.getPlayerGameState(game, player.id);
       if (state) {
         updates[`games/${game.id}/playerState/${player.sessionId}`] =
-          playerStateToFirebase(state);
+          playerStateToFirebase(state as WerewolfPlayerGameState);
       }
     }
     if (Object.keys(updates).length > 0) {
