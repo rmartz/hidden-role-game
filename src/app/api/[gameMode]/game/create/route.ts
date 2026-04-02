@@ -2,6 +2,7 @@ import { ServerResponseStatus } from "@/server/types";
 import type { CreateGameRequest } from "@/server/types";
 import { lobbyService } from "@/services/LobbyService";
 import { gameService } from "@/services/GameService";
+import { gameStateService } from "@/services/GameStateService";
 import {
   authenticateLobby,
   errorResponse,
@@ -44,7 +45,7 @@ export async function POST(
     return errorResponse("Role slot ranges must cover the player count", 400);
   }
 
-  const { ownerTitle, roles } = gameService.getModeDefinition(gameMode);
+  const { ownerTitle, roles } = gameStateService.getModeDefinition(gameMode);
   for (const slot of roleSlots) {
     if (!(slot.roleId in roles)) {
       return errorResponse(`Unknown role: ${slot.roleId}`, 400);
@@ -63,9 +64,11 @@ export async function POST(
     lobby.config.showRolesInPlay,
     ownerPlayer?.id ?? undefined,
     lobby.config.timerConfig,
-    lobby.config.nominationsEnabled,
-    lobby.config.singleTrialPerDay,
-    lobby.config.revealProtections,
+    {
+      nominationsEnabled: lobby.config.nominationsEnabled,
+      singleTrialPerDay: lobby.config.singleTrialPerDay,
+      revealProtections: lobby.config.revealProtections,
+    },
   );
 
   await lobbyService.clearReadyPlayerIds(lobbyId);

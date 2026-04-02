@@ -2,17 +2,13 @@ import { randomUUID } from "crypto";
 import { GameStatus, GameMode, ShowRolesInPlay } from "@/lib/types";
 import type {
   Game,
-  GameModeConfig,
   GamePlayer,
   LobbyPlayer,
   RoleSlot,
   VisibilityReason,
 } from "@/lib/types";
-import type { PlayerGameState, VisibleTeammate } from "@/server/types";
+import type { PlayerGameState } from "@/server/types";
 import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
-import { GAME_MODES } from "@/lib/game-modes";
-import { getPlayer } from "@/lib/player-utils";
-import { assignRoles, adjustRoleSlots } from "@/server/utils";
 import { getAdminDatabase } from "@/lib/firebase/admin";
 import { ServerValue } from "firebase-admin/database";
 import {
@@ -23,178 +19,32 @@ import {
   type FirebaseGamePublic,
   type FirebasePlayerState,
 } from "@/lib/firebase/schema";
-import { gameInitializationService } from "./GameInitializationService";
+import { gameStateService } from "./GameStateService";
 
 function gameRef(gameId: string) {
   return getAdminDatabase().ref(`games/${gameId}`);
 }
 
+/**
+ * Firebase data access layer for games. Handles reading and writing
+ * game data to Firebase RTDB. Delegates all business logic to
+ * GameStateService and GameModeServices.
+ */
 export class FirebaseGameService {
-  public getModeDefinition(gameMode: GameMode): GameModeConfig {
-    return GAME_MODES[gameMode];
-  }
-
-  public getPlayerGameState(
-    game: Game,
-    callerId: string,
-  ): PlayerGameState | null {
-    const config = this.getModeDefinition(game.gameMode);
-    const { roles, services } = config;
-
-    const caller = getPlayer(game.players, callerId);
-    if (!caller) return null;
-
-    const playerById = new Map(game.players.map((p) => [p.id, p]));
-    const publicPlayers = game.players.map((p) => ({ id: p.id, name: p.name }));
-
-    if (callerId === game.ownerPlayerId) {
-      const visibleRoleAssignments = game.roleAssignments.flatMap(
-        (assignment) => {
-          const player = playerById.get(assignment.playerId);
-          const role = roles[assignment.roleDefinitionId];
-          if (!player || !role) return [];
-          return [
-            {
-              player: { id: player.id, name: player.name },
-              reason: "revealed" as const,
-              role: { id: role.id, name: role.name, team: role.team },
-            },
-          ];
-        },
-      );
-      const modeState = services.extractPlayerState(game, callerId, undefined);
-      return {
-        status: game.status,
-        gameMode: game.gameMode,
-        lobbyId: game.lobbyId,
-        players: publicPlayers,
-        gameOwner: { id: caller.id, name: caller.name },
-        myPlayerId: undefined,
-        myRole: undefined,
-        visibleRoleAssignments,
-        rolesInPlay: gameInitializationService.buildRolesInPlay(game),
-        nominationsEnabled: game.nominationsEnabled,
-        singleTrialPerDay: game.singleTrialPerDay,
-        revealProtections: game.revealProtections,
-        timerConfig: game.timerConfig,
-        ...modeState,
-      } as PlayerGameState;
-    }
-
-    const myAssignment = game.roleAssignments.find(
-      (r) => r.playerId === callerId,
-    );
-    if (!myAssignment) return null;
-
-    const myRole = roles[myAssignment.roleDefinitionId];
-    if (!myRole) return null;
-
-    // Start with teammate visibility.
-    const visibleRoleAssignments: VisibleTeammate[] =
-      caller.visiblePlayers.flatMap((vp) => {
-        const visiblePlayer = playerById.get(vp.playerId);
-        if (!visiblePlayer) return [];
-        return [
-          {
-            player: { id: visiblePlayer.id, name: visiblePlayer.name },
-            reason: vp.reason,
-          },
-        ];
-      });
-
-    // When game is finished, reveal all roles to every player.
-    // For dead player reveals during play, the mode services include
-    // deadPlayerIds — use those for role reveals.
-    const modeState = services.extractPlayerState(game, callerId, myRole);
-    const deadPlayerIds =
-      (modeState["deadPlayerIds"] as string[] | undefined) ?? [];
-    const isFinished = game.status.type === GameStatus.Finished;
-    const revealIds = isFinished
-      ? game.roleAssignments.map((a) => a.playerId)
-      : deadPlayerIds;
-
-    // Reveal dead players' (or all players', if game over) roles.
-    const visiblePlayerIds = new Set(
-      visibleRoleAssignments.map((v) => v.player.id),
-    );
-    for (const revealId of revealIds) {
-      if (revealId === callerId || visiblePlayerIds.has(revealId)) continue;
-      const revealAssignment = game.roleAssignments.find(
-        (a) => a.playerId === revealId,
-      );
-      if (!revealAssignment) continue;
-      const revealPlayer = playerById.get(revealId);
-      const revealRole = roles[revealAssignment.roleDefinitionId];
-      if (!revealPlayer || !revealRole) continue;
-      visibleRoleAssignments.push({
-        player: { id: revealPlayer.id, name: revealPlayer.name },
-        reason: "revealed",
-        role: {
-          id: revealRole.id,
-          name: revealRole.name,
-          team: revealRole.team,
-        },
-      });
-      visiblePlayerIds.add(revealId);
-    }
-
-    // Mode-specific additional visibility (e.g. Executioner target).
-    // Strip modeVisiblePlayerIds from the state before spreading — it's
-    // a transient directive for visibility, not a serialized field.
-    const { modeVisiblePlayerIds: modeVisibleRaw, ...modeStateClean } =
-      modeState;
-    const modeVisiblePlayerIds = (modeVisibleRaw as string[] | undefined) ?? [];
-    for (const pid of modeVisiblePlayerIds) {
-      if (pid === callerId || visiblePlayerIds.has(pid)) continue;
-      const visiblePlayer = playerById.get(pid);
-      if (visiblePlayer) {
-        visibleRoleAssignments.push({
-          player: { id: visiblePlayer.id, name: visiblePlayer.name },
-          reason: "aware-of",
-        });
-        visiblePlayerIds.add(pid);
-      }
-    }
-
-    return {
-      status: game.status,
-      gameMode: game.gameMode,
-      lobbyId: game.lobbyId,
-      players: publicPlayers,
-      gameOwner: game.ownerPlayerId
-        ? {
-            id: game.ownerPlayerId,
-            name:
-              playerById.get(game.ownerPlayerId)?.name ?? game.ownerPlayerId,
-          }
-        : undefined,
-      myPlayerId: callerId,
-      myRole: { id: myRole.id, name: myRole.name, team: myRole.team },
-      visibleRoleAssignments,
-      rolesInPlay: gameInitializationService.buildRolesInPlay(game),
-      nominationsEnabled: game.nominationsEnabled,
-      singleTrialPerDay: game.singleTrialPerDay,
-      revealProtections: game.revealProtections,
-      timerConfig: game.timerConfig,
-      ...modeStateClean,
-    } as PlayerGameState;
-  }
-
-  /** Writes pre-computed PlayerGameState for every player in the game. */
+  /** Write pre-computed PlayerGameState for every player to Firebase. */
   private async writeAllPlayerStates(game: Game): Promise<void> {
+    const states = gameStateService.buildAllPlayerStates(game);
     const updates: Record<string, unknown> = {};
-    for (const player of game.players) {
-      const state = this.getPlayerGameState(game, player.id);
-      if (state) {
-        updates[`games/${game.id}/playerState/${player.sessionId}`] =
-          playerStateToFirebase(state as WerewolfPlayerGameState);
-      }
+    for (const [sessionId, state] of states) {
+      updates[`games/${game.id}/playerState/${sessionId}`] =
+        playerStateToFirebase(state as WerewolfPlayerGameState);
     }
     if (Object.keys(updates).length > 0) {
       await getAdminDatabase().ref().update(updates);
     }
   }
 
+  /** Create a game in Firebase from lobby data. */
   public async createGame(
     lobbyId: string,
     players: LobbyPlayer[],
@@ -203,51 +53,22 @@ export class FirebaseGameService {
     showRolesInPlay: ShowRolesInPlay,
     ownerPlayerId: string | undefined,
     timerConfig: import("@/lib/types").TimerConfig,
-    nominationsEnabled: boolean,
-    singleTrialPerDay: boolean,
-    revealProtections: boolean,
+    modeConfig?: Record<string, unknown>,
   ): Promise<Game> {
-    const { roles } = this.getModeDefinition(gameMode);
-    const rolePlayers = ownerPlayerId
-      ? players.filter((p) => p.id !== ownerPlayerId)
-      : players;
-    const roleAssignments = assignRoles(rolePlayers, roleSlots);
-
-    const ownerPlayer = ownerPlayerId
-      ? getPlayer(players, ownerPlayerId)
-      : null;
-    const gamePlayers: GamePlayer[] = [
-      ...gameInitializationService.buildGamePlayers(
-        rolePlayers,
-        roleAssignments,
-        roles,
-      ),
-      ...(ownerPlayer ? [{ ...ownerPlayer, visiblePlayers: [] }] : []),
-    ];
-
-    const { services } = this.getModeDefinition(gameMode);
-    const specialTargets = services.selectSpecialTargets(roleAssignments);
-
-    const game: Game = {
-      id: randomUUID(),
+    const game = gameStateService.buildGame(
+      randomUUID(),
       lobbyId,
+      players,
+      roleSlots,
       gameMode,
-      status: { type: GameStatus.Starting, startedAt: Date.now() },
-      players: gamePlayers,
-      roleAssignments,
-      configuredRoleSlots: roleSlots,
       showRolesInPlay,
       ownerPlayerId,
       timerConfig,
-      nominationsEnabled,
-      singleTrialPerDay,
-      revealProtections,
-      ...specialTargets,
-    };
+      modeConfig,
+    );
 
-    // sessionIndex: { [sessionId]: playerId } — needed to reconstruct Game from Firebase
     const sessionIndex: Record<string, string> = {};
-    for (const p of gamePlayers) {
+    for (const p of game.players) {
       sessionIndex[p.sessionId] = p.id;
     }
 
@@ -260,18 +81,17 @@ export class FirebaseGameService {
     return game;
   }
 
+  /** Read a game from Firebase. */
   public async getGame(gameId: string): Promise<Game | undefined> {
     const snap = await gameRef(gameId).once("value");
     if (!snap.exists()) return undefined;
 
     const data = snap.val() as {
       public?: FirebaseGamePublic;
-      sessionIndex?: Record<string, string>; // { [sessionId]: playerId }
+      sessionIndex?: Record<string, string>;
     };
     if (!data.public) return undefined;
 
-    // Reconstruct GamePlayers with sessionIds using the stored sessionIndex.
-    // visiblePlayers is omitted — it's only needed at creation time for building playerState.
     const playerIdToSession = new Map(
       Object.entries(data.sessionIndex ?? {}).map(([sid, pid]) => [pid, sid]),
     );
@@ -291,6 +111,7 @@ export class FirebaseGameService {
     return firebaseToGame(gameId, data.public, players);
   }
 
+  /** Read a player's pre-computed game state from Firebase. */
   public async getPlayerGameStateBySession(
     gameId: string,
     sessionId: string,
@@ -302,17 +123,12 @@ export class FirebaseGameService {
     return firebaseToPlayerState(snap.val() as FirebasePlayerState);
   }
 
+  /** Advance a game from Starting to Playing in Firebase. */
   public async advanceToPlaying(gameId: string): Promise<Game | null> {
     const game = await this.getGame(gameId);
     if (game?.status.type !== GameStatus.Starting) return null;
 
-    const { services } = this.getModeDefinition(game.gameMode);
-    game.status = {
-      type: GameStatus.Playing,
-      turnState: services.buildInitialTurnState(game.roleAssignments, {
-        executionerTargetId: game.executionerTargetId,
-      }),
-    };
+    game.status = gameStateService.buildPlayingStatus(game);
 
     await gameRef(gameId)
       .child("public/status")
@@ -322,35 +138,30 @@ export class FirebaseGameService {
     return game;
   }
 
+  /** Apply a game action via Firebase transaction. */
   public async applyAction(
     gameId: string,
     actionId: string,
     callerId: string,
     payload: unknown,
   ): Promise<{ game: Game } | { error: string }> {
-    // Pre-fetch stable game data (players, roleAssignments don't change during play).
     const baseGame = await this.getGame(gameId);
     if (!baseGame) return { error: "Game not found" };
 
-    const config = this.getModeDefinition(baseGame.gameMode);
+    const config = gameStateService.getModeDefinition(baseGame.gameMode);
     const action = config.actions[actionId];
     if (!action) return { error: "Unknown action" };
 
-    // Use a Firebase transaction on `public/status` so concurrent actions are
-    // serialized and each sees the latest committed state, preventing lost updates.
     let finalGame: Game | undefined;
     const result = await gameRef(gameId)
       .child("public/status")
       .transaction((currentStatusJson: string | null) => {
-        // Firebase may call the callback with null before it has the cached
-        // value. Fall back to the pre-fetched status so Firebase can compare
-        // and retry with the real server value if it differs.
         const statusJson = currentStatusJson ?? JSON.stringify(baseGame.status);
         const currentStatus = JSON.parse(
           statusJson,
         ) as import("@/lib/types").GameStatusState;
         const game: Game = { ...baseGame, status: currentStatus };
-        if (!action.isValid(game, callerId, payload)) return undefined; // abort
+        if (!action.isValid(game, callerId, payload)) return undefined;
         action.apply(game, payload, callerId);
         finalGame = game;
         return JSON.stringify(game.status);
@@ -360,11 +171,6 @@ export class FirebaseGameService {
       return { error: "Action not valid for current game state" };
     }
 
-    // Use the committed status from the transaction snapshot rather than
-    // re-fetching via getGame(). The snapshot is guaranteed to reflect exactly
-    // what was written — avoids potential SDK cache staleness and removes the
-    // concurrent-write window where a stale writeAllPlayerStates could
-    // overwrite a more-recent commit.
     const committedStatusJson = result.snapshot.val() as string | null;
     const committedGame =
       committedStatusJson !== null
@@ -377,20 +183,6 @@ export class FirebaseGameService {
         : finalGame;
     await this.writeAllPlayerStates(committedGame);
     return { game: committedGame };
-  }
-
-  public adjustRoleSlotsForPlayer(
-    current: RoleSlot[],
-    gameMode: GameMode,
-    numPlayers: number,
-    operation: "add" | "remove",
-  ): RoleSlot[] {
-    const config = this.getModeDefinition(gameMode);
-    return adjustRoleSlots(
-      current,
-      config.defaultRoleCount(numPlayers),
-      operation,
-    );
   }
 }
 

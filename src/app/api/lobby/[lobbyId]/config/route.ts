@@ -2,7 +2,7 @@ import { GameMode } from "@/lib/types";
 import { ServerResponseStatus } from "@/server/types";
 import type { UpdateLobbyConfigRequest } from "@/server/types";
 import { lobbyService } from "@/services/LobbyService";
-import { gameService } from "@/services/GameService";
+import { gameStateService } from "@/services/GameStateService";
 import {
   authenticateLobby,
   errorResponse,
@@ -32,7 +32,7 @@ export async function PUT(
   }
 
   if (body.roleSlots !== undefined && body.gameMode !== undefined) {
-    const { roles } = gameService.getModeDefinition(body.gameMode);
+    const { roles } = gameStateService.getModeDefinition(body.gameMode);
     for (const slot of body.roleSlots) {
       if (!(slot.roleId in roles)) {
         return errorResponse(`Unknown role: ${slot.roleId}`, 400);

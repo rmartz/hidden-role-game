@@ -80,13 +80,20 @@ export const werewolfServices: GameModeServices = {
     callerId: string,
     myRole: RoleDefinition | undefined,
   ): Record<string, unknown> {
-    if (!myRole) {
-      return extractOwnerState(game) as Record<string, unknown>;
-    }
-    return extractNonOwnerState(game, callerId, myRole) as Record<
-      string,
-      unknown
-    >;
+    const modeState = !myRole
+      ? (extractOwnerState(game) as Record<string, unknown>)
+      : (extractNonOwnerState(game, callerId, myRole) as Record<
+          string,
+          unknown
+        >);
+
+    // Include Werewolf-specific game settings in the player state.
+    return {
+      ...modeState,
+      nominationsEnabled: game.nominationsEnabled as unknown,
+      singleTrialPerDay: game.singleTrialPerDay as unknown,
+      revealProtections: game.revealProtections as unknown,
+    };
   },
 };
 

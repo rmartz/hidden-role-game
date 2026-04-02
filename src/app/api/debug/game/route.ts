@@ -4,6 +4,7 @@ import type { LobbyPlayer, TimerConfig } from "@/lib/types";
 import type { RoleSlot } from "@/server/types";
 import { ServerResponseStatus } from "@/server/types";
 import { gameService } from "@/services/GameService";
+import { gameStateService } from "@/services/GameStateService";
 import { errorResponse } from "@/server/utils";
 import { getRoleSlotsRequired } from "@/lib/game-modes";
 
@@ -13,9 +14,6 @@ interface CreateDebugGameRequest {
   roleSlots: RoleSlot[];
   showRolesInPlay: ShowRolesInPlay;
   timerConfig: TimerConfig;
-  nominationsEnabled: boolean;
-  singleTrialPerDay: boolean;
-  revealProtections: boolean;
 }
 
 export interface DebugPlayer {
@@ -26,16 +24,8 @@ export interface DebugPlayer {
 }
 
 export async function POST(request: Request): Promise<Response> {
-  const {
-    playerCount,
-    gameMode,
-    roleSlots,
-    showRolesInPlay,
-    timerConfig,
-    nominationsEnabled,
-    singleTrialPerDay,
-    revealProtections,
-  } = (await request.json()) as CreateDebugGameRequest;
+  const { playerCount, gameMode, roleSlots, showRolesInPlay, timerConfig } =
+    (await request.json()) as CreateDebugGameRequest;
 
   if (!Object.values(GameMode).includes(gameMode)) {
     return errorResponse("Unknown game mode", 400);
@@ -45,7 +35,7 @@ export async function POST(request: Request): Promise<Response> {
     return errorResponse("playerCount must be between 2 and 20", 400);
   }
 
-  const { ownerTitle, roles } = gameService.getModeDefinition(gameMode);
+  const { ownerTitle, roles } = gameStateService.getModeDefinition(gameMode);
 
   const players: LobbyPlayer[] = Array.from(
     { length: playerCount },
@@ -79,9 +69,11 @@ export async function POST(request: Request): Promise<Response> {
     showRolesInPlay,
     ownerPlayer?.id ?? undefined,
     timerConfig,
-    nominationsEnabled,
-    singleTrialPerDay,
-    revealProtections,
+    {
+      nominationsEnabled: true,
+      singleTrialPerDay: true,
+      revealProtections: true,
+    },
   );
 
   const debugPlayers: DebugPlayer[] = players.map((p) => ({
