@@ -9,3 +9,5 @@ tsconfig.tsbuildinfo
 .env*.local
 .env.sentry-build-plugin
 storybook-static
+GENERIC_AGENTS.md
+TECHNICAL_ARCHITECTURE.md
