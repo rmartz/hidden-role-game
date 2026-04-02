@@ -44,6 +44,7 @@ pnpm build-storybook  # Build static Storybook
 
 - All user-facing strings must be stored in a co-located copy file (e.g., `ComponentName.copy.ts` or `copy.ts`) for internationalization (i18n) readiness.
 - Do not hardcode display strings inline in components.
+- Copy files export a single `as const` object named `{SCOPE}_COPY` (e.g., `WEREWOLF_COPY`, `HOME_PAGE_COPY`, `GAME_TIMER_COPY`).
 
 ## Documentation
 
@@ -71,6 +72,24 @@ pnpm build-storybook  # Build static Storybook
 ### Component Structure
 
 - Components should have a single JSX return statement. Invalid states should be prevented by the type system or guarded against by the calling component. An early `return null` can be acceptable if the invalid state is infeasible for the parent component to detect, but the component itself should be returned as a single JSX block.
+
+## Naming Conventions
+
+- **Game actions**: Export as `{actionName}Action` with type `GameAction` (e.g., `castVoteAction`, `startNightAction`).
+- **Firebase schema conversions**: `{domain}ToFirebase()` / `firebaseTo{Domain}()` (e.g., `gameToFirebase()`, `firebaseToGame()`).
+- **Redux slices**: File suffix `-slice.ts` (e.g., `game-config-slice.ts`).
+- **Presentational views**: Components extracted for testability use the `{Component}View` suffix (e.g., `GameOverScreenView`, `ConfirmTargetButtonView`).
+
+## Testing Conventions
+
+- Use `describe`/`it` from Vitest (not `test`).
+- Test fixture generators use `make{DomainName}()` (e.g., `makePlayingGame()`, `makeGameState()`).
+- When splitting large test files, organize into `{module}-tests/` directories (e.g., `resolution-tests/altruist.test.ts`).
+
+## Git Conventions
+
+- Branch names: lowercase with hyphens, prefixed by type: `feature/`, `chore/`, `refactor/`, `docs/`, with issue number suffix (e.g., `feature/secret-villain-deck-290`).
+- Commit messages: imperative verbs (Add, Implement, Fix, Update, Extract, Remove). No `feat:`/`fix:` prefixes.
 
 ## Storybook
 
