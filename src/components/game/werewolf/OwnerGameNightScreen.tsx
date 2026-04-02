@@ -26,7 +26,7 @@ import type {
   WerewolfRoleDefinition,
 } from "@/lib/game-modes/werewolf";
 import { WEREWOLF_ROLES } from "@/lib/game-modes/werewolf/roles";
-import type { PlayerGameState } from "@/server/types";
+import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 import { Button } from "@/components/ui/button";
 import { getPlayerName } from "@/lib/player-utils";
 import { useGameAction } from "@/hooks";
@@ -40,7 +40,7 @@ import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 
 interface OwnerGameNightScreenProps {
   gameId: string;
-  gameState: PlayerGameState;
+  gameState: WerewolfPlayerGameState;
   turnState: WerewolfTurnState;
 }
 

@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 import type { DaytimeVote } from "@/lib/game-modes/werewolf";
 import { WEREWOLF_COPY, WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
+import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 import { useGameAction } from "@/hooks";
 import { GameTimer } from "@/components/game";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ import { Card } from "@/components/ui/card";
 
 interface TrialVotePanelProps {
   gameId: string;
-  activeTrial: NonNullable<PlayerGameState["activeTrial"]>;
+  activeTrial: NonNullable<WerewolfPlayerGameState["activeTrial"]>;
   players: PlayerGameState["players"];
   myPlayerId?: string;
   amDead?: boolean;

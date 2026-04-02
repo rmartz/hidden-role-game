@@ -1,6 +1,7 @@
 import { GameStatus } from "@/lib/types";
 import type { Game } from "@/lib/types";
-import type { DaytimeNightStatusEntry, PlayerGameState } from "@/server/types";
+import type { DaytimeNightStatusEntry } from "@/server/types";
+import type { WerewolfPlayerGameState } from "../player-state";
 import type {
   AltruistInterceptedNightResolutionEvent,
   AnyNightAction,
@@ -45,7 +46,7 @@ function extractHunterRevengePlayerId(game: Game): string | undefined {
 export function extractDaytimeNightSummary(
   game: Game,
   callerId: string,
-): Partial<PlayerGameState> {
+): Partial<WerewolfPlayerGameState> {
   if (game.status.type !== GameStatus.Playing) return {};
   const ts = game.status.turnState as WerewolfTurnState | undefined;
   if (ts?.phase.type !== WerewolfPhase.Daytime) return {};
@@ -97,7 +98,7 @@ export function extractDaytimeNightSummary(
     return [];
   });
 
-  const result: Partial<PlayerGameState> = {
+  const result: Partial<WerewolfPlayerGameState> = {
     ...(nightStatus.length > 0 ? { nightStatus } : {}),
   };
 
@@ -128,13 +129,13 @@ export function extractDaytimeNightSummary(
 export function extractDaytimePlayerState(
   game: Game,
   callerId: string,
-): Partial<PlayerGameState> {
+): Partial<WerewolfPlayerGameState> {
   if (game.status.type !== GameStatus.Playing) return {};
   const ts = game.status.turnState as WerewolfTurnState | undefined;
   if (ts?.phase.type !== WerewolfPhase.Daytime) return {};
   const phase = ts.phase;
 
-  const result: Partial<PlayerGameState> = {};
+  const result: Partial<WerewolfPlayerGameState> = {};
 
   // Nominations.
   if (game.nominationsEnabled) {
@@ -242,7 +243,9 @@ export function extractDaytimePlayerState(
 /**
  * Extracts complete owner/narrator state from the Werewolf game.
  */
-export function extractOwnerState(game: Game): Partial<PlayerGameState> {
+export function extractOwnerState(
+  game: Game,
+): Partial<WerewolfPlayerGameState> {
   const nightActions = extractNightActions(game);
   const deadPlayerIds = extractDeadPlayerIds(game);
   const hunterRevengePlayerId = extractHunterRevengePlayerId(game);

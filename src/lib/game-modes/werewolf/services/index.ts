@@ -4,7 +4,7 @@ import type {
   PlayerRoleAssignment,
   RoleDefinition,
 } from "@/lib/types";
-import type { PlayerGameState } from "@/server/types";
+import type { WerewolfPlayerGameState } from "../player-state";
 import { WerewolfRole } from "../roles";
 import {
   selectExecutionerTarget,
@@ -23,7 +23,7 @@ function extractNonOwnerState(
   game: Game,
   callerId: string,
   myRole: RoleDefinition,
-): Partial<PlayerGameState> & { modeVisiblePlayerIds?: string[] } {
+): Partial<WerewolfPlayerGameState> & { modeVisiblePlayerIds?: string[] } {
   const deadPlayerIds = extractDeadPlayerIds(game);
   const nightActions = extractNightActions(game);
 
