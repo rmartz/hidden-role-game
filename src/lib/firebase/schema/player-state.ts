@@ -113,9 +113,15 @@ export function playerStateToFirebase(
     ...(state.isSilenced ? { isSilenced: true } : {}),
     ...(state.isHypnotized ? { isHypnotized: true } : {}),
     ...(state.activeTrial ? { activeTrial: state.activeTrial } : {}),
-    nominationsEnabled: state.nominationsEnabled,
-    singleTrialPerDay: state.singleTrialPerDay,
-    revealProtections: state.revealProtections,
+    ...(state.nominationsEnabled !== undefined
+      ? { nominationsEnabled: state.nominationsEnabled }
+      : {}),
+    ...(state.singleTrialPerDay !== undefined
+      ? { singleTrialPerDay: state.singleTrialPerDay }
+      : {}),
+    ...(state.revealProtections !== undefined
+      ? { revealProtections: state.revealProtections }
+      : {}),
     ...(state.executionerTargetId
       ? { executionerTargetId: state.executionerTargetId }
       : {}),
@@ -128,7 +134,7 @@ export function playerStateToFirebase(
 
 export function firebaseToPlayerState(
   raw: FirebasePlayerState,
-): WerewolfPlayerGameState {
+): PlayerGameState {
   return {
     status: JSON.parse(raw.statusJson) as GameStatusState,
     gameMode: raw.gameMode as PlayerGameState["gameMode"],
@@ -200,9 +206,15 @@ export function firebaseToPlayerState(
             raw.activeTrial as WerewolfPlayerGameState["activeTrial"],
         }
       : {}),
-    nominationsEnabled: raw.nominationsEnabled ?? false,
-    singleTrialPerDay: raw.singleTrialPerDay ?? false,
-    revealProtections: raw.revealProtections ?? false,
+    ...(raw.nominationsEnabled !== undefined
+      ? { nominationsEnabled: raw.nominationsEnabled }
+      : {}),
+    ...(raw.singleTrialPerDay !== undefined
+      ? { singleTrialPerDay: raw.singleTrialPerDay }
+      : {}),
+    ...(raw.revealProtections !== undefined
+      ? { revealProtections: raw.revealProtections }
+      : {}),
     ...(raw.executionerTargetId
       ? { executionerTargetId: raw.executionerTargetId }
       : {}),
