@@ -1,5 +1,5 @@
 import { ServerResponseStatus } from "@/server/types";
-import { lobbyService } from "@/services/LobbyService";
+import { lobbyService } from "@/services/FirebaseLobbyService";
 import {
   authenticateLobby,
   errorResponse,

@@ -1,7 +1,7 @@
 import { GameMode } from "@/lib/types";
 import { ServerResponseStatus } from "@/server/types";
 import type { UpdateLobbyConfigRequest } from "@/server/types";
-import { lobbyService } from "@/services/LobbyService";
+import { lobbyService } from "@/services/FirebaseLobbyService";
 import { gameStateService } from "@/services/GameStateService";
 import {
   authenticateLobby,

@@ -3,7 +3,7 @@ import { GameMode, ShowRolesInPlay } from "@/lib/types";
 import type { LobbyPlayer, TimerConfig } from "@/lib/types";
 import type { RoleSlot } from "@/server/types";
 import { ServerResponseStatus } from "@/server/types";
-import { gameService } from "@/services/GameService";
+import { gameService } from "@/services/FirebaseGameService";
 import { gameStateService } from "@/services/GameStateService";
 import { errorResponse } from "@/server/utils";
 import { getRoleSlotsRequired } from "@/lib/game-modes";

@@ -50,7 +50,7 @@ function makeGameWithPlayers(
   };
 }
 
-describe("GameService.getPlayerGameState", () => {
+describe("GameStateService.getPlayerGameState", () => {
   const service = new GameStateService();
 
   it("returns null when callerId is not in game.players", () => {
@@ -161,7 +161,7 @@ function makeNarratorGame(nominationsEnabled = false): Game {
   };
 }
 
-describe("GameService.getPlayerGameState — narrator nominationsEnabled", () => {
+describe("GameStateService.getPlayerGameState — narrator nominationsEnabled", () => {
   const service = new GameStateService();
 
   it("narrator state has nominationsEnabled true when enabled on game", () => {
