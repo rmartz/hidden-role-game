@@ -249,4 +249,23 @@ describe("StartNight — Mirrorcaster charge persistence", () => {
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
     expect(ts.mirrorcasterCharged).toBeUndefined();
   });
+
+  it("carries morticianAbilityEnded forward to next night", () => {
+    const game = makePlayingGame({
+      ...dayTurnState,
+      morticianAbilityEnded: true,
+    });
+    startNightAction.apply(game, null, "owner-1");
+
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.morticianAbilityEnded).toBe(true);
+  });
+
+  it("does not carry morticianAbilityEnded when it is false/undefined", () => {
+    const game = makePlayingGame(dayTurnState);
+    startNightAction.apply(game, null, "owner-1");
+
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.morticianAbilityEnded).toBeUndefined();
+  });
 });
