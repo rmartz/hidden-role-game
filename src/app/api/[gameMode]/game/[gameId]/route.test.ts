@@ -186,11 +186,7 @@ describe("GET /api/game/[gameId]", () => {
 
     expect(specialGoodPlayer.visibleRoleAssignments).toHaveLength(1);
     expect(specialGoodPlayer.visibleRoleAssignments[0].reason).toBe("aware-of");
-    expect(specialGoodPlayer.visibleRoleAssignments[0].role).toEqual({
-      id: "avalon-bad",
-      name: "Bad Role",
-      team: "Bad",
-    });
+    expect(specialGoodPlayer.visibleRoleAssignments[0].role).toBeUndefined();
     expect(badPlayer.visibleRoleAssignments).toHaveLength(0);
   });
 });

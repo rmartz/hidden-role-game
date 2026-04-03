@@ -96,8 +96,12 @@ export interface RoleDefinition<
   summary?: string;
   /** Full description shown in the expanded glossary entry. */
   description?: string;
-  /** Players matching these criteria are visible (name only, no role info). */
-  awareOf?: { teams?: T[]; roles?: Role[] };
+  /**
+   * Players matching these criteria are visible.
+   * By default only identity is revealed. Set `revealRole: true` to also
+   * reveal the exact role of matched players.
+   */
+  awareOf?: { teams?: T[]; roles?: Role[]; revealRole?: boolean };
   /** Used to group roles in the role config UI and glossary. */
   category?: string;
 }
