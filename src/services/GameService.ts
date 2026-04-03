@@ -102,9 +102,11 @@ export class GameService {
     const result = await this.firebase.applyStatusTransaction(
       gameId,
       baseGame,
-      action,
-      callerId,
-      payload,
+      (game) => {
+        if (!action.isValid(game, callerId, payload)) return undefined;
+        action.apply(game, payload, callerId);
+        return game;
+      },
     );
 
     if ("error" in result) return result;

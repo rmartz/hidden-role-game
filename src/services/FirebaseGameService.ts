@@ -1,6 +1,5 @@
 import type {
   Game,
-  GameAction,
   GamePlayer,
   GameStatusState,
   VisibilityReason,
@@ -105,16 +104,15 @@ export class FirebaseGameService {
   }
 
   /**
-   * Apply a game action via Firebase transaction on the status field.
-   * The callback receives the current game state and should mutate it
-   * if the action is valid, or return undefined to abort.
+   * Apply a mutation to the game status via Firebase transaction.
+   * The `mutate` callback receives the current game state and should
+   * return the mutated game if valid, or `undefined` to abort.
+   * Firebase retries if the underlying value changed concurrently.
    */
   async applyStatusTransaction(
     gameId: string,
     baseGame: Game,
-    action: GameAction,
-    callerId: string,
-    payload: unknown,
+    mutate: (game: Game) => Game | undefined,
   ): Promise<{ game: Game } | { error: string }> {
     let finalGame: Game | undefined;
     const result = await gameRef(gameId)
@@ -123,10 +121,10 @@ export class FirebaseGameService {
         const statusJson = currentStatusJson ?? JSON.stringify(baseGame.status);
         const currentStatus = JSON.parse(statusJson) as GameStatusState;
         const game: Game = { ...baseGame, status: currentStatus };
-        if (!action.isValid(game, callerId, payload)) return undefined;
-        action.apply(game, payload, callerId);
-        finalGame = game;
-        return JSON.stringify(game.status);
+        const mutated = mutate(game);
+        if (!mutated) return undefined;
+        finalGame = mutated;
+        return JSON.stringify(mutated.status);
       });
 
     if (!result.committed || !finalGame) {
