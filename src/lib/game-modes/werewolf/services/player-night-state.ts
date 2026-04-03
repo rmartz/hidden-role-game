@@ -1,9 +1,7 @@
 import { GameStatus, Team } from "@/lib/types";
 import type { Game, RoleDefinition } from "@/lib/types";
-import type {
-  NighttimeNightStatusEntry,
-  PlayerGameState,
-} from "@/server/types";
+import type { NighttimeNightStatusEntry } from "@/server/types";
+import type { WerewolfPlayerGameState } from "../player-state";
 import {
   getGroupPhasePlayerIds,
   getInterimAttackedPlayerIds,
@@ -38,7 +36,7 @@ export function extractPlayerNightState(
   callerId: string,
   myRole: RoleDefinition,
   deadPlayerIds: string[],
-): Partial<PlayerGameState> {
+): Partial<WerewolfPlayerGameState> {
   const ts = getTurnState(game);
   const nightActions = ts?.phase.nightActions ?? {};
   const roleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
@@ -81,7 +79,7 @@ function extractGroupPhaseState(
   nightActions: Record<string, AnyNightAction>,
   deadPlayerIds: string[],
   ts: WerewolfTurnState | undefined,
-): Partial<PlayerGameState> {
+): Partial<WerewolfPlayerGameState> {
   const activePhaseKey =
     ts?.phase.type === WerewolfPhase.Nighttime
       ? ts.phase.nightPhaseOrder[ts.phase.currentPhaseIndex]
@@ -153,7 +151,7 @@ function extractRoleSpecificState(
   nightActions: Record<string, AnyNightAction>,
   deadPlayerIds: string[],
   ts: WerewolfTurnState | undefined,
-): Partial<PlayerGameState> | undefined {
+): Partial<WerewolfPlayerGameState> | undefined {
   if (isRoleActive(myRole.id, WerewolfRole.Exposer)) {
     const exposerAction = nightActions[myRole.id];
     const soloAction =
@@ -250,11 +248,11 @@ function extractWitchState(
   myRole: RoleDefinition,
   deadPlayerIds: string[],
   ts: WerewolfTurnState | undefined,
-): Partial<PlayerGameState> {
+): Partial<WerewolfPlayerGameState> {
   const witchAction = nightActions[myRole.id];
   const soloAction =
     witchAction && !isTeamNightAction(witchAction) ? witchAction : undefined;
-  const result: Partial<PlayerGameState> = {
+  const result: Partial<WerewolfPlayerGameState> = {
     myNightTarget: soloAction?.skipped ? null : soloAction?.targetPlayerId,
     myNightTargetConfirmed: soloAction?.confirmed ?? false,
     witchAbilityUsed: ts?.witchAbilityUsed ?? false,
@@ -286,7 +284,7 @@ function extractAltruistState(
   myRole: RoleDefinition,
   deadPlayerIds: string[],
   ts: WerewolfTurnState | undefined,
-): Partial<PlayerGameState> {
+): Partial<WerewolfPlayerGameState> {
   const altruistAction = nightActions[myRole.id];
   const soloAction =
     altruistAction && !isTeamNightAction(altruistAction)
@@ -303,7 +301,7 @@ function extractAltruistState(
     ts?.priestWards,
     ts?.mirrorcasterCharged,
   ).filter((id) => id !== callerId && id !== witchProtectedId);
-  const result: Partial<PlayerGameState> = {
+  const result: Partial<WerewolfPlayerGameState> = {
     myNightTarget: soloAction?.skipped ? null : soloAction?.targetPlayerId,
     myNightTargetConfirmed: soloAction?.confirmed ?? false,
   };
@@ -323,7 +321,7 @@ function extractGenericSoloState(
   myRole: RoleDefinition,
   nightActions: Record<string, AnyNightAction>,
   ts: WerewolfTurnState | undefined,
-): Partial<PlayerGameState> {
+): Partial<WerewolfPlayerGameState> {
   const myAction = nightActions[myRole.id];
   if (!myAction || isTeamNightAction(myAction)) {
     const myRoleDefForRepeat = (
@@ -352,7 +350,7 @@ function extractGenericSoloState(
     isRoleActive(myRole.id, WerewolfRole.Priest) && hasPriestActiveWard(ts);
   const mySecondNightTarget = myAction.secondTargetPlayerId ?? undefined;
 
-  const result: Partial<PlayerGameState> = {
+  const result: Partial<WerewolfPlayerGameState> = {
     myNightTarget: myAction.skipped ? null : myAction.targetPlayerId,
     myNightTargetConfirmed: myAction.confirmed ?? false,
     ...(previousNightTargetId ? { previousNightTargetId } : {}),
@@ -374,7 +372,7 @@ function extractGenericSoloState(
 }
 
 function appendInvestigationResult(
-  result: Partial<PlayerGameState>,
+  result: Partial<WerewolfPlayerGameState>,
   game: Game,
   myRoleDef: WerewolfRoleDefinition,
   myAction: { targetPlayerId: string; secondTargetPlayerId?: string },

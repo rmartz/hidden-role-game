@@ -7,7 +7,7 @@ import {
 } from "@/lib/types";
 import { getDefaultRoleSlots, parseGameMode } from "@/lib/game-modes";
 import { ServerResponseStatus, type CreateLobbyRequest } from "@/server/types";
-import { lobbyService } from "@/services/LobbyService";
+import { lobbyService } from "@/services/FirebaseLobbyService";
 import {
   errorResponse,
   toPublicLobby,

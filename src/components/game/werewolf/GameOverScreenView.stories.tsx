@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { GameOverScreenView } from "./GameOverScreenView";
 import { GameMode, GameStatus, Team, DEFAULT_TIMER_CONFIG } from "@/lib/types";
 import { WerewolfWinner } from "@/lib/game-modes/werewolf/utils/win-condition";
-import type { PlayerGameState } from "@/server/types";
+import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 import { fn } from "storybook/test";
 
 const meta = {
@@ -15,7 +15,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const baseGameState: PlayerGameState = {
+const baseGameState: WerewolfPlayerGameState = {
   status: { type: GameStatus.Finished, winner: WerewolfWinner.Village },
   gameMode: GameMode.Werewolf,
   lobbyId: "lobby-1",

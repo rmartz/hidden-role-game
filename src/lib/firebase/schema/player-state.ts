@@ -7,6 +7,7 @@ import type {
   VisibleTeammate,
   NightStatusEntry,
 } from "@/server/types";
+import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 import type { FirebaseLobbyPlayer } from "./lobby";
 
 export interface FirebasePlayerState {
@@ -68,7 +69,7 @@ export interface FirebasePlayerState {
 }
 
 export function playerStateToFirebase(
-  state: PlayerGameState,
+  state: PlayerGameState & Partial<WerewolfPlayerGameState>,
 ): FirebasePlayerState {
   return {
     statusJson: JSON.stringify(state.status),
@@ -127,7 +128,7 @@ export function playerStateToFirebase(
 
 export function firebaseToPlayerState(
   raw: FirebasePlayerState,
-): PlayerGameState {
+): WerewolfPlayerGameState {
   return {
     status: JSON.parse(raw.statusJson) as GameStatusState,
     gameMode: raw.gameMode as PlayerGameState["gameMode"],
@@ -195,7 +196,8 @@ export function firebaseToPlayerState(
     ...(raw.isHypnotized ? { isHypnotized: true } : {}),
     ...(raw.activeTrial
       ? {
-          activeTrial: raw.activeTrial as PlayerGameState["activeTrial"],
+          activeTrial:
+            raw.activeTrial as WerewolfPlayerGameState["activeTrial"],
         }
       : {}),
     nominationsEnabled: raw.nominationsEnabled ?? false,

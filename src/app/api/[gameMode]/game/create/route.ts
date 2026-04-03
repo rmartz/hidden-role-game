@@ -1,6 +1,6 @@
 import { ServerResponseStatus } from "@/server/types";
 import type { CreateGameRequest } from "@/server/types";
-import { lobbyService } from "@/services/LobbyService";
+import { lobbyService } from "@/services/FirebaseLobbyService";
 import { gameService } from "@/services/GameService";
 import {
   authenticateLobby,
@@ -63,9 +63,11 @@ export async function POST(
     lobby.config.showRolesInPlay,
     ownerPlayer?.id ?? undefined,
     lobby.config.timerConfig,
-    lobby.config.nominationsEnabled,
-    lobby.config.singleTrialPerDay,
-    lobby.config.revealProtections,
+    {
+      nominationsEnabled: lobby.config.nominationsEnabled,
+      singleTrialPerDay: lobby.config.singleTrialPerDay,
+      revealProtections: lobby.config.revealProtections,
+    },
   );
 
   await lobbyService.clearReadyPlayerIds(lobbyId);

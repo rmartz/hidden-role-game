@@ -3,6 +3,7 @@
 import { useCallback } from "react";
 import { WEREWOLF_COPY, WerewolfAction } from "@/lib/game-modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
+import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 import { useGameAction } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -14,7 +15,7 @@ interface NominationPanelProps {
   myPlayerId?: string;
   amDead?: boolean;
   isSilenced?: boolean;
-  nominations: NonNullable<PlayerGameState["nominations"]>;
+  nominations: NonNullable<WerewolfPlayerGameState["nominations"]>;
   myNominatedDefendantId?: string;
   deadPlayerIds?: string[];
   gameOwnerId?: string;

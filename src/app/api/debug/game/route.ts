@@ -13,9 +13,6 @@ interface CreateDebugGameRequest {
   roleSlots: RoleSlot[];
   showRolesInPlay: ShowRolesInPlay;
   timerConfig: TimerConfig;
-  nominationsEnabled: boolean;
-  singleTrialPerDay: boolean;
-  revealProtections: boolean;
 }
 
 export interface DebugPlayer {
@@ -26,16 +23,8 @@ export interface DebugPlayer {
 }
 
 export async function POST(request: Request): Promise<Response> {
-  const {
-    playerCount,
-    gameMode,
-    roleSlots,
-    showRolesInPlay,
-    timerConfig,
-    nominationsEnabled,
-    singleTrialPerDay,
-    revealProtections,
-  } = (await request.json()) as CreateDebugGameRequest;
+  const { playerCount, gameMode, roleSlots, showRolesInPlay, timerConfig } =
+    (await request.json()) as CreateDebugGameRequest;
 
   if (!Object.values(GameMode).includes(gameMode)) {
     return errorResponse("Unknown game mode", 400);
@@ -79,9 +68,11 @@ export async function POST(request: Request): Promise<Response> {
     showRolesInPlay,
     ownerPlayer?.id ?? undefined,
     timerConfig,
-    nominationsEnabled,
-    singleTrialPerDay,
-    revealProtections,
+    {
+      nominationsEnabled: true,
+      singleTrialPerDay: true,
+      revealProtections: true,
+    },
   );
 
   const debugPlayers: DebugPlayer[] = players.map((p) => ({

@@ -3,7 +3,7 @@
 import { GameStatus } from "@/lib/types";
 import { WerewolfPhase } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
-import type { PlayerGameState } from "@/server/types";
+import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 import { useGameStateQuery } from "@/hooks";
 import { PlayerGameNightScreen } from "./PlayerGameNightScreen";
 import { PlayerGameDayScreen } from "./PlayerGameDayScreen";
@@ -12,7 +12,7 @@ const POLL_INTERVAL_MS = 2000;
 
 interface PlayerGameScreenProps {
   gameId: string;
-  gameState: PlayerGameState;
+  gameState: WerewolfPlayerGameState;
 }
 
 export function PlayerGameScreen({ gameId, gameState }: PlayerGameScreenProps) {

@@ -3,7 +3,7 @@
 import { GameStatus } from "@/lib/types";
 import { WerewolfPhase } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
-import type { PlayerGameState } from "@/server/types";
+import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 import { useAdvanceGame } from "@/hooks";
 import { OwnerStartingScreen } from "./OwnerStartingScreen";
 import { OwnerGameNightScreen } from "./OwnerGameNightScreen";
@@ -13,7 +13,7 @@ import { GameOverScreen } from "./GameOverScreen";
 
 interface WerewolfOwnerScreenProps {
   gameId: string;
-  gameState: PlayerGameState;
+  gameState: WerewolfPlayerGameState;
 }
 
 export function WerewolfOwnerScreen({

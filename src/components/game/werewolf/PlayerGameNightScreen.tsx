@@ -2,13 +2,13 @@
 
 import { isPlayersTurn } from "@/lib/game-modes/werewolf";
 import type { WerewolfNighttimePhase } from "@/lib/game-modes/werewolf";
-import type { PlayerGameState } from "@/server/types";
+import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 import { PlayerNightSnoozeScreen } from "./PlayerNightSnoozeScreen";
 import { PlayerNightActionScreen } from "./PlayerNightActionScreen";
 
 interface PlayerGameNightScreenProps {
   gameId: string;
-  gameState: PlayerGameState;
+  gameState: WerewolfPlayerGameState;
   phase: WerewolfNighttimePhase;
   turn: number;
   deadPlayerIds: string[];
