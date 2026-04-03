@@ -1,8 +1,7 @@
 import { ServerResponseStatus } from "@/server/types";
 import type { CreateGameRequest } from "@/server/types";
 import { lobbyService } from "@/services/FirebaseLobbyService";
-import { gameService } from "@/services/FirebaseGameService";
-import { gameStateService } from "@/services/GameStateService";
+import { gameService } from "@/services/GameService";
 import {
   authenticateLobby,
   errorResponse,
@@ -45,7 +44,7 @@ export async function POST(
     return errorResponse("Role slot ranges must cover the player count", 400);
   }
 
-  const { ownerTitle, roles } = gameStateService.getModeDefinition(gameMode);
+  const { ownerTitle, roles } = gameService.getModeDefinition(gameMode);
   for (const slot of roleSlots) {
     if (!(slot.roleId in roles)) {
       return errorResponse(`Unknown role: ${slot.roleId}`, 400);

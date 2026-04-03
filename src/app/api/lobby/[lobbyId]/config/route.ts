@@ -2,7 +2,7 @@ import { GameMode } from "@/lib/types";
 import { ServerResponseStatus } from "@/server/types";
 import type { UpdateLobbyConfigRequest } from "@/server/types";
 import { lobbyService } from "@/services/FirebaseLobbyService";
-import { gameStateService } from "@/services/GameStateService";
+import { gameService } from "@/services/GameService";
 import {
   authenticateLobby,
   errorResponse,
@@ -32,7 +32,7 @@ export async function PUT(
   }
 
   if (body.roleSlots !== undefined && body.gameMode !== undefined) {
-    const { roles } = gameStateService.getModeDefinition(body.gameMode);
+    const { roles } = gameService.getModeDefinition(body.gameMode);
     for (const slot of body.roleSlots) {
       if (!(slot.roleId in roles)) {
         return errorResponse(`Unknown role: ${slot.roleId}`, 400);

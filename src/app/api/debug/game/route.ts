@@ -3,8 +3,7 @@ import { GameMode, ShowRolesInPlay } from "@/lib/types";
 import type { LobbyPlayer, TimerConfig } from "@/lib/types";
 import type { RoleSlot } from "@/server/types";
 import { ServerResponseStatus } from "@/server/types";
-import { gameService } from "@/services/FirebaseGameService";
-import { gameStateService } from "@/services/GameStateService";
+import { gameService } from "@/services/GameService";
 import { errorResponse } from "@/server/utils";
 import { getRoleSlotsRequired } from "@/lib/game-modes";
 
@@ -35,7 +34,7 @@ export async function POST(request: Request): Promise<Response> {
     return errorResponse("playerCount must be between 2 and 20", 400);
   }
 
-  const { ownerTitle, roles } = gameStateService.getModeDefinition(gameMode);
+  const { ownerTitle, roles } = gameService.getModeDefinition(gameMode);
 
   const players: LobbyPlayer[] = Array.from(
     { length: playerCount },

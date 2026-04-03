@@ -1,5 +1,5 @@
 import { ServerResponseStatus } from "@/server/types";
-import { gameService } from "@/services/FirebaseGameService";
+import { gameService } from "@/services/GameService";
 import { authenticateGame, errorResponse, parseGameMode } from "@/server/utils";
 
 export async function GET(

@@ -69,7 +69,7 @@ export interface FirebasePlayerState {
 }
 
 export function playerStateToFirebase(
-  state: WerewolfPlayerGameState,
+  state: PlayerGameState & Partial<WerewolfPlayerGameState>,
 ): FirebasePlayerState {
   return {
     statusJson: JSON.stringify(state.status),

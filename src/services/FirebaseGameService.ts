@@ -1,14 +1,11 @@
-import { randomUUID } from "crypto";
-import { GameStatus, GameMode, ShowRolesInPlay } from "@/lib/types";
 import type {
   Game,
+  GameAction,
   GamePlayer,
-  LobbyPlayer,
-  RoleSlot,
+  GameStatusState,
   VisibilityReason,
 } from "@/lib/types";
 import type { PlayerGameState } from "@/server/types";
-import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 import { getAdminDatabase } from "@/lib/firebase/admin";
 import { ServerValue } from "firebase-admin/database";
 import {
@@ -19,54 +16,18 @@ import {
   type FirebaseGamePublic,
   type FirebasePlayerState,
 } from "@/lib/firebase/schema";
-import { gameStateService } from "./GameStateService";
 
 function gameRef(gameId: string) {
   return getAdminDatabase().ref(`games/${gameId}`);
 }
 
 /**
- * Firebase data access layer for games. Handles reading and writing
- * game data to Firebase RTDB. Delegates all business logic to
- * GameStateService and GameModeServices.
+ * Firebase data access layer for games. Pure I/O — no business logic,
+ * no game-mode awareness. Accepts and returns domain objects.
  */
 export class FirebaseGameService {
-  /** Write pre-computed PlayerGameState for every player to Firebase. */
-  private async writeAllPlayerStates(game: Game): Promise<void> {
-    const states = gameStateService.buildAllPlayerStates(game);
-    const updates: Record<string, unknown> = {};
-    for (const [sessionId, state] of states) {
-      updates[`games/${game.id}/playerState/${sessionId}`] =
-        playerStateToFirebase(state as WerewolfPlayerGameState);
-    }
-    if (Object.keys(updates).length > 0) {
-      await getAdminDatabase().ref().update(updates);
-    }
-  }
-
-  /** Create a game in Firebase from lobby data. */
-  public async createGame(
-    lobbyId: string,
-    players: LobbyPlayer[],
-    roleSlots: RoleSlot[],
-    gameMode: GameMode,
-    showRolesInPlay: ShowRolesInPlay,
-    ownerPlayerId: string | undefined,
-    timerConfig: import("@/lib/types").TimerConfig,
-    modeConfig?: Record<string, unknown>,
-  ): Promise<Game> {
-    const game = gameStateService.buildGame(
-      randomUUID(),
-      lobbyId,
-      players,
-      roleSlots,
-      gameMode,
-      showRolesInPlay,
-      ownerPlayerId,
-      timerConfig,
-      modeConfig,
-    );
-
+  /** Write a new game to Firebase. */
+  async saveGame(game: Game): Promise<void> {
     const sessionIndex: Record<string, string> = {};
     for (const p of game.players) {
       sessionIndex[p.sessionId] = p.id;
@@ -76,13 +37,10 @@ export class FirebaseGameService {
       public: { ...gameToFirebase(game), createdAt: ServerValue.TIMESTAMP },
       sessionIndex,
     });
-    await this.writeAllPlayerStates(game);
-
-    return game;
   }
 
   /** Read a game from Firebase. */
-  public async getGame(gameId: string): Promise<Game | undefined> {
+  async getGame(gameId: string): Promise<Game | undefined> {
     const snap = await gameRef(gameId).once("value");
     if (!snap.exists()) return undefined;
 
@@ -112,7 +70,7 @@ export class FirebaseGameService {
   }
 
   /** Read a player's pre-computed game state from Firebase. */
-  public async getPlayerGameStateBySession(
+  async getPlayerGameStateBySession(
     gameId: string,
     sessionId: string,
   ): Promise<PlayerGameState | null> {
@@ -123,43 +81,47 @@ export class FirebaseGameService {
     return firebaseToPlayerState(snap.val() as FirebasePlayerState);
   }
 
-  /** Advance a game from Starting to Playing in Firebase. */
-  public async advanceToPlaying(gameId: string): Promise<Game | null> {
-    const game = await this.getGame(gameId);
-    if (game?.status.type !== GameStatus.Starting) return null;
-
-    game.status = gameStateService.buildPlayingStatus(game);
-
-    await gameRef(gameId)
-      .child("public/status")
-      .set(JSON.stringify(game.status));
-    await this.writeAllPlayerStates(game);
-
-    return game;
+  /** Write pre-computed PlayerGameState for every player to Firebase. */
+  async writeAllPlayerStates(
+    gameId: string,
+    states: Map<string, PlayerGameState>,
+  ): Promise<void> {
+    const updates: Record<string, unknown> = {};
+    for (const [sessionId, state] of states) {
+      updates[`games/${gameId}/playerState/${sessionId}`] =
+        playerStateToFirebase(state);
+    }
+    if (Object.keys(updates).length > 0) {
+      await getAdminDatabase().ref().update(updates);
+    }
   }
 
-  /** Apply a game action via Firebase transaction. */
-  public async applyAction(
+  /** Write game status to Firebase. */
+  async updateGameStatus(
     gameId: string,
-    actionId: string,
+    status: GameStatusState,
+  ): Promise<void> {
+    await gameRef(gameId).child("public/status").set(JSON.stringify(status));
+  }
+
+  /**
+   * Apply a game action via Firebase transaction on the status field.
+   * The callback receives the current game state and should mutate it
+   * if the action is valid, or return undefined to abort.
+   */
+  async applyStatusTransaction(
+    gameId: string,
+    baseGame: Game,
+    action: GameAction,
     callerId: string,
     payload: unknown,
   ): Promise<{ game: Game } | { error: string }> {
-    const baseGame = await this.getGame(gameId);
-    if (!baseGame) return { error: "Game not found" };
-
-    const config = gameStateService.getModeDefinition(baseGame.gameMode);
-    const action = config.actions[actionId];
-    if (!action) return { error: "Unknown action" };
-
     let finalGame: Game | undefined;
     const result = await gameRef(gameId)
       .child("public/status")
       .transaction((currentStatusJson: string | null) => {
         const statusJson = currentStatusJson ?? JSON.stringify(baseGame.status);
-        const currentStatus = JSON.parse(
-          statusJson,
-        ) as import("@/lib/types").GameStatusState;
+        const currentStatus = JSON.parse(statusJson) as GameStatusState;
         const game: Game = { ...baseGame, status: currentStatus };
         if (!action.isValid(game, callerId, payload)) return undefined;
         action.apply(game, payload, callerId);
@@ -176,12 +138,9 @@ export class FirebaseGameService {
       committedStatusJson !== null
         ? ({
             ...baseGame,
-            status: JSON.parse(
-              committedStatusJson,
-            ) as import("@/lib/types").GameStatusState,
+            status: JSON.parse(committedStatusJson) as GameStatusState,
           } as Game)
         : finalGame;
-    await this.writeAllPlayerStates(committedGame);
     return { game: committedGame };
   }
 }
@@ -190,6 +149,6 @@ declare global {
   var firebaseGameServiceInstance: FirebaseGameService | undefined;
 }
 
-export const gameService: FirebaseGameService =
+export const firebaseGameService: FirebaseGameService =
   globalThis.firebaseGameServiceInstance ??
   (globalThis.firebaseGameServiceInstance = new FirebaseGameService());

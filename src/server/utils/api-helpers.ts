@@ -1,7 +1,7 @@
 import type { Lobby, Game, GamePlayer } from "@/lib/types";
 import { ServerResponseStatus } from "@/server/types";
 import { lobbyService } from "@/services/FirebaseLobbyService";
-import { gameService } from "@/services/FirebaseGameService";
+import { gameService } from "@/services/GameService";
 import { isValidSession } from "./lobby-helpers";
 import { parseGameMode } from "@/lib/game-modes";
 

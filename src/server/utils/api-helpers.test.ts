@@ -25,7 +25,7 @@ vi.mock("@/services/FirebaseLobbyService", () => ({
   lobbyService: { getLobby: mockGetLobby },
 }));
 
-vi.mock("@/services/FirebaseGameService", () => ({
+vi.mock("@/services/GameService", () => ({
   gameService: { getGame: mockGetGame },
 }));
 
