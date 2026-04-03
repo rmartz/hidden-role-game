@@ -2,7 +2,7 @@
 
 ## Overview
 
-Game state lives in Firebase Realtime Database and is pre-computed per player by `GameSerializationService`. Each player receives only the information appropriate for their role and the current phase.
+Game state lives in Firebase Realtime Database and is pre-computed per player by `GameStateService`. Each player receives only the information appropriate for their role and the current phase.
 
 ## Database Layout
 
@@ -16,7 +16,7 @@ The Narrator's session is stored separately and receives a different (fuller) `P
 
 ## PlayerGameState Fields
 
-### Always Present
+### Always Present (base PlayerGameState)
 
 | Field                    | Narrator        | Players                         |
 | ------------------------ | --------------- | ------------------------------- |
@@ -30,8 +30,14 @@ The Narrator's session is stored separately and receives a different (fuller) `P
 | `rolesInPlay`            | ✓               | ✓                               |
 | `deadPlayerIds`          | ✓               | ✓                               |
 | `timerConfig`            | ✓ (if set)      | ✓ (if set)                      |
-| `nominationsEnabled`     | ✓               | ✓                               |
-| `singleTrialPerDay`      | ✓               | ✓                               |
+
+### Werewolf Game Settings (WerewolfPlayerGameState)
+
+| Field                | Narrator | Players | Description                                      |
+| -------------------- | -------- | ------- | ------------------------------------------------ |
+| `nominationsEnabled` | ✓        | ✓       | Whether player nominations for trial are enabled |
+| `singleTrialPerDay`  | ✓        | ✓       | Whether only one trial is allowed per day phase  |
+| `revealProtections`  | ✓        | ✓       | Whether night summary reveals protection saves   |
 
 ### Narrator-Only (Nighttime)
 
@@ -94,8 +100,8 @@ stateDiagram-v2
 ### Lobby → Game Start
 
 1. Narrator calls the lobby API to start the game.
-2. `GameInitializationService` creates the game record and assigns roles.
-3. Firebase writes initial `PlayerGameState` for each session.
+2. `GameService` orchestrates game creation: `GameStateService` assigns roles and builds the `Game` object, `FirebaseGameService` persists it to Firebase.
+3. `GameStateService` computes per-player `PlayerGameState` for each session; `FirebaseGameService` writes them.
 4. Clients receive real-time updates via Firebase `onValue`.
 
 ### Night Phase

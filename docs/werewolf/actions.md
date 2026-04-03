@@ -73,7 +73,7 @@ Additional resolution steps:
 
 **Who:** Narrator only
 **When:** During Nighttime, active phase is an Investigate role (Seer, Wizard, One-Eyed Seer, Mystic Seer, Mentalist), action is confirmed
-**Effect:** Sets `resultRevealed: true` on the night action. This causes `GameSerializationService` to include the `investigationResult` in the investigating player's `PlayerGameState`.
+**Effect:** Sets `resultRevealed: true` on the night action. This causes the Werewolf player state extraction to include the `investigationResult` in the investigating player's `WerewolfPlayerGameState`.
 
 ---
 
@@ -272,7 +272,7 @@ interface TeamNightAction {
 After resolution, `start-day` performs additional checks:
 
 - **Mortician ability end**: if the Mortician's target died and was a Werewolf (`isWerewolf`), sets `morticianAbilityEnded: true` on the turn state. The Mortician can no longer target players on subsequent nights.
-- **Old Man peaceful death**: `GameSerializationService` detects `attackedBy: [OLD_MAN_TIMER_KEY]` and maps it to `DaytimeNightStatusEntry.effect: "peaceful"`, which renders as a special death message for all players.
+- **Old Man peaceful death**: The Werewolf player state extraction detects `attackedBy: [OLD_MAN_TIMER_KEY]` and maps it to `DaytimeNightStatusEntry.effect: "peaceful"`, which renders as a special death message for all players.
 
 ```mermaid
 flowchart TD
