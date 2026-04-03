@@ -7,7 +7,7 @@ import {
 import type { Game } from "@/lib/types";
 import { WerewolfPhase, WerewolfRole } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
-import type { PlayerGameState } from "@/server/types";
+import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 import {
   extractDaytimeNightSummary,
   extractDaytimePlayerState,
@@ -20,7 +20,7 @@ import {
 export function extractDaytimeState(
   game: Game,
   callerId: string,
-): Partial<PlayerGameState> {
+): Partial<WerewolfPlayerGameState> {
   return {
     ...extractDaytimeNightSummary(game, callerId),
     ...extractDaytimePlayerState(game, callerId),

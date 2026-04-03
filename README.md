@@ -32,8 +32,10 @@ hidden-role-game/
 │   │   ├── types/          # API response types (public-facing)
 │   │   └── utils/          # Server-only helpers (auth, role slots, role assignment)
 │   ├── services/
-│   │   ├── FirebaseLobbyService.ts  # Firebase-backed lobby store
-│   │   └── FirebaseGameService.ts   # Firebase-backed game store
+│   │   ├── GameService.ts           # Orchestrator: combines logic + data access
+│   │   ├── GameStateService.ts      # Pure business logic (player state, role assignment)
+│   │   ├── FirebaseGameService.ts   # Firebase I/O for games (read/write/transactions)
+│   │   └── FirebaseLobbyService.ts  # Firebase I/O for lobbies
 │   └── hooks/
 │       ├── lobbySocket.ts  # Firebase RTDB real-time lobby subscription
 │       └── game.ts         # Firebase RTDB real-time game state subscription

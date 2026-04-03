@@ -4,13 +4,13 @@ import { GameOverScreenView } from "./GameOverScreenView";
 import { WerewolfWinner } from "@/lib/game-modes/werewolf/utils/win-condition";
 import { GameStatus, GameMode, Team, DEFAULT_TIMER_CONFIG } from "@/lib/types";
 import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
-import type { PlayerGameState } from "@/server/types";
+import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 
 afterEach(cleanup);
 
 function makeGameState(
-  overrides: Partial<PlayerGameState> = {},
-): PlayerGameState {
+  overrides: Partial<WerewolfPlayerGameState> = {},
+): WerewolfPlayerGameState {
   return {
     status: { type: GameStatus.Finished, winner: WerewolfWinner.Village },
     gameMode: GameMode.Werewolf,

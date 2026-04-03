@@ -7,7 +7,7 @@ import {
 } from "@/lib/game-modes/werewolf";
 import { WerewolfRole } from "@/lib/game-modes/werewolf/roles";
 import type { WerewolfNighttimePhase } from "@/lib/game-modes/werewolf";
-import type { PlayerGameState } from "@/server/types";
+import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 import { getPlayerName } from "@/lib/player-utils";
 import { GameTimer } from "@/components/game";
 import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
@@ -19,7 +19,7 @@ import { PlayerTargetSelection } from "./PlayerTargetSelection";
 
 interface PlayerNightActionScreenProps {
   gameId: string;
-  gameState: PlayerGameState;
+  gameState: WerewolfPlayerGameState;
   phase: WerewolfNighttimePhase;
   turn: number;
   deadPlayerIds: string[];

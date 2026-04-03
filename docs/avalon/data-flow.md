@@ -24,7 +24,7 @@ Night-phase fields (`nightActions`, `myNightTarget`, `teamVotes`, `nightStatus`,
 ### Lobby → Game Start
 
 1. Players join the lobby; Narrator starts the game via the API.
-2. `GameInitializationService` assigns roles and writes per-player `PlayerGameState` to Firebase.
+2. `GameService` orchestrates game creation: assigns roles, computes per-player `PlayerGameState`, and writes to Firebase.
 3. Each client receives its state via Firebase `onValue` and displays the player's role and any visible teammates.
 
 ### During Play

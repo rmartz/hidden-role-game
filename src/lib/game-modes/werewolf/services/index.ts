@@ -4,7 +4,7 @@ import type {
   PlayerRoleAssignment,
   RoleDefinition,
 } from "@/lib/types";
-import type { PlayerGameState } from "@/server/types";
+import type { WerewolfPlayerGameState } from "../player-state";
 import { WerewolfRole } from "../roles";
 import {
   selectExecutionerTarget,
@@ -23,7 +23,7 @@ function extractNonOwnerState(
   game: Game,
   callerId: string,
   myRole: RoleDefinition,
-): Partial<PlayerGameState> & { modeVisiblePlayerIds?: string[] } {
+): Partial<WerewolfPlayerGameState> & { modeVisiblePlayerIds?: string[] } {
   const deadPlayerIds = extractDeadPlayerIds(game);
   const nightActions = extractNightActions(game);
 
@@ -80,13 +80,20 @@ export const werewolfServices: GameModeServices = {
     callerId: string,
     myRole: RoleDefinition | undefined,
   ): Record<string, unknown> {
-    if (!myRole) {
-      return extractOwnerState(game) as Record<string, unknown>;
-    }
-    return extractNonOwnerState(game, callerId, myRole) as Record<
-      string,
-      unknown
-    >;
+    const modeState = !myRole
+      ? (extractOwnerState(game) as Record<string, unknown>)
+      : (extractNonOwnerState(game, callerId, myRole) as Record<
+          string,
+          unknown
+        >);
+
+    // Include Werewolf-specific game settings in the player state.
+    return {
+      ...modeState,
+      nominationsEnabled: game.nominationsEnabled as unknown,
+      singleTrialPerDay: game.singleTrialPerDay as unknown,
+      revealProtections: game.revealProtections as unknown,
+    };
   },
 };
 

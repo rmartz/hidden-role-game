@@ -4,7 +4,7 @@ import {
   errorResponse,
   toPublicLobby,
 } from "@/server/utils";
-import { lobbyService } from "@/services/LobbyService";
+import { lobbyService } from "@/services/FirebaseLobbyService";
 
 export async function DELETE(
   request: Request,

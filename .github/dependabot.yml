@@ -1,18 +1,7 @@
 version: 2
 updates:
-  # Root workspace dependencies
   - package-ecosystem: npm
     directory: /
-    schedule:
-      interval: weekly
-    groups:
-      dev-dependencies:
-        patterns:
-          - "*"
-
-  # Next.js app dependencies
-  - package-ecosystem: npm
-    directory: /app
     schedule:
       interval: weekly
     groups:
@@ -25,7 +14,6 @@ updates:
         patterns:
           - "*"
 
-  # GitHub Actions
   - package-ecosystem: github-actions
     directory: /
     schedule:

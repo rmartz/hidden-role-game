@@ -41,9 +41,6 @@ const baseGameState: PlayerGameState = {
       role: { id: "special-bad", name: "Special Bad Role", team: Team.Bad },
     },
   ],
-  nominationsEnabled: false,
-  singleTrialPerDay: false,
-  revealProtections: false,
   timerConfig: DEFAULT_TIMER_CONFIG,
 };
 

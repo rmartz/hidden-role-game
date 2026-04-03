@@ -20,9 +20,6 @@ function makeGameState(
     ],
     visibleRoleAssignments: [],
     timerConfig: DEFAULT_TIMER_CONFIG,
-    nominationsEnabled: false,
-    singleTrialPerDay: false,
-    revealProtections: false,
     ...overrides,
   };
 }

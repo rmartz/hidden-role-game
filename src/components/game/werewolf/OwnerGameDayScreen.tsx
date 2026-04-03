@@ -10,7 +10,7 @@ import {
   WEREWOLF_ROLE_CATEGORY_LABELS,
   WEREWOLF_ROLE_CATEGORY_ORDER,
 } from "@/lib/game-modes/werewolf/roles";
-import type { PlayerGameState } from "@/server/types";
+import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 import { useGameAction } from "@/hooks";
 import {
   GameRolesList,
@@ -27,7 +27,7 @@ import { HunterRevengePanel } from "./HunterRevengePanel";
 
 interface OwnerGameDayScreenProps {
   gameId: string;
-  gameState: PlayerGameState;
+  gameState: WerewolfPlayerGameState;
   turnState: WerewolfTurnState;
 }
 

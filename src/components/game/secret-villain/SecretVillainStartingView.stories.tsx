@@ -22,9 +22,6 @@ const baseGameState: PlayerGameState = {
     { id: "p5", name: "Eve" },
   ],
   visibleRoleAssignments: [],
-  nominationsEnabled: false,
-  singleTrialPerDay: false,
-  revealProtections: false,
   timerConfig: DEFAULT_TIMER_CONFIG,
 };
 

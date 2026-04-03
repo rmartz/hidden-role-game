@@ -5,6 +5,7 @@ import { GameStatus } from "@/lib/types";
 import type { GameMode } from "@/lib/types";
 import { useGameStateQuery, GameModeContext } from "@/hooks";
 import { WerewolfGameScreen } from "@/components/game";
+import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 
 const POLL_INTERVAL_MS = 2000;
 
@@ -46,7 +47,10 @@ export function GameScreenForPlayer({
 
   return (
     <GameModeContext.Provider value={gameMode}>
-      <WerewolfGameScreen gameId={gameId} gameState={gameState} />
+      <WerewolfGameScreen
+        gameId={gameId}
+        gameState={gameState as WerewolfPlayerGameState}
+      />
     </GameModeContext.Provider>
   );
 }

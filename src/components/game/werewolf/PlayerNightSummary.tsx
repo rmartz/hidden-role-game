@@ -4,11 +4,12 @@ import groupBy from "lodash/groupBy";
 import { getPlayerName } from "@/lib/player-utils";
 import type { PlayerGameState } from "@/server/types";
 import type { DaytimeNightStatusEntry } from "@/server/types";
+import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 import { PlayerNightSummaryItem } from "./PlayerNightSummaryItem";
 
 interface PlayerNightSummaryProps {
   players: PlayerGameState["players"];
-  nightStatus?: PlayerGameState["nightStatus"];
+  nightStatus?: WerewolfPlayerGameState["nightStatus"];
   myPlayerId?: string;
 }
 

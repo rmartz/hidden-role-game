@@ -1,14 +1,14 @@
 "use client";
 
 import { GameStatus } from "@/lib/types";
-import type { PlayerGameState } from "@/server/types";
+import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 import { PlayerStartingScreen } from "./PlayerStartingScreen";
 import { PlayerGameScreen } from "./PlayerGameScreen";
 import { GameOverScreen } from "./GameOverScreen";
 
 interface WerewolfPlayerScreenProps {
   gameId: string;
-  gameState: PlayerGameState;
+  gameState: WerewolfPlayerGameState;
 }
 
 export function WerewolfPlayerScreen({
