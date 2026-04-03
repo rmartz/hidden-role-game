@@ -20,7 +20,8 @@ export async function POST(
     return errorResponse("Game mode mismatch", 409);
   }
 
-  if (caller.id !== game.ownerPlayerId) {
+  // Owner-only for games with a narrator; any player can advance otherwise.
+  if (game.ownerPlayerId && caller.id !== game.ownerPlayerId) {
     return errorResponse("Unauthorized", 403);
   }
 

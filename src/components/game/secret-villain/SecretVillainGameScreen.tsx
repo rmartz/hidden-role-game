@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GameStatus } from "@/lib/types";
 import type { StartingGameStatus } from "@/lib/types";
 import type { PlayerGameState } from "@/server/types";
-import { useGameAction, useReturnToLobby } from "@/hooks";
+import { useAdvanceGame, useGameAction, useReturnToLobby } from "@/hooks";
 import { SecretVillainGameScreenView } from "./SecretVillainGameScreenView";
 
 /** How long the Starting phase lasts before auto-advancing to Playing (seconds). */
@@ -33,6 +33,7 @@ export function SecretVillainGameScreen({
   >();
 
   // Starting phase countdown.
+  const advanceGame = useAdvanceGame(gameId);
   const isStarting = gameState.status.type === GameStatus.Starting;
   const startedAt = isStarting
     ? (gameState.status as StartingGameStatus).startedAt
@@ -40,17 +41,22 @@ export function SecretVillainGameScreen({
   const [startingSecondsRemaining, setStartingSecondsRemaining] = useState<
     number | undefined
   >();
+  const hasAdvancedRef = useRef(false);
 
   useEffect(() => {
-    if (!isStarting || !startedAt) return;
+    if (!isStarting || !startedAt) {
+      hasAdvancedRef.current = false;
+      return;
+    }
 
     const tick = () => {
       const elapsed = Math.floor((Date.now() - startedAt) / 1000);
       const remaining = Math.max(0, STARTING_DURATION_SECONDS - elapsed);
       setStartingSecondsRemaining(remaining);
 
-      if (remaining <= 0) {
-        action.mutate({ actionId: "advance-game" });
+      if (remaining <= 0 && !hasAdvancedRef.current) {
+        hasAdvancedRef.current = true;
+        advanceGame.mutate();
       }
     };
 
@@ -59,7 +65,7 @@ export function SecretVillainGameScreen({
     return () => {
       clearInterval(interval);
     };
-  }, [isStarting, startedAt, action]);
+  }, [isStarting, startedAt, advanceGame]);
 
   return (
     <SecretVillainGameScreenView
