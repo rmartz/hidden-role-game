@@ -6,8 +6,8 @@ import type {
   LobbyPlayer,
   RoleSlot,
   GameMode,
+  ShowRolesInPlay,
 } from "@/lib/types";
-import { ShowRolesInPlay } from "@/lib/types";
 import type { PlayerGameState } from "@/server/types";
 import {
   firebaseGameService,
