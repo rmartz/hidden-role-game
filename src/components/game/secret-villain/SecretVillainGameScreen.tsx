@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { GameStatus } from "@/lib/types";
 import type { StartingGameStatus } from "@/lib/types";
-import type { PlayerGameState } from "@/server/types";
+import type { SecretVillainPlayerGameState } from "@/lib/game-modes/secret-villain/player-state";
 import { useAdvanceGame, useGameAction, useReturnToLobby } from "@/hooks";
 import { SecretVillainAction } from "@/lib/game-modes/secret-villain/actions";
 import { SpecialActionType } from "@/lib/game-modes/secret-villain/types";
@@ -13,7 +13,7 @@ import { SecretVillainGameScreenView } from "./SecretVillainGameScreenView";
 const STARTING_DURATION_SECONDS = 15;
 
 interface SecretVillainGameScreenProps {
-  gameState: PlayerGameState;
+  gameState: SecretVillainPlayerGameState;
   gameId: string;
 }
 

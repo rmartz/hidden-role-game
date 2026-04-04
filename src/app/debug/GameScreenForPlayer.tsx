@@ -5,6 +5,7 @@ import { useGameStateQuery, GameModeContext } from "@/hooks";
 import { WerewolfGameScreen } from "@/components/game";
 import { SecretVillainGameScreen } from "@/components/game/secret-villain";
 import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
+import type { SecretVillainPlayerGameState } from "@/lib/game-modes/secret-villain/player-state";
 
 export interface GameScreenForPlayerProps {
   gameId: string;
@@ -40,7 +41,10 @@ export function GameScreenForPlayer({
           gameState={gameState as WerewolfPlayerGameState}
         />
       ) : gameMode === GameMode.SecretVillain ? (
-        <SecretVillainGameScreen gameId={gameId} gameState={gameState} />
+        <SecretVillainGameScreen
+          gameId={gameId}
+          gameState={gameState as SecretVillainPlayerGameState}
+        />
       ) : (
         <p className="p-5 text-muted-foreground">
           Unsupported game mode: {gameMode}
