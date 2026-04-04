@@ -2,6 +2,7 @@ import type { Game, GameAction } from "@/lib/types";
 import type { ElectionVote } from "../types";
 import { SecretVillainPhase } from "../types";
 import { currentTurnState } from "../utils";
+import { resolveElection } from "./resolve-election";
 
 const VALID_VOTES: ElectionVote[] = ["aye", "no"];
 
@@ -27,5 +28,13 @@ export const castElectionVoteAction: GameAction = {
 
     const { vote } = payload as { vote: ElectionVote };
     ts.phase.votes = [...ts.phase.votes, { playerId: callerId, vote }];
+
+    // Auto-resolve when all alive players have voted.
+    const alivePlayerIds = game.players
+      .map((p) => p.id)
+      .filter((id) => !ts.eliminatedPlayerIds.includes(id));
+    if (ts.phase.votes.length >= alivePlayerIds.length) {
+      resolveElection(game);
+    }
   },
 };
