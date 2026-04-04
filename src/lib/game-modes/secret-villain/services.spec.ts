@@ -293,7 +293,7 @@ describe("extractPlayerState", () => {
       "p1",
       goodRole,
     );
-    expect(result["investigationResult"]).toEqual({
+    expect(result["svInvestigationResult"]).toEqual({
       targetPlayerId: "p3",
       team: "Bad",
     });

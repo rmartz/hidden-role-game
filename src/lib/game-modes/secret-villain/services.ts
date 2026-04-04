@@ -1,6 +1,10 @@
 import { GameStatus } from "@/lib/types";
 import type { Game, GameModeServices, PlayerRoleAssignment } from "@/lib/types";
-import { SecretVillainPhase } from "./types";
+import {
+  SecretVillainPhase,
+  SpecialActionType,
+  VETO_UNLOCK_THRESHOLD,
+} from "./types";
 import type { SecretVillainTurnState } from "./types";
 import { createDeck, getEligibleChancellorIds } from "./utils";
 
@@ -13,6 +17,31 @@ function shuffle<T>(array: T[]): T[] {
     result[j] = temp;
   }
   return result;
+}
+
+function buildPhaseInfo(
+  phase: SecretVillainTurnState["phase"],
+): Record<string, unknown> {
+  const base: Record<string, unknown> = {
+    type: phase.type,
+    presidentId: phase.presidentId,
+  };
+  if (
+    phase.type === SecretVillainPhase.ElectionVote &&
+    phase.chancellorNomineeId
+  ) {
+    base["chancellorNomineeId"] = phase.chancellorNomineeId;
+  }
+  if (
+    phase.type === SecretVillainPhase.PolicyPresident ||
+    phase.type === SecretVillainPhase.PolicyChancellor
+  ) {
+    base["chancellorId"] = phase.chancellorId;
+  }
+  if (phase.type === SecretVillainPhase.SpecialAction) {
+    base["actionType"] = phase.actionType;
+  }
+  return base;
 }
 
 export const secretVillainServices: GameModeServices = {
@@ -54,6 +83,21 @@ export const secretVillainServices: GameModeServices = {
 
     const result: Record<string, unknown> = {};
     const { phase } = ts;
+
+    // Phase info — visible to all players.
+    result["svPhase"] = buildPhaseInfo(phase);
+
+    // Board state — visible to all players.
+    result["svBoard"] = {
+      goodCardsPlayed: ts.goodCardsPlayed,
+      badCardsPlayed: ts.badCardsPlayed,
+      failedElectionCount: ts.failedElectionCount,
+    };
+
+    // Veto unlock status.
+    if (ts.badCardsPlayed >= VETO_UNLOCK_THRESHOLD) {
+      result["vetoUnlocked"] = true;
+    }
 
     // President sees drawn cards during policy president phase.
     if (
@@ -101,16 +145,37 @@ export const secretVillainServices: GameModeServices = {
       result["policyCards"] = { peekedCards: phase.peekedCards };
     }
 
+    // President sees investigation waiting state (target selected, awaiting consent).
+    if (
+      phase.type === SecretVillainPhase.SpecialAction &&
+      phase.actionType === SpecialActionType.InvestigateTeam &&
+      phase.presidentId === callerId &&
+      phase.targetPlayerId &&
+      !phase.revealedTeam
+    ) {
+      result["svInvestigationWaitingForPlayerId"] = phase.targetPlayerId;
+    }
+
     // President sees investigation result.
     if (
       phase.type === SecretVillainPhase.SpecialAction &&
       phase.presidentId === callerId &&
       phase.revealedTeam
     ) {
-      result["investigationResult"] = {
+      result["svInvestigationResult"] = {
         targetPlayerId: phase.targetPlayerId ?? "",
         team: phase.revealedTeam,
       };
+    }
+
+    // Investigation consent target sees a prompt.
+    if (
+      phase.type === SecretVillainPhase.SpecialAction &&
+      phase.actionType === SpecialActionType.InvestigateTeam &&
+      phase.targetPlayerId === callerId &&
+      !phase.targetConsented
+    ) {
+      result["svInvestigationConsent"] = true;
     }
 
     // Election vote phase: include the player's own vote.
@@ -118,6 +183,11 @@ export const secretVillainServices: GameModeServices = {
       const myVote = phase.votes.find((v) => v.playerId === callerId);
       if (myVote) {
         result["myElectionVote"] = myVote.vote;
+      }
+      // After all votes are in, share results.
+      if (phase.passed !== undefined) {
+        result["electionVotes"] = phase.votes;
+        result["electionPassed"] = phase.passed;
       }
     }
 

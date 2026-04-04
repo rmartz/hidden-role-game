@@ -2,6 +2,7 @@ import type { Game, GameAction } from "@/lib/types";
 import type { ElectionVote } from "../types";
 import { SecretVillainPhase } from "../types";
 import { currentTurnState } from "../utils";
+import { tallyElection } from "./resolve-election";
 
 const VALID_VOTES: ElectionVote[] = ["aye", "no"];
 
@@ -27,5 +28,15 @@ export const castElectionVoteAction: GameAction = {
 
     const { vote } = payload as { vote: ElectionVote };
     ts.phase.votes = [...ts.phase.votes, { playerId: callerId, vote }];
+
+    // Auto-tally when all alive players have voted, but don't advance
+    // to the next phase — players need to see the results first.
+    // A player triggers advanceFromElection to continue. (#373)
+    const alivePlayerIds = game.players
+      .map((p) => p.id)
+      .filter((id) => !ts.eliminatedPlayerIds.includes(id));
+    if (ts.phase.votes.length >= alivePlayerIds.length) {
+      tallyElection(game);
+    }
   },
 };

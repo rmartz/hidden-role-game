@@ -92,14 +92,21 @@ export class GameInitializationService {
             | (R & ExtendedRoleProperties)
             | undefined;
           if (!otherRole) continue;
-          if (
-            awareOfTeams.has(otherRole.team) ||
-            awareOfRoles.has(otherRole.id) ||
-            (awareOfWerewolves && otherRole.isWerewolf === true)
-          ) {
+          const matchedByTeam = awareOfTeams.has(otherRole.team);
+          const matchedByRole = awareOfRoles.has(otherRole.id);
+          const matchedByWerewolf =
+            awareOfWerewolves && otherRole.isWerewolf === true;
+          if (matchedByTeam || matchedByRole || matchedByWerewolf) {
+            // Include the exact role only when:
+            // - Matched by specific role name (you see "the Seer" — you know the role)
+            // - awareOf.revealRole is explicitly true (opt-in per role definition)
+            // Team-only and werewolf-aware matching do NOT reveal specific roles.
+            const revealRole =
+              matchedByRole || myRole.awareOf.revealRole === true;
             visiblePlayers.push({
               playerId: other.playerId,
               reason: "aware-of",
+              ...(revealRole ? { roleId: other.roleDefinitionId } : {}),
             });
             seenPlayerIds.add(other.playerId);
           }

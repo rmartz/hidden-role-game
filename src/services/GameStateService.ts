@@ -84,10 +84,20 @@ export class GameStateService {
       caller.visiblePlayers.flatMap((vp) => {
         const visiblePlayer = playerById.get(vp.playerId);
         if (!visiblePlayer) return [];
+        const visibleRole = vp.roleId ? roles[vp.roleId] : undefined;
         return [
           {
             player: { id: visiblePlayer.id, name: visiblePlayer.name },
             reason: vp.reason,
+            ...(visibleRole
+              ? {
+                  role: {
+                    id: visibleRole.id,
+                    name: visibleRole.name,
+                    team: visibleRole.team,
+                  },
+                }
+              : {}),
           },
         ];
       });

@@ -56,11 +56,10 @@ See [docs/](docs/README.md) for detailed documentation on each game mode, includ
 1. A player creates a lobby and configures the role mix
 2. Players join via share link
 3. The lobby owner starts the game — roles are secretly assigned
-4. **Night phase**: roles wake in order and take actions; the owner advances each phase
-5. **Day phase**: players discuss; the owner advances to the next night
-6. Repeat until the game ends
+4. Players interact through game-mode-specific phases (elections, night actions, quests, etc.)
+5. The game ends when a win condition is met
 
-The lobby owner has a dedicated `/owner` view with full role visibility and controls to advance phases.
+Some game modes (Werewolf, Clocktower) use a narrator who controls phase progression. Others (Secret Villain, Avalon) are fully player-driven with the app mediating all interactions.
 
 ## Real-Time Updates
 

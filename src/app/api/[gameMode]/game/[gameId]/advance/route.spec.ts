@@ -47,4 +47,23 @@ describe("POST /api/[gameMode]/game/[gameId]/advance", () => {
     );
     expect(res.status).toBe(409);
   });
+
+  it("should allow any player to advance a game with no owner", async () => {
+    const { gameId, bobSession } = await setupStartedSecretVillainGame();
+
+    const res = await advanceGame(
+      new Request(
+        `http://localhost/api/secret-villain/game/${gameId}/advance`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-session-id": bobSession,
+          },
+        },
+      ),
+      makeGameParams(gameId, "secret-villain"),
+    );
+    expect(res.status).toBe(200);
+  });
 });

@@ -11,10 +11,14 @@ import { nominateChancellorAction } from "./nominate-chancellor";
 import { policyPeekAction, resolvePolicyPeekAction } from "./policy-peek";
 import { presidentDiscardAction } from "./president-discard";
 import { proposeVetoAction, respondVetoAction } from "./veto";
-import { resolveElectionAction } from "./resolve-election";
+import {
+  advanceFromElectionAction,
+  resolveElectionAction,
+} from "./resolve-election";
 import { shootPlayerAction } from "./shoot-player";
 
 export enum SecretVillainAction {
+  AdvanceFromElection = "advance-from-election",
   CallSpecialElection = "call-special-election",
   CastElectionVote = "cast-election-vote",
   ChancellorPlay = "chancellor-play",
@@ -32,6 +36,7 @@ export enum SecretVillainAction {
 }
 
 export const SECRET_VILLAIN_ACTIONS: Record<SecretVillainAction, GameAction> = {
+  [SecretVillainAction.AdvanceFromElection]: advanceFromElectionAction,
   [SecretVillainAction.CallSpecialElection]: callSpecialElectionAction,
   [SecretVillainAction.CastElectionVote]: castElectionVoteAction,
   [SecretVillainAction.ChancellorPlay]: chancellorPlayAction,

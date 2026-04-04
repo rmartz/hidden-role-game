@@ -2,42 +2,106 @@
 
 ## Overview
 
-Secret Villain uses the shared game infrastructure for role assignment and team visibility. Like Avalon, there is no night phase — the app's role is to distribute identities and enforce information asymmetry between Bad players and the Special Bad.
+Secret Villain is a fully app-mediated game with no narrator. All gameplay flows through game actions — election, policy, and special action phases are driven by players interacting with the UI.
+
+Game state lives in Firebase Realtime Database. `GameStateService` pre-computes per-player `PlayerGameState` on each action, and Firebase pushes updates to clients in real time via `onValue`.
 
 ## PlayerGameState Fields
 
-| Field                    | Narrator        | Players                                            |
-| ------------------------ | --------------- | -------------------------------------------------- |
-| `status`                 | ✓               | ✓                                                  |
-| `gameMode`               | ✓               | ✓                                                  |
-| `players`                | ✓               | ✓                                                  |
-| `gameOwner`              | ✓               | ✓                                                  |
-| `myPlayerId`             | — (undefined)   | ✓                                                  |
-| `myRole`                 | — (undefined)   | ✓ own role                                         |
-| `visibleRoleAssignments` | All assignments | Bad teammates only (Good and Special Bad see none) |
-| `rolesInPlay`            | ✓               | ✓                                                  |
+### Always Present (base)
 
-Night-phase fields (`nightActions`, `myNightTarget`, `teamVotes`, `nightStatus`, etc.) are never populated for Secret Villain.
+| Field                    | Players                                            |
+| ------------------------ | -------------------------------------------------- |
+| `status`                 | ✓                                                  |
+| `gameMode`               | ✓                                                  |
+| `players`                | ✓                                                  |
+| `myPlayerId`             | ✓                                                  |
+| `myRole`                 | ✓ own role                                         |
+| `visibleRoleAssignments` | Bad teammates only (Good and Special Bad see none) |
+| `rolesInPlay`            | ✓                                                  |
+| `timerConfig`            | ✓                                                  |
+| `amDead`                 | ✓ (if eliminated)                                  |
+| `deadPlayerIds`          | ✓ (if any eliminated)                              |
 
-## Data Flow
+### Secret Villain–Specific Fields
 
-### Lobby → Game Start
+| Field                               | Phase              | Visibility      | Description                                        |
+| ----------------------------------- | ------------------ | --------------- | -------------------------------------------------- |
+| `svPhase`                           | All                | All players     | Current phase type, presidentId, chancellorId, etc |
+| `svBoard`                           | All                | All players     | Good/Bad cards played, failed election count       |
+| `vetoUnlocked`                      | All (4+ bad cards) | All players     | Whether veto power is available                    |
+| `eligibleChancellorIds`             | Nomination         | President only  | Player IDs eligible for chancellor selection       |
+| `myElectionVote`                    | Election vote      | Own vote only   | The player's cast vote (aye/no)                    |
+| `electionVotes`                     | After tally        | All players     | All votes (after all have voted)                   |
+| `electionPassed`                    | After tally        | All players     | Whether the election passed                        |
+| `policyCards.drawnCards`            | Policy president   | President only  | The 3 drawn cards                                  |
+| `policyCards.remainingCards`        | Policy chancellor  | Chancellor only | The 2 cards passed from president                  |
+| `policyCards.peekedCards`           | Policy peek        | President only  | Top 3 deck cards (after peek action)               |
+| `vetoProposal`                      | Policy chancellor  | President only  | Veto proposed/response state                       |
+| `svInvestigationResult`             | Investigate        | President only  | Target's team (after consent)                      |
+| `svInvestigationWaitingForPlayerId` | Investigate        | President only  | Target selected, awaiting consent                  |
+| `svInvestigationConsent`            | Investigate        | Target only     | Prompt to reveal loyalty                           |
 
-1. Players join the lobby; Narrator starts the game via the API.
-2. `GameService` orchestrates game creation: assigns roles, computes per-player `PlayerGameState`, and writes to Firebase.
-3. Each client receives its state via Firebase `onValue` and displays the player's role and any visible teammates.
+## Game Phase Flow
 
-### During Play
+```
+Starting (15s countdown)
+  → advance-to-playing (any player, auto on timer)
 
-The app has no further involvement — gameplay happens outside the app. No actions or state mutations are defined for Secret Villain.
+Election Nomination
+  → nominate-chancellor (president selects)
 
-## Role Visibility Details
+Election Vote
+  → cast-election-vote (all players, simultaneous)
+  → [auto-tally when all voted]
+  → advance-from-election (any player, after seeing results)
 
-`visibleRoleAssignments` reflects each role's `canSeeTeam` configuration:
+  If passed:
+    Policy President
+      → president-discard (president discards 1 of 3)
 
-- **Bad players** see all other Bad players (including the Special Bad) — they know who's on their side and who the special role is.
-- **Special Bad player** sees nobody — they must identify their teammates through play.
+    Policy Chancellor
+      → chancellor-play (chancellor plays 1 of 2)
+      → [optional] propose-veto → respond-veto (accept/reject)
+
+    If bad card triggers special action:
+      Special Action (varies by type)
+        → select-investigation-target / consent-investigation / resolve-investigation
+        → call-special-election
+        → shoot-player
+        → policy-peek / resolve-policy-peek
+
+  If failed:
+    → increment failedElectionCount
+    → if 3 consecutive failures: auto-play top deck card
+    → advance to next president
+```
+
+## Election Tally vs Advance
+
+When the last vote is cast, `tallyElection()` is called to set `passed` on the vote phase — but the phase does NOT transition. This gives all players a window to see the vote breakdown (who voted aye/no) before any player triggers `advanceFromElection` to proceed.
+
+## Special Action Flow
+
+Special actions are triggered when a Bad policy card is played and the board position maps to a presidential power (per the player count config).
+
+| Action Type      | President Flow                                       | Target/Other Flow                        |
+| ---------------- | ---------------------------------------------------- | ---------------------------------------- |
+| Investigate Team | Select target → wait for consent → see result → Done | Target: consent button. Others: waiting. |
+| Special Election | Select player → Appoint                              | Waiting for president.                   |
+| Shoot            | Select player → Execute                              | Waiting for president.                   |
+| Policy Peek      | Press "Peek" → see 3 cards → Done                    | Waiting for president.                   |
+
+## Role Visibility
+
+`visibleRoleAssignments` is built from each role's `awareOf` configuration:
+
+- **Bad players** see all other Bad team members with exact roles revealed (`awareOf: { teams: [Bad], revealRole: true }`). They know who is Bad and who is Special Bad.
+- **Special Bad player** sees nobody — must identify teammates through gameplay.
 - **Good players** see nobody.
-- **Narrator** sees all role assignments.
 
-This deliberate asymmetry is the core mechanic: Bad players can coordinate, but the Special Bad cannot.
+## Win Conditions
+
+- **Good wins**: 5 Good policy cards played, or Special Bad eliminated via Shoot.
+- **Bad wins**: 5 Bad policy cards played, or Special Bad elected Chancellor after 3+ Bad cards played.
+- **Chaos (auto-play)**: 3 consecutive failed elections → top deck card played automatically, previous administration cleared.

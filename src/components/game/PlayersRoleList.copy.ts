@@ -1,4 +1,5 @@
 import { WerewolfRole } from "@/lib/game-modes/werewolf/roles";
+import { SecretVillainRole } from "@/lib/game-modes/secret-villain/roles";
 
 export const PLAYER_VISIBILITY_COPY = {
   wakePartnerHeading: "Players who wake with you",
@@ -10,20 +11,19 @@ export const PLAYER_VISIBILITY_COPY = {
   revealedHeading: "Revealed roles",
 } as const;
 
+interface VisibilityOverride {
+  wakePartnerHeading?: string;
+  wakePartnerDescription?: string;
+  awareOfHeading?: string;
+  awareOfDescription?: string;
+}
+
 /**
  * Role-specific overrides for visibility section headings and descriptions.
- * Keyed by WerewolfRole enum value.
+ * Keyed by role ID (WerewolfRole or SecretVillainRole).
  */
 export const ROLE_VISIBILITY_OVERRIDES: Partial<
-  Record<
-    WerewolfRole,
-    Partial<{
-      wakePartnerHeading: string;
-      wakePartnerDescription: string;
-      awareOfHeading: string;
-      awareOfDescription: string;
-    }>
-  >
+  Record<string, VisibilityOverride>
 > = {
   [WerewolfRole.Werewolf]: {
     wakePartnerHeading: "Your pack",
@@ -57,6 +57,11 @@ export const ROLE_VISIBILITY_OVERRIDES: Partial<
     awareOfHeading: "Your target",
     awareOfDescription:
       "Convince the village to vote this player out at trial to win.",
+  },
+  [SecretVillainRole.Bad]: {
+    awareOfHeading: "Your allies",
+    awareOfDescription:
+      "You know who is on the Bad team and who the Special Bad is.",
   },
 };
 

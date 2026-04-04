@@ -24,7 +24,7 @@ export interface FirebaseLobbyPlayer {
   id: string;
   name: string;
   /** Visible players for this player. Absent for the game owner. */
-  visiblePlayers?: { playerId: string; reason: string }[];
+  visiblePlayers?: { playerId: string; reason: string; roleId?: string }[];
 }
 
 export interface FirebaseLobbyConfig {

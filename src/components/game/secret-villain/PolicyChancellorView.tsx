@@ -1,0 +1,130 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
+import { cn } from "@/lib/utils";
+
+interface PolicyChancellorViewProps {
+  remainingCards: string[];
+  selectedIndex?: number;
+  onSelectCard: (index: number) => void;
+  onPlay: () => void;
+  vetoUnlocked?: boolean;
+  vetoProposed?: boolean;
+  vetoResponse?: boolean;
+  onProposeVeto?: () => void;
+  isPending?: boolean;
+  isChancellor: boolean;
+  chancellorName: string;
+}
+
+export function PolicyChancellorView({
+  remainingCards,
+  selectedIndex,
+  onSelectCard,
+  onPlay,
+  vetoUnlocked,
+  vetoProposed,
+  vetoResponse,
+  onProposeVeto,
+  isPending,
+  isChancellor,
+  chancellorName,
+}: PolicyChancellorViewProps) {
+  if (!isChancellor) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{SECRET_VILLAIN_COPY.policy.chancellorHeading}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            {SECRET_VILLAIN_COPY.policy.waitingForChancellor(chancellorName)}
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (vetoProposed && vetoResponse === undefined) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{SECRET_VILLAIN_COPY.policy.chancellorHeading}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            {SECRET_VILLAIN_COPY.policy.vetoProposed}
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const vetoWasRejected = vetoProposed && vetoResponse === false;
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>{SECRET_VILLAIN_COPY.policy.chancellorHeading}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-sm">
+          {SECRET_VILLAIN_COPY.policy.chancellorInstructions}
+        </p>
+        {vetoWasRejected && (
+          <p className="text-sm font-medium text-destructive">
+            {SECRET_VILLAIN_COPY.policy.vetoRejected}
+          </p>
+        )}
+        <div className="flex gap-2">
+          {remainingCards.map((card, index) => (
+            <Button
+              key={index}
+              variant={selectedIndex === index ? "default" : "outline"}
+              className={cn(
+                card === "good"
+                  ? "border-green-500 text-green-700"
+                  : "border-red-500 text-red-700",
+                selectedIndex === index &&
+                  (card === "good"
+                    ? "bg-green-500 text-white"
+                    : "bg-red-500 text-white"),
+              )}
+              onClick={() => {
+                onSelectCard(index);
+              }}
+            >
+              {card === "good"
+                ? SECRET_VILLAIN_COPY.policy.goodCard
+                : SECRET_VILLAIN_COPY.policy.badCard}
+            </Button>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <Button
+            onClick={onPlay}
+            disabled={selectedIndex === undefined || !!isPending}
+          >
+            {SECRET_VILLAIN_COPY.policy.play}
+          </Button>
+          {vetoUnlocked && !vetoWasRejected && onProposeVeto && (
+            <Button
+              variant="outline"
+              onClick={onProposeVeto}
+              disabled={!!isPending}
+            >
+              {SECRET_VILLAIN_COPY.policy.proposeVeto}
+            </Button>
+          )}
+        </div>
+        {vetoUnlocked && !vetoWasRejected && (
+          <p className="text-sm text-muted-foreground">
+            {SECRET_VILLAIN_COPY.policy.vetoAvailable}
+          </p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}

@@ -61,6 +61,7 @@ export class FirebaseGameService {
         visiblePlayers: (p.visiblePlayers ?? []).map((vp) => ({
           playerId: vp.playerId,
           reason: vp.reason as VisibilityReason,
+          ...(vp.roleId ? { roleId: vp.roleId } : {}),
         })),
       }),
     );

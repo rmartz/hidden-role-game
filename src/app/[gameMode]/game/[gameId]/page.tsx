@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { GameMode } from "@/lib/types";
 import { useGameStateQuery, GameModeContext } from "@/hooks";
 import { WerewolfGameScreen } from "@/components/game";
+import { SecretVillainGameScreen } from "@/components/game/secret-villain";
 import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 import { parseGameMode } from "@/lib/game-modes";
 import { GAME_PAGE_COPY } from "./page.copy";
@@ -58,6 +59,8 @@ export default function GameModePage() {
               gameId={gameId}
               gameState={gameState as WerewolfPlayerGameState}
             />
+          ) : validatedGameMode === GameMode.SecretVillain ? (
+            <SecretVillainGameScreen gameId={gameId} gameState={gameState} />
           ) : (
             <UnsupportedGameMode />
           )}
