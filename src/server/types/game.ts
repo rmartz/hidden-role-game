@@ -136,4 +136,6 @@ export interface PlayerGameState {
   };
   /** True when this player is the investigation target and needs to consent. */
   svInvestigationConsent?: boolean;
+  /** Player ID the president is waiting on for investigation consent. */
+  svInvestigationWaitingForPlayerId?: string;
 }

@@ -258,9 +258,7 @@ export function SecretVillainGameScreenView({
             isPending={isPending}
             investigationResult={gameState.svInvestigationResult}
             investigationWaitingForPlayerId={
-              (gameState as unknown as Record<string, unknown>)[
-                "svInvestigationWaitingForPlayerId"
-              ] as string | undefined
+              gameState.svInvestigationWaitingForPlayerId
             }
             investigationConsent={
               gameState.svPhase?.presidentId !== myPlayerId &&
