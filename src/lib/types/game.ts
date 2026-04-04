@@ -233,28 +233,17 @@ export interface GameAction {
 
 // --- Phase Timer Configuration ---
 
+/** Base timer configuration shared across all game modes. */
 export interface TimerConfig {
   /** When true, each phase automatically advances when its timer expires. */
   autoAdvance: boolean;
   /** Seconds for game-start countdown. */
   startCountdownSeconds: number;
-  /** Seconds per night role phase. */
-  nightPhaseSeconds: number;
-  /** Seconds for day discussion. */
-  dayPhaseSeconds: number;
-  /** Seconds for a daytime elimination vote. */
-  votePhaseSeconds: number;
-  /** Seconds for the defense speech before an elimination vote. */
-  defensePhaseSeconds: number;
 }
 
 export const DEFAULT_TIMER_CONFIG: TimerConfig = {
   autoAdvance: false,
   startCountdownSeconds: 10,
-  nightPhaseSeconds: 30,
-  dayPhaseSeconds: 300,
-  votePhaseSeconds: 20,
-  defensePhaseSeconds: 10,
 };
 
 // --- Lobby (top-level entity; game is absent until started) ---

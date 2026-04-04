@@ -2,7 +2,8 @@ import { afterEach, describe, it, expect, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import { GameOverScreenView } from "./GameOverScreenView";
 import { WerewolfWinner } from "@/lib/game-modes/werewolf/utils/win-condition";
-import { GameStatus, GameMode, Team, DEFAULT_TIMER_CONFIG } from "@/lib/types";
+import { GameStatus, GameMode, Team } from "@/lib/types";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game-modes/werewolf/timer-config";
 import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
 import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 
@@ -31,7 +32,7 @@ function makeGameState(
         role: { id: "werewolf", name: "Werewolf", team: Team.Bad },
       },
     ],
-    timerConfig: DEFAULT_TIMER_CONFIG,
+    timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     nominationsEnabled: false,
     singleTrialPerDay: false,
     revealProtections: false,
