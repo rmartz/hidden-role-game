@@ -15,11 +15,11 @@ export interface SecretVillainGameOverViewProps {
   returnError?: boolean;
 }
 
-function RoleAssignmentList({
-  assignments,
-}: {
+interface RoleAssignmentListProps {
   assignments: VisibleTeammate[];
-}) {
+}
+
+function RoleAssignmentList({ assignments }: RoleAssignmentListProps) {
   if (assignments.length === 0) return null;
   return (
     <ul className="text-sm space-y-1">

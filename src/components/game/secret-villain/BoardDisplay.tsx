@@ -15,13 +15,12 @@ interface BoardDisplayProps {
 
 const TRACK_SIZE = 5;
 
-function TrackSlots({
-  filled,
-  variant,
-}: {
+interface TrackSlotsProps {
   filled: number;
   variant: "good" | "bad";
-}) {
+}
+
+function TrackSlots({ filled, variant }: TrackSlotsProps) {
   return (
     <div className="flex gap-2">
       {Array.from({ length: TRACK_SIZE }, (_, i) => (
