@@ -27,8 +27,8 @@ pnpm build-storybook  # Build static Storybook
 ## File Organization
 
 - **Source files**: Keep under ~200 lines (split at ~240). Large files should be split by logical concern.
-- **Test files**: Keep under ~300 lines (split at ~360). When splitting, organize into a `{module}-tests/` directory with domain-specific files (e.g., `resolution-tests/altruist.test.ts`).
-- **Components**: Each component file must contain exactly one component and its associated props interface. Delegate complex logic to utility functions or sub-components.
+- **Test files**: Keep under ~300 lines (split at ~360). Use `.spec.ts` / `.spec.tsx` extension (not `.test.ts`). When splitting, organize into a `{module}-tests/` directory with domain-specific files (e.g., `resolution-tests/altruist.spec.ts`).
+- **Components**: Each component file must contain exactly one component and its associated props interface. All component props must be defined as an explicitly named interface (e.g., `interface PlayerListProps`), never inline in the function signature. Delegate complex logic to utility functions or sub-components.
 - **Type files**: Convert large type files into barrel-exported directories with one file per logical domain (e.g., `lobby.ts`, `game.ts`, `player.ts`).
 - **Utility files**: Split by the type of operation or domain they serve.
 - **Service files**: Extract complex logic areas into focused utility functions or smaller services.
@@ -84,7 +84,7 @@ pnpm build-storybook  # Build static Storybook
 
 - Use `describe`/`it` from Vitest (not `test`).
 - Test fixture generators use `make{DomainName}()` (e.g., `makePlayingGame()`, `makeGameState()`).
-- When splitting large test files, organize into `{module}-tests/` directories (e.g., `resolution-tests/altruist.test.ts`).
+- When splitting large test files, organize into `{module}-tests/` directories (e.g., `resolution-tests/altruist.spec.ts`).
 
 ## Git Conventions
 
@@ -100,7 +100,7 @@ pnpm build-storybook  # Build static Storybook
 
 ## Component Tests
 
-- Test files are co-located with their component: `ComponentName.test.tsx`.
+- Test files are co-located with their component: `ComponentName.spec.tsx`.
 - When adding or modifying a UI component, add or update its test to verify rendering behavior and key prop-driven states.
 - Use `@testing-library/react` with `vitest`. Always call `afterEach(cleanup)`.
 - Do not use `.toBeInTheDocument()` — use `.toBeDefined()` or check `.textContent` instead.

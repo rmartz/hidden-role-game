@@ -5,13 +5,15 @@ import { useGameStateQuery, GameModeContext } from "@/hooks";
 import { WerewolfGameScreen } from "@/components/game";
 import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 
+export interface GameScreenForPlayerProps {
+  gameId: string;
+  gameMode: GameMode;
+}
+
 export function GameScreenForPlayer({
   gameId,
   gameMode,
-}: {
-  gameId: string;
-  gameMode: GameMode;
-}) {
+}: GameScreenForPlayerProps) {
   const {
     data: gameState,
     isLoading,

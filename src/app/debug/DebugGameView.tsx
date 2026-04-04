@@ -14,13 +14,12 @@ export interface GameInfo {
   players: DebugPlayer[];
 }
 
-export function DebugGameView({
-  gameInfo,
-  onReset,
-}: {
+export interface DebugGameViewProps {
   gameInfo: GameInfo;
   onReset: () => void;
-}) {
+}
+
+export function DebugGameView({ gameInfo, onReset }: DebugGameViewProps) {
   const queryClient = useQueryClient();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const { gameId, gameMode, players } = gameInfo;
