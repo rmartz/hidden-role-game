@@ -6,8 +6,8 @@ import {
   RoleConfigMode,
   ShowRolesInPlay,
   Team,
-  DEFAULT_TIMER_CONFIG,
 } from "@/lib/types";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game-modes/werewolf/timer-config";
 import { ServerResponseStatus } from "@/server/types";
 import type { PlayerGameState, PublicLobby } from "@/server/types";
 import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
@@ -49,7 +49,7 @@ const mockGameState: WerewolfPlayerGameState = {
   nominationsEnabled: false,
   singleTrialPerDay: true,
   revealProtections: true,
-  timerConfig: DEFAULT_TIMER_CONFIG,
+  timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
 };
 
 const mockOwnerGameState: PlayerGameState = {
@@ -86,7 +86,7 @@ describe("useStartGame", () => {
             nominationsEnabled: false,
             singleTrialPerDay: true,
             revealProtections: true,
-            timerConfig: DEFAULT_TIMER_CONFIG,
+            timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
           },
           gameId: "game-1",
           readyPlayerIds: [],

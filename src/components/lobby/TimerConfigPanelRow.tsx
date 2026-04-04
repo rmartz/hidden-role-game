@@ -1,12 +1,12 @@
 "use client";
 
-import type { TimerConfig } from "@/lib/types";
+import type { WerewolfTimerConfig } from "@/lib/game-modes/werewolf/timer-config";
 import { Incrementer } from "./Incrementer";
 import { TIMER_CONFIG_COPY } from "./TimerConfigPanel.copy";
 
 export interface TimerRow {
   label: string;
-  field: keyof Omit<TimerConfig, "autoAdvance">;
+  field: keyof Omit<WerewolfTimerConfig, "autoAdvance">;
   min: number;
   max: number;
   step: number;

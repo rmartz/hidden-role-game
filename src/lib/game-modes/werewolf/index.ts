@@ -1,4 +1,5 @@
 export * from "./types";
+export * from "./timer-config";
 export * from "./player-state";
 export * from "./roles";
 export * from "./actions";

@@ -2,8 +2,9 @@ import { createSlice, createSelector } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { sum } from "lodash";
 import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
-import type { RoleSlot, TimerConfig } from "@/lib/types";
-import { DEFAULT_TIMER_CONFIG } from "@/lib/types";
+import type { RoleSlot } from "@/lib/types";
+import type { WerewolfTimerConfig } from "@/lib/game-modes/werewolf/timer-config";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game-modes/werewolf/timer-config";
 import type { GameConfig } from "@/server/types";
 import { GAME_MODES } from "@/lib/game-modes";
 
@@ -55,7 +56,7 @@ export interface GameConfigState {
   roleMaxes: Record<string, number>;
   showConfigToPlayers: boolean;
   showRolesInPlay: ShowRolesInPlay;
-  timerConfig: TimerConfig;
+  timerConfig: WerewolfTimerConfig;
   nominationEnabled: boolean;
   singleTrialPerDay: boolean;
   revealProtections: boolean;
@@ -73,7 +74,7 @@ const initialState: GameConfigState = {
   roleMaxes: {},
   showConfigToPlayers: false,
   showRolesInPlay: ShowRolesInPlay.None,
-  timerConfig: DEFAULT_TIMER_CONFIG,
+  timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   nominationEnabled: true,
   singleTrialPerDay: true,
   revealProtections: true,
@@ -114,7 +115,7 @@ const gameConfigSlice = createSlice({
       state.roleMaxes = roleMaxesFromSlots(slots);
       state.showConfigToPlayers = config.showConfigToPlayers;
       state.showRolesInPlay = config.showRolesInPlay;
-      state.timerConfig = config.timerConfig;
+      state.timerConfig = config.timerConfig as WerewolfTimerConfig;
       state.nominationEnabled = config.nominationsEnabled;
       state.singleTrialPerDay = config.singleTrialPerDay;
       state.revealProtections = config.revealProtections;
@@ -246,7 +247,7 @@ const gameConfigSlice = createSlice({
       state.syncVersion++;
     },
 
-    setTimerConfig(state, action: PayloadAction<TimerConfig>) {
+    setTimerConfig(state, action: PayloadAction<WerewolfTimerConfig>) {
       state.timerConfig = action.payload;
       state.syncVersion++;
     },

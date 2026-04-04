@@ -6,6 +6,8 @@ import type {
   TimerConfig,
 } from "@/lib/types";
 import { DEFAULT_TIMER_CONFIG } from "@/lib/types";
+import type { WerewolfTimerConfig } from "@/lib/game-modes/werewolf/timer-config";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game-modes/werewolf/timer-config";
 import type { PublicLobby } from "@/server/types";
 
 export interface FirebaseLobbyPublic {
@@ -145,8 +147,14 @@ export function firebaseToRoleSlot(s: FirebaseRoleSlot): RoleSlot {
   return { roleId: s.roleId, min: s.min, max: s.max };
 }
 
-/** Parses a raw Firebase TimerConfig, filling missing fields with defaults. */
-export function parseTimerConfig(raw: Record<string, unknown>): TimerConfig {
+/**
+ * Parses a raw Firebase TimerConfig, filling missing fields with defaults.
+ * Returns a WerewolfTimerConfig since DEFAULT_TIMER_CONFIG includes all fields.
+ * Non-Werewolf game modes ignore the Werewolf-specific fields.
+ */
+export function parseTimerConfig(
+  raw: Record<string, unknown>,
+): WerewolfTimerConfig {
   return {
     autoAdvance:
       typeof raw["autoAdvance"] === "boolean"
@@ -159,19 +167,19 @@ export function parseTimerConfig(raw: Record<string, unknown>): TimerConfig {
     nightPhaseSeconds:
       typeof raw["nightPhaseSeconds"] === "number"
         ? raw["nightPhaseSeconds"]
-        : DEFAULT_TIMER_CONFIG.nightPhaseSeconds,
+        : DEFAULT_WEREWOLF_TIMER_CONFIG.nightPhaseSeconds,
     dayPhaseSeconds:
       typeof raw["dayPhaseSeconds"] === "number"
         ? raw["dayPhaseSeconds"]
-        : DEFAULT_TIMER_CONFIG.dayPhaseSeconds,
+        : DEFAULT_WEREWOLF_TIMER_CONFIG.dayPhaseSeconds,
     votePhaseSeconds:
       typeof raw["votePhaseSeconds"] === "number"
         ? raw["votePhaseSeconds"]
-        : DEFAULT_TIMER_CONFIG.votePhaseSeconds,
+        : DEFAULT_WEREWOLF_TIMER_CONFIG.votePhaseSeconds,
     defensePhaseSeconds:
       typeof raw["defensePhaseSeconds"] === "number"
         ? raw["defensePhaseSeconds"]
-        : DEFAULT_TIMER_CONFIG.defensePhaseSeconds,
+        : DEFAULT_WEREWOLF_TIMER_CONFIG.defensePhaseSeconds,
   };
 }
 

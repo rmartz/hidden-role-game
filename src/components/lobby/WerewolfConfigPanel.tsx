@@ -1,18 +1,18 @@
 "use client";
 
-import type { TimerConfig } from "@/lib/types";
+import type { WerewolfTimerConfig } from "@/lib/game-modes/werewolf/timer-config";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { WEREWOLF_CONFIG_PANEL_COPY } from "./WerewolfConfigPanel.copy";
 import { TimerConfigPanel } from "./TimerConfigPanel";
 
 interface WerewolfConfigPanelProps {
-  timerConfig: TimerConfig;
+  timerConfig: WerewolfTimerConfig;
   nominationEnabled: boolean;
   singleTrialPerDay: boolean;
   revealProtections: boolean;
   disabled?: boolean;
-  onTimerConfigChange?: (config: TimerConfig) => void;
+  onWerewolfTimerConfigChange?: (config: WerewolfTimerConfig) => void;
   onNominationEnabledChange?: (value: boolean) => void;
   onSingleTrialPerDayChange?: (value: boolean) => void;
   onRevealProtectionsChange?: (value: boolean) => void;
@@ -24,7 +24,7 @@ export function WerewolfConfigPanel({
   singleTrialPerDay,
   revealProtections,
   disabled,
-  onTimerConfigChange,
+  onWerewolfTimerConfigChange,
   onNominationEnabledChange,
   onSingleTrialPerDayChange,
   onRevealProtectionsChange,
@@ -67,7 +67,7 @@ export function WerewolfConfigPanel({
       <TimerConfigPanel
         timerConfig={timerConfig}
         disabled={disabled}
-        onChange={onTimerConfigChange}
+        onChange={onWerewolfTimerConfigChange}
       />
     </div>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import type { TimerConfig } from "@/lib/types";
+import type { WerewolfTimerConfig } from "@/lib/game-modes/werewolf/timer-config";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { TIMER_CONFIG_COPY } from "./TimerConfigPanel.copy";
@@ -8,9 +8,9 @@ import { TimerConfigPanelRow, TIMER_ROWS } from "./TimerConfigPanelRow";
 import type { TimerRow } from "./TimerConfigPanelRow";
 
 interface TimerConfigPanelProps {
-  timerConfig: TimerConfig;
+  timerConfig: WerewolfTimerConfig;
   disabled?: boolean;
-  onChange?: (config: TimerConfig) => void;
+  onChange?: (config: WerewolfTimerConfig) => void;
 }
 
 export function TimerConfigPanel({
