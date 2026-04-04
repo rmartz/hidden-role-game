@@ -139,7 +139,7 @@ export default function Home() {
               }}
             >
               <SelectTrigger id="game-mode">
-                <SelectValue />
+                <SelectValue>{GAME_MODES[selectedGameMode].name}</SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {GAME_MODE_OPTIONS.map((opt) => (
