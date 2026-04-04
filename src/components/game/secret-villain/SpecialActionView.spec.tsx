@@ -150,6 +150,39 @@ describe("SpecialActionView", () => {
     ).toBeDefined();
   });
 
+  it("shows Peek button before cards are revealed for policy-peek", () => {
+    const onPeek = vi.fn();
+    render(
+      <SpecialActionView
+        {...defaultProps}
+        actionType={SpecialActionType.PolicyPeek}
+        onPeek={onPeek}
+      />,
+    );
+    expect(
+      screen.getByRole("button", {
+        name: SECRET_VILLAIN_COPY.specialAction.policyPeekConfirm,
+      }),
+    ).toBeDefined();
+    expect(
+      screen.getByText(
+        SECRET_VILLAIN_COPY.specialAction.policyPeekInstructions,
+      ),
+    ).toBeDefined();
+  });
+
+  it("does not show player selection list for policy-peek", () => {
+    render(
+      <SpecialActionView
+        {...defaultProps}
+        actionType={SpecialActionType.PolicyPeek}
+        onPeek={vi.fn()}
+      />,
+    );
+    expect(screen.queryByText("Alice")).toBeNull();
+    expect(screen.queryByText("Bob")).toBeNull();
+  });
+
   it("uses presidentName in waiting message for non-president players", () => {
     render(
       <SpecialActionView
