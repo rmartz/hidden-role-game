@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { GameMode, GameStatus } from "@/lib/types";
+import { GameMode } from "@/lib/types";
 import { useGameStateQuery, GameModeContext } from "@/hooks";
 import { WerewolfGameScreen } from "@/components/game";
 import { SecretVillainGameScreen } from "@/components/game/secret-villain";
@@ -11,8 +11,6 @@ import { parseGameMode } from "@/lib/game-modes";
 import { GAME_PAGE_COPY } from "./page.copy";
 import { UnsupportedGameMode } from "../UnsupportedGameMode";
 
-const POLL_INTERVAL_MS = 2000;
-
 export default function GameModePage() {
   const { gameId, gameMode: gameModeParam } = useParams<{
     gameId: string;
@@ -20,19 +18,14 @@ export default function GameModePage() {
   }>();
   const router = useRouter();
 
-  const [refetchInterval, setRefetchInterval] = useState<number | undefined>(
-    POLL_INTERVAL_MS,
-  );
-
   const validatedGameMode = parseGameMode(gameModeParam);
 
   const {
     data: gameState,
     isLoading,
     error,
-  } = useGameStateQuery(gameId, validatedGameMode, refetchInterval);
+  } = useGameStateQuery(gameId, validatedGameMode);
 
-  const gameStatus = gameState?.status.type;
   const actualGameMode = gameState?.gameMode;
 
   useEffect(() => {
@@ -40,12 +33,6 @@ export default function GameModePage() {
       router.push("/");
     }
   }, [validatedGameMode, router]);
-
-  useEffect(() => {
-    if (gameStatus && gameStatus !== GameStatus.Starting) {
-      setRefetchInterval(undefined);
-    }
-  }, [gameStatus]);
 
   useEffect(() => {
     if (error?.message === "401" || error?.message === "403") {

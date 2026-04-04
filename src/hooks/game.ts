@@ -46,7 +46,6 @@ export function useStartGame(lobbyId: string) {
 export function useGameStateQuery(
   gameId: string,
   gameMode: GameMode | undefined,
-  refetchInterval?: number,
 ) {
   const queryClient = useQueryClient();
   const { isReady } = useFirebaseAuth();
@@ -90,7 +89,6 @@ export function useGameStateQuery(
     },
     enabled: !!gameMode,
     retry: false,
-    refetchInterval,
   });
 }
 
