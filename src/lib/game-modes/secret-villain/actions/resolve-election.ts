@@ -117,14 +117,6 @@ export function advanceFromElection(game: Game): void {
 }
 
 /**
- * Tally + advance in one step (used by resolveElectionAction).
- */
-export function resolveElection(game: Game): void {
-  tallyElection(game);
-  advanceFromElection(game);
-}
-
-/**
  * Tally the election and mark it resolved. Can be called when all players
  * have voted or when the timer has expired (abstentions count as "no").
  * Any player can trigger this — the UI gates when the button appears.
