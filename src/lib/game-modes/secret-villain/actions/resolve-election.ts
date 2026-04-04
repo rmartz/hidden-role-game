@@ -139,7 +139,7 @@ export const resolveElectionAction: GameAction = {
   },
 
   apply(game: Game) {
-    resolveElection(game);
+    tallyElection(game);
   },
 };
 
