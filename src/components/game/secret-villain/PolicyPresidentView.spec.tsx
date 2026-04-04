@@ -7,14 +7,43 @@ afterEach(cleanup);
 
 const defaultProps = {
   drawnCards: ["good", "bad", "bad"] as string[],
+  cardsRevealed: true,
   onSelectCard: vi.fn(),
+  onDraw: vi.fn(),
   onDiscard: vi.fn(),
   isPresident: true,
   presidentName: "TestPresident",
 };
 
 describe("PolicyPresidentView", () => {
-  it("shows 3 card buttons when president", () => {
+  it("shows Draw button before cards are revealed", () => {
+    render(
+      <PolicyPresidentView
+        {...defaultProps}
+        drawnCards={[]}
+        cardsRevealed={false}
+      />,
+    );
+    expect(
+      screen.getByRole("button", {
+        name: SECRET_VILLAIN_COPY.policy.presidentDraw,
+      }),
+    ).toBeDefined();
+  });
+
+  it("does not show cards before drawing", () => {
+    render(
+      <PolicyPresidentView
+        {...defaultProps}
+        drawnCards={[]}
+        cardsRevealed={false}
+      />,
+    );
+    expect(screen.queryByText(SECRET_VILLAIN_COPY.policy.goodCard)).toBeNull();
+    expect(screen.queryByText(SECRET_VILLAIN_COPY.policy.badCard)).toBeNull();
+  });
+
+  it("shows 3 card buttons after drawing", () => {
     render(<PolicyPresidentView {...defaultProps} />);
     const goodButtons = screen.getAllByText(
       SECRET_VILLAIN_COPY.policy.goodCard,

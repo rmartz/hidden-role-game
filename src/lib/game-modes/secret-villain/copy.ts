@@ -31,6 +31,8 @@ export const SECRET_VILLAIN_COPY = {
   },
   policy: {
     presidentHeading: "Policy Phase — President",
+    presidentDrawInstructions: "Draw 3 policy cards from the deck.",
+    presidentDraw: "Draw",
     presidentInstructions:
       "You drew 3 policy cards. Discard 1 and pass 2 to the Chancellor.",
     discard: "Discard",

@@ -6,6 +6,7 @@ const meta = {
   component: PolicyPresidentView,
   args: {
     onSelectCard: fn(),
+    onDraw: fn(),
     onDiscard: fn(),
   },
 } satisfies Meta<typeof PolicyPresidentView>;
@@ -13,17 +14,27 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const PresidentView: Story = {
+export const BeforeDraw: Story = {
   args: {
-    drawnCards: ["good", "bad", "bad"],
+    drawnCards: [],
     isPresident: true,
     presidentName: "Alice",
   },
 };
 
-export const PresidentWithSelection: Story = {
+export const AfterDraw: Story = {
   args: {
     drawnCards: ["good", "bad", "bad"],
+    cardsRevealed: true,
+    isPresident: true,
+    presidentName: "Alice",
+  },
+};
+
+export const WithSelection: Story = {
+  args: {
+    drawnCards: ["good", "bad", "bad"],
+    cardsRevealed: true,
     selectedIndex: 1,
     isPresident: true,
     presidentName: "Alice",
@@ -41,6 +52,7 @@ export const NonPresidentView: Story = {
 export const Pending: Story = {
   args: {
     drawnCards: ["good", "bad", "bad"],
+    cardsRevealed: true,
     selectedIndex: 2,
     isPresident: true,
     presidentName: "Alice",

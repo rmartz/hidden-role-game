@@ -34,6 +34,7 @@ export interface SecretVillainGameScreenViewProps {
   /** Tally votes and show results. */
   onResolveElection: () => void;
   // Policy actions
+  onDrawCards: () => void;
   selectedCardIndex?: number;
   onSelectCard: (index: number) => void;
   onDiscardCard: () => void;
@@ -69,6 +70,7 @@ export function SecretVillainGameScreenView({
   onConfirmNomination,
   onVote,
   onResolveElection,
+  onDrawCards,
   selectedCardIndex,
   onSelectCard,
   onDiscardCard,
@@ -210,8 +212,10 @@ export function SecretVillainGameScreenView({
         return (
           <PolicyPresidentView
             drawnCards={gameState.policyCards?.drawnCards ?? []}
+            cardsRevealed={gameState.policyCards?.drawnCards !== undefined}
             selectedIndex={selectedCardIndex}
             onSelectCard={onSelectCard}
+            onDraw={onDrawCards}
             onDiscard={onDiscardCard}
             isPending={isPending}
             isPresident={phase.presidentId === myPlayerId}

@@ -92,6 +92,9 @@ export function SecretVillainGameScreen({
       onResolveElection={() => {
         action.mutate({ actionId: SecretVillainAction.ResolveElection });
       }}
+      onDrawCards={() => {
+        action.mutate({ actionId: SecretVillainAction.PresidentDraw });
+      }}
       selectedCardIndex={selectedCardIndex}
       onSelectCard={setSelectedCardIndex}
       onDiscardCard={() => {

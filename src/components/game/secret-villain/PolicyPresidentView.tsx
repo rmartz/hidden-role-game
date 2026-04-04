@@ -7,8 +7,10 @@ import { cn } from "@/lib/utils";
 
 interface PolicyPresidentViewProps {
   drawnCards: string[];
+  cardsRevealed?: boolean;
   selectedIndex?: number;
   onSelectCard: (index: number) => void;
+  onDraw: () => void;
   onDiscard: () => void;
   isPending?: boolean;
   isPresident: boolean;
@@ -17,8 +19,10 @@ interface PolicyPresidentViewProps {
 
 export function PolicyPresidentView({
   drawnCards,
+  cardsRevealed,
   selectedIndex,
   onSelectCard,
+  onDraw,
   onDiscard,
   isPending,
   isPresident,
@@ -39,6 +43,26 @@ export function PolicyPresidentView({
     );
   }
 
+  // Before drawing: show "Draw" button.
+  if (!cardsRevealed || drawnCards.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{SECRET_VILLAIN_COPY.policy.presidentHeading}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm">
+            {SECRET_VILLAIN_COPY.policy.presidentDrawInstructions}
+          </p>
+          <Button onClick={onDraw} disabled={!!isPending}>
+            {SECRET_VILLAIN_COPY.policy.presidentDraw}
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // After drawing: show cards and discard selection.
   return (
     <Card>
       <CardHeader>

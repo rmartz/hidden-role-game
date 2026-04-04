@@ -100,10 +100,11 @@ export const secretVillainServices: GameModeServices = {
       result["vetoUnlocked"] = true;
     }
 
-    // President sees drawn cards during policy president phase.
+    // President sees drawn cards during policy president phase (after drawing).
     if (
       phase.type === SecretVillainPhase.PolicyPresident &&
-      phase.presidentId === callerId
+      phase.presidentId === callerId &&
+      phase.cardsRevealed
     ) {
       result["policyCards"] = {
         drawnCards: phase.drawnCards,
