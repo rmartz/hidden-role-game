@@ -4,16 +4,24 @@ on:
   pull_request_target:
     branches: ["main"]
 
+permissions:
+  contents: read
+
 jobs:
   regenerate-lockfile:
     name: Regenerate lockfile
     if: github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
+      # Checkout the PR branch to get the updated package.json.
+      # Safe because this job only runs for dependabot[bot] PRs.
       - uses: actions/checkout@v6
         with:
           ref: ${{ github.head_ref }}
           token: ${{ secrets.CI_PAT_TOKEN }}
+          persist-credentials: true
       - uses: ./.github/actions/setup
         with:
           frozen-lockfile: "false"
