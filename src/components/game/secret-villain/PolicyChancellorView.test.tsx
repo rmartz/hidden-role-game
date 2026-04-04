@@ -65,7 +65,9 @@ describe("PolicyChancellorView", () => {
   it("shows waiting message when not chancellor", () => {
     render(<PolicyChancellorView {...defaultProps} isChancellor={false} />);
     expect(
-      screen.getByText(SECRET_VILLAIN_COPY.policy.waitingForChancellor),
+      screen.getByText(
+        SECRET_VILLAIN_COPY.policy.waitingForChancellor("TestChancellor"),
+      ),
     ).toBeDefined();
   });
 

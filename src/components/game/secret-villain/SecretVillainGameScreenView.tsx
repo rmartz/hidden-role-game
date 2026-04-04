@@ -43,6 +43,8 @@ export interface SecretVillainGameScreenViewProps {
   selectedTargetId?: string;
   onSelectTarget: (playerId: string) => void;
   onConfirmAction: () => void;
+  /** Acknowledge a special action result and advance to next election. */
+  onResolveAction: () => void;
   onConsent: () => void;
   // Game over
   onReturnToLobby: () => void;
@@ -70,6 +72,7 @@ export function SecretVillainGameScreenView({
   selectedTargetId,
   onSelectTarget,
   onConfirmAction,
+  onResolveAction,
   onConsent,
   onReturnToLobby,
   startingSecondsRemaining,
@@ -240,8 +243,14 @@ export function SecretVillainGameScreenView({
             selectedPlayerId={selectedTargetId}
             onSelectPlayer={onSelectTarget}
             onConfirm={onConfirmAction}
+            onResolve={onResolveAction}
             isPending={isPending}
             investigationResult={gameState.svInvestigationResult}
+            investigationWaitingForPlayerId={
+              (gameState as unknown as Record<string, unknown>)[
+                "svInvestigationWaitingForPlayerId"
+              ] as string | undefined
+            }
             investigationConsent={
               gameState.svPhase?.presidentId !== myPlayerId &&
               gameState.svInvestigationConsent === true

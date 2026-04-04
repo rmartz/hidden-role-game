@@ -47,8 +47,10 @@ export const SECRET_VILLAIN_COPY = {
     presidentVetoPrompt: "The Chancellor has proposed a veto.",
     acceptVeto: "Accept Veto",
     rejectVeto: "Reject Veto",
-    waitingForPresident: "Waiting for the President\u2026",
-    waitingForChancellor: "Waiting for the Chancellor\u2026",
+    waitingForPresident: (name: string) =>
+      `Waiting for ${name} (President)\u2026`,
+    waitingForChancellor: (name: string) =>
+      `Waiting for ${name} (Chancellor)\u2026`,
   },
   specialAction: {
     heading: "Presidential Power",
@@ -58,10 +60,12 @@ export const SECRET_VILLAIN_COPY = {
     investigateConfirm: "Investigate",
     investigateWaitingConsent: (playerName: string) =>
       `Waiting for ${playerName} to reveal\u2026`,
-    investigateConsent: "The President is investigating your loyalty.",
+    investigateConsent: (presidentName: string) =>
+      `${presidentName} (President) is investigating your loyalty.`,
     investigateReveal: "Reveal",
     investigateResult: (playerName: string, team: string) =>
       `${playerName} is on the ${team} team.`,
+    done: "Done",
     specialElectionHeading: "Special Election",
     specialElectionInstructions: "Select a player to be the next President.",
     specialElectionConfirm: "Appoint",

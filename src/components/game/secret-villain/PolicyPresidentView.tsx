@@ -22,6 +22,7 @@ export function PolicyPresidentView({
   onDiscard,
   isPending,
   isPresident,
+  presidentName,
 }: PolicyPresidentViewProps) {
   if (!isPresident) {
     return (
@@ -31,7 +32,7 @@ export function PolicyPresidentView({
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            {SECRET_VILLAIN_COPY.policy.waitingForPresident}
+            {SECRET_VILLAIN_COPY.policy.waitingForPresident(presidentName)}
           </p>
         </CardContent>
       </Card>

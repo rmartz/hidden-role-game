@@ -14,8 +14,12 @@ interface SpecialActionViewProps {
   selectedPlayerId?: string;
   onSelectPlayer: (playerId: string) => void;
   onConfirm: () => void;
+  /** Acknowledge result and advance to next election. */
+  onResolve?: () => void;
   isPending?: boolean;
   investigationResult?: { targetPlayerId: string; team: string };
+  /** Player ID the president is waiting on for investigation consent. */
+  investigationWaitingForPlayerId?: string;
   investigationConsent?: boolean;
   onConsent?: () => void;
   peekedCards?: string[];
@@ -48,9 +52,11 @@ const ACTION_CONFIG: Record<
 };
 
 function InvestigationConsentContent({
+  presidentName,
   onConsent,
   isPending,
 }: {
+  presidentName: string;
   onConsent?: () => void;
   isPending?: boolean;
 }) {
@@ -63,7 +69,7 @@ function InvestigationConsentContent({
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm">
-          {SECRET_VILLAIN_COPY.specialAction.investigateConsent}
+          {SECRET_VILLAIN_COPY.specialAction.investigateConsent(presidentName)}
         </p>
         {onConsent && (
           <Button onClick={onConsent} disabled={!!isPending}>
@@ -188,12 +194,15 @@ function PlayerSelectionContent({
 export function SpecialActionView({
   actionType,
   isPresident,
+  presidentName,
   players,
   selectedPlayerId,
   onSelectPlayer,
   onConfirm,
+  onResolve,
   isPending,
   investigationResult,
+  investigationWaitingForPlayerId,
   investigationConsent,
   onConsent,
   peekedCards,
@@ -208,6 +217,7 @@ export function SpecialActionView({
     ) {
       return (
         <InvestigationConsentContent
+          presidentName={presidentName}
           onConsent={onConsent}
           isPending={isPending}
         />
@@ -221,7 +231,7 @@ export function SpecialActionView({
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            {SECRET_VILLAIN_COPY.policy.waitingForPresident}
+            {SECRET_VILLAIN_COPY.policy.waitingForPresident(presidentName)}
           </p>
         </CardContent>
       </Card>
@@ -232,16 +242,66 @@ export function SpecialActionView({
     return null;
   }
 
+  // President: investigation result — show result with "Done" button.
+  if (investigationResult) {
+    const targetPlayer = players.find(
+      (p) => p.id === investigationResult.targetPlayerId,
+    );
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{config.heading}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm font-medium">
+            {SECRET_VILLAIN_COPY.specialAction.investigateResult(
+              targetPlayer?.name ?? investigationResult.targetPlayerId,
+              investigationResult.team,
+            )}
+          </p>
+          {onResolve && (
+            <Button onClick={onResolve} disabled={!!isPending}>
+              {SECRET_VILLAIN_COPY.specialAction.done}
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // President: waiting for investigation target to consent.
+  if (investigationWaitingForPlayerId) {
+    const waitingPlayer = players.find(
+      (p) => p.id === investigationWaitingForPlayerId,
+    );
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>{config.heading}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            {SECRET_VILLAIN_COPY.specialAction.investigateWaitingConsent(
+              waitingPlayer?.name ?? investigationWaitingForPlayerId,
+            )}
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // President: policy peek — show cards with "Done" button.
   if (actionType === SpecialActionType.PolicyPeek && peekedCards) {
     return (
       <PolicyPeekContent
         peekedCards={peekedCards}
-        onConfirm={onConfirm}
+        onConfirm={onResolve ?? onConfirm}
         isPending={isPending}
       />
     );
   }
 
+  // President: select a target player.
   return (
     <PlayerSelectionContent
       config={config}

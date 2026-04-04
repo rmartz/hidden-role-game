@@ -26,7 +26,9 @@ describe("PolicyPresidentView", () => {
   it("shows waiting message when not president", () => {
     render(<PolicyPresidentView {...defaultProps} isPresident={false} />);
     expect(
-      screen.getByText(SECRET_VILLAIN_COPY.policy.waitingForPresident),
+      screen.getByText(
+        SECRET_VILLAIN_COPY.policy.waitingForPresident("TestPresident"),
+      ),
     ).toBeDefined();
   });
 

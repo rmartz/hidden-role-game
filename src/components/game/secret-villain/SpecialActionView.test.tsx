@@ -87,7 +87,7 @@ describe("SpecialActionView", () => {
   it("shows waiting message for non-president", () => {
     render(<SpecialActionView {...defaultProps} isPresident={false} />);
     expect(
-      screen.getByText(SECRET_VILLAIN_COPY.policy.waitingForPresident),
+      screen.getByText(SECRET_VILLAIN_COPY.policy.waitingForPresident("Alice")),
     ).toBeDefined();
   });
 

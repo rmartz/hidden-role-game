@@ -147,6 +147,22 @@ export function SecretVillainGameScreen({
           }
         }
       }}
+      onResolveAction={() => {
+        if (gameState.svPhase?.actionType) {
+          const resolveMap: Partial<
+            Record<SpecialActionType, SecretVillainAction>
+          > = {
+            [SpecialActionType.InvestigateTeam]:
+              SecretVillainAction.ResolveInvestigation,
+            [SpecialActionType.PolicyPeek]:
+              SecretVillainAction.ResolvePolicyPeek,
+          };
+          const actionId = resolveMap[gameState.svPhase.actionType];
+          if (actionId) {
+            action.mutate({ actionId });
+          }
+        }
+      }}
       onConsent={() => {
         action.mutate({
           actionId: SecretVillainAction.ConsentInvestigation,

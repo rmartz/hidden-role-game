@@ -30,6 +30,7 @@ export function PolicyChancellorView({
   onProposeVeto,
   isPending,
   isChancellor,
+  chancellorName,
 }: PolicyChancellorViewProps) {
   if (!isChancellor) {
     return (
@@ -39,7 +40,7 @@ export function PolicyChancellorView({
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            {SECRET_VILLAIN_COPY.policy.waitingForChancellor}
+            {SECRET_VILLAIN_COPY.policy.waitingForChancellor(chancellorName)}
           </p>
         </CardContent>
       </Card>

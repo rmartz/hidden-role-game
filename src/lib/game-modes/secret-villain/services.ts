@@ -145,6 +145,17 @@ export const secretVillainServices: GameModeServices = {
       result["policyCards"] = { peekedCards: phase.peekedCards };
     }
 
+    // President sees investigation waiting state (target selected, awaiting consent).
+    if (
+      phase.type === SecretVillainPhase.SpecialAction &&
+      phase.actionType === SpecialActionType.InvestigateTeam &&
+      phase.presidentId === callerId &&
+      phase.targetPlayerId &&
+      !phase.revealedTeam
+    ) {
+      result["svInvestigationWaitingForPlayerId"] = phase.targetPlayerId;
+    }
+
     // President sees investigation result.
     if (
       phase.type === SecretVillainPhase.SpecialAction &&
