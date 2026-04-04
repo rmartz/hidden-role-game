@@ -5,6 +5,8 @@ import { GameStatus } from "@/lib/types";
 import type { StartingGameStatus } from "@/lib/types";
 import type { PlayerGameState } from "@/server/types";
 import { useAdvanceGame, useGameAction, useReturnToLobby } from "@/hooks";
+import { SecretVillainAction } from "@/lib/game-modes/secret-villain/actions";
+import { SpecialActionType } from "@/lib/game-modes/secret-villain/types";
 import { SecretVillainGameScreenView } from "./SecretVillainGameScreenView";
 
 /** How long the Starting phase lasts before auto-advancing to Playing (seconds). */
@@ -75,21 +77,24 @@ export function SecretVillainGameScreen({
       onConfirmNomination={() => {
         if (selectedChancellorId) {
           action.mutate({
-            actionId: "nominate-chancellor",
-            payload: { targetPlayerId: selectedChancellorId },
+            actionId: SecretVillainAction.NominateChancellor,
+            payload: { chancellorId: selectedChancellorId },
           });
           setSelectedChancellorId(undefined);
         }
       }}
       onVote={(vote) => {
-        action.mutate({ actionId: "cast-election-vote", payload: { vote } });
+        action.mutate({
+          actionId: SecretVillainAction.CastElectionVote,
+          payload: { vote },
+        });
       }}
       selectedCardIndex={selectedCardIndex}
       onSelectCard={setSelectedCardIndex}
       onDiscardCard={() => {
         if (selectedCardIndex !== undefined) {
           action.mutate({
-            actionId: "president-discard",
+            actionId: SecretVillainAction.PresidentDiscard,
             payload: { cardIndex: selectedCardIndex },
           });
           setSelectedCardIndex(undefined);
@@ -98,40 +103,54 @@ export function SecretVillainGameScreen({
       onPlayCard={() => {
         if (selectedCardIndex !== undefined) {
           action.mutate({
-            actionId: "chancellor-play",
+            actionId: SecretVillainAction.ChancellorPlay,
             payload: { cardIndex: selectedCardIndex },
           });
           setSelectedCardIndex(undefined);
         }
       }}
       onProposeVeto={() => {
-        action.mutate({ actionId: "propose-veto" });
+        action.mutate({ actionId: SecretVillainAction.ProposeVeto });
       }}
       onAcceptVeto={() => {
         action.mutate({
-          actionId: "veto-response",
-          payload: { accept: true },
+          actionId: SecretVillainAction.RespondVeto,
+          payload: { consent: true },
         });
       }}
       onRejectVeto={() => {
         action.mutate({
-          actionId: "veto-response",
-          payload: { accept: false },
+          actionId: SecretVillainAction.RespondVeto,
+          payload: { consent: false },
         });
       }}
       selectedTargetId={selectedTargetId}
       onSelectTarget={setSelectedTargetId}
       onConfirmAction={() => {
-        if (selectedTargetId) {
-          action.mutate({
-            actionId: "special-action",
-            payload: { targetPlayerId: selectedTargetId },
-          });
-          setSelectedTargetId(undefined);
+        if (selectedTargetId && gameState.svPhase?.actionType) {
+          const specialActionMap: Record<string, SecretVillainAction> = {
+            [SpecialActionType.InvestigateTeam]:
+              SecretVillainAction.SelectInvestigationTarget,
+            [SpecialActionType.SpecialElection]:
+              SecretVillainAction.CallSpecialElection,
+            [SpecialActionType.Shoot]: SecretVillainAction.ShootPlayer,
+            [SpecialActionType.PolicyPeek]:
+              SecretVillainAction.ResolvePolicyPeek,
+          };
+          const actionId = specialActionMap[gameState.svPhase.actionType];
+          if (actionId) {
+            action.mutate({
+              actionId,
+              payload: { targetPlayerId: selectedTargetId },
+            });
+            setSelectedTargetId(undefined);
+          }
         }
       }}
       onConsent={() => {
-        action.mutate({ actionId: "investigation-consent" });
+        action.mutate({
+          actionId: SecretVillainAction.ConsentInvestigation,
+        });
       }}
       onReturnToLobby={() => {
         returnToLobby.mutate();
