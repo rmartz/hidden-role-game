@@ -104,4 +104,64 @@ describe("SpecialActionView", () => {
       ),
     ).toBeDefined();
   });
+
+  it("shows Done button when investigationResult is present and onResolve is provided", () => {
+    render(
+      <SpecialActionView
+        {...defaultProps}
+        investigationResult={{ targetPlayerId: "p2", team: "bad" }}
+        onResolve={vi.fn()}
+      />,
+    );
+    expect(
+      screen.getByRole("button", {
+        name: SECRET_VILLAIN_COPY.specialAction.done,
+      }),
+    ).toBeDefined();
+  });
+
+  it("shows waiting message with player name when investigationWaitingForPlayerId is set", () => {
+    render(
+      <SpecialActionView
+        {...defaultProps}
+        investigationWaitingForPlayerId="p2"
+      />,
+    );
+    expect(
+      screen.getByText(
+        SECRET_VILLAIN_COPY.specialAction.investigateWaitingConsent("Bob"),
+      ),
+    ).toBeDefined();
+  });
+
+  it("shows PolicyPeekView with Done button when peekedCards is present", () => {
+    render(
+      <SpecialActionView
+        {...defaultProps}
+        actionType={SpecialActionType.PolicyPeek}
+        peekedCards={["good", "bad", "bad"]}
+        onResolve={vi.fn()}
+      />,
+    );
+    expect(
+      screen.getByRole("button", {
+        name: SECRET_VILLAIN_COPY.specialAction.policyPeekConfirm,
+      }),
+    ).toBeDefined();
+  });
+
+  it("uses presidentName in waiting message for non-president players", () => {
+    render(
+      <SpecialActionView
+        {...defaultProps}
+        isPresident={false}
+        presidentName="Charlie"
+      />,
+    );
+    expect(
+      screen.getByText(
+        SECRET_VILLAIN_COPY.policy.waitingForPresident("Charlie"),
+      ),
+    ).toBeDefined();
+  });
 });
