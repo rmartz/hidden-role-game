@@ -66,6 +66,8 @@ export interface FirebasePlayerState {
   executionerTargetId?: string;
   nominations?: { defendantId: string; nominatorIds: string[] }[];
   myNominatedDefendantId?: string;
+  /** JSON blob for game-mode-specific fields not explicitly modeled above. */
+  modeStateJson?: string;
 }
 
 export function playerStateToFirebase(
@@ -129,7 +131,72 @@ export function playerStateToFirebase(
     ...(state.myNominatedDefendantId
       ? { myNominatedDefendantId: state.myNominatedDefendantId }
       : {}),
+    ...buildModeStateJson(state as unknown as Record<string, unknown>),
   };
+}
+
+/** Base PlayerGameState keys that are serialized explicitly above. */
+const BASE_KEYS = new Set([
+  "status",
+  "gameMode",
+  "lobbyId",
+  "players",
+  "gameOwner",
+  "myPlayerId",
+  "myRole",
+  "visibleRoleAssignments",
+  "rolesInPlay",
+  "amDead",
+  "deadPlayerIds",
+  "timerConfig",
+]);
+
+/** Werewolf keys that are serialized explicitly above. */
+const WEREWOLF_KEYS = new Set([
+  "nightActions",
+  "myNightTarget",
+  "myNightTargetConfirmed",
+  "teamVotes",
+  "suggestedTargetId",
+  "allAgreed",
+  "nightStatus",
+  "previousNightTargetId",
+  "investigationResult",
+  "witchAbilityUsed",
+  "morticianAbilityEnded",
+  "priestWardActive",
+  "isSilenced",
+  "isHypnotized",
+  "activeTrial",
+  "nominationsEnabled",
+  "singleTrialPerDay",
+  "revealProtections",
+  "executionerTargetId",
+  "nominations",
+  "myNominatedDefendantId",
+  "mirrorcasterCharged",
+  "oneEyedSeerLockedTargetId",
+  "elusiveSeerVillagerIds",
+  "exposerReveal",
+  "mySecondNightTarget",
+  "exposerAbilityUsed",
+  "hunterRevengePlayerId",
+]);
+
+/**
+ * Collect any mode-specific fields not handled by explicit serialization
+ * and bundle them into a single JSON string. Returns empty object if none.
+ */
+function buildModeStateJson(
+  state: Record<string, unknown>,
+): { modeStateJson: string } | Record<string, never> {
+  const extra: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(state)) {
+    if (BASE_KEYS.has(key) || WEREWOLF_KEYS.has(key)) continue;
+    if (value !== undefined) extra[key] = value;
+  }
+  if (Object.keys(extra).length === 0) return {};
+  return { modeStateJson: JSON.stringify(extra) };
 }
 
 export function firebaseToPlayerState(
@@ -222,5 +289,8 @@ export function firebaseToPlayerState(
     ...(raw.myNominatedDefendantId
       ? { myNominatedDefendantId: raw.myNominatedDefendantId }
       : {}),
-  };
+    ...(raw.modeStateJson
+      ? (JSON.parse(raw.modeStateJson) as Record<string, unknown>)
+      : {}),
+  } as PlayerGameState;
 }
