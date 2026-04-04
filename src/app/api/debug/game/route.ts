@@ -5,7 +5,7 @@ import type { RoleSlot } from "@/server/types";
 import { ServerResponseStatus } from "@/server/types";
 import { gameService } from "@/services/GameService";
 import { errorResponse } from "@/server/utils";
-import { getRoleSlotsRequired } from "@/lib/game-modes";
+import { getRoleSlotsRequired, GAME_MODES } from "@/lib/game-modes";
 
 interface CreateDebugGameRequest {
   playerCount: number;
@@ -67,7 +67,7 @@ export async function POST(request: Request): Promise<Response> {
     gameMode,
     showRolesInPlay,
     ownerPlayer?.id ?? undefined,
-    timerConfig,
+    { ...GAME_MODES[gameMode].defaultTimerConfig, ...timerConfig },
     {
       nominationsEnabled: true,
       singleTrialPerDay: true,

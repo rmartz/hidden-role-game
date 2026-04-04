@@ -1,12 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import {
-  GameMode,
-  RoleConfigMode,
-  ShowRolesInPlay,
-  DEFAULT_TIMER_CONFIG,
-} from "@/lib/types";
+import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
+import { GAME_MODES } from "@/lib/game-modes";
 import type { GameConfig } from "@/server/types";
 import { GameConfigurationPanel } from "@/components/lobby";
 import { useAppSelector } from "@/store";
@@ -25,7 +21,7 @@ const DEFAULT_CONFIG: GameConfig = {
   nominationsEnabled: false,
   singleTrialPerDay: true,
   revealProtections: true,
-  timerConfig: DEFAULT_TIMER_CONFIG,
+  timerConfig: GAME_MODES[GameMode.Werewolf].defaultTimerConfig,
 };
 
 export default function DebugPage() {
