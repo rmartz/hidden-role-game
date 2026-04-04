@@ -69,22 +69,6 @@ export function SecretVillainGameScreen({
     };
   }, [isStarting, startedAt, advanceGame]);
 
-  // Auto-trigger Policy Peek when the phase starts (no player selection needed).
-  const isPolicyPeek =
-    gameState.svPhase?.actionType === SpecialActionType.PolicyPeek;
-  const hasPeekedCards = gameState.policyCards?.peekedCards !== undefined;
-  const hasPeekedRef = useRef(false);
-
-  useEffect(() => {
-    if (isPolicyPeek && !hasPeekedCards && !hasPeekedRef.current) {
-      hasPeekedRef.current = true;
-      action.mutate({ actionId: SecretVillainAction.PolicyPeek });
-    }
-    if (!isPolicyPeek) {
-      hasPeekedRef.current = false;
-    }
-  }, [isPolicyPeek, hasPeekedCards, action]);
-
   return (
     <SecretVillainGameScreenView
       gameState={gameState}
@@ -178,6 +162,9 @@ export function SecretVillainGameScreen({
             action.mutate({ actionId });
           }
         }
+      }}
+      onPeek={() => {
+        action.mutate({ actionId: SecretVillainAction.PolicyPeek });
       }}
       onConsent={() => {
         action.mutate({

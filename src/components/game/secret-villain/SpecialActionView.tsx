@@ -25,6 +25,8 @@ interface SpecialActionViewProps {
   investigationWaitingForPlayerId?: string;
   investigationConsent?: boolean;
   onConsent?: () => void;
+  /** Trigger the peek action to reveal cards. */
+  onPeek?: () => void;
   peekedCards?: string[];
 }
 
@@ -68,6 +70,7 @@ export function SpecialActionView({
   investigationWaitingForPlayerId,
   investigationConsent,
   onConsent,
+  onPeek,
   peekedCards,
 }: SpecialActionViewProps) {
   const config = ACTION_CONFIG[actionType];
@@ -149,14 +152,31 @@ export function SpecialActionView({
     );
   }
 
-  // President: policy peek — show cards with "Done" button.
-  if (actionType === SpecialActionType.PolicyPeek && peekedCards) {
+  // President: policy peek — show cards with "Done" button, or "Peek" button before reveal.
+  if (actionType === SpecialActionType.PolicyPeek) {
+    if (peekedCards) {
+      return (
+        <PolicyPeekView
+          peekedCards={peekedCards}
+          onConfirm={onResolve ?? onConfirm}
+          isPending={isPending}
+        />
+      );
+    }
     return (
-      <PolicyPeekView
-        peekedCards={peekedCards}
-        onConfirm={onResolve ?? onConfirm}
-        isPending={isPending}
-      />
+      <Card>
+        <CardHeader>
+          <CardTitle>{config.heading}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm">{config.instructions}</p>
+          {onPeek && (
+            <Button onClick={onPeek} disabled={!!isPending}>
+              {config.confirm}
+            </Button>
+          )}
+        </CardContent>
+      </Card>
     );
   }
 

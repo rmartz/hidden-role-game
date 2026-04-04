@@ -46,6 +46,7 @@ export interface SecretVillainGameScreenViewProps {
   /** Acknowledge a special action result and advance to next election. */
   onResolveAction: () => void;
   onConsent: () => void;
+  onPeek: () => void;
   // Game over
   onReturnToLobby: () => void;
   // Starting
@@ -74,6 +75,7 @@ export function SecretVillainGameScreenView({
   onConfirmAction,
   onResolveAction,
   onConsent,
+  onPeek,
   onReturnToLobby,
   startingSecondsRemaining,
   isPending,
@@ -256,6 +258,7 @@ export function SecretVillainGameScreenView({
               gameState.svInvestigationConsent === true
             }
             onConsent={onConsent}
+            onPeek={onPeek}
             peekedCards={gameState.policyCards?.peekedCards}
           />
         );
