@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
 
@@ -8,6 +9,8 @@ interface ElectionResultViewProps {
   chancellorNomineeName: string;
   passed: boolean;
   votes: { playerName: string; vote: "aye" | "no" }[];
+  onContinue: () => void;
+  isPending?: boolean;
 }
 
 export function ElectionResultView({
@@ -15,6 +18,8 @@ export function ElectionResultView({
   chancellorNomineeName,
   passed,
   votes,
+  onContinue,
+  isPending,
 }: ElectionResultViewProps) {
   const ayeCount = votes.filter((v) => v.vote === "aye").length;
   const noCount = votes.filter((v) => v.vote === "no").length;
@@ -53,6 +58,10 @@ export function ElectionResultView({
             </li>
           ))}
         </ul>
+
+        <Button onClick={onContinue} disabled={!!isPending}>
+          {SECRET_VILLAIN_COPY.specialAction.done}
+        </Button>
       </CardContent>
     </Card>
   );

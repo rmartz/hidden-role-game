@@ -1,4 +1,4 @@
-import { afterEach, describe, it, expect } from "vitest";
+import { afterEach, describe, it, expect, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import { ElectionResultView } from "./ElectionResultView";
 import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
@@ -16,6 +16,7 @@ const defaultProps = {
   chancellorNomineeName: "Bob",
   passed: true,
   votes: defaultVotes,
+  onContinue: vi.fn(),
 };
 
 describe("ElectionResultView", () => {

@@ -15,21 +15,31 @@ import {
 } from "../utils";
 
 /**
- * Resolve the current election — called automatically when all votes
- * are in (from castElectionVoteAction) or manually via resolveElectionAction.
+ * Tally the election votes and set `passed` on the phase.
+ * Does NOT transition to the next phase — call advanceFromElection for that.
  */
-export function resolveElection(game: Game): void {
+export function tallyElection(game: Game): void {
+  const ts = currentTurnState(game);
+  if (ts?.phase.type !== SecretVillainPhase.ElectionVote) return;
+  if (ts.phase.passed !== undefined) return;
+
+  const ayes = ts.phase.votes.filter((v) => v.vote === "aye").length;
+  const nos = ts.phase.votes.filter((v) => v.vote === "no").length;
+  ts.phase.passed = ayes > nos;
+}
+
+/**
+ * Advance from a resolved election to the next phase.
+ * Must be called after tallyElection has set `passed`.
+ */
+export function advanceFromElection(game: Game): void {
   const ts = currentTurnState(game);
   if (ts?.phase.type !== SecretVillainPhase.ElectionVote) return;
 
   const votePhase = ts.phase;
-  const ayes = votePhase.votes.filter((v) => v.vote === "aye").length;
-  const nos = votePhase.votes.filter((v) => v.vote === "no").length;
-  const passed = ayes > nos;
+  if (votePhase.passed === undefined) return;
 
-  votePhase.passed = passed;
-
-  if (passed) {
+  if (votePhase.passed) {
     // Check Special Bad chancellor win condition.
     const chancellorWin = checkChancellorElectionWinCondition(
       votePhase.chancellorNomineeId,
@@ -47,7 +57,6 @@ export function resolveElection(game: Game): void {
     // Successful election → transition to policy phase.
     ts.failedElectionCount = 0;
 
-    // Reshuffle if needed before drawing.
     const reshuffled = reshuffleIfNeeded(ts.deck, ts.discardPile);
     const { drawn, remaining } = drawCards(reshuffled.deck, 3);
     ts.deck = remaining;
@@ -61,21 +70,18 @@ export function resolveElection(game: Game): void {
       drawnCards: drawn as [PolicyCard, PolicyCard, PolicyCard],
     };
 
-    // Clear special president after use.
     ts.specialPresidentId = undefined;
   } else {
     // Failed election.
     ts.failedElectionCount++;
 
     if (ts.failedElectionCount >= FAILED_ELECTION_THRESHOLD) {
-      // Auto-play: draw top card from deck.
       const reshuffled = reshuffleIfNeeded(ts.deck, ts.discardPile);
       const { drawn, remaining } = drawCards(reshuffled.deck, 1);
       ts.deck = remaining;
       ts.discardPile = reshuffled.discardPile;
       ts.failedElectionCount = 0;
 
-      // Previous administration is cleared on chaos.
       ts.previousPresidentId = undefined;
       ts.previousChancellorId = undefined;
 
@@ -86,7 +92,6 @@ export function resolveElection(game: Game): void {
         ts.badCardsPlayed++;
       }
 
-      // Check win after auto-play.
       const boardWin = checkBoardWinCondition(ts);
       if (boardWin) {
         game.status = {
@@ -97,8 +102,6 @@ export function resolveElection(game: Game): void {
       }
     }
 
-    // Advance to next president. Clear special president — whether they
-    // just served (failed) or were skipped by chaos, the override is consumed.
     ts.specialPresidentId = undefined;
     const { presidentId, nextIndex } = getNextPresidentId(ts);
     ts.currentPresidentIndex = nextIndex;
@@ -111,6 +114,14 @@ export function resolveElection(game: Game): void {
 
     ts.turn++;
   }
+}
+
+/**
+ * Tally + advance in one step (used by resolveElectionAction).
+ */
+export function resolveElection(game: Game): void {
+  tallyElection(game);
+  advanceFromElection(game);
 }
 
 export const resolveElectionAction: GameAction = {
@@ -128,5 +139,22 @@ export const resolveElectionAction: GameAction = {
 
   apply(game: Game) {
     resolveElection(game);
+  },
+};
+
+/**
+ * Advance from election results to the next phase.
+ * Any player can call this once the election has been tallied.
+ */
+export const advanceFromElectionAction: GameAction = {
+  isValid(game: Game) {
+    const ts = currentTurnState(game);
+    if (!ts) return false;
+    if (ts.phase.type !== SecretVillainPhase.ElectionVote) return false;
+    return ts.phase.passed !== undefined;
+  },
+
+  apply(game: Game) {
+    advanceFromElection(game);
   },
 };

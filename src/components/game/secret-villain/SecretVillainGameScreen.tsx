@@ -166,6 +166,11 @@ export function SecretVillainGameScreen({
       onPeek={() => {
         action.mutate({ actionId: SecretVillainAction.PolicyPeek });
       }}
+      onAdvanceFromElection={() => {
+        action.mutate({
+          actionId: SecretVillainAction.AdvanceFromElection,
+        });
+      }}
       onConsent={() => {
         action.mutate({
           actionId: SecretVillainAction.ConsentInvestigation,

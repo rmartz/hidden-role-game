@@ -47,6 +47,8 @@ export interface SecretVillainGameScreenViewProps {
   onResolveAction: () => void;
   onConsent: () => void;
   onPeek: () => void;
+  /** Advance from election results to the next phase. */
+  onAdvanceFromElection: () => void;
   // Game over
   onReturnToLobby: () => void;
   // Starting
@@ -76,6 +78,7 @@ export function SecretVillainGameScreenView({
   onResolveAction,
   onConsent,
   onPeek,
+  onAdvanceFromElection,
   onReturnToLobby,
   startingSecondsRemaining,
   isPending,
@@ -169,6 +172,8 @@ export function SecretVillainGameScreenView({
                 playerName: getPlayerName(players, v.playerId),
                 vote: v.vote,
               }))}
+              onContinue={onAdvanceFromElection}
+              isPending={isPending}
             />
           );
         }

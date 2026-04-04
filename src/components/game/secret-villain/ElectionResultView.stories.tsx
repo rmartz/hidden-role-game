@@ -1,8 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { fn } from "storybook/test";
 import { ElectionResultView } from "./ElectionResultView";
 
 const meta = {
   component: ElectionResultView,
+  args: {
+    onContinue: fn(),
+  },
 } satisfies Meta<typeof ElectionResultView>;
 
 export default meta;
