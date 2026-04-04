@@ -5,6 +5,7 @@ import { SecretVillainPhase } from "@/lib/game-modes/secret-villain/types";
 import { FAILED_ELECTION_THRESHOLD } from "@/lib/game-modes/secret-villain/types";
 import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
 import type { PlayerGameState } from "@/server/types";
+import type { SecretVillainPlayerGameState } from "@/lib/game-modes/secret-villain/player-state";
 import { BoardDisplay } from "./BoardDisplay";
 import { ElectionNominationView } from "./ElectionNominationView";
 import { ElectionVoteView } from "./ElectionVoteView";
@@ -24,7 +25,7 @@ function getPlayerName(
 }
 
 export interface SecretVillainGameScreenViewProps {
-  gameState: PlayerGameState;
+  gameState: SecretVillainPlayerGameState;
   // Election actions
   selectedChancellorId?: string;
   onSelectChancellor: (playerId: string) => void;
