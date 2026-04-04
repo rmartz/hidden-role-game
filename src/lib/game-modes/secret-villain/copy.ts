@@ -19,6 +19,7 @@ export const SECRET_VILLAIN_COPY = {
     no: "No",
     waitingForVotes: "Waiting for all players to vote\u2026",
     alreadyVoted: "Vote cast. Waiting for others\u2026",
+    resolveVote: "Reveal Results",
     resultPassed: "Election Passed",
     resultFailed: "Election Failed",
     ayeCount: (count: number) => `${String(count)} Aye`,

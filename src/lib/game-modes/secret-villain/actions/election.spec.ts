@@ -241,9 +241,9 @@ describe("resolveElectionAction", () => {
       expect(resolveElectionAction.isValid(game, "p1", {})).toBe(true);
     });
 
-    it("cannot resolve before all votes are in", () => {
+    it("can resolve before all votes are in (timer expiry case)", () => {
       const game = makeResolveGame([{ playerId: "p1", vote: "aye" }]);
-      expect(resolveElectionAction.isValid(game, "p1", {})).toBe(false);
+      expect(resolveElectionAction.isValid(game, "p1", {})).toBe(true);
     });
   });
 

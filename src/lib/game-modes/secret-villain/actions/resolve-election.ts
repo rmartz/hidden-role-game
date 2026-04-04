@@ -124,17 +124,18 @@ export function resolveElection(game: Game): void {
   advanceFromElection(game);
 }
 
+/**
+ * Tally the election and mark it resolved. Can be called when all players
+ * have voted or when the timer has expired (abstentions count as "no").
+ * Any player can trigger this — the UI gates when the button appears.
+ */
 export const resolveElectionAction: GameAction = {
   isValid(game: Game) {
     const ts = currentTurnState(game);
     if (!ts) return false;
     if (ts.phase.type !== SecretVillainPhase.ElectionVote) return false;
-    if (ts.phase.passed !== undefined) return false;
-
-    const alivePlayerIds = game.players
-      .map((p) => p.id)
-      .filter((id) => !ts.eliminatedPlayerIds.includes(id));
-    return ts.phase.votes.length >= alivePlayerIds.length;
+    // Already tallied — use advanceFromElection instead.
+    return ts.phase.passed === undefined;
   },
 
   apply(game: Game) {

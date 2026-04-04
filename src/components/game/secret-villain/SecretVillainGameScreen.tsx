@@ -89,6 +89,9 @@ export function SecretVillainGameScreen({
           payload: { vote },
         });
       }}
+      onResolveElection={() => {
+        action.mutate({ actionId: SecretVillainAction.ResolveElection });
+      }}
       selectedCardIndex={selectedCardIndex}
       onSelectCard={setSelectedCardIndex}
       onDiscardCard={() => {

@@ -31,6 +31,8 @@ export interface SecretVillainGameScreenViewProps {
   onSelectChancellor: (playerId: string) => void;
   onConfirmNomination: () => void;
   onVote: (vote: "aye" | "no") => void;
+  /** Tally votes and show results. */
+  onResolveElection: () => void;
   // Policy actions
   selectedCardIndex?: number;
   onSelectCard: (index: number) => void;
@@ -66,6 +68,7 @@ export function SecretVillainGameScreenView({
   onSelectChancellor,
   onConfirmNomination,
   onVote,
+  onResolveElection,
   selectedCardIndex,
   onSelectCard,
   onDiscardCard,
@@ -178,6 +181,11 @@ export function SecretVillainGameScreenView({
             />
           );
         }
+        const aliveCount = players.filter(
+          (p) => !(gameState.deadPlayerIds ?? []).includes(p.id),
+        ).length;
+        const allVoted = (gameState.electionVoteCount ?? 0) >= aliveCount;
+
         return (
           <ElectionVoteView
             presidentName={getPlayerName(players, phase.presidentId)}
@@ -187,6 +195,12 @@ export function SecretVillainGameScreenView({
             )}
             myVote={gameState.myElectionVote}
             onVote={onVote}
+            onResolve={onResolveElection}
+            allVoted={allVoted}
+            timerDurationSeconds={gameState.timerConfig.electionVoteSeconds}
+            voteStartedAt={
+              phase.startedAt ? new Date(phase.startedAt) : undefined
+            }
             isPending={isPending}
             isEliminated={isEliminated}
           />
