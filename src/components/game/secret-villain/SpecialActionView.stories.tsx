@@ -74,3 +74,28 @@ export const InvestigationConsent: Story = {
     investigationConsent: true,
   },
 };
+
+export const PolicyPeekBeforeReveal: Story = {
+  args: {
+    actionType: SpecialActionType.PolicyPeek,
+    isPresident: true,
+    onPeek: fn(),
+  },
+};
+
+export const InvestigationWaiting: Story = {
+  args: {
+    actionType: SpecialActionType.InvestigateTeam,
+    isPresident: true,
+    investigationWaitingForPlayerId: "p2",
+  },
+};
+
+export const InvestigationResultWithDone: Story = {
+  args: {
+    actionType: SpecialActionType.InvestigateTeam,
+    isPresident: true,
+    investigationResult: { targetPlayerId: "p2", team: "bad" },
+    onResolve: fn(),
+  },
+};
