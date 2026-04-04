@@ -203,7 +203,11 @@ export function SecretVillainGameScreenView({
         const isChancellor = chancellorId === myPlayerId;
         const isPresident = phase.presidentId === myPlayerId;
 
-        if (isPresident && gameState.vetoProposal?.vetoProposed) {
+        if (
+          isPresident &&
+          gameState.vetoProposal?.vetoProposed &&
+          gameState.vetoProposal.vetoResponse === undefined
+        ) {
           return (
             <VetoPromptView
               onAccept={onAcceptVeto}
