@@ -169,10 +169,12 @@ export function SpecialActionView({
           <CardTitle>{config.heading}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <p className="text-sm">{config.instructions}</p>
+          <p className="text-sm">
+            {SECRET_VILLAIN_COPY.specialAction.policyPeekInstructions}
+          </p>
           {onPeek && (
             <Button onClick={onPeek} disabled={!!isPending}>
-              {config.confirm}
+              {SECRET_VILLAIN_COPY.specialAction.policyPeekReveal}
             </Button>
           )}
         </CardContent>

@@ -73,7 +73,10 @@ export const SECRET_VILLAIN_COPY = {
     shootInstructions: "Select a player to execute.",
     shootConfirm: "Execute",
     policyPeekHeading: "Policy Peek",
-    policyPeekInstructions: "These are the top 3 cards of the policy deck.",
+    policyPeekInstructions:
+      "You may secretly look at the top 3 cards of the policy deck.",
+    policyPeekReveal: "Peek",
+    policyPeekCardsRevealed: "These are the top 3 cards of the policy deck.",
     policyPeekConfirm: "Done",
   },
   gameOver: {

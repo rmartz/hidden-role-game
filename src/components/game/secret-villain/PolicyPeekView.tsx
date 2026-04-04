@@ -25,7 +25,7 @@ export function PolicyPeekView({
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm">
-          {SECRET_VILLAIN_COPY.specialAction.policyPeekInstructions}
+          {SECRET_VILLAIN_COPY.specialAction.policyPeekCardsRevealed}
         </p>
         <div className="flex gap-2">
           {peekedCards.map((card, index) => (

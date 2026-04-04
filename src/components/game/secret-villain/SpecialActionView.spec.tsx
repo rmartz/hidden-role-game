@@ -161,7 +161,7 @@ describe("SpecialActionView", () => {
     );
     expect(
       screen.getByRole("button", {
-        name: SECRET_VILLAIN_COPY.specialAction.policyPeekConfirm,
+        name: SECRET_VILLAIN_COPY.specialAction.policyPeekReveal,
       }),
     ).toBeDefined();
     expect(
