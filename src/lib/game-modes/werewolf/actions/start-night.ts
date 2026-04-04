@@ -57,6 +57,7 @@ export const startNightAction: GameAction = {
           ? { oneEyedSeerLockedTargetId: ts.oneEyedSeerLockedTargetId }
           : {}),
         ...(ts.exposerAbilityUsed ? { exposerAbilityUsed: true } : {}),
+        ...(ts.morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),
         ...(ts.exposerReveal ? { exposerReveal: ts.exposerReveal } : {}),
         ...(ts.executionerTargetId
           ? { executionerTargetId: ts.executionerTargetId }
