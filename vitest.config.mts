@@ -8,8 +8,8 @@ export default defineConfig({
         test: {
           name: "node",
           environment: "node",
-          include: ["src/**/*.test.ts"],
-          exclude: ["src/hooks/**/*.test.ts"],
+          include: ["src/**/*.spec.ts"],
+          exclude: ["src/hooks/**/*.spec.ts"],
           setupFiles: ["src/test-setup/firebase-admin-mock.ts"],
         },
         resolve: { alias: { "@": path.resolve(import.meta.dirname, "./src") } },
@@ -18,7 +18,7 @@ export default defineConfig({
         test: {
           name: "hooks",
           environment: "happy-dom",
-          include: ["src/hooks/**/*.test.ts"],
+          include: ["src/hooks/**/*.spec.ts"],
         },
         resolve: { alias: { "@": path.resolve(import.meta.dirname, "./src") } },
       },
@@ -26,7 +26,7 @@ export default defineConfig({
         test: {
           name: "components",
           environment: "happy-dom",
-          include: ["src/**/*.test.tsx"],
+          include: ["src/**/*.spec.tsx"],
         },
         resolve: { alias: { "@": path.resolve(import.meta.dirname, "./src") } },
       },

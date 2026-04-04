@@ -6,13 +6,15 @@ import { WerewolfGameScreen } from "@/components/game";
 import { SecretVillainGameScreen } from "@/components/game/secret-villain";
 import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 
+export interface GameScreenForPlayerProps {
+  gameId: string;
+  gameMode: GameMode;
+}
+
 export function GameScreenForPlayer({
   gameId,
   gameMode,
-}: {
-  gameId: string;
-  gameMode: GameMode;
-}) {
+}: GameScreenForPlayerProps) {
   const {
     data: gameState,
     isLoading,

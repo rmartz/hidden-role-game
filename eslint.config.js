@@ -57,7 +57,7 @@ export default tseslint.config(
   },
   // Test files use Response.json() which inherently returns `any`; relax unsafe rules
   {
-    files: ["src/**/*.test.ts"],
+    files: ["src/**/*.spec.ts"],
     rules: {
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",
