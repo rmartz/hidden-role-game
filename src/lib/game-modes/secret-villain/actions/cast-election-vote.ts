@@ -29,7 +29,8 @@ export const castElectionVoteAction: GameAction = {
     const { vote } = payload as { vote: ElectionVote };
     ts.phase.votes = [...ts.phase.votes, { playerId: callerId, vote }];
 
-    // Auto-resolve when all alive players have voted.
+    // TODO(#373): Replace auto-resolve with manual trigger button + timer.
+    // For now, auto-resolve when all alive players have voted.
     const alivePlayerIds = game.players
       .map((p) => p.id)
       .filter((id) => !ts.eliminatedPlayerIds.includes(id));
