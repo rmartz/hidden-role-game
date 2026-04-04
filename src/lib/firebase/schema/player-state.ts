@@ -71,7 +71,8 @@ export interface FirebasePlayerState {
 }
 
 export function playerStateToFirebase(
-  state: PlayerGameState & Partial<WerewolfPlayerGameState>,
+  state: PlayerGameState &
+    Partial<Omit<WerewolfPlayerGameState, keyof PlayerGameState>>,
 ): FirebasePlayerState {
   return {
     statusJson: JSON.stringify(state.status),

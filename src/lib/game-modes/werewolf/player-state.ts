@@ -1,4 +1,5 @@
 import type { Team } from "@/lib/types";
+import type { WerewolfTimerConfig } from "./timer-config";
 import type { PlayerGameState, NightStatusEntry } from "@/server/types/game";
 import type { AnyNightAction, DaytimeVote } from "./types";
 
@@ -8,6 +9,8 @@ import type { AnyNightAction, DaytimeVote } from "./types";
  * should type their props as WerewolfPlayerGameState.
  */
 export interface WerewolfPlayerGameState extends PlayerGameState {
+  /** Override base timerConfig with Werewolf-specific timer fields. */
+  timerConfig: WerewolfTimerConfig;
   /** Whether player nominations for trial are enabled in this game. */
   nominationsEnabled: boolean;
   /** When true, only one trial is allowed per day phase. */

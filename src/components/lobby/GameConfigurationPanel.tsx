@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { GAME_MODES, getRoleSlotsRequired } from "@/lib/game-modes";
 import type { GameConfig } from "@/server/types";
 import { GameMode } from "@/lib/types";
+import type { WerewolfTimerConfig } from "@/lib/game-modes/werewolf/timer-config";
 import {
   WEREWOLF_ROLE_CATEGORY_LABELS,
   WEREWOLF_ROLE_CATEGORY_ORDER,
@@ -99,7 +100,7 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
         revealProtections: config.revealProtections,
         onShowRolesInPlayChange: undefined,
         onShowConfigToPlayersChange: undefined,
-        onTimerConfigChange: undefined,
+        onWerewolfTimerConfigChange: undefined,
         onNominationEnabledChange: undefined,
         onSingleTrialPerDayChange: undefined,
         onRevealProtectionsChange: undefined,
@@ -115,7 +116,7 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
           dispatch(setShowRolesInPlay(value)),
         onShowConfigToPlayersChange: (value: boolean) =>
           dispatch(setShowConfigToPlayers(value)),
-        onTimerConfigChange: (value: typeof timerConfig) =>
+        onWerewolfTimerConfigChange: (value: typeof timerConfig) =>
           dispatch(setTimerConfig(value)),
         onNominationEnabledChange: (value: boolean) =>
           dispatch(setNominationEnabled(value)),
@@ -133,12 +134,12 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
 
   const werewolfConfig = isWerewolf ? (
     <WerewolfConfigPanel
-      timerConfig={resolved.timerConfig}
+      timerConfig={resolved.timerConfig as WerewolfTimerConfig}
       nominationEnabled={resolved.nominationEnabled}
       singleTrialPerDay={resolved.singleTrialPerDay}
       revealProtections={resolved.revealProtections}
       disabled={disabled}
-      onTimerConfigChange={resolved.onTimerConfigChange}
+      onWerewolfTimerConfigChange={resolved.onWerewolfTimerConfigChange}
       onNominationEnabledChange={resolved.onNominationEnabledChange}
       onSingleTrialPerDayChange={resolved.onSingleTrialPerDayChange}
       onRevealProtectionsChange={resolved.onRevealProtectionsChange}
