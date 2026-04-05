@@ -2,9 +2,10 @@ import { SvBoardPreset } from "./types";
 
 export const SECRET_VILLAIN_COPY = {
   boardPresets: {
-    [SvBoardPreset.Small]: "5–6 Players",
-    [SvBoardPreset.Medium]: "7–8 Players",
+    [SvBoardPreset.Custom]: "Custom",
     [SvBoardPreset.Large]: "9–10 Players",
+    [SvBoardPreset.Medium]: "7–8 Players",
+    [SvBoardPreset.Small]: "5–6 Players",
   } satisfies Record<SvBoardPreset, string>,
   board: {
     goodTrack: "Good Policies",

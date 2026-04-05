@@ -12,6 +12,7 @@ export * from "./RoleConfigModePicker";
 export * from "./ShareLobby";
 export * from "./ShowRolesInPlayPicker";
 export * from "./TimerConfigPanel";
+export * from "./CustomPowerTableEditor";
 export * from "./SecretVillainConfigPanel";
 export * from "./SecretVillainTimerConfigPanel";
 export * from "./WerewolfConfigPanel";

@@ -14,6 +14,7 @@ import {
   SvBoardPreset,
 } from "../types";
 import type { SecretVillainTurnState, ElectionVotePhase } from "../types";
+import { BOARD_PRESETS } from "../utils";
 import { SecretVillainRole } from "../roles";
 import { nominateChancellorAction } from "./nominate-chancellor";
 import { castElectionVoteAction } from "./cast-election-vote";
@@ -54,6 +55,7 @@ function makeElectionGame(
     eliminatedPlayerIds: [],
     failedElectionCount: 0,
     boardPreset: SvBoardPreset.Medium,
+    powerTable: BOARD_PRESETS[SvBoardPreset.Medium],
     ...overrides.turnState,
   };
 

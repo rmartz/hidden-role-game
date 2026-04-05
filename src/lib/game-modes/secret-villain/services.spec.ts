@@ -15,6 +15,7 @@ import {
   DECK_BAD_CARDS,
   SvBoardPreset,
 } from "./types";
+import { BOARD_PRESETS } from "./utils";
 import type { SecretVillainTurnState } from "./types";
 import { SecretVillainRole } from "./roles";
 import { secretVillainServices } from "./services";
@@ -54,6 +55,7 @@ const baseTurnState: SecretVillainTurnState = {
   eliminatedPlayerIds: [],
   failedElectionCount: 0,
   boardPreset: SvBoardPreset.Medium,
+  powerTable: BOARD_PRESETS[SvBoardPreset.Medium],
 };
 
 function makeGame(turnState: SecretVillainTurnState): Game {
@@ -136,6 +138,33 @@ describe("buildInitialTurnState", () => {
     for (const id of playerIds) {
       expect(ts.presidentOrder).toContain(id);
     }
+  });
+
+  it("resolves power table from board preset", () => {
+    const ts = secretVillainServices.buildInitialTurnState(assignments, {
+      boardPreset: SvBoardPreset.Small,
+    }) as SecretVillainTurnState;
+    expect(ts.powerTable).toEqual(BOARD_PRESETS[SvBoardPreset.Small]);
+  });
+
+  it("resolves custom power table when preset is Custom", () => {
+    const customPowerTable = [
+      SpecialActionType.PolicyPeek,
+      SpecialActionType.InvestigateTeam,
+      undefined,
+    ];
+    const ts = secretVillainServices.buildInitialTurnState(assignments, {
+      boardPreset: SvBoardPreset.Custom,
+      customPowerTable,
+    }) as SecretVillainTurnState;
+    expect(ts.boardPreset).toBe(SvBoardPreset.Custom);
+    expect(ts.powerTable).toEqual([
+      SpecialActionType.PolicyPeek,
+      SpecialActionType.InvestigateTeam,
+      undefined,
+      SpecialActionType.Shoot,
+      SpecialActionType.Shoot,
+    ]);
   });
 });
 

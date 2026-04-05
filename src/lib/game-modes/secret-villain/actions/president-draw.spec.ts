@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { presidentDrawAction } from "./president-draw";
 import { SecretVillainPhase, PolicyCard, SvBoardPreset } from "../types";
 import type { SecretVillainTurnState } from "../types";
+import { BOARD_PRESETS } from "../utils";
 import {
   GameMode,
   GameStatus,
@@ -28,6 +29,7 @@ const baseTurnState: SecretVillainTurnState = {
   eliminatedPlayerIds: [],
   failedElectionCount: 0,
   boardPreset: SvBoardPreset.Medium,
+  powerTable: BOARD_PRESETS[SvBoardPreset.Medium],
 };
 
 function makeGame(ts: SecretVillainTurnState): Game {

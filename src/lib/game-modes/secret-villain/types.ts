@@ -38,9 +38,10 @@ export const CARDS_TO_WIN = 5;
 
 /** Preset board identifiers for Secret Villain power tables. */
 export enum SvBoardPreset {
-  Small = "small",
-  Medium = "medium",
+  Custom = "custom",
   Large = "large",
+  Medium = "medium",
+  Small = "small",
 }
 
 export enum SpecialActionType {
@@ -49,6 +50,26 @@ export enum SpecialActionType {
   SpecialElection = "special-election",
   Shoot = "shoot",
 }
+
+/** Power table: actions triggered when the Nth Bad card is played (index 0 = 1st card). */
+export type SvPowerTable = (SpecialActionType | undefined)[];
+
+/**
+ * Configurable power slot for custom boards (cards #1–#3).
+ * Shoot is excluded because cards #4-#5 are always locked to Shoot.
+ */
+export type SvCustomPowerSlot =
+  | SpecialActionType.InvestigateTeam
+  | SpecialActionType.PolicyPeek
+  | SpecialActionType.SpecialElection
+  | undefined;
+
+/** Custom power configuration for Bad cards #1–#3. */
+export type SvCustomPowerConfig = [
+  SvCustomPowerSlot,
+  SvCustomPowerSlot,
+  SvCustomPowerSlot,
+];
 
 /** Number of Bad cards that must be played before veto power is unlocked. */
 export const VETO_UNLOCK_THRESHOLD = 4;
@@ -176,4 +197,6 @@ export interface SecretVillainTurnState {
   specialPresidentId?: string;
   /** Which board preset determines special action powers. */
   boardPreset: SvBoardPreset;
+  /** Resolved power table for this game (5 entries, one per Bad card slot). */
+  powerTable: SvPowerTable;
 }

@@ -6,8 +6,11 @@ export {
 } from "./turn-state";
 export {
   BOARD_PRESETS,
+  DEFAULT_CUSTOM_POWER_CONFIG,
   getDefaultBoardPreset,
   getSpecialAction,
+  resolveCustomPowerTable,
+  resolvePowerTable,
 } from "./special-actions";
 export {
   SecretVillainWinner,

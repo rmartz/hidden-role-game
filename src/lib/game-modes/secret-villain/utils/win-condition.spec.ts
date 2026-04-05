@@ -7,6 +7,7 @@ import {
 } from "./win-condition";
 import type { SecretVillainTurnState } from "../types";
 import { SecretVillainPhase, PolicyCard, SvBoardPreset } from "../types";
+import { BOARD_PRESETS } from "./special-actions";
 import { SecretVillainRole } from "../roles";
 import type { PlayerRoleAssignment } from "@/lib/types";
 
@@ -26,6 +27,7 @@ const baseTurnState: SecretVillainTurnState = {
   eliminatedPlayerIds: [],
   failedElectionCount: 0,
   boardPreset: SvBoardPreset.Medium,
+  powerTable: BOARD_PRESETS[SvBoardPreset.Medium],
 };
 
 const roleAssignments: PlayerRoleAssignment[] = [
