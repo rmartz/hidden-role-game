@@ -6,7 +6,7 @@ import {
   checkChancellorElectionWinCondition,
 } from "./win-condition";
 import type { SecretVillainTurnState } from "../types";
-import { SecretVillainPhase, PolicyCard } from "../types";
+import { SecretVillainPhase, PolicyCard, SvBoardPreset } from "../types";
 import { SecretVillainRole } from "../roles";
 import type { PlayerRoleAssignment } from "@/lib/types";
 
@@ -25,6 +25,7 @@ const baseTurnState: SecretVillainTurnState = {
   discardPile: [],
   eliminatedPlayerIds: [],
   failedElectionCount: 0,
+  boardPreset: SvBoardPreset.Medium,
 };
 
 const roleAssignments: PlayerRoleAssignment[] = [

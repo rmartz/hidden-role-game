@@ -13,6 +13,7 @@ import {
   SpecialActionType,
   DECK_GOOD_CARDS,
   DECK_BAD_CARDS,
+  SvBoardPreset,
 } from "./types";
 import type { SecretVillainTurnState } from "./types";
 import { SecretVillainRole } from "./roles";
@@ -52,6 +53,7 @@ const baseTurnState: SecretVillainTurnState = {
   discardPile: [],
   eliminatedPlayerIds: [],
   failedElectionCount: 0,
+  boardPreset: SvBoardPreset.Medium,
 };
 
 function makeGame(turnState: SecretVillainTurnState): Game {

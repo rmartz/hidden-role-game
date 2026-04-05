@@ -67,6 +67,9 @@ export async function POST(
       nominationsEnabled: lobby.config.nominationsEnabled,
       singleTrialPerDay: lobby.config.singleTrialPerDay,
       revealProtections: lobby.config.revealProtections,
+      ...(lobby.config.boardPreset
+        ? { boardPreset: lobby.config.boardPreset }
+        : {}),
     },
   );
 

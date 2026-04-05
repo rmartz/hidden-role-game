@@ -3,6 +3,7 @@ import {
   SecretVillainPhase,
   type SecretVillainTurnState,
   PolicyCard,
+  SvBoardPreset,
 } from "../types";
 import { getNextPresidentId, getEligibleChancellorIds } from "./turn-state";
 
@@ -24,6 +25,7 @@ function makeTurnState(
     discardPile: [] as PolicyCard[],
     eliminatedPlayerIds: [],
     failedElectionCount: 0,
+    boardPreset: SvBoardPreset.Medium,
     ...overrides,
   };
 }

@@ -11,6 +11,7 @@ import {
   PolicyCard,
   FAILED_ELECTION_THRESHOLD,
   BAD_CARDS_FOR_SPECIAL_BAD_WIN,
+  SvBoardPreset,
 } from "../types";
 import type { SecretVillainTurnState, ElectionVotePhase } from "../types";
 import { SecretVillainRole } from "../roles";
@@ -52,6 +53,7 @@ function makeElectionGame(
     discardPile: [],
     eliminatedPlayerIds: [],
     failedElectionCount: 0,
+    boardPreset: SvBoardPreset.Medium,
     ...overrides.turnState,
   };
 

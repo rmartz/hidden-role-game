@@ -6,7 +6,12 @@ import {
   ShowRolesInPlay,
 } from "@/lib/types";
 import type { Game } from "@/lib/types";
-import { SecretVillainPhase, SpecialActionType, PolicyCard } from "../types";
+import {
+  SecretVillainPhase,
+  SpecialActionType,
+  PolicyCard,
+  SvBoardPreset,
+} from "../types";
 import type { SecretVillainTurnState, SpecialActionPhase } from "../types";
 import { SecretVillainRole } from "../roles";
 import {
@@ -46,6 +51,7 @@ function makeSpecialActionGame(
     discardPile: [],
     eliminatedPlayerIds: [],
     failedElectionCount: 0,
+    boardPreset: SvBoardPreset.Medium,
     ...overrides,
   };
 

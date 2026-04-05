@@ -6,6 +6,7 @@ import type {
   TimerConfig,
 } from "@/lib/types";
 import { DEFAULT_TIMER_CONFIG } from "@/lib/types";
+import type { SvBoardPreset } from "@/lib/game-modes/secret-villain/types";
 import type { PublicLobby } from "@/server/types";
 
 export interface FirebaseLobbyPublic {
@@ -38,6 +39,7 @@ export interface FirebaseLobbyConfig {
   nominationsEnabled?: boolean;
   singleTrialPerDay?: boolean;
   revealProtections?: boolean;
+  boardPreset?: SvBoardPreset;
 }
 
 export interface FirebaseRoleSlot {
@@ -98,6 +100,7 @@ function lobbyConfigToFirebase(config: LobbyConfig): FirebaseLobbyConfig {
     nominationsEnabled: config.nominationsEnabled,
     singleTrialPerDay: config.singleTrialPerDay,
     revealProtections: config.revealProtections,
+    ...(config.boardPreset ? { boardPreset: config.boardPreset } : {}),
   };
 }
 
@@ -135,6 +138,9 @@ export function firebaseToLobby(
       nominationsEnabled: pub.config.nominationsEnabled ?? false,
       singleTrialPerDay: pub.config.singleTrialPerDay ?? false,
       revealProtections: pub.config.revealProtections ?? false,
+      ...(pub.config.boardPreset
+        ? { boardPreset: pub.config.boardPreset }
+        : {}),
     },
     readyPlayerIds: pub.readyPlayerIds ?? [],
     ...(pub.gameId ? { gameId: pub.gameId } : {}),
@@ -210,6 +216,9 @@ export function firebaseToPublicLobby(
       nominationsEnabled: pub.config.nominationsEnabled ?? false,
       singleTrialPerDay: pub.config.singleTrialPerDay ?? false,
       revealProtections: pub.config.revealProtections ?? false,
+      ...(pub.config.boardPreset
+        ? { boardPreset: pub.config.boardPreset }
+        : {}),
     },
     readyPlayerIds: pub.readyPlayerIds ?? [],
     ...(pub.gameId ? { gameId: pub.gameId } : {}),

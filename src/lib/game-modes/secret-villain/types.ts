@@ -36,6 +36,13 @@ export const CARDS_TO_WIN = 5;
 // Special action types
 // ---------------------------------------------------------------------------
 
+/** Preset board identifiers for Secret Villain power tables. */
+export enum SvBoardPreset {
+  Small = "small",
+  Medium = "medium",
+  Large = "large",
+}
+
 export enum SpecialActionType {
   InvestigateTeam = "investigate-team",
   PolicyPeek = "policy-peek",
@@ -167,4 +174,6 @@ export interface SecretVillainTurnState {
    * next turn, after which the normal rotation resumes.
    */
   specialPresidentId?: string;
+  /** Which board preset determines special action powers. */
+  boardPreset: SvBoardPreset;
 }

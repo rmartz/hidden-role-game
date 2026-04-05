@@ -1,3 +1,5 @@
+import type { SvBoardPreset } from "@/lib/game-modes/secret-villain/types";
+
 export interface LobbyPlayer {
   id: string;
   name: string;
@@ -262,6 +264,8 @@ export interface LobbyConfig {
   singleTrialPerDay: boolean;
   /** When true, the night summary reveals players who were attacked but saved by protection. */
   revealProtections: boolean;
+  /** Secret Villain board preset (determines special action powers). */
+  boardPreset?: SvBoardPreset;
 }
 
 export interface Lobby {
