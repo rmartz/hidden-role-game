@@ -8,7 +8,7 @@ import {
   parseGameMode,
   toPublicLobby,
 } from "@/server/utils";
-import { getRoleSlotsRequired } from "@/lib/game-modes";
+import { getRoleSlotsRequired, isGameModeEnabled } from "@/lib/game-modes";
 
 export async function POST(
   request: Request,
@@ -17,6 +17,8 @@ export async function POST(
   const { gameMode: gameModeParam } = await params;
   const gameMode = parseGameMode(gameModeParam);
   if (!gameMode) return errorResponse("Unknown game mode", 400);
+  if (!isGameModeEnabled(gameMode))
+    return errorResponse("Game mode is not available", 400);
 
   const sessionId = request.headers.get("x-session-id") ?? undefined;
   const { lobbyId } = (await request.json()) as CreateGameRequest;

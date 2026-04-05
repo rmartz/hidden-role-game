@@ -12,6 +12,7 @@ import { werewolfServices } from "./services";
 
 export const WEREWOLF_CONFIG = {
   name: "Werewolf",
+  released: true,
   minPlayers: MIN_PLAYERS,
   ownerTitle: "Narrator",
   teamLabels: {

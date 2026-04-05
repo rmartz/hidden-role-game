@@ -148,6 +148,8 @@ export interface GameModeServices {
 
 export interface GameModeConfig {
   readonly name: string;
+  /** Whether this game mode is available in production. Unreleased modes are only visible in development. */
+  readonly released: boolean;
   readonly minPlayers: number;
   readonly ownerTitle: string | null;
   readonly roles: Record<string, RoleDefinition<string, Team>>;

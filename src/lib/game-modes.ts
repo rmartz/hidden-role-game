@@ -20,6 +20,22 @@ export const GAME_MODES: Record<GameMode, GameModeConfig> = {
   [GameMode.Werewolf]: WEREWOLF_CONFIG,
 };
 
+const isDev = process.env.NODE_ENV !== "production";
+
+/** Returns whether a game mode is available in the current environment. */
+export function isGameModeEnabled(mode: GameMode): boolean {
+  return GAME_MODES[mode].released || isDev;
+}
+
+/** Game modes available in the current environment, sorted alphabetically by name. */
+export const ENABLED_GAME_MODES: GameMode[] = Object.values(GameMode)
+  .filter(isGameModeEnabled)
+  .sort((a, b) => GAME_MODES[a].name.localeCompare(GAME_MODES[b].name));
+
+/** The default game mode — first alphabetical released mode. */
+export const DEFAULT_GAME_MODE: GameMode =
+  ENABLED_GAME_MODES.find((m) => GAME_MODES[m].released) ?? GameMode.Werewolf;
+
 export function getDefaultRoleSlots(
   gameMode: GameMode,
   playerCount: number,

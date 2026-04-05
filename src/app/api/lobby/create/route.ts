@@ -1,7 +1,9 @@
 import { randomUUID } from "crypto";
 import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
 import {
+  DEFAULT_GAME_MODE,
   getDefaultRoleSlots,
+  isGameModeEnabled,
   parseGameMode,
   GAME_MODES,
 } from "@/lib/game-modes";
@@ -33,9 +35,11 @@ export async function POST(request: Request): Promise<Response> {
   if (body.gameMode) {
     const parsed = parseGameMode(body.gameMode);
     if (!parsed) return errorResponse("Unknown game mode", 400);
+    if (!isGameModeEnabled(parsed))
+      return errorResponse("Game mode is not available", 400);
     selectedGameMode = parsed;
   } else {
-    selectedGameMode = GameMode.SecretVillain;
+    selectedGameMode = DEFAULT_GAME_MODE;
   }
   const lobby = {
     id: randomUUID(),
