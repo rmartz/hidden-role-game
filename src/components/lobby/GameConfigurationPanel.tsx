@@ -151,6 +151,7 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
     <SecretVillainConfigPanel
       timerConfig={activeTimerConfig as SecretVillainTimerConfig}
       modeConfig={activeModeConfigData}
+      playerCount={playerCount}
       disabled={disabled}
       onTimerConfigChange={
         onTimerConfigChange as

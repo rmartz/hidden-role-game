@@ -6,7 +6,11 @@ import type { SecretVillainLobbyConfig } from "@/lib/game-modes/secret-villain/l
 import { SvBoardPreset } from "@/lib/game-modes/secret-villain/types";
 import type { SvCustomPowerConfig } from "@/lib/game-modes/secret-villain/types";
 import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
-import { DEFAULT_CUSTOM_POWER_CONFIG } from "@/lib/game-modes/secret-villain/utils";
+import {
+  getDefaultBoardPreset,
+  presetToCustomConfig,
+  type SvConcretePreset,
+} from "@/lib/game-modes/secret-villain/utils";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -19,9 +23,19 @@ import { SecretVillainTimerConfigPanel } from "./SecretVillainTimerConfigPanel";
 import { SECRET_VILLAIN_CONFIG_PANEL_COPY } from "./SecretVillainConfigPanel.copy";
 import { CustomPowerTableEditor } from "./CustomPowerTableEditor";
 
+/** Display order for the board preset dropdown. */
+const PRESET_DISPLAY_ORDER: SvBoardPreset[] = [
+  SvBoardPreset.Default,
+  SvBoardPreset.Small,
+  SvBoardPreset.Medium,
+  SvBoardPreset.Large,
+  SvBoardPreset.Custom,
+];
+
 interface SecretVillainConfigPanelProps {
   timerConfig: SecretVillainTimerConfig;
   modeConfig: SecretVillainLobbyConfig["modeConfig"];
+  playerCount: number;
   disabled?: boolean;
   onTimerConfigChange?: (config: SecretVillainTimerConfig) => void;
   onModeConfigFieldChange?: (key: ModeConfigField, value: unknown) => void;
@@ -30,14 +44,25 @@ interface SecretVillainConfigPanelProps {
 export function SecretVillainConfigPanel({
   timerConfig,
   modeConfig,
+  playerCount,
   disabled,
   onTimerConfigChange,
   onModeConfigFieldChange,
 }: SecretVillainConfigPanelProps) {
   const currentPreset = modeConfig.boardPreset ?? "";
   const isCustom = currentPreset === SvBoardPreset.Custom;
+  const presetLabel =
+    currentPreset === "" ? "" : SECRET_VILLAIN_COPY.boardPresets[currentPreset];
+
+  const previousConcretePreset: SvConcretePreset =
+    currentPreset !== "" &&
+    currentPreset !== SvBoardPreset.Custom &&
+    currentPreset !== SvBoardPreset.Default
+      ? (currentPreset as SvConcretePreset)
+      : getDefaultBoardPreset(playerCount);
+
   const customPowerTable: SvCustomPowerConfig =
-    modeConfig.customPowerTable ?? DEFAULT_CUSTOM_POWER_CONFIG;
+    modeConfig.customPowerTable ?? presetToCustomConfig(previousConcretePreset);
 
   const handlePresetChange = (value: string | null) => {
     if (!value) return;
@@ -48,7 +73,7 @@ export function SecretVillainConfigPanel({
     ) {
       onModeConfigFieldChange?.(
         "customPowerTable",
-        DEFAULT_CUSTOM_POWER_CONFIG,
+        presetToCustomConfig(previousConcretePreset),
       );
     }
   };
@@ -65,10 +90,10 @@ export function SecretVillainConfigPanel({
           onValueChange={handlePresetChange}
         >
           <SelectTrigger id="board-preset" className="w-[180px]">
-            <SelectValue />
+            <SelectValue>{presetLabel}</SelectValue>
           </SelectTrigger>
           <SelectContent>
-            {Object.values(SvBoardPreset).map((preset) => (
+            {PRESET_DISPLAY_ORDER.map((preset) => (
               <SelectItem key={preset} value={preset}>
                 {SECRET_VILLAIN_COPY.boardPresets[preset]}
               </SelectItem>

@@ -36,6 +36,10 @@ function parseCustomPowerSlot(value: unknown): SvCustomPowerSlot {
   return undefined;
 }
 
+/**
+ * Parse a raw custom power table from Firebase. Firebase serializes `undefined`
+ * array entries as `null`, so non-string values are normalized back to `undefined`.
+ */
 function parseCustomPowerTable(raw: unknown): SvCustomPowerConfig | undefined {
   if (!Array.isArray(raw) || raw.length < 3) return undefined;
   return [

@@ -3,8 +3,10 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { SecretVillainConfigPanel } from "./SecretVillainConfigPanel";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game-modes/secret-villain/timer-config";
 import { GameMode } from "@/lib/types";
-import { SvBoardPreset } from "@/lib/game-modes/secret-villain/types";
-import { SpecialActionType } from "@/lib/game-modes/secret-villain/types";
+import {
+  SvBoardPreset,
+  SpecialActionType,
+} from "@/lib/game-modes/secret-villain/types";
 import { SECRET_VILLAIN_CONFIG_PANEL_COPY } from "./SecretVillainConfigPanel.copy";
 import { SECRET_VILLAIN_TIMER_CONFIG_PANEL_COPY } from "./SecretVillainTimerConfigPanel.copy";
 import { TIMER_CONFIG_COPY } from "./TimerConfigPanel.copy";
@@ -14,6 +16,7 @@ afterEach(cleanup);
 const defaultProps = {
   timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
   modeConfig: { gameMode: GameMode.SecretVillain as const },
+  playerCount: 6,
   onTimerConfigChange: vi.fn(),
   onModeConfigFieldChange: vi.fn(),
 };
@@ -62,6 +65,7 @@ describe("SecretVillainConfigPanel", () => {
       <SecretVillainConfigPanel
         timerConfig={DEFAULT_SECRET_VILLAIN_TIMER_CONFIG}
         modeConfig={defaultProps.modeConfig}
+        playerCount={6}
       />,
     );
     const trigger = screen.getByRole("combobox");

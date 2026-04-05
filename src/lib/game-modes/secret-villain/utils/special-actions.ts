@@ -1,10 +1,13 @@
 import { SpecialActionType, SvBoardPreset } from "../types";
 import type { SvCustomPowerConfig, SvPowerTable } from "../types";
 
-export const BOARD_PRESETS: Record<
-  Exclude<SvBoardPreset, SvBoardPreset.Custom>,
-  SvPowerTable
-> = {
+/** Concrete preset type — excludes virtual presets (Custom, Default). */
+export type SvConcretePreset = Exclude<
+  SvBoardPreset,
+  SvBoardPreset.Custom | SvBoardPreset.Default
+>;
+
+export const BOARD_PRESETS: Record<SvConcretePreset, SvPowerTable> = {
   [SvBoardPreset.Large]: [
     SpecialActionType.InvestigateTeam, // 1st Bad card
     SpecialActionType.InvestigateTeam, // 2nd
@@ -36,7 +39,7 @@ export const DEFAULT_CUSTOM_POWER_CONFIG: SvCustomPowerConfig = [
 ];
 
 /** Returns the recommended board preset for a given player count. */
-export function getDefaultBoardPreset(playerCount: number): SvBoardPreset {
+export function getDefaultBoardPreset(playerCount: number): SvConcretePreset {
   if (playerCount <= 6) return SvBoardPreset.Small;
   if (playerCount <= 8) return SvBoardPreset.Medium;
   return SvBoardPreset.Large;
@@ -53,13 +56,30 @@ export function resolveCustomPowerTable(
 export function resolvePowerTable(
   preset: SvBoardPreset,
   customPowerTable?: SvCustomPowerConfig,
+  playerCount?: number,
 ): SvPowerTable {
   if (preset === SvBoardPreset.Custom) {
     return resolveCustomPowerTable(
       customPowerTable ?? DEFAULT_CUSTOM_POWER_CONFIG,
     );
   }
-  return BOARD_PRESETS[preset];
+  const concrete =
+    preset === SvBoardPreset.Default
+      ? getDefaultBoardPreset(playerCount ?? 5)
+      : (preset as SvConcretePreset);
+  return BOARD_PRESETS[concrete];
+}
+
+/** Extract the configurable portion (cards #1–#3) from a preset's power table. */
+export function presetToCustomConfig(
+  preset: SvConcretePreset,
+): SvCustomPowerConfig {
+  const table = BOARD_PRESETS[preset];
+  return [
+    table[0] as SvCustomPowerConfig[0],
+    table[1] as SvCustomPowerConfig[1],
+    table[2] as SvCustomPowerConfig[2],
+  ];
 }
 
 /**

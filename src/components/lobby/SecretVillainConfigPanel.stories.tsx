@@ -19,6 +19,7 @@ export const Default: Story = {
   args: {
     timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
     modeConfig: { gameMode: GameMode.SecretVillain },
+    playerCount: 6,
     onTimerConfigChange: fn(),
     onModeConfigFieldChange: fn(),
   },
@@ -31,6 +32,7 @@ export const WithBoardPreset: Story = {
       gameMode: GameMode.SecretVillain,
       boardPreset: SvBoardPreset.Large,
     },
+    playerCount: 9,
     onTimerConfigChange: fn(),
     onModeConfigFieldChange: fn(),
   },
@@ -48,6 +50,7 @@ export const WithCustomPreset: Story = {
         SpecialActionType.SpecialElection,
       ],
     },
+    playerCount: 7,
     onTimerConfigChange: fn(),
     onModeConfigFieldChange: fn(),
   },
@@ -60,6 +63,7 @@ export const ReadOnly: Story = {
       gameMode: GameMode.SecretVillain,
       boardPreset: SvBoardPreset.Medium,
     },
+    playerCount: 7,
     disabled: true,
   },
 };

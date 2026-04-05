@@ -40,8 +40,16 @@ const POWER_OPTIONS: { value: string; label: string }[] = [
   },
 ];
 
+const POWER_LABELS: Record<string, string> = Object.fromEntries(
+  POWER_OPTIONS.map((o) => [o.value, o.label]),
+);
+
 function toSelectValue(slot: SvCustomPowerSlot): string {
   return slot ?? NONE_VALUE;
+}
+
+function toSelectLabel(slot: SvCustomPowerSlot): string {
+  return POWER_LABELS[slot ?? NONE_VALUE] ?? "";
 }
 
 function fromSelectValue(value: string): SvCustomPowerSlot {
@@ -78,7 +86,7 @@ export function CustomPowerTableEditor({
             }}
           >
             <SelectTrigger className="w-[180px]">
-              <SelectValue />
+              <SelectValue>{toSelectLabel(slot)}</SelectValue>
             </SelectTrigger>
             <SelectContent>
               {POWER_OPTIONS.map((option) => (

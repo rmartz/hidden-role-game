@@ -39,6 +39,7 @@ export const CARDS_TO_WIN = 5;
 /** Preset board identifiers for Secret Villain power tables. */
 export enum SvBoardPreset {
   Custom = "custom",
+  Default = "default",
   Large = "large",
   Medium = "medium",
   Small = "small",

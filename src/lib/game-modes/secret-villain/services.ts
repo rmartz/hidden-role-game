@@ -68,7 +68,11 @@ export const secretVillainServices: GameModeServices = {
     const customPowerTable = options?.["customPowerTable"] as
       | SvCustomPowerConfig
       | undefined;
-    const powerTable = resolvePowerTable(boardPreset, customPowerTable);
+    const powerTable = resolvePowerTable(
+      boardPreset,
+      customPowerTable,
+      playerIds.length,
+    );
 
     return {
       turn: 1,

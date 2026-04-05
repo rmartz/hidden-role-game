@@ -4,6 +4,7 @@ import type { SvCustomPowerConfig } from "../types";
 import {
   BOARD_PRESETS,
   getSpecialAction,
+  presetToCustomConfig,
   resolveCustomPowerTable,
   resolvePowerTable,
 } from "./special-actions";
@@ -159,6 +160,42 @@ describe("resolvePowerTable", () => {
       undefined,
       SpecialActionType.Shoot,
       SpecialActionType.Shoot,
+    ]);
+  });
+
+  it("resolves Default preset to Small for 5 players", () => {
+    expect(resolvePowerTable(SvBoardPreset.Default, undefined, 5)).toBe(
+      BOARD_PRESETS[SvBoardPreset.Small],
+    );
+  });
+
+  it("resolves Default preset to Medium for 8 players", () => {
+    expect(resolvePowerTable(SvBoardPreset.Default, undefined, 8)).toBe(
+      BOARD_PRESETS[SvBoardPreset.Medium],
+    );
+  });
+
+  it("resolves Default preset to Large for 10 players", () => {
+    expect(resolvePowerTable(SvBoardPreset.Default, undefined, 10)).toBe(
+      BOARD_PRESETS[SvBoardPreset.Large],
+    );
+  });
+});
+
+describe("presetToCustomConfig", () => {
+  it("extracts cards #1-#3 from Small preset", () => {
+    expect(presetToCustomConfig(SvBoardPreset.Small)).toEqual([
+      undefined,
+      undefined,
+      SpecialActionType.PolicyPeek,
+    ]);
+  });
+
+  it("extracts cards #1-#3 from Large preset", () => {
+    expect(presetToCustomConfig(SvBoardPreset.Large)).toEqual([
+      SpecialActionType.InvestigateTeam,
+      SpecialActionType.InvestigateTeam,
+      SpecialActionType.SpecialElection,
     ]);
   });
 });

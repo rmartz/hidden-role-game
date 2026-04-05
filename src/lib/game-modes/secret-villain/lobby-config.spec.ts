@@ -72,4 +72,11 @@ describe("parseSecretVillainModeConfig", () => {
     expect(result.boardPreset).toBe(SvBoardPreset.Custom);
     expect(result.customPowerTable).toBeUndefined();
   });
+
+  it("parses Default board preset", () => {
+    const result = parseSecretVillainModeConfig({
+      boardPreset: SvBoardPreset.Default,
+    });
+    expect(result.boardPreset).toBe(SvBoardPreset.Default);
+  });
 });
