@@ -11,6 +11,7 @@ import {
   PolicyCard,
   CARDS_TO_WIN,
   SpecialActionType,
+  SvBoardPreset,
 } from "../types";
 import type { SecretVillainTurnState, PolicyChancellorPhase } from "../types";
 import { SecretVillainRole } from "../roles";
@@ -54,6 +55,7 @@ function makePolicyGame(
     discardPile: [],
     eliminatedPlayerIds: [],
     failedElectionCount: 0,
+    boardPreset: SvBoardPreset.Medium,
     ...overrides.turnState,
   };
 

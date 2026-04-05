@@ -1,46 +1,56 @@
-import { SpecialActionType } from "../types";
+import { SpecialActionType, SvBoardPreset } from "../types";
 
-/**
- * Special action power tables indexed by badCardsPlayed count (1-5).
- * Each table maps to the action triggered when the Nth Bad card is played.
- * undefined = no special action for that card.
- */
-const POWERS_5_6: (SpecialActionType | undefined)[] = [
-  undefined, // 1st Bad card
-  undefined, // 2nd Bad card
-  SpecialActionType.PolicyPeek, // 3rd
-  SpecialActionType.Shoot, // 4th
-  SpecialActionType.Shoot, // 5th
-];
+/** Power table: actions triggered when the Nth Bad card is played (index 0 = 1st card). */
+export type SvPowerTable = (SpecialActionType | undefined)[];
 
-const POWERS_7_8: (SpecialActionType | undefined)[] = [
-  undefined, // 1st Bad card
-  SpecialActionType.InvestigateTeam, // 2nd
-  SpecialActionType.SpecialElection, // 3rd
-  SpecialActionType.Shoot, // 4th
-  SpecialActionType.Shoot, // 5th
-];
+export const BOARD_PRESETS: Record<SvBoardPreset, SvPowerTable> = {
+  [SvBoardPreset.Small]: [
+    undefined, // 1st Bad card
+    undefined, // 2nd Bad card
+    SpecialActionType.PolicyPeek, // 3rd
+    SpecialActionType.Shoot, // 4th
+    SpecialActionType.Shoot, // 5th
+  ],
+  [SvBoardPreset.Medium]: [
+    undefined, // 1st Bad card
+    SpecialActionType.InvestigateTeam, // 2nd
+    SpecialActionType.SpecialElection, // 3rd
+    SpecialActionType.Shoot, // 4th
+    SpecialActionType.Shoot, // 5th
+  ],
+  [SvBoardPreset.Large]: [
+    SpecialActionType.InvestigateTeam, // 1st Bad card
+    SpecialActionType.InvestigateTeam, // 2nd
+    SpecialActionType.SpecialElection, // 3rd
+    SpecialActionType.Shoot, // 4th
+    SpecialActionType.Shoot, // 5th
+  ],
+};
 
-const POWERS_9_10: (SpecialActionType | undefined)[] = [
-  SpecialActionType.InvestigateTeam, // 1st Bad card
-  SpecialActionType.InvestigateTeam, // 2nd
-  SpecialActionType.SpecialElection, // 3rd
-  SpecialActionType.Shoot, // 4th
-  SpecialActionType.Shoot, // 5th
-];
+/** Board preset labels for display in the config panel. */
+export const BOARD_PRESET_LABELS: Record<SvBoardPreset, string> = {
+  [SvBoardPreset.Small]: "5–6 Players",
+  [SvBoardPreset.Medium]: "7–8 Players",
+  [SvBoardPreset.Large]: "9–10 Players",
+};
+
+/** Returns the recommended board preset for a given player count. */
+export function getDefaultBoardPreset(playerCount: number): SvBoardPreset {
+  if (playerCount <= 6) return SvBoardPreset.Small;
+  if (playerCount <= 8) return SvBoardPreset.Medium;
+  return SvBoardPreset.Large;
+}
 
 /**
  * Returns the special action triggered by playing the Nth Bad card,
  * or undefined if no action is triggered.
  *
  * @param badCardsPlayed — the count AFTER the card has been played (1-5)
- * @param playerCount — total players in the game (including eliminated)
+ * @param preset — the board preset to use
  */
 export function getSpecialAction(
   badCardsPlayed: number,
-  playerCount: number,
+  preset: SvBoardPreset,
 ): SpecialActionType | undefined {
-  const powers =
-    playerCount <= 6 ? POWERS_5_6 : playerCount <= 8 ? POWERS_7_8 : POWERS_9_10;
-  return powers[badCardsPlayed - 1];
+  return BOARD_PRESETS[preset][badCardsPlayed - 1];
 }

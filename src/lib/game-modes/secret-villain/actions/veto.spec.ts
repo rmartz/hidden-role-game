@@ -10,6 +10,7 @@ import {
   SecretVillainPhase,
   PolicyCard,
   VETO_UNLOCK_THRESHOLD,
+  SvBoardPreset,
 } from "../types";
 import type { SecretVillainTurnState, PolicyChancellorPhase } from "../types";
 import { SecretVillainRole } from "../roles";
@@ -44,6 +45,7 @@ function makeChancellorGame(
     discardPile: [],
     eliminatedPlayerIds: [],
     failedElectionCount: 0,
+    boardPreset: SvBoardPreset.Medium,
     ...overrides,
   };
 

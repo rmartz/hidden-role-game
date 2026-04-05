@@ -3,9 +3,11 @@ import type { Game, GameModeServices, PlayerRoleAssignment } from "@/lib/types";
 import {
   SecretVillainPhase,
   SpecialActionType,
+  SvBoardPreset,
   VETO_UNLOCK_THRESHOLD,
 } from "./types";
 import type { SecretVillainTurnState } from "./types";
+import { getDefaultBoardPreset } from "./utils";
 import { createDeck, getEligibleChancellorIds } from "./utils";
 
 function shuffle<T>(array: T[]): T[] {
@@ -48,12 +50,17 @@ function buildPhaseInfo(
 export const secretVillainServices: GameModeServices = {
   buildInitialTurnState(
     roleAssignments: PlayerRoleAssignment[],
+    options?: Record<string, unknown>,
   ): SecretVillainTurnState {
     const playerIds = shuffle(roleAssignments.map((a) => a.playerId));
     const firstPresidentId = playerIds[0];
     if (!firstPresidentId) {
       throw new Error("No players to initialize Secret Villain game");
     }
+
+    const boardPreset =
+      (options?.["boardPreset"] as SvBoardPreset | undefined) ??
+      getDefaultBoardPreset(playerIds.length);
 
     return {
       turn: 1,
@@ -70,6 +77,7 @@ export const secretVillainServices: GameModeServices = {
       discardPile: [],
       eliminatedPlayerIds: [],
       failedElectionCount: 0,
+      boardPreset,
     };
   },
 

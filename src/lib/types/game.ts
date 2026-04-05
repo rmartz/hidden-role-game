@@ -262,6 +262,8 @@ export interface LobbyConfig {
   singleTrialPerDay: boolean;
   /** When true, the night summary reveals players who were attacked but saved by protection. */
   revealProtections: boolean;
+  /** Secret Villain board preset (determines special action powers). */
+  boardPreset?: string;
 }
 
 export interface Lobby {

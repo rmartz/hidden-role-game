@@ -4,7 +4,12 @@ export {
   getNextPresidentId,
   getEligibleChancellorIds,
 } from "./turn-state";
-export { getSpecialAction } from "./special-actions";
+export {
+  BOARD_PRESETS,
+  BOARD_PRESET_LABELS,
+  getDefaultBoardPreset,
+  getSpecialAction,
+} from "./special-actions";
 export {
   SecretVillainWinner,
   checkBoardWinCondition,

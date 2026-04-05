@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { presidentDrawAction } from "./president-draw";
-import { SecretVillainPhase, PolicyCard } from "../types";
+import { SecretVillainPhase, PolicyCard, SvBoardPreset } from "../types";
 import type { SecretVillainTurnState } from "../types";
 import {
   GameMode,
@@ -27,6 +27,7 @@ const baseTurnState: SecretVillainTurnState = {
   discardPile: [],
   eliminatedPlayerIds: [],
   failedElectionCount: 0,
+  boardPreset: SvBoardPreset.Medium,
 };
 
 function makeGame(ts: SecretVillainTurnState): Game {

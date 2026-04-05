@@ -188,6 +188,7 @@ export class FirebaseLobbyService {
       nominationsEnabled?: boolean;
       singleTrialPerDay?: boolean;
       revealProtections?: boolean;
+      boardPreset?: string;
     },
   ): Promise<Lobby | undefined> {
     const snap = await lobbyRef(lobbyId).once("value");
@@ -242,6 +243,10 @@ export class FirebaseLobbyService {
     if (config.revealProtections !== undefined) {
       updates["public/config/revealProtections"] = config.revealProtections;
       data.public.config.revealProtections = config.revealProtections;
+    }
+    if (config.boardPreset !== undefined) {
+      updates["public/config/boardPreset"] = config.boardPreset;
+      data.public.config.boardPreset = config.boardPreset;
     }
 
     if (Object.keys(updates).length > 0) {
