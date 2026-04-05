@@ -34,9 +34,7 @@ export const ENABLED_GAME_MODES: GameMode[] = Object.values(GameMode)
 
 /** The default game mode — first alphabetical released mode. */
 export const DEFAULT_GAME_MODE: GameMode =
-  ENABLED_GAME_MODES.find((m) => GAME_MODES[m].released) ??
-  ENABLED_GAME_MODES[0] ??
-  GameMode.Werewolf;
+  ENABLED_GAME_MODES.find((m) => GAME_MODES[m].released) ?? GameMode.Werewolf;
 
 export function getDefaultRoleSlots(
   gameMode: GameMode,

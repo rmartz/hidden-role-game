@@ -5,6 +5,7 @@ import {
   ENABLED_GAME_MODES,
   GAME_MODES,
   isGameModeEnabled,
+  parseGameMode,
 } from "@/lib/game-modes";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { setGameMode } from "@/store/game-config-slice";
@@ -19,7 +20,9 @@ import {
 import { GAME_MODE_PICKER_COPY } from "./GameModePicker.copy";
 
 function isEnabledGameMode(value: string | null): value is GameMode {
-  return value !== null && isGameModeEnabled(value as GameMode);
+  if (value === null) return false;
+  const parsed = parseGameMode(value);
+  return parsed !== undefined && isGameModeEnabled(parsed);
 }
 
 export function GameModePicker() {
