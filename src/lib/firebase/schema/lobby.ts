@@ -6,8 +6,6 @@ import type {
   TimerConfig,
 } from "@/lib/types";
 import { DEFAULT_TIMER_CONFIG } from "@/lib/types";
-import type { WerewolfTimerConfig } from "@/lib/game-modes/werewolf/timer-config";
-import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game-modes/werewolf/timer-config";
 import type { PublicLobby } from "@/server/types";
 
 export interface FirebaseLobbyPublic {
@@ -148,14 +146,14 @@ export function firebaseToRoleSlot(s: FirebaseRoleSlot): RoleSlot {
 }
 
 /**
- * Parses a raw Firebase TimerConfig, filling missing fields with defaults.
- * Returns a WerewolfTimerConfig since DEFAULT_TIMER_CONFIG includes all fields.
- * Non-Werewolf game modes ignore the Werewolf-specific fields.
+ * Parses a raw Firebase TimerConfig. Extracts base fields with defaults,
+ * then preserves any game-mode-specific fields (e.g., nightPhaseSeconds
+ * for Werewolf, electionVoteSeconds for Secret Villain) as-is.
+ * The caller casts to the appropriate game-mode timer type.
  */
-export function parseTimerConfig(
-  raw: Record<string, unknown>,
-): WerewolfTimerConfig {
-  return {
+export function parseTimerConfig(raw: Record<string, unknown>): TimerConfig {
+  // Extract base fields with defaults.
+  const base: TimerConfig = {
     autoAdvance:
       typeof raw["autoAdvance"] === "boolean"
         ? raw["autoAdvance"]
@@ -164,23 +162,18 @@ export function parseTimerConfig(
       typeof raw["startCountdownSeconds"] === "number"
         ? raw["startCountdownSeconds"]
         : DEFAULT_TIMER_CONFIG.startCountdownSeconds,
-    nightPhaseSeconds:
-      typeof raw["nightPhaseSeconds"] === "number"
-        ? raw["nightPhaseSeconds"]
-        : DEFAULT_WEREWOLF_TIMER_CONFIG.nightPhaseSeconds,
-    dayPhaseSeconds:
-      typeof raw["dayPhaseSeconds"] === "number"
-        ? raw["dayPhaseSeconds"]
-        : DEFAULT_WEREWOLF_TIMER_CONFIG.dayPhaseSeconds,
-    votePhaseSeconds:
-      typeof raw["votePhaseSeconds"] === "number"
-        ? raw["votePhaseSeconds"]
-        : DEFAULT_WEREWOLF_TIMER_CONFIG.votePhaseSeconds,
-    defensePhaseSeconds:
-      typeof raw["defensePhaseSeconds"] === "number"
-        ? raw["defensePhaseSeconds"]
-        : DEFAULT_WEREWOLF_TIMER_CONFIG.defensePhaseSeconds,
   };
+
+  // Preserve any additional game-mode-specific numeric/boolean fields.
+  const extra: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(raw)) {
+    if (key in base) continue;
+    if (typeof value === "number" || typeof value === "boolean") {
+      extra[key] = value;
+    }
+  }
+
+  return { ...base, ...extra } as TimerConfig;
 }
 
 /**

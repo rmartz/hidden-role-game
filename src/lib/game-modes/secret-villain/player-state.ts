@@ -4,6 +4,7 @@ import type {
   SpecialActionType,
   ElectionVote,
 } from "./types";
+import type { SecretVillainTimerConfig } from "./timer-config";
 
 /** Current Secret Villain phase info visible to all players. */
 export interface SvPhaseInfo {
@@ -12,6 +13,8 @@ export interface SvPhaseInfo {
   chancellorNomineeId?: string;
   chancellorId?: string;
   actionType?: SpecialActionType;
+  /** Unix epoch ms when the current phase started (for timer display). */
+  startedAt?: number;
 }
 
 /** Board state: policy cards played and failed election count. */
@@ -55,6 +58,8 @@ export interface SvInvestigationResult {
  * should type their props as SecretVillainPlayerGameState.
  */
 export interface SecretVillainPlayerGameState extends PlayerGameState {
+  /** Override base timerConfig with Secret Villain–specific timer fields. */
+  timerConfig: SecretVillainTimerConfig;
   /** Current phase info (type, presidentId, etc.). */
   svPhase?: SvPhaseInfo;
   /** Board state: Good and Bad cards played, failed election count. */
@@ -69,6 +74,8 @@ export interface SecretVillainPlayerGameState extends PlayerGameState {
   myElectionVote?: ElectionVote;
   /** All election votes (after resolution). */
   electionVotes?: SvElectionVoteEntry[];
+  /** Number of votes cast so far (not who voted — votes are secret until tally). */
+  electionVoteCount?: number;
   /** Whether the election passed. */
   electionPassed?: boolean;
   /** Whether veto power is unlocked (4+ Bad cards). */

@@ -61,9 +61,7 @@ export function GameTimer({
 
       if (elapsed >= durationSeconds && !hasTriggeredRef.current) {
         hasTriggeredRef.current = true;
-        if (autoAdvance) {
-          onTriggerRef.current?.();
-        }
+        onTriggerRef.current?.();
       }
     };
 

@@ -31,6 +31,7 @@ function buildPhaseInfo(
     phase.chancellorNomineeId
   ) {
     base["chancellorNomineeId"] = phase.chancellorNomineeId;
+    base["startedAt"] = phase.startedAt;
   }
   if (
     phase.type === SecretVillainPhase.PolicyPresident ||
@@ -99,10 +100,11 @@ export const secretVillainServices: GameModeServices = {
       result["vetoUnlocked"] = true;
     }
 
-    // President sees drawn cards during policy president phase.
+    // President sees drawn cards during policy president phase (after drawing).
     if (
       phase.type === SecretVillainPhase.PolicyPresident &&
-      phase.presidentId === callerId
+      phase.presidentId === callerId &&
+      phase.cardsRevealed
     ) {
       result["policyCards"] = {
         drawnCards: phase.drawnCards,
@@ -178,13 +180,15 @@ export const secretVillainServices: GameModeServices = {
       result["svInvestigationConsent"] = true;
     }
 
-    // Election vote phase: include the player's own vote.
+    // Election vote phase: include the player's own vote and vote count.
     if (phase.type === SecretVillainPhase.ElectionVote) {
       const myVote = phase.votes.find((v) => v.playerId === callerId);
       if (myVote) {
         result["myElectionVote"] = myVote.vote;
       }
-      // After all votes are in, share results.
+      // Vote count (not who voted) — used to determine if all players have voted.
+      result["electionVoteCount"] = phase.votes.length;
+      // After tally, share full results.
       if (phase.passed !== undefined) {
         result["electionVotes"] = phase.votes;
         result["electionPassed"] = phase.passed;

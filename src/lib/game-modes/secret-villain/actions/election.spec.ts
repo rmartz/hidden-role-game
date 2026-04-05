@@ -16,7 +16,10 @@ import type { SecretVillainTurnState, ElectionVotePhase } from "../types";
 import { SecretVillainRole } from "../roles";
 import { nominateChancellorAction } from "./nominate-chancellor";
 import { castElectionVoteAction } from "./cast-election-vote";
-import { resolveElectionAction } from "./resolve-election";
+import {
+  resolveElectionAction,
+  advanceFromElectionAction,
+} from "./resolve-election";
 
 function makePlayer(id: string) {
   return {
@@ -241,9 +244,9 @@ describe("resolveElectionAction", () => {
       expect(resolveElectionAction.isValid(game, "p1", {})).toBe(true);
     });
 
-    it("cannot resolve before all votes are in", () => {
+    it("can resolve before all votes are in (timer expiry case)", () => {
       const game = makeResolveGame([{ playerId: "p1", vote: "aye" }]);
-      expect(resolveElectionAction.isValid(game, "p1", {})).toBe(false);
+      expect(resolveElectionAction.isValid(game, "p1", {})).toBe(true);
     });
   });
 
@@ -251,6 +254,7 @@ describe("resolveElectionAction", () => {
     it("passed: transitions to PolicyPresident phase and resets failedElectionCount", () => {
       const game = makeResolveGame(allVotes("aye"), { failedElectionCount: 1 });
       resolveElectionAction.apply(game, {}, "p1");
+      advanceFromElectionAction.apply(game, {}, "p1");
 
       const ts = getTurnState(game);
       expect(ts.phase.type).toBe(SecretVillainPhase.PolicyPresident);
@@ -260,6 +264,7 @@ describe("resolveElectionAction", () => {
     it("failed: increments failedElectionCount and advances to next president", () => {
       const game = makeResolveGame(allVotes("no"));
       resolveElectionAction.apply(game, {}, "p1");
+      advanceFromElectionAction.apply(game, {}, "p1");
 
       const ts = getTurnState(game);
       expect(ts.failedElectionCount).toBe(1);
@@ -273,6 +278,7 @@ describe("resolveElectionAction", () => {
         currentPresidentIndex: 2,
       });
       resolveElectionAction.apply(game, {}, "p1");
+      advanceFromElectionAction.apply(game, {}, "p1");
 
       const ts = getTurnState(game);
       expect(ts.specialPresidentId).toBeUndefined();
@@ -288,6 +294,7 @@ describe("resolveElectionAction", () => {
         previousChancellorId: "p3",
       });
       resolveElectionAction.apply(game, {}, "p1");
+      advanceFromElectionAction.apply(game, {}, "p1");
 
       const ts = getTurnState(game);
       expect(ts.failedElectionCount).toBe(0);
@@ -305,6 +312,7 @@ describe("resolveElectionAction", () => {
       (ts.phase as ElectionVotePhase).chancellorNomineeId = "p5";
 
       resolveElectionAction.apply(game, {}, "p1");
+      advanceFromElectionAction.apply(game, {}, "p1");
 
       expect(game.status.type).toBe(GameStatus.Finished);
       if (game.status.type === GameStatus.Finished) {
@@ -319,6 +327,7 @@ describe("resolveElectionAction", () => {
         deck: [PolicyCard.Good, PolicyCard.Bad, PolicyCard.Bad],
       });
       resolveElectionAction.apply(game, {}, "p1");
+      advanceFromElectionAction.apply(game, {}, "p1");
 
       expect(game.status.type).toBe(GameStatus.Finished);
       if (game.status.type === GameStatus.Finished) {

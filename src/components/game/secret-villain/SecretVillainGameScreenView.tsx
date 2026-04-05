@@ -31,7 +31,10 @@ export interface SecretVillainGameScreenViewProps {
   onSelectChancellor: (playerId: string) => void;
   onConfirmNomination: () => void;
   onVote: (vote: "aye" | "no") => void;
+  /** Tally votes and show results. */
+  onResolveElection: () => void;
   // Policy actions
+  onDrawCards: () => void;
   selectedCardIndex?: number;
   onSelectCard: (index: number) => void;
   onDiscardCard: () => void;
@@ -66,6 +69,8 @@ export function SecretVillainGameScreenView({
   onSelectChancellor,
   onConfirmNomination,
   onVote,
+  onResolveElection,
+  onDrawCards,
   selectedCardIndex,
   onSelectCard,
   onDiscardCard,
@@ -178,6 +183,11 @@ export function SecretVillainGameScreenView({
             />
           );
         }
+        const aliveCount = players.filter(
+          (p) => !(gameState.deadPlayerIds ?? []).includes(p.id),
+        ).length;
+        const allVoted = (gameState.electionVoteCount ?? 0) >= aliveCount;
+
         return (
           <ElectionVoteView
             presidentName={getPlayerName(players, phase.presidentId)}
@@ -187,6 +197,12 @@ export function SecretVillainGameScreenView({
             )}
             myVote={gameState.myElectionVote}
             onVote={onVote}
+            onResolve={onResolveElection}
+            allVoted={allVoted}
+            timerDurationSeconds={gameState.timerConfig.electionVoteSeconds}
+            voteStartedAt={
+              phase.startedAt ? new Date(phase.startedAt) : undefined
+            }
             isPending={isPending}
             isEliminated={isEliminated}
           />
@@ -196,8 +212,10 @@ export function SecretVillainGameScreenView({
         return (
           <PolicyPresidentView
             drawnCards={gameState.policyCards?.drawnCards ?? []}
+            cardsRevealed={gameState.policyCards?.drawnCards !== undefined}
             selectedIndex={selectedCardIndex}
             onSelectCard={onSelectCard}
+            onDraw={onDrawCards}
             onDiscard={onDiscardCard}
             isPending={isPending}
             isPresident={phase.presidentId === myPlayerId}

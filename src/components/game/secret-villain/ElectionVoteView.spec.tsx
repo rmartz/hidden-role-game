@@ -9,6 +9,7 @@ const defaultProps = {
   presidentName: "Alice",
   chancellorNomineeName: "Bob",
   onVote: vi.fn(),
+  onResolve: vi.fn(),
 };
 
 describe("ElectionVoteView", () => {
@@ -49,5 +50,41 @@ describe("ElectionVoteView", () => {
   it("shows eliminated text when eliminated", () => {
     render(<ElectionVoteView {...defaultProps} isEliminated={true} />);
     expect(screen.getByText(SECRET_VILLAIN_COPY.eliminated)).toBeDefined();
+  });
+
+  it("shows Reveal Results button when all players have voted", () => {
+    render(<ElectionVoteView {...defaultProps} allVoted={true} myVote="aye" />);
+    expect(
+      screen.getByRole("button", {
+        name: SECRET_VILLAIN_COPY.election.resolveVote,
+      }),
+    ).toBeDefined();
+  });
+
+  it("does not show Reveal Results button when not all players have voted", () => {
+    render(
+      <ElectionVoteView {...defaultProps} allVoted={false} myVote="aye" />,
+    );
+    expect(
+      screen.queryByRole("button", {
+        name: SECRET_VILLAIN_COPY.election.resolveVote,
+      }),
+    ).toBeNull();
+  });
+
+  it("does not show Reveal Results button without onResolve callback", () => {
+    render(
+      <ElectionVoteView
+        {...defaultProps}
+        onResolve={undefined}
+        allVoted={true}
+        myVote="aye"
+      />,
+    );
+    expect(
+      screen.queryByRole("button", {
+        name: SECRET_VILLAIN_COPY.election.resolveVote,
+      }),
+    ).toBeNull();
   });
 });

@@ -80,8 +80,10 @@ export interface PolicyPresidentPhase {
   startedAt: number;
   presidentId: string;
   chancellorId: string;
-  /** The 3 cards drawn from the deck. Only visible to the president. */
+  /** The 3 cards drawn from the deck. Only visible after president draws. */
   drawnCards: [PolicyCard, PolicyCard, PolicyCard];
+  /** True once the president has pressed "Draw" to reveal their cards. */
+  cardsRevealed?: boolean;
   /** The card discarded by the president. Set once the president decides. */
   discardedCard?: PolicyCard;
 }

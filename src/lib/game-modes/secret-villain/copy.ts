@@ -19,6 +19,7 @@ export const SECRET_VILLAIN_COPY = {
     no: "No",
     waitingForVotes: "Waiting for all players to vote\u2026",
     alreadyVoted: "Vote cast. Waiting for others\u2026",
+    resolveVote: "Reveal Results",
     resultPassed: "Election Passed",
     resultFailed: "Election Failed",
     ayeCount: (count: number) => `${String(count)} Aye`,
@@ -30,6 +31,8 @@ export const SECRET_VILLAIN_COPY = {
   },
   policy: {
     presidentHeading: "Policy Phase — President",
+    presidentDrawInstructions: "Draw 3 policy cards from the deck.",
+    presidentDraw: "Draw",
     presidentInstructions:
       "You drew 3 policy cards. Discard 1 and pass 2 to the Chancellor.",
     discard: "Discard",

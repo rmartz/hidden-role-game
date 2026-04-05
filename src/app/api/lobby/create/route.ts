@@ -1,11 +1,10 @@
 import { randomUUID } from "crypto";
+import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
 import {
-  GameMode,
-  RoleConfigMode,
-  ShowRolesInPlay,
-  DEFAULT_TIMER_CONFIG,
-} from "@/lib/types";
-import { getDefaultRoleSlots, parseGameMode } from "@/lib/game-modes";
+  getDefaultRoleSlots,
+  parseGameMode,
+  GAME_MODES,
+} from "@/lib/game-modes";
 import { ServerResponseStatus, type CreateLobbyRequest } from "@/server/types";
 import { lobbyService } from "@/services/FirebaseLobbyService";
 import {
@@ -51,7 +50,7 @@ export async function POST(request: Request): Promise<Response> {
       nominationsEnabled: true,
       singleTrialPerDay: true,
       revealProtections: true,
-      timerConfig: DEFAULT_TIMER_CONFIG,
+      timerConfig: GAME_MODES[selectedGameMode].defaultTimerConfig,
     },
     readyPlayerIds: [] as string[],
   };

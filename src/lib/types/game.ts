@@ -171,6 +171,7 @@ export interface GameModeConfig {
     numPlayers: number,
     roleCounts: Record<string, number>,
   ): boolean;
+  readonly defaultTimerConfig: TimerConfig;
   readonly actions: Record<string, GameAction>;
   readonly services: GameModeServices;
 }

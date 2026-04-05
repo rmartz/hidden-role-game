@@ -150,7 +150,7 @@ describe("extractPlayerState", () => {
     ).toEqual({});
   });
 
-  it("president sees drawn cards during PolicyPresident phase", () => {
+  it("president sees drawn cards during PolicyPresident phase after drawing", () => {
     const ts: SecretVillainTurnState = {
       ...baseTurnState,
       phase: {
@@ -159,6 +159,7 @@ describe("extractPlayerState", () => {
         presidentId: "p1",
         chancellorId: "p2",
         drawnCards: [PolicyCard.Good, PolicyCard.Bad, PolicyCard.Bad],
+        cardsRevealed: true,
       },
     };
     const result = secretVillainServices.extractPlayerState(
