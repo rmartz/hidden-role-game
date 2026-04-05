@@ -1,5 +1,6 @@
 import type {
   Game,
+  GamePlayer,
   GameStatusState,
   PlayerRoleAssignment,
   TimerConfig,
@@ -77,7 +78,7 @@ export function gameToFirebase(game: Game): FirebaseGamePublic {
 export function firebaseToGame(
   gameId: string,
   pub: FirebaseGamePublic,
-  gamePlayers: import("@/lib/types").GamePlayer[],
+  gamePlayers: GamePlayer[],
 ): Game {
   const roleAssignments: PlayerRoleAssignment[] = Object.entries(
     pub.roleAssignments ?? {},

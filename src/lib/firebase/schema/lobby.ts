@@ -2,6 +2,7 @@ import type {
   Lobby,
   LobbyConfig,
   LobbyPlayer,
+  ModeConfig,
   RoleSlot,
   TimerConfig,
 } from "@/lib/types";
@@ -85,7 +86,7 @@ export function lobbyToFirebase(lobby: Lobby): {
 
 /** Strip the `gameMode` discriminant before writing to Firebase. */
 export function modeConfigToFirebase(
-  modeConfig: import("@/lib/types").ModeConfig,
+  modeConfig: ModeConfig,
 ): Record<string, unknown> {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { gameMode: _discriminant, ...rest } = modeConfig;

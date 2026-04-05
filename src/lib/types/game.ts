@@ -1,3 +1,5 @@
+import type { ModeConfig } from "./mode-config";
+
 export interface LobbyPlayer {
   id: string;
   name: string;
@@ -173,11 +175,9 @@ export interface GameModeConfig {
   ): boolean;
   readonly defaultTimerConfig: TimerConfig;
   /** Default game-mode-specific lobby config fields. */
-  readonly defaultModeConfig: import("./mode-config").ModeConfig;
+  readonly defaultModeConfig: ModeConfig;
   /** Parse raw Firebase data into typed mode-specific config, applying defaults. */
-  parseModeConfig(
-    raw: Record<string, unknown>,
-  ): import("./mode-config").ModeConfig;
+  parseModeConfig(raw: Record<string, unknown>): ModeConfig;
   readonly actions: Record<string, GameAction>;
   readonly services: GameModeServices;
 }
@@ -220,7 +220,7 @@ export interface Game {
   ownerPlayerId?: string;
   timerConfig: TimerConfig;
   /** Game-mode-specific configuration. Discriminated by `modeConfig.gameMode`. */
-  modeConfig: import("./mode-config").ModeConfig;
+  modeConfig: ModeConfig;
   /** Executioner: the player ID the Executioner must get eliminated at trial. */
   executionerTargetId?: string;
 }
@@ -261,7 +261,7 @@ export interface LobbyConfig {
   showRolesInPlay: ShowRolesInPlay;
   timerConfig: TimerConfig;
   /** Game-mode-specific configuration. Discriminated by `modeConfig.gameMode`. */
-  modeConfig: import("./mode-config").ModeConfig;
+  modeConfig: ModeConfig;
 }
 
 export interface Lobby {

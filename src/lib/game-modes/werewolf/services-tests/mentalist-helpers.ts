@@ -6,6 +6,7 @@ import {
   DEFAULT_TIMER_CONFIG,
 } from "@/lib/types";
 import type { Game } from "@/lib/types";
+import type { AnyNightAction } from "@/lib/game-modes/werewolf";
 import { WerewolfPhase, WerewolfRole } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 
@@ -27,10 +28,7 @@ export function makeMentalistGame(
       startedAt: 1000,
       nightPhaseOrder: [WerewolfRole.Mentalist],
       currentPhaseIndex: 0,
-      nightActions: nightActions as Record<
-        string,
-        import("@/lib/game-modes/werewolf").AnyNightAction
-      >,
+      nightActions: nightActions as Record<string, AnyNightAction>,
     },
     deadPlayerIds: [],
   };
