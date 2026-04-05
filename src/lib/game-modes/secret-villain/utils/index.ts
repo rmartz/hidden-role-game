@@ -6,7 +6,6 @@ export {
 } from "./turn-state";
 export {
   BOARD_PRESETS,
-  BOARD_PRESET_LABELS,
   getDefaultBoardPreset,
   getSpecialAction,
 } from "./special-actions";

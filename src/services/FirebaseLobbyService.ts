@@ -5,6 +5,7 @@ import type {
   RoleConfigMode,
   ShowRolesInPlay,
 } from "@/lib/types";
+import type { SvBoardPreset } from "@/lib/game-modes/secret-villain/types";
 import { getAdminDatabase } from "@/lib/firebase/admin";
 import { ServerValue } from "firebase-admin/database";
 import {
@@ -188,7 +189,7 @@ export class FirebaseLobbyService {
       nominationsEnabled?: boolean;
       singleTrialPerDay?: boolean;
       revealProtections?: boolean;
-      boardPreset?: string;
+      boardPreset?: SvBoardPreset;
     },
   ): Promise<Lobby | undefined> {
     const snap = await lobbyRef(lobbyId).once("value");

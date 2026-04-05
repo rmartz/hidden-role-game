@@ -27,13 +27,6 @@ export const BOARD_PRESETS: Record<SvBoardPreset, SvPowerTable> = {
   ],
 };
 
-/** Board preset labels for display in the config panel. */
-export const BOARD_PRESET_LABELS: Record<SvBoardPreset, string> = {
-  [SvBoardPreset.Small]: "5–6 Players",
-  [SvBoardPreset.Medium]: "7–8 Players",
-  [SvBoardPreset.Large]: "9–10 Players",
-};
-
 /** Returns the recommended board preset for a given player count. */
 export function getDefaultBoardPreset(playerCount: number): SvBoardPreset {
   if (playerCount <= 6) return SvBoardPreset.Small;

@@ -6,6 +6,7 @@ import type {
   TimerConfig,
 } from "@/lib/types";
 import { DEFAULT_TIMER_CONFIG } from "@/lib/types";
+import type { SvBoardPreset } from "@/lib/game-modes/secret-villain/types";
 import type { PublicLobby } from "@/server/types";
 
 export interface FirebaseLobbyPublic {
@@ -38,7 +39,7 @@ export interface FirebaseLobbyConfig {
   nominationsEnabled?: boolean;
   singleTrialPerDay?: boolean;
   revealProtections?: boolean;
-  boardPreset?: string;
+  boardPreset?: SvBoardPreset;
 }
 
 export interface FirebaseRoleSlot {
