@@ -4,9 +4,11 @@ import type {
   Game,
   GameModeConfig,
   LobbyPlayer,
+  ModeConfig,
   RoleSlot,
   GameMode,
   ShowRolesInPlay,
+  TimerConfig,
 } from "@/lib/types";
 import type { PlayerGameState } from "@/server/types";
 import {
@@ -38,8 +40,8 @@ export class GameService {
     gameMode: GameMode,
     showRolesInPlay: ShowRolesInPlay,
     ownerPlayerId: string | undefined,
-    timerConfig: import("@/lib/types").TimerConfig,
-    modeConfig?: import("@/lib/types").ModeConfig,
+    timerConfig: TimerConfig,
+    modeConfig?: ModeConfig,
   ): Promise<Game> {
     const game = this.state.buildGame(
       randomUUID(),

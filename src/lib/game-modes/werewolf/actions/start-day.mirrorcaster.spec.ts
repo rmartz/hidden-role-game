@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import type { Game } from "@/lib/types";
 import type { WerewolfTurnState } from "../types";
 import { WerewolfRole } from "../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
@@ -14,7 +15,7 @@ const mcRoleAssignments = [
   { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
 ];
 
-function getTurnState(game: import("@/lib/types").Game): WerewolfTurnState {
+function getTurnState(game: Game): WerewolfTurnState {
   return (game.status as { turnState: WerewolfTurnState }).turnState;
 }
 
