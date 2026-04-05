@@ -81,9 +81,15 @@ Election Vote
 
 When the last vote is cast, `tallyElection()` is called to set `passed` on the vote phase — but the phase does NOT transition. This gives all players a window to see the vote breakdown (who voted aye/no) before any player triggers `advanceFromElection` to proceed.
 
+## Board Power Configuration
+
+The board preset determines which presidential power is triggered when each Bad card is played. Three standard presets exist (Small, Medium, Large) keyed to player count. A **Custom** preset allows the lobby owner to configure powers for Bad cards #1–#3; cards #4 and #5 are always locked to Shoot.
+
+**Config flow:** `SecretVillainModeConfig.boardPreset` + optional `customPowerTable` → passed via `buildInitialTurnState` options → resolved into a full 5-slot `powerTable` stored on `SecretVillainTurnState` → read at runtime by `getSpecialAction(badCardsPlayed, ts.powerTable)`.
+
 ## Special Action Flow
 
-Special actions are triggered when a Bad policy card is played and the board position maps to a presidential power (per the player count config).
+Special actions are triggered when a Bad policy card is played and the board position maps to a presidential power (per the board preset or custom power table).
 
 | Action Type      | President Flow                                       | Target/Other Flow                        |
 | ---------------- | ---------------------------------------------------- | ---------------------------------------- |

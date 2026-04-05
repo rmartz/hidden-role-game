@@ -2,7 +2,10 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { fn } from "storybook/test";
 import { GameMode } from "@/lib/types";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game-modes/secret-villain/timer-config";
-import { SvBoardPreset } from "@/lib/game-modes/secret-villain/types";
+import {
+  SvBoardPreset,
+  SpecialActionType,
+} from "@/lib/game-modes/secret-villain/types";
 import { SecretVillainConfigPanel } from "./SecretVillainConfigPanel";
 
 const meta = {
@@ -16,6 +19,7 @@ export const Default: Story = {
   args: {
     timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
     modeConfig: { gameMode: GameMode.SecretVillain },
+    playerCount: 6,
     onTimerConfigChange: fn(),
     onModeConfigFieldChange: fn(),
   },
@@ -28,6 +32,25 @@ export const WithBoardPreset: Story = {
       gameMode: GameMode.SecretVillain,
       boardPreset: SvBoardPreset.Large,
     },
+    playerCount: 9,
+    onTimerConfigChange: fn(),
+    onModeConfigFieldChange: fn(),
+  },
+};
+
+export const WithCustomPreset: Story = {
+  args: {
+    timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
+    modeConfig: {
+      gameMode: GameMode.SecretVillain,
+      boardPreset: SvBoardPreset.Custom,
+      customPowerTable: [
+        SpecialActionType.InvestigateTeam,
+        SpecialActionType.PolicyPeek,
+        SpecialActionType.SpecialElection,
+      ],
+    },
+    playerCount: 7,
     onTimerConfigChange: fn(),
     onModeConfigFieldChange: fn(),
   },
@@ -40,6 +63,7 @@ export const ReadOnly: Story = {
       gameMode: GameMode.SecretVillain,
       boardPreset: SvBoardPreset.Medium,
     },
+    playerCount: 7,
     disabled: true,
   },
 };

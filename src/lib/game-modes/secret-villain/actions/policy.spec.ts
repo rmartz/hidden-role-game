@@ -14,6 +14,7 @@ import {
   SvBoardPreset,
 } from "../types";
 import type { SecretVillainTurnState, PolicyChancellorPhase } from "../types";
+import { BOARD_PRESETS } from "../utils";
 import { SecretVillainRole } from "../roles";
 import { presidentDiscardAction } from "./president-discard";
 import { chancellorPlayAction } from "./chancellor-play";
@@ -56,6 +57,7 @@ function makePolicyGame(
     eliminatedPlayerIds: [],
     failedElectionCount: 0,
     boardPreset: SvBoardPreset.Medium,
+    powerTable: BOARD_PRESETS[SvBoardPreset.Medium],
     ...overrides.turnState,
   };
 

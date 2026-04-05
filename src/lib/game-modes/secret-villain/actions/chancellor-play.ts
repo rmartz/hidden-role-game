@@ -54,7 +54,7 @@ export const chancellorPlayAction: GameAction = {
 
     // Check for special action trigger (only on Bad cards).
     if (played === PolicyCard.Bad) {
-      const action = getSpecialAction(ts.badCardsPlayed, ts.boardPreset);
+      const action = getSpecialAction(ts.badCardsPlayed, ts.powerTable);
       if (action) {
         ts.phase = {
           type: SecretVillainPhase.SpecialAction,

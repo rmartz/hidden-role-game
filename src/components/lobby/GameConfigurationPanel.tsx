@@ -18,6 +18,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   loadConfig,
+  setModeConfig,
   setPlayerCount,
   setShowConfigToPlayers,
   setShowRolesInPlay,
@@ -31,7 +32,7 @@ import { RoleConfig } from "./RoleConfig";
 import { GameModePicker } from "./GameModePicker";
 import { ShowRolesInPlayPicker } from "./ShowRolesInPlayPicker";
 import { WerewolfConfigPanel } from "./WerewolfConfigPanel";
-import { SecretVillainConfigPanel } from "./SecretVillainConfigPanel";
+import { SecretVillainConfigPanel } from "./secret-villain";
 
 interface ReadOnlyProps {
   config: GameConfig;
@@ -151,6 +152,7 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
     <SecretVillainConfigPanel
       timerConfig={activeTimerConfig as SecretVillainTimerConfig}
       modeConfig={activeModeConfigData}
+      playerCount={playerCount}
       disabled={disabled}
       onTimerConfigChange={
         onTimerConfigChange as
@@ -158,6 +160,9 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
           | undefined
       }
       onModeConfigFieldChange={onModeConfigFieldChange}
+      onModeConfigChange={
+        readOnly ? undefined : (config) => dispatch(setModeConfig(config))
+      }
     />
   ) : null;
 

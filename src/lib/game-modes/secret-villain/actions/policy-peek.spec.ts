@@ -13,6 +13,7 @@ import {
   SvBoardPreset,
 } from "../types";
 import type { SecretVillainTurnState, SpecialActionPhase } from "../types";
+import { BOARD_PRESETS } from "../utils";
 import { SecretVillainRole } from "../roles";
 import { policyPeekAction, resolvePolicyPeekAction } from "./policy-peek";
 
@@ -46,6 +47,7 @@ function makeSpecialActionGame(
     eliminatedPlayerIds: [],
     failedElectionCount: 0,
     boardPreset: SvBoardPreset.Medium,
+    powerTable: BOARD_PRESETS[SvBoardPreset.Medium],
     ...overrides,
   };
 

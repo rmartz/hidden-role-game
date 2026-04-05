@@ -6,9 +6,13 @@ import {
   SvBoardPreset,
   VETO_UNLOCK_THRESHOLD,
 } from "./types";
-import type { SecretVillainTurnState } from "./types";
-import { getDefaultBoardPreset } from "./utils";
-import { createDeck, getEligibleChancellorIds } from "./utils";
+import type { SecretVillainTurnState, SvCustomPowerConfig } from "./types";
+import {
+  createDeck,
+  getDefaultBoardPreset,
+  getEligibleChancellorIds,
+  resolvePowerTable,
+} from "./utils";
 
 function shuffle<T>(array: T[]): T[] {
   const result = [...array];
@@ -61,6 +65,14 @@ export const secretVillainServices: GameModeServices = {
     const boardPreset =
       (options?.["boardPreset"] as SvBoardPreset | undefined) ??
       getDefaultBoardPreset(playerIds.length);
+    const customPowerTable = options?.["customPowerTable"] as
+      | SvCustomPowerConfig
+      | undefined;
+    const powerTable = resolvePowerTable(
+      boardPreset,
+      customPowerTable,
+      playerIds.length,
+    );
 
     return {
       turn: 1,
@@ -78,6 +90,7 @@ export const secretVillainServices: GameModeServices = {
       eliminatedPlayerIds: [],
       failedElectionCount: 0,
       boardPreset,
+      powerTable,
     };
   },
 

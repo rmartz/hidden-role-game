@@ -5,6 +5,7 @@ import {
   PolicyCard,
   SvBoardPreset,
 } from "../types";
+import { BOARD_PRESETS } from "./special-actions";
 import { getNextPresidentId, getEligibleChancellorIds } from "./turn-state";
 
 function makeTurnState(
@@ -26,6 +27,7 @@ function makeTurnState(
     eliminatedPlayerIds: [],
     failedElectionCount: 0,
     boardPreset: SvBoardPreset.Medium,
+    powerTable: BOARD_PRESETS[SvBoardPreset.Medium],
     ...overrides,
   };
 }
