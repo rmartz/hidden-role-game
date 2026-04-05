@@ -186,8 +186,9 @@ export const secretVillainServices: GameModeServices = {
       if (myVote) {
         result["myElectionVote"] = myVote.vote;
       }
-      // Vote count (not who voted) — used to determine if all players have voted.
+      // Who has voted (not how) — used for voter status display.
       result["electionVoteCount"] = phase.votes.length;
+      result["votedPlayerIds"] = phase.votes.map((v) => v.playerId);
       // After tally, share full results.
       if (phase.passed !== undefined) {
         result["electionVotes"] = phase.votes;

@@ -90,4 +90,66 @@ describe("ElectionVoteView", () => {
       }),
     ).toBeNull();
   });
+
+  it("shows pending player names when 3 or fewer are left to vote", () => {
+    const players = [
+      { id: "p1", name: "Alice" },
+      { id: "p2", name: "Bob" },
+      { id: "p3", name: "Charlie" },
+    ];
+    render(
+      <ElectionVoteView
+        {...defaultProps}
+        myVote="aye"
+        players={players}
+        votedPlayerIds={["p1"]}
+      />,
+    );
+    expect(
+      screen.getByText(
+        SECRET_VILLAIN_COPY.election.waitingForPlayers(["Bob", "Charlie"]),
+      ),
+    ).toBeDefined();
+  });
+
+  it("shows generic waiting text when more than 3 are left to vote", () => {
+    const players = [
+      { id: "p1", name: "Alice" },
+      { id: "p2", name: "Bob" },
+      { id: "p3", name: "Charlie" },
+      { id: "p4", name: "Diana" },
+      { id: "p5", name: "Eve" },
+    ];
+    render(
+      <ElectionVoteView
+        {...defaultProps}
+        myVote="aye"
+        players={players}
+        votedPlayerIds={["p1"]}
+      />,
+    );
+    expect(
+      screen.getByText(SECRET_VILLAIN_COPY.election.alreadyVoted),
+    ).toBeDefined();
+  });
+
+  it("excludes eliminated players from pending voter count", () => {
+    const players = [
+      { id: "p1", name: "Alice" },
+      { id: "p2", name: "Bob" },
+      { id: "p3", name: "Charlie" },
+    ];
+    render(
+      <ElectionVoteView
+        {...defaultProps}
+        myVote="aye"
+        players={players}
+        votedPlayerIds={["p1"]}
+        eliminatedPlayerIds={["p3"]}
+      />,
+    );
+    expect(
+      screen.getByText(SECRET_VILLAIN_COPY.election.waitingForPlayers(["Bob"])),
+    ).toBeDefined();
+  });
 });
