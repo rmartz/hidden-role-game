@@ -11,6 +11,7 @@ import { secretVillainServices } from "./services";
 
 export const SECRET_VILLAIN_CONFIG = {
   name: "Secret Villain",
+  released: true,
   minPlayers: MIN_PLAYERS,
   ownerTitle: null,
   teamLabels: {
