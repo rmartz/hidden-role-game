@@ -19,6 +19,8 @@ export const SECRET_VILLAIN_COPY = {
     no: "No",
     waitingForVotes: "Waiting for all players to vote\u2026",
     alreadyVoted: "Vote cast. Waiting for others\u2026",
+    waitingForPlayers: (names: string[]) =>
+      `Waiting for ${names.join(", ")}\u2026`,
     resolveVote: "Reveal Results",
     resultPassed: "Election Passed",
     resultFailed: "Election Failed",

@@ -203,6 +203,9 @@ export function SecretVillainGameScreenView({
             voteStartedAt={
               phase.startedAt ? new Date(phase.startedAt) : undefined
             }
+            players={players}
+            votedPlayerIds={gameState.votedPlayerIds}
+            eliminatedPlayerIds={gameState.deadPlayerIds}
             isPending={isPending}
             isEliminated={isEliminated}
           />

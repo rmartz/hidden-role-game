@@ -19,9 +19,18 @@ interface ElectionVoteViewProps {
   timerDurationSeconds?: number;
   /** When the vote phase started (for timer). */
   voteStartedAt?: Date;
+  /** All players in the game (for voter status display). */
+  players?: { id: string; name: string }[];
+  /** Player IDs who have already voted. */
+  votedPlayerIds?: string[];
+  /** Player IDs who are eliminated (cannot vote). */
+  eliminatedPlayerIds?: string[];
   isPending?: boolean;
   isEliminated?: boolean;
 }
+
+/** Max number of pending players to show by name. */
+const PENDING_NAME_THRESHOLD = 3;
 
 export function ElectionVoteView({
   presidentName,
@@ -32,6 +41,9 @@ export function ElectionVoteView({
   allVoted,
   timerDurationSeconds,
   voteStartedAt,
+  players,
+  votedPlayerIds,
+  eliminatedPlayerIds,
   isPending,
   isEliminated,
 }: ElectionVoteViewProps) {
@@ -45,6 +57,18 @@ export function ElectionVoteView({
     timerDurationSeconds > 0 &&
     voteStartedAt !== undefined;
   const canResolve = allVoted === true || timerExpired;
+
+  const votedSet = new Set(votedPlayerIds ?? []);
+  const eliminatedSet = new Set(eliminatedPlayerIds ?? []);
+  const pendingPlayers = (players ?? []).filter(
+    (p) => !votedSet.has(p.id) && !eliminatedSet.has(p.id),
+  );
+  const waitingText =
+    pendingPlayers.length > 0 && pendingPlayers.length <= PENDING_NAME_THRESHOLD
+      ? SECRET_VILLAIN_COPY.election.waitingForPlayers(
+          pendingPlayers.map((p) => p.name),
+        )
+      : SECRET_VILLAIN_COPY.election.alreadyVoted;
 
   return (
     <Card>
@@ -73,9 +97,7 @@ export function ElectionVoteView({
             {SECRET_VILLAIN_COPY.eliminated}
           </p>
         ) : hasVoted ? (
-          <p className="text-sm text-muted-foreground">
-            {SECRET_VILLAIN_COPY.election.alreadyVoted}
-          </p>
+          <p className="text-sm text-muted-foreground">{waitingText}</p>
         ) : (
           <div className="space-y-2">
             <p className="text-sm font-medium">

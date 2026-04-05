@@ -74,8 +74,10 @@ export interface SecretVillainPlayerGameState extends PlayerGameState {
   myElectionVote?: ElectionVote;
   /** All election votes (after resolution). */
   electionVotes?: SvElectionVoteEntry[];
-  /** Number of votes cast so far (not who voted — votes are secret until tally). */
+  /** Number of votes cast so far. */
   electionVoteCount?: number;
+  /** Player IDs who have voted (not how they voted — votes are secret until tally). */
+  votedPlayerIds?: string[];
   /** Whether the election passed. */
   electionPassed?: boolean;
   /** Whether veto power is unlocked (4+ Bad cards). */
