@@ -96,8 +96,6 @@ export function ElectionVoteView({
           <p className="text-sm text-muted-foreground">
             {SECRET_VILLAIN_COPY.eliminated}
           </p>
-        ) : hasVoted ? (
-          <p className="text-sm text-muted-foreground">{waitingText}</p>
         ) : (
           <div className="space-y-2">
             <p className="text-sm font-medium">
@@ -105,6 +103,7 @@ export function ElectionVoteView({
             </p>
             <div className="flex gap-2">
               <Button
+                variant={myVote === "aye" ? "default" : "outline"}
                 onClick={() => {
                   onVote("aye");
                 }}
@@ -113,7 +112,7 @@ export function ElectionVoteView({
                 {SECRET_VILLAIN_COPY.election.aye}
               </Button>
               <Button
-                variant="outline"
+                variant={myVote === "no" ? "default" : "outline"}
                 onClick={() => {
                   onVote("no");
                 }}
@@ -122,6 +121,9 @@ export function ElectionVoteView({
                 {SECRET_VILLAIN_COPY.election.no}
               </Button>
             </div>
+            {hasVoted && (
+              <p className="text-sm text-muted-foreground">{waitingText}</p>
+            )}
           </div>
         )}
 
