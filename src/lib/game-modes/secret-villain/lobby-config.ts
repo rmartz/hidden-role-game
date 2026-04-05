@@ -1,5 +1,5 @@
 import { GameMode } from "@/lib/types";
-import type { LobbyConfig } from "@/lib/types";
+import type { BaseLobbyConfig } from "@/lib/types";
 import type { SecretVillainTimerConfig } from "./timer-config";
 import { SpecialActionType, SvBoardPreset } from "./types";
 import type { SvCustomPowerConfig, SvCustomPowerSlot } from "./types";
@@ -14,7 +14,8 @@ export interface SecretVillainModeConfig {
 }
 
 /** Secret Villain–specific lobby configuration. */
-export interface SecretVillainLobbyConfig extends LobbyConfig {
+export interface SecretVillainLobbyConfig extends BaseLobbyConfig {
+  gameMode: GameMode.SecretVillain;
   timerConfig: SecretVillainTimerConfig;
   modeConfig: SecretVillainModeConfig;
 }

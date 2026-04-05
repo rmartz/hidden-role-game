@@ -1,10 +1,6 @@
 import { describe, it, expect } from "vitest";
-import {
-  GameMode,
-  GameStatus,
-  DEFAULT_TIMER_CONFIG,
-  ShowRolesInPlay,
-} from "@/lib/types";
+import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "../timer-config";
 import type { Game } from "@/lib/types";
 import {
   SecretVillainPhase,
@@ -79,7 +75,7 @@ function makePolicyGame(
     ],
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
-    timerConfig: DEFAULT_TIMER_CONFIG,
+    timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
     modeConfig: { gameMode: GameMode.SecretVillain },
   } satisfies Game;
 }

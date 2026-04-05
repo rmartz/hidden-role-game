@@ -140,6 +140,9 @@ function firebaseToLobbyConfig(config: FirebaseLobbyConfig): LobbyConfig {
     ? GAME_MODES[gameMode].parseModeConfig(rawModeConfig)
     : GAME_MODES[GameMode.Werewolf].parseModeConfig(rawModeConfig);
 
+  // Cast required: LobbyConfig is a discriminated union keyed on gameMode, but
+  // we construct from runtime Firebase data where the discriminant is a string.
+  // This is the single boundary-cast location for LobbyConfig deserialization.
   return {
     gameMode,
     roleConfigMode: config.roleConfigMode as LobbyConfig["roleConfigMode"],
@@ -150,7 +153,7 @@ function firebaseToLobbyConfig(config: FirebaseLobbyConfig): LobbyConfig {
       config.timerConfig as unknown as Record<string, unknown>,
     ),
     modeConfig,
-  };
+  } as LobbyConfig;
 }
 
 export function firebaseToRoleSlot(s: FirebaseRoleSlot): RoleSlot {

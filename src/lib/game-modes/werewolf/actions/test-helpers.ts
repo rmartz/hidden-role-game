@@ -1,10 +1,6 @@
-import {
-  GameMode,
-  GameStatus,
-  ShowRolesInPlay,
-  DEFAULT_TIMER_CONFIG,
-} from "@/lib/types";
+import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 import type { Game } from "@/lib/types";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "../timer-config";
 import { WerewolfPhase } from "../types";
 import type { WerewolfTurnState, AnyNightAction } from "../types";
 import { WerewolfRole } from "../roles";
@@ -42,9 +38,9 @@ export function makePlayingGame(
       singleTrialPerDay: true,
       revealProtections: true,
     },
-    timerConfig: DEFAULT_TIMER_CONFIG,
+    timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     ...overrides,
-  };
+  } as Game;
 }
 
 export function makeNightState(
@@ -148,9 +144,9 @@ export function makeTeamGame(
       singleTrialPerDay: true,
       revealProtections: true,
     },
-    timerConfig: DEFAULT_TIMER_CONFIG,
+    timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     ...overrides,
-  };
+  } as Game;
 }
 
 export function makeTeamNightState(

@@ -228,6 +228,8 @@ export class GameStateService {
 
     const specialTargets = services.selectSpecialTargets(roleAssignments);
 
+    // Cast required: Game is a discriminated union keyed on gameMode, but
+    // gameMode is a runtime parameter so TS cannot narrow the union statically.
     return {
       id: gameId,
       lobbyId,
@@ -241,7 +243,7 @@ export class GameStateService {
       timerConfig,
       modeConfig: modeConfig ?? config.defaultModeConfig,
       ...specialTargets,
-    };
+    } as Game;
   }
 
   /**

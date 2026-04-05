@@ -1,12 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { isValidSession, toPublicLobby } from "./lobby-helpers";
-import {
-  GameMode,
-  RoleConfigMode,
-  ShowRolesInPlay,
-  DEFAULT_TIMER_CONFIG,
-} from "@/lib/types";
+import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
 import type { Lobby } from "@/lib/types";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game-modes/secret-villain/timer-config";
+import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game-modes/secret-villain/lobby-config";
 
 function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
   return {
@@ -22,13 +19,8 @@ function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
       roleSlots: [{ roleId: "good", min: 2, max: 2 }],
       showConfigToPlayers: false,
       showRolesInPlay: ShowRolesInPlay.None,
-      modeConfig: {
-        gameMode: GameMode.Werewolf,
-        nominationsEnabled: false,
-        singleTrialPerDay: true,
-        revealProtections: true,
-      },
-      timerConfig: DEFAULT_TIMER_CONFIG,
+      modeConfig: DEFAULT_SECRET_VILLAIN_MODE_CONFIG,
+      timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
     },
     readyPlayerIds: [],
     ...overrides,
@@ -101,13 +93,8 @@ describe("toPublicLobby", () => {
           roleSlots: [{ roleId: "good", min: 2, max: 2 }],
           showConfigToPlayers: true,
           showRolesInPlay: ShowRolesInPlay.None,
-          modeConfig: {
-            gameMode: GameMode.Werewolf,
-            nominationsEnabled: false,
-            singleTrialPerDay: true,
-            revealProtections: true,
-          },
-          timerConfig: DEFAULT_TIMER_CONFIG,
+          modeConfig: DEFAULT_SECRET_VILLAIN_MODE_CONFIG,
+          timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
         },
       });
       const result = toPublicLobby(lobby, "session-bob");

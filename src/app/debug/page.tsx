@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
-import { GAME_MODES } from "@/lib/game-modes";
 import type { GameConfig } from "@/server/types";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game-modes/werewolf/timer-config";
+import { DEFAULT_WEREWOLF_MODE_CONFIG } from "@/lib/game-modes/werewolf/lobby-config";
 import { GameConfigurationPanel } from "@/components/lobby";
 import { useAppSelector } from "@/store";
 import { selectRoleSlots } from "@/store/game-config-slice";
@@ -19,8 +20,8 @@ const DEFAULT_CONFIG: GameConfig = {
   roleSlots: [],
   showConfigToPlayers: false,
   showRolesInPlay: ShowRolesInPlay.None,
-  timerConfig: GAME_MODES[GameMode.Werewolf].defaultTimerConfig,
-  modeConfig: GAME_MODES[GameMode.Werewolf].defaultModeConfig,
+  timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
+  modeConfig: DEFAULT_WEREWOLF_MODE_CONFIG,
 };
 
 export default function DebugPage() {

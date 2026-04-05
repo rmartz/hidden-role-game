@@ -1,27 +1,56 @@
+import { GameMode } from "@/lib/types";
 import type {
-  GameMode,
   ModeConfig,
   RoleSlot,
   RoleConfigMode,
   ShowRolesInPlay,
   TimerConfig,
 } from "@/lib/types";
+import type { WerewolfModeConfig } from "@/lib/game-modes/werewolf/lobby-config";
+import type { WerewolfTimerConfig } from "@/lib/game-modes/werewolf/timer-config";
+import type { SecretVillainModeConfig } from "@/lib/game-modes/secret-villain/lobby-config";
+import type { SecretVillainTimerConfig } from "@/lib/game-modes/secret-villain/timer-config";
+import type { AvalonModeConfig } from "@/lib/game-modes/avalon/lobby-config";
 
 export interface PublicLobbyPlayer {
   id: string;
   name: string;
 }
 
-/** Client-visible lobby configuration. roleSlots is optional — hidden from non-owner players. */
-export interface GameConfig {
-  gameMode: GameMode;
+/** Shared game config fields. Game-mode-specific variants extend this. */
+export interface BaseGameConfig {
   roleConfigMode: RoleConfigMode;
   showConfigToPlayers: boolean;
   showRolesInPlay: ShowRolesInPlay;
   roleSlots?: RoleSlot[];
-  timerConfig: TimerConfig;
-  modeConfig: ModeConfig;
 }
+
+export interface WerewolfGameConfig extends BaseGameConfig {
+  gameMode: GameMode.Werewolf;
+  timerConfig: WerewolfTimerConfig;
+  modeConfig: WerewolfModeConfig;
+}
+
+export interface SecretVillainGameConfig extends BaseGameConfig {
+  gameMode: GameMode.SecretVillain;
+  timerConfig: SecretVillainTimerConfig;
+  modeConfig: SecretVillainModeConfig;
+}
+
+export interface AvalonGameConfig extends BaseGameConfig {
+  gameMode: GameMode.Avalon;
+  timerConfig: TimerConfig;
+  modeConfig: AvalonModeConfig;
+}
+
+/**
+ * Client-visible lobby configuration. roleSlots is optional — hidden from non-owner players.
+ * Discriminated union on `gameMode`.
+ */
+export type GameConfig =
+  | WerewolfGameConfig
+  | SecretVillainGameConfig
+  | AvalonGameConfig;
 
 export interface PublicLobby {
   id: string;

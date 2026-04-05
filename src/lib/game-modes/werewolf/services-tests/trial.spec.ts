@@ -1,12 +1,11 @@
 import { describe, it, expect } from "vitest";
-import {
-  GameMode,
-  GameStatus,
-  ShowRolesInPlay,
-  DEFAULT_TIMER_CONFIG,
-} from "@/lib/types";
+import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 import type { Game } from "@/lib/types";
-import { WerewolfPhase, WerewolfRole } from "@/lib/game-modes/werewolf";
+import {
+  WerewolfPhase,
+  WerewolfRole,
+  DEFAULT_WEREWOLF_TIMER_CONFIG,
+} from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import { extractDaytimeState, makeDaytimeGameWithTrial } from "./helpers";
 
@@ -77,7 +76,7 @@ describe("extractDaytimePlayerState — playerCount excludes silenced", () => {
         singleTrialPerDay: true,
         revealProtections: true,
       },
-      timerConfig: DEFAULT_TIMER_CONFIG,
+      timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     };
     const result = extractDaytimeState(game, "p3");
     expect(result.activeTrial?.playerCount).toBe(2);
@@ -125,7 +124,7 @@ describe("extractDaytimePlayerState — playerCount excludes silenced", () => {
         singleTrialPerDay: true,
         revealProtections: true,
       },
-      timerConfig: DEFAULT_TIMER_CONFIG,
+      timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     };
     const result = extractDaytimeState(game, "p2");
     expect(result.activeTrial?.playerCount).toBe(2);

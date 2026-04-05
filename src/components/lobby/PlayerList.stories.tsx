@@ -1,11 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { PlayerList } from "./PlayerList";
-import {
-  GameMode,
-  RoleConfigMode,
-  ShowRolesInPlay,
-  DEFAULT_TIMER_CONFIG,
-} from "@/lib/types";
+import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game-modes/werewolf/timer-config";
 import type { PublicLobby } from "@/server/types";
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noop = () => {};
@@ -39,7 +35,7 @@ const baseLobby: PublicLobby = {
     showConfigToPlayers: true,
     showRolesInPlay: ShowRolesInPlay.AssignedRolesOnly,
     roleSlots: [],
-    timerConfig: DEFAULT_TIMER_CONFIG,
+    timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     modeConfig: {
       gameMode: GameMode.Werewolf,
       nominationsEnabled: true,

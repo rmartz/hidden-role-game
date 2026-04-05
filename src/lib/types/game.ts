@@ -1,4 +1,18 @@
 import type { ModeConfig } from "./mode-config";
+import type {
+  WerewolfLobbyConfig,
+  WerewolfModeConfig,
+} from "@/lib/game-modes/werewolf/lobby-config";
+import type { WerewolfTimerConfig } from "@/lib/game-modes/werewolf/timer-config";
+import type {
+  SecretVillainLobbyConfig,
+  SecretVillainModeConfig,
+} from "@/lib/game-modes/secret-villain/lobby-config";
+import type { SecretVillainTimerConfig } from "@/lib/game-modes/secret-villain/timer-config";
+import type {
+  AvalonLobbyConfig,
+  AvalonModeConfig,
+} from "@/lib/game-modes/avalon/lobby-config";
 
 export interface LobbyPlayer {
   id: string;
@@ -210,22 +224,43 @@ export interface GamePlayer extends LobbyPlayer {
 
 // --- Game (exists only after the game has been started) ---
 
-export interface Game {
+/** Shared game fields. Game-mode-specific variants extend this. */
+export interface BaseGame {
   id: string;
   lobbyId: string;
-  gameMode: GameMode;
   status: GameStatusState;
   players: GamePlayer[];
   roleAssignments: PlayerRoleAssignment[];
   configuredRoleSlots: RoleSlot[];
   showRolesInPlay: ShowRolesInPlay;
   ownerPlayerId?: string;
-  timerConfig: TimerConfig;
-  /** Game-mode-specific configuration. Discriminated by `modeConfig.gameMode`. */
-  modeConfig: ModeConfig;
   /** Executioner: the player ID the Executioner must get eliminated at trial. */
   executionerTargetId?: string;
 }
+
+export interface WerewolfGame extends BaseGame {
+  gameMode: GameMode.Werewolf;
+  timerConfig: WerewolfTimerConfig;
+  modeConfig: WerewolfModeConfig;
+}
+
+export interface SecretVillainGame extends BaseGame {
+  gameMode: GameMode.SecretVillain;
+  timerConfig: SecretVillainTimerConfig;
+  modeConfig: SecretVillainModeConfig;
+}
+
+export interface AvalonGame extends BaseGame {
+  gameMode: GameMode.Avalon;
+  timerConfig: TimerConfig;
+  modeConfig: AvalonModeConfig;
+}
+
+/**
+ * Discriminated union of all game-mode-specific game objects.
+ * Narrow on `gameMode` to access typed `timerConfig` and `modeConfig`.
+ */
+export type Game = WerewolfGame | SecretVillainGame | AvalonGame;
 
 /**
  * A game-mode-defined action that can be applied to a game. Actions are
@@ -255,16 +290,22 @@ export const DEFAULT_TIMER_CONFIG: TimerConfig = {
 
 // --- Lobby (top-level entity; game is absent until started) ---
 
-export interface LobbyConfig {
-  gameMode: GameMode;
+/** Shared lobby config fields. Game-mode-specific variants extend this. */
+export interface BaseLobbyConfig {
   roleConfigMode: RoleConfigMode;
   roleSlots: RoleSlot[];
   showConfigToPlayers: boolean;
   showRolesInPlay: ShowRolesInPlay;
-  timerConfig: TimerConfig;
-  /** Game-mode-specific configuration. Discriminated by `modeConfig.gameMode`. */
-  modeConfig: ModeConfig;
 }
+
+/**
+ * Discriminated union of all game-mode-specific lobby configurations.
+ * Narrow on `gameMode` to access typed `timerConfig` and `modeConfig`.
+ */
+export type LobbyConfig =
+  | WerewolfLobbyConfig
+  | SecretVillainLobbyConfig
+  | AvalonLobbyConfig;
 
 export interface Lobby {
   id: string;
