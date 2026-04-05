@@ -1,5 +1,5 @@
 import { GameMode } from "@/lib/types";
-import type { Game, LobbyConfig } from "@/lib/types";
+import type { BaseLobbyConfig, Game } from "@/lib/types";
 import type { WerewolfTimerConfig } from "./timer-config";
 
 /** Werewolf-specific mode configuration. */
@@ -14,7 +14,8 @@ export interface WerewolfModeConfig {
 }
 
 /** Werewolf-specific lobby configuration. */
-export interface WerewolfLobbyConfig extends LobbyConfig {
+export interface WerewolfLobbyConfig extends BaseLobbyConfig {
+  gameMode: GameMode.Werewolf;
   timerConfig: WerewolfTimerConfig;
   modeConfig: WerewolfModeConfig;
 }
@@ -25,6 +26,14 @@ export const DEFAULT_WEREWOLF_MODE_CONFIG: WerewolfModeConfig = {
   singleTrialPerDay: true,
   revealProtections: true,
 };
+
+/**
+ * Extract the WerewolfModeConfig from a Game, asserting the game is Werewolf.
+ * Safe to call from werewolf-specific code that only runs for Werewolf games.
+ */
+export function getWerewolfModeConfig(game: Game): WerewolfModeConfig {
+  return game.modeConfig as WerewolfModeConfig;
+}
 
 export function parseWerewolfModeConfig(
   raw: Record<string, unknown>,
@@ -44,11 +53,4 @@ export function parseWerewolfModeConfig(
         ? raw["revealProtections"]
         : DEFAULT_WEREWOLF_MODE_CONFIG.revealProtections,
   };
-}
-
-/** Extract typed Werewolf mode config from a Game's modeConfig. */
-export function getWerewolfModeConfig(game: Game): WerewolfModeConfig {
-  return parseWerewolfModeConfig(
-    game.modeConfig as unknown as Record<string, unknown>,
-  );
 }

@@ -1,4 +1,5 @@
 import { randomUUID } from "crypto";
+import type { LobbyConfig } from "@/lib/types";
 import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
 import {
   DEFAULT_GAME_MODE,
@@ -53,7 +54,7 @@ export async function POST(request: Request): Promise<Response> {
       showRolesInPlay: ShowRolesInPlay.ConfiguredOnly,
       timerConfig: GAME_MODES[selectedGameMode].defaultTimerConfig,
       modeConfig: GAME_MODES[selectedGameMode].defaultModeConfig,
-    },
+    } as LobbyConfig,
     readyPlayerIds: [] as string[],
   };
 

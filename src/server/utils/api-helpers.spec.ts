@@ -12,9 +12,10 @@ import {
   GameStatus,
   RoleConfigMode,
   ShowRolesInPlay,
-  DEFAULT_TIMER_CONFIG,
 } from "@/lib/types";
 import type { Lobby, Game, GamePlayer } from "@/lib/types";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game-modes/secret-villain/timer-config";
+import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game-modes/secret-villain/lobby-config";
 
 const { mockGetLobby, mockGetGame } = vi.hoisted(() => ({
   mockGetLobby: vi.fn(),
@@ -43,13 +44,8 @@ function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
       roleSlots: [],
       showConfigToPlayers: false,
       showRolesInPlay: ShowRolesInPlay.None,
-      modeConfig: {
-        gameMode: GameMode.Werewolf,
-        nominationsEnabled: false,
-        singleTrialPerDay: true,
-        revealProtections: true,
-      },
-      timerConfig: DEFAULT_TIMER_CONFIG,
+      modeConfig: DEFAULT_SECRET_VILLAIN_MODE_CONFIG,
+      timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
     },
     readyPlayerIds: [],
     ...overrides,
@@ -75,15 +71,10 @@ function makeGame(overrides: Partial<Game> = {}): Game {
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: undefined,
-    modeConfig: {
-      gameMode: GameMode.Werewolf,
-      nominationsEnabled: false,
-      singleTrialPerDay: true,
-      revealProtections: true,
-    },
-    timerConfig: DEFAULT_TIMER_CONFIG,
+    modeConfig: DEFAULT_SECRET_VILLAIN_MODE_CONFIG,
+    timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
     ...overrides,
-  };
+  } as Game;
 }
 
 beforeEach(() => {

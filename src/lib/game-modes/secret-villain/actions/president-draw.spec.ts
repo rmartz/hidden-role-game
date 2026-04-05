@@ -3,12 +3,8 @@ import { presidentDrawAction } from "./president-draw";
 import { SecretVillainPhase, PolicyCard, SvBoardPreset } from "../types";
 import type { SecretVillainTurnState } from "../types";
 import { BOARD_PRESETS } from "../utils";
-import {
-  GameMode,
-  GameStatus,
-  ShowRolesInPlay,
-  DEFAULT_TIMER_CONFIG,
-} from "@/lib/types";
+import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "../timer-config";
 import type { Game } from "@/lib/types";
 
 const baseTurnState: SecretVillainTurnState = {
@@ -49,7 +45,7 @@ function makeGame(ts: SecretVillainTurnState): Game {
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: undefined,
-    timerConfig: DEFAULT_TIMER_CONFIG,
+    timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
     modeConfig: { gameMode: GameMode.SecretVillain },
   };
 }

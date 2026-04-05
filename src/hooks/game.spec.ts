@@ -7,10 +7,11 @@ import {
   ShowRolesInPlay,
   Team,
 } from "@/lib/types";
-import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game-modes/werewolf/timer-config";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game-modes/secret-villain/timer-config";
+import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game-modes/secret-villain/lobby-config";
 import { ServerResponseStatus } from "@/server/types";
 import type { PlayerGameState, PublicLobby } from "@/server/types";
-import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
+import type { SecretVillainPlayerGameState } from "@/lib/game-modes/secret-villain/player-state";
 import { createWrapper } from "./test-utils";
 
 vi.mock("@/lib/api", () => ({
@@ -36,7 +37,7 @@ vi.mock("@/hooks/firebaseAuth", () => ({
 import * as api from "@/lib/api";
 import { useStartGame, useGameStateQuery } from "./game";
 
-const mockGameState: WerewolfPlayerGameState = {
+const mockGameState: SecretVillainPlayerGameState = {
   status: { type: GameStatus.Playing },
   gameMode: GameMode.SecretVillain,
   lobbyId: "lobby-1",
@@ -46,10 +47,7 @@ const mockGameState: WerewolfPlayerGameState = {
   myRole: { id: "villager", name: "Villager", team: Team.Good },
   visibleRoleAssignments: [],
   rolesInPlay: undefined,
-  nominationsEnabled: false,
-  singleTrialPerDay: true,
-  revealProtections: true,
-  timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
+  timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
 };
 
 const mockOwnerGameState: PlayerGameState = {
@@ -83,8 +81,8 @@ describe("useStartGame", () => {
             roleConfigMode: RoleConfigMode.Default,
             showConfigToPlayers: false,
             showRolesInPlay: ShowRolesInPlay.RoleAndCount,
-            modeConfig: { gameMode: GameMode.SecretVillain },
-            timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
+            modeConfig: DEFAULT_SECRET_VILLAIN_MODE_CONFIG,
+            timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
           },
           gameId: "game-1",
           readyPlayerIds: [],

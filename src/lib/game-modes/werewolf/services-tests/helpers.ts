@@ -1,11 +1,10 @@
-import {
-  GameMode,
-  GameStatus,
-  ShowRolesInPlay,
-  DEFAULT_TIMER_CONFIG,
-} from "@/lib/types";
+import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 import type { Game } from "@/lib/types";
-import { WerewolfPhase, WerewolfRole } from "@/lib/game-modes/werewolf";
+import {
+  WerewolfPhase,
+  WerewolfRole,
+  DEFAULT_WEREWOLF_TIMER_CONFIG,
+} from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
 import {
@@ -78,7 +77,7 @@ export function makeDaytimeGame(
       singleTrialPerDay: true,
       revealProtections: true,
     },
-    timerConfig: DEFAULT_TIMER_CONFIG,
+    timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   };
 }
 
@@ -127,7 +126,7 @@ export function makeDaytimeGameWithTrial(callerRoleId: WerewolfRole): Game {
       singleTrialPerDay: true,
       revealProtections: true,
     },
-    timerConfig: DEFAULT_TIMER_CONFIG,
+    timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   };
 }
 
@@ -174,6 +173,6 @@ export function makeDaytimeGameWithNominations(
       singleTrialPerDay: true,
       revealProtections: true,
     },
-    timerConfig: DEFAULT_TIMER_CONFIG,
+    timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   };
 }

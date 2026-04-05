@@ -1,11 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
-import {
-  GameMode,
-  RoleConfigMode,
-  ShowRolesInPlay,
-  DEFAULT_TIMER_CONFIG,
-} from "@/lib/types";
+import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game-modes/werewolf/timer-config";
 import { ServerResponseStatus } from "@/server/types";
 import type { PublicLobby } from "@/server/types";
 import { createWrapper } from "./test-utils";
@@ -25,7 +21,7 @@ const mockLobby: PublicLobby = {
       singleTrialPerDay: true,
       revealProtections: true,
     },
-    timerConfig: DEFAULT_TIMER_CONFIG,
+    timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   },
   readyPlayerIds: [],
 };

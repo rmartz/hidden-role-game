@@ -90,6 +90,9 @@ export function firebaseToGame(
     ? GAME_MODES[gameMode].parseModeConfig(rawModeConfig)
     : GAME_MODES[GameMode.Werewolf].parseModeConfig(rawModeConfig);
 
+  // Cast required: Game is a discriminated union keyed on gameMode, but we
+  // construct from runtime Firebase data where the discriminant is a string.
+  // This is the single boundary-cast location for Game deserialization.
   return {
     id: gameId,
     lobbyId: pub.lobbyId,
@@ -113,5 +116,5 @@ export function firebaseToGame(
     ...(pub.executionerTargetId
       ? { executionerTargetId: pub.executionerTargetId }
       : {}),
-  };
+  } as Game;
 }

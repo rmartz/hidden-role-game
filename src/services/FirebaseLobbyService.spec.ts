@@ -1,13 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { FirebaseLobbyService } from "./FirebaseLobbyService";
-import {
-  GameMode,
-  RoleConfigMode,
-  ShowRolesInPlay,
-  DEFAULT_TIMER_CONFIG,
-} from "@/lib/types";
+import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
 import type { Lobby } from "@/lib/types";
 import type { WerewolfModeConfig } from "@/lib/game-modes/werewolf/lobby-config";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game-modes/werewolf/timer-config";
 
 function makeBaseLobby(overrides: Partial<Lobby["config"]> = {}): Lobby {
   return {
@@ -27,9 +23,9 @@ function makeBaseLobby(overrides: Partial<Lobby["config"]> = {}): Lobby {
         singleTrialPerDay: true,
         revealProtections: true,
       },
-      timerConfig: DEFAULT_TIMER_CONFIG,
+      timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
       ...overrides,
-    },
+    } as Lobby["config"],
   };
 }
 

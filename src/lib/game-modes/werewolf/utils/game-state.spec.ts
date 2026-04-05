@@ -1,11 +1,7 @@
 import { describe, it, expect } from "vitest";
-import {
-  GameMode,
-  GameStatus,
-  ShowRolesInPlay,
-  DEFAULT_TIMER_CONFIG,
-} from "@/lib/types";
+import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 import type { Game } from "@/lib/types";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "../timer-config";
 import { WerewolfPhase } from "../types";
 import type { WerewolfTurnState } from "../types";
 import { WerewolfRole } from "../roles";
@@ -31,9 +27,9 @@ function makePlayingGame(
       singleTrialPerDay: true,
       revealProtections: true,
     },
-    timerConfig: DEFAULT_TIMER_CONFIG,
+    timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     ...overrides,
-  };
+  } as Game;
 }
 
 const nightTurnState: WerewolfTurnState = {
@@ -82,7 +78,7 @@ describe("isOwnerPlaying", () => {
         singleTrialPerDay: true,
         revealProtections: true,
       },
-      timerConfig: DEFAULT_TIMER_CONFIG,
+      timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     };
     expect(isOwnerPlaying(game, "owner-1")).toBe(false);
   });
@@ -116,7 +112,7 @@ describe("currentTurnState", () => {
         singleTrialPerDay: true,
         revealProtections: true,
       },
-      timerConfig: DEFAULT_TIMER_CONFIG,
+      timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     };
     expect(currentTurnState(game)).toBeUndefined();
   });
@@ -138,7 +134,7 @@ describe("currentTurnState", () => {
         singleTrialPerDay: true,
         revealProtections: true,
       },
-      timerConfig: DEFAULT_TIMER_CONFIG,
+      timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     };
     expect(currentTurnState(game)).toBeUndefined();
   });

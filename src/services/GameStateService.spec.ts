@@ -1,14 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { GameStateService } from "./GameStateService";
-import {
-  GameMode,
-  GameStatus,
-  ShowRolesInPlay,
-  Team,
-  DEFAULT_TIMER_CONFIG,
-} from "@/lib/types";
+import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
 import type { Game, GamePlayer, RoleSlot } from "@/lib/types";
 import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game-modes/secret-villain/timer-config";
+import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game-modes/secret-villain/lobby-config";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game-modes/werewolf/timer-config";
 
 const DEFAULT_SLOTS: RoleSlot[] = [
   { roleId: "good", min: 1, max: 1 },
@@ -43,13 +40,8 @@ function makeGameWithPlayers(
     configuredRoleSlots,
     showRolesInPlay,
     ownerPlayerId: undefined,
-    modeConfig: {
-      gameMode: GameMode.Werewolf,
-      nominationsEnabled: false,
-      singleTrialPerDay: true,
-      revealProtections: true,
-    },
-    timerConfig: DEFAULT_TIMER_CONFIG,
+    modeConfig: DEFAULT_SECRET_VILLAIN_MODE_CONFIG,
+    timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
   };
 }
 
@@ -163,7 +155,7 @@ function makeNarratorGame(nominationsEnabled = false): Game {
       singleTrialPerDay: true,
       revealProtections: true,
     },
-    timerConfig: DEFAULT_TIMER_CONFIG,
+    timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   };
 }
 
