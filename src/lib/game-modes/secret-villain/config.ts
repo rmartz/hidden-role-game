@@ -3,6 +3,10 @@ import type { GameModeConfig } from "@/lib/types";
 import { MIN_PLAYERS, defaultRoleCount, SECRET_VILLAIN_ROLES } from "./roles";
 import { SECRET_VILLAIN_ACTIONS } from "./actions";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "./timer-config";
+import {
+  DEFAULT_SECRET_VILLAIN_MODE_CONFIG,
+  parseSecretVillainModeConfig,
+} from "./lobby-config";
 import { secretVillainServices } from "./services";
 
 export const SECRET_VILLAIN_CONFIG = {
@@ -16,6 +20,8 @@ export const SECRET_VILLAIN_CONFIG = {
   roles: SECRET_VILLAIN_ROLES,
   defaultRoleCount,
   defaultTimerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
+  defaultModeConfig: DEFAULT_SECRET_VILLAIN_MODE_CONFIG,
+  parseModeConfig: parseSecretVillainModeConfig,
   actions: SECRET_VILLAIN_ACTIONS,
   services: secretVillainServices,
 } satisfies GameModeConfig;

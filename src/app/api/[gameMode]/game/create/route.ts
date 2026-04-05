@@ -63,14 +63,7 @@ export async function POST(
     lobby.config.showRolesInPlay,
     ownerPlayer?.id ?? undefined,
     lobby.config.timerConfig,
-    {
-      nominationsEnabled: lobby.config.nominationsEnabled,
-      singleTrialPerDay: lobby.config.singleTrialPerDay,
-      revealProtections: lobby.config.revealProtections,
-      ...(lobby.config.boardPreset
-        ? { boardPreset: lobby.config.boardPreset }
-        : {}),
-    },
+    lobby.config.modeConfig,
   );
 
   await lobbyService.clearReadyPlayerIds(lobbyId);

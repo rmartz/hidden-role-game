@@ -4,8 +4,14 @@ import type {
   PlayerRoleAssignment,
   TimerConfig,
 } from "@/lib/types";
+import { GameMode } from "@/lib/types";
+import { GAME_MODES } from "@/lib/game-modes";
 import type { FirebaseLobbyPlayer, FirebaseRoleSlot } from "./lobby";
-import { firebaseToRoleSlot, parseTimerConfig } from "./lobby";
+import {
+  firebaseToRoleSlot,
+  modeConfigToFirebase,
+  parseTimerConfig,
+} from "./lobby";
 
 export interface FirebaseGamePublic {
   lobbyId: string;
@@ -20,9 +26,8 @@ export interface FirebaseGamePublic {
   showRolesInPlay: string;
   ownerPlayerId: string | null;
   timerConfig: TimerConfig;
-  nominationsEnabled?: boolean;
-  singleTrialPerDay?: boolean;
-  revealProtections?: boolean;
+  /** Game-mode-specific config stored as a flat record. Firebase omits empty objects. */
+  modeConfig?: Record<string, unknown>;
   executionerTargetId?: string;
   /** Unix ms timestamp set server-side at game creation. Used for TTL cleanup. */
   createdAt?: number;
@@ -59,9 +64,10 @@ export function gameToFirebase(game: Game): FirebaseGamePublic {
     showRolesInPlay: game.showRolesInPlay,
     ownerPlayerId: game.ownerPlayerId ?? null,
     timerConfig: game.timerConfig,
-    nominationsEnabled: game.nominationsEnabled,
-    singleTrialPerDay: game.singleTrialPerDay,
-    revealProtections: game.revealProtections,
+    ...(() => {
+      const mc = modeConfigToFirebase(game.modeConfig);
+      return Object.keys(mc).length > 0 ? { modeConfig: mc } : {};
+    })(),
     ...(game.executionerTargetId
       ? { executionerTargetId: game.executionerTargetId }
       : {}),
@@ -96,9 +102,13 @@ export function firebaseToGame(
     timerConfig: parseTimerConfig(
       pub.timerConfig as unknown as Record<string, unknown>,
     ),
-    nominationsEnabled: pub.nominationsEnabled ?? false,
-    singleTrialPerDay: pub.singleTrialPerDay ?? false,
-    revealProtections: pub.revealProtections ?? false,
+    modeConfig: (() => {
+      const gm = pub.gameMode as GameMode;
+      const raw = pub.modeConfig ?? {};
+      return Object.values(GameMode).includes(gm)
+        ? GAME_MODES[gm].parseModeConfig(raw)
+        : GAME_MODES[GameMode.Werewolf].parseModeConfig(raw);
+    })(),
     ...(pub.executionerTargetId
       ? { executionerTargetId: pub.executionerTargetId }
       : {}),

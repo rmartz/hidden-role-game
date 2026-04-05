@@ -2,9 +2,7 @@ import { createSlice, createSelector } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { sum } from "lodash";
 import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
-import type { RoleSlot } from "@/lib/types";
-import type { WerewolfTimerConfig } from "@/lib/game-modes/werewolf/timer-config";
-import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game-modes/werewolf/timer-config";
+import type { ModeConfig, RoleSlot, TimerConfig } from "@/lib/types";
 import type { GameConfig } from "@/server/types";
 import { GAME_MODES } from "@/lib/game-modes";
 
@@ -56,17 +54,18 @@ export interface GameConfigState {
   roleMaxes: Record<string, number>;
   showConfigToPlayers: boolean;
   showRolesInPlay: ShowRolesInPlay;
-  timerConfig: WerewolfTimerConfig;
-  nominationEnabled: boolean;
-  singleTrialPerDay: boolean;
-  revealProtections: boolean;
+  timerConfig: TimerConfig;
+  /** Game-mode-specific configuration. Discriminated by `modeConfig.gameMode`. */
+  modeConfig: ModeConfig;
   isValid: boolean;
   /** Increments on every user-initiated action. Used to detect when a sync is needed. */
   syncVersion: number;
 }
 
+const defaultMode = GameMode.SecretVillain;
+
 const initialState: GameConfigState = {
-  gameMode: GameMode.SecretVillain,
+  gameMode: defaultMode,
   playerCount: 5,
   roleConfigMode: RoleConfigMode.Default,
   roleCounts: {},
@@ -74,10 +73,8 @@ const initialState: GameConfigState = {
   roleMaxes: {},
   showConfigToPlayers: false,
   showRolesInPlay: ShowRolesInPlay.None,
-  timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
-  nominationEnabled: true,
-  singleTrialPerDay: true,
-  revealProtections: true,
+  timerConfig: GAME_MODES[defaultMode].defaultTimerConfig,
+  modeConfig: GAME_MODES[defaultMode].defaultModeConfig,
   isValid: false,
   syncVersion: 0,
 };
@@ -115,21 +112,20 @@ const gameConfigSlice = createSlice({
       state.roleMaxes = roleMaxesFromSlots(slots);
       state.showConfigToPlayers = config.showConfigToPlayers;
       state.showRolesInPlay = config.showRolesInPlay;
-      state.timerConfig = config.timerConfig as WerewolfTimerConfig;
-      state.nominationEnabled = config.nominationsEnabled;
-      state.singleTrialPerDay = config.singleTrialPerDay;
-      state.revealProtections = config.revealProtections;
+      state.timerConfig = config.timerConfig;
+      state.modeConfig = config.modeConfig;
       state.isValid = recomputeIsValid(state);
     },
 
     setGameMode(state, action: PayloadAction<GameMode>) {
       state.gameMode = action.payload;
-      const slots = GAME_MODES[action.payload].defaultRoleCount(
-        state.playerCount,
-      );
+      const modeConfig = GAME_MODES[action.payload];
+      const slots = modeConfig.defaultRoleCount(state.playerCount);
       state.roleCounts = roleCountsFromSlots(slots);
       state.roleMins = roleMinsFromSlots(slots);
       state.roleMaxes = roleMaxesFromSlots(slots);
+      state.timerConfig = modeConfig.defaultTimerConfig;
+      state.modeConfig = modeConfig.defaultModeConfig;
       state.isValid = recomputeIsValid(state);
       state.syncVersion++;
     },
@@ -247,23 +243,24 @@ const gameConfigSlice = createSlice({
       state.syncVersion++;
     },
 
-    setTimerConfig(state, action: PayloadAction<WerewolfTimerConfig>) {
+    setTimerConfig(state, action: PayloadAction<TimerConfig>) {
       state.timerConfig = action.payload;
       state.syncVersion++;
     },
 
-    setNominationEnabled(state, action: PayloadAction<boolean>) {
-      state.nominationEnabled = action.payload;
+    setModeConfig(state, action: PayloadAction<ModeConfig>) {
+      state.modeConfig = action.payload;
       state.syncVersion++;
     },
 
-    setSingleTrialPerDay(state, action: PayloadAction<boolean>) {
-      state.singleTrialPerDay = action.payload;
-      state.syncVersion++;
-    },
-
-    setRevealProtections(state, action: PayloadAction<boolean>) {
-      state.revealProtections = action.payload;
+    updateModeConfigField(
+      state,
+      action: PayloadAction<{ key: string; value: unknown }>,
+    ) {
+      state.modeConfig = {
+        ...state.modeConfig,
+        [action.payload.key]: action.payload.value,
+      } as ModeConfig;
       state.syncVersion++;
     },
   },
@@ -303,9 +300,8 @@ export const {
   setShowConfigToPlayers,
   setShowRolesInPlay,
   setTimerConfig,
-  setNominationEnabled,
-  setSingleTrialPerDay,
-  setRevealProtections,
+  setModeConfig,
+  updateModeConfigField,
 } = gameConfigSlice.actions;
 
 export default gameConfigSlice.reducer;

@@ -71,9 +71,12 @@ describe("extractDaytimePlayerState — playerCount excludes silenced", () => {
       configuredRoleSlots: [],
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner",
-      nominationsEnabled: false,
-      singleTrialPerDay: true,
-      revealProtections: true,
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: false,
+        singleTrialPerDay: true,
+        revealProtections: true,
+      },
       timerConfig: DEFAULT_TIMER_CONFIG,
     };
     const result = extractDaytimeState(game, "p3");
@@ -116,9 +119,12 @@ describe("extractDaytimePlayerState — playerCount excludes silenced", () => {
       configuredRoleSlots: [],
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner",
-      nominationsEnabled: false,
-      singleTrialPerDay: true,
-      revealProtections: true,
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: false,
+        singleTrialPerDay: true,
+        revealProtections: true,
+      },
       timerConfig: DEFAULT_TIMER_CONFIG,
     };
     const result = extractDaytimeState(game, "p2");

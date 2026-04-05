@@ -2,6 +2,7 @@ import { GameStatus } from "@/lib/types";
 import type { Game } from "@/lib/types";
 import type { DaytimeNightStatusEntry } from "@/server/types";
 import type { WerewolfPlayerGameState } from "../player-state";
+import { getWerewolfModeConfig } from "../lobby-config";
 import type {
   AltruistInterceptedNightResolutionEvent,
   AnyNightAction,
@@ -85,7 +86,7 @@ export function extractDaytimeNightSummary(
       e.type === "killed" &&
       !e.died &&
       e.protectedBy.length > 0 &&
-      game.revealProtections
+      getWerewolfModeConfig(game).revealProtections
     ) {
       return [{ targetPlayerId: e.targetPlayerId, effect: "protected" }];
     }
@@ -138,7 +139,7 @@ export function extractDaytimePlayerState(
   const result: Partial<WerewolfPlayerGameState> = {};
 
   // Nominations.
-  if (game.nominationsEnabled) {
+  if (getWerewolfModeConfig(game).nominationsEnabled) {
     const nominations = phase.nominations ?? [];
     const nominatorsByDefendant = nominations.reduce<Record<string, string[]>>(
       (acc, n) => {

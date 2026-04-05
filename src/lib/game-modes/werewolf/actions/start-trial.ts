@@ -1,5 +1,6 @@
 import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase } from "../types";
+import { getWerewolfModeConfig } from "../lobby-config";
 import {
   currentTurnState,
   isOwnerPlaying,
@@ -16,7 +17,11 @@ export const startTrialAction: GameAction = {
     if (ts.phase.type !== WerewolfPhase.Daytime) return false;
     if (ts.phase.activeTrial && !ts.phase.activeTrial.verdict) return false;
     // Single trial per day: cannot start another trial after one has concluded
-    if (game.singleTrialPerDay && ts.phase.activeTrial?.verdict) return false;
+    if (
+      getWerewolfModeConfig(game).singleTrialPerDay &&
+      ts.phase.activeTrial?.verdict
+    )
+      return false;
     const { defendantId } = payload as { defendantId?: unknown };
     if (typeof defendantId !== "string") return false;
     if (defendantId === game.ownerPlayerId) return false;

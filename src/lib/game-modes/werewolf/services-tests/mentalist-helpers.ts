@@ -54,9 +54,12 @@ export function makeMentalistGame(
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: undefined,
-    nominationsEnabled: false,
-    singleTrialPerDay: true,
-    revealProtections: true,
+    modeConfig: {
+      gameMode: GameMode.Werewolf,
+      nominationsEnabled: false,
+      singleTrialPerDay: true,
+      revealProtections: true,
+    },
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }

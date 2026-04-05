@@ -1,11 +1,12 @@
 import type {
   Lobby,
   GameMode,
+  ModeConfig,
   RoleSlot,
   RoleConfigMode,
   ShowRolesInPlay,
 } from "@/lib/types";
-import type { SvBoardPreset } from "@/lib/game-modes/secret-villain/types";
+import { modeConfigToFirebase } from "@/lib/firebase/schema";
 import { getAdminDatabase } from "@/lib/firebase/admin";
 import { ServerValue } from "firebase-admin/database";
 import {
@@ -186,10 +187,7 @@ export class FirebaseLobbyService {
       gameMode?: GameMode;
       roleSlots?: RoleSlot[];
       timerConfig?: import("@/lib/types").TimerConfig;
-      nominationsEnabled?: boolean;
-      singleTrialPerDay?: boolean;
-      revealProtections?: boolean;
-      boardPreset?: SvBoardPreset;
+      modeConfig?: ModeConfig;
     },
   ): Promise<Lobby | undefined> {
     const snap = await lobbyRef(lobbyId).once("value");
@@ -233,21 +231,10 @@ export class FirebaseLobbyService {
       updates["public/config/timerConfig"] = config.timerConfig;
       data.public.config.timerConfig = config.timerConfig;
     }
-    if (config.nominationsEnabled !== undefined) {
-      updates["public/config/nominationsEnabled"] = config.nominationsEnabled;
-      data.public.config.nominationsEnabled = config.nominationsEnabled;
-    }
-    if (config.singleTrialPerDay !== undefined) {
-      updates["public/config/singleTrialPerDay"] = config.singleTrialPerDay;
-      data.public.config.singleTrialPerDay = config.singleTrialPerDay;
-    }
-    if (config.revealProtections !== undefined) {
-      updates["public/config/revealProtections"] = config.revealProtections;
-      data.public.config.revealProtections = config.revealProtections;
-    }
-    if (config.boardPreset !== undefined) {
-      updates["public/config/boardPreset"] = config.boardPreset;
-      data.public.config.boardPreset = config.boardPreset;
+    if (config.modeConfig !== undefined) {
+      const firebaseModeConfig = modeConfigToFirebase(config.modeConfig);
+      updates["public/config/modeConfig"] = firebaseModeConfig;
+      data.public.config.modeConfig = firebaseModeConfig;
     }
 
     if (Object.keys(updates).length > 0) {

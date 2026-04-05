@@ -4,6 +4,10 @@ import type { GameModeConfig } from "@/lib/types";
 import { MIN_PLAYERS, defaultRoleCount, WEREWOLF_ROLES } from "./roles";
 import { WEREWOLF_ACTIONS } from "./actions";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "./timer-config";
+import {
+  DEFAULT_WEREWOLF_MODE_CONFIG,
+  parseWerewolfModeConfig,
+} from "./lobby-config";
 import { werewolfServices } from "./services";
 
 export const WEREWOLF_CONFIG = {
@@ -18,6 +22,8 @@ export const WEREWOLF_CONFIG = {
   roles: WEREWOLF_ROLES,
   defaultRoleCount,
   defaultTimerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
+  defaultModeConfig: DEFAULT_WEREWOLF_MODE_CONFIG,
+  parseModeConfig: parseWerewolfModeConfig,
   actions: WEREWOLF_ACTIONS,
   services: werewolfServices,
   // The Narrator is a player but doesn't receive a role.

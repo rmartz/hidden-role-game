@@ -7,6 +7,7 @@ import {
   DEFAULT_TIMER_CONFIG,
 } from "@/lib/types";
 import type { Lobby } from "@/lib/types";
+import type { WerewolfModeConfig } from "@/lib/game-modes/werewolf/lobby-config";
 
 function makeBaseLobby(overrides: Partial<Lobby["config"]> = {}): Lobby {
   return {
@@ -20,9 +21,12 @@ function makeBaseLobby(overrides: Partial<Lobby["config"]> = {}): Lobby {
       roleSlots: [],
       showConfigToPlayers: false,
       showRolesInPlay: ShowRolesInPlay.None,
-      nominationsEnabled: false,
-      singleTrialPerDay: true,
-      revealProtections: true,
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: false,
+        singleTrialPerDay: true,
+        revealProtections: true,
+      },
       timerConfig: DEFAULT_TIMER_CONFIG,
       ...overrides,
     },
@@ -35,49 +39,106 @@ describe("FirebaseLobbyService.updateConfig — nominationsEnabled", () => {
     await service.addLobby(makeBaseLobby());
 
     const updated = await service.updateConfig("lobby-1", {
-      nominationsEnabled: true,
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: true,
+        singleTrialPerDay: true,
+        revealProtections: true,
+      },
     });
 
-    expect(updated?.config.nominationsEnabled).toBe(true);
+    expect(
+      (updated!.config.modeConfig as WerewolfModeConfig).nominationsEnabled,
+    ).toBe(true);
   });
 
   it("sets nominationsEnabled to false when false is provided", async () => {
     const service = new FirebaseLobbyService();
-    await service.addLobby(makeBaseLobby({ nominationsEnabled: true }));
+    await service.addLobby(
+      makeBaseLobby({
+        modeConfig: {
+          gameMode: GameMode.Werewolf,
+          nominationsEnabled: true,
+          singleTrialPerDay: true,
+          revealProtections: true,
+        },
+      }),
+    );
 
     const updated = await service.updateConfig("lobby-1", {
-      nominationsEnabled: false,
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: false,
+        singleTrialPerDay: true,
+        revealProtections: true,
+      },
     });
 
-    expect(updated?.config.nominationsEnabled).toBe(false);
+    expect(
+      (updated!.config.modeConfig as WerewolfModeConfig).nominationsEnabled,
+    ).toBe(false);
   });
 
   it("a subsequent getLobby reflects the updated nominationsEnabled", async () => {
     const service = new FirebaseLobbyService();
-    await service.addLobby(makeBaseLobby({ nominationsEnabled: true }));
-    await service.updateConfig("lobby-1", { nominationsEnabled: false });
+    await service.addLobby(
+      makeBaseLobby({
+        modeConfig: {
+          gameMode: GameMode.Werewolf,
+          nominationsEnabled: true,
+          singleTrialPerDay: true,
+          revealProtections: true,
+        },
+      }),
+    );
+    await service.updateConfig("lobby-1", {
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: false,
+        singleTrialPerDay: true,
+        revealProtections: true,
+      },
+    });
 
     const fetched = await service.getLobby("lobby-1");
 
-    expect(fetched?.config.nominationsEnabled).toBe(false);
+    expect(
+      (fetched!.config.modeConfig as WerewolfModeConfig).nominationsEnabled,
+    ).toBe(false);
   });
 
-  it("omitting nominationsEnabled leaves an existing value intact", async () => {
+  it("omitting modeConfig leaves existing modeConfig intact", async () => {
     const service = new FirebaseLobbyService();
-    await service.addLobby(makeBaseLobby({ nominationsEnabled: true }));
+    await service.addLobby(
+      makeBaseLobby({
+        modeConfig: {
+          gameMode: GameMode.Werewolf,
+          nominationsEnabled: true,
+          singleTrialPerDay: true,
+          revealProtections: true,
+        },
+      }),
+    );
 
     const updated = await service.updateConfig("lobby-1", {
       showConfigToPlayers: true,
     });
 
-    expect(updated?.config.nominationsEnabled).toBe(true);
+    expect(
+      (updated!.config.modeConfig as WerewolfModeConfig).nominationsEnabled,
+    ).toBe(true);
   });
 
   it("returns undefined when the lobby does not exist", async () => {
     const service = new FirebaseLobbyService();
 
     const result = await service.updateConfig("no-such-lobby", {
-      nominationsEnabled: true,
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: true,
+        singleTrialPerDay: true,
+        revealProtections: true,
+      },
     });
 
     expect(result).toBeUndefined();

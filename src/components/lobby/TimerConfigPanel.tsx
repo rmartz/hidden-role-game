@@ -1,24 +1,27 @@
 "use client";
 
-import type { WerewolfTimerConfig } from "@/lib/game-modes/werewolf/timer-config";
+import type { TimerConfig } from "@/lib/types";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { TIMER_CONFIG_COPY } from "./TimerConfigPanel.copy";
-import { TimerConfigPanelRow, TIMER_ROWS } from "./TimerConfigPanelRow";
+import { TimerConfigPanelRow } from "./TimerConfigPanelRow";
 import type { TimerRow } from "./TimerConfigPanelRow";
 
 interface TimerConfigPanelProps {
-  timerConfig: WerewolfTimerConfig;
+  timerConfig: TimerConfig;
+  rows: TimerRow[];
   disabled?: boolean;
-  onChange?: (config: WerewolfTimerConfig) => void;
+  onChange?: (config: TimerConfig) => void;
 }
 
 export function TimerConfigPanel({
   timerConfig,
+  rows,
   disabled,
   onChange,
 }: TimerConfigPanelProps) {
   const readOnly = !onChange;
+  const config = timerConfig as unknown as Record<string, unknown>;
 
   function handleAutoAdvanceChange(checked: boolean) {
     onChange?.({ ...timerConfig, autoAdvance: checked });
@@ -29,12 +32,12 @@ export function TimerConfigPanel({
     direction: "increment" | "decrement",
   ) {
     if (!onChange) return;
-    const current = timerConfig[row.field];
+    const current = config[row.field] as number;
     const next =
       direction === "increment"
         ? Math.min(row.max, current + row.step)
         : Math.max(row.min, current - row.step);
-    onChange({ ...timerConfig, [row.field]: next });
+    onChange({ ...timerConfig, [row.field]: next } as TimerConfig);
   }
 
   return (
@@ -51,11 +54,11 @@ export function TimerConfigPanel({
           {TIMER_CONFIG_COPY.autoAdvance}
         </Label>
       </div>
-      {TIMER_ROWS.map((row) => (
+      {rows.map((row) => (
         <TimerConfigPanelRow
           key={row.field}
           row={row}
-          value={timerConfig[row.field]}
+          value={config[row.field] as number}
           readOnly={readOnly}
           disabled={disabled ?? false}
           onIncrement={handleIncrement}

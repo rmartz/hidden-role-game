@@ -5,6 +5,7 @@ import type {
   RoleDefinition,
 } from "@/lib/types";
 import type { WerewolfPlayerGameState } from "../player-state";
+import { getWerewolfModeConfig } from "../lobby-config";
 import { WerewolfRole } from "../roles";
 import {
   selectExecutionerTarget,
@@ -88,11 +89,12 @@ export const werewolfServices: GameModeServices = {
         >);
 
     // Include Werewolf-specific game settings in the player state.
+    const wwConfig = getWerewolfModeConfig(game);
     return {
       ...modeState,
-      nominationsEnabled: game.nominationsEnabled as unknown,
-      singleTrialPerDay: game.singleTrialPerDay as unknown,
-      revealProtections: game.revealProtections as unknown,
+      nominationsEnabled: wwConfig.nominationsEnabled as unknown,
+      singleTrialPerDay: wwConfig.singleTrialPerDay as unknown,
+      revealProtections: wwConfig.revealProtections as unknown,
     };
   },
 };

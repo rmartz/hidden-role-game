@@ -39,7 +39,7 @@ export class GameService {
     showRolesInPlay: ShowRolesInPlay,
     ownerPlayerId: string | undefined,
     timerConfig: import("@/lib/types").TimerConfig,
-    modeConfig?: Record<string, unknown>,
+    modeConfig?: import("@/lib/types").ModeConfig,
   ): Promise<Game> {
     const game = this.state.buildGame(
       randomUUID(),

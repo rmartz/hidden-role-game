@@ -5,8 +5,8 @@ import type {
   RoleSlot,
   TimerConfig,
 } from "@/lib/types";
-import { DEFAULT_TIMER_CONFIG } from "@/lib/types";
-import type { SvBoardPreset } from "@/lib/game-modes/secret-villain/types";
+import { DEFAULT_TIMER_CONFIG, GameMode } from "@/lib/types";
+import { GAME_MODES } from "@/lib/game-modes";
 import type { PublicLobby } from "@/server/types";
 
 export interface FirebaseLobbyPublic {
@@ -36,10 +36,8 @@ export interface FirebaseLobbyConfig {
   showConfigToPlayers: boolean;
   showRolesInPlay: string;
   timerConfig: TimerConfig;
-  nominationsEnabled?: boolean;
-  singleTrialPerDay?: boolean;
-  revealProtections?: boolean;
-  boardPreset?: SvBoardPreset;
+  /** Game-mode-specific config stored as a flat record. Firebase omits empty objects. */
+  modeConfig?: Record<string, unknown>;
 }
 
 export interface FirebaseRoleSlot {
@@ -85,7 +83,18 @@ export function lobbyToFirebase(lobby: Lobby): {
   };
 }
 
+/** Strip the `gameMode` discriminant before writing to Firebase. */
+export function modeConfigToFirebase(
+  modeConfig: import("@/lib/types").ModeConfig,
+): Record<string, unknown> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { gameMode: _discriminant, ...rest } = modeConfig;
+  return rest;
+}
+
 function lobbyConfigToFirebase(config: LobbyConfig): FirebaseLobbyConfig {
+  const firebaseModeConfig = modeConfigToFirebase(config.modeConfig);
+  const hasModeConfig = Object.keys(firebaseModeConfig).length > 0;
   return {
     gameMode: config.gameMode,
     roleConfigMode: config.roleConfigMode,
@@ -97,10 +106,7 @@ function lobbyConfigToFirebase(config: LobbyConfig): FirebaseLobbyConfig {
     showConfigToPlayers: config.showConfigToPlayers,
     showRolesInPlay: config.showRolesInPlay,
     timerConfig: config.timerConfig,
-    nominationsEnabled: config.nominationsEnabled,
-    singleTrialPerDay: config.singleTrialPerDay,
-    revealProtections: config.revealProtections,
-    ...(config.boardPreset ? { boardPreset: config.boardPreset } : {}),
+    ...(hasModeConfig ? { modeConfig: firebaseModeConfig } : {}),
   };
 }
 
@@ -120,30 +126,29 @@ export function firebaseToLobby(
     id: lobbyId,
     ownerSessionId: priv.ownerSessionId,
     players,
-    config: {
-      gameMode: pub.config.gameMode as LobbyConfig["gameMode"],
-      roleConfigMode: pub.config
-        .roleConfigMode as LobbyConfig["roleConfigMode"],
-      roleSlots: (pub.config.roleSlots ?? []).map(firebaseToRoleSlot),
-      showConfigToPlayers: pub.config.showConfigToPlayers,
-      showRolesInPlay: pub.config
-        .showRolesInPlay as LobbyConfig["showRolesInPlay"],
-      // The TypeScript type says TimerConfig, but old Firebase documents may
-      // have partial data (e.g. missing autoAdvance). Cast to raw Record so
-      // parseTimerConfig validates each field and fills defaults, rather than
-      // blindly trusting the cast value.
-      timerConfig: parseTimerConfig(
-        pub.config.timerConfig as unknown as Record<string, unknown>,
-      ),
-      nominationsEnabled: pub.config.nominationsEnabled ?? false,
-      singleTrialPerDay: pub.config.singleTrialPerDay ?? false,
-      revealProtections: pub.config.revealProtections ?? false,
-      ...(pub.config.boardPreset
-        ? { boardPreset: pub.config.boardPreset }
-        : {}),
-    },
+    config: firebaseToLobbyConfig(pub.config),
     readyPlayerIds: pub.readyPlayerIds ?? [],
     ...(pub.gameId ? { gameId: pub.gameId } : {}),
+  };
+}
+
+function firebaseToLobbyConfig(config: FirebaseLobbyConfig): LobbyConfig {
+  const gameMode = config.gameMode as LobbyConfig["gameMode"];
+  const rawModeConfig = config.modeConfig ?? {};
+  const modeConfig = Object.values(GameMode).includes(gameMode)
+    ? GAME_MODES[gameMode].parseModeConfig(rawModeConfig)
+    : GAME_MODES[GameMode.Werewolf].parseModeConfig(rawModeConfig);
+
+  return {
+    gameMode,
+    roleConfigMode: config.roleConfigMode as LobbyConfig["roleConfigMode"],
+    roleSlots: (config.roleSlots ?? []).map(firebaseToRoleSlot),
+    showConfigToPlayers: config.showConfigToPlayers,
+    showRolesInPlay: config.showRolesInPlay as LobbyConfig["showRolesInPlay"],
+    timerConfig: parseTimerConfig(
+      config.timerConfig as unknown as Record<string, unknown>,
+    ),
+    modeConfig,
   };
 }
 
@@ -198,28 +203,7 @@ export function firebaseToPublicLobby(
       id: p.id,
       name: p.name,
     })),
-    config: {
-      gameMode: pub.config.gameMode as LobbyConfig["gameMode"],
-      roleConfigMode: pub.config
-        .roleConfigMode as LobbyConfig["roleConfigMode"],
-      roleSlots: (pub.config.roleSlots ?? []).map(firebaseToRoleSlot),
-      showConfigToPlayers: pub.config.showConfigToPlayers,
-      showRolesInPlay: pub.config
-        .showRolesInPlay as LobbyConfig["showRolesInPlay"],
-      // The TypeScript type says TimerConfig, but old Firebase documents may
-      // have partial data (e.g. missing autoAdvance). Cast to raw Record so
-      // parseTimerConfig validates each field and fills defaults, rather than
-      // blindly trusting the cast value.
-      timerConfig: parseTimerConfig(
-        pub.config.timerConfig as unknown as Record<string, unknown>,
-      ),
-      nominationsEnabled: pub.config.nominationsEnabled ?? false,
-      singleTrialPerDay: pub.config.singleTrialPerDay ?? false,
-      revealProtections: pub.config.revealProtections ?? false,
-      ...(pub.config.boardPreset
-        ? { boardPreset: pub.config.boardPreset }
-        : {}),
-    },
+    config: firebaseToLobbyConfig(pub.config),
     readyPlayerIds: pub.readyPlayerIds ?? [],
     ...(pub.gameId ? { gameId: pub.gameId } : {}),
   };

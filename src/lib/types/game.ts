@@ -1,5 +1,3 @@
-import type { SvBoardPreset } from "@/lib/game-modes/secret-villain/types";
-
 export interface LobbyPlayer {
   id: string;
   name: string;
@@ -174,6 +172,12 @@ export interface GameModeConfig {
     roleCounts: Record<string, number>,
   ): boolean;
   readonly defaultTimerConfig: TimerConfig;
+  /** Default game-mode-specific lobby config fields. */
+  readonly defaultModeConfig: import("./mode-config").ModeConfig;
+  /** Parse raw Firebase data into typed mode-specific config, applying defaults. */
+  parseModeConfig(
+    raw: Record<string, unknown>,
+  ): import("./mode-config").ModeConfig;
   readonly actions: Record<string, GameAction>;
   readonly services: GameModeServices;
 }
@@ -215,12 +219,8 @@ export interface Game {
   showRolesInPlay: ShowRolesInPlay;
   ownerPlayerId?: string;
   timerConfig: TimerConfig;
-  /** Whether player nominations for trial are enabled. */
-  nominationsEnabled: boolean;
-  /** When true, only one trial is allowed per day phase. */
-  singleTrialPerDay: boolean;
-  /** When true, the night summary reveals players who were attacked but saved by protection. */
-  revealProtections: boolean;
+  /** Game-mode-specific configuration. Discriminated by `modeConfig.gameMode`. */
+  modeConfig: import("./mode-config").ModeConfig;
   /** Executioner: the player ID the Executioner must get eliminated at trial. */
   executionerTargetId?: string;
 }
@@ -258,14 +258,8 @@ export interface LobbyConfig {
   showConfigToPlayers: boolean;
   showRolesInPlay: ShowRolesInPlay;
   timerConfig: TimerConfig;
-  /** Whether player nominations for trial are enabled. */
-  nominationsEnabled: boolean;
-  /** When true, only one trial is allowed per day phase. */
-  singleTrialPerDay: boolean;
-  /** When true, the night summary reveals players who were attacked but saved by protection. */
-  revealProtections: boolean;
-  /** Secret Villain board preset (determines special action powers). */
-  boardPreset?: SvBoardPreset;
+  /** Game-mode-specific configuration. Discriminated by `modeConfig.gameMode`. */
+  modeConfig: import("./mode-config").ModeConfig;
 }
 
 export interface Lobby {

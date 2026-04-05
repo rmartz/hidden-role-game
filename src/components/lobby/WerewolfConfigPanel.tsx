@@ -4,7 +4,7 @@ import type { WerewolfTimerConfig } from "@/lib/game-modes/werewolf/timer-config
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { WEREWOLF_CONFIG_PANEL_COPY } from "./WerewolfConfigPanel.copy";
-import { TimerConfigPanel } from "./TimerConfigPanel";
+import { WerewolfTimerConfigPanel } from "./WerewolfTimerConfigPanel";
 
 interface WerewolfConfigPanelProps {
   timerConfig: WerewolfTimerConfig;
@@ -64,7 +64,7 @@ export function WerewolfConfigPanel({
           {WEREWOLF_CONFIG_PANEL_COPY.revealProtections}
         </Label>
       </div>
-      <TimerConfigPanel
+      <WerewolfTimerConfigPanel
         timerConfig={timerConfig}
         disabled={disabled}
         onChange={onWerewolfTimerConfigChange}

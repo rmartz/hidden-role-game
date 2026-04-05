@@ -16,12 +16,11 @@ import type { GameInfo } from "./DebugGameView";
 const DEFAULT_CONFIG: GameConfig = {
   gameMode: GameMode.Werewolf,
   roleConfigMode: RoleConfigMode.Default,
+  roleSlots: [],
   showConfigToPlayers: false,
   showRolesInPlay: ShowRolesInPlay.None,
-  nominationsEnabled: false,
-  singleTrialPerDay: true,
-  revealProtections: true,
   timerConfig: GAME_MODES[GameMode.Werewolf].defaultTimerConfig,
+  modeConfig: GAME_MODES[GameMode.Werewolf].defaultModeConfig,
 };
 
 export default function DebugPage() {
@@ -33,15 +32,7 @@ export default function DebugPage() {
   const roleSlots = useAppSelector((s) => selectRoleSlots(s.gameConfig));
   const showRolesInPlay = useAppSelector((s) => s.gameConfig.showRolesInPlay);
   const timerConfig = useAppSelector((s) => s.gameConfig.timerConfig);
-  const nominationsEnabled = useAppSelector(
-    (s) => s.gameConfig.nominationEnabled,
-  );
-  const singleTrialPerDay = useAppSelector(
-    (s) => s.gameConfig.singleTrialPerDay,
-  );
-  const revealProtections = useAppSelector(
-    (s) => s.gameConfig.revealProtections,
-  );
+  const modeConfig = useAppSelector((s) => s.gameConfig.modeConfig);
 
   async function handleCreateGame() {
     setIsCreating(true);
@@ -56,9 +47,7 @@ export default function DebugPage() {
           roleSlots,
           showRolesInPlay,
           timerConfig,
-          nominationsEnabled,
-          singleTrialPerDay,
-          revealProtections,
+          modeConfig,
         }),
       });
       const body = (await res.json()) as {

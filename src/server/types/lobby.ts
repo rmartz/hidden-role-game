@@ -1,5 +1,6 @@
 import type {
   GameMode,
+  ModeConfig,
   RoleSlot,
   RoleConfigMode,
   ShowRolesInPlay,
@@ -11,6 +12,7 @@ export interface PublicLobbyPlayer {
   name: string;
 }
 
+/** Client-visible lobby configuration. roleSlots is optional — hidden from non-owner players. */
 export interface GameConfig {
   gameMode: GameMode;
   roleConfigMode: RoleConfigMode;
@@ -18,9 +20,7 @@ export interface GameConfig {
   showRolesInPlay: ShowRolesInPlay;
   roleSlots?: RoleSlot[];
   timerConfig: TimerConfig;
-  nominationsEnabled: boolean;
-  singleTrialPerDay: boolean;
-  revealProtections: boolean;
+  modeConfig: ModeConfig;
 }
 
 export interface PublicLobby {
@@ -48,9 +48,7 @@ export interface UpdateLobbyConfigRequest {
   gameMode?: GameMode;
   roleSlots?: RoleSlot[];
   timerConfig?: TimerConfig;
-  nominationsEnabled?: boolean;
-  singleTrialPerDay?: boolean;
-  revealProtections?: boolean;
+  modeConfig?: ModeConfig;
 }
 
 export interface LobbyJoinResponse {

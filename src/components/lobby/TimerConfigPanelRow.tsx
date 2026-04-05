@@ -1,54 +1,14 @@
 "use client";
 
-import type { WerewolfTimerConfig } from "@/lib/game-modes/werewolf/timer-config";
 import { Incrementer } from "./Incrementer";
-import { TIMER_CONFIG_COPY } from "./TimerConfigPanel.copy";
 
 export interface TimerRow {
   label: string;
-  field: keyof Omit<WerewolfTimerConfig, "autoAdvance">;
+  field: string;
   min: number;
   max: number;
   step: number;
 }
-
-export const TIMER_ROWS: TimerRow[] = [
-  {
-    label: TIMER_CONFIG_COPY.startCountdown,
-    field: "startCountdownSeconds",
-    min: 5,
-    max: 60,
-    step: 5,
-  },
-  {
-    label: TIMER_CONFIG_COPY.nightPhase,
-    field: "nightPhaseSeconds",
-    min: 10,
-    max: 120,
-    step: 5,
-  },
-  {
-    label: TIMER_CONFIG_COPY.dayDiscussion,
-    field: "dayPhaseSeconds",
-    min: 30,
-    max: 900,
-    step: 30,
-  },
-  {
-    label: TIMER_CONFIG_COPY.votingPhase,
-    field: "votePhaseSeconds",
-    min: 15,
-    max: 300,
-    step: 15,
-  },
-  {
-    label: TIMER_CONFIG_COPY.defensePhase,
-    field: "defensePhaseSeconds",
-    min: 5,
-    max: 60,
-    step: 5,
-  },
-];
 
 function formatDuration(seconds: number): string {
   if (seconds < 60) return `${String(seconds)}s`;

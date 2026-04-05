@@ -7,7 +7,10 @@ import {
 } from "@/lib/types";
 import type { Game } from "@/lib/types";
 import { WerewolfPhase, WerewolfRole } from "@/lib/game-modes/werewolf";
-import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
+import type {
+  WerewolfTurnState,
+  WerewolfModeConfig,
+} from "@/lib/game-modes/werewolf";
 import { extractDaytimeState, makeDaytimeGame } from "./helpers";
 
 describe("extractDaytimeNightSummary", () => {
@@ -37,9 +40,12 @@ describe("extractDaytimeNightSummary", () => {
       configuredRoleSlots: [],
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: undefined,
-      nominationsEnabled: false,
-      singleTrialPerDay: true,
-      revealProtections: true,
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: false,
+        singleTrialPerDay: true,
+        revealProtections: true,
+      },
       timerConfig: DEFAULT_TIMER_CONFIG,
     };
 
@@ -105,7 +111,10 @@ describe("extractDaytimeNightSummary", () => {
         },
       ],
     });
-    game.revealProtections = false;
+    game.modeConfig = {
+      ...(game.modeConfig as WerewolfModeConfig),
+      revealProtections: false,
+    };
 
     const result = extractDaytimeState(game, "player-1");
     expect(result.nightStatus).toBeUndefined();

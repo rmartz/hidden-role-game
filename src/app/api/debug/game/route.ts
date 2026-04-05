@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { GameMode, ShowRolesInPlay } from "@/lib/types";
-import type { LobbyPlayer, TimerConfig } from "@/lib/types";
+import type { LobbyPlayer, ModeConfig, TimerConfig } from "@/lib/types";
 import type { RoleSlot } from "@/server/types";
 import { ServerResponseStatus } from "@/server/types";
 import { gameService } from "@/services/GameService";
@@ -13,6 +13,7 @@ interface CreateDebugGameRequest {
   roleSlots: RoleSlot[];
   showRolesInPlay: ShowRolesInPlay;
   timerConfig: TimerConfig;
+  modeConfig?: ModeConfig;
 }
 
 export interface DebugPlayer {
@@ -23,8 +24,14 @@ export interface DebugPlayer {
 }
 
 export async function POST(request: Request): Promise<Response> {
-  const { playerCount, gameMode, roleSlots, showRolesInPlay, timerConfig } =
-    (await request.json()) as CreateDebugGameRequest;
+  const {
+    playerCount,
+    gameMode,
+    roleSlots,
+    showRolesInPlay,
+    timerConfig,
+    modeConfig,
+  } = (await request.json()) as CreateDebugGameRequest;
 
   if (!Object.values(GameMode).includes(gameMode)) {
     return errorResponse("Unknown game mode", 400);
@@ -68,11 +75,7 @@ export async function POST(request: Request): Promise<Response> {
     showRolesInPlay,
     ownerPlayer?.id ?? undefined,
     { ...GAME_MODES[gameMode].defaultTimerConfig, ...timerConfig },
-    {
-      nominationsEnabled: true,
-      singleTrialPerDay: true,
-      revealProtections: true,
-    },
+    modeConfig ?? GAME_MODES[gameMode].defaultModeConfig,
   );
 
   const debugPlayers: DebugPlayer[] = players.map((p) => ({
