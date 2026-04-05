@@ -2,7 +2,12 @@ import { createSlice, createSelector } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { sum } from "lodash";
 import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
-import type { ModeConfig, RoleSlot, TimerConfig } from "@/lib/types";
+import type {
+  ModeConfig,
+  ModeConfigField,
+  RoleSlot,
+  TimerConfig,
+} from "@/lib/types";
 import type { GameConfig } from "@/server/types";
 import { GAME_MODES } from "@/lib/game-modes";
 
@@ -255,7 +260,7 @@ const gameConfigSlice = createSlice({
 
     updateModeConfigField(
       state,
-      action: PayloadAction<{ key: string; value: unknown }>,
+      action: PayloadAction<{ key: ModeConfigField; value: unknown }>,
     ) {
       state.modeConfig = {
         ...state.modeConfig,

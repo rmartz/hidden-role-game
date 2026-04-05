@@ -50,6 +50,9 @@ export function gameToFirebase(game: Game): FirebaseGamePublic {
     roleAssignments[a.playerId] = a.roleDefinitionId;
   }
 
+  const firebaseModeConfig = modeConfigToFirebase(game.modeConfig);
+  const hasModeConfig = Object.keys(firebaseModeConfig).length > 0;
+
   return {
     lobbyId: game.lobbyId,
     gameMode: game.gameMode,
@@ -64,10 +67,7 @@ export function gameToFirebase(game: Game): FirebaseGamePublic {
     showRolesInPlay: game.showRolesInPlay,
     ownerPlayerId: game.ownerPlayerId ?? null,
     timerConfig: game.timerConfig,
-    ...(() => {
-      const mc = modeConfigToFirebase(game.modeConfig);
-      return Object.keys(mc).length > 0 ? { modeConfig: mc } : {};
-    })(),
+    ...(hasModeConfig ? { modeConfig: firebaseModeConfig } : {}),
     ...(game.executionerTargetId
       ? { executionerTargetId: game.executionerTargetId }
       : {}),
@@ -82,6 +82,12 @@ export function firebaseToGame(
   const roleAssignments: PlayerRoleAssignment[] = Object.entries(
     pub.roleAssignments ?? {},
   ).map(([playerId, roleDefinitionId]) => ({ playerId, roleDefinitionId }));
+
+  const gameMode = pub.gameMode as GameMode;
+  const rawModeConfig = pub.modeConfig ?? {};
+  const modeConfig = Object.values(GameMode).includes(gameMode)
+    ? GAME_MODES[gameMode].parseModeConfig(rawModeConfig)
+    : GAME_MODES[GameMode.Werewolf].parseModeConfig(rawModeConfig);
 
   return {
     id: gameId,
@@ -102,13 +108,7 @@ export function firebaseToGame(
     timerConfig: parseTimerConfig(
       pub.timerConfig as unknown as Record<string, unknown>,
     ),
-    modeConfig: (() => {
-      const gm = pub.gameMode as GameMode;
-      const raw = pub.modeConfig ?? {};
-      return Object.values(GameMode).includes(gm)
-        ? GAME_MODES[gm].parseModeConfig(raw)
-        : GAME_MODES[GameMode.Werewolf].parseModeConfig(raw);
-    })(),
+    modeConfig,
     ...(pub.executionerTargetId
       ? { executionerTargetId: pub.executionerTargetId }
       : {}),

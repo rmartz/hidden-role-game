@@ -21,7 +21,6 @@ export function TimerConfigPanel({
   onChange,
 }: TimerConfigPanelProps) {
   const readOnly = !onChange;
-  const config = timerConfig as unknown as Record<string, unknown>;
 
   function handleAutoAdvanceChange(checked: boolean) {
     onChange?.({ ...timerConfig, autoAdvance: checked });
@@ -32,12 +31,12 @@ export function TimerConfigPanel({
     direction: "increment" | "decrement",
   ) {
     if (!onChange) return;
-    const current = config[row.field] as number;
+    const current = timerConfig[row.field] as number;
     const next =
       direction === "increment"
         ? Math.min(row.max, current + row.step)
         : Math.max(row.min, current - row.step);
-    onChange({ ...timerConfig, [row.field]: next } as TimerConfig);
+    onChange({ ...timerConfig, [row.field]: next });
   }
 
   return (
@@ -58,7 +57,7 @@ export function TimerConfigPanel({
         <TimerConfigPanelRow
           key={row.field}
           row={row}
-          value={config[row.field] as number}
+          value={timerConfig[row.field] as number}
           readOnly={readOnly}
           disabled={disabled ?? false}
           onIncrement={handleIncrement}

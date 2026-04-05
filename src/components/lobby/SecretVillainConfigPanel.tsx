@@ -1,5 +1,6 @@
 "use client";
 
+import type { ModeConfigField } from "@/lib/types";
 import type { SecretVillainTimerConfig } from "@/lib/game-modes/secret-villain/timer-config";
 import type { SecretVillainLobbyConfig } from "@/lib/game-modes/secret-villain/lobby-config";
 import { SvBoardPreset } from "@/lib/game-modes/secret-villain/types";
@@ -20,7 +21,7 @@ interface SecretVillainConfigPanelProps {
   modeConfig: SecretVillainLobbyConfig["modeConfig"];
   disabled?: boolean;
   onTimerConfigChange?: (config: SecretVillainTimerConfig) => void;
-  onModeConfigFieldChange?: (key: string, value: unknown) => void;
+  onModeConfigFieldChange?: (key: ModeConfigField, value: unknown) => void;
 }
 
 export function SecretVillainConfigPanel({

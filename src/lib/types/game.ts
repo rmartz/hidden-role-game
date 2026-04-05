@@ -242,6 +242,8 @@ export interface TimerConfig {
   autoAdvance: boolean;
   /** Seconds for game-start countdown. */
   startCountdownSeconds: number;
+  /** Index signature for game-mode-specific timer fields (e.g. nightPhaseSeconds). */
+  [field: string]: boolean | number;
 }
 
 export const DEFAULT_TIMER_CONFIG: TimerConfig = {

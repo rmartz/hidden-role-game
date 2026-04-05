@@ -12,6 +12,15 @@ export type ModeConfig =
   | SecretVillainModeConfig
   | AvalonModeConfig;
 
+/**
+ * Any mutable field key across all ModeConfig variants (excludes the
+ * `gameMode` discriminant which is read-only).
+ */
+export type ModeConfigField = Exclude<
+  keyof WerewolfModeConfig | keyof SecretVillainModeConfig,
+  "gameMode"
+>;
+
 /** Narrow a ModeConfig to the Werewolf variant. */
 export function isWerewolfModeConfig(
   config: ModeConfig,

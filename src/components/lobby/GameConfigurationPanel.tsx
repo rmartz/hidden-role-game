@@ -8,7 +8,7 @@ import {
   isWerewolfModeConfig,
   isSecretVillainModeConfig,
 } from "@/lib/types";
-import type { TimerConfig } from "@/lib/types";
+import type { ModeConfigField, TimerConfig } from "@/lib/types";
 import type { WerewolfTimerConfig } from "@/lib/game-modes/werewolf/timer-config";
 import type { SecretVillainTimerConfig } from "@/lib/game-modes/secret-villain/timer-config";
 import {
@@ -94,7 +94,7 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
     : (value: TimerConfig) => dispatch(setTimerConfig(value));
   const onModeConfigFieldChange = readOnly
     ? undefined
-    : (key: string, value: unknown) =>
+    : (key: ModeConfigField, value: unknown) =>
         dispatch(updateModeConfigField({ key, value }));
 
   const resolved = readOnly
