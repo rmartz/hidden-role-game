@@ -27,9 +27,12 @@ function makeGame(
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner",
-    nominationsEnabled: false,
-    singleTrialPerDay: true,
-    revealProtections: true,
+    modeConfig: {
+      gameMode: GameMode.Werewolf,
+      nominationsEnabled: false,
+      singleTrialPerDay: true,
+      revealProtections: true,
+    },
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }

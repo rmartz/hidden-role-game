@@ -36,9 +36,12 @@ export function makePlayingGame(
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner-1",
-    nominationsEnabled: false,
-    singleTrialPerDay: true,
-    revealProtections: true,
+    modeConfig: {
+      gameMode: GameMode.Werewolf,
+      nominationsEnabled: false,
+      singleTrialPerDay: true,
+      revealProtections: true,
+    },
     timerConfig: DEFAULT_TIMER_CONFIG,
     ...overrides,
   };
@@ -139,9 +142,12 @@ export function makeTeamGame(
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner-1",
-    nominationsEnabled: false,
-    singleTrialPerDay: true,
-    revealProtections: true,
+    modeConfig: {
+      gameMode: GameMode.Werewolf,
+      nominationsEnabled: false,
+      singleTrialPerDay: true,
+      revealProtections: true,
+    },
     timerConfig: DEFAULT_TIMER_CONFIG,
     ...overrides,
   };

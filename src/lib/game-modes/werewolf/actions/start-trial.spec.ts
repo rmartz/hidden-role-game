@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { GameMode } from "@/lib/types";
 import { WerewolfPhase } from "../types";
 import type { WerewolfTurnState, WerewolfDaytimePhase } from "../types";
 import { WerewolfRole } from "../roles";
@@ -276,7 +277,14 @@ describe("WerewolfAction.StartTrial — singleTrialPerDay", () => {
       votes: [{ playerId: "p4", vote: "guilty" }],
       verdict: "eliminated",
     };
-    const game = makePlayingGame(ds, { singleTrialPerDay: true });
+    const game = makePlayingGame(ds, {
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: false,
+        singleTrialPerDay: true,
+        revealProtections: true,
+      },
+    });
     expect(action.isValid(game, "owner-1", { defendantId: "p4" })).toBe(false);
   });
 
@@ -289,7 +297,14 @@ describe("WerewolfAction.StartTrial — singleTrialPerDay", () => {
       votes: [{ playerId: "p4", vote: "guilty" }],
       verdict: "eliminated",
     };
-    const game = makePlayingGame(ds, { singleTrialPerDay: false });
+    const game = makePlayingGame(ds, {
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: false,
+        singleTrialPerDay: false,
+        revealProtections: true,
+      },
+    });
     expect(action.isValid(game, "owner-1", { defendantId: "p4" })).toBe(true);
   });
 });

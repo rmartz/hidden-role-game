@@ -43,9 +43,12 @@ function makeGameWithPlayers(
     configuredRoleSlots,
     showRolesInPlay,
     ownerPlayerId: undefined,
-    nominationsEnabled: false,
-    singleTrialPerDay: true,
-    revealProtections: true,
+    modeConfig: {
+      gameMode: GameMode.Werewolf,
+      nominationsEnabled: false,
+      singleTrialPerDay: true,
+      revealProtections: true,
+    },
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }
@@ -154,9 +157,12 @@ function makeNarratorGame(nominationsEnabled = false): Game {
     ],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "narrator",
-    nominationsEnabled,
-    singleTrialPerDay: true,
-    revealProtections: true,
+    modeConfig: {
+      gameMode: GameMode.Werewolf,
+      nominationsEnabled,
+      singleTrialPerDay: true,
+      revealProtections: true,
+    },
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }

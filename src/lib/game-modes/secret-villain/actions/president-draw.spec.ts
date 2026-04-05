@@ -48,9 +48,7 @@ function makeGame(ts: SecretVillainTurnState): Game {
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: undefined,
     timerConfig: DEFAULT_TIMER_CONFIG,
-    nominationsEnabled: false,
-    singleTrialPerDay: false,
-    revealProtections: false,
+    modeConfig: { gameMode: GameMode.SecretVillain },
   };
 }
 

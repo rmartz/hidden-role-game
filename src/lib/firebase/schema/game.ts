@@ -4,8 +4,14 @@ import type {
   PlayerRoleAssignment,
   TimerConfig,
 } from "@/lib/types";
+import { GameMode } from "@/lib/types";
+import { GAME_MODES } from "@/lib/game-modes";
 import type { FirebaseLobbyPlayer, FirebaseRoleSlot } from "./lobby";
-import { firebaseToRoleSlot, parseTimerConfig } from "./lobby";
+import {
+  firebaseToRoleSlot,
+  modeConfigToFirebase,
+  parseTimerConfig,
+} from "./lobby";
 
 export interface FirebaseGamePublic {
   lobbyId: string;
@@ -20,9 +26,8 @@ export interface FirebaseGamePublic {
   showRolesInPlay: string;
   ownerPlayerId: string | null;
   timerConfig: TimerConfig;
-  nominationsEnabled?: boolean;
-  singleTrialPerDay?: boolean;
-  revealProtections?: boolean;
+  /** Game-mode-specific config stored as a flat record. Firebase omits empty objects. */
+  modeConfig?: Record<string, unknown>;
   executionerTargetId?: string;
   /** Unix ms timestamp set server-side at game creation. Used for TTL cleanup. */
   createdAt?: number;
@@ -45,6 +50,9 @@ export function gameToFirebase(game: Game): FirebaseGamePublic {
     roleAssignments[a.playerId] = a.roleDefinitionId;
   }
 
+  const firebaseModeConfig = modeConfigToFirebase(game.modeConfig);
+  const hasModeConfig = Object.keys(firebaseModeConfig).length > 0;
+
   return {
     lobbyId: game.lobbyId,
     gameMode: game.gameMode,
@@ -59,9 +67,7 @@ export function gameToFirebase(game: Game): FirebaseGamePublic {
     showRolesInPlay: game.showRolesInPlay,
     ownerPlayerId: game.ownerPlayerId ?? null,
     timerConfig: game.timerConfig,
-    nominationsEnabled: game.nominationsEnabled,
-    singleTrialPerDay: game.singleTrialPerDay,
-    revealProtections: game.revealProtections,
+    ...(hasModeConfig ? { modeConfig: firebaseModeConfig } : {}),
     ...(game.executionerTargetId
       ? { executionerTargetId: game.executionerTargetId }
       : {}),
@@ -76,6 +82,12 @@ export function firebaseToGame(
   const roleAssignments: PlayerRoleAssignment[] = Object.entries(
     pub.roleAssignments ?? {},
   ).map(([playerId, roleDefinitionId]) => ({ playerId, roleDefinitionId }));
+
+  const gameMode = pub.gameMode as GameMode;
+  const rawModeConfig = pub.modeConfig ?? {};
+  const modeConfig = Object.values(GameMode).includes(gameMode)
+    ? GAME_MODES[gameMode].parseModeConfig(rawModeConfig)
+    : GAME_MODES[GameMode.Werewolf].parseModeConfig(rawModeConfig);
 
   return {
     id: gameId,
@@ -96,9 +108,7 @@ export function firebaseToGame(
     timerConfig: parseTimerConfig(
       pub.timerConfig as unknown as Record<string, unknown>,
     ),
-    nominationsEnabled: pub.nominationsEnabled ?? false,
-    singleTrialPerDay: pub.singleTrialPerDay ?? false,
-    revealProtections: pub.revealProtections ?? false,
+    modeConfig,
     ...(pub.executionerTargetId
       ? { executionerTargetId: pub.executionerTargetId }
       : {}),

@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { GameMode } from "@/lib/types";
 import { WerewolfPhase } from "../types";
 import type { WerewolfTurnState, WerewolfDaytimePhase } from "../types";
 import { WerewolfRole } from "../roles";
@@ -39,7 +40,12 @@ describe("WerewolfAction.NominatePlayer — apply", () => {
 
   it("adds a nomination for the defendant", () => {
     const game = makePlayingGame(makeDayState(), {
-      nominationsEnabled: true,
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: true,
+        singleTrialPerDay: true,
+        revealProtections: true,
+      },
     });
     action.apply(game, { defendantId: "p3" }, "p2");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
@@ -56,7 +62,14 @@ describe("WerewolfAction.NominatePlayer — apply", () => {
   it("replaces an existing nomination when caller re-nominates", () => {
     const game = makePlayingGame(
       makeDayState([{ nominatorId: "p2", defendantId: "p3" }]),
-      { nominationsEnabled: true },
+      {
+        modeConfig: {
+          gameMode: GameMode.Werewolf,
+          nominationsEnabled: true,
+          singleTrialPerDay: true,
+          revealProtections: true,
+        },
+      },
     );
     action.apply(game, { defendantId: "p4" }, "p2");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
@@ -80,7 +93,14 @@ describe("WerewolfAction.NominatePlayer — apply", () => {
   it("auto-starts a trial when nomination count reaches threshold", () => {
     const game = makePlayingGame(
       makeDayState([{ nominatorId: "p2", defendantId: "p3" }]),
-      { nominationsEnabled: true },
+      {
+        modeConfig: {
+          gameMode: GameMode.Werewolf,
+          nominationsEnabled: true,
+          singleTrialPerDay: true,
+          revealProtections: true,
+        },
+      },
     );
     action.apply(game, { defendantId: "p3" }, "p4");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
@@ -95,7 +115,14 @@ describe("WerewolfAction.NominatePlayer — apply", () => {
   it("clears nominations when a trial auto-starts", () => {
     const game = makePlayingGame(
       makeDayState([{ nominatorId: "p2", defendantId: "p3" }]),
-      { nominationsEnabled: true },
+      {
+        modeConfig: {
+          gameMode: GameMode.Werewolf,
+          nominationsEnabled: true,
+          singleTrialPerDay: true,
+          revealProtections: true,
+        },
+      },
     );
     action.apply(game, { defendantId: "p3" }, "p4");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
@@ -108,7 +135,12 @@ describe("WerewolfAction.NominatePlayer — apply", () => {
 
   it("does not start a trial when count is below threshold", () => {
     const game = makePlayingGame(makeDayState(), {
-      nominationsEnabled: true,
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: true,
+        singleTrialPerDay: true,
+        revealProtections: true,
+      },
     });
     action.apply(game, { defendantId: "p3" }, "p2");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
@@ -130,21 +162,36 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
 
   it("returns true for a valid nomination", () => {
     const game = makePlayingGame(makeDayState(), {
-      nominationsEnabled: true,
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: true,
+        singleTrialPerDay: true,
+        revealProtections: true,
+      },
     });
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(true);
   });
 
   it("returns false when caller is the owner", () => {
     const game = makePlayingGame(makeDayState(), {
-      nominationsEnabled: true,
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: true,
+        singleTrialPerDay: true,
+        revealProtections: true,
+      },
     });
     expect(action.isValid(game, "owner-1", { defendantId: "p3" })).toBe(false);
   });
 
   it("returns false during nighttime", () => {
     const game = makePlayingGame(makeNightState(), {
-      nominationsEnabled: true,
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: true,
+        singleTrialPerDay: true,
+        revealProtections: true,
+      },
     });
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(false);
   });
@@ -165,7 +212,14 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
       },
       deadPlayerIds: [],
     };
-    const game = makePlayingGame(ts, { nominationsEnabled: true });
+    const game = makePlayingGame(ts, {
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: true,
+        singleTrialPerDay: true,
+        revealProtections: true,
+      },
+    });
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(false);
   });
 
@@ -187,8 +241,12 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
       deadPlayerIds: [],
     };
     const game = makePlayingGame(ts, {
-      nominationsEnabled: true,
-      singleTrialPerDay: false,
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: true,
+        singleTrialPerDay: false,
+        revealProtections: true,
+      },
     });
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(true);
   });
@@ -198,7 +256,14 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
       ...makeDayState(),
       deadPlayerIds: ["p2"],
     };
-    const game = makePlayingGame(ts, { nominationsEnabled: true });
+    const game = makePlayingGame(ts, {
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: true,
+        singleTrialPerDay: true,
+        revealProtections: true,
+      },
+    });
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(false);
   });
 
@@ -207,20 +272,37 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
       ...makeDayState(),
       deadPlayerIds: ["p3"],
     };
-    const game = makePlayingGame(ts, { nominationsEnabled: true });
+    const game = makePlayingGame(ts, {
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: true,
+        singleTrialPerDay: true,
+        revealProtections: true,
+      },
+    });
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(false);
   });
 
   it("returns false when caller nominates themselves", () => {
     const game = makePlayingGame(makeDayState(), {
-      nominationsEnabled: true,
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: true,
+        singleTrialPerDay: true,
+        revealProtections: true,
+      },
     });
     expect(action.isValid(game, "p2", { defendantId: "p2" })).toBe(false);
   });
 
   it("returns false when defendant is the owner", () => {
     const game = makePlayingGame(makeDayState(), {
-      nominationsEnabled: true,
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: true,
+        singleTrialPerDay: true,
+        revealProtections: true,
+      },
     });
     expect(action.isValid(game, "p2", { defendantId: "owner-1" })).toBe(false);
   });
@@ -228,7 +310,14 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
   it("returns false when caller already nominated the same defendant", () => {
     const game = makePlayingGame(
       makeDayState([{ nominatorId: "p2", defendantId: "p3" }]),
-      { nominationsEnabled: true },
+      {
+        modeConfig: {
+          gameMode: GameMode.Werewolf,
+          nominationsEnabled: true,
+          singleTrialPerDay: true,
+          revealProtections: true,
+        },
+      },
     );
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(false);
   });
@@ -238,14 +327,28 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
     (ts.phase as WerewolfDaytimePhase).nightResolution = [
       { type: "silenced", targetPlayerId: "p2" },
     ];
-    const game = makePlayingGame(ts, { nominationsEnabled: true });
+    const game = makePlayingGame(ts, {
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: true,
+        singleTrialPerDay: true,
+        revealProtections: true,
+      },
+    });
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(false);
   });
 
   it("returns true when caller changes their nomination to a different defendant", () => {
     const game = makePlayingGame(
       makeDayState([{ nominatorId: "p2", defendantId: "p3" }]),
-      { nominationsEnabled: true },
+      {
+        modeConfig: {
+          gameMode: GameMode.Werewolf,
+          nominationsEnabled: true,
+          singleTrialPerDay: true,
+          revealProtections: true,
+        },
+      },
     );
     expect(action.isValid(game, "p2", { defendantId: "p4" })).toBe(true);
   });
@@ -264,8 +367,12 @@ describe("WerewolfAction.NominatePlayer — singleTrialPerDay", () => {
       verdict: "eliminated",
     };
     const game = makePlayingGame(ds, {
-      nominationsEnabled: true,
-      singleTrialPerDay: true,
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: true,
+        singleTrialPerDay: true,
+        revealProtections: true,
+      },
     });
     expect(action.isValid(game, "p2", { defendantId: "p4" })).toBe(false);
   });
@@ -280,8 +387,12 @@ describe("WerewolfAction.NominatePlayer — singleTrialPerDay", () => {
       verdict: "eliminated",
     };
     const game = makePlayingGame(ds, {
-      nominationsEnabled: true,
-      singleTrialPerDay: false,
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: true,
+        singleTrialPerDay: false,
+        revealProtections: true,
+      },
     });
     expect(action.isValid(game, "p2", { defendantId: "p4" })).toBe(true);
   });

@@ -37,9 +37,12 @@ function makeSecretVillainGame(
     configuredRoleSlots,
     showRolesInPlay,
     ownerPlayerId: undefined,
-    nominationsEnabled: false,
-    singleTrialPerDay: true,
-    revealProtections: true,
+    modeConfig: {
+      gameMode: GameMode.Werewolf,
+      nominationsEnabled: false,
+      singleTrialPerDay: true,
+      revealProtections: true,
+    },
     timerConfig: DEFAULT_TIMER_CONFIG,
   };
 }

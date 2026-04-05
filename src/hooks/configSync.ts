@@ -51,9 +51,7 @@ export function useConfigSync(
             showConfigToPlayers,
             showRolesInPlay,
             timerConfig,
-            nominationEnabled,
-            singleTrialPerDay,
-            revealProtections,
+            modeConfig,
           } = gameConfigRef.current;
           const roleSlots = selectRoleSlots(gameConfigRef.current);
           const drainResolvers = () => {
@@ -70,9 +68,7 @@ export function useConfigSync(
               showRolesInPlay,
               roleSlots,
               timerConfig,
-              nominationsEnabled: nominationEnabled,
-              singleTrialPerDay,
-              revealProtections,
+              modeConfig,
             },
             {
               onSuccess: () => {

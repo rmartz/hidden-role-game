@@ -1,13 +1,16 @@
 import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase } from "../types";
+import { getWerewolfModeConfig } from "../lobby-config";
 import { currentTurnState, getSilencedPlayerIds } from "../utils";
 import { NOMINATION_VOTE_THRESHOLD } from "../constants";
 import { startTrialAction } from "./start-trial";
 
 export const nominatePlayerAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {
+    const { nominationsEnabled, singleTrialPerDay } =
+      getWerewolfModeConfig(game);
     // Only non-owner players can nominate
-    if (!game.nominationsEnabled) return false;
+    if (!nominationsEnabled) return false;
     if (callerId === game.ownerPlayerId) return false;
     const ts = currentTurnState(game);
     if (!ts) return false;
@@ -15,7 +18,7 @@ export const nominatePlayerAction: GameAction = {
     // Cannot nominate while a trial is active and unresolved
     if (ts.phase.activeTrial && !ts.phase.activeTrial.verdict) return false;
     // Single trial per day: cannot nominate after a trial has concluded
-    if (game.singleTrialPerDay && ts.phase.activeTrial?.verdict) return false;
+    if (singleTrialPerDay && ts.phase.activeTrial?.verdict) return false;
     if (ts.deadPlayerIds.includes(callerId)) return false;
     // Silenced players cannot nominate
     const silencedIds = getSilencedPlayerIds(ts);

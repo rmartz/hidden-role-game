@@ -78,9 +78,7 @@ function makePolicyGame(
     configuredRoleSlots: [],
     showRolesInPlay: ShowRolesInPlay.None,
     timerConfig: DEFAULT_TIMER_CONFIG,
-    nominationsEnabled: false,
-    singleTrialPerDay: false,
-    revealProtections: false,
+    modeConfig: { gameMode: GameMode.SecretVillain },
   } satisfies Game;
 }
 

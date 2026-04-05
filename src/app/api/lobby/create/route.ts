@@ -47,10 +47,8 @@ export async function POST(request: Request): Promise<Response> {
       roleSlots: getDefaultRoleSlots(selectedGameMode, 1),
       showConfigToPlayers: false,
       showRolesInPlay: ShowRolesInPlay.ConfiguredOnly,
-      nominationsEnabled: true,
-      singleTrialPerDay: true,
-      revealProtections: true,
       timerConfig: GAME_MODES[selectedGameMode].defaultTimerConfig,
+      modeConfig: GAME_MODES[selectedGameMode].defaultModeConfig,
     },
     readyPlayerIds: [] as string[],
   };

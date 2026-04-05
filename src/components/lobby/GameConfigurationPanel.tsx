@@ -3,8 +3,14 @@
 import { useEffect, useRef } from "react";
 import { GAME_MODES, getRoleSlotsRequired } from "@/lib/game-modes";
 import type { GameConfig } from "@/server/types";
-import { GameMode } from "@/lib/types";
+import {
+  GameMode,
+  isWerewolfModeConfig,
+  isSecretVillainModeConfig,
+} from "@/lib/types";
+import type { ModeConfigField, TimerConfig } from "@/lib/types";
 import type { WerewolfTimerConfig } from "@/lib/game-modes/werewolf/timer-config";
+import type { SecretVillainTimerConfig } from "@/lib/game-modes/secret-villain/timer-config";
 import {
   WEREWOLF_ROLE_CATEGORY_LABELS,
   WEREWOLF_ROLE_CATEGORY_ORDER,
@@ -12,13 +18,11 @@ import {
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   loadConfig,
-  setNominationEnabled,
-  setSingleTrialPerDay,
-  setRevealProtections,
   setPlayerCount,
   setShowConfigToPlayers,
   setShowRolesInPlay,
   setTimerConfig,
+  updateModeConfigField,
 } from "@/store/game-config-slice";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +31,7 @@ import { RoleConfig } from "./RoleConfig";
 import { GameModePicker } from "./GameModePicker";
 import { ShowRolesInPlayPicker } from "./ShowRolesInPlayPicker";
 import { WerewolfConfigPanel } from "./WerewolfConfigPanel";
+import { SecretVillainConfigPanel } from "./SecretVillainConfigPanel";
 
 interface ReadOnlyProps {
   config: GameConfig;
@@ -55,15 +60,7 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
   const showRolesInPlay = useAppSelector((s) => s.gameConfig.showRolesInPlay);
   const roleConfigMode = useAppSelector((s) => s.gameConfig.roleConfigMode);
   const timerConfig = useAppSelector((s) => s.gameConfig.timerConfig);
-  const nominationEnabled = useAppSelector(
-    (s) => s.gameConfig.nominationEnabled,
-  );
-  const singleTrialPerDay = useAppSelector(
-    (s) => s.gameConfig.singleTrialPerDay,
-  );
-  const revealProtections = useAppSelector(
-    (s) => s.gameConfig.revealProtections,
-  );
+  const modeConfig = useAppSelector((s) => s.gameConfig.modeConfig);
   const isValid = useAppSelector((s) => s.gameConfig.isValid);
 
   const hasLoadedRef = useRef(false);
@@ -90,40 +87,30 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
   const disabled = readOnly ? true : props.isPending;
   const isWerewolf = activeGameMode === GameMode.Werewolf;
 
+  const activeTimerConfig = readOnly ? config.timerConfig : timerConfig;
+  const activeModeConfigData = readOnly ? config.modeConfig : modeConfig;
+  const onTimerConfigChange = readOnly
+    ? undefined
+    : (value: TimerConfig) => dispatch(setTimerConfig(value));
+  const onModeConfigFieldChange = readOnly
+    ? undefined
+    : (key: ModeConfigField, value: unknown) =>
+        dispatch(updateModeConfigField({ key, value }));
+
   const resolved = readOnly
     ? {
         showRolesInPlay: config.showRolesInPlay,
         showConfigToPlayers: config.showConfigToPlayers,
-        timerConfig: config.timerConfig,
-        nominationEnabled: config.nominationsEnabled,
-        singleTrialPerDay: config.singleTrialPerDay,
-        revealProtections: config.revealProtections,
         onShowRolesInPlayChange: undefined,
         onShowConfigToPlayersChange: undefined,
-        onWerewolfTimerConfigChange: undefined,
-        onNominationEnabledChange: undefined,
-        onSingleTrialPerDayChange: undefined,
-        onRevealProtectionsChange: undefined,
       }
     : {
         showRolesInPlay,
         showConfigToPlayers,
-        timerConfig,
-        nominationEnabled,
-        singleTrialPerDay,
-        revealProtections,
         onShowRolesInPlayChange: (value: typeof showRolesInPlay) =>
           dispatch(setShowRolesInPlay(value)),
         onShowConfigToPlayersChange: (value: boolean) =>
           dispatch(setShowConfigToPlayers(value)),
-        onWerewolfTimerConfigChange: (value: typeof timerConfig) =>
-          dispatch(setTimerConfig(value)),
-        onNominationEnabledChange: (value: boolean) =>
-          dispatch(setNominationEnabled(value)),
-        onSingleTrialPerDayChange: (value: boolean) =>
-          dispatch(setSingleTrialPerDay(value)),
-        onRevealProtectionsChange: (value: boolean) =>
-          dispatch(setRevealProtections(value)),
       };
 
   const ownerTitleText = ownerTitle
@@ -132,17 +119,45 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
       : `You will be the ${ownerTitle} and will see all player roles. Role slots are for the remaining ${String(roleSlotsRequired)} players.`
     : null;
 
-  const werewolfConfig = isWerewolf ? (
+  const gameModePanel = isWerewolfModeConfig(activeModeConfigData) ? (
     <WerewolfConfigPanel
-      timerConfig={resolved.timerConfig as WerewolfTimerConfig}
-      nominationEnabled={resolved.nominationEnabled}
-      singleTrialPerDay={resolved.singleTrialPerDay}
-      revealProtections={resolved.revealProtections}
+      timerConfig={activeTimerConfig as WerewolfTimerConfig}
+      nominationEnabled={activeModeConfigData.nominationsEnabled}
+      singleTrialPerDay={activeModeConfigData.singleTrialPerDay}
+      revealProtections={activeModeConfigData.revealProtections}
       disabled={disabled}
-      onWerewolfTimerConfigChange={resolved.onWerewolfTimerConfigChange}
-      onNominationEnabledChange={resolved.onNominationEnabledChange}
-      onSingleTrialPerDayChange={resolved.onSingleTrialPerDayChange}
-      onRevealProtectionsChange={resolved.onRevealProtectionsChange}
+      onWerewolfTimerConfigChange={
+        onTimerConfigChange as
+          | ((config: WerewolfTimerConfig) => void)
+          | undefined
+      }
+      onNominationEnabledChange={
+        onModeConfigFieldChange
+          ? (v: boolean) => onModeConfigFieldChange("nominationsEnabled", v)
+          : undefined
+      }
+      onSingleTrialPerDayChange={
+        onModeConfigFieldChange
+          ? (v: boolean) => onModeConfigFieldChange("singleTrialPerDay", v)
+          : undefined
+      }
+      onRevealProtectionsChange={
+        onModeConfigFieldChange
+          ? (v: boolean) => onModeConfigFieldChange("revealProtections", v)
+          : undefined
+      }
+    />
+  ) : isSecretVillainModeConfig(activeModeConfigData) ? (
+    <SecretVillainConfigPanel
+      timerConfig={activeTimerConfig as SecretVillainTimerConfig}
+      modeConfig={activeModeConfigData}
+      disabled={disabled}
+      onTimerConfigChange={
+        onTimerConfigChange as
+          | ((config: SecretVillainTimerConfig) => void)
+          | undefined
+      }
+      onModeConfigFieldChange={onModeConfigFieldChange}
     />
   ) : null;
 
@@ -209,7 +224,7 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
             onShowConfigToPlayersChange={resolved.onShowConfigToPlayersChange}
           />
 
-          {werewolfConfig}
+          {gameModePanel}
 
           {ownerTitleText && (
             <p className="text-sm text-muted-foreground">{ownerTitleText}</p>

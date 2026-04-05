@@ -38,10 +38,14 @@ const baseLobby: PublicLobby = {
     roleConfigMode: RoleConfigMode.Default,
     showConfigToPlayers: true,
     showRolesInPlay: ShowRolesInPlay.AssignedRolesOnly,
+    roleSlots: [],
     timerConfig: DEFAULT_TIMER_CONFIG,
-    nominationsEnabled: false,
-    singleTrialPerDay: false,
-    revealProtections: false,
+    modeConfig: {
+      gameMode: GameMode.Werewolf,
+      nominationsEnabled: true,
+      singleTrialPerDay: true,
+      revealProtections: true,
+    },
   },
   readyPlayerIds: ["p2", "p4"],
 };

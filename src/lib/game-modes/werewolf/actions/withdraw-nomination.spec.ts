@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { GameMode } from "@/lib/types";
 import { WerewolfPhase } from "../types";
 import type { WerewolfTurnState } from "../types";
 import { WerewolfRole } from "../roles";
@@ -27,14 +28,26 @@ describe("WerewolfAction.WithdrawNomination", () => {
     it("returns true when caller has an existing nomination", () => {
       const game = makePlayingGame(
         makeDayState([{ nominatorId: "p2", defendantId: "p3" }]),
-        { nominationsEnabled: true },
+        {
+          modeConfig: {
+            gameMode: GameMode.Werewolf,
+            nominationsEnabled: true,
+            singleTrialPerDay: true,
+            revealProtections: true,
+          },
+        },
       );
       expect(action.isValid(game, "p2", null)).toBe(true);
     });
 
     it("returns false when caller has no nomination", () => {
       const game = makePlayingGame(makeDayState(), {
-        nominationsEnabled: true,
+        modeConfig: {
+          gameMode: GameMode.Werewolf,
+          nominationsEnabled: true,
+          singleTrialPerDay: true,
+          revealProtections: true,
+        },
       });
       expect(action.isValid(game, "p2", null)).toBe(false);
     });
@@ -42,7 +55,14 @@ describe("WerewolfAction.WithdrawNomination", () => {
     it("returns false when caller is the owner", () => {
       const game = makePlayingGame(
         makeDayState([{ nominatorId: "owner-1", defendantId: "p3" }]),
-        { nominationsEnabled: true },
+        {
+          modeConfig: {
+            gameMode: GameMode.Werewolf,
+            nominationsEnabled: true,
+            singleTrialPerDay: true,
+            revealProtections: true,
+          },
+        },
       );
       expect(action.isValid(game, "owner-1", null)).toBe(false);
     });
@@ -64,7 +84,14 @@ describe("WerewolfAction.WithdrawNomination", () => {
         },
         deadPlayerIds: [],
       };
-      const game = makePlayingGame(ts, { nominationsEnabled: true });
+      const game = makePlayingGame(ts, {
+        modeConfig: {
+          gameMode: GameMode.Werewolf,
+          nominationsEnabled: true,
+          singleTrialPerDay: true,
+          revealProtections: true,
+        },
+      });
       expect(action.isValid(game, "p2", null)).toBe(false);
     });
 
@@ -80,7 +107,14 @@ describe("WerewolfAction.WithdrawNomination", () => {
         },
         deadPlayerIds: [],
       };
-      const game = makePlayingGame(ts, { nominationsEnabled: true });
+      const game = makePlayingGame(ts, {
+        modeConfig: {
+          gameMode: GameMode.Werewolf,
+          nominationsEnabled: true,
+          singleTrialPerDay: true,
+          revealProtections: true,
+        },
+      });
       expect(action.isValid(game, "p2", null)).toBe(false);
     });
   });
@@ -92,7 +126,14 @@ describe("WerewolfAction.WithdrawNomination", () => {
           { nominatorId: "p2", defendantId: "p3" },
           { nominatorId: "p4", defendantId: "p3" },
         ]),
-        { nominationsEnabled: true },
+        {
+          modeConfig: {
+            gameMode: GameMode.Werewolf,
+            nominationsEnabled: true,
+            singleTrialPerDay: true,
+            revealProtections: true,
+          },
+        },
       );
       action.apply(game, null, "p2");
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
@@ -115,7 +156,14 @@ describe("WerewolfAction.WithdrawNomination", () => {
           { nominatorId: "p2", defendantId: "p3" },
           { nominatorId: "p4", defendantId: "p3" },
         ]),
-        { nominationsEnabled: true },
+        {
+          modeConfig: {
+            gameMode: GameMode.Werewolf,
+            nominationsEnabled: true,
+            singleTrialPerDay: true,
+            revealProtections: true,
+          },
+        },
       );
       action.apply(game, null, "p2");
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;

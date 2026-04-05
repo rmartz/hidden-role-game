@@ -201,7 +201,7 @@ export class GameStateService {
     ownerPlayerId: string | undefined,
     timerConfig: import("@/lib/types").TimerConfig,
     /** Game-mode-specific config (e.g., nominationsEnabled for Werewolf). */
-    modeConfig?: Record<string, unknown>,
+    modeConfig?: import("@/lib/types").ModeConfig,
   ): Game {
     const config = this.getModeDefinition(gameMode);
     const { roles, services } = config;
@@ -236,9 +236,9 @@ export class GameStateService {
       showRolesInPlay,
       ownerPlayerId,
       timerConfig,
+      modeConfig: modeConfig ?? config.defaultModeConfig,
       ...specialTargets,
-      ...modeConfig,
-    } as Game;
+    };
   }
 
   /**
@@ -251,6 +251,7 @@ export class GameStateService {
     return {
       type: GameStatus.Playing,
       turnState: services.buildInitialTurnState(game.roleAssignments, {
+        ...game.modeConfig,
         executionerTargetId: game.executionerTargetId,
       }),
     };
