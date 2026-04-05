@@ -183,10 +183,10 @@ describe("castElectionVoteAction", () => {
       );
     });
 
-    it("player cannot vote twice", () => {
+    it("player can change their vote", () => {
       const game = makeVoteGame([{ playerId: "p2", vote: "aye" }]);
       expect(castElectionVoteAction.isValid(game, "p2", { vote: "no" })).toBe(
-        false,
+        true,
       );
     });
 
@@ -209,6 +209,29 @@ describe("castElectionVoteAction", () => {
       const ts = getTurnState(game);
       const phase = ts.phase as ElectionVotePhase;
       expect(phase.votes).toEqual([{ playerId: "p2", vote: "aye" }]);
+    });
+
+    it("replaces existing vote when player re-votes", () => {
+      const game = makeVoteGame([{ playerId: "p2", vote: "aye" }]);
+      castElectionVoteAction.apply(game, { vote: "no" }, "p2");
+
+      const ts = getTurnState(game);
+      const phase = ts.phase as ElectionVotePhase;
+      expect(phase.votes).toEqual([{ playerId: "p2", vote: "no" }]);
+    });
+
+    it("does not duplicate vote count on re-vote", () => {
+      const game = makeVoteGame([
+        { playerId: "p2", vote: "aye" },
+        { playerId: "p3", vote: "no" },
+      ]);
+      castElectionVoteAction.apply(game, { vote: "no" }, "p2");
+
+      const ts = getTurnState(game);
+      const phase = ts.phase as ElectionVotePhase;
+      expect(phase.votes).toHaveLength(2);
+      expect(phase.votes[0]).toEqual({ playerId: "p2", vote: "no" });
+      expect(phase.votes[1]).toEqual({ playerId: "p3", vote: "no" });
     });
   });
 });

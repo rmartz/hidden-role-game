@@ -23,14 +23,17 @@ describe("ElectionVoteView", () => {
     ).toBeDefined();
   });
 
-  it("shows already-voted text when voted aye", () => {
+  it("keeps vote buttons visible after voting with current vote highlighted", () => {
     render(<ElectionVoteView {...defaultProps} myVote="aye" />);
     expect(
-      screen.getByText(SECRET_VILLAIN_COPY.election.alreadyVoted),
+      screen.getByRole("button", { name: SECRET_VILLAIN_COPY.election.aye }),
+    ).toBeDefined();
+    expect(
+      screen.getByRole("button", { name: SECRET_VILLAIN_COPY.election.no }),
     ).toBeDefined();
   });
 
-  it("shows already-voted text when voted no", () => {
+  it("shows waiting text after voting", () => {
     render(<ElectionVoteView {...defaultProps} myVote="no" />);
     expect(
       screen.getByText(SECRET_VILLAIN_COPY.election.alreadyVoted),

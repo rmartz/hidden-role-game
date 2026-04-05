@@ -13,7 +13,6 @@ export const castElectionVoteAction: GameAction = {
     if (ts.phase.passed !== undefined) return false;
     if (ts.eliminatedPlayerIds.includes(callerId)) return false;
     if (!game.players.some((p) => p.id === callerId)) return false;
-    if (ts.phase.votes.some((v) => v.playerId === callerId)) return false;
 
     const { vote } = payload as { vote?: unknown };
     return (
@@ -26,11 +25,15 @@ export const castElectionVoteAction: GameAction = {
     if (ts?.phase.type !== SecretVillainPhase.ElectionVote) return;
 
     const { vote } = payload as { vote: ElectionVote };
-    ts.phase.votes = [...ts.phase.votes, { playerId: callerId, vote }];
 
-    // Votes are NOT auto-tallied. A player must press "Reveal Results"
-    // (resolveElectionAction) once all players have voted or the timer
-    // expires. This gives all players a moment to see that voting is
-    // complete before results are revealed.
+    // Replace existing vote if the player already voted, otherwise append.
+    const existing = ts.phase.votes.findIndex((v) => v.playerId === callerId);
+    if (existing >= 0) {
+      ts.phase.votes = ts.phase.votes.map((v, i) =>
+        i === existing ? { playerId: callerId, vote } : v,
+      );
+    } else {
+      ts.phase.votes = [...ts.phase.votes, { playerId: callerId, vote }];
+    }
   },
 };
