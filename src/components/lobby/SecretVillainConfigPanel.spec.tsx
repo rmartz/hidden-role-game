@@ -5,6 +5,7 @@ import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game-modes/secret-vil
 import { GameMode } from "@/lib/types";
 import { SvBoardPreset } from "@/lib/game-modes/secret-villain/types";
 import { SECRET_VILLAIN_CONFIG_PANEL_COPY } from "./SecretVillainConfigPanel.copy";
+import { SECRET_VILLAIN_TIMER_CONFIG_PANEL_COPY } from "./SecretVillainTimerConfigPanel.copy";
 import { TIMER_CONFIG_COPY } from "./TimerConfigPanel.copy";
 
 afterEach(cleanup);
@@ -45,7 +46,7 @@ describe("SecretVillainConfigPanel", () => {
   it("renders the election vote timer row", () => {
     render(<SecretVillainConfigPanel {...defaultProps} />);
     expect(
-      screen.getByText(SECRET_VILLAIN_CONFIG_PANEL_COPY.electionVote),
+      screen.getByText(SECRET_VILLAIN_TIMER_CONFIG_PANEL_COPY.electionVote),
     ).toBeDefined();
   });
 

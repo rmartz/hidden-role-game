@@ -18,4 +18,3 @@ export * from "./WerewolfConfigPanel";
 export * from "./WerewolfTimerConfigPanel";
 export * from "./WerewolfLobbyGlossary";
 export * from "./TimerConfigPanelRow";
-export * from "./timer-rows";
