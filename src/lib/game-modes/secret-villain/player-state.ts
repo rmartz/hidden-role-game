@@ -1,4 +1,5 @@
-import type { PlayerGameState } from "@/server/types/game";
+import { GameMode } from "@/lib/types";
+import type { BasePlayerGameState } from "@/server/types/game";
 import type {
   SecretVillainPhase,
   SpecialActionType,
@@ -57,7 +58,8 @@ export interface SvInvestigationResult {
  * that only exist in Secret Villain games. Components receiving SV game state
  * should type their props as SecretVillainPlayerGameState.
  */
-export interface SecretVillainPlayerGameState extends PlayerGameState {
+export interface SecretVillainPlayerGameState extends BasePlayerGameState {
+  gameMode: GameMode.SecretVillain;
   /** Override base timerConfig with Secret Villain–specific timer fields. */
   timerConfig: SecretVillainTimerConfig;
   /** Current phase info (type, presidentId, etc.). */

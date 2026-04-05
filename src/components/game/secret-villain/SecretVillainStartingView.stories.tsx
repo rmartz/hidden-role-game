@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { SecretVillainStartingView } from "./SecretVillainStartingView";
-import { GameMode, GameStatus, Team, DEFAULT_TIMER_CONFIG } from "@/lib/types";
+import { GameMode, GameStatus, Team } from "@/lib/types";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game-modes/secret-villain/timer-config";
 import type { PlayerGameState } from "@/server/types";
 
 const meta = {
@@ -22,7 +23,7 @@ const baseGameState: PlayerGameState = {
     { id: "p5", name: "Eve" },
   ],
   visibleRoleAssignments: [],
-  timerConfig: DEFAULT_TIMER_CONFIG,
+  timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
 };
 
 export const GoodPlayer: Story = {

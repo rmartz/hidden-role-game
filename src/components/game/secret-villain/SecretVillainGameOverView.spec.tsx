@@ -2,7 +2,8 @@ import { afterEach, describe, it, expect, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import { SecretVillainGameOverView } from "./SecretVillainGameOverView";
 import { SecretVillainWinner } from "@/lib/game-modes/secret-villain/utils/win-condition";
-import { GameStatus, GameMode, Team, DEFAULT_TIMER_CONFIG } from "@/lib/types";
+import { GameStatus, GameMode, Team } from "@/lib/types";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game-modes/secret-villain/timer-config";
 import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
 import type { PlayerGameState } from "@/server/types";
 
@@ -31,9 +32,9 @@ function makeGameState(
         role: { id: "bad", name: "Bad Role", team: Team.Bad },
       },
     ],
-    timerConfig: DEFAULT_TIMER_CONFIG,
+    timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
     ...overrides,
-  };
+  } as PlayerGameState;
 }
 
 const defaultProps = {

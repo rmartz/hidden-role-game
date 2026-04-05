@@ -1,11 +1,8 @@
-import type {
-  GameStatusState,
-  GameMode,
-  RoleSlot,
-  Team,
-  TimerConfig,
-} from "@/lib/types";
+import type { GameStatusState, RoleSlot, Team, TimerConfig } from "@/lib/types";
 import type { PublicLobbyPlayer } from "./lobby";
+import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
+import type { SecretVillainPlayerGameState } from "@/lib/game-modes/secret-villain/player-state";
+import type { AvalonPlayerGameState } from "@/lib/game-modes/avalon/player-state";
 
 export type { RoleSlot };
 
@@ -66,9 +63,9 @@ export type NightStatusEntry =
   | DaytimeNightStatusEntry
   | NighttimeNightStatusEntry;
 
-export interface PlayerGameState {
+/** Shared player game state fields. Game-mode-specific variants extend this. */
+export interface BasePlayerGameState {
   status: GameStatusState;
-  gameMode: GameMode;
   /** The lobby this game was started from. Used for returning to the lobby after the game ends. */
   lobbyId: string;
   players: PublicLobbyPlayer[];
@@ -85,3 +82,12 @@ export interface PlayerGameState {
   /** Phase timer configuration. */
   timerConfig: TimerConfig;
 }
+
+/**
+ * Discriminated union of all game-mode-specific player game states.
+ * Narrow on `gameMode` to access mode-specific fields.
+ */
+export type PlayerGameState =
+  | WerewolfPlayerGameState
+  | SecretVillainPlayerGameState
+  | AvalonPlayerGameState;
