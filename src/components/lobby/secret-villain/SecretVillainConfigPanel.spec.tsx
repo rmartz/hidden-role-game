@@ -9,7 +9,7 @@ import {
 } from "@/lib/game-modes/secret-villain/types";
 import { SECRET_VILLAIN_CONFIG_PANEL_COPY } from "./SecretVillainConfigPanel.copy";
 import { SECRET_VILLAIN_TIMER_CONFIG_PANEL_COPY } from "./SecretVillainTimerConfigPanel.copy";
-import { TIMER_CONFIG_COPY } from "./TimerConfigPanel.copy";
+import { TIMER_CONFIG_COPY } from "../TimerConfigPanel.copy";
 
 afterEach(cleanup);
 

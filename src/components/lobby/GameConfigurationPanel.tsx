@@ -32,7 +32,7 @@ import { RoleConfig } from "./RoleConfig";
 import { GameModePicker } from "./GameModePicker";
 import { ShowRolesInPlayPicker } from "./ShowRolesInPlayPicker";
 import { WerewolfConfigPanel } from "./WerewolfConfigPanel";
-import { SecretVillainConfigPanel } from "./SecretVillainConfigPanel";
+import { SecretVillainConfigPanel } from "./secret-villain";
 
 interface ReadOnlyProps {
   config: GameConfig;
