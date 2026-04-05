@@ -4,7 +4,10 @@ import type {
   GameModeConfig,
   GamePlayer,
   LobbyPlayer,
+  ModeConfig,
+  PlayingGameStatus,
   RoleSlot,
+  TimerConfig,
 } from "@/lib/types";
 import type { PlayerGameState, VisibleTeammate } from "@/server/types";
 import { GAME_MODES } from "@/lib/game-modes";
@@ -199,9 +202,9 @@ export class GameStateService {
     gameMode: GameMode,
     showRolesInPlay: ShowRolesInPlay,
     ownerPlayerId: string | undefined,
-    timerConfig: import("@/lib/types").TimerConfig,
+    timerConfig: TimerConfig,
     /** Game-mode-specific config (e.g., nominationsEnabled for Werewolf). */
-    modeConfig?: import("@/lib/types").ModeConfig,
+    modeConfig?: ModeConfig,
   ): Game {
     const config = this.getModeDefinition(gameMode);
     const { roles, services } = config;
@@ -244,9 +247,7 @@ export class GameStateService {
   /**
    * Build the initial turn state for transitioning from Starting → Playing.
    */
-  public buildPlayingStatus(
-    game: Game,
-  ): import("@/lib/types").PlayingGameStatus {
+  public buildPlayingStatus(game: Game): PlayingGameStatus {
     const { services } = this.getModeDefinition(game.gameMode);
     return {
       type: GameStatus.Playing,

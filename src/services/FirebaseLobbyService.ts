@@ -5,6 +5,7 @@ import type {
   RoleSlot,
   RoleConfigMode,
   ShowRolesInPlay,
+  TimerConfig,
 } from "@/lib/types";
 import { modeConfigToFirebase } from "@/lib/firebase/schema";
 import { getAdminDatabase } from "@/lib/firebase/admin";
@@ -186,7 +187,7 @@ export class FirebaseLobbyService {
       roleConfigMode?: RoleConfigMode;
       gameMode?: GameMode;
       roleSlots?: RoleSlot[];
-      timerConfig?: import("@/lib/types").TimerConfig;
+      timerConfig?: TimerConfig;
       modeConfig?: ModeConfig;
     },
   ): Promise<Lobby | undefined> {

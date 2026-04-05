@@ -6,6 +6,7 @@ import {
   DEFAULT_TIMER_CONFIG,
 } from "@/lib/types";
 import type { Game } from "@/lib/types";
+import type { AnyNightAction } from "@/lib/game-modes/werewolf";
 import { WerewolfPhase, WerewolfRole } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
 
@@ -24,10 +25,7 @@ export function makeNighttimeGame(
       startedAt: 1000,
       nightPhaseOrder: [WerewolfRole.Witch],
       currentPhaseIndex: 0,
-      nightActions: nightActions as Record<
-        string,
-        import("@/lib/game-modes/werewolf").AnyNightAction
-      >,
+      nightActions: nightActions as Record<string, AnyNightAction>,
     },
     deadPlayerIds: [],
     ...(witchAbilityUsed ? { witchAbilityUsed: true } : {}),
@@ -77,10 +75,7 @@ export function makeNighttimeGameWithBonusPhase(
       startedAt: 1000,
       nightPhaseOrder: [WerewolfRole.Werewolf, BONUS_PHASE_KEY],
       currentPhaseIndex,
-      nightActions: nightActions as Record<
-        string,
-        import("@/lib/game-modes/werewolf").AnyNightAction
-      >,
+      nightActions: nightActions as Record<string, AnyNightAction>,
     },
     deadPlayerIds: [],
   };

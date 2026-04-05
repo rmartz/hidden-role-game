@@ -177,10 +177,7 @@ describe("SetNightTarget — Witch cannot self-attack", () => {
         startedAt: 1000,
         nightPhaseOrder: [WerewolfRole.Werewolf, WerewolfRole.Witch],
         currentPhaseIndex: 1,
-        nightActions: nightActions as Record<
-          string,
-          import("../../types").AnyNightAction
-        >,
+        nightActions: nightActions as Record<string, AnyNightAction>,
       },
       deadPlayerIds: [],
     };
