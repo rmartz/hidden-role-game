@@ -1,7 +1,7 @@
 import { Team } from "@/lib/types";
 import { TargetCategory } from "../types";
 import type { AnyNightAction } from "../types";
-import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
+import { WerewolfRole, getWerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
 import { WEREWOLF_COPY } from "../copy";
 import { isGroupPhaseKey, baseGroupPhaseKey, isRoleActive } from "./phase-keys";
@@ -71,9 +71,7 @@ export function isPlayersTurn(
   if (isGroupPhaseKey(activePhaseKey)) {
     const baseKey = baseGroupPhaseKey(activePhaseKey);
     if (myRole.id === baseKey) return true;
-    const roleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
-      myRole.id
-    ];
+    const roleDef = getWerewolfRole(myRole.id);
     return (roleDef?.wakesWith as string | undefined) === baseKey;
   }
   return myRole.id === activePhaseKey;
@@ -138,9 +136,7 @@ export function getInvestigationResultForNarrator(
     (a) => a.player.id === activeTarget,
   );
   if (!targetAssignment?.role) return undefined;
-  const roleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
-    targetAssignment.role.id
-  ];
+  const roleDef = getWerewolfRole(targetAssignment.role.id);
 
   if (activeRoleDef?.checksForSeer) {
     const isSeer = targetAssignment.role.id === (WerewolfRole.Seer as string);
@@ -166,9 +162,7 @@ export function getInvestigationResultForNarrator(
       (a) => a.player.id === secondTargetId,
     );
     if (!secondAssignment?.role) return undefined;
-    const secondRoleDef = (
-      WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
-    )[secondAssignment.role.id];
+    const secondRoleDef = getWerewolfRole(secondAssignment.role.id);
     // Neutral players win individually, so treat them as never sharing a team.
     const sameTeam =
       roleDef?.team !== Team.Neutral &&
@@ -221,9 +215,7 @@ export function getConfirmLabel(
   if (isRoleActive(phaseKey, WerewolfRole.Mirrorcaster)) {
     return mirrorcasterCharged ? "Attack" : "Protect";
   }
-  const roleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
-    phaseKey
-  ];
+  const roleDef = getWerewolfRole(phaseKey);
   if (!roleDef) return "Confirm";
   switch (roleDef.targetCategory) {
     case TargetCategory.Attack:

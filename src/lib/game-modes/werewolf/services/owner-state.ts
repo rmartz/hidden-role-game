@@ -1,4 +1,3 @@
-import { GameStatus } from "@/lib/types";
 import type { Game } from "@/lib/types";
 import type { DaytimeNightStatusEntry } from "@/server/types";
 import type { WerewolfPlayerGameState } from "../player-state";
@@ -6,20 +5,23 @@ import { getWerewolfModeConfig } from "../lobby-config";
 import type {
   AltruistInterceptedNightResolutionEvent,
   AnyNightAction,
-  WerewolfTurnState,
 } from "../types";
 import { WerewolfPhase } from "../types";
 import { SMITE_PHASE_KEY, OLD_MAN_TIMER_KEY } from "../utils";
 import { getSilencedPlayerIds, getHypnotizedPlayerId } from "../utils";
-import { WerewolfRole, WEREWOLF_ROLES, isWerewolfRole } from "../roles";
-import type { WerewolfRoleDefinition } from "../roles";
+import { currentTurnState } from "../utils/game-state";
+import {
+  WerewolfRole,
+  WEREWOLF_ROLES,
+  isWerewolfRole,
+  getWerewolfRole,
+} from "../roles";
 
 /** Extracts nightActions from the current turnState, if present. */
 function extractNightActions(
   game: Game,
 ): Record<string, AnyNightAction> | undefined {
-  if (game.status.type !== GameStatus.Playing) return undefined;
-  const ts = game.status.turnState as WerewolfTurnState | undefined;
+  const ts = currentTurnState(game);
   if (!ts) return undefined;
   const { nightActions } = ts.phase;
   if (ts.phase.type === WerewolfPhase.Nighttime) return nightActions;
@@ -28,15 +30,13 @@ function extractNightActions(
 
 /** Extracts deadPlayerIds from the Werewolf turn state. */
 function extractDeadPlayerIds(game: Game): string[] {
-  if (game.status.type !== GameStatus.Playing) return [];
-  const ts = game.status.turnState as WerewolfTurnState | undefined;
+  const ts = currentTurnState(game);
   return ts?.deadPlayerIds ?? [];
 }
 
 /** Extracts the Hunter revenge player ID (narrator-only). */
 function extractHunterRevengePlayerId(game: Game): string | undefined {
-  if (game.status.type !== GameStatus.Playing) return undefined;
-  const ts = game.status.turnState as WerewolfTurnState | undefined;
+  const ts = currentTurnState(game);
   return ts?.hunterRevengePlayerId;
 }
 
@@ -48,8 +48,7 @@ export function extractDaytimeNightSummary(
   game: Game,
   callerId: string,
 ): Partial<WerewolfPlayerGameState> {
-  if (game.status.type !== GameStatus.Playing) return {};
-  const ts = game.status.turnState as WerewolfTurnState | undefined;
+  const ts = currentTurnState(game);
   if (ts?.phase.type !== WerewolfPhase.Daytime) return {};
   const phase = ts.phase;
 
@@ -109,9 +108,7 @@ export function extractDaytimeNightSummary(
     const revealedPlayer = game.players.find(
       (p) => p.id === exposerReveal.playerId,
     );
-    const revealedRoleDef = (
-      WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
-    )[exposerReveal.roleId];
+    const revealedRoleDef = getWerewolfRole(exposerReveal.roleId);
     if (revealedPlayer && revealedRoleDef) {
       result.exposerReveal = {
         playerName: revealedPlayer.name,
@@ -131,8 +128,7 @@ export function extractDaytimePlayerState(
   game: Game,
   callerId: string,
 ): Partial<WerewolfPlayerGameState> {
-  if (game.status.type !== GameStatus.Playing) return {};
-  const ts = game.status.turnState as WerewolfTurnState | undefined;
+  const ts = currentTurnState(game);
   if (ts?.phase.type !== WerewolfPhase.Daytime) return {};
   const phase = ts.phase;
 
@@ -223,9 +219,7 @@ export function extractDaytimePlayerState(
           (a) => a.playerId === activeTrial.defendantId,
         );
         const roleDef = assignment
-          ? (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
-              assignment.roleDefinitionId
-            ]
+          ? getWerewolfRole(assignment.roleDefinitionId)
           : undefined;
         if (roleDef) {
           result.activeTrial.eliminatedRole = {

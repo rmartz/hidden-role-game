@@ -1,8 +1,7 @@
 import type { PlayerRoleAssignment } from "@/lib/types";
 import { TargetCategory } from "../types";
 import type { AnyNightAction, TargetablePlayer, TeamNightVote } from "../types";
-import { WEREWOLF_ROLES } from "../roles";
-import type { WerewolfRoleDefinition } from "../roles";
+import { getWerewolfRole } from "../roles";
 import { isGroupPhaseKey, baseGroupPhaseKey } from "./phase-keys";
 
 /**
@@ -34,9 +33,7 @@ export function getTargetablePlayers(
 
   if (isGroupPhaseKey(activePhaseKey)) {
     if (myPlayerId) excludeIds.push(myPlayerId);
-    const primaryRole = (
-      WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
-    )[baseGroupPhaseKey(activePhaseKey)];
+    const primaryRole = getWerewolfRole(baseGroupPhaseKey(activePhaseKey));
     for (const a of visibleRoleAssignments) {
       // When role info is present (narrator view), exclude same-team players.
       // When role is absent (player view with wake-partner/aware-of), exclude all.
@@ -48,9 +45,7 @@ export function getTargetablePlayers(
       }
     }
   } else {
-    const role = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
-      activePhaseKey
-    ];
+    const role = getWerewolfRole(activePhaseKey);
     const restrictsSelf =
       role?.targetCategory === TargetCategory.Attack ||
       role?.targetCategory === TargetCategory.Investigate ||
@@ -85,9 +80,7 @@ export function getGroupPhasePlayerIds(
     .filter((a) => {
       if (deadPlayerIds.includes(a.playerId)) return false;
       if (a.roleDefinitionId === baseKey) return true;
-      const role = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
-        a.roleDefinitionId
-      ];
+      const role = getWerewolfRole(a.roleDefinitionId);
       return (role?.wakesWith as string | undefined) === baseKey;
     })
     .map((a) => a.playerId);
@@ -107,9 +100,7 @@ export function getGroupPhaseMemberIds(
   return roleAssignments
     .filter((a) => {
       if (a.roleDefinitionId === baseKey) return true;
-      const role = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
-        a.roleDefinitionId
-      ];
+      const role = getWerewolfRole(a.roleDefinitionId);
       return (role?.wakesWith as string | undefined) === baseKey;
     })
     .map((a) => a.playerId);

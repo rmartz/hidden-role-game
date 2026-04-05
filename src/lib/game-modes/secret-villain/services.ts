@@ -1,4 +1,3 @@
-import { GameStatus } from "@/lib/types";
 import type { Game, GameModeServices, PlayerRoleAssignment } from "@/lib/types";
 import {
   SecretVillainPhase,
@@ -9,6 +8,7 @@ import {
 import type { SecretVillainTurnState, SvCustomPowerConfig } from "./types";
 import {
   createDeck,
+  currentTurnState,
   getDefaultBoardPreset,
   getEligibleChancellorIds,
   resolvePowerTable,
@@ -99,8 +99,7 @@ export const secretVillainServices: GameModeServices = {
   },
 
   extractPlayerState(game: Game, callerId: string): Record<string, unknown> {
-    if (game.status.type !== GameStatus.Playing) return {};
-    const ts = game.status.turnState as SecretVillainTurnState | undefined;
+    const ts = currentTurnState(game);
     if (!ts) return {};
 
     const result: Record<string, unknown> = {};

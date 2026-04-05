@@ -14,8 +14,7 @@ import {
   checkWinCondition,
   WerewolfWinner,
 } from "../utils";
-import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
-import type { WerewolfRoleDefinition } from "../roles";
+import { WerewolfRole, getWerewolfRole } from "../roles";
 import { didWolfCubDie } from "./helpers";
 
 export const startDayAction: GameAction = {
@@ -48,9 +47,7 @@ export const startDayAction: GameAction = {
 
     // Old Man timer: fires after (#werewolves + 2) nights.
     const werewolfCount = game.roleAssignments.filter((a) => {
-      const roleDef = (
-        WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
-      )[a.roleDefinitionId];
+      const roleDef = getWerewolfRole(a.roleDefinitionId);
       return roleDef?.isWerewolf === true;
     }).length;
     const oldManAssignment = game.roleAssignments.find(
@@ -121,9 +118,7 @@ export const startDayAction: GameAction = {
         (a) => a.playerId === oesAction.targetPlayerId,
       );
       const oesTargetRoleDef = oesTargetAssignment
-        ? (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
-            oesTargetAssignment.roleDefinitionId
-          ]
+        ? getWerewolfRole(oesTargetAssignment.roleDefinitionId)
         : undefined;
       if (oesTargetRoleDef?.isWerewolf) {
         oneEyedSeerLockedTargetId = oesAction.targetPlayerId;
@@ -164,9 +159,7 @@ export const startDayAction: GameAction = {
     const lastTargets: Record<string, string> = {};
     for (const [phaseKey, action] of Object.entries(nightPhase.nightActions)) {
       if (isTeamNightAction(action)) continue;
-      const roleDef = (
-        WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
-      )[phaseKey];
+      const roleDef = getWerewolfRole(phaseKey);
       if (roleDef?.preventRepeatTarget && action.targetPlayerId) {
         lastTargets[phaseKey] = action.targetPlayerId;
       }
@@ -191,9 +184,7 @@ export const startDayAction: GameAction = {
             (a) => a.playerId === vigilanteAction.targetPlayerId,
           );
           const targetRole = targetAssignment
-            ? (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
-                targetAssignment.roleDefinitionId
-              ]
+            ? getWerewolfRole(targetAssignment.roleDefinitionId)
             : undefined;
           if (targetRole?.team === Team.Good) {
             newDeadIds.push(vigilanteAssignment.playerId);
@@ -217,9 +208,7 @@ export const startDayAction: GameAction = {
             (a) => a.playerId === morticianAction.targetPlayerId,
           );
           const targetRole = targetAssignment
-            ? (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
-                targetAssignment.roleDefinitionId
-              ]
+            ? getWerewolfRole(targetAssignment.roleDefinitionId)
             : undefined;
           if (targetRole?.isWerewolf) {
             morticianAbilityEnded = true;

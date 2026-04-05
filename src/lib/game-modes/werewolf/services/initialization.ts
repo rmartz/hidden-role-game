@@ -3,7 +3,7 @@ import type { PlayerRoleAssignment } from "@/lib/types";
 import { WerewolfPhase } from "../types";
 import type { WerewolfTurnState, WerewolfNighttimePhase } from "../types";
 import { buildNightPhaseOrder } from "../utils";
-import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
+import { WerewolfRole, getWerewolfRole } from "../roles";
 
 /**
  * Selects the Executioner's target from the Good team players.
@@ -12,11 +12,6 @@ import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
 export function selectExecutionerTarget(
   roleAssignments: PlayerRoleAssignment[],
 ): string | undefined {
-  const rolesLookup = WEREWOLF_ROLES as Record<
-    string,
-    (typeof WEREWOLF_ROLES)[WerewolfRole] | undefined
-  >;
-
   const executionerAssignment = roleAssignments.find(
     (a) => a.roleDefinitionId === (WerewolfRole.Executioner as string),
   );
@@ -24,7 +19,7 @@ export function selectExecutionerTarget(
 
   const goodCandidates = roleAssignments.filter((a) => {
     if (a.playerId === executionerAssignment.playerId) return false;
-    const role = rolesLookup[a.roleDefinitionId];
+    const role = getWerewolfRole(a.roleDefinitionId);
     return role?.team === Team.Good;
   });
   if (goodCandidates.length === 0) return undefined;

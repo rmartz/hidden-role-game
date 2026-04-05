@@ -535,3 +535,11 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
 export function isWerewolfRole(id: string): id is WerewolfRole {
   return id in WEREWOLF_ROLES;
 }
+
+/** Look up a WerewolfRoleDefinition by string ID, returning undefined if not found. */
+export function getWerewolfRole(
+  id: string,
+): WerewolfRoleDefinition | undefined {
+  if (!isWerewolfRole(id)) return undefined;
+  return WEREWOLF_ROLES[id];
+}

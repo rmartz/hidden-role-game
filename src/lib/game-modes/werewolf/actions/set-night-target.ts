@@ -12,8 +12,7 @@ import {
   isRoleActive,
   getInterimAttackedPlayerIds,
 } from "../utils";
-import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
-import type { WerewolfRoleDefinition } from "../roles";
+import { WerewolfRole, getWerewolfRole } from "../roles";
 import { getPlayer } from "@/lib/player-utils";
 
 export const setNightTargetAction: GameAction = {
@@ -81,9 +80,7 @@ export const setNightTargetAction: GameAction = {
     }
 
     // Roles with preventRepeatTarget cannot target the same player twice in a row.
-    const phaseRoleDef = (
-      WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
-    )[phaseKey];
+    const phaseRoleDef = getWerewolfRole(phaseKey);
     if (
       phaseRoleDef?.preventRepeatTarget &&
       ts.lastTargets?.[phaseKey] === targetPlayerId
@@ -112,9 +109,7 @@ export const setNightTargetAction: GameAction = {
         (a) => a.playerId === callerId,
       );
       const callerRoleDef = callerAssignment
-        ? (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
-            callerAssignment.roleDefinitionId
-          ]
+        ? getWerewolfRole(callerAssignment.roleDefinitionId)
         : undefined;
       if (
         callerRoleDef?.targetCategory === TargetCategory.Attack ||
