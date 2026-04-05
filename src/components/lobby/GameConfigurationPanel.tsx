@@ -18,6 +18,7 @@ import {
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   loadConfig,
+  setModeConfig,
   setPlayerCount,
   setShowConfigToPlayers,
   setShowRolesInPlay,
@@ -159,6 +160,9 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
           | undefined
       }
       onModeConfigFieldChange={onModeConfigFieldChange}
+      onModeConfigChange={
+        readOnly ? undefined : (config) => dispatch(setModeConfig(config))
+      }
     />
   ) : null;
 

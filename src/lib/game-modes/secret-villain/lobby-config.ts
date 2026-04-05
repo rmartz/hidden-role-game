@@ -21,6 +21,7 @@ export interface SecretVillainLobbyConfig extends LobbyConfig {
 
 export const DEFAULT_SECRET_VILLAIN_MODE_CONFIG: SecretVillainModeConfig = {
   gameMode: GameMode.SecretVillain,
+  boardPreset: SvBoardPreset.Default,
 };
 
 const VALID_CUSTOM_SLOTS = new Set<string>([
