@@ -1,6 +1,7 @@
 import { GameMode } from "@/lib/types";
 import type { BaseLobbyConfig } from "@/lib/types";
 import type { SecretVillainTimerConfig } from "./timer-config";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "./timer-config";
 import { SpecialActionType, SvBoardPreset } from "./types";
 import { SvTheme } from "./themes";
 import type { SvCustomPowerConfig, SvCustomPowerSlot } from "./types";
@@ -52,6 +53,17 @@ function parseCustomPowerTable(raw: unknown): SvCustomPowerConfig | undefined {
     parseCustomPowerSlot(raw[1]),
     parseCustomPowerSlot(raw[2]),
   ];
+}
+
+export function buildDefaultSecretVillainLobbyConfig(
+  base: BaseLobbyConfig,
+): SecretVillainLobbyConfig {
+  return {
+    ...base,
+    gameMode: GameMode.SecretVillain,
+    timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
+    modeConfig: DEFAULT_SECRET_VILLAIN_MODE_CONFIG,
+  };
 }
 
 export function parseSecretVillainModeConfig(

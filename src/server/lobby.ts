@@ -1,5 +1,5 @@
 import { randomUUID } from "crypto";
-import type { GameMode, Lobby, LobbyConfig } from "@/lib/types";
+import type { GameMode, Lobby } from "@/lib/types";
 import {
   RoleConfigMode as RoleConfigModeEnum,
   ShowRolesInPlay as ShowRolesInPlayEnum,
@@ -49,18 +49,13 @@ export async function addLobby(
   gameMode: GameMode,
 ): Promise<Lobby> {
   const lobbyId = randomUUID();
-  // Cast required: LobbyConfig is a discriminated union whose timerConfig and
-  // modeConfig are narrowed per game mode, but gameMode is a runtime parameter
-  // so TypeScript cannot narrow the union statically here.
-  const config = {
-    gameMode,
+  const base = {
     roleConfigMode: RoleConfigModeEnum.Default,
     roleSlots: getDefaultRoleSlots(gameMode, 1),
     showConfigToPlayers: false,
     showRolesInPlay: ShowRolesInPlayEnum.ConfiguredOnly,
-    timerConfig: GAME_MODES[gameMode].defaultTimerConfig,
-    modeConfig: GAME_MODES[gameMode].defaultModeConfig,
-  } as LobbyConfig;
+  };
+  const config = GAME_MODES[gameMode].buildDefaultLobbyConfig(base);
 
   const lobby: Lobby = {
     id: lobbyId,
