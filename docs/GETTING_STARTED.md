@@ -146,6 +146,8 @@ Also export a `defaultRoleCount(numPlayers)` function that returns the recommend
 
 The turn state is the server-side source of truth for everything that happens during a game. It is never sent to clients directly — `extractPlayerState` (step 3) decides what each player sees.
 
+A **turn** is one complete cycle of the game's main loop (e.g., one presidency in Secret Villain, one night/day cycle in Werewolf). Within a turn, the game moves through a sequence of **phases** — distinct moments where a specific player or set of players can act. Each phase ends when its required actions are complete, which advances the game to the next phase (or starts a new turn). A **player action** is a single step within a phase: one vote, one card pick, one nomination. Actions are validated against the current phase to ensure only the right player can act at the right time.
+
 Define a `{Mode}TurnState` interface that holds all mutable game state: current phase, card decks, player positions, vote records, etc. If the game has multiple phases, define a phase enum and per-phase interfaces (as a discriminated union) and include the current phase as a field on the turn state.
 
 For a simple game mode with no turn state (e.g., one where the app only handles role distribution), `buildInitialTurnState` can return `undefined` and `types.ts` can be omitted.
