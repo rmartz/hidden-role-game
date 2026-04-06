@@ -22,12 +22,12 @@ const { mockGetLobby, mockGetGame } = vi.hoisted(() => ({
   mockGetGame: vi.fn(),
 }));
 
-vi.mock("@/services/FirebaseLobbyService", () => ({
-  lobbyService: { getLobby: mockGetLobby },
+vi.mock("@/lib/firebase/lobby", () => ({
+  getLobby: mockGetLobby,
 }));
 
-vi.mock("@/services/GameService", () => ({
-  gameService: { getGame: mockGetGame },
+vi.mock("@/server/game", () => ({
+  getGame: mockGetGame,
 }));
 
 function makeLobby(overrides: Partial<Lobby> = {}): Lobby {

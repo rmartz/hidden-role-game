@@ -1,9 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { Team } from "@/lib/types";
 import type { LobbyPlayer, RoleDefinition } from "@/lib/types";
-import { GameInitializationService } from "@/services/GameInitializationService";
-
-const service = new GameInitializationService();
+import { buildGamePlayers } from "@/lib/game-initialization";
 
 type TestWerewolfRole = RoleDefinition<string, Team> & {
   teamTargeting?: boolean;
@@ -39,7 +37,7 @@ describe("GameInitializationService.buildGamePlayers (Werewolf-specific)", () =>
       { playerId: "p1", roleDefinitionId: "villager" },
     ];
 
-    const result = service.buildGamePlayers(players, assignments, wolfRoles);
+    const result = buildGamePlayers(players, assignments, wolfRoles);
     const wolf1 = result.find((p) => p.id === "w1")!;
     const wolf2 = result.find((p) => p.id === "w2")!;
     const villager = result.find((p) => p.id === "p1")!;
@@ -81,7 +79,7 @@ describe("GameInitializationService.buildGamePlayers (Werewolf-specific)", () =>
       { playerId: "p1", roleDefinitionId: "villager" },
     ];
 
-    const result = service.buildGamePlayers(players, assignments, minionRoles);
+    const result = buildGamePlayers(players, assignments, minionRoles);
     const wolf = result.find((p) => p.id === "w1")!;
     const minion = result.find((p) => p.id === "m1")!;
 
@@ -120,7 +118,7 @@ describe("GameInitializationService.buildGamePlayers (Werewolf-specific)", () =>
       { playerId: "p1", roleDefinitionId: "villager" },
     ];
 
-    const result = service.buildGamePlayers(players, assignments, cubRoles);
+    const result = buildGamePlayers(players, assignments, cubRoles);
     const wolf = result.find((p) => p.id === "w1")!;
     const cub = result.find((p) => p.id === "wc1")!;
 

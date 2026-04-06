@@ -1,8 +1,8 @@
 import { GameMode } from "@/lib/types";
 import { ServerResponseStatus } from "@/server/types";
 import type { UpdateLobbyConfigRequest } from "@/server/types";
-import { lobbyService } from "@/services/LobbyService";
-import { gameService } from "@/services/GameService";
+import { updateConfig } from "@/lib/firebase/lobby";
+import { getModeDefinition } from "@/server/game";
 import {
   authenticateLobby,
   errorResponse,
@@ -32,7 +32,7 @@ export async function PUT(
   }
 
   if (body.roleSlots !== undefined && body.gameMode !== undefined) {
-    const { roles } = gameService.getModeDefinition(body.gameMode);
+    const { roles } = getModeDefinition(body.gameMode);
     for (const slot of body.roleSlots) {
       if (!(slot.roleId in roles)) {
         return errorResponse(`Unknown role: ${slot.roleId}`, 400);
@@ -40,7 +40,7 @@ export async function PUT(
     }
   }
 
-  const updated = await lobbyService.updateConfig(lobbyId, body);
+  const updated = await updateConfig(lobbyId, body);
   if (!updated) {
     return errorResponse("Failed to update config", 500);
   }

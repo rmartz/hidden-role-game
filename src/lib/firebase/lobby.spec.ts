@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { FirebaseLobbyService } from "./FirebaseLobbyService";
+import { addLobby, getLobby, updateConfig } from "./lobby";
 import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
 import type { Lobby } from "@/lib/types";
 import type { WerewolfModeConfig } from "@/lib/game-modes/werewolf/lobby-config";
@@ -31,10 +31,9 @@ function makeBaseLobby(overrides: Partial<Lobby["config"]> = {}): Lobby {
 
 describe("FirebaseLobbyService.updateConfig — nominationsEnabled", () => {
   it("sets nominationsEnabled when true is provided", async () => {
-    const service = new FirebaseLobbyService();
-    await service.addLobby(makeBaseLobby());
+    await addLobby(makeBaseLobby());
 
-    const updated = await service.updateConfig("lobby-1", {
+    const updated = await updateConfig("lobby-1", {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: true,
@@ -49,8 +48,7 @@ describe("FirebaseLobbyService.updateConfig — nominationsEnabled", () => {
   });
 
   it("sets nominationsEnabled to false when false is provided", async () => {
-    const service = new FirebaseLobbyService();
-    await service.addLobby(
+    await addLobby(
       makeBaseLobby({
         modeConfig: {
           gameMode: GameMode.Werewolf,
@@ -61,7 +59,7 @@ describe("FirebaseLobbyService.updateConfig — nominationsEnabled", () => {
       }),
     );
 
-    const updated = await service.updateConfig("lobby-1", {
+    const updated = await updateConfig("lobby-1", {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: false,
@@ -76,8 +74,7 @@ describe("FirebaseLobbyService.updateConfig — nominationsEnabled", () => {
   });
 
   it("a subsequent getLobby reflects the updated nominationsEnabled", async () => {
-    const service = new FirebaseLobbyService();
-    await service.addLobby(
+    await addLobby(
       makeBaseLobby({
         modeConfig: {
           gameMode: GameMode.Werewolf,
@@ -87,7 +84,7 @@ describe("FirebaseLobbyService.updateConfig — nominationsEnabled", () => {
         },
       }),
     );
-    await service.updateConfig("lobby-1", {
+    await updateConfig("lobby-1", {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: false,
@@ -96,7 +93,7 @@ describe("FirebaseLobbyService.updateConfig — nominationsEnabled", () => {
       },
     });
 
-    const fetched = await service.getLobby("lobby-1");
+    const fetched = await getLobby("lobby-1");
 
     expect(
       (fetched!.config.modeConfig as WerewolfModeConfig).nominationsEnabled,
@@ -104,8 +101,7 @@ describe("FirebaseLobbyService.updateConfig — nominationsEnabled", () => {
   });
 
   it("omitting modeConfig leaves existing modeConfig intact", async () => {
-    const service = new FirebaseLobbyService();
-    await service.addLobby(
+    await addLobby(
       makeBaseLobby({
         modeConfig: {
           gameMode: GameMode.Werewolf,
@@ -116,7 +112,7 @@ describe("FirebaseLobbyService.updateConfig — nominationsEnabled", () => {
       }),
     );
 
-    const updated = await service.updateConfig("lobby-1", {
+    const updated = await updateConfig("lobby-1", {
       showConfigToPlayers: true,
     });
 
@@ -126,9 +122,7 @@ describe("FirebaseLobbyService.updateConfig — nominationsEnabled", () => {
   });
 
   it("returns undefined when the lobby does not exist", async () => {
-    const service = new FirebaseLobbyService();
-
-    const result = await service.updateConfig("no-such-lobby", {
+    const result = await updateConfig("no-such-lobby", {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: true,

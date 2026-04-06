@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { GameStateService } from "./GameStateService";
+import { getPlayerGameState } from "./game-state";
 import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
 import type { Game, GamePlayer, RoleSlot } from "@/lib/types";
 import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
@@ -46,21 +46,19 @@ function makeGameWithPlayers(
 }
 
 describe("GameStateService.getPlayerGameState", () => {
-  const service = new GameStateService();
-
   it("returns null when callerId is not in game.players", () => {
     const game = makeGameWithPlayers(
       [makePlayer("p1")],
       [{ playerId: "p1", roleDefinitionId: "good" }],
     );
 
-    expect(service.getPlayerGameState(game, "unknown")).toBeNull();
+    expect(getPlayerGameState(game, "unknown")).toBeNull();
   });
 
   it("returns null when caller has no role assignment", () => {
     const game = makeGameWithPlayers([makePlayer("p1")], []);
 
-    expect(service.getPlayerGameState(game, "p1")).toBeNull();
+    expect(getPlayerGameState(game, "p1")).toBeNull();
   });
 
   it("returns null when caller's role definition does not exist", () => {
@@ -69,7 +67,7 @@ describe("GameStateService.getPlayerGameState", () => {
       [{ playerId: "p1", roleDefinitionId: "unknown-role" }],
     );
 
-    expect(service.getPlayerGameState(game, "p1")).toBeNull();
+    expect(getPlayerGameState(game, "p1")).toBeNull();
   });
 
   it("returns correct status, player list, and myRole", () => {
@@ -81,7 +79,7 @@ describe("GameStateService.getPlayerGameState", () => {
       ],
     );
 
-    const result = service.getPlayerGameState(game, "p1");
+    const result = getPlayerGameState(game, "p1");
 
     expect(result?.status).toEqual({ type: GameStatus.Playing });
     expect(result?.players).toEqual([
@@ -101,7 +99,7 @@ describe("GameStateService.getPlayerGameState", () => {
       [{ playerId: "p1", roleDefinitionId: "good" }],
     );
 
-    const result = service.getPlayerGameState(game, "p1");
+    const result = getPlayerGameState(game, "p1");
 
     expect(result?.visibleRoleAssignments).toEqual([]);
   });
@@ -117,7 +115,7 @@ describe("GameStateService.getPlayerGameState", () => {
       ],
     );
 
-    const result = service.getPlayerGameState(game, "p1");
+    const result = getPlayerGameState(game, "p1");
 
     expect(result?.visibleRoleAssignments).toEqual([
       {
@@ -160,11 +158,9 @@ function makeNarratorGame(nominationsEnabled = false): Game {
 }
 
 describe("GameStateService.getPlayerGameState — narrator nominationsEnabled", () => {
-  const service = new GameStateService();
-
   it("narrator state has nominationsEnabled true when enabled on game", () => {
     const game = makeNarratorGame(true);
-    const result = service.getPlayerGameState(
+    const result = getPlayerGameState(
       game,
       "narrator",
     ) as WerewolfPlayerGameState | null;
@@ -173,7 +169,7 @@ describe("GameStateService.getPlayerGameState — narrator nominationsEnabled", 
 
   it("narrator state has nominationsEnabled false when disabled on game", () => {
     const game = makeNarratorGame(false);
-    const result = service.getPlayerGameState(
+    const result = getPlayerGameState(
       game,
       "narrator",
     ) as WerewolfPlayerGameState | null;
@@ -182,7 +178,7 @@ describe("GameStateService.getPlayerGameState — narrator nominationsEnabled", 
 
   it("narrator state has myPlayerId undefined and myRole undefined", () => {
     const game = makeNarratorGame(true);
-    const result = service.getPlayerGameState(game, "narrator");
+    const result = getPlayerGameState(game, "narrator");
     expect(result?.myPlayerId).toBeUndefined();
     expect(result?.myRole).toBeUndefined();
   });

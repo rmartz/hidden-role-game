@@ -6,7 +6,7 @@ import {
   parseGameMode,
 } from "@/lib/game-modes";
 import { ServerResponseStatus, type CreateLobbyRequest } from "@/server/types";
-import { lobbyService } from "@/services/LobbyService";
+import { addLobby } from "@/server/lobby";
 import {
   errorResponse,
   toPublicLobby,
@@ -40,7 +40,7 @@ export async function POST(request: Request): Promise<Response> {
     selectedGameMode = DEFAULT_GAME_MODE;
   }
 
-  const lobby = await lobbyService.addLobby(owner, selectedGameMode);
+  const lobby = await addLobby(owner, selectedGameMode);
 
   return Response.json({
     status: ServerResponseStatus.Success,

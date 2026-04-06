@@ -1,5 +1,5 @@
 import { ServerResponseStatus } from "@/server/types";
-import { gameService } from "@/services/GameService";
+import { applyAction } from "@/server/game";
 import { authenticateGame, errorResponse, parseGameMode } from "@/server/utils";
 
 export async function POST(
@@ -28,7 +28,7 @@ export async function POST(
     return errorResponse("actionId must be a string", 400);
   }
 
-  const result = await gameService.applyAction(
+  const result = await applyAction(
     gameId,
     body.actionId,
     caller.id,

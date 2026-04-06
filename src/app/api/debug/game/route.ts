@@ -3,7 +3,7 @@ import { GameMode, ShowRolesInPlay } from "@/lib/types";
 import type { LobbyPlayer, ModeConfig, TimerConfig } from "@/lib/types";
 import type { RoleSlot } from "@/server/types";
 import { ServerResponseStatus } from "@/server/types";
-import { gameService } from "@/services/GameService";
+import { getModeDefinition, createGame } from "@/server/game";
 import { errorResponse } from "@/server/utils";
 import { getRoleSlotsRequired, GAME_MODES } from "@/lib/game-modes";
 
@@ -41,7 +41,7 @@ export async function POST(request: Request): Promise<Response> {
     return errorResponse("playerCount must be between 2 and 20", 400);
   }
 
-  const { ownerTitle, roles } = gameService.getModeDefinition(gameMode);
+  const { ownerTitle, roles } = getModeDefinition(gameMode);
 
   const players: LobbyPlayer[] = Array.from(
     { length: playerCount },
@@ -67,7 +67,7 @@ export async function POST(request: Request): Promise<Response> {
     }
   }
 
-  const game = await gameService.createGame(
+  const game = await createGame(
     `debug-${randomUUID()}`,
     players,
     roleSlots,

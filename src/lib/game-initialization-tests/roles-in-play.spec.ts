@@ -4,9 +4,8 @@ import type { Game, RoleSlot } from "@/lib/types";
 import { SecretVillainRole } from "@/lib/game-modes/secret-villain";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game-modes/secret-villain/timer-config";
 import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game-modes/secret-villain/lobby-config";
-import { GameInitializationService } from "../GameInitializationService";
+import { buildRolesInPlay } from "../game-initialization";
 
-const service = new GameInitializationService();
 const DEFAULT_SLOTS: RoleSlot[] = [
   { roleId: SecretVillainRole.Good, min: 1, max: 1 },
   { roleId: SecretVillainRole.Bad, min: 1, max: 1 },
@@ -45,7 +44,7 @@ describe("GameInitializationService.buildRolesInPlay", () => {
       ShowRolesInPlay.None,
     );
 
-    expect(service.buildRolesInPlay(game)).toBeUndefined();
+    expect(buildRolesInPlay(game)).toBeUndefined();
   });
 
   it("returns roles with count when showRolesInPlay is RoleAndCount", () => {
@@ -62,7 +61,7 @@ describe("GameInitializationService.buildRolesInPlay", () => {
       ],
     );
 
-    const result = service.buildRolesInPlay(game);
+    const result = buildRolesInPlay(game);
 
     expect(result).toBeDefined();
     expect(result).toContainEqual(
@@ -92,7 +91,7 @@ describe("GameInitializationService.buildRolesInPlay", () => {
       slots,
     );
 
-    const result = service.buildRolesInPlay(game);
+    const result = buildRolesInPlay(game);
 
     expect(result).toHaveLength(1);
     expect(result?.[0]).toEqual({
@@ -116,7 +115,7 @@ describe("GameInitializationService.buildRolesInPlay", () => {
       slots,
     );
 
-    const result = service.buildRolesInPlay(game);
+    const result = buildRolesInPlay(game);
 
     expect(result).toHaveLength(2);
     expect(result).toContainEqual(
@@ -138,7 +137,7 @@ describe("GameInitializationService.buildRolesInPlay", () => {
       slots,
     );
 
-    const result = service.buildRolesInPlay(game);
+    const result = buildRolesInPlay(game);
 
     expect(result).toHaveLength(1);
     expect(result?.[0]!.id).toBe(SecretVillainRole.Good);

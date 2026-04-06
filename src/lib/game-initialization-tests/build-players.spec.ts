@@ -1,9 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { Team } from "@/lib/types";
 import type { LobbyPlayer } from "@/lib/types";
-import { GameInitializationService } from "../GameInitializationService";
-
-const service = new GameInitializationService();
+import { buildGamePlayers } from "../game-initialization";
 
 function makeLobbyPlayer(id: string): LobbyPlayer {
   return { id, name: `Player ${id}`, sessionId: `session-${id}` };
@@ -28,7 +26,7 @@ describe("GameInitializationService.buildGamePlayers", () => {
       { playerId: "p2", roleDefinitionId: "bad" },
     ];
 
-    const result = service.buildGamePlayers(players, assignments, MOCK_ROLES);
+    const result = buildGamePlayers(players, assignments, MOCK_ROLES);
 
     expect(result).toHaveLength(2);
     expect(result[0]!.id).toBe("p1");
@@ -42,7 +40,7 @@ describe("GameInitializationService.buildGamePlayers", () => {
       { playerId: "p2", roleDefinitionId: "good" },
     ];
 
-    const result = service.buildGamePlayers(players, assignments, MOCK_ROLES);
+    const result = buildGamePlayers(players, assignments, MOCK_ROLES);
 
     expect(result[0]!.visiblePlayers).toEqual([]);
   });
@@ -59,7 +57,7 @@ describe("GameInitializationService.buildGamePlayers", () => {
       { playerId: "p3", roleDefinitionId: "good" },
     ];
 
-    const result = service.buildGamePlayers(players, assignments, MOCK_ROLES);
+    const result = buildGamePlayers(players, assignments, MOCK_ROLES);
     const badPlayer = result.find((p) => p.id === "p1")!;
 
     expect(badPlayer.visiblePlayers).toHaveLength(1);
@@ -74,7 +72,7 @@ describe("GameInitializationService.buildGamePlayers", () => {
       { playerId: "p2", roleDefinitionId: "special" },
     ];
 
-    const result = service.buildGamePlayers(players, assignments, MOCK_ROLES);
+    const result = buildGamePlayers(players, assignments, MOCK_ROLES);
     const badPlayer = result.find((p) => p.id === "p1")!;
 
     expect(badPlayer.visiblePlayers.every((vp) => vp.playerId !== "p1")).toBe(
@@ -86,8 +84,8 @@ describe("GameInitializationService.buildGamePlayers", () => {
     const players = [makeLobbyPlayer("p1")];
     const assignments = [{ playerId: "missing", roleDefinitionId: "good" }];
 
-    expect(() =>
-      service.buildGamePlayers(players, assignments, MOCK_ROLES),
-    ).toThrow("Player not found: missing");
+    expect(() => buildGamePlayers(players, assignments, MOCK_ROLES)).toThrow(
+      "Player not found: missing",
+    );
   });
 });

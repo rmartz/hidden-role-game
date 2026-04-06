@@ -1,7 +1,7 @@
 import { ServerResponseStatus } from "@/server/types";
 import type { CreateGameRequest } from "@/server/types";
-import { lobbyService } from "@/services/LobbyService";
-import { gameService } from "@/services/GameService";
+import { clearReadyPlayerIds, setGameId } from "@/lib/firebase/lobby";
+import { getModeDefinition, createGame } from "@/server/game";
 import {
   authenticateLobby,
   errorResponse,
@@ -46,7 +46,7 @@ export async function POST(
     return errorResponse("Role slot ranges must cover the player count", 400);
   }
 
-  const { ownerTitle, roles } = gameService.getModeDefinition(gameMode);
+  const { ownerTitle, roles } = getModeDefinition(gameMode);
   for (const slot of roleSlots) {
     if (!(slot.roleId in roles)) {
       return errorResponse(`Unknown role: ${slot.roleId}`, 400);
@@ -57,7 +57,7 @@ export async function POST(
     ? lobby.players.find((p) => p.sessionId === lobby.ownerSessionId)
     : undefined;
 
-  const game = await gameService.createGame(
+  const game = await createGame(
     lobbyId,
     lobby.players,
     roleSlots,
@@ -68,8 +68,8 @@ export async function POST(
     lobby.config.modeConfig,
   );
 
-  await lobbyService.clearReadyPlayerIds(lobbyId);
-  const updated = await lobbyService.setGameId(lobbyId, game.id);
+  await clearReadyPlayerIds(lobbyId);
+  const updated = await setGameId(lobbyId, game.id);
   if (!updated) {
     return errorResponse("Failed to start game", 500);
   }

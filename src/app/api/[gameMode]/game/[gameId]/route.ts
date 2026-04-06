@@ -1,5 +1,5 @@
 import { ServerResponseStatus } from "@/server/types";
-import { gameService } from "@/services/GameService";
+import { getPlayerGameStateBySession } from "@/server/game";
 import { authenticateGame, errorResponse, parseGameMode } from "@/server/utils";
 
 export async function GET(
@@ -19,7 +19,7 @@ export async function GET(
     return errorResponse("Game mode mismatch", 409);
   }
 
-  const gameState = await gameService.getPlayerGameStateBySession(
+  const gameState = await getPlayerGameStateBySession(
     gameId,
     auth.caller.sessionId,
   );

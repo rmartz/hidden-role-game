@@ -1,5 +1,5 @@
 import { ServerResponseStatus } from "@/server/types";
-import { gameService } from "@/services/GameService";
+import { advanceToPlaying } from "@/server/game";
 import { authenticateGame, errorResponse, parseGameMode } from "@/server/utils";
 
 export async function POST(
@@ -25,7 +25,7 @@ export async function POST(
     return errorResponse("Unauthorized", 403);
   }
 
-  const updated = await gameService.advanceToPlaying(gameId);
+  const updated = await advanceToPlaying(gameId);
   if (!updated) {
     return errorResponse("Game cannot be advanced", 409);
   }
