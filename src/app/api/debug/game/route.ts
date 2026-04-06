@@ -4,8 +4,12 @@ import type { LobbyPlayer, ModeConfig, TimerConfig } from "@/lib/types";
 import type { RoleSlot } from "@/server/types";
 import { ServerResponseStatus } from "@/server/types";
 import { getModeDefinition, createGame } from "@/server/game";
-import { errorResponse } from "@/server/utils";
-import { getRoleSlotsRequired, GAME_MODES } from "@/lib/game/modes";
+import {
+  errorResponse,
+  validateRoleSlotsForMode,
+  validateRoleSlotsCoverPlayerCount,
+} from "@/server/utils";
+import { GAME_MODES } from "@/lib/game/modes";
 
 interface CreateDebugGameRequest {
   playerCount: number;
@@ -41,7 +45,17 @@ export async function POST(request: Request): Promise<Response> {
     return errorResponse("playerCount must be between 2 and 20", 400);
   }
 
-  const { ownerTitle, roles } = getModeDefinition(gameMode);
+  const coverError = validateRoleSlotsCoverPlayerCount(
+    roleSlots,
+    gameMode,
+    playerCount,
+  );
+  if (coverError) return errorResponse(coverError, 400);
+
+  const modeError = validateRoleSlotsForMode(roleSlots, gameMode);
+  if (modeError) return errorResponse(modeError, 400);
+
+  const { ownerTitle } = getModeDefinition(gameMode);
 
   const players: LobbyPlayer[] = Array.from(
     { length: playerCount },
@@ -53,19 +67,6 @@ export async function POST(request: Request): Promise<Response> {
   );
 
   const ownerPlayer = ownerTitle ? players[0] : undefined;
-  const roleSlotsRequired = getRoleSlotsRequired(gameMode, playerCount);
-  const totalMin = roleSlots.reduce((sum, s) => sum + s.min, 0);
-  const totalMax = roleSlots.reduce((sum, s) => sum + s.max, 0);
-
-  if (totalMin > roleSlotsRequired || totalMax < roleSlotsRequired) {
-    return errorResponse("Role slot ranges must cover the player count", 400);
-  }
-
-  for (const slot of roleSlots) {
-    if (!(slot.roleId in roles)) {
-      return errorResponse(`Unknown role: ${slot.roleId}`, 400);
-    }
-  }
 
   const game = await createGame(
     `debug-${randomUUID()}`,

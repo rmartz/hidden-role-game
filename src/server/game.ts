@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { GameStatus } from "@/lib/types";
 import type {
   Game,
+  Lobby,
   LobbyPlayer,
   ModeConfig,
   RoleSlot,
@@ -112,4 +113,25 @@ export async function applyAction(
 
   await writePlayerStates(result.game);
   return result;
+}
+
+/**
+ * Validates prerequisites before starting a game from a lobby. Checks that the
+ * lobby's configured game mode matches the requested mode, then resolves the
+ * owner player ID if the mode requires one.
+ *
+ * Returns `{ error }` on failure, or `{ ownerPlayerId }` on success.
+ */
+export function validateGameStartPrerequisites(
+  lobby: Lobby,
+  gameMode: GameMode,
+): { error: string } | { ownerPlayerId: string | undefined } {
+  if (lobby.config.gameMode !== gameMode) {
+    return { error: "Game mode does not match lobby configuration" };
+  }
+  const { ownerTitle } = getModeDefinition(gameMode);
+  const ownerPlayerId = ownerTitle
+    ? lobby.players.find((p) => p.sessionId === lobby.ownerSessionId)?.id
+    : undefined;
+  return { ownerPlayerId };
 }

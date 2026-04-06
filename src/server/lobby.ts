@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
 import type { GameMode, Lobby } from "@/lib/types";
+import { playerNameKey } from "@/server/utils/api-helpers";
 import {
   RoleConfigMode as RoleConfigModeEnum,
   ShowRolesInPlay as ShowRolesInPlayEnum,
@@ -67,4 +68,50 @@ export async function addLobby(
 
   await firebaseAddLobby(lobby);
   return lobby;
+}
+
+export const MAX_LOBBY_PLAYERS = 100;
+
+/**
+ * Validates that a player can join a lobby: checks capacity and duplicate
+ * display name. Returns an error message, or undefined if valid.
+ */
+export function validatePlayerJoin(
+  lobby: Lobby,
+  displayName: string,
+): string | undefined {
+  if (lobby.players.length >= MAX_LOBBY_PLAYERS) {
+    return "Lobby is full";
+  }
+  const incomingKey = playerNameKey(displayName);
+  const isDuplicate = lobby.players.some(
+    (p) => playerNameKey(p.name) === incomingKey,
+  );
+  if (isDuplicate) {
+    return "A player with that name is already in the lobby";
+  }
+  return undefined;
+}
+
+/**
+ * Validates that a caller is permitted to remove a player from a lobby.
+ * The caller may remove themselves or (as owner) remove others, but the owner
+ * cannot remove themselves. Returns an error message, or undefined if allowed.
+ */
+export function authorizePlayerRemoval(
+  lobby: Lobby,
+  playerId: string,
+  sessionId: string,
+): string | undefined {
+  const callerIsOwner = lobby.ownerSessionId === sessionId;
+  const callerIsTarget = lobby.players.some(
+    (p) => p.id === playerId && p.sessionId === sessionId,
+  );
+  if (!callerIsOwner && !callerIsTarget) {
+    return "Unauthorized";
+  }
+  if (callerIsOwner && callerIsTarget) {
+    return "Owner cannot leave the lobby";
+  }
+  return undefined;
 }

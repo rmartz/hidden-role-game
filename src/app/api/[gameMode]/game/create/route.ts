@@ -1,14 +1,16 @@
 import { ServerResponseStatus } from "@/server/types";
 import type { CreateGameRequest } from "@/server/types";
 import { startLobbyGame } from "@/server/lobby";
-import { getModeDefinition, createGame } from "@/server/game";
+import { createGame, validateGameStartPrerequisites } from "@/server/game";
 import {
   authenticateLobby,
   errorResponse,
   parseGameMode,
   toPublicLobby,
+  validateRoleSlotsForMode,
+  validateRoleSlotsCoverPlayerCount,
 } from "@/server/utils";
-import { getRoleSlotsRequired, isGameModeEnabled } from "@/lib/game/modes";
+import { isGameModeEnabled } from "@/lib/game/modes";
 
 export async function POST(
   request: Request,
@@ -30,32 +32,22 @@ export async function POST(
   if (auth instanceof Response) return auth;
   const { lobby } = auth;
 
-  if (lobby.config.gameMode !== gameMode) {
-    return errorResponse("Game mode does not match lobby configuration", 409);
+  const prereqs = validateGameStartPrerequisites(lobby, gameMode);
+  if ("error" in prereqs) {
+    return errorResponse(prereqs.error, 409);
   }
 
   const roleSlots = lobby.config.roleSlots;
 
-  const roleSlotsRequired = getRoleSlotsRequired(
+  const coverError = validateRoleSlotsCoverPlayerCount(
+    roleSlots,
     gameMode,
     lobby.players.length,
   );
-  const totalMin = roleSlots.reduce((sum, s) => sum + s.min, 0);
-  const totalMax = roleSlots.reduce((sum, s) => sum + s.max, 0);
-  if (totalMin > roleSlotsRequired || totalMax < roleSlotsRequired) {
-    return errorResponse("Role slot ranges must cover the player count", 400);
-  }
+  if (coverError) return errorResponse(coverError, 400);
 
-  const { ownerTitle, roles } = getModeDefinition(gameMode);
-  for (const slot of roleSlots) {
-    if (!(slot.roleId in roles)) {
-      return errorResponse(`Unknown role: ${slot.roleId}`, 400);
-    }
-  }
-
-  const ownerPlayer = ownerTitle
-    ? lobby.players.find((p) => p.sessionId === lobby.ownerSessionId)
-    : undefined;
+  const modeError = validateRoleSlotsForMode(roleSlots, gameMode);
+  if (modeError) return errorResponse(modeError, 400);
 
   const game = await createGame(
     lobbyId,
@@ -63,7 +55,7 @@ export async function POST(
     roleSlots,
     gameMode,
     lobby.config.showRolesInPlay,
-    ownerPlayer?.id ?? undefined,
+    prereqs.ownerPlayerId,
     lobby.config.timerConfig,
     lobby.config.modeConfig,
   );

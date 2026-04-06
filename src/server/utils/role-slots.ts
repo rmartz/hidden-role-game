@@ -1,4 +1,6 @@
-import type { RoleSlot } from "@/lib/types";
+import type { RoleSlot, GameMode } from "@/lib/types";
+import { getModeDefinition } from "@/lib/game/state";
+import { getRoleSlotsRequired } from "@/lib/game/modes";
 
 /**
  * Adjusts role slots by one step toward the target distribution.
@@ -52,4 +54,41 @@ export function adjustRoleSlots(
       )
       .filter((s) => s.min > 0);
   }
+}
+
+/**
+ * Validates that a set of role slots can accommodate a specific player count.
+ * Returns an error message if the slot ranges do not cover the required count,
+ * or undefined if valid.
+ */
+export function validateRoleSlotsCoverPlayerCount(
+  roleSlots: RoleSlot[],
+  gameMode: GameMode,
+  playerCount: number,
+): string | undefined {
+  const required = getRoleSlotsRequired(gameMode, playerCount);
+  const totalMin = roleSlots.reduce((sum, s) => sum + s.min, 0);
+  const totalMax = roleSlots.reduce((sum, s) => sum + s.max, 0);
+  if (totalMin > required || totalMax < required) {
+    return "Role slot ranges must cover the player count";
+  }
+  return undefined;
+}
+
+/**
+ * Validates that all role IDs in a set of slots are known for the given game
+ * mode. Returns an error message for the first unknown role, or undefined if
+ * all roles are valid.
+ */
+export function validateRoleSlotsForMode(
+  roleSlots: RoleSlot[],
+  gameMode: GameMode,
+): string | undefined {
+  const { roles } = getModeDefinition(gameMode);
+  for (const slot of roleSlots) {
+    if (!(slot.roleId in roles)) {
+      return `Unknown role: ${slot.roleId}`;
+    }
+  }
+  return undefined;
 }

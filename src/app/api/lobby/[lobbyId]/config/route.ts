@@ -2,11 +2,11 @@ import { GameMode } from "@/lib/types";
 import { ServerResponseStatus } from "@/server/types";
 import type { UpdateLobbyConfigRequest } from "@/server/types";
 import { updateConfig } from "@/server/lobby";
-import { getModeDefinition } from "@/server/game";
 import {
   authenticateLobby,
   errorResponse,
   toPublicLobby,
+  validateRoleSlotsForMode,
 } from "@/server/utils";
 
 export async function PUT(
@@ -32,12 +32,8 @@ export async function PUT(
   }
 
   if (body.roleSlots !== undefined && body.gameMode !== undefined) {
-    const { roles } = getModeDefinition(body.gameMode);
-    for (const slot of body.roleSlots) {
-      if (!(slot.roleId in roles)) {
-        return errorResponse(`Unknown role: ${slot.roleId}`, 400);
-      }
-    }
+    const modeError = validateRoleSlotsForMode(body.roleSlots, body.gameMode);
+    if (modeError) return errorResponse(modeError, 400);
   }
 
   const updated = await updateConfig(lobbyId, body);

@@ -73,13 +73,21 @@ const MAX_PLAYER_NAME_LENGTH = 32;
 const INVALID_NAME_CHARS = /[<>&"{}[\]\\`]/;
 
 /**
+ * Normalizes a raw player name for display: trims surrounding whitespace and
+ * collapses internal whitespace runs to a single space.
+ */
+export function normalizeDisplayName(name: string): string {
+  return name.trim().replace(/\s+/g, " ");
+}
+
+/**
  * Returns a normalized form of a player name used for uniqueness comparison.
  * Applies Unicode NFC normalization, trims surrounding whitespace, collapses
  * internal whitespace runs to a single space, and lowercases the result so
  * that trivially confusing variations (e.g. "alice", " Alice ", "ALICE") are
  * treated as the same name.
  */
-export function normalizePlayerName(name: string): string {
+export function playerNameKey(name: string): string {
   return name.normalize("NFC").trim().replace(/\s+/g, " ").toLowerCase();
 }
 
