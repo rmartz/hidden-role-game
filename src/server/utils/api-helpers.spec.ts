@@ -4,7 +4,7 @@ import {
   authenticateLobby,
   authenticateGame,
   normalizeDisplayName,
-  normalizePlayerName,
+  playerNameKey,
   validatePlayerName,
 } from "./api-helpers";
 import { ServerResponseStatus } from "@/server/types";
@@ -265,34 +265,32 @@ describe("normalizeDisplayName", () => {
   });
 });
 
-describe("normalizePlayerName", () => {
+describe("playerNameKey", () => {
   it("lowercases the name", () => {
-    expect(normalizePlayerName("Alice")).toBe("alice");
-    expect(normalizePlayerName("ALICE")).toBe("alice");
+    expect(playerNameKey("Alice")).toBe("alice");
+    expect(playerNameKey("ALICE")).toBe("alice");
   });
 
   it("trims leading and trailing whitespace", () => {
-    expect(normalizePlayerName("  Alice  ")).toBe("alice");
+    expect(playerNameKey("  Alice  ")).toBe("alice");
   });
 
   it("collapses internal whitespace runs to a single space", () => {
-    expect(normalizePlayerName("Alice  Bob")).toBe("alice bob");
-    expect(normalizePlayerName("Alice\t\tBob")).toBe("alice bob");
+    expect(playerNameKey("Alice  Bob")).toBe("alice bob");
+    expect(playerNameKey("Alice\t\tBob")).toBe("alice bob");
   });
 
   it("applies Unicode NFC normalization", () => {
     const composed = "\u00e9"; // é as single codepoint
     const decomposed = "e\u0301"; // e + combining accent
-    expect(normalizePlayerName(`caf${composed}`)).toBe(
-      normalizePlayerName(`caf${decomposed}`),
+    expect(playerNameKey(`caf${composed}`)).toBe(
+      playerNameKey(`caf${decomposed}`),
     );
   });
 
   it("two names that differ only by case or whitespace normalize to the same value", () => {
-    expect(normalizePlayerName("Alice")).toBe(normalizePlayerName("alice"));
-    expect(normalizePlayerName(" alice ")).toBe(normalizePlayerName("Alice"));
-    expect(normalizePlayerName("Alice  Bob")).toBe(
-      normalizePlayerName("Alice Bob"),
-    );
+    expect(playerNameKey("Alice")).toBe(playerNameKey("alice"));
+    expect(playerNameKey(" alice ")).toBe(playerNameKey("Alice"));
+    expect(playerNameKey("Alice  Bob")).toBe(playerNameKey("Alice Bob"));
   });
 });

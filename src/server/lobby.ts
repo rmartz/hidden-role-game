@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import type { GameMode, Lobby } from "@/lib/types";
-import { normalizePlayerName } from "@/server/utils/api-helpers";
+import { playerNameKey } from "@/server/utils/api-helpers";
 import {
   RoleConfigMode as RoleConfigModeEnum,
   ShowRolesInPlay as ShowRolesInPlayEnum,
@@ -83,9 +83,9 @@ export function validatePlayerJoin(
   if (lobby.players.length >= MAX_LOBBY_PLAYERS) {
     return "Lobby is full";
   }
-  const normalizedNew = normalizePlayerName(displayName);
+  const incomingKey = playerNameKey(displayName);
   const isDuplicate = lobby.players.some(
-    (p) => normalizePlayerName(p.name) === normalizedNew,
+    (p) => playerNameKey(p.name) === incomingKey,
   );
   if (isDuplicate) {
     return "A player with that name is already in the lobby";

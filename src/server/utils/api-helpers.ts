@@ -87,7 +87,7 @@ export function normalizeDisplayName(name: string): string {
  * that trivially confusing variations (e.g. "alice", " Alice ", "ALICE") are
  * treated as the same name.
  */
-export function normalizePlayerName(name: string): string {
+export function playerNameKey(name: string): string {
   return name.normalize("NFC").trim().replace(/\s+/g, " ").toLowerCase();
 }
 
