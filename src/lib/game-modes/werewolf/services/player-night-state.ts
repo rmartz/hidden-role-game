@@ -1,8 +1,9 @@
-import { GameStatus, Team } from "@/lib/types";
+import { Team } from "@/lib/types";
 import type { Game, RoleDefinition } from "@/lib/types";
 import type { NighttimeNightStatusEntry } from "@/server/types";
 import type { WerewolfPlayerGameState } from "../player-state";
 import {
+  currentTurnState,
   getGroupPhasePlayerIds,
   getInterimAttackedPlayerIds,
   baseGroupPhaseKey,
@@ -11,7 +12,7 @@ import {
 import { WerewolfPhase, TargetCategory, isTeamNightAction } from "../types";
 import type { AnyNightAction, WerewolfTurnState } from "../types";
 import type { WerewolfRoleDefinition } from "../roles";
-import { WerewolfRole, WEREWOLF_ROLES } from "../roles";
+import { WerewolfRole, getWerewolfRole } from "../roles";
 import { WEREWOLF_COPY } from "../copy";
 
 function hasPriestActiveWard(ts: WerewolfTurnState | undefined): boolean {
@@ -19,11 +20,6 @@ function hasPriestActiveWard(ts: WerewolfTurnState | undefined): boolean {
   return Object.keys(ts.priestWards).some(
     (wardedId) => !ts.deadPlayerIds.includes(wardedId),
   );
-}
-
-function getTurnState(game: Game): WerewolfTurnState | undefined {
-  if (game.status.type !== GameStatus.Playing) return undefined;
-  return game.status.turnState as WerewolfTurnState | undefined;
 }
 
 /**
@@ -37,11 +33,9 @@ export function extractPlayerNightState(
   myRole: RoleDefinition,
   deadPlayerIds: string[],
 ): Partial<WerewolfPlayerGameState> {
-  const ts = getTurnState(game);
+  const ts = currentTurnState(game);
   const nightActions = ts?.phase.nightActions ?? {};
-  const roleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
-    myRole.id
-  ] as WerewolfRoleDefinition | undefined;
+  const roleDef = getWerewolfRole(myRole.id);
 
   // Group phase handling.
   const groupPhaseKey = roleDef?.teamTargeting ? myRole.id : roleDef?.wakesWith;
@@ -324,9 +318,7 @@ function extractGenericSoloState(
 ): Partial<WerewolfPlayerGameState> {
   const myAction = nightActions[myRole.id];
   if (!myAction || isTeamNightAction(myAction)) {
-    const myRoleDefForRepeat = (
-      WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>
-    )[myRole.id] as WerewolfRoleDefinition | undefined;
+    const myRoleDefForRepeat = getWerewolfRole(myRole.id);
     const previousNightTargetId = myRoleDefForRepeat?.preventRepeatTarget
       ? ts?.lastTargets?.[myRole.id]
       : undefined;
@@ -340,9 +332,7 @@ function extractGenericSoloState(
     };
   }
 
-  const myRoleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
-    myRole.id
-  ] as WerewolfRoleDefinition | undefined;
+  const myRoleDef = getWerewolfRole(myRole.id);
   const previousNightTargetId = myRoleDef?.preventRepeatTarget
     ? ts?.lastTargets?.[myRole.id]
     : undefined;
@@ -381,9 +371,7 @@ function appendInvestigationResult(
     (a) => a.playerId === myAction.targetPlayerId,
   );
   const targetRoleDef = targetAssignment
-    ? ((WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
-        targetAssignment.roleDefinitionId
-      ] as WerewolfRoleDefinition | undefined)
+    ? getWerewolfRole(targetAssignment.roleDefinitionId)
     : undefined;
 
   if (myRoleDef.checksForSeer) {
@@ -406,9 +394,7 @@ function appendInvestigationResult(
       (a) => a.playerId === myAction.secondTargetPlayerId,
     );
     const secondRoleDef = secondAssignment
-      ? ((WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
-          secondAssignment.roleDefinitionId
-        ] as WerewolfRoleDefinition | undefined)
+      ? getWerewolfRole(secondAssignment.roleDefinitionId)
       : undefined;
     const sameTeam =
       targetRoleDef?.team !== Team.Neutral &&

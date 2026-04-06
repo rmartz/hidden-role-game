@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { SecretVillainGameOverView } from "./SecretVillainGameOverView";
-import { GameMode, GameStatus, Team, DEFAULT_TIMER_CONFIG } from "@/lib/types";
+import { GameMode, GameStatus, Team } from "@/lib/types";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game-modes/secret-villain/timer-config";
 import { SecretVillainWinner } from "@/lib/game-modes/secret-villain/utils/win-condition";
 import type { PlayerGameState } from "@/server/types";
 import { fn } from "storybook/test";
@@ -41,7 +42,7 @@ const baseGameState: PlayerGameState = {
       role: { id: "special-bad", name: "Special Bad Role", team: Team.Bad },
     },
   ],
-  timerConfig: DEFAULT_TIMER_CONFIG,
+  timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
 };
 
 export const GoodTeamVictory: Story = {

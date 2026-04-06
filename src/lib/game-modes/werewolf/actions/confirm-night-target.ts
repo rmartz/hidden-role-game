@@ -5,8 +5,7 @@ import {
   validateActiveNightPlayer,
   getGroupPhasePlayerIds,
 } from "../utils";
-import { WEREWOLF_ROLES } from "../roles";
-import type { WerewolfRoleDefinition } from "../roles";
+import { getWerewolfRole } from "../roles";
 
 export const confirmNightTargetAction: GameAction = {
   isValid(game: Game, callerId: string) {
@@ -43,9 +42,7 @@ export const confirmNightTargetAction: GameAction = {
     }
 
     // Mentalist requires both targets to be set (unless skipping entirely).
-    const roleDef = (WEREWOLF_ROLES as Record<string, WerewolfRoleDefinition>)[
-      result.activePhaseKey
-    ];
+    const roleDef = getWerewolfRole(result.activePhaseKey);
     if (roleDef?.dualTargetInvestigate) {
       if (!isTeamNightAction(action) && !action.skipped) {
         if (!action.targetPlayerId || !action.secondTargetPlayerId)
