@@ -1,4 +1,4 @@
-import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
+import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 import type { Game } from "@/lib/types";
 import type { AnyNightAction } from "@/lib/game-modes/werewolf";
 import {
@@ -7,12 +7,9 @@ import {
   DEFAULT_WEREWOLF_TIMER_CONFIG,
 } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
+import { WEREWOLF_ROLES } from "@/lib/game-modes/werewolf/roles";
 
-export const mentalistRole = {
-  id: WerewolfRole.Mentalist,
-  name: "Mentalist",
-  team: Team.Good,
-};
+export const mentalistRole = WEREWOLF_ROLES[WerewolfRole.Mentalist];
 
 export function makeMentalistGame(
   p2Role: WerewolfRole,
