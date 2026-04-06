@@ -1,9 +1,32 @@
 import type { Game, PlayerRoleAssignment } from "@/lib/types";
 import { WakesAtNight, WerewolfPhase } from "../types";
 import type { WerewolfNighttimePhase } from "../types";
-import { WEREWOLF_ROLES, WerewolfRole, getWerewolfRole } from "../roles";
+import {
+  WEREWOLF_ROLES,
+  WerewolfRole,
+  WerewolfRoleCategory,
+  getWerewolfRole,
+} from "../roles";
 import { isGroupPhaseKey, baseGroupPhaseKey } from "./phase-keys";
 import { currentTurnState } from "./game-state";
+
+/**
+ * Defines the order in which role categories wake during the night phase.
+ * Follows the rule: Bad team → Neutral team → Good team,
+ * and within each team: Attack → Investigate → Protect → Special.
+ * This is distinct from WEREWOLF_ROLE_CATEGORY_ORDER which is used for the UI.
+ */
+const NIGHT_PHASE_CATEGORY_ORDER: WerewolfRoleCategory[] = [
+  WerewolfRoleCategory.EvilKilling,
+  WerewolfRoleCategory.EvilSupport,
+  WerewolfRoleCategory.NeutralKilling,
+  WerewolfRoleCategory.NeutralManipulation,
+  WerewolfRoleCategory.VillagerKilling,
+  WerewolfRoleCategory.VillagerInvestigation,
+  WerewolfRoleCategory.VillagerProtection,
+  WerewolfRoleCategory.VillagerSupport,
+  WerewolfRoleCategory.VillagerHandicap,
+];
 
 /**
  * Returns the ordered list of phase keys that wake during a Werewolf night.
@@ -52,7 +75,13 @@ export function buildNightPhaseOrder(
   let altruistPhaseKey: string | undefined;
   let witchPhaseKey: string | undefined;
 
-  for (const role of Object.values(WEREWOLF_ROLES)) {
+  const sortedRoles = Object.values(WEREWOLF_ROLES).sort((a, b) => {
+    const aIdx = NIGHT_PHASE_CATEGORY_ORDER.indexOf(a.category);
+    const bIdx = NIGHT_PHASE_CATEGORY_ORDER.indexOf(b.category);
+    return aIdx - bIdx;
+  });
+
+  for (const role of sortedRoles) {
     if (role.wakesAtNight === WakesAtNight.Never) continue;
     if (role.wakesAtNight === WakesAtNight.FirstNightOnly && turn !== 1)
       continue;
@@ -66,6 +95,13 @@ export function buildNightPhaseOrder(
       if (!hasAliveGroupParticipants(role.id, roleAssignments, dead)) continue;
       emittedGroupPhases.add(role.id);
       phaseKeys.push(role.id);
+      // Insert any extra phases for this group consecutively, so both phases
+      // for the same group (e.g. Wolf Cub bonus) are adjacent in the order.
+      for (const key of extraGroupPhaseKeys) {
+        if (baseGroupPhaseKey(key) !== (role.id as string)) continue;
+        if (!hasAliveGroupParticipants(key, roleAssignments, dead)) continue;
+        phaseKeys.push(key);
+      }
     } else if (role.id === WerewolfRole.Witch) {
       if (!hasAlivePlayers(role.id as string, roleAssignments, dead)) continue;
       witchPhaseKey = role.id;
@@ -78,13 +114,6 @@ export function buildNightPhaseOrder(
       if (!hasAlivePlayers(role.id as string, roleAssignments, dead)) continue;
       phaseKeys.push(role.id);
     }
-  }
-
-  // Extra group phase keys are inserted before the Witch and Altruist (e.g. Wolf Cub bonus phases).
-  // Skip any extra phase where all group participants are dead.
-  for (const key of extraGroupPhaseKeys) {
-    if (!hasAliveGroupParticipants(key, roleAssignments, dead)) continue;
-    phaseKeys.push(key);
   }
 
   // Witch acts second-to-last — they need to see all prior attacks before choosing.

@@ -133,4 +133,77 @@ describe("buildNightPhaseOrder", () => {
     const order = buildNightPhaseOrder(2, withVigilante);
     expect(order).toContain(WerewolfRole.Vigilante);
   });
+
+  it("places Werewolf (Bad team) before Chupacabra (Neutral team) before Seer (Good team)", () => {
+    const mixedTeams = [
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "n1", roleDefinitionId: WerewolfRole.Chupacabra },
+      { playerId: "g1", roleDefinitionId: WerewolfRole.Seer },
+    ];
+    const order = buildNightPhaseOrder(2, mixedTeams);
+    const werewolfIdx = order.indexOf(WerewolfRole.Werewolf);
+    const chupacabraIdx = order.indexOf(WerewolfRole.Chupacabra);
+    const seerIdx = order.indexOf(WerewolfRole.Seer);
+    expect(werewolfIdx).toBeLessThan(chupacabraIdx);
+    expect(chupacabraIdx).toBeLessThan(seerIdx);
+  });
+
+  it("places Wizard (Bad/EvilSupport) after Werewolf (Bad/EvilKilling)", () => {
+    const badTeam = [
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "wz1", roleDefinitionId: WerewolfRole.Wizard },
+    ];
+    const order = buildNightPhaseOrder(2, badTeam);
+    const werewolfIdx = order.indexOf(WerewolfRole.Werewolf);
+    const wizardIdx = order.indexOf(WerewolfRole.Wizard);
+    expect(werewolfIdx).toBeLessThan(wizardIdx);
+  });
+
+  it("places Good/Attack role (Mortician) before Good/Investigate role (Seer)", () => {
+    const goodAttackAndInvestigate = [
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "m1", roleDefinitionId: WerewolfRole.Mortician },
+      { playerId: "s1", roleDefinitionId: WerewolfRole.Seer },
+    ];
+    const order = buildNightPhaseOrder(2, goodAttackAndInvestigate);
+    const morticianIdx = order.indexOf(WerewolfRole.Mortician);
+    const seerIdx = order.indexOf(WerewolfRole.Seer);
+    expect(morticianIdx).toBeLessThan(seerIdx);
+  });
+
+  it("places Good/Investigate role (Seer) before Good/Protect role (Bodyguard)", () => {
+    const goodInvestigateAndProtect = [
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "s1", roleDefinitionId: WerewolfRole.Seer },
+      { playerId: "b1", roleDefinitionId: WerewolfRole.Bodyguard },
+    ];
+    const order = buildNightPhaseOrder(2, goodInvestigateAndProtect);
+    const seerIdx = order.indexOf(WerewolfRole.Seer);
+    const bodyguardIdx = order.indexOf(WerewolfRole.Bodyguard);
+    expect(seerIdx).toBeLessThan(bodyguardIdx);
+  });
+
+  it("places Wolf Cub bonus phase immediately after the first Werewolf phase", () => {
+    const BONUS_PHASE_KEY = `${WerewolfRole.Werewolf}:2`;
+    const withSeer = [
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "s1", roleDefinitionId: WerewolfRole.Seer },
+    ];
+    const order = buildNightPhaseOrder(2, withSeer, [], [BONUS_PHASE_KEY]);
+    const werewolfIdx = order.indexOf(WerewolfRole.Werewolf);
+    const bonusIdx = order.indexOf(BONUS_PHASE_KEY);
+    expect(bonusIdx).toBe(werewolfIdx + 1);
+  });
+
+  it("places Werewolf first when many roles are present", () => {
+    const manyRoles = [
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "c1", roleDefinitionId: WerewolfRole.Chupacabra },
+      { playerId: "s1", roleDefinitionId: WerewolfRole.Seer },
+      { playerId: "b1", roleDefinitionId: WerewolfRole.Bodyguard },
+      { playerId: "wz1", roleDefinitionId: WerewolfRole.Wizard },
+    ];
+    const order = buildNightPhaseOrder(2, manyRoles);
+    expect(order[0]).toBe(WerewolfRole.Werewolf);
+  });
 });
