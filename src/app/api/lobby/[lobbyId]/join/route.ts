@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { ServerResponseStatus, type JoinLobbyRequest } from "@/server/types";
-import { lobbyService } from "@/services/FirebaseLobbyService";
+import { lobbyService } from "@/services/LobbyService";
 import {
   errorResponse,
   normalizePlayerName,
