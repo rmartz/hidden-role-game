@@ -4,13 +4,13 @@ import { SecretVillainStartingView } from "./SecretVillainStartingView";
 import { GameStatus, GameMode, Team } from "@/lib/types";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game-modes/secret-villain/timer-config";
 import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
-import type { PlayerGameState } from "@/server/types";
+import type { SecretVillainPlayerGameState } from "@/lib/game-modes/secret-villain/player-state";
 
 afterEach(cleanup);
 
 function makeGameState(
-  overrides: Partial<PlayerGameState> = {},
-): PlayerGameState {
+  overrides: Partial<SecretVillainPlayerGameState> = {},
+): SecretVillainPlayerGameState {
   return {
     status: { type: GameStatus.Starting, startedAt: Date.now() },
     gameMode: GameMode.SecretVillain,
@@ -22,7 +22,7 @@ function makeGameState(
     visibleRoleAssignments: [],
     timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
     ...overrides,
-  } as PlayerGameState;
+  } as SecretVillainPlayerGameState;
 }
 
 describe("SecretVillainStartingView", () => {

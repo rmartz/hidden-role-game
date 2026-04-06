@@ -1,4 +1,5 @@
 export * from "./types";
+export * from "./themes";
 export * from "./timer-config";
 export * from "./lobby-config";
 export * from "./player-state";

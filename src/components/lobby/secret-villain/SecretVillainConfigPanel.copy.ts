@@ -1,4 +1,5 @@
 export const SECRET_VILLAIN_CONFIG_PANEL_COPY = {
+  themeLabel: "Theme",
   boardPresetLabel: "Board Preset",
   customBoardHeading: "Custom Board Powers",
   badCardSlotLabel: (n: number) => `Bad Card #${String(n)}`,

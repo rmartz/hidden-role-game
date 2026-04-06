@@ -105,6 +105,11 @@ export const secretVillainServices: GameModeServices = {
     const result: Record<string, unknown> = {};
     const { phase } = ts;
 
+    // Pass the theme to the client for cosmetic label resolution.
+    const theme =
+      "theme" in game.modeConfig ? game.modeConfig.theme : undefined;
+    if (theme) result["svTheme"] = theme;
+
     // Phase info — visible to all players.
     result["svPhase"] = buildPhaseInfo(phase);
 

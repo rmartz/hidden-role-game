@@ -3,6 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
+import { getSvThemeLabels } from "@/lib/game-modes/secret-villain/themes";
+import type { SvTheme } from "@/lib/game-modes/secret-villain/themes";
 import { SpecialActionType } from "@/lib/game-modes/secret-villain/types";
 
 import { InvestigationConsentView } from "./InvestigationConsentView";
@@ -28,33 +30,40 @@ interface SpecialActionViewProps {
   /** Trigger the peek action to reveal cards. */
   onPeek?: () => void;
   peekedCards?: string[];
+  svTheme?: SvTheme;
 }
 
-const ACTION_CONFIG: Record<
+function getActionConfig(
+  svTheme?: SvTheme,
+): Record<
   SpecialActionType,
   { heading: string; instructions: string; confirm: string }
-> = {
-  [SpecialActionType.InvestigateTeam]: {
-    heading: SECRET_VILLAIN_COPY.specialAction.investigateHeading,
-    instructions: SECRET_VILLAIN_COPY.specialAction.investigateInstructions,
-    confirm: SECRET_VILLAIN_COPY.specialAction.investigateConfirm,
-  },
-  [SpecialActionType.SpecialElection]: {
-    heading: SECRET_VILLAIN_COPY.specialAction.specialElectionHeading,
-    instructions: SECRET_VILLAIN_COPY.specialAction.specialElectionInstructions,
-    confirm: SECRET_VILLAIN_COPY.specialAction.specialElectionConfirm,
-  },
-  [SpecialActionType.Shoot]: {
-    heading: SECRET_VILLAIN_COPY.specialAction.shootHeading,
-    instructions: SECRET_VILLAIN_COPY.specialAction.shootInstructions,
-    confirm: SECRET_VILLAIN_COPY.specialAction.shootConfirm,
-  },
-  [SpecialActionType.PolicyPeek]: {
-    heading: SECRET_VILLAIN_COPY.specialAction.policyPeekHeading,
-    instructions: SECRET_VILLAIN_COPY.specialAction.policyPeekInstructions,
-    confirm: SECRET_VILLAIN_COPY.specialAction.policyPeekConfirm,
-  },
-};
+> {
+  const themeLabels = getSvThemeLabels(svTheme);
+  return {
+    [SpecialActionType.InvestigateTeam]: {
+      heading: SECRET_VILLAIN_COPY.specialAction.investigateHeading,
+      instructions: SECRET_VILLAIN_COPY.specialAction.investigateInstructions,
+      confirm: SECRET_VILLAIN_COPY.specialAction.investigateConfirm,
+    },
+    [SpecialActionType.SpecialElection]: {
+      heading: SECRET_VILLAIN_COPY.specialAction.specialElectionHeading,
+      instructions:
+        SECRET_VILLAIN_COPY.specialAction.specialElectionInstructions,
+      confirm: SECRET_VILLAIN_COPY.specialAction.specialElectionConfirm,
+    },
+    [SpecialActionType.Shoot]: {
+      heading: themeLabels.shootHeading,
+      instructions: themeLabels.shootInstruction,
+      confirm: themeLabels.shootConfirm,
+    },
+    [SpecialActionType.PolicyPeek]: {
+      heading: SECRET_VILLAIN_COPY.specialAction.policyPeekHeading,
+      instructions: SECRET_VILLAIN_COPY.specialAction.policyPeekInstructions,
+      confirm: SECRET_VILLAIN_COPY.specialAction.policyPeekConfirm,
+    },
+  };
+}
 
 export function SpecialActionView({
   actionType,
@@ -72,8 +81,9 @@ export function SpecialActionView({
   onConsent,
   onPeek,
   peekedCards,
+  svTheme,
 }: SpecialActionViewProps) {
-  const config = ACTION_CONFIG[actionType];
+  const config = getActionConfig(svTheme)[actionType];
 
   if (!isPresident) {
     if (

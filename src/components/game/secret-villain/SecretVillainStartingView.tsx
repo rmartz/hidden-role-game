@@ -2,15 +2,22 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
-import type { PlayerGameState, VisibleTeammate } from "@/server/types";
+import { getSvThemeLabels } from "@/lib/game-modes/secret-villain/themes";
+import type { SecretVillainPlayerGameState } from "@/lib/game-modes/secret-villain/player-state";
+import type { VisibleTeammate } from "@/server/types";
 import { Team } from "@/lib/types";
 
 export interface SecretVillainStartingViewProps {
-  gameState: PlayerGameState;
+  gameState: SecretVillainPlayerGameState;
   secondsRemaining?: number;
 }
 
-function BadTeamReveal({ teammates }: { teammates: VisibleTeammate[] }) {
+interface BadTeamRevealProps {
+  teammates: VisibleTeammate[];
+  specialBadMarker: string;
+}
+
+function BadTeamReveal({ teammates, specialBadMarker }: BadTeamRevealProps) {
   return (
     <Card className="mb-4">
       <CardHeader className="pb-2 pt-4">
@@ -28,7 +35,7 @@ function BadTeamReveal({ teammates }: { teammates: VisibleTeammate[] }) {
               <span>{player.name}</span>
               {role?.id === "special-bad" && (
                 <span className="text-muted-foreground">
-                  {SECRET_VILLAIN_COPY.starting.specialBadMarker}
+                  {specialBadMarker}
                 </span>
               )}
             </li>
@@ -46,8 +53,16 @@ export function SecretVillainStartingView({
   const myRole = gameState.myRole;
   const isBadTeam = myRole?.team === Team.Bad;
   const isSpecialBad = myRole?.id === "special-bad";
+  const themeLabels = getSvThemeLabels(gameState.svTheme);
 
-  const roleName = myRole?.name ?? "Unknown";
+  const roleName =
+    myRole?.id === "good"
+      ? themeLabels.goodRole
+      : myRole?.id === "bad"
+        ? themeLabels.badRole
+        : myRole?.id === "special-bad"
+          ? themeLabels.specialBadRole
+          : (myRole?.name ?? "Unknown");
   const badTeammates = gameState.visibleRoleAssignments.filter(
     (a) => a.reason === "aware-of" || a.reason === "wake-partner",
   );
@@ -67,7 +82,10 @@ export function SecretVillainStartingView({
         {SECRET_VILLAIN_COPY.starting.yourRole(roleName)}
       </p>
       {isBadTeam && !isSpecialBad && badTeammates.length > 0 && (
-        <BadTeamReveal teammates={badTeammates} />
+        <BadTeamReveal
+          teammates={badTeammates}
+          specialBadMarker={themeLabels.specialBadMarker}
+        />
       )}
       {(isSpecialBad || !isBadTeam) && (
         <p className="text-sm text-muted-foreground mb-4">{roleMessage}</p>

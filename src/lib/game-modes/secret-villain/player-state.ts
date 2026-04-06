@@ -6,6 +6,7 @@ import type {
   ElectionVote,
 } from "./types";
 import type { SecretVillainTimerConfig } from "./timer-config";
+import type { SvTheme } from "./themes";
 
 /** Current Secret Villain phase info visible to all players. */
 export interface SvPhaseInfo {
@@ -62,6 +63,8 @@ export interface SecretVillainPlayerGameState extends BasePlayerGameState {
   gameMode: GameMode.SecretVillain;
   /** Override base timerConfig with Secret Villain–specific timer fields. */
   timerConfig: SecretVillainTimerConfig;
+  /** Cosmetic theme for role/team/policy labels. */
+  svTheme?: SvTheme;
   /** Current phase info (type, presidentId, etc.). */
   svPhase?: SvPhaseInfo;
   /** Board state: Good and Bad cards played, failed election count. */
