@@ -58,7 +58,7 @@ function TrackSlots({ filled, variant, labels }: TrackSlotsProps) {
                     ? "font-medium"
                     : "text-muted-foreground/60",
               )}
-              data-testid={`bad-slot-label-${String(i)}`}
+              data-testid={`${variant}-slot-label-${String(i)}`}
             >
               {labels[i]}
             </span>
