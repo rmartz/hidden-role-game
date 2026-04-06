@@ -1,4 +1,4 @@
-import { SvBoardPreset } from "./types";
+import { SvBoardPreset, SpecialActionType } from "./types";
 
 export const SECRET_VILLAIN_COPY = {
   boardPresets: {
@@ -13,6 +13,12 @@ export const SECRET_VILLAIN_COPY = {
     badTrack: "Bad Policies",
     failedElections: "Failed Elections",
     vetoUnlocked: "Veto Power Unlocked",
+    powerLabels: {
+      [SpecialActionType.InvestigateTeam]: "Investigate",
+      [SpecialActionType.PolicyPeek]: "Policy Peek",
+      [SpecialActionType.SpecialElection]: "Special Election",
+      [SpecialActionType.Shoot]: "Shoot",
+    } satisfies Record<SpecialActionType, string>,
   },
   election: {
     nominationHeading: "Nomination",

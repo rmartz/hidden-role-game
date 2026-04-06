@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { BoardDisplay } from "./BoardDisplay";
 import { SvTheme } from "@/lib/game/modes/secret-villain/themes";
+import { SpecialActionType } from "@/lib/game/modes/secret-villain/types";
 
 const meta = {
   component: BoardDisplay,
@@ -72,5 +73,39 @@ export const BusinessTheme: Story = {
     failedElectionCount: 1,
     failedElectionThreshold: 3,
     svTheme: SvTheme.Business,
+  },
+};
+
+// Medium preset (7–8 players): slots 3–5 have powers
+export const WithPowerTable: Story = {
+  args: {
+    goodCardsPlayed: 1,
+    badCardsPlayed: 2,
+    failedElectionCount: 0,
+    failedElectionThreshold: 3,
+    powerTable: [
+      undefined,
+      undefined,
+      SpecialActionType.InvestigateTeam,
+      SpecialActionType.Shoot,
+      SpecialActionType.Shoot,
+    ],
+  },
+};
+
+// Shows played (strikethrough) and upcoming power distinction
+export const WithPowerTablePartiallyPlayed: Story = {
+  args: {
+    goodCardsPlayed: 0,
+    badCardsPlayed: 3,
+    failedElectionCount: 1,
+    failedElectionThreshold: 3,
+    powerTable: [
+      undefined,
+      undefined,
+      SpecialActionType.InvestigateTeam,
+      SpecialActionType.Shoot,
+      SpecialActionType.Shoot,
+    ],
   },
 };
