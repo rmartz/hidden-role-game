@@ -16,11 +16,12 @@ interface PolicyCardTableProps {
 /**
  * Displays policy cards in a two-row table layout.
  *
- * Top row (Pass axis): one card per column. Clicking a column marks it as the
- * card to discard, dimming it to indicate it will not be passed or played.
+ * Pass axis (top row): cards available to pass. When a card is selected for
+ * discard its slot becomes an invisible placeholder to preserve column width.
  *
- * Bottom row (Discard axis): shows a ✕ in the column currently selected for
- * discard, making the outcome of each choice unambiguous before submitting.
+ * Discard axis (bottom row): empty for unselected columns. The selected column
+ * shows the card (ghosted) with a ✕ overlay, so the player can see exactly
+ * which card type they are discarding before submitting.
  */
 export function PolicyCardTable({
   cards,
@@ -40,38 +41,52 @@ export function PolicyCardTable({
       {cards.map((card, i) => {
         const isDiscard = discardIndex === i;
         const isGood = card === "good";
+        const cardLabel = isGood
+          ? themeLabels.goodPolicy
+          : themeLabels.badPolicy;
+        const cardColorClass = isGood
+          ? "border-green-500 text-green-700"
+          : "border-red-500 text-red-700";
+
         return (
           <button
             key={i}
             type="button"
             disabled={disabled}
-            onClick={() => { onSelectDiscard(i); }}
+            onClick={() => {
+              onSelectDiscard(i);
+            }}
             className="flex flex-col gap-2 items-center"
             data-testid={`policy-card-column-${String(i)}`}
             aria-pressed={isDiscard}
           >
+            {/* Pass row: show card normally, or an invisible spacer when discarded */}
             <div
               className={cn(
-                "rounded border-2 px-3 py-2 text-sm font-medium w-full text-center transition-opacity",
-                isGood
-                  ? "border-green-500 text-green-700"
-                  : "border-red-500 text-red-700",
-                isDiscard && "opacity-50",
+                "rounded border-2 px-3 py-2 text-sm font-medium w-full text-center",
+                isDiscard ? "invisible" : cardColorClass,
               )}
               data-testid={`policy-card-${String(i)}`}
             >
-              {isGood ? themeLabels.goodPolicy : themeLabels.badPolicy}
+              {cardLabel}
             </div>
+
+            {/* Discard row: empty when not selected; card with ✕ overlay when selected */}
             <div
               className={cn(
-                "flex items-center justify-center h-8 w-full rounded border-2 border-dashed text-base font-bold",
+                "relative flex items-center justify-center rounded border-2 px-3 py-2 text-sm font-medium w-full text-center",
                 isDiscard
-                  ? "border-destructive text-destructive"
-                  : "border-muted text-transparent",
+                  ? cn(cardColorClass, "opacity-50")
+                  : "border-dashed border-muted invisible",
               )}
               data-testid={`policy-discard-cell-${String(i)}`}
             >
-              ✕
+              {cardLabel}
+              {isDiscard && (
+                <span className="absolute inset-0 flex items-center justify-center text-destructive font-bold text-base pointer-events-none">
+                  ✕
+                </span>
+              )}
             </div>
           </button>
         );

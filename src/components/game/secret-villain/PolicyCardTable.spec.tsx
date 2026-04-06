@@ -16,15 +16,9 @@ describe("PolicyCardTable", () => {
     expect(screen.getAllByTestId(/^policy-card-column-/)).toHaveLength(3);
   });
 
-  it("renders card labels in the pass row", () => {
+  it("renders one column per card", () => {
     render(<PolicyCardTable {...defaultProps} />);
-    // 1 good + 2 bad
-    expect(
-      screen.getAllByText(SECRET_VILLAIN_COPY.policy.goodCard),
-    ).toHaveLength(1);
-    expect(
-      screen.getAllByText(SECRET_VILLAIN_COPY.policy.badCard),
-    ).toHaveLength(2);
+    expect(screen.getAllByTestId(/^policy-card-\d$/)).toHaveLength(3);
   });
 
   it("shows pass and discard axis labels", () => {
@@ -43,6 +37,26 @@ describe("PolicyCardTable", () => {
     expect(columns[2]?.getAttribute("aria-pressed")).toBe("false");
   });
 
+  it("hides the pass-row card and shows it in the discard row when selected", () => {
+    render(<PolicyCardTable {...defaultProps} discardIndex={1} />);
+    // Pass row: selected card slot is invisible
+    expect(screen.getByTestId("policy-card-1").className).toContain(
+      "invisible",
+    );
+    // Pass row: unselected slots are visible
+    expect(screen.getByTestId("policy-card-0").className).not.toContain(
+      "invisible",
+    );
+    // Discard row: selected slot is visible (not invisible)
+    expect(screen.getByTestId("policy-discard-cell-1").className).not.toContain(
+      "invisible",
+    );
+    // Discard row: unselected slots are invisible
+    expect(screen.getByTestId("policy-discard-cell-0").className).toContain(
+      "invisible",
+    );
+  });
+
   it("calls onSelectDiscard with the column index when clicked", () => {
     const onSelectDiscard = vi.fn();
     render(
@@ -55,7 +69,9 @@ describe("PolicyCardTable", () => {
   it("disables all column buttons when disabled", () => {
     render(<PolicyCardTable {...defaultProps} disabled />);
     const columns = screen.getAllByTestId(/^policy-card-column-/);
-    columns.forEach((col) => { expect(col.hasAttribute("disabled")).toBe(true); });
+    columns.forEach((col) => {
+      expect(col.hasAttribute("disabled")).toBe(true);
+    });
   });
 
   it("renders two columns for a two-card hand", () => {
