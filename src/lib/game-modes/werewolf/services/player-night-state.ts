@@ -1,5 +1,5 @@
 import { Team } from "@/lib/types";
-import type { Game, RoleDefinition } from "@/lib/types";
+import type { Game } from "@/lib/types";
 import type { NighttimeNightStatusEntry } from "@/server/types";
 import type { WerewolfPlayerGameState } from "../player-state";
 import {
@@ -7,7 +7,6 @@ import {
   getGroupPhasePlayerIds,
   getInterimAttackedPlayerIds,
   baseGroupPhaseKey,
-  isRoleActive,
 } from "../utils";
 import { WerewolfPhase, TargetCategory, isTeamNightAction } from "../types";
 import type { AnyNightAction, WerewolfTurnState } from "../types";
@@ -30,15 +29,14 @@ function hasPriestActiveWard(ts: WerewolfTurnState | undefined): boolean {
 export function extractPlayerNightState(
   game: Game,
   callerId: string,
-  myRole: RoleDefinition,
+  myRole: WerewolfRoleDefinition,
   deadPlayerIds: string[],
 ): Partial<WerewolfPlayerGameState> {
   const ts = currentTurnState(game);
   const nightActions = ts?.phase.nightActions ?? {};
-  const roleDef = getWerewolfRole(myRole.id);
 
   // Group phase handling.
-  const groupPhaseKey = roleDef?.teamTargeting ? myRole.id : roleDef?.wakesWith;
+  const groupPhaseKey = myRole.teamTargeting ? myRole.id : myRole.wakesWith;
 
   if (groupPhaseKey) {
     return extractGroupPhaseState(
@@ -141,12 +139,12 @@ function extractGroupPhaseState(
 function extractRoleSpecificState(
   game: Game,
   callerId: string,
-  myRole: RoleDefinition,
+  myRole: WerewolfRoleDefinition,
   nightActions: Record<string, AnyNightAction>,
   deadPlayerIds: string[],
   ts: WerewolfTurnState | undefined,
 ): Partial<WerewolfPlayerGameState> | undefined {
-  if (isRoleActive(myRole.id, WerewolfRole.Exposer)) {
+  if (myRole.id === WerewolfRole.Exposer) {
     const exposerAction = nightActions[myRole.id];
     const soloAction =
       exposerAction && !isTeamNightAction(exposerAction)
@@ -159,7 +157,7 @@ function extractRoleSpecificState(
     };
   }
 
-  if (isRoleActive(myRole.id, WerewolfRole.Mortician)) {
+  if (myRole.id === WerewolfRole.Mortician) {
     const morticianAction = nightActions[myRole.id];
     const soloAction =
       morticianAction && !isTeamNightAction(morticianAction)
@@ -172,11 +170,11 @@ function extractRoleSpecificState(
     };
   }
 
-  if (isRoleActive(myRole.id, WerewolfRole.Witch)) {
+  if (myRole.id === WerewolfRole.Witch) {
     return extractWitchState(game, nightActions, myRole, deadPlayerIds, ts);
   }
 
-  if (isRoleActive(myRole.id, WerewolfRole.Altruist)) {
+  if (myRole.id === WerewolfRole.Altruist) {
     return extractAltruistState(
       game,
       callerId,
@@ -187,7 +185,7 @@ function extractRoleSpecificState(
     );
   }
 
-  if (isRoleActive(myRole.id, WerewolfRole.Mirrorcaster)) {
+  if (myRole.id === WerewolfRole.Mirrorcaster) {
     const mcAction = nightActions[myRole.id];
     const soloAction =
       mcAction && !isTeamNightAction(mcAction) ? mcAction : undefined;
@@ -198,7 +196,7 @@ function extractRoleSpecificState(
     };
   }
 
-  if (isRoleActive(myRole.id, WerewolfRole.Executioner)) {
+  if (myRole.id === WerewolfRole.Executioner) {
     return {
       myNightTarget: undefined,
       myNightTargetConfirmed: false,
@@ -208,7 +206,7 @@ function extractRoleSpecificState(
     };
   }
 
-  if (isRoleActive(myRole.id, WerewolfRole.OneEyedSeer)) {
+  if (myRole.id === WerewolfRole.OneEyedSeer) {
     if (
       ts?.oneEyedSeerLockedTargetId &&
       !ts.deadPlayerIds.includes(ts.oneEyedSeerLockedTargetId)
@@ -221,7 +219,7 @@ function extractRoleSpecificState(
     }
   }
 
-  if (isRoleActive(myRole.id, WerewolfRole.ElusiveSeer)) {
+  if (myRole.id === WerewolfRole.ElusiveSeer) {
     if (ts?.turn === 1) {
       const elusiveSeerVillagerIds = game.roleAssignments
         .filter((a) => a.roleDefinitionId === (WerewolfRole.Villager as string))
@@ -239,7 +237,7 @@ function extractRoleSpecificState(
 function extractWitchState(
   game: Game,
   nightActions: Record<string, AnyNightAction>,
-  myRole: RoleDefinition,
+  myRole: WerewolfRoleDefinition,
   deadPlayerIds: string[],
   ts: WerewolfTurnState | undefined,
 ): Partial<WerewolfPlayerGameState> {
@@ -275,7 +273,7 @@ function extractAltruistState(
   game: Game,
   callerId: string,
   nightActions: Record<string, AnyNightAction>,
-  myRole: RoleDefinition,
+  myRole: WerewolfRoleDefinition,
   deadPlayerIds: string[],
   ts: WerewolfTurnState | undefined,
 ): Partial<WerewolfPlayerGameState> {
@@ -312,18 +310,17 @@ function extractAltruistState(
 
 function extractGenericSoloState(
   game: Game,
-  myRole: RoleDefinition,
+  myRole: WerewolfRoleDefinition,
   nightActions: Record<string, AnyNightAction>,
   ts: WerewolfTurnState | undefined,
 ): Partial<WerewolfPlayerGameState> {
   const myAction = nightActions[myRole.id];
   if (!myAction || isTeamNightAction(myAction)) {
-    const myRoleDefForRepeat = getWerewolfRole(myRole.id);
-    const previousNightTargetId = myRoleDefForRepeat?.preventRepeatTarget
+    const previousNightTargetId = myRole.preventRepeatTarget
       ? ts?.lastTargets?.[myRole.id]
       : undefined;
     const priestWardActive =
-      isRoleActive(myRole.id, WerewolfRole.Priest) && hasPriestActiveWard(ts);
+      myRole.id === WerewolfRole.Priest && hasPriestActiveWard(ts);
     return {
       myNightTarget: undefined,
       myNightTargetConfirmed: false,
@@ -332,12 +329,11 @@ function extractGenericSoloState(
     };
   }
 
-  const myRoleDef = getWerewolfRole(myRole.id);
-  const previousNightTargetId = myRoleDef?.preventRepeatTarget
+  const previousNightTargetId = myRole.preventRepeatTarget
     ? ts?.lastTargets?.[myRole.id]
     : undefined;
   const priestWardActive =
-    isRoleActive(myRole.id, WerewolfRole.Priest) && hasPriestActiveWard(ts);
+    myRole.id === WerewolfRole.Priest && hasPriestActiveWard(ts);
   const mySecondNightTarget = myAction.secondTargetPlayerId ?? undefined;
 
   const result: Partial<WerewolfPlayerGameState> = {
@@ -350,12 +346,12 @@ function extractGenericSoloState(
 
   // Investigation results.
   if (
-    myRoleDef?.targetCategory === TargetCategory.Investigate &&
+    myRole.targetCategory === TargetCategory.Investigate &&
     myAction.confirmed &&
     myAction.resultRevealed &&
     myAction.targetPlayerId
   ) {
-    appendInvestigationResult(result, game, myRoleDef, myAction);
+    appendInvestigationResult(result, game, myRole, myAction);
   }
 
   return result;

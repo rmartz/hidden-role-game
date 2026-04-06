@@ -6,7 +6,8 @@ import type {
 } from "@/lib/types";
 import type { WerewolfPlayerGameState } from "../player-state";
 import { getWerewolfModeConfig } from "../lobby-config";
-import { WerewolfRole } from "../roles";
+import { WerewolfRole, getWerewolfRole } from "../roles";
+import type { WerewolfRoleDefinition } from "../roles";
 import {
   selectExecutionerTarget,
   buildInitialTurnState,
@@ -23,7 +24,7 @@ import { extractPlayerNightState } from "./player-night-state";
 function extractNonOwnerState(
   game: Game,
   callerId: string,
-  myRole: RoleDefinition,
+  myRole: WerewolfRoleDefinition,
 ): Partial<WerewolfPlayerGameState> & { modeVisiblePlayerIds?: string[] } {
   const deadPlayerIds = extractDeadPlayerIds(game);
   const nightActions = extractNightActions(game);
@@ -40,7 +41,7 @@ function extractNonOwnerState(
   // Executioner: surface the target so the player knows who to get eliminated,
   // and mark the target as visible (name only, no role).
   const executionerTargetId =
-    myRole.id === (WerewolfRole.Executioner as string)
+    myRole.id === WerewolfRole.Executioner
       ? game.executionerTargetId
       : undefined;
   const executionerState = executionerTargetId
@@ -81,12 +82,19 @@ export const werewolfServices: GameModeServices = {
     callerId: string,
     myRole: RoleDefinition | undefined,
   ): Record<string, unknown> {
-    const modeState = !myRole
-      ? (extractOwnerState(game) as Record<string, unknown>)
-      : (extractNonOwnerState(game, callerId, myRole) as Record<
-          string,
-          unknown
-        >);
+    let modeState: Record<string, unknown>;
+    if (!myRole) {
+      modeState = extractOwnerState(game) as Record<string, unknown>;
+    } else {
+      const werewolfRole = getWerewolfRole(myRole.id);
+      if (!werewolfRole) {
+        throw new Error(`Unknown Werewolf role ID: ${myRole.id}`);
+      }
+      modeState = extractNonOwnerState(game, callerId, werewolfRole) as Record<
+        string,
+        unknown
+      >;
+    }
 
     // Include Werewolf-specific game settings in the player state.
     const wwConfig = getWerewolfModeConfig(game);

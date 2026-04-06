@@ -1,4 +1,4 @@
-import { isWerewolfRole, getWerewolfRole } from "../roles";
+import { isWerewolfRole, WEREWOLF_ROLES } from "../roles";
 import type { WerewolfRole } from "../roles";
 
 /** A valid night phase key: a role ID. Group phases use the primary role's ID. */
@@ -39,6 +39,7 @@ export function isRoleActive(
  * Handles suffixed repeat keys (e.g. "werewolf-werewolf:2").
  */
 export function isGroupPhaseKey(phaseKey: string): boolean {
-  const role = getWerewolfRole(baseGroupPhaseKey(phaseKey));
-  return role?.teamTargeting === true;
+  const baseKey = baseGroupPhaseKey(phaseKey);
+  if (!isWerewolfRole(baseKey)) return false;
+  return WEREWOLF_ROLES[baseKey].teamTargeting === true;
 }

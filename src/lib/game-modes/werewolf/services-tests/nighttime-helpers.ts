@@ -1,4 +1,4 @@
-import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
+import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 import type { Game } from "@/lib/types";
 import type { AnyNightAction } from "@/lib/game-modes/werewolf";
 import {
@@ -7,6 +7,7 @@ import {
   DEFAULT_WEREWOLF_TIMER_CONFIG,
 } from "@/lib/game-modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
+import { WEREWOLF_ROLES } from "@/lib/game-modes/werewolf/roles";
 
 // ---------------------------------------------------------------------------
 // makeNighttimeGame (Witch tests)
@@ -109,14 +110,5 @@ export function makeNighttimeGameWithBonusPhase(
 // Shared role definitions
 // ---------------------------------------------------------------------------
 
-export const witchRole = {
-  id: WerewolfRole.Witch,
-  name: "Witch",
-  team: Team.Bad,
-};
-
-export const werewolfRole = {
-  id: WerewolfRole.Werewolf,
-  name: "Werewolf",
-  team: Team.Bad,
-};
+export const witchRole = WEREWOLF_ROLES[WerewolfRole.Witch];
+export const werewolfRole = WEREWOLF_ROLES[WerewolfRole.Werewolf];
