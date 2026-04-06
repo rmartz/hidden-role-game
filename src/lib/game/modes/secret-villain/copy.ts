@@ -53,6 +53,8 @@ export const SECRET_VILLAIN_COPY = {
     play: "Play",
     goodCard: "Good",
     badCard: "Bad",
+    passAxis: "Pass",
+    discardAxis: "Discard",
     vetoAvailable: "Veto power is available.",
     proposeVeto: "Propose Veto",
     vetoProposed: "Veto proposed. Waiting for the President\u2026",

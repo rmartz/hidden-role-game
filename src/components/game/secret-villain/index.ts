@@ -4,6 +4,7 @@ export { ElectionResultView } from "./ElectionResultView";
 export { ElectionVoteView } from "./ElectionVoteView";
 export { InvestigationConsentView } from "./InvestigationConsentView";
 export { PlayerSelectionView } from "./PlayerSelectionView";
+export { PolicyCardTable } from "./PolicyCardTable";
 export { PolicyChancellorView } from "./PolicyChancellorView";
 export { PolicyPeekView } from "./PolicyPeekView";
 export { PolicyPresidentView } from "./PolicyPresidentView";

@@ -3,9 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
-import { getSvThemeLabels } from "@/lib/game/modes/secret-villain/themes";
 import type { SvTheme } from "@/lib/game/modes/secret-villain/themes";
-import { cn } from "@/lib/utils";
+import { PolicyCardTable } from "./PolicyCardTable";
 
 interface PolicyChancellorViewProps {
   remainingCards: string[];
@@ -36,8 +35,6 @@ export function PolicyChancellorView({
   chancellorName,
   svTheme,
 }: PolicyChancellorViewProps) {
-  const themeLabels = getSvThemeLabels(svTheme);
-
   if (!isChancellor) {
     return (
       <Card>
@@ -84,28 +81,13 @@ export function PolicyChancellorView({
             {SECRET_VILLAIN_COPY.policy.vetoRejected}
           </p>
         )}
-        <div className="flex gap-2">
-          {remainingCards.map((card, index) => (
-            <Button
-              key={index}
-              variant={selectedIndex === index ? "default" : "outline"}
-              className={cn(
-                card === "good"
-                  ? "border-green-500 text-green-700"
-                  : "border-red-500 text-red-700",
-                selectedIndex === index &&
-                  (card === "good"
-                    ? "bg-green-500 text-white"
-                    : "bg-red-500 text-white"),
-              )}
-              onClick={() => {
-                onSelectCard(index);
-              }}
-            >
-              {card === "good" ? themeLabels.goodPolicy : themeLabels.badPolicy}
-            </Button>
-          ))}
-        </div>
+        <PolicyCardTable
+          cards={remainingCards}
+          discardIndex={selectedIndex}
+          onSelectDiscard={onSelectCard}
+          disabled={!!isPending}
+          svTheme={svTheme}
+        />
         <div className="flex gap-2">
           <Button
             onClick={onPlay}
