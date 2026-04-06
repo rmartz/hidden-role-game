@@ -1,6 +1,6 @@
 # Hidden Role Game
 
-A multiplayer social deduction game platform. Players join a lobby, are secretly assigned roles, and play through night and day phases. Supports multiple game modes.
+A multiplayer social deduction game platform. Players join a lobby, are secretly assigned roles, and play through game-mode-specific phases. Supports multiple game modes.
 
 ## Tech Stack
 
@@ -12,63 +12,114 @@ A multiplayer social deduction game platform. Players join a lobby, are secretly
 - **Vitest** — test runner
 - **Storybook** — component development and visual documentation
 
-## Project Structure
+## Getting Started
 
+```bash
+pnpm install
+cp .env.example .env.local  # fill in Firebase credentials
+pnpm dev                    # http://localhost:3000
 ```
-hidden-role-game/
-├── src/
-│   ├── app/
-│   │   ├── page.tsx               # Home — create or join a lobby
-│   │   ├── [gameMode]/lobby/      # Lobby UI (role config, waiting room)
-│   │   ├── [gameMode]/game/       # Player game view
-│   │   └── api/
-│   │       ├── lobby/             # Lobby API routes
-│   │       └── [gameMode]/game/   # Game API routes
-│   ├── lib/
-│   │   ├── firebase/       # Firebase Admin + client SDK wrappers and RTDB schema
-│   │   ├── types/          # Core domain types
-│   │   └── game-modes/     # Per-mode role definitions (Werewolf, Avalon, Secret Villain)
-│   ├── server/
-│   │   ├── types/          # API response types (public-facing)
-│   │   └── utils/          # Server-only helpers (auth, role slots, role assignment)
-│   ├── services/
-│   │   ├── GameService.ts           # Orchestrator: combines logic + data access
-│   │   ├── GameStateService.ts      # Pure business logic (player state, role assignment)
-│   │   ├── FirebaseGameService.ts   # Firebase I/O for games (read/write/transactions)
-│   │   └── FirebaseLobbyService.ts  # Firebase I/O for lobbies
-│   └── hooks/
-│       ├── lobbySocket.ts  # Firebase RTDB real-time lobby subscription
-│       └── game.ts         # Firebase RTDB real-time game state subscription
-├── docs/                   # Game mode documentation
-├── .storybook/          # Storybook configuration
-├── package.json
-├── tsconfig.json
-├── next.config.ts
-└── vitest.config.mts
+
+See [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md) for a full new-developer orientation including how to run tests without Firebase, where game logic lives, and how to add a new game mode.
+
+## Development
+
+```bash
+pnpm test             # Run tests (watch mode)
+pnpm test --run       # Run tests (single pass)
+pnpm lint             # ESLint
+pnpm format           # Prettier
+pnpm tsc              # Type check
+pnpm storybook        # Storybook dev server at http://localhost:6006
+pnpm build-storybook  # Static Storybook build
 ```
+
+CI runs on every PR: **Tests**, **Lint**, **Format**, and **Build**.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for code style guidelines and conventions.
 
 ## Game Modes
 
-See [docs/](docs/README.md) for detailed documentation on each game mode, including roles, actions, and data flow.
+Three game modes are supported. See [docs/GAME_MODES.md](docs/GAME_MODES.md) for per-mode role, action, and data flow documentation.
+
+- **Werewolf** — narrator-driven night/day deduction game; fully app-mediated
+- **Secret Villain** — election and policy game with asymmetric Bad team visibility; fully app-mediated
+- **Avalon** — quest-voting game; app handles role distribution only
 
 ## Game Flow
 
 1. A player creates a lobby and configures the role mix
 2. Players join via share link
 3. The lobby owner starts the game — roles are secretly assigned
-4. Players interact through game-mode-specific phases (elections, night actions, quests, etc.)
+4. Players interact through game-mode-specific phases (elections, night actions, etc.)
 5. The game ends when a win condition is met
 
-Some game modes (Werewolf, Clocktower) use a narrator who controls phase progression. Others (Secret Villain, Avalon) are fully player-driven with the app mediating all interactions.
+Werewolf uses a Narrator (the lobby owner) who controls night-phase progression. Secret Villain and Avalon are fully player-driven with the app mediating all interactions.
 
 ## Real-Time Updates
 
 State changes are pushed to clients in real time via Firebase Realtime Database subscriptions:
 
-- **Lobby**: clients subscribe to `lobbies/{lobbyId}/public` via `onValue`. The lobby owner's config edits are the source of truth — the client skips echoed config-only updates to avoid overwriting local state.
-- **Game**: each player subscribes to `games/{gameId}/playerState/{sessionId}`. The server pre-computes and writes every player's `PlayerGameState` to Firebase on each mutation, so updates arrive immediately without an extra HTTP round-trip.
+- **Lobby**: clients subscribe to `lobbies/{lobbyId}/public` via `onValue`
+- **Game**: each player subscribes to `games/{gameId}/playerState/{sessionId}`. The server pre-computes and writes every player's `PlayerGameState` to Firebase on each mutation, so updates arrive immediately without an extra HTTP round-trip
 
 The Firebase schema separates public and private data. Private data (session IDs) is stored at `lobbies/{id}/private` and is only accessed via the Admin SDK in API routes — never exposed to the client.
+
+## Source Code Organization
+
+See [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md) for a detailed breakdown of every directory.
+
+### `src/app/`
+
+Next.js pages and API routes. Pages handle auth/redirect; API routes parse requests and delegate to `src/server/`. No business logic lives here.
+
+### `src/lib/`
+
+Shared logic used by both server and client. Contains core domain types (`lib/types/`), Firebase schema helpers (`lib/firebase/schema/`), and all game-mode logic (`lib/game/modes/`). The per-mode directories hold turn state definitions, action handlers, role definitions, and player-state extraction.
+
+### `src/server/`
+
+Server-side orchestration called by API routes. `server/game.ts` and `server/lobby.ts` coordinate game/lobby operations; `server/utils/` holds request authentication, role slot validation, and role assignment. Nothing in `server/` is imported by client components.
+
+### `src/services/`
+
+All Firebase Realtime Database reads and writes. This is the only layer that calls `getAdminDatabase()`. Functions here accept and return typed domain objects; wire-format conversion happens in `lib/firebase/schema/`.
+
+### `src/hooks/`
+
+React hooks for real-time state. `useGameStateQuery` subscribes to `games/{gameId}/playerState/{sessionId}` and `useLobbyQuery` subscribes to `lobbies/{lobbyId}/public` — both via Firebase `onValue`. Components never read from Firebase directly.
+
+### `src/components/`
+
+UI components split by domain: `lobby/` for the waiting room and config panel, `game/werewolf/` and `game/secret-villain/` for in-game phase UIs, and `ui/` for ShadCN primitives.
+
+## API
+
+All API routes are served by the same Next.js process — no separate server needed. Session IDs are stored in `localStorage` and sent as the `x-session-id` header.
+
+### Lobby
+
+| Method   | Path                               | Description                                |
+| -------- | ---------------------------------- | ------------------------------------------ |
+| `POST`   | `/api/lobby/create`                | Create a lobby; returns lobby + session ID |
+| `GET`    | `/api/lobby/:id`                   | Get lobby state                            |
+| `POST`   | `/api/lobby/:id/join`              | Join a lobby; returns lobby + session ID   |
+| `PUT`    | `/api/lobby/:id/config`            | Update role configuration (owner only)     |
+| `PUT`    | `/api/lobby/:id/owner`             | Transfer ownership (owner only)            |
+| `POST`   | `/api/lobby/:id/ready`             | Mark self as ready                         |
+| `POST`   | `/api/lobby/:id/return`            | Return to lobby after a game ends          |
+| `DELETE` | `/api/lobby/:id/players/:playerId` | Remove a player (owner or self)            |
+
+### Game
+
+| Method | Path                              | Description                                  |
+| ------ | --------------------------------- | -------------------------------------------- |
+| `POST` | `/api/:gameMode/game/create`      | Start a game from a lobby                    |
+| `GET`  | `/api/:gameMode/game/:id`         | Get game state for the current player        |
+| `POST` | `/api/:gameMode/game/:id/advance` | Advance game phase (Narrator only, Werewolf) |
+| `POST` | `/api/:gameMode/game/:id/action`  | Submit a game action                         |
 
 ## Environment Variables
 
@@ -84,65 +135,3 @@ Copy `.env.example` to `.env.local` and fill in your Firebase project values.
 | `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`  | Client SDK auth domain                     |
 | `NEXT_PUBLIC_FIREBASE_PROJECT_ID`   | Client SDK project ID                      |
 | `NEXT_PUBLIC_FIREBASE_DATABASE_URL` | Client SDK RTDB URL                        |
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for code style guidelines and conventions.
-
-## Getting Started
-
-```bash
-# Install dependencies
-pnpm install
-
-# Start Next.js dev server
-pnpm dev   # http://localhost:3000
-```
-
-## API
-
-All API routes are served by the same Next.js process — no separate server needed.
-
-### Lobby
-
-| Method   | Path                          | Description                                |
-| -------- | ----------------------------- | ------------------------------------------ |
-| `POST`   | `/api/lobby/create`           | Create a lobby; returns lobby + session ID |
-| `GET`    | `/api/lobby/:id`              | Get lobby state                            |
-| `POST`   | `/api/lobby/:id/join`         | Join a lobby; returns lobby + session ID   |
-| `PUT`    | `/api/lobby/:id/config`       | Update role configuration (owner only)     |
-| `PUT`    | `/api/lobby/:id/owner`        | Transfer ownership (owner only)            |
-| `DELETE` | `/api/lobby/:id/players/:pid` | Remove a player (owner or self)            |
-
-### Game
-
-| Method | Path                    | Description                                |
-| ------ | ----------------------- | ------------------------------------------ |
-| `POST` | `/api/game/create`      | Start a game from a lobby; returns game ID |
-| `GET`  | `/api/game/:id`         | Get game state for the current player      |
-| `POST` | `/api/game/:id/advance` | Advance game status (owner only)           |
-| `POST` | `/api/game/:id/action`  | Submit a role action                       |
-
-Session IDs are stored in `localStorage` and sent as the `x-session-id` header.
-
-## Development
-
-```bash
-# Run tests
-pnpm test
-
-# Lint
-pnpm lint
-
-# Format
-pnpm format
-
-# Type check
-pnpm tsc
-
-# Storybook
-pnpm storybook        # Dev server at http://localhost:6006
-pnpm build-storybook  # Static build
-```
-
-CI runs on every PR: **Tests**, **Lint**, **Format**, and **Build**.
