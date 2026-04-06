@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { WerewolfRole } from "../roles";
+import { GROUP_PHASE_KEY_SEPARATOR } from "./phase-keys";
 import { buildNightPhaseOrder } from "./night-phase";
 
 const assignments = [
@@ -93,7 +94,7 @@ describe("buildNightPhaseOrder", () => {
 
   it("skips extraGroupPhaseKey when all group participants are dead", () => {
     // Simulates the Wolf Cub bonus phase when all werewolves are dead.
-    const BONUS_PHASE_KEY = `${WerewolfRole.Werewolf}:2`;
+    const BONUS_PHASE_KEY = `${WerewolfRole.Werewolf}${GROUP_PHASE_KEY_SEPARATOR}2`;
     const order = buildNightPhaseOrder(
       2,
       assignments,
@@ -106,7 +107,7 @@ describe("buildNightPhaseOrder", () => {
   });
 
   it("keeps extraGroupPhaseKey when at least one group participant is alive", () => {
-    const BONUS_PHASE_KEY = `${WerewolfRole.Werewolf}:2`;
+    const BONUS_PHASE_KEY = `${WerewolfRole.Werewolf}${GROUP_PHASE_KEY_SEPARATOR}2`;
     const multiWolf = [
       { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
       { playerId: "w2", roleDefinitionId: WerewolfRole.Werewolf },
@@ -184,7 +185,7 @@ describe("buildNightPhaseOrder", () => {
   });
 
   it("places Wolf Cub bonus phase immediately after the first Werewolf phase", () => {
-    const BONUS_PHASE_KEY = `${WerewolfRole.Werewolf}:2`;
+    const BONUS_PHASE_KEY = `${WerewolfRole.Werewolf}${GROUP_PHASE_KEY_SEPARATOR}2`;
     const withSeer = [
       { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
       { playerId: "s1", roleDefinitionId: WerewolfRole.Seer },
@@ -205,5 +206,35 @@ describe("buildNightPhaseOrder", () => {
     ];
     const order = buildNightPhaseOrder(2, manyRoles);
     expect(order[0]).toBe(WerewolfRole.Werewolf);
+  });
+
+  it("places FirstNightOnly role (Minion/EvilSupport) after Werewolf and before Seer on turn 1", () => {
+    // Minion is FirstNightOnly and EvilSupport — it should sort between
+    // EvilKilling (Werewolf) and VillagerInvestigation (Seer) on night 1.
+    const withMinion = [
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "m1", roleDefinitionId: WerewolfRole.Minion },
+      { playerId: "s1", roleDefinitionId: WerewolfRole.Seer },
+    ];
+    const order = buildNightPhaseOrder(1, withMinion);
+    const werewolfIdx = order.indexOf(WerewolfRole.Werewolf);
+    const minionIdx = order.indexOf(WerewolfRole.Minion);
+    const seerIdx = order.indexOf(WerewolfRole.Seer);
+    expect(werewolfIdx).toBeLessThan(minionIdx);
+    expect(minionIdx).toBeLessThan(seerIdx);
+  });
+
+  it("places AfterFirstNight role (Vigilante/VillagerKilling) before Seer (VillagerInvestigation) on turn 2+", () => {
+    // Vigilante is AfterFirstNight and VillagerKilling — it should sort before
+    // VillagerInvestigation (Seer) once active.
+    const withVigilante = [
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "v1", roleDefinitionId: WerewolfRole.Vigilante },
+      { playerId: "s1", roleDefinitionId: WerewolfRole.Seer },
+    ];
+    const order = buildNightPhaseOrder(2, withVigilante);
+    const vigilanteIdx = order.indexOf(WerewolfRole.Vigilante);
+    const seerIdx = order.indexOf(WerewolfRole.Seer);
+    expect(vigilanteIdx).toBeLessThan(seerIdx);
   });
 });

@@ -29,6 +29,24 @@ const NIGHT_PHASE_CATEGORY_ORDER: WerewolfRoleCategory[] = [
 ];
 
 /**
+ * Priority map built once at module load — avoids rebuilding on every call.
+ * Categories absent from NIGHT_PHASE_CATEGORY_ORDER sort to the end (index = length).
+ */
+const NIGHT_PHASE_CATEGORY_PRIORITY = new Map(
+  NIGHT_PHASE_CATEGORY_ORDER.map((cat, i) => [cat, i]),
+);
+
+if (process.env.NODE_ENV !== "production") {
+  for (const role of Object.values(WEREWOLF_ROLES)) {
+    if (!NIGHT_PHASE_CATEGORY_PRIORITY.has(role.category)) {
+      console.warn(
+        `night-phase: role "${role.id}" has category "${role.category}" not in NIGHT_PHASE_CATEGORY_ORDER — it will sort last`,
+      );
+    }
+  }
+}
+
+/**
  * Returns the ordered list of phase keys that wake during a Werewolf night.
  * Roles with `teamTargeting` use their own role ID as the phase key (group phase).
  * Roles with `wakesWith` are skipped — they join the referenced role's phase.
@@ -75,15 +93,13 @@ export function buildNightPhaseOrder(
   let altruistPhaseKey: string | undefined;
   let witchPhaseKey: string | undefined;
 
-  const categoryPriority = new Map(
-    NIGHT_PHASE_CATEGORY_ORDER.map((cat, i) => [cat, i]),
-  );
-
   const sortedRoles = Object.values(WEREWOLF_ROLES).sort((a, b) => {
     const aIdx =
-      categoryPriority.get(a.category) ?? NIGHT_PHASE_CATEGORY_ORDER.length;
+      NIGHT_PHASE_CATEGORY_PRIORITY.get(a.category) ??
+      NIGHT_PHASE_CATEGORY_ORDER.length;
     const bIdx =
-      categoryPriority.get(b.category) ?? NIGHT_PHASE_CATEGORY_ORDER.length;
+      NIGHT_PHASE_CATEGORY_PRIORITY.get(b.category) ??
+      NIGHT_PHASE_CATEGORY_ORDER.length;
     return aIdx - bIdx;
   });
 
