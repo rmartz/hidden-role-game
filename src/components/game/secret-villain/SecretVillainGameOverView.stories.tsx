@@ -3,7 +3,8 @@ import { SecretVillainGameOverView } from "./SecretVillainGameOverView";
 import { GameMode, GameStatus, Team } from "@/lib/types";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game-modes/secret-villain/timer-config";
 import { SecretVillainWinner } from "@/lib/game-modes/secret-villain/utils/win-condition";
-import type { PlayerGameState } from "@/server/types";
+import { SvTheme } from "@/lib/game-modes/secret-villain/themes";
+import type { SecretVillainPlayerGameState } from "@/lib/game-modes/secret-villain/player-state";
 import { fn } from "storybook/test";
 
 const meta = {
@@ -16,7 +17,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const baseGameState: PlayerGameState = {
+const baseGameState: SecretVillainPlayerGameState = {
   status: { type: GameStatus.Finished, winner: SecretVillainWinner.Good },
   gameMode: GameMode.SecretVillain,
   lobbyId: "lobby-1",
@@ -70,6 +71,29 @@ export const BadTeamVictory: Story = {
   args: {
     gameState: {
       ...baseGameState,
+      status: { type: GameStatus.Finished, winner: SecretVillainWinner.Bad },
+      myPlayerId: "p2",
+      myRole: { id: "bad", name: "Bad Role", team: Team.Bad },
+    },
+  },
+};
+
+export const OriginalThemeGoodWins: Story = {
+  args: {
+    gameState: {
+      ...baseGameState,
+      svTheme: SvTheme.Original,
+      myPlayerId: "p1",
+      myRole: { id: "good", name: "Good Role", team: Team.Good },
+    },
+  },
+};
+
+export const StarWarsThemeBadWins: Story = {
+  args: {
+    gameState: {
+      ...baseGameState,
+      svTheme: SvTheme.StarWars,
       status: { type: GameStatus.Finished, winner: SecretVillainWinner.Bad },
       myPlayerId: "p2",
       myRole: { id: "bad", name: "Bad Role", team: Team.Bad },

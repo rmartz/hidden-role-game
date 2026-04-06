@@ -1,3 +1,4 @@
+import { isSecretVillainModeConfig } from "@/lib/types";
 import type { Game, GameModeServices, PlayerRoleAssignment } from "@/lib/types";
 import {
   SecretVillainPhase,
@@ -106,9 +107,9 @@ export const secretVillainServices: GameModeServices = {
     const { phase } = ts;
 
     // Pass the theme to the client for cosmetic label resolution.
-    const theme =
-      "theme" in game.modeConfig ? game.modeConfig.theme : undefined;
-    if (theme) result["svTheme"] = theme;
+    if (isSecretVillainModeConfig(game.modeConfig) && game.modeConfig.theme) {
+      result["svTheme"] = game.modeConfig.theme;
+    }
 
     // Phase info — visible to all players.
     result["svPhase"] = buildPhaseInfo(phase);

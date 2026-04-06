@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { GameMode } from "@/lib/types";
 import { SpecialActionType, SvBoardPreset } from "./types";
+import { SvTheme } from "./themes";
 import { parseSecretVillainModeConfig } from "./lobby-config";
 
 describe("parseSecretVillainModeConfig", () => {
@@ -78,5 +79,24 @@ describe("parseSecretVillainModeConfig", () => {
       boardPreset: SvBoardPreset.Default,
     });
     expect(result.boardPreset).toBe(SvBoardPreset.Default);
+  });
+
+  it("parses a valid theme", () => {
+    const result = parseSecretVillainModeConfig({
+      theme: SvTheme.StarWars,
+    });
+    expect(result.theme).toBe(SvTheme.StarWars);
+  });
+
+  it("ignores invalid theme", () => {
+    const result = parseSecretVillainModeConfig({
+      theme: "invalid",
+    });
+    expect(result.theme).toBeUndefined();
+  });
+
+  it("omits theme when not present", () => {
+    const result = parseSecretVillainModeConfig({});
+    expect(result.theme).toBeUndefined();
   });
 });

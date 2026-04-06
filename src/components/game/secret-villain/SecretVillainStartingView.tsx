@@ -6,6 +6,7 @@ import { getSvThemeLabels } from "@/lib/game-modes/secret-villain/themes";
 import type { SecretVillainPlayerGameState } from "@/lib/game-modes/secret-villain/player-state";
 import type { VisibleTeammate } from "@/server/types";
 import { Team } from "@/lib/types";
+import { SecretVillainRole } from "@/lib/game-modes/secret-villain/roles";
 
 export interface SecretVillainStartingViewProps {
   gameState: SecretVillainPlayerGameState;
@@ -33,7 +34,7 @@ function BadTeamReveal({ teammates, specialBadMarker }: BadTeamRevealProps) {
           {teammates.map(({ player, role }) => (
             <li key={player.id} className="flex justify-between gap-4">
               <span>{player.name}</span>
-              {role?.id === "special-bad" && (
+              {role?.id === (SecretVillainRole.SpecialBad as string) && (
                 <span className="text-muted-foreground">
                   {specialBadMarker}
                 </span>
@@ -52,15 +53,15 @@ export function SecretVillainStartingView({
 }: SecretVillainStartingViewProps) {
   const myRole = gameState.myRole;
   const isBadTeam = myRole?.team === Team.Bad;
-  const isSpecialBad = myRole?.id === "special-bad";
+  const isSpecialBad = myRole?.id === (SecretVillainRole.SpecialBad as string);
   const themeLabels = getSvThemeLabels(gameState.svTheme);
 
   const roleName =
-    myRole?.id === "good"
+    myRole?.id === (SecretVillainRole.Good as string)
       ? themeLabels.goodRole
-      : myRole?.id === "bad"
+      : myRole?.id === (SecretVillainRole.Bad as string)
         ? themeLabels.badRole
-        : myRole?.id === "special-bad"
+        : myRole?.id === (SecretVillainRole.SpecialBad as string)
           ? themeLabels.specialBadRole
           : (myRole?.name ?? "Unknown");
   const badTeammates = gameState.visibleRoleAssignments.filter(

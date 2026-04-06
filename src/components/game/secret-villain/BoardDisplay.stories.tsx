@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { BoardDisplay } from "./BoardDisplay";
+import { SvTheme } from "@/lib/game-modes/secret-villain/themes";
 
 const meta = {
   component: BoardDisplay,
@@ -51,5 +52,25 @@ export const HighFailedElections: Story = {
     badCardsPlayed: 2,
     failedElectionCount: 3,
     failedElectionThreshold: 3,
+  },
+};
+
+export const StarWarsTheme: Story = {
+  args: {
+    goodCardsPlayed: 3,
+    badCardsPlayed: 2,
+    failedElectionCount: 0,
+    failedElectionThreshold: 3,
+    svTheme: SvTheme.StarWars,
+  },
+};
+
+export const BusinessTheme: Story = {
+  args: {
+    goodCardsPlayed: 1,
+    badCardsPlayed: 3,
+    failedElectionCount: 1,
+    failedElectionThreshold: 3,
+    svTheme: SvTheme.Business,
   },
 };

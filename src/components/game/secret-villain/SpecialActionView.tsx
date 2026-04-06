@@ -33,36 +33,46 @@ interface SpecialActionViewProps {
   svTheme?: SvTheme;
 }
 
+interface ActionConfig {
+  heading: string;
+  instructions: string;
+  confirm: string;
+}
+
+const STATIC_ACTION_CONFIG: Record<
+  Exclude<SpecialActionType, SpecialActionType.Shoot>,
+  ActionConfig
+> = {
+  [SpecialActionType.InvestigateTeam]: {
+    heading: SECRET_VILLAIN_COPY.specialAction.investigateHeading,
+    instructions: SECRET_VILLAIN_COPY.specialAction.investigateInstructions,
+    confirm: SECRET_VILLAIN_COPY.specialAction.investigateConfirm,
+  },
+  [SpecialActionType.SpecialElection]: {
+    heading: SECRET_VILLAIN_COPY.specialAction.specialElectionHeading,
+    instructions: SECRET_VILLAIN_COPY.specialAction.specialElectionInstructions,
+    confirm: SECRET_VILLAIN_COPY.specialAction.specialElectionConfirm,
+  },
+  [SpecialActionType.PolicyPeek]: {
+    heading: SECRET_VILLAIN_COPY.specialAction.policyPeekHeading,
+    instructions: SECRET_VILLAIN_COPY.specialAction.policyPeekInstructions,
+    confirm: SECRET_VILLAIN_COPY.specialAction.policyPeekConfirm,
+  },
+};
+
 function getActionConfig(
+  actionType: SpecialActionType,
   svTheme?: SvTheme,
-): Record<
-  SpecialActionType,
-  { heading: string; instructions: string; confirm: string }
-> {
-  const themeLabels = getSvThemeLabels(svTheme);
-  return {
-    [SpecialActionType.InvestigateTeam]: {
-      heading: SECRET_VILLAIN_COPY.specialAction.investigateHeading,
-      instructions: SECRET_VILLAIN_COPY.specialAction.investigateInstructions,
-      confirm: SECRET_VILLAIN_COPY.specialAction.investigateConfirm,
-    },
-    [SpecialActionType.SpecialElection]: {
-      heading: SECRET_VILLAIN_COPY.specialAction.specialElectionHeading,
-      instructions:
-        SECRET_VILLAIN_COPY.specialAction.specialElectionInstructions,
-      confirm: SECRET_VILLAIN_COPY.specialAction.specialElectionConfirm,
-    },
-    [SpecialActionType.Shoot]: {
+): ActionConfig {
+  if (actionType === SpecialActionType.Shoot) {
+    const themeLabels = getSvThemeLabels(svTheme);
+    return {
       heading: themeLabels.shootHeading,
       instructions: themeLabels.shootInstruction,
       confirm: themeLabels.shootConfirm,
-    },
-    [SpecialActionType.PolicyPeek]: {
-      heading: SECRET_VILLAIN_COPY.specialAction.policyPeekHeading,
-      instructions: SECRET_VILLAIN_COPY.specialAction.policyPeekInstructions,
-      confirm: SECRET_VILLAIN_COPY.specialAction.policyPeekConfirm,
-    },
-  };
+    };
+  }
+  return STATIC_ACTION_CONFIG[actionType];
 }
 
 export function SpecialActionView({
@@ -83,7 +93,7 @@ export function SpecialActionView({
   peekedCards,
   svTheme,
 }: SpecialActionViewProps) {
-  const config = getActionConfig(svTheme)[actionType];
+  const config = getActionConfig(actionType, svTheme);
 
   if (!isPresident) {
     if (
