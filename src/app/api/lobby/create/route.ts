@@ -9,6 +9,7 @@ import { ServerResponseStatus, type CreateLobbyRequest } from "@/server/types";
 import { addLobby } from "@/server/lobby";
 import {
   errorResponse,
+  normalizeDisplayName,
   toPublicLobby,
   validatePlayerName,
 } from "@/server/utils";
@@ -16,7 +17,7 @@ import {
 export async function POST(request: Request): Promise<Response> {
   const body = (await request.json()) as CreateLobbyRequest;
 
-  const displayName = body.playerName.trim().replace(/\s+/g, " ");
+  const displayName = normalizeDisplayName(body.playerName);
   const nameError = validatePlayerName(displayName);
   if (nameError) {
     return errorResponse(nameError, 400);

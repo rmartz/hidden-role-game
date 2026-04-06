@@ -4,7 +4,7 @@ import {
   errorResponse,
   toPublicLobby,
 } from "@/server/utils";
-import { removePlayer } from "@/server/lobby";
+import { removePlayer, authorizePlayerRemoval } from "@/server/lobby";
 
 export async function DELETE(
   request: Request,
@@ -19,17 +19,9 @@ export async function DELETE(
   if (auth instanceof Response) return auth;
   const { lobby } = auth;
 
-  const callerIsOwner = lobby.ownerSessionId === sessionId;
-  const callerIsTarget = lobby.players.some(
-    (p) => p.id === playerId && p.sessionId === sessionId,
-  );
-
-  if (!callerIsOwner && !callerIsTarget) {
-    return errorResponse("Unauthorized", 403);
-  }
-
-  if (callerIsOwner && callerIsTarget) {
-    return errorResponse("Owner cannot leave the lobby", 403);
+  const authError = authorizePlayerRemoval(lobby, playerId, auth.sessionId);
+  if (authError) {
+    return errorResponse(authError, 403);
   }
 
   const updated = await removePlayer(lobbyId, playerId);
