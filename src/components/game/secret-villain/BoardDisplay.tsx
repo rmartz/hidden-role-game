@@ -33,7 +33,7 @@ function TrackSlots({ filled, variant, labels }: TrackSlotsProps) {
   return (
     <div className="flex gap-2">
       {Array.from({ length: TRACK_SIZE }, (_, i) => (
-        <div key={i} className="flex flex-col items-center gap-1">
+        <div key={i} className="relative">
           <div
             className={cn(
               "size-8 rounded border-2",
@@ -51,7 +51,7 @@ function TrackSlots({ filled, variant, labels }: TrackSlotsProps) {
           {labels?.[i] !== undefined && (
             <span
               className={cn(
-                "text-xs text-center leading-tight w-10",
+                "absolute top-full left-1/2 text-xs leading-tight whitespace-nowrap origin-top-left rotate-45",
                 i < filled
                   ? "text-muted-foreground line-through"
                   : i === filled
