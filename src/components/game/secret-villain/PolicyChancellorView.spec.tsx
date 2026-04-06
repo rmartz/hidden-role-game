@@ -14,13 +14,9 @@ const defaultProps = {
 };
 
 describe("PolicyChancellorView", () => {
-  it("shows 2 card buttons when chancellor", () => {
+  it("shows 2 card columns when chancellor", () => {
     render(<PolicyChancellorView {...defaultProps} />);
-    const goodButtons = screen.getAllByText(
-      SECRET_VILLAIN_COPY.policy.goodCard,
-    );
-    const badButtons = screen.getAllByText(SECRET_VILLAIN_COPY.policy.badCard);
-    expect(goodButtons.length + badButtons.length).toBe(2);
+    expect(screen.getAllByTestId(/^policy-card-column-/)).toHaveLength(2);
   });
 
   it("shows veto button when veto is unlocked", () => {

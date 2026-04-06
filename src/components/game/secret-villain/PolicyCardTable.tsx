@@ -9,6 +9,7 @@ interface PolicyCardTableProps {
   cards: string[];
   discardIndex?: number;
   onSelectDiscard: (index: number) => void;
+  passAxisLabel?: string;
   disabled?: boolean;
   svTheme?: SvTheme;
 }
@@ -27,6 +28,7 @@ export function PolicyCardTable({
   cards,
   discardIndex,
   onSelectDiscard,
+  passAxisLabel = SECRET_VILLAIN_COPY.policy.passAxis,
   disabled,
   svTheme,
 }: PolicyCardTableProps) {
@@ -35,7 +37,7 @@ export function PolicyCardTable({
   return (
     <div className="flex gap-3 items-stretch">
       <div className="flex flex-col justify-around text-xs font-medium text-muted-foreground text-right pr-1 py-1 gap-2">
-        <span>{SECRET_VILLAIN_COPY.policy.passAxis}</span>
+        <span>{passAxisLabel}</span>
         <span>{SECRET_VILLAIN_COPY.policy.discardAxis}</span>
       </div>
       {cards.map((card, i) => {

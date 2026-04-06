@@ -85,6 +85,7 @@ export function PolicyChancellorView({
           cards={remainingCards}
           discardIndex={selectedIndex}
           onSelectDiscard={onSelectCard}
+          passAxisLabel={SECRET_VILLAIN_COPY.policy.playAxis}
           disabled={!!isPending}
           svTheme={svTheme}
         />
