@@ -3,6 +3,15 @@ import { BoardDisplay } from "./BoardDisplay";
 import { SvTheme } from "@/lib/game/modes/secret-villain/themes";
 import { SpecialActionType } from "@/lib/game/modes/secret-villain/types";
 
+// Medium preset (7–8 players): Investigate → Shoot → Shoot on slots 3–5
+const MEDIUM_POWER_TABLE = [
+  undefined,
+  undefined,
+  SpecialActionType.InvestigateTeam,
+  SpecialActionType.Shoot,
+  SpecialActionType.Shoot,
+];
+
 const meta = {
   component: BoardDisplay,
 } satisfies Meta<typeof BoardDisplay>;
@@ -16,6 +25,7 @@ export const Default: Story = {
     badCardsPlayed: 3,
     failedElectionCount: 1,
     failedElectionThreshold: 3,
+    powerTable: MEDIUM_POWER_TABLE,
   },
 };
 
@@ -25,6 +35,7 @@ export const Empty: Story = {
     badCardsPlayed: 0,
     failedElectionCount: 0,
     failedElectionThreshold: 3,
+    powerTable: MEDIUM_POWER_TABLE,
   },
 };
 
@@ -34,6 +45,7 @@ export const NearWin: Story = {
     badCardsPlayed: 4,
     failedElectionCount: 2,
     failedElectionThreshold: 3,
+    powerTable: MEDIUM_POWER_TABLE,
   },
 };
 
@@ -44,6 +56,7 @@ export const VetoUnlocked: Story = {
     failedElectionCount: 0,
     failedElectionThreshold: 3,
     vetoUnlocked: true,
+    powerTable: MEDIUM_POWER_TABLE,
   },
 };
 
@@ -53,6 +66,7 @@ export const HighFailedElections: Story = {
     badCardsPlayed: 2,
     failedElectionCount: 3,
     failedElectionThreshold: 3,
+    powerTable: MEDIUM_POWER_TABLE,
   },
 };
 
@@ -63,6 +77,7 @@ export const StarWarsTheme: Story = {
     failedElectionCount: 0,
     failedElectionThreshold: 3,
     svTheme: SvTheme.StarWars,
+    powerTable: MEDIUM_POWER_TABLE,
   },
 };
 
@@ -73,6 +88,7 @@ export const BusinessTheme: Story = {
     failedElectionCount: 1,
     failedElectionThreshold: 3,
     svTheme: SvTheme.Business,
+    powerTable: MEDIUM_POWER_TABLE,
   },
 };
 

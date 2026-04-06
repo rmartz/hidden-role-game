@@ -16,7 +16,7 @@ interface BoardDisplayProps {
   badCardsPlayed: number;
   failedElectionCount: number;
   failedElectionThreshold: number;
-  powerTable?: SvPowerTable;
+  powerTable: SvPowerTable;
   vetoUnlocked?: boolean;
   svTheme?: SvTheme;
 }
@@ -69,10 +69,7 @@ function TrackSlots({ filled, variant, labels }: TrackSlotsProps) {
   );
 }
 
-function resolvePowerLabels(
-  powerTable: SvPowerTable | undefined,
-): (string | undefined)[] | undefined {
-  if (!powerTable) return undefined;
+function resolvePowerLabels(powerTable: SvPowerTable): (string | undefined)[] {
   const labels = SECRET_VILLAIN_COPY.board.powerLabels as Record<
     SpecialActionType,
     string
@@ -102,7 +99,7 @@ export function BoardDisplay({
       <CardContent className="space-y-4">
         <TrackSlots filled={goodCardsPlayed} variant="good" />
 
-        <div className={powerLabels ? "pb-16" : undefined}>
+        <div className="pb-16">
           <p className="text-sm font-medium mb-1">{themeLabels.badTrack}</p>
           <TrackSlots
             filled={badCardsPlayed}

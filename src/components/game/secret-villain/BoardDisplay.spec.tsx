@@ -6,11 +6,20 @@ import { SpecialActionType } from "@/lib/game/modes/secret-villain/types";
 
 afterEach(cleanup);
 
+const defaultPowerTable = [
+  undefined,
+  undefined,
+  SpecialActionType.InvestigateTeam,
+  SpecialActionType.Shoot,
+  SpecialActionType.Shoot,
+];
+
 const defaultProps = {
   goodCardsPlayed: 0,
   badCardsPlayed: 0,
   failedElectionCount: 0,
   failedElectionThreshold: 3,
+  powerTable: defaultPowerTable,
 };
 
 describe("BoardDisplay", () => {
@@ -88,8 +97,13 @@ describe("BoardDisplay", () => {
     expect(screen.queryByTestId("bad-slot-label-2")).toBeNull();
   });
 
-  it("renders no labels when powerTable is not provided", () => {
-    render(<BoardDisplay {...defaultProps} />);
+  it("renders no label for slots with no power action", () => {
+    render(
+      <BoardDisplay
+        {...defaultProps}
+        powerTable={[undefined, undefined, undefined, undefined, undefined]}
+      />,
+    );
     expect(screen.queryByTestId(/^bad-slot-label-/)).toBeNull();
   });
 });
