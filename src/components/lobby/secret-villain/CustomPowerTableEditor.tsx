@@ -5,6 +5,8 @@ import type {
   SvCustomPowerConfig,
   SvCustomPowerSlot,
 } from "@/lib/game-modes/secret-villain/types";
+import { getSvThemeLabels } from "@/lib/game-modes/secret-villain/themes";
+import type { SvTheme } from "@/lib/game-modes/secret-villain/themes";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -22,6 +24,7 @@ interface CustomPowerTableEditorProps {
   powerTable: SvCustomPowerConfig;
   disabled?: boolean;
   onChange?: (table: SvCustomPowerConfig) => void;
+  svTheme?: SvTheme;
 }
 
 const POWER_OPTIONS: { value: string; label: string }[] = [
@@ -60,7 +63,10 @@ export function CustomPowerTableEditor({
   powerTable,
   disabled,
   onChange,
+  svTheme,
 }: CustomPowerTableEditorProps) {
+  const lockedLabel = `${getSvThemeLabels(svTheme).shootAction} (${SECRET_VILLAIN_CONFIG_PANEL_COPY.badCardSlotLocked})`;
+
   const handleSlotChange = (index: number, value: string | null) => {
     if (!value) return;
     const updated: SvCustomPowerConfig = [...powerTable];
@@ -103,9 +109,7 @@ export function CustomPowerTableEditor({
           <Label className="text-sm min-w-[100px]">
             {SECRET_VILLAIN_CONFIG_PANEL_COPY.badCardSlotLabel(n)}
           </Label>
-          <span className="text-sm text-muted-foreground">
-            {SECRET_VILLAIN_CONFIG_PANEL_COPY.badCardSlotLocked}
-          </span>
+          <span className="text-sm text-muted-foreground">{lockedLabel}</span>
         </div>
       ))}
     </div>

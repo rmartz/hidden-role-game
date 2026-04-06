@@ -3,6 +3,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
+import { getSvThemeLabels } from "@/lib/game-modes/secret-villain/themes";
+import type { SvTheme } from "@/lib/game-modes/secret-villain/themes";
 import { cn } from "@/lib/utils";
 
 interface BoardDisplayProps {
@@ -11,6 +13,7 @@ interface BoardDisplayProps {
   failedElectionCount: number;
   failedElectionThreshold: number;
   vetoUnlocked?: boolean;
+  svTheme?: SvTheme;
 }
 
 const TRACK_SIZE = 5;
@@ -50,19 +53,20 @@ export function BoardDisplay({
   failedElectionCount,
   failedElectionThreshold,
   vetoUnlocked,
+  svTheme,
 }: BoardDisplayProps) {
+  const themeLabels = getSvThemeLabels(svTheme);
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{SECRET_VILLAIN_COPY.board.goodTrack}</CardTitle>
+        <CardTitle>{themeLabels.goodTrack}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <TrackSlots filled={goodCardsPlayed} variant="good" />
 
         <div>
-          <p className="text-sm font-medium mb-1">
-            {SECRET_VILLAIN_COPY.board.badTrack}
-          </p>
+          <p className="text-sm font-medium mb-1">{themeLabels.badTrack}</p>
           <TrackSlots filled={badCardsPlayed} variant="bad" />
         </div>
 

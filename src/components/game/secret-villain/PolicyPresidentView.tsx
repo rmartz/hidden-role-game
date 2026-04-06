@@ -3,6 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
+import { getSvThemeLabels } from "@/lib/game-modes/secret-villain/themes";
+import type { SvTheme } from "@/lib/game-modes/secret-villain/themes";
 import { cn } from "@/lib/utils";
 
 interface PolicyPresidentViewProps {
@@ -15,6 +17,7 @@ interface PolicyPresidentViewProps {
   isPending?: boolean;
   isPresident: boolean;
   presidentName: string;
+  svTheme?: SvTheme;
 }
 
 export function PolicyPresidentView({
@@ -27,7 +30,9 @@ export function PolicyPresidentView({
   isPending,
   isPresident,
   presidentName,
+  svTheme,
 }: PolicyPresidentViewProps) {
+  const themeLabels = getSvThemeLabels(svTheme);
   if (!isPresident) {
     return (
       <Card>
@@ -90,9 +95,7 @@ export function PolicyPresidentView({
                 onSelectCard(index);
               }}
             >
-              {card === "good"
-                ? SECRET_VILLAIN_COPY.policy.goodCard
-                : SECRET_VILLAIN_COPY.policy.badCard}
+              {card === "good" ? themeLabels.goodPolicy : themeLabels.badPolicy}
             </Button>
           ))}
         </div>

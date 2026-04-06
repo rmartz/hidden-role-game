@@ -126,6 +126,7 @@ export function SecretVillainGameScreenView({
       failedElectionCount={board.failedElectionCount}
       failedElectionThreshold={FAILED_ELECTION_THRESHOLD}
       vetoUnlocked={gameState.vetoUnlocked}
+      svTheme={gameState.svTheme}
     />
   ) : null;
 
@@ -223,6 +224,7 @@ export function SecretVillainGameScreenView({
             isPending={isPending}
             isPresident={phase.presidentId === myPlayerId}
             presidentName={getPlayerName(players, phase.presidentId)}
+            svTheme={gameState.svTheme}
           />
         );
       case SecretVillainPhase.PolicyChancellor: {
@@ -257,6 +259,7 @@ export function SecretVillainGameScreenView({
             isPending={isPending}
             isChancellor={isChancellor}
             chancellorName={getPlayerName(players, chancellorId)}
+            svTheme={gameState.svTheme}
           />
         );
       }
@@ -289,6 +292,7 @@ export function SecretVillainGameScreenView({
             onConsent={onConsent}
             onPeek={onPeek}
             peekedCards={gameState.policyCards?.peekedCards}
+            svTheme={gameState.svTheme}
           />
         );
       }

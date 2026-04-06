@@ -3,6 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
+import { getSvThemeLabels } from "@/lib/game-modes/secret-villain/themes";
+import type { SvTheme } from "@/lib/game-modes/secret-villain/themes";
+import { Team } from "@/lib/types";
 import { SpecialActionType } from "@/lib/game-modes/secret-villain/types";
 
 import { InvestigationConsentView } from "./InvestigationConsentView";
@@ -28,11 +31,18 @@ interface SpecialActionViewProps {
   /** Trigger the peek action to reveal cards. */
   onPeek?: () => void;
   peekedCards?: string[];
+  svTheme?: SvTheme;
 }
 
-const ACTION_CONFIG: Record<
-  SpecialActionType,
-  { heading: string; instructions: string; confirm: string }
+interface ActionConfig {
+  heading: string;
+  instructions: string;
+  confirm: string;
+}
+
+const STATIC_ACTION_CONFIG: Record<
+  Exclude<SpecialActionType, SpecialActionType.Shoot>,
+  ActionConfig
 > = {
   [SpecialActionType.InvestigateTeam]: {
     heading: SECRET_VILLAIN_COPY.specialAction.investigateHeading,
@@ -44,17 +54,27 @@ const ACTION_CONFIG: Record<
     instructions: SECRET_VILLAIN_COPY.specialAction.specialElectionInstructions,
     confirm: SECRET_VILLAIN_COPY.specialAction.specialElectionConfirm,
   },
-  [SpecialActionType.Shoot]: {
-    heading: SECRET_VILLAIN_COPY.specialAction.shootHeading,
-    instructions: SECRET_VILLAIN_COPY.specialAction.shootInstructions,
-    confirm: SECRET_VILLAIN_COPY.specialAction.shootConfirm,
-  },
   [SpecialActionType.PolicyPeek]: {
     heading: SECRET_VILLAIN_COPY.specialAction.policyPeekHeading,
     instructions: SECRET_VILLAIN_COPY.specialAction.policyPeekInstructions,
     confirm: SECRET_VILLAIN_COPY.specialAction.policyPeekConfirm,
   },
 };
+
+function getActionConfig(
+  actionType: SpecialActionType,
+  svTheme?: SvTheme,
+): ActionConfig {
+  if (actionType === SpecialActionType.Shoot) {
+    const themeLabels = getSvThemeLabels(svTheme);
+    return {
+      heading: themeLabels.shootHeading,
+      instructions: themeLabels.shootInstruction,
+      confirm: themeLabels.shootConfirm,
+    };
+  }
+  return STATIC_ACTION_CONFIG[actionType];
+}
 
 export function SpecialActionView({
   actionType,
@@ -72,8 +92,9 @@ export function SpecialActionView({
   onConsent,
   onPeek,
   peekedCards,
+  svTheme,
 }: SpecialActionViewProps) {
-  const config = ACTION_CONFIG[actionType];
+  const config = getActionConfig(actionType, svTheme);
 
   if (!isPresident) {
     if (
@@ -106,9 +127,14 @@ export function SpecialActionView({
 
   // President: investigation result — show result with "Done" button.
   if (investigationResult) {
+    const themeLabels = getSvThemeLabels(svTheme);
     const targetPlayer = players.find(
       (p) => p.id === investigationResult.targetPlayerId,
     );
+    const themedTeam =
+      investigationResult.team === (Team.Good as string)
+        ? themeLabels.goodTeam
+        : themeLabels.badTeam;
     return (
       <Card>
         <CardHeader>
@@ -118,7 +144,7 @@ export function SpecialActionView({
           <p className="text-sm font-medium">
             {SECRET_VILLAIN_COPY.specialAction.investigateResult(
               targetPlayer?.name ?? investigationResult.targetPlayerId,
-              investigationResult.team,
+              themedTeam,
             )}
           </p>
           {onResolve && (

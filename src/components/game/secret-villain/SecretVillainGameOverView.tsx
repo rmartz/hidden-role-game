@@ -4,12 +4,14 @@ import { Team } from "@/lib/types";
 import type { FinishedGameStatus } from "@/lib/types";
 import { SecretVillainWinner } from "@/lib/game-modes/secret-villain/utils/win-condition";
 import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
-import type { PlayerGameState, VisibleTeammate } from "@/server/types";
+import { getSvThemeLabels } from "@/lib/game-modes/secret-villain/themes";
+import type { SecretVillainPlayerGameState } from "@/lib/game-modes/secret-villain/player-state";
+import type { VisibleTeammate } from "@/server/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 export interface SecretVillainGameOverViewProps {
-  gameState: PlayerGameState;
+  gameState: SecretVillainPlayerGameState;
   onReturnToLobby: () => void;
   isReturning?: boolean;
   returnError?: boolean;
@@ -41,6 +43,7 @@ export function SecretVillainGameOverView({
 }: SecretVillainGameOverViewProps) {
   const finishedStatus = gameState.status as FinishedGameStatus;
   const { winner } = finishedStatus;
+  const themeLabels = getSvThemeLabels(gameState.svTheme);
 
   const isGoodWin = winner === SecretVillainWinner.Good;
   const isBadWin = winner === SecretVillainWinner.Bad;
@@ -53,9 +56,9 @@ export function SecretVillainGameOverView({
     : SECRET_VILLAIN_COPY.gameOver.defeat;
 
   const subheading = isGoodWin
-    ? SECRET_VILLAIN_COPY.gameOver.goodWins
+    ? themeLabels.goodWins
     : isBadWin
-      ? SECRET_VILLAIN_COPY.gameOver.badWins
+      ? themeLabels.badWins
       : undefined;
 
   return (

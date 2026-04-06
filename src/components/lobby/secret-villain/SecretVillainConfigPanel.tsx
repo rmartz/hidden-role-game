@@ -5,6 +5,7 @@ import type { SecretVillainTimerConfig } from "@/lib/game-modes/secret-villain/t
 import type { SecretVillainModeConfig } from "@/lib/game-modes/secret-villain/lobby-config";
 import type { SecretVillainLobbyConfig } from "@/lib/game-modes/secret-villain/lobby-config";
 import { SvBoardPreset } from "@/lib/game-modes/secret-villain/types";
+import { SvTheme, SV_THEMES } from "@/lib/game-modes/secret-villain/themes";
 import type { SvCustomPowerConfig } from "@/lib/game-modes/secret-villain/types";
 import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
 import {
@@ -92,8 +93,34 @@ export function SecretVillainConfigPanel({
     onModeConfigFieldChange?.("boardPreset", newPreset);
   };
 
+  const currentTheme = modeConfig.theme ?? SvTheme.Default;
+  const themeLabel = SV_THEMES[currentTheme].name;
+
   return (
     <div className="space-y-3">
+      <div className="flex items-center gap-2">
+        <Label htmlFor="sv-theme" className="text-sm min-w-[100px]">
+          {SECRET_VILLAIN_CONFIG_PANEL_COPY.themeLabel}
+        </Label>
+        <Select
+          value={currentTheme}
+          disabled={disabled ?? !onModeConfigFieldChange}
+          onValueChange={(value: string | null) => {
+            if (value) onModeConfigFieldChange?.("theme", value as SvTheme);
+          }}
+        >
+          <SelectTrigger id="sv-theme" className="w-[180px]">
+            <SelectValue>{themeLabel}</SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {Object.values(SvTheme).map((t) => (
+              <SelectItem key={t} value={t}>
+                {SV_THEMES[t].name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
       <div className="flex items-center gap-2">
         <Label htmlFor="board-preset" className="text-sm min-w-[100px]">
           {SECRET_VILLAIN_CONFIG_PANEL_COPY.boardPresetLabel}
@@ -119,6 +146,7 @@ export function SecretVillainConfigPanel({
         <CustomPowerTableEditor
           powerTable={customPowerTable}
           disabled={disabled}
+          svTheme={currentTheme}
           onChange={
             onModeConfigFieldChange
               ? (table) => {

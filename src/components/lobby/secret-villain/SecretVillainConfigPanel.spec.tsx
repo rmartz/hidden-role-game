@@ -22,6 +22,13 @@ const defaultProps = {
 };
 
 describe("SecretVillainConfigPanel", () => {
+  it("renders the theme label", () => {
+    render(<SecretVillainConfigPanel {...defaultProps} />);
+    expect(
+      screen.getByText(SECRET_VILLAIN_CONFIG_PANEL_COPY.themeLabel),
+    ).toBeDefined();
+  });
+
   it("renders the board preset label", () => {
     render(<SecretVillainConfigPanel {...defaultProps} />);
     expect(
@@ -29,7 +36,7 @@ describe("SecretVillainConfigPanel", () => {
     ).toBeDefined();
   });
 
-  it("renders the board preset selector", () => {
+  it("renders the theme and board preset selectors", () => {
     render(
       <SecretVillainConfigPanel
         {...defaultProps}
@@ -39,7 +46,8 @@ describe("SecretVillainConfigPanel", () => {
         }}
       />,
     );
-    expect(screen.getByRole("combobox")).toBeDefined();
+    const selects = screen.getAllByRole("combobox");
+    expect(selects.length).toBeGreaterThanOrEqual(2);
   });
 
   it("renders the timer config heading", () => {
@@ -56,8 +64,10 @@ describe("SecretVillainConfigPanel", () => {
 
   it("disables controls when disabled is true", () => {
     render(<SecretVillainConfigPanel {...defaultProps} disabled={true} />);
-    const trigger = screen.getByRole("combobox");
-    expect(trigger.getAttribute("disabled")).not.toBeNull();
+    const triggers = screen.getAllByRole("combobox");
+    for (const trigger of triggers) {
+      expect(trigger.getAttribute("disabled")).not.toBeNull();
+    }
   });
 
   it("disables controls when no change handlers are provided", () => {
@@ -68,8 +78,10 @@ describe("SecretVillainConfigPanel", () => {
         playerCount={6}
       />,
     );
-    const trigger = screen.getByRole("combobox");
-    expect(trigger.getAttribute("disabled")).not.toBeNull();
+    const triggers = screen.getAllByRole("combobox");
+    for (const trigger of triggers) {
+      expect(trigger.getAttribute("disabled")).not.toBeNull();
+    }
   });
 
   it("shows custom power table editor when preset is Custom", () => {
