@@ -22,33 +22,23 @@ pnpm dev                    # http://localhost:3000
 
 See [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md) for a full new-developer orientation including how to run tests without Firebase, where game logic lives, and how to add a new game mode.
 
-## Source Code Organization
+## Development
 
-See [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md) for a detailed breakdown of every directory.
+```bash
+pnpm test             # Run tests (watch mode)
+pnpm test --run       # Run tests (single pass)
+pnpm lint             # ESLint
+pnpm format           # Prettier
+pnpm tsc              # Type check
+pnpm storybook        # Storybook dev server at http://localhost:6006
+pnpm build-storybook  # Static Storybook build
+```
 
-### `src/app/`
+CI runs on every PR: **Tests**, **Lint**, **Format**, and **Build**.
 
-Next.js pages and API routes. Pages handle auth/redirect; API routes parse requests and delegate to `src/server/`. No business logic lives here.
+## Contributing
 
-### `src/lib/`
-
-Shared logic used by both server and client. Contains core domain types (`lib/types/`), Firebase schema helpers (`lib/firebase/schema/`), and all game-mode logic (`lib/game/modes/`). The per-mode directories hold turn state definitions, action handlers, role definitions, and player-state extraction.
-
-### `src/server/`
-
-Server-side orchestration called by API routes. `server/game.ts` and `server/lobby.ts` coordinate game/lobby operations; `server/utils/` holds request authentication, role slot validation, and role assignment. Nothing in `server/` is imported by client components.
-
-### `src/services/`
-
-All Firebase Realtime Database reads and writes. This is the only layer that calls `getAdminDatabase()`. Functions here accept and return typed domain objects; wire-format conversion happens in `lib/firebase/schema/`.
-
-### `src/hooks/`
-
-React hooks for real-time state. `useGameStateQuery` subscribes to `games/{gameId}/playerState/{sessionId}` and `useLobbyQuery` subscribes to `lobbies/{lobbyId}/public` — both via Firebase `onValue`. Components never read from Firebase directly.
-
-### `src/components/`
-
-UI components split by domain: `lobby/` for the waiting room and config panel, `game/werewolf/` and `game/secret-villain/` for in-game phase UIs, and `ui/` for ShadCN primitives.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for code style guidelines and conventions.
 
 ## Game Modes
 
@@ -76,6 +66,34 @@ State changes are pushed to clients in real time via Firebase Realtime Database 
 - **Game**: each player subscribes to `games/{gameId}/playerState/{sessionId}`. The server pre-computes and writes every player's `PlayerGameState` to Firebase on each mutation, so updates arrive immediately without an extra HTTP round-trip
 
 The Firebase schema separates public and private data. Private data (session IDs) is stored at `lobbies/{id}/private` and is only accessed via the Admin SDK in API routes — never exposed to the client.
+
+## Source Code Organization
+
+See [docs/PROJECT_STRUCTURE.md](docs/PROJECT_STRUCTURE.md) for a detailed breakdown of every directory.
+
+### `src/app/`
+
+Next.js pages and API routes. Pages handle auth/redirect; API routes parse requests and delegate to `src/server/`. No business logic lives here.
+
+### `src/lib/`
+
+Shared logic used by both server and client. Contains core domain types (`lib/types/`), Firebase schema helpers (`lib/firebase/schema/`), and all game-mode logic (`lib/game/modes/`). The per-mode directories hold turn state definitions, action handlers, role definitions, and player-state extraction.
+
+### `src/server/`
+
+Server-side orchestration called by API routes. `server/game.ts` and `server/lobby.ts` coordinate game/lobby operations; `server/utils/` holds request authentication, role slot validation, and role assignment. Nothing in `server/` is imported by client components.
+
+### `src/services/`
+
+All Firebase Realtime Database reads and writes. This is the only layer that calls `getAdminDatabase()`. Functions here accept and return typed domain objects; wire-format conversion happens in `lib/firebase/schema/`.
+
+### `src/hooks/`
+
+React hooks for real-time state. `useGameStateQuery` subscribes to `games/{gameId}/playerState/{sessionId}` and `useLobbyQuery` subscribes to `lobbies/{lobbyId}/public` — both via Firebase `onValue`. Components never read from Firebase directly.
+
+### `src/components/`
+
+UI components split by domain: `lobby/` for the waiting room and config panel, `game/werewolf/` and `game/secret-villain/` for in-game phase UIs, and `ui/` for ShadCN primitives.
 
 ## API
 
@@ -117,21 +135,3 @@ Copy `.env.example` to `.env.local` and fill in your Firebase project values.
 | `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`  | Client SDK auth domain                     |
 | `NEXT_PUBLIC_FIREBASE_PROJECT_ID`   | Client SDK project ID                      |
 | `NEXT_PUBLIC_FIREBASE_DATABASE_URL` | Client SDK RTDB URL                        |
-
-## Development
-
-```bash
-pnpm test             # Run tests (watch mode)
-pnpm test --run       # Run tests (single pass)
-pnpm lint             # ESLint
-pnpm format           # Prettier
-pnpm tsc              # Type check
-pnpm storybook        # Storybook dev server at http://localhost:6006
-pnpm build-storybook  # Static Storybook build
-```
-
-CI runs on every PR: **Tests**, **Lint**, **Format**, and **Build**.
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for code style guidelines and conventions.
