@@ -102,12 +102,13 @@ export function RoleConfig(props: RoleConfigProps) {
         }, [])
       : [];
 
-  const uncategorizedDisabled =
-    hasCategoryGrouping && !isSearching
+  const uncategorizedDisabled = isSearching
+    ? []
+    : hasCategoryGrouping
       ? disabledRoles.filter(
           (r) => !r.category || !categoryOrder.includes(r.category),
         )
-      : [];
+      : disabledRoles;
 
   const topListRoles = isSearching
     ? searchedRoles
