@@ -88,6 +88,13 @@ pnpm build-storybook  # Build static Storybook
 - Test fixture generators use `make{DomainName}()` (e.g., `makePlayingGame()`, `makeGameState()`).
 - When splitting large test files, organize into `{module}-tests/` directories (e.g., `resolution-tests/altruist.spec.ts`).
 
+### Test Design
+
+- **Control inputs and outputs.** Do not rely on a function's default return values as the assertion of a test unless the purpose of the test is specifically to verify those defaults. Use explicit, non-default values so a passing test proves the value was produced by logic, not inherited from an initializer.
+- **One reason to fail per test.** Each test should assert a single logical outcome. Helper functions are fine, but if a test invokes two functions from the codebase it should be explicitly testing how those two interact (e.g. validating a serialization round-trip). Incidental coverage of a second function is not a reason to combine assertions.
+- **Keep tests simple.** A failing test should make it immediately obvious whether the failure is a bug or an intentional change in behavior. If understanding a failure requires reading more than one layer of test setup or multiple assertions, split the test.
+- **Granularity scales with level of abstraction.** Low-level functions (pure utilities, serializers, resolvers) warrant thorough edge-case coverage. High-level functions (actions, service orchestration) should have smoke tests that verify they correctly apply the lower-level logic — not re-test every edge case that belongs in the lower-level tests.
+
 ## Git Conventions
 
 - Branch names: lowercase with hyphens, prefixed by type: `feature/`, `chore/`, `refactor/`, `docs/`, with issue number suffix (e.g., `feature/secret-villain-deck-290`).
