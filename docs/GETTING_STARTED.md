@@ -107,9 +107,145 @@ Players are identified by a UUID session ID stored in `localStorage` and sent wi
 
 ## Adding a New Game Mode
 
-1. Create `src/lib/game/modes/{mode}/` with `config.ts`, `types.ts`, `roles.ts`, `services.ts`, and an `actions/` directory
-2. Implement `GameModeServices` in `services.ts` (`buildInitialTurnState`, `extractPlayerState`, `selectSpecialTargets`)
-3. Implement `GameModeConfig` in `config.ts` — `satisfies GameModeConfig` will catch missing fields at compile time
-4. Register the mode in `src/lib/game/modes.ts` under `GAME_MODES`
-5. Add a `[Mode]PlayerGameState` interface extending `BasePlayerGameState` in `player-state.ts`
-6. Add documentation under `docs/{mode}/`
+The engine handles routing, authentication, Firebase persistence, and role assignment automatically. Adding a game mode means plugging the mode's own logic into a set of well-defined interfaces — the engine calls your code at the right moments.
+
+The starting point for any new mode is its directory: `src/lib/game/modes/{mode}/`.
+
+### 1. Define roles in `roles.ts`
+
+A role definition specifies the role's ID, display name, and which team it belongs to. It also optionally declares an `awareOf` rule — the visibility information that role receives at game start (i.e., which other players this role can see, and whether they see the full role ID or just the team).
+
+```ts
+export enum MyGameRole {
+  Villager = "my-game-villager",
+  Werewolf = "my-game-werewolf",
+}
+
+export const MY_GAME_ROLES = {
+  [MyGameRole.Villager]: {
+    id: MyGameRole.Villager,
+    name: "Villager",
+    team: Team.Good,
+    // No awareOf — Villagers see no one
+  },
+  [MyGameRole.Werewolf]: {
+    id: MyGameRole.Werewolf,
+    name: "Werewolf",
+    team: Team.Bad,
+    awareOf: { teams: [Team.Bad], revealRole: true },
+    // Werewolves see all Bad team members and their exact role
+  },
+};
+```
+
+The `awareOf` field drives `visibleRoleAssignments` in every player's `BasePlayerGameState` — if you set it correctly here, the engine handles the rest. Role IDs must be globally unique across all game modes to avoid collisions in the Firebase schema (prefix them with the mode name as shown above).
+
+Also export a `defaultRoleCount(numPlayers)` function that returns the recommended `RoleSlot[]` for a given player count. This populates the lobby config panel automatically.
+
+### 2. Define turn state in `types.ts`
+
+The turn state is the server-side source of truth for everything that happens during a game. It is never sent to clients directly — `extractPlayerState` (step 3) decides what each player sees.
+
+Define a `{Mode}TurnState` interface that holds all mutable game state: current phase, card decks, player positions, vote records, etc. If the game has multiple phases, define a phase enum and per-phase interfaces (as a discriminated union) and include the current phase as a field on the turn state.
+
+For a simple game mode with no turn state (e.g., one where the app only handles role distribution), `buildInitialTurnState` can return `undefined` and `types.ts` can be omitted.
+
+### 3. Implement services in `services.ts`
+
+This is the most important file in the mode. It exports a `GameModeServices` object with three methods that the engine calls at key moments:
+
+**`buildInitialTurnState(roleAssignments, options)`** — called once when the lobby owner starts the game. Receives the role-to-player assignments and any mode-specific config from the lobby. Returns the initial turn state.
+
+**`extractPlayerState(game, callerId)`** — called after every action, once per player. Receives the full game object and the ID of the player whose state is being built. Returns a plain object that will be merged into that player's `PlayerGameState` and written to Firebase. This is where all visibility logic lives: if the current player is the president, include their policy cards; if they are eliminated, mark them as dead; etc.
+
+**`selectSpecialTargets()`** — called at game creation to designate players for mode-specific special roles that need to know each other (e.g., pointing a Bodyguard at their target). For most modes this returns `{}`.
+
+Avalon's services are a useful minimal example:
+
+```ts
+export const avalonServices: GameModeServices = {
+  buildInitialTurnState() {
+    return undefined; // Role distribution only — no turn state needed
+  },
+  selectSpecialTargets() {
+    return {};
+  },
+  extractPlayerState() {
+    return {}; // BasePlayerGameState fields are added by the engine
+  },
+};
+```
+
+Secret Villain's `services.ts` is a fully-featured example with phase-gated visibility logic.
+
+### 4. Implement `GameModeConfig` in `config.ts`
+
+`config.ts` is the manifest that registers the mode with the engine. Use `satisfies GameModeConfig` — TypeScript will catch any missing or mistyped fields at compile time, and you get autocomplete without losing the concrete type.
+
+```ts
+export const MY_GAME_CONFIG = {
+  name: "My Game",
+  released: false, // set true to show in production
+  minPlayers: 5,
+  ownerTitle: null, // set to e.g. "Narrator" if one player controls the game
+  teamLabels: {
+    [Team.Good]: "Villager",
+    [Team.Bad]: "Werewolf",
+  },
+  roles: MY_GAME_ROLES,
+  defaultRoleCount,
+  defaultTimerConfig: DEFAULT_TIMER_CONFIG,
+  defaultModeConfig: DEFAULT_MY_GAME_MODE_CONFIG,
+  parseModeConfig: parseMyGameModeConfig,
+  buildDefaultLobbyConfig: buildDefaultMyGameLobbyConfig,
+  actions: MY_GAME_ACTIONS,
+  services: myGameServices,
+} satisfies GameModeConfig;
+```
+
+`ownerTitle` controls whether one player takes a special owner role (e.g., `"Narrator"` in Werewolf). When non-null, the lobby owner is not dealt a role and instead controls phase progression via the advance endpoint.
+
+### 5. Register the mode in `src/lib/game/modes.ts`
+
+Add the mode's enum value to `GameMode` in `src/lib/types/game.ts`, then add an entry to `GAME_MODES` in `src/lib/game/modes.ts`:
+
+```ts
+export const GAME_MODES: Record<GameMode, GameModeConfig> = {
+  [GameMode.SecretVillain]: SECRET_VILLAIN_CONFIG,
+  [GameMode.Avalon]: AVALON_CONFIG,
+  [GameMode.Werewolf]: WEREWOLF_CONFIG,
+  [GameMode.MyGame]: MY_GAME_CONFIG, // add this
+};
+```
+
+This is the only place outside the mode directory that needs to be touched. The home page, lobby creation, game routing, and Firebase schema are all keyed off `GameMode` and will pick up the new entry automatically. Modes with `released: false` are only visible in development.
+
+### 6. Add a `[Mode]PlayerGameState` in `player-state.ts`
+
+Extend `BasePlayerGameState` with all mode-specific fields that `extractPlayerState` may include. This gives TypeScript end-to-end safety from server to component — the mode screen component narrows to this type and gets compile-time guarantees about every field it reads.
+
+```ts
+export interface MyGamePlayerGameState extends BasePlayerGameState {
+  gameMode: GameMode.MyGame;
+  myGamePhase?: MyGamePhase;
+  // ... other mode-specific fields
+}
+```
+
+For a mode with no turn state (like the current Avalon stub), the interface only needs the `gameMode` discriminant:
+
+```ts
+export interface AvalonPlayerGameState extends BasePlayerGameState {
+  gameMode: GameMode.Avalon;
+}
+```
+
+### 7. Add actions in `actions/`
+
+Each player action is a file exporting a `GameAction` with two methods: `isValid` (can this player take this action right now?) and `apply` (mutate the turn state). Actions are registered in `config.ts` under the `actions` key as a `Record<string, GameAction>`.
+
+See `src/lib/game/modes/secret-villain/actions/nominate-chancellor.ts` for a short, well-commented example.
+
+### 8. Add documentation under `docs/{mode}/`
+
+Add `roles.md`, `actions.md`, and `data-flow.md` following the same structure as the existing `docs/secret-villain/` and `docs/werewolf/` directories. Keep these in sync with the code — outdated docs are worse than no docs.
