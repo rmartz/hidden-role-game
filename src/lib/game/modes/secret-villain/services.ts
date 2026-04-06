@@ -121,6 +121,7 @@ export const secretVillainServices: GameModeServices = {
       goodCardsPlayed: ts.goodCardsPlayed,
       badCardsPlayed: ts.badCardsPlayed,
       failedElectionCount: ts.failedElectionCount,
+      powerTable: ts.powerTable,
     };
 
     // Veto unlock status.
