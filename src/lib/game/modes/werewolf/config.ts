@@ -6,6 +6,7 @@ import { WEREWOLF_ACTIONS } from "./actions";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "./timer-config";
 import {
   DEFAULT_WEREWOLF_MODE_CONFIG,
+  buildDefaultWerewolfLobbyConfig,
   parseWerewolfModeConfig,
 } from "./lobby-config";
 import { werewolfServices } from "./services";
@@ -25,6 +26,7 @@ export const WEREWOLF_CONFIG = {
   defaultTimerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   defaultModeConfig: DEFAULT_WEREWOLF_MODE_CONFIG,
   parseModeConfig: parseWerewolfModeConfig,
+  buildDefaultLobbyConfig: buildDefaultWerewolfLobbyConfig,
   actions: WEREWOLF_ACTIONS,
   services: werewolfServices,
   // The Narrator is a player but doesn't receive a role.

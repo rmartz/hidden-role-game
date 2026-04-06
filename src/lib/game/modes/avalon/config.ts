@@ -3,6 +3,7 @@ import type { GameModeConfig } from "@/lib/types";
 import { MIN_PLAYERS, defaultRoleCount, AVALON_ROLES } from "./roles";
 import {
   DEFAULT_AVALON_MODE_CONFIG,
+  buildDefaultAvalonLobbyConfig,
   parseAvalonModeConfig,
 } from "./lobby-config";
 import { avalonServices } from "./services";
@@ -21,6 +22,7 @@ export const AVALON_CONFIG = {
   defaultTimerConfig: DEFAULT_TIMER_CONFIG,
   defaultModeConfig: DEFAULT_AVALON_MODE_CONFIG,
   parseModeConfig: parseAvalonModeConfig,
+  buildDefaultLobbyConfig: buildDefaultAvalonLobbyConfig,
   actions: {},
   services: avalonServices,
 } satisfies GameModeConfig;

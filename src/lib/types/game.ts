@@ -194,6 +194,8 @@ export interface GameModeConfig {
   readonly defaultModeConfig: ModeConfig;
   /** Parse raw Firebase data into typed mode-specific config, applying defaults. */
   parseModeConfig(raw: Record<string, unknown>): ModeConfig;
+  /** Build a complete default lobby config from a base config for this game mode. */
+  buildDefaultLobbyConfig(base: BaseLobbyConfig): LobbyConfig;
   readonly actions: Record<string, GameAction>;
   readonly services: GameModeServices;
 }
