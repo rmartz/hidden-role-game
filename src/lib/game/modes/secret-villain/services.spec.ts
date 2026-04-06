@@ -75,11 +75,17 @@ const goodRole = {
 };
 
 describe("buildInitialTurnState", () => {
-  it("returns a turn state with turn 1", () => {
+  it("initializes expected defaults", () => {
     const ts = secretVillainServices.buildInitialTurnState(
       assignments,
     ) as SecretVillainTurnState;
     expect(ts.turn).toBe(1);
+    expect(ts.currentPresidentIndex).toBe(1);
+    expect(ts.goodCardsPlayed).toBe(0);
+    expect(ts.badCardsPlayed).toBe(0);
+    expect(ts.discardPile).toEqual([]);
+    expect(ts.eliminatedPlayerIds).toEqual([]);
+    expect(ts.failedElectionCount).toBe(0);
   });
 
   it("starts in ElectionNomination phase with the first president", () => {
@@ -88,21 +94,6 @@ describe("buildInitialTurnState", () => {
     ) as SecretVillainTurnState;
     expect(ts.phase.type).toBe(SecretVillainPhase.ElectionNomination);
     expect(ts.phase.presidentId).toBe(ts.presidentOrder[0]);
-  });
-
-  it("sets currentPresidentIndex to 1", () => {
-    const ts = secretVillainServices.buildInitialTurnState(
-      assignments,
-    ) as SecretVillainTurnState;
-    expect(ts.currentPresidentIndex).toBe(1);
-  });
-
-  it("starts with 0 good and bad cards played", () => {
-    const ts = secretVillainServices.buildInitialTurnState(
-      assignments,
-    ) as SecretVillainTurnState;
-    expect(ts.goodCardsPlayed).toBe(0);
-    expect(ts.badCardsPlayed).toBe(0);
   });
 
   it("creates a deck with 17 cards (6 Good + 11 Bad)", () => {
@@ -116,15 +107,6 @@ describe("buildInitialTurnState", () => {
     expect(badCount).toBe(DECK_BAD_CARDS);
   });
 
-  it("starts with empty discardPile, eliminatedPlayerIds, and 0 failedElectionCount", () => {
-    const ts = secretVillainServices.buildInitialTurnState(
-      assignments,
-    ) as SecretVillainTurnState;
-    expect(ts.discardPile).toEqual([]);
-    expect(ts.eliminatedPlayerIds).toEqual([]);
-    expect(ts.failedElectionCount).toBe(0);
-  });
-
   it("includes all player IDs in presidentOrder", () => {
     const ts = secretVillainServices.buildInitialTurnState(
       assignments,
@@ -135,11 +117,13 @@ describe("buildInitialTurnState", () => {
     }
   });
 
-  it("resolves power table from board preset", () => {
+  it("wires boardPreset option through to powerTable lookup", () => {
     const ts = secretVillainServices.buildInitialTurnState(assignments, {
       boardPreset: SvBoardPreset.Small,
     }) as SecretVillainTurnState;
-    expect(ts.powerTable).toEqual(BOARD_PRESETS[SvBoardPreset.Small]);
+    expect(ts.boardPreset).toBe(SvBoardPreset.Small);
+    // Small preset has PolicyPeek in slot 2; Medium (the default) has InvestigateTeam there
+    expect(ts.powerTable[2]).toBe(SpecialActionType.PolicyPeek);
   });
 
   it("resolves custom power table when preset is Custom", () => {
