@@ -17,7 +17,7 @@ import {
   writeAllPlayerStates,
   updateGameStatus,
   applyStatusTransaction,
-} from "@/lib/firebase/game";
+} from "@/services/game";
 import {
   getModeDefinition,
   buildGame,

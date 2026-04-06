@@ -22,7 +22,7 @@ const { mockGetLobby, mockGetGame } = vi.hoisted(() => ({
   mockGetGame: vi.fn(),
 }));
 
-vi.mock("@/lib/firebase/lobby", () => ({
+vi.mock("@/services/lobby", () => ({
   getLobby: mockGetLobby,
 }));
 

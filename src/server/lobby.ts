@@ -16,7 +16,7 @@ import {
   clearGameId,
   clearReadyPlayerIds,
   setLobbyGameId,
-} from "@/lib/firebase/lobby";
+} from "@/services/lobby";
 
 export {
   getLobby,
