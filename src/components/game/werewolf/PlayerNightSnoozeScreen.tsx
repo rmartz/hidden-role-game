@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
+import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 
 interface PlayerNightSnoozeScreenProps {
   amDead: boolean;

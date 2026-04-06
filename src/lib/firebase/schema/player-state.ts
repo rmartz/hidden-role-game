@@ -1,13 +1,13 @@
 import type { TimerConfig, GameStatusState, Team } from "@/lib/types";
 import { parseTimerConfig } from "./lobby";
-import type { AnyNightAction, DaytimeVote } from "@/lib/game-modes/werewolf";
+import type { AnyNightAction, DaytimeVote } from "@/lib/game/modes/werewolf";
 import type {
   PlayerGameState,
   RoleInPlay,
   VisibleTeammate,
   NightStatusEntry,
 } from "@/server/types";
-import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import type { FirebaseLobbyPlayer } from "./lobby";
 
 export interface FirebasePlayerState {

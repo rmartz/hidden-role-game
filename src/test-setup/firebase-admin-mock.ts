@@ -1,7 +1,7 @@
 /**
  * In-memory Firebase Admin Database mock for Vitest.
  * Provides a minimal implementation of the RTDB reference API used by
- * FirebaseLobbyService and FirebaseGameService.
+ * the Firebase lobby and game modules.
  */
 
 import { vi, beforeEach } from "vitest";

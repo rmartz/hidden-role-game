@@ -4,7 +4,7 @@ import {
   errorResponse,
   toPublicLobby,
 } from "@/server/utils";
-import { lobbyService } from "@/services/LobbyService";
+import { transferOwner } from "@/server/lobby";
 
 export async function PUT(
   request: Request,
@@ -20,7 +20,7 @@ export async function PUT(
   if (auth instanceof Response) return auth;
 
   const { playerId } = (await request.json()) as { playerId: string };
-  const updated = await lobbyService.transferOwner(lobbyId, playerId);
+  const updated = await transferOwner(lobbyId, playerId);
 
   if (!updated) {
     return errorResponse("Player not found", 404);

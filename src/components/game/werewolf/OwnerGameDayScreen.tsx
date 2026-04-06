@@ -2,15 +2,15 @@
 
 import { useCallback, useMemo } from "react";
 import { WeatherMoonRegular } from "@fluentui/react-icons";
-import { GAME_MODES } from "@/lib/game-modes";
-import { WerewolfPhase, WerewolfAction } from "@/lib/game-modes/werewolf";
-import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
-import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
+import { GAME_MODES } from "@/lib/game/modes";
+import { WerewolfPhase, WerewolfAction } from "@/lib/game/modes/werewolf";
+import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
+import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import {
   WEREWOLF_ROLE_CATEGORY_LABELS,
   WEREWOLF_ROLE_CATEGORY_ORDER,
-} from "@/lib/game-modes/werewolf/roles";
-import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
+} from "@/lib/game/modes/werewolf/roles";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { useGameAction } from "@/hooks";
 import {
   GameRolesList,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { GAME_MODES } from "@/lib/game-modes";
+import { GAME_MODES } from "@/lib/game/modes";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -12,7 +12,7 @@ import {
 import { InfoIcon } from "lucide-react";
 import type { GameMode } from "@/lib/types";
 import type { PublicRoleInfo } from "@/server/types";
-import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
+import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 
 const REVEAL_DURATION_MS = 5000;
 

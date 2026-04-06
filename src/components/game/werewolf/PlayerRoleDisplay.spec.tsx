@@ -9,7 +9,7 @@ import {
 import { PlayerRoleDisplay } from "./PlayerRoleDisplay";
 import type { PublicRoleInfo } from "@/server/types";
 import { GameMode, Team } from "@/lib/types";
-import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
+import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 
 afterEach(cleanup);
 

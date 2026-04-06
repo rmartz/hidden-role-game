@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { VisibilityGroupCard } from "./VisibilityGroupCard";
 import { GameMode, Team } from "@/lib/types";
 import type { VisibleTeammate } from "@/server/types";
-import { WerewolfRole } from "@/lib/game-modes/werewolf/roles";
+import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 
 const meta = {
   component: VisibilityGroupCard,

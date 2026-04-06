@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { ServerResponseStatus, type JoinLobbyRequest } from "@/server/types";
-import { lobbyService } from "@/services/LobbyService";
+import { getLobby, addPlayer } from "@/server/lobby";
 import {
   errorResponse,
   normalizePlayerName,
@@ -23,7 +23,7 @@ export async function POST(
     return errorResponse(nameError, 400);
   }
 
-  const lobby = await lobbyService.getLobby(lobbyId);
+  const lobby = await getLobby(lobbyId);
 
   if (!lobby) {
     return errorResponse("Lobby not found", 404);
@@ -51,7 +51,7 @@ export async function POST(
     sessionId,
   };
 
-  const updated = await lobbyService.addPlayer(lobbyId, newPlayer);
+  const updated = await addPlayer(lobbyId, newPlayer);
   if (!updated) {
     return errorResponse("Failed to join lobby", 500);
   }

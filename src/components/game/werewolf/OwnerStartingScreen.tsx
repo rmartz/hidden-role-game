@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { GameStatus } from "@/lib/types";
-import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { GameRolesList, PlayersRoleList } from "@/components/game";
 import { OwnerHeader } from "./OwnerHeader";
 

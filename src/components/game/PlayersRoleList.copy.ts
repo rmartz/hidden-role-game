@@ -1,5 +1,5 @@
-import { WerewolfRole } from "@/lib/game-modes/werewolf/roles";
-import { SecretVillainRole } from "@/lib/game-modes/secret-villain/roles";
+import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
+import { SecretVillainRole } from "@/lib/game/modes/secret-villain/roles";
 
 export const PLAYER_VISIBILITY_COPY = {
   wakePartnerHeading: "Players who wake with you",

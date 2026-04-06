@@ -1,7 +1,7 @@
 import { GameStatus } from "@/lib/types";
 import { ServerResponseStatus } from "@/server/types";
-import { lobbyService } from "@/services/LobbyService";
-import { gameService } from "@/services/GameService";
+import { clearGameId } from "@/server/lobby";
+import { getGame } from "@/server/game";
 import {
   authenticateLobby,
   errorResponse,
@@ -23,12 +23,12 @@ export async function POST(
     return errorResponse("No active game", 409);
   }
 
-  const game = await gameService.getGame(gameId);
+  const game = await getGame(gameId);
   if (game?.status.type !== GameStatus.Finished) {
     return errorResponse("Game is still in progress", 409);
   }
 
-  const updated = await lobbyService.clearGameId(lobbyId);
+  const updated = await clearGameId(lobbyId);
   if (!updated) {
     return errorResponse("Failed to return to lobby", 500);
   }

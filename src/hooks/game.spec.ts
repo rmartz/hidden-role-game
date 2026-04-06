@@ -7,11 +7,11 @@ import {
   ShowRolesInPlay,
   Team,
 } from "@/lib/types";
-import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game-modes/secret-villain/timer-config";
-import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game-modes/secret-villain/lobby-config";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
+import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-villain/lobby-config";
 import { ServerResponseStatus } from "@/server/types";
 import type { PlayerGameState, PublicLobby } from "@/server/types";
-import type { SecretVillainPlayerGameState } from "@/lib/game-modes/secret-villain/player-state";
+import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
 import { createWrapper } from "./test-utils";
 
 vi.mock("@/lib/api", () => ({

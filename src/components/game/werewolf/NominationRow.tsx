@@ -1,6 +1,6 @@
 "use client";
 
-import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
+import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import { Button } from "@/components/ui/button";
 
 interface NominationRowProps {

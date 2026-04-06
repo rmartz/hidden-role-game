@@ -1,6 +1,6 @@
 "use client";
 
-import { GAME_MODES } from "@/lib/game-modes";
+import { GAME_MODES } from "@/lib/game/modes";
 import type { GameMode } from "@/lib/types";
 import type { PublicRoleInfo } from "@/server/types";
 import { Badge } from "@/components/ui/badge";

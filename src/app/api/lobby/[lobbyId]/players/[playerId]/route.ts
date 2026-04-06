@@ -4,7 +4,7 @@ import {
   errorResponse,
   toPublicLobby,
 } from "@/server/utils";
-import { lobbyService } from "@/services/LobbyService";
+import { removePlayer } from "@/server/lobby";
 
 export async function DELETE(
   request: Request,
@@ -32,7 +32,7 @@ export async function DELETE(
     return errorResponse("Owner cannot leave the lobby", 403);
   }
 
-  const updated = await lobbyService.removePlayer(lobbyId, playerId);
+  const updated = await removePlayer(lobbyId, playerId);
 
   return Response.json({
     status: ServerResponseStatus.Success,

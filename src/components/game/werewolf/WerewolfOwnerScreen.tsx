@@ -1,9 +1,9 @@
 "use client";
 
 import { GameStatus } from "@/lib/types";
-import { WerewolfPhase } from "@/lib/game-modes/werewolf";
-import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
-import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
+import { WerewolfPhase } from "@/lib/game/modes/werewolf";
+import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { useAdvanceGame } from "@/hooks";
 import { OwnerStartingScreen } from "./OwnerStartingScreen";
 import { OwnerGameNightScreen } from "./OwnerGameNightScreen";

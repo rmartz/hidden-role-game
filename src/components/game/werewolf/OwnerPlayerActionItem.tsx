@@ -1,6 +1,6 @@
 "use client";
 
-import { WEREWOLF_COPY, WerewolfAction } from "@/lib/game-modes/werewolf";
+import { WEREWOLF_COPY, WerewolfAction } from "@/lib/game/modes/werewolf";
 import { useGameAction } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import {

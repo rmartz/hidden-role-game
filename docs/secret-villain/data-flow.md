@@ -4,7 +4,7 @@
 
 Secret Villain is a fully app-mediated game with no narrator. All gameplay flows through game actions — election, policy, and special action phases are driven by players interacting with the UI.
 
-Game state lives in Firebase Realtime Database. `GameStateService` pre-computes per-player `PlayerGameState` on each action, and Firebase pushes updates to clients in real time via `onValue`.
+Game state lives in Firebase Realtime Database. `getPlayerGameState` (`src/lib/game-state.ts`) pre-computes per-player `PlayerGameState` on each action, and Firebase pushes updates to clients in real time via `onValue`.
 
 ## PlayerGameState Fields
 

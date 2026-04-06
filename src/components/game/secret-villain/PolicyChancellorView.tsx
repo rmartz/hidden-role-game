@@ -2,9 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
-import { getSvThemeLabels } from "@/lib/game-modes/secret-villain/themes";
-import type { SvTheme } from "@/lib/game-modes/secret-villain/themes";
+import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
+import { getSvThemeLabels } from "@/lib/game/modes/secret-villain/themes";
+import type { SvTheme } from "@/lib/game/modes/secret-villain/themes";
 import { cn } from "@/lib/utils";
 
 interface PolicyChancellorViewProps {

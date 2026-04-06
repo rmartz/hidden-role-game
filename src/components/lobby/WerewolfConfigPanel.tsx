@@ -1,6 +1,6 @@
 "use client";
 
-import type { WerewolfTimerConfig } from "@/lib/game-modes/werewolf/timer-config";
+import type { WerewolfTimerConfig } from "@/lib/game/modes/werewolf/timer-config";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { WEREWOLF_CONFIG_PANEL_COPY } from "./WerewolfConfigPanel.copy";

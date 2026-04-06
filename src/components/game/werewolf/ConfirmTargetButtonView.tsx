@@ -1,14 +1,14 @@
 "use client";
 
-import type { PhaseKey, WitchConfirmContext } from "@/lib/game-modes/werewolf";
-import { getConfirmLabel } from "@/lib/game-modes/werewolf";
+import type { PhaseKey, WitchConfirmContext } from "@/lib/game/modes/werewolf";
+import { getConfirmLabel } from "@/lib/game/modes/werewolf";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
+import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 
 export interface ConfirmTargetButtonViewProps {
   roleId?: PhaseKey;

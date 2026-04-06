@@ -1,6 +1,6 @@
 "use client";
 
-import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { GameRolesList } from "@/components/game";
 import { NarratorPlayerRoleLists } from "./NarratorPlayerRoleLists";
 

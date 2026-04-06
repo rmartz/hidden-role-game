@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { GAME_MODES, getRoleSlotsRequired } from "@/lib/game-modes";
+import { GAME_MODES, getRoleSlotsRequired } from "@/lib/game/modes";
 import type { GameConfig } from "@/server/types";
 import {
   GameMode,
@@ -9,12 +9,12 @@ import {
   isSecretVillainModeConfig,
 } from "@/lib/types";
 import type { ModeConfigField, TimerConfig } from "@/lib/types";
-import type { WerewolfTimerConfig } from "@/lib/game-modes/werewolf/timer-config";
-import type { SecretVillainTimerConfig } from "@/lib/game-modes/secret-villain/timer-config";
+import type { WerewolfTimerConfig } from "@/lib/game/modes/werewolf/timer-config";
+import type { SecretVillainTimerConfig } from "@/lib/game/modes/secret-villain/timer-config";
 import {
   WEREWOLF_ROLE_CATEGORY_LABELS,
   WEREWOLF_ROLE_CATEGORY_ORDER,
-} from "@/lib/game-modes/werewolf/roles";
+} from "@/lib/game/modes/werewolf/roles";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   loadConfig,

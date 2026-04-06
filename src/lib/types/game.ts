@@ -2,17 +2,17 @@ import type { ModeConfig } from "./mode-config";
 import type {
   WerewolfLobbyConfig,
   WerewolfModeConfig,
-} from "@/lib/game-modes/werewolf/lobby-config";
-import type { WerewolfTimerConfig } from "@/lib/game-modes/werewolf/timer-config";
+} from "@/lib/game/modes/werewolf/lobby-config";
+import type { WerewolfTimerConfig } from "@/lib/game/modes/werewolf/timer-config";
 import type {
   SecretVillainLobbyConfig,
   SecretVillainModeConfig,
-} from "@/lib/game-modes/secret-villain/lobby-config";
-import type { SecretVillainTimerConfig } from "@/lib/game-modes/secret-villain/timer-config";
+} from "@/lib/game/modes/secret-villain/lobby-config";
+import type { SecretVillainTimerConfig } from "@/lib/game/modes/secret-villain/timer-config";
 import type {
   AvalonLobbyConfig,
   AvalonModeConfig,
-} from "@/lib/game-modes/avalon/lobby-config";
+} from "@/lib/game/modes/avalon/lobby-config";
 
 export interface LobbyPlayer {
   id: string;

@@ -1,12 +1,12 @@
 "use client";
 
-import { SpecialActionType } from "@/lib/game-modes/secret-villain/types";
+import { SpecialActionType } from "@/lib/game/modes/secret-villain/types";
 import type {
   SvCustomPowerConfig,
   SvCustomPowerSlot,
-} from "@/lib/game-modes/secret-villain/types";
-import { getSvThemeLabels } from "@/lib/game-modes/secret-villain/themes";
-import type { SvTheme } from "@/lib/game-modes/secret-villain/themes";
+} from "@/lib/game/modes/secret-villain/types";
+import { getSvThemeLabels } from "@/lib/game/modes/secret-villain/themes";
+import type { SvTheme } from "@/lib/game/modes/secret-villain/themes";
 import { Label } from "@/components/ui/label";
 import {
   Select,

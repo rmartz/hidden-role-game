@@ -1,8 +1,8 @@
 import { afterEach, describe, it, expect, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import { SpecialActionView } from "./SpecialActionView";
-import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
-import { SpecialActionType } from "@/lib/game-modes/secret-villain/types";
+import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
+import { SpecialActionType } from "@/lib/game/modes/secret-villain/types";
 
 afterEach(cleanup);
 

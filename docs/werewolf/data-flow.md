@@ -2,7 +2,7 @@
 
 ## Overview
 
-Game state lives in Firebase Realtime Database and is pre-computed per player by `GameStateService`. Each player receives only the information appropriate for their role and the current phase.
+Game state lives in Firebase Realtime Database and is pre-computed per player by `getPlayerGameState` (`src/lib/game-state.ts`). Each player receives only the information appropriate for their role and the current phase.
 
 ## Database Layout
 
@@ -100,8 +100,8 @@ stateDiagram-v2
 ### Lobby → Game Start
 
 1. Narrator calls the lobby API to start the game.
-2. `GameService` orchestrates game creation: `GameStateService` assigns roles and builds the `Game` object, `FirebaseGameService` persists it to Firebase.
-3. `GameStateService` computes per-player `PlayerGameState` for each session; `FirebaseGameService` writes them.
+2. `createGame` (`src/server/game.ts`) orchestrates game creation: `buildGame` assembles the `Game` object (role assignment, player visibility), `saveGame` persists it to Firebase.
+3. `buildAllPlayerStates` computes per-player `PlayerGameState` for each session; `writeAllPlayerStates` writes them to Firebase.
 4. Clients receive real-time updates via Firebase `onValue`.
 
 ### Night Phase

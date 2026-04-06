@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { BoardDisplay } from "./BoardDisplay";
-import { SvTheme } from "@/lib/game-modes/secret-villain/themes";
+import { SvTheme } from "@/lib/game/modes/secret-villain/themes";
 
 const meta = {
   component: BoardDisplay,

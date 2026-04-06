@@ -3,7 +3,7 @@
 import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
+import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
 import { GameTimer } from "@/components/game/GameTimer";
 
 interface ElectionVoteViewProps {

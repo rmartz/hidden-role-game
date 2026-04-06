@@ -1,4 +1,4 @@
-import { getPhaseLabel } from "@/lib/game-modes/werewolf";
+import { getPhaseLabel } from "@/lib/game/modes/werewolf";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Item, ItemContent, ItemTitle } from "@/components/ui/item";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import type { TargetablePlayer } from "@/lib/game-modes/werewolf";
+import type { TargetablePlayer } from "@/lib/game/modes/werewolf";
 
 interface ResolvedVote {
   key: string;

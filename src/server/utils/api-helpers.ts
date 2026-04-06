@@ -1,9 +1,9 @@
 import type { Lobby, Game, GamePlayer } from "@/lib/types";
 import { ServerResponseStatus } from "@/server/types";
-import { lobbyService } from "@/services/LobbyService";
-import { gameService } from "@/services/GameService";
+import { getLobby } from "@/services/lobby";
+import { getGame } from "@/server/game";
 import { isValidSession } from "./lobby-helpers";
-import { parseGameMode } from "@/lib/game-modes";
+import { parseGameMode } from "@/lib/game/modes";
 
 export { parseGameMode };
 
@@ -30,7 +30,7 @@ export async function authenticateLobby(
     return errorResponse("No session", 401);
   }
 
-  const lobby = await lobbyService.getLobby(lobbyId);
+  const lobby = await getLobby(lobbyId);
   if (!lobby) {
     return errorResponse("Lobby not found", 404);
   }
@@ -58,7 +58,7 @@ export async function authenticateGame(
     return errorResponse("No session", 401);
   }
 
-  const game = await gameService.getGame(gameId);
+  const game = await getGame(gameId);
   const caller = game?.players.find((p) => p.sessionId === sessionId);
 
   if (!game || !caller) {

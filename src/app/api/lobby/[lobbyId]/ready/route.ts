@@ -1,5 +1,5 @@
 import { ServerResponseStatus } from "@/server/types";
-import { lobbyService } from "@/services/LobbyService";
+import { toggleReady } from "@/server/lobby";
 import {
   authenticateLobby,
   errorResponse,
@@ -34,7 +34,7 @@ export async function POST(
     return errorResponse("Owner cannot ready up", 400);
   }
 
-  const updated = await lobbyService.toggleReady(lobbyId, callerPlayer.id);
+  const updated = await toggleReady(lobbyId, callerPlayer.id);
   if (!updated) {
     return errorResponse("Failed to toggle ready state", 500);
   }

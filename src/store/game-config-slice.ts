@@ -9,7 +9,7 @@ import type {
   TimerConfig,
 } from "@/lib/types";
 import type { GameConfig } from "@/server/types";
-import { DEFAULT_GAME_MODE, GAME_MODES } from "@/lib/game-modes";
+import { DEFAULT_GAME_MODE, GAME_MODES } from "@/lib/game/modes";
 
 function computeIsValid(
   gameMode: GameMode,

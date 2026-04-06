@@ -1,11 +1,11 @@
 import { afterEach, describe, it, expect, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import { SecretVillainGameOverView } from "./SecretVillainGameOverView";
-import { SecretVillainWinner } from "@/lib/game-modes/secret-villain/utils/win-condition";
+import { SecretVillainWinner } from "@/lib/game/modes/secret-villain/utils/win-condition";
 import { GameStatus, GameMode, Team } from "@/lib/types";
-import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game-modes/secret-villain/timer-config";
-import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
-import type { SecretVillainPlayerGameState } from "@/lib/game-modes/secret-villain/player-state";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
+import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
+import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
 
 afterEach(cleanup);
 

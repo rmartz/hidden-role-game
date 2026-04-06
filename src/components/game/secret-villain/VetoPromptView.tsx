@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
+import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
 
 interface VetoPromptViewProps {
   onAccept: () => void;

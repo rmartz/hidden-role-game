@@ -1,5 +1,5 @@
 import { ServerResponseStatus } from "@/server/types";
-import { gameService } from "@/services/GameService";
+import { getGame } from "@/server/game";
 import { errorResponse } from "@/server/utils";
 
 export async function GET(
@@ -12,7 +12,7 @@ export async function GET(
 
   const { gameId } = await params;
 
-  const game = await gameService.getGame(gameId);
+  const game = await getGame(gameId);
   if (!game) {
     return errorResponse("Game not found", 404);
   }

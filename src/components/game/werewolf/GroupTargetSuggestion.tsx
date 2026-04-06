@@ -1,11 +1,11 @@
 "use client";
 
-import { WerewolfAction } from "@/lib/game-modes/werewolf";
+import { WerewolfAction } from "@/lib/game/modes/werewolf";
 import { useGameAction } from "@/hooks";
 import { Button } from "@/components/ui/button";
-import { getPlayerName } from "@/lib/player-utils";
+import { getPlayerName } from "@/lib/player";
 import type { PublicLobbyPlayer } from "@/server/types";
-import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
+import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 
 interface GroupTargetSuggestionProps {
   gameId: string;

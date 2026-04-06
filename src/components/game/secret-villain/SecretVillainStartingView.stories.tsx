@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { SecretVillainStartingView } from "./SecretVillainStartingView";
 import { GameMode, GameStatus, Team } from "@/lib/types";
-import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game-modes/secret-villain/timer-config";
-import { SvTheme } from "@/lib/game-modes/secret-villain/themes";
-import type { SecretVillainPlayerGameState } from "@/lib/game-modes/secret-villain/player-state";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
+import { SvTheme } from "@/lib/game/modes/secret-villain/themes";
+import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
 
 const meta = {
   component: SecretVillainStartingView,

@@ -3,7 +3,7 @@ import { render, screen, cleanup } from "@testing-library/react";
 import { PlayerNightSummary } from "./PlayerNightSummary";
 import type { DaytimeNightStatusEntry } from "@/server/types";
 import type { PublicLobbyPlayer } from "@/server/types/lobby";
-import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
+import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 
 afterEach(cleanup);
 
