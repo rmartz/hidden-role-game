@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
 import { getSvThemeLabels } from "@/lib/game-modes/secret-villain/themes";
 import type { SvTheme } from "@/lib/game-modes/secret-villain/themes";
+import { Team } from "@/lib/types";
 import { SpecialActionType } from "@/lib/game-modes/secret-villain/types";
 
 import { InvestigationConsentView } from "./InvestigationConsentView";
@@ -126,9 +127,14 @@ export function SpecialActionView({
 
   // President: investigation result — show result with "Done" button.
   if (investigationResult) {
+    const themeLabels = getSvThemeLabels(svTheme);
     const targetPlayer = players.find(
       (p) => p.id === investigationResult.targetPlayerId,
     );
+    const themedTeam =
+      investigationResult.team === (Team.Good as string)
+        ? themeLabels.goodTeam
+        : themeLabels.badTeam;
     return (
       <Card>
         <CardHeader>
@@ -138,7 +144,7 @@ export function SpecialActionView({
           <p className="text-sm font-medium">
             {SECRET_VILLAIN_COPY.specialAction.investigateResult(
               targetPlayer?.name ?? investigationResult.targetPlayerId,
-              investigationResult.team,
+              themedTeam,
             )}
           </p>
           {onResolve && (

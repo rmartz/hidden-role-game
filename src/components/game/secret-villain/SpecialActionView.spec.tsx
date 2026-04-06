@@ -95,12 +95,12 @@ describe("SpecialActionView", () => {
     render(
       <SpecialActionView
         {...defaultProps}
-        investigationResult={{ targetPlayerId: "p2", team: "bad" }}
+        investigationResult={{ targetPlayerId: "p2", team: "Bad" }}
       />,
     );
     expect(
       screen.getByText(
-        SECRET_VILLAIN_COPY.specialAction.investigateResult("Bob", "bad"),
+        SECRET_VILLAIN_COPY.specialAction.investigateResult("Bob", "Bad"),
       ),
     ).toBeDefined();
   });
