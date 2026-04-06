@@ -117,6 +117,15 @@ describe("buildInitialTurnState", () => {
     }
   });
 
+  it("wires boardPreset option through to powerTable lookup", () => {
+    const ts = secretVillainServices.buildInitialTurnState(assignments, {
+      boardPreset: SvBoardPreset.Small,
+    }) as SecretVillainTurnState;
+    expect(ts.boardPreset).toBe(SvBoardPreset.Small);
+    // Small preset has PolicyPeek in slot 2; Medium (the default) has InvestigateTeam there
+    expect(ts.powerTable[2]).toBe(SpecialActionType.PolicyPeek);
+  });
+
   it("resolves custom power table when preset is Custom", () => {
     const customPowerTable = [
       SpecialActionType.PolicyPeek,
