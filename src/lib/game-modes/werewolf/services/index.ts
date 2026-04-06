@@ -82,14 +82,19 @@ export const werewolfServices: GameModeServices = {
     callerId: string,
     myRole: RoleDefinition | undefined,
   ): Record<string, unknown> {
-    const werewolfRole = myRole ? getWerewolfRole(myRole.id) : undefined;
-    const modeState =
-      !myRole || !werewolfRole
-        ? (extractOwnerState(game) as Record<string, unknown>)
-        : (extractNonOwnerState(game, callerId, werewolfRole) as Record<
-            string,
-            unknown
-          >);
+    let modeState: Record<string, unknown>;
+    if (!myRole) {
+      modeState = extractOwnerState(game) as Record<string, unknown>;
+    } else {
+      const werewolfRole = getWerewolfRole(myRole.id);
+      if (!werewolfRole) {
+        throw new Error(`Unknown Werewolf role ID: ${myRole.id}`);
+      }
+      modeState = extractNonOwnerState(game, callerId, werewolfRole) as Record<
+        string,
+        unknown
+      >;
+    }
 
     // Include Werewolf-specific game settings in the player state.
     const wwConfig = getWerewolfModeConfig(game);
