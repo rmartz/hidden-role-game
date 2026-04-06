@@ -146,6 +146,7 @@ export function SecretVillainConfigPanel({
         <CustomPowerTableEditor
           powerTable={customPowerTable}
           disabled={disabled}
+          svTheme={currentTheme}
           onChange={
             onModeConfigFieldChange
               ? (table) => {

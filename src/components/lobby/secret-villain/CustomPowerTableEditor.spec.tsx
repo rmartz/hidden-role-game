@@ -26,10 +26,10 @@ describe("CustomPowerTableEditor", () => {
     }
   });
 
-  it("renders locked text for cards #4 and #5", () => {
+  it("renders locked shoot labels for cards #4 and #5", () => {
     render(<CustomPowerTableEditor powerTable={defaultTable} />);
-    const locked = screen.getAllByText(
-      SECRET_VILLAIN_CONFIG_PANEL_COPY.badCardSlotLocked,
+    const locked = screen.getAllByText((content) =>
+      content.includes(SECRET_VILLAIN_CONFIG_PANEL_COPY.badCardSlotLocked),
     );
     expect(locked).toHaveLength(2);
   });

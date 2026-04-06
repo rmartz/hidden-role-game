@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
 import { getSvThemeLabels } from "@/lib/game-modes/secret-villain/themes";
+import type { SvTheme } from "@/lib/game-modes/secret-villain/themes";
 import type { SecretVillainPlayerGameState } from "@/lib/game-modes/secret-villain/player-state";
 import type { VisibleTeammate } from "@/server/types";
 import { Team } from "@/lib/types";
@@ -15,10 +16,11 @@ export interface SecretVillainStartingViewProps {
 
 interface BadTeamRevealProps {
   teammates: VisibleTeammate[];
-  specialBadMarker: string;
+  svTheme?: SvTheme;
 }
 
-function BadTeamReveal({ teammates, specialBadMarker }: BadTeamRevealProps) {
+function BadTeamReveal({ teammates, svTheme }: BadTeamRevealProps) {
+  const themeLabels = getSvThemeLabels(svTheme);
   return (
     <Card className="mb-4">
       <CardHeader className="pb-2 pt-4">
@@ -36,7 +38,7 @@ function BadTeamReveal({ teammates, specialBadMarker }: BadTeamRevealProps) {
               <span>{player.name}</span>
               {role?.id === (SecretVillainRole.SpecialBad as string) && (
                 <span className="text-muted-foreground">
-                  {specialBadMarker}
+                  {themeLabels.specialBadMarker}
                 </span>
               )}
             </li>
@@ -83,10 +85,7 @@ export function SecretVillainStartingView({
         {SECRET_VILLAIN_COPY.starting.yourRole(roleName)}
       </p>
       {isBadTeam && !isSpecialBad && badTeammates.length > 0 && (
-        <BadTeamReveal
-          teammates={badTeammates}
-          specialBadMarker={themeLabels.specialBadMarker}
-        />
+        <BadTeamReveal teammates={badTeammates} svTheme={gameState.svTheme} />
       )}
       {(isSpecialBad || !isBadTeam) && (
         <p className="text-sm text-muted-foreground mb-4">{roleMessage}</p>
