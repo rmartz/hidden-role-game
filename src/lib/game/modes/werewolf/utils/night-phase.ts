@@ -7,7 +7,7 @@ import {
   WerewolfRoleCategory,
   getWerewolfRole,
 } from "../roles";
-import { isGroupPhaseKey, baseGroupPhaseKey } from "./phase-keys";
+import { isGroupPhaseKey, baseGroupPhaseKey, isRoleActive } from "./phase-keys";
 import { currentTurnState } from "./game-state";
 
 /**
@@ -75,9 +75,15 @@ export function buildNightPhaseOrder(
   let altruistPhaseKey: string | undefined;
   let witchPhaseKey: string | undefined;
 
+  const categoryPriority = new Map(
+    NIGHT_PHASE_CATEGORY_ORDER.map((cat, i) => [cat, i]),
+  );
+
   const sortedRoles = Object.values(WEREWOLF_ROLES).sort((a, b) => {
-    const aIdx = NIGHT_PHASE_CATEGORY_ORDER.indexOf(a.category);
-    const bIdx = NIGHT_PHASE_CATEGORY_ORDER.indexOf(b.category);
+    const aIdx =
+      categoryPriority.get(a.category) ?? NIGHT_PHASE_CATEGORY_ORDER.length;
+    const bIdx =
+      categoryPriority.get(b.category) ?? NIGHT_PHASE_CATEGORY_ORDER.length;
     return aIdx - bIdx;
   });
 
@@ -98,7 +104,7 @@ export function buildNightPhaseOrder(
       // Insert any extra phases for this group consecutively, so both phases
       // for the same group (e.g. Wolf Cub bonus) are adjacent in the order.
       for (const key of extraGroupPhaseKeys) {
-        if (baseGroupPhaseKey(key) !== (role.id as string)) continue;
+        if (!isRoleActive(baseGroupPhaseKey(key), role.id)) continue;
         if (!hasAliveGroupParticipants(key, roleAssignments, dead)) continue;
         phaseKeys.push(key);
       }
