@@ -71,7 +71,7 @@ export function PolicyCardTable({
               {cardLabel}
             </div>
 
-            {/* Discard row: empty when not selected; card with ✕ overlay when selected */}
+            {/* Discard row: empty when not selected; coloured card with ✕ when selected */}
             <div
               className={cn(
                 "relative flex items-center justify-center rounded border-2 px-3 py-2 text-sm font-medium w-full text-center",
@@ -81,9 +81,10 @@ export function PolicyCardTable({
               )}
               data-testid={`policy-discard-cell-${String(i)}`}
             >
-              {cardLabel}
+              {/* Label hidden — colour conveys card type; see #430 for a11y follow-up */}
+              <span className="invisible">{cardLabel}</span>
               {isDiscard && (
-                <span className="absolute inset-0 flex items-center justify-center text-destructive font-bold text-base pointer-events-none">
+                <span className="absolute inset-0 flex items-center justify-center font-bold text-base pointer-events-none">
                   ✕
                 </span>
               )}
