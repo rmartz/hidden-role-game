@@ -24,13 +24,11 @@ function BadTeamReveal({ teammates, svTheme }: BadTeamRevealProps) {
   return (
     <Card className="mb-4">
       <CardHeader className="pb-2 pt-4">
-        <CardTitle className="text-sm">
-          {SECRET_VILLAIN_COPY.starting.badTeamHeading}
-        </CardTitle>
+        <CardTitle className="text-sm">{themeLabels.badTeamHeading}</CardTitle>
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground mb-3">
-          {SECRET_VILLAIN_COPY.starting.badTeamDescription}
+          {themeLabels.badTeamDescription}
         </p>
         <ul className="text-sm space-y-1">
           {teammates.map(({ player, role }) => (
@@ -71,10 +69,10 @@ export function SecretVillainStartingView({
   );
 
   const roleMessage = isSpecialBad
-    ? SECRET_VILLAIN_COPY.starting.specialBadMessage
+    ? themeLabels.specialBadMessage
     : isBadTeam
-      ? SECRET_VILLAIN_COPY.starting.badTeamDescription
-      : SECRET_VILLAIN_COPY.starting.goodTeamMessage;
+      ? themeLabels.badTeamDescription
+      : themeLabels.goodTeamMessage;
 
   return (
     <div className="p-5 max-w-lg mx-auto">
