@@ -363,4 +363,63 @@ describe("extractPlayerState", () => {
     );
     expect(result["deadPlayerIds"]).toEqual(["p3", "p5"]);
   });
+
+  it("Special Bad does not see Bad teammate in a multi-fascist game (3+ Bad team members)", () => {
+    // Standard 5-player game: 1 SpecialBad + 1 Bad + 3 Good — Bad team has 2 members
+    // The special-bad should NOT see the Bad player here (3-player bad team total
+    // is covered by the next test; the standard case has exactly 1 Bad + 1 SpecialBad)
+    // Here we add a second Bad player to make 3 Bad-team members total
+    const largeAssignments = [
+      { playerId: "p1", roleDefinitionId: SecretVillainRole.Good },
+      { playerId: "p2", roleDefinitionId: SecretVillainRole.Good },
+      { playerId: "p3", roleDefinitionId: SecretVillainRole.Bad },
+      { playerId: "p4", roleDefinitionId: SecretVillainRole.Bad },
+      { playerId: "p5", roleDefinitionId: SecretVillainRole.SpecialBad },
+      { playerId: "p6", roleDefinitionId: SecretVillainRole.Good },
+      { playerId: "p7", roleDefinitionId: SecretVillainRole.Good },
+    ];
+    const largePlayers = largeAssignments.map((a) => ({
+      id: a.playerId,
+      name: `Player ${a.playerId}`,
+      sessionId: `session-${a.playerId}`,
+      visiblePlayers: [],
+    }));
+    const largeGame: Game = {
+      id: "game-1",
+      lobbyId: "lobby-1",
+      gameMode: GameMode.SecretVillain,
+      status: { type: GameStatus.Playing, turnState: baseTurnState },
+      players: largePlayers,
+      roleAssignments: largeAssignments,
+      configuredRoleSlots: [],
+      showRolesInPlay: ShowRolesInPlay.None,
+      timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
+      modeConfig: { gameMode: GameMode.SecretVillain },
+    } satisfies Game;
+    const result = secretVillainServices.extractPlayerState(
+      largeGame,
+      "p5",
+      goodRole,
+    );
+    expect(result["modeVisiblePlayerIds"]).toBeUndefined();
+  });
+
+  it("Special Bad sees the Bad teammate in a 2-fascist game (1 Bad + 1 SpecialBad)", () => {
+    // 5-player game: the default — exactly 1 Bad + 1 SpecialBad
+    const result = secretVillainServices.extractPlayerState(
+      makeGame(baseTurnState),
+      "p4", // p4 is SpecialBad; p3 is Bad
+      goodRole,
+    );
+    expect(result["modeVisiblePlayerIds"]).toEqual(["p3"]);
+  });
+
+  it("Good player does not receive modeVisiblePlayerIds", () => {
+    const result = secretVillainServices.extractPlayerState(
+      makeGame(baseTurnState),
+      "p1",
+      goodRole,
+    );
+    expect(result["modeVisiblePlayerIds"]).toBeUndefined();
+  });
 });

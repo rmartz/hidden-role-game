@@ -1,5 +1,6 @@
 import { isSecretVillainModeConfig } from "@/lib/types";
 import type { Game, GameModeServices, PlayerRoleAssignment } from "@/lib/types";
+import { SecretVillainRole } from "./roles";
 import {
   SecretVillainPhase,
   SpecialActionType,
@@ -106,6 +107,31 @@ export const secretVillainServices: GameModeServices = {
     // This must be set before the turnState guard so it's available during Starting status.
     if (isSecretVillainModeConfig(game.modeConfig) && game.modeConfig.theme) {
       result["svTheme"] = game.modeConfig.theme;
+    }
+
+    // In a 2-fascist game (exactly 1 Bad + 1 Special Bad), the Special Bad can
+    // identify their only Bad teammate — there is no ambiguity to protect.
+    const callerAssignment = game.roleAssignments.find(
+      (a) => a.playerId === callerId,
+    );
+    if (
+      (callerAssignment?.roleDefinitionId as SecretVillainRole | undefined) ===
+      SecretVillainRole.SpecialBad
+    ) {
+      const badTeamIds = game.roleAssignments
+        .filter(
+          (a) =>
+            (a.roleDefinitionId as SecretVillainRole) === SecretVillainRole.Bad,
+        )
+        .map((a) => a.playerId);
+      const specialBadCount = game.roleAssignments.filter(
+        (a) =>
+          (a.roleDefinitionId as SecretVillainRole) ===
+          SecretVillainRole.SpecialBad,
+      ).length;
+      if (badTeamIds.length === 1 && specialBadCount === 1) {
+        result["modeVisiblePlayerIds"] = badTeamIds;
+      }
     }
 
     const ts = currentTurnState(game);
