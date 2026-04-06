@@ -1,15 +1,12 @@
 import { randomUUID } from "crypto";
-import type { LobbyConfig } from "@/lib/types";
-import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
+import { GameMode } from "@/lib/types";
 import {
   DEFAULT_GAME_MODE,
-  getDefaultRoleSlots,
   isGameModeEnabled,
   parseGameMode,
-  GAME_MODES,
 } from "@/lib/game-modes";
 import { ServerResponseStatus, type CreateLobbyRequest } from "@/server/types";
-import { lobbyService } from "@/services/FirebaseLobbyService";
+import { lobbyService } from "@/services/LobbyService";
 import {
   errorResponse,
   toPublicLobby,
@@ -42,23 +39,8 @@ export async function POST(request: Request): Promise<Response> {
   } else {
     selectedGameMode = DEFAULT_GAME_MODE;
   }
-  const lobby = {
-    id: randomUUID(),
-    ownerSessionId: sessionId,
-    players: [owner],
-    config: {
-      gameMode: selectedGameMode,
-      roleConfigMode: RoleConfigMode.Default,
-      roleSlots: getDefaultRoleSlots(selectedGameMode, 1),
-      showConfigToPlayers: false,
-      showRolesInPlay: ShowRolesInPlay.ConfiguredOnly,
-      timerConfig: GAME_MODES[selectedGameMode].defaultTimerConfig,
-      modeConfig: GAME_MODES[selectedGameMode].defaultModeConfig,
-    } as LobbyConfig,
-    readyPlayerIds: [] as string[],
-  };
 
-  await lobbyService.addLobby(lobby);
+  const lobby = await lobbyService.addLobby(owner, selectedGameMode);
 
   return Response.json({
     status: ServerResponseStatus.Success,
