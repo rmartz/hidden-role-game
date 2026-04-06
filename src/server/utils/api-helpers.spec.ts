@@ -3,6 +3,7 @@ import {
   errorResponse,
   authenticateLobby,
   authenticateGame,
+  normalizeDisplayName,
   normalizePlayerName,
   validatePlayerName,
 } from "./api-helpers";
@@ -246,6 +247,21 @@ describe("validatePlayerName", () => {
     expect(validatePlayerName("Ångström")).toBeUndefined();
     expect(validatePlayerName("O'Brien")).toBeUndefined();
     expect(validatePlayerName("José-María")).toBeUndefined();
+  });
+});
+
+describe("normalizeDisplayName", () => {
+  it("trims leading and trailing whitespace", () => {
+    expect(normalizeDisplayName("  Alice  ")).toBe("Alice");
+  });
+
+  it("collapses internal whitespace runs to a single space", () => {
+    expect(normalizeDisplayName("Alice  Bob")).toBe("Alice Bob");
+  });
+
+  it("preserves original case", () => {
+    expect(normalizeDisplayName("Alice")).toBe("Alice");
+    expect(normalizeDisplayName("ALICE")).toBe("ALICE");
   });
 });
 

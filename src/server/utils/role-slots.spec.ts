@@ -1,6 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { adjustRoleSlots } from "./role-slots";
+import {
+  adjustRoleSlots,
+  validateRoleSlotsForMode,
+  validateRoleSlotsCoverPlayerCount,
+} from "./role-slots";
+import { GameMode } from "@/lib/types";
 import type { RoleSlot } from "@/lib/types";
+import { SecretVillainRole } from "@/lib/game/modes/secret-villain/roles";
 
 describe("adjustRoleSlots", () => {
   describe("add", () => {
@@ -128,5 +134,59 @@ describe("adjustRoleSlots", () => {
       expect(slots).toEqual(expect.arrayContaining(target));
       expect(slots.reduce((sum, s) => sum + s.min, 0)).toBe(4);
     });
+  });
+});
+
+describe("validateRoleSlotsCoverPlayerCount", () => {
+  // SecretVillain has no custom roleSlotsRequired, so required == playerCount
+  it("returns undefined when slots exactly cover the player count", () => {
+    const slots: RoleSlot[] = [{ roleId: "r", min: 5, max: 5 }];
+    expect(
+      validateRoleSlotsCoverPlayerCount(slots, GameMode.SecretVillain, 5),
+    ).toBeUndefined();
+  });
+
+  it("returns an error when totalMax is less than the required count", () => {
+    const slots: RoleSlot[] = [{ roleId: "r", min: 3, max: 4 }];
+    expect(
+      validateRoleSlotsCoverPlayerCount(slots, GameMode.SecretVillain, 5),
+    ).toBeDefined();
+  });
+
+  it("returns an error when totalMin exceeds the required count", () => {
+    const slots: RoleSlot[] = [{ roleId: "r", min: 6, max: 8 }];
+    expect(
+      validateRoleSlotsCoverPlayerCount(slots, GameMode.SecretVillain, 5),
+    ).toBeDefined();
+  });
+
+  it("returns undefined when the player count falls within the slot range", () => {
+    const slots: RoleSlot[] = [{ roleId: "r", min: 3, max: 7 }];
+    expect(
+      validateRoleSlotsCoverPlayerCount(slots, GameMode.SecretVillain, 5),
+    ).toBeUndefined();
+  });
+});
+
+describe("validateRoleSlotsForMode", () => {
+  it("returns undefined when all role IDs are valid for the mode", () => {
+    const slots: RoleSlot[] = [
+      { roleId: SecretVillainRole.Good, min: 3, max: 3 },
+      { roleId: SecretVillainRole.Bad, min: 1, max: 1 },
+      { roleId: SecretVillainRole.SpecialBad, min: 1, max: 1 },
+    ];
+    expect(
+      validateRoleSlotsForMode(slots, GameMode.SecretVillain),
+    ).toBeUndefined();
+  });
+
+  it("returns an error message naming the unknown role ID", () => {
+    const slots: RoleSlot[] = [
+      { roleId: SecretVillainRole.Good, min: 3, max: 3 },
+      { roleId: "not-a-real-role", min: 1, max: 1 },
+    ];
+    const error = validateRoleSlotsForMode(slots, GameMode.SecretVillain);
+    expect(error).toBeDefined();
+    expect(error).toContain("not-a-real-role");
   });
 });
