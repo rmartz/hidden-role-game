@@ -50,7 +50,6 @@ export async function addLobby(
 ): Promise<Lobby> {
   const lobbyId = randomUUID();
   const base = {
-    gameMode,
     roleConfigMode: RoleConfigModeEnum.Default,
     roleSlots: getDefaultRoleSlots(gameMode, 1),
     showConfigToPlayers: false,

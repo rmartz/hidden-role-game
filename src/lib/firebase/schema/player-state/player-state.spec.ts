@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { playerStateToFirebase, firebaseToPlayerState } from "./index";
-import { GameMode, GameStatus } from "@/lib/types";
+import { GameMode, GameStatus, Team } from "@/lib/types";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
 import { DEFAULT_TIMER_CONFIG } from "@/lib/types";
@@ -115,6 +115,47 @@ describe("Werewolf player state round-trip", () => {
     expect(result.myNightTarget).toBeUndefined();
     expect(result.isSilenced).toBeUndefined();
     expect(result.nightStatus).toBeUndefined();
+  });
+
+  it("preserves Werewolf-specific timer fields", () => {
+    const state = makeWerewolfState({
+      timerConfig: {
+        autoAdvance: true,
+        startCountdownSeconds: 5,
+        nightPhaseSeconds: 45,
+        dayPhaseSeconds: 180,
+        votePhaseSeconds: 30,
+        defensePhaseSeconds: 15,
+      },
+    });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.timerConfig.autoAdvance).toBe(true);
+    expect(result.timerConfig.nightPhaseSeconds).toBe(45);
+    expect(result.timerConfig.dayPhaseSeconds).toBe(180);
+    expect(result.timerConfig.votePhaseSeconds).toBe(30);
+    expect(result.timerConfig.defensePhaseSeconds).toBe(15);
+  });
+
+  it("preserves visibleRoleAssignments including role", () => {
+    const state = makeWerewolfState({
+      visibleRoleAssignments: [
+        {
+          player: { id: "p2", name: "Bob" },
+          reason: "aware-of",
+          role: { id: "werewolf-seer", name: "Seer", team: Team.Good },
+        },
+      ],
+    });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.visibleRoleAssignments).toHaveLength(1);
+    const assignment = result.visibleRoleAssignments[0];
+    expect(assignment?.reason).toBe("aware-of");
+    expect(assignment?.role?.id).toBe("werewolf-seer");
+    expect(assignment?.role?.team).toBe(Team.Good);
   });
 
   it("preserves amDead and deadPlayerIds", () => {
