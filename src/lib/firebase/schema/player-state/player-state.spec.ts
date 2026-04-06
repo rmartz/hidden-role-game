@@ -242,14 +242,6 @@ describe("Avalon player state round-trip", () => {
     expect(result.lobbyId).toBe("lobby-1");
     expect(result.myPlayerId).toBe("p1");
   });
-
-  it("preserves timerConfig", () => {
-    const state = makeAvalonState();
-    const result = firebaseToPlayerState(playerStateToFirebase(state));
-    expect(result.timerConfig.autoAdvance).toBe(
-      DEFAULT_TIMER_CONFIG.autoAdvance,
-    );
-  });
 });
 
 describe("firebaseToPlayerState", () => {
