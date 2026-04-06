@@ -108,6 +108,25 @@ describe("WerewolfAction.CastVote — apply (basic)", () => {
     });
   });
 
+  it("replaces the existing vote when a player re-votes", () => {
+    const game = makePlayingGame(
+      makeDayStateWithTrial({ votes: [{ playerId: "p2", vote: "guilty" }] }),
+    );
+    action.apply(game, { vote: "innocent" }, "p2");
+    const phase = (
+      game.status as {
+        turnState: {
+          phase: {
+            activeTrial: { votes: { playerId: string; vote: string }[] };
+          };
+        };
+      }
+    ).turnState.phase;
+    const p2Votes = phase.activeTrial.votes.filter((v) => v.playerId === "p2");
+    expect(p2Votes).toHaveLength(1);
+    expect(p2Votes[0].vote).toBe("innocent");
+  });
+
   it("triggers Werewolves win when auto-resolve eliminates last non-Bad player", () => {
     const game = makePlayingGame(
       makeDayStateWithTrial({
