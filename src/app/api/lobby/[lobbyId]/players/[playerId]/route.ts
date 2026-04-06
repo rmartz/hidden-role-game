@@ -4,7 +4,7 @@ import {
   errorResponse,
   toPublicLobby,
 } from "@/server/utils";
-import { removePlayer } from "@/lib/firebase/lobby";
+import { removePlayer } from "@/server/lobby";
 
 export async function DELETE(
   request: Request,

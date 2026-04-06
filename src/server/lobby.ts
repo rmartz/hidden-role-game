@@ -5,7 +5,44 @@ import {
   ShowRolesInPlay as ShowRolesInPlayEnum,
 } from "@/lib/types";
 import { GAME_MODES, getDefaultRoleSlots } from "@/lib/game-modes";
-import { addLobby as firebaseAddLobby } from "@/lib/firebase/lobby";
+import {
+  addLobby as firebaseAddLobby,
+  getLobby,
+  addPlayer,
+  removePlayer,
+  transferOwner,
+  toggleReady,
+  updateConfig,
+  clearGameId,
+  clearReadyPlayerIds,
+  setLobbyGameId,
+} from "@/lib/firebase/lobby";
+
+export {
+  getLobby,
+  addPlayer,
+  removePlayer,
+  transferOwner,
+  toggleReady,
+  updateConfig,
+  clearGameId,
+};
+
+/**
+ * Marks a lobby as having an active game: clears ready player IDs and records
+ * the new game ID in one parallel write. Returns the updated lobby, or
+ * undefined if the lobby does not exist.
+ */
+export async function startLobbyGame(
+  lobbyId: string,
+  gameId: string,
+): Promise<Lobby | undefined> {
+  const [, updated] = await Promise.all([
+    clearReadyPlayerIds(lobbyId),
+    setLobbyGameId(lobbyId, gameId),
+  ]);
+  return updated;
+}
 
 export async function addLobby(
   owner: { id: string; name: string; sessionId: string },

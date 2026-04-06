@@ -1,6 +1,6 @@
 import { ServerResponseStatus } from "@/server/types";
 import type { CreateGameRequest } from "@/server/types";
-import { clearReadyPlayerIds, setGameId } from "@/lib/firebase/lobby";
+import { startLobbyGame } from "@/server/lobby";
 import { getModeDefinition, createGame } from "@/server/game";
 import {
   authenticateLobby,
@@ -68,8 +68,7 @@ export async function POST(
     lobby.config.modeConfig,
   );
 
-  await clearReadyPlayerIds(lobbyId);
-  const updated = await setGameId(lobbyId, game.id);
+  const updated = await startLobbyGame(lobbyId, game.id);
   if (!updated) {
     return errorResponse("Failed to start game", 500);
   }

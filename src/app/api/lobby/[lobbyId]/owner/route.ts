@@ -4,7 +4,7 @@ import {
   errorResponse,
   toPublicLobby,
 } from "@/server/utils";
-import { transferOwner } from "@/lib/firebase/lobby";
+import { transferOwner } from "@/server/lobby";
 
 export async function PUT(
   request: Request,

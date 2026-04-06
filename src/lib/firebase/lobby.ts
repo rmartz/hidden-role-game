@@ -53,7 +53,7 @@ export async function clearGameId(lobbyId: string): Promise<Lobby | undefined> {
   return firebaseToLobby(lobbyId, data.public, data.private);
 }
 
-export async function setGameId(
+export async function setLobbyGameId(
   lobbyId: string,
   gameId: string,
 ): Promise<Lobby | undefined> {

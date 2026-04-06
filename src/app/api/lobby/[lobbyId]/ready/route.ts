@@ -1,5 +1,5 @@
 import { ServerResponseStatus } from "@/server/types";
-import { toggleReady } from "@/lib/firebase/lobby";
+import { toggleReady } from "@/server/lobby";
 import {
   authenticateLobby,
   errorResponse,

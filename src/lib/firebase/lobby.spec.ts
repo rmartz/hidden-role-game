@@ -29,7 +29,7 @@ function makeBaseLobby(overrides: Partial<Lobby["config"]> = {}): Lobby {
   };
 }
 
-describe("FirebaseLobbyService.updateConfig — nominationsEnabled", () => {
+describe("updateConfig — nominationsEnabled", () => {
   it("sets nominationsEnabled when true is provided", async () => {
     await addLobby(makeBaseLobby());
 

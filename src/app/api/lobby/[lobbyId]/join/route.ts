@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 import { ServerResponseStatus, type JoinLobbyRequest } from "@/server/types";
-import { getLobby, addPlayer } from "@/lib/firebase/lobby";
+import { getLobby, addPlayer } from "@/server/lobby";
 import {
   errorResponse,
   normalizePlayerName,

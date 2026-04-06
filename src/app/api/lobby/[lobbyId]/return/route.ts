@@ -1,6 +1,6 @@
 import { GameStatus } from "@/lib/types";
 import { ServerResponseStatus } from "@/server/types";
-import { clearGameId } from "@/lib/firebase/lobby";
+import { clearGameId } from "@/server/lobby";
 import { getGame } from "@/server/game";
 import {
   authenticateLobby,
