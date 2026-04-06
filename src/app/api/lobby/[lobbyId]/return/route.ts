@@ -1,6 +1,6 @@
 import { GameStatus } from "@/lib/types";
 import { ServerResponseStatus } from "@/server/types";
-import { lobbyService } from "@/services/FirebaseLobbyService";
+import { lobbyService } from "@/services/LobbyService";
 import { gameService } from "@/services/GameService";
 import {
   authenticateLobby,
