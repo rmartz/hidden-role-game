@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { WerewolfRole } from "@/lib/game-modes/werewolf";
+import { WerewolfRole } from "@/lib/game/modes/werewolf";
 import { extractPlayerNightState } from "../services/player-night-state";
 import { mentalistRole, makeMentalistGame } from "./mentalist-helpers";
 

@@ -13,7 +13,7 @@ import {
   getInterimAttackedPlayerIds,
 } from "../utils";
 import { WerewolfRole, getWerewolfRole } from "../roles";
-import { getPlayer } from "@/lib/player-utils";
+import { getPlayer } from "@/lib/player";
 
 export const setNightTargetAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {

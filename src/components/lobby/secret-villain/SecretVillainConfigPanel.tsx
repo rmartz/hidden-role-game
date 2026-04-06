@@ -1,18 +1,18 @@
 "use client";
 
 import type { ModeConfigField } from "@/lib/types";
-import type { SecretVillainTimerConfig } from "@/lib/game-modes/secret-villain/timer-config";
-import type { SecretVillainModeConfig } from "@/lib/game-modes/secret-villain/lobby-config";
-import type { SecretVillainLobbyConfig } from "@/lib/game-modes/secret-villain/lobby-config";
-import { SvBoardPreset } from "@/lib/game-modes/secret-villain/types";
-import { SvTheme, SV_THEMES } from "@/lib/game-modes/secret-villain/themes";
-import type { SvCustomPowerConfig } from "@/lib/game-modes/secret-villain/types";
-import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
+import type { SecretVillainTimerConfig } from "@/lib/game/modes/secret-villain/timer-config";
+import type { SecretVillainModeConfig } from "@/lib/game/modes/secret-villain/lobby-config";
+import type { SecretVillainLobbyConfig } from "@/lib/game/modes/secret-villain/lobby-config";
+import { SvBoardPreset } from "@/lib/game/modes/secret-villain/types";
+import { SvTheme, SV_THEMES } from "@/lib/game/modes/secret-villain/themes";
+import type { SvCustomPowerConfig } from "@/lib/game/modes/secret-villain/types";
+import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
 import {
   getDefaultBoardPreset,
   presetToCustomConfig,
   type SvConcretePreset,
-} from "@/lib/game-modes/secret-villain/utils";
+} from "@/lib/game/modes/secret-villain/utils";
 import { Label } from "@/components/ui/label";
 import {
   Select,

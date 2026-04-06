@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { PlayerList } from "./PlayerList";
 import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
-import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game-modes/werewolf/timer-config";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
 import type { PublicLobby } from "@/server/types";
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 const noop = () => {};

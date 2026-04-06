@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest";
 import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
 import type { Game, RoleSlot } from "@/lib/types";
-import { SecretVillainRole } from "@/lib/game-modes/secret-villain";
-import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game-modes/secret-villain/timer-config";
-import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game-modes/secret-villain/lobby-config";
-import { buildRolesInPlay } from "../game-initialization";
+import { SecretVillainRole } from "@/lib/game/modes/secret-villain";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
+import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-villain/lobby-config";
+import { buildRolesInPlay } from "../initialization";
 
 const DEFAULT_SLOTS: RoleSlot[] = [
   { roleId: SecretVillainRole.Good, min: 1, max: 1 },

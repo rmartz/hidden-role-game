@@ -1,8 +1,8 @@
 "use client";
 
 import { useCallback } from "react";
-import type { ActiveTrial } from "@/lib/game-modes/werewolf";
-import { WEREWOLF_COPY, WerewolfAction } from "@/lib/game-modes/werewolf";
+import type { ActiveTrial } from "@/lib/game/modes/werewolf";
+import { WEREWOLF_COPY, WerewolfAction } from "@/lib/game/modes/werewolf";
 import type { PublicLobbyPlayer } from "@/server/types/lobby";
 import { useGameAction } from "@/hooks";
 import { GameTimer } from "@/components/game";

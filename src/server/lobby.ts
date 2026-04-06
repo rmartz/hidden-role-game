@@ -4,7 +4,7 @@ import {
   RoleConfigMode as RoleConfigModeEnum,
   ShowRolesInPlay as ShowRolesInPlayEnum,
 } from "@/lib/types";
-import { GAME_MODES, getDefaultRoleSlots } from "@/lib/game-modes";
+import { GAME_MODES, getDefaultRoleSlots } from "@/lib/game/modes";
 import {
   addLobby as firebaseAddLobby,
   getLobby,

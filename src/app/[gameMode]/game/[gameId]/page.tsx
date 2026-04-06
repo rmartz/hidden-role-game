@@ -6,7 +6,7 @@ import { GameMode } from "@/lib/types";
 import { useGameStateQuery, GameModeContext } from "@/hooks";
 import { WerewolfGameScreen } from "@/components/game";
 import { SecretVillainGameScreen } from "@/components/game/secret-villain";
-import { parseGameMode } from "@/lib/game-modes";
+import { parseGameMode } from "@/lib/game/modes";
 import { GAME_PAGE_COPY } from "./page.copy";
 import { UnsupportedGameMode } from "../UnsupportedGameMode";
 

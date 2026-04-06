@@ -1,13 +1,13 @@
 import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 import type { Game } from "@/lib/types";
-import type { AnyNightAction } from "@/lib/game-modes/werewolf";
+import type { AnyNightAction } from "@/lib/game/modes/werewolf";
 import {
   WerewolfPhase,
   WerewolfRole,
   DEFAULT_WEREWOLF_TIMER_CONFIG,
-} from "@/lib/game-modes/werewolf";
-import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
-import { WEREWOLF_ROLES } from "@/lib/game-modes/werewolf/roles";
+} from "@/lib/game/modes/werewolf";
+import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
+import { WEREWOLF_ROLES } from "@/lib/game/modes/werewolf/roles";
 
 // ---------------------------------------------------------------------------
 // makeNighttimeGame (Witch tests)

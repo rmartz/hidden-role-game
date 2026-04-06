@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { GameOverScreenView } from "./GameOverScreenView";
 import { GameMode, GameStatus, Team } from "@/lib/types";
-import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game-modes/werewolf/timer-config";
-import { WerewolfWinner } from "@/lib/game-modes/werewolf/utils/win-condition";
-import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
+import { WerewolfWinner } from "@/lib/game/modes/werewolf/utils/win-condition";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { fn } from "storybook/test";
 
 const meta = {

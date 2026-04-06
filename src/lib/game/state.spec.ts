@@ -1,11 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { getPlayerGameState } from "./game-state";
+import { getPlayerGameState } from "./state";
 import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
 import type { Game, GamePlayer, RoleSlot } from "@/lib/types";
-import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
-import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game-modes/secret-villain/timer-config";
-import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game-modes/secret-villain/lobby-config";
-import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game-modes/werewolf/timer-config";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
+import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-villain/lobby-config";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
 
 const DEFAULT_SLOTS: RoleSlot[] = [
   { roleId: "good", min: 1, max: 1 },

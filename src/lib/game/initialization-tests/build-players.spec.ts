@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { Team } from "@/lib/types";
 import type { LobbyPlayer } from "@/lib/types";
-import { buildGamePlayers } from "../game-initialization";
+import { buildGamePlayers } from "../initialization";
 
 function makeLobbyPlayer(id: string): LobbyPlayer {
   return { id, name: `Player ${id}`, sessionId: `session-${id}` };

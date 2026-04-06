@@ -6,7 +6,7 @@ import {
   ClockWarningRegular,
   WeatherSunnyLowRegular,
 } from "@fluentui/react-icons";
-import { GAME_MODES } from "@/lib/game-modes";
+import { GAME_MODES } from "@/lib/game/modes";
 import {
   WerewolfPhase,
   WerewolfAction,
@@ -18,16 +18,16 @@ import {
   getSoloTarget,
   TargetCategory,
   getInvestigationResultForNarrator,
-} from "@/lib/game-modes/werewolf";
-import { WerewolfRole, getWerewolfRole } from "@/lib/game-modes/werewolf/roles";
-import { isRoleActive } from "@/lib/game-modes/werewolf";
+} from "@/lib/game/modes/werewolf";
+import { WerewolfRole, getWerewolfRole } from "@/lib/game/modes/werewolf/roles";
+import { isRoleActive } from "@/lib/game/modes/werewolf";
 import type {
   WerewolfTurnState,
   WerewolfRoleDefinition,
-} from "@/lib/game-modes/werewolf";
-import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
+} from "@/lib/game/modes/werewolf";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { Button } from "@/components/ui/button";
-import { getPlayerName } from "@/lib/player-utils";
+import { getPlayerName } from "@/lib/player";
 import { useGameAction } from "@/hooks";
 import { GameTimer } from "@/components/game";
 import { OwnerAdvanceCard } from "./OwnerAdvanceCard";
@@ -35,7 +35,7 @@ import { OwnerInvestigationConfirm } from "./OwnerInvestigationConfirm";
 import { OwnerNightTargetPanel } from "./OwnerNightTargetPanel";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
 import { NightPhaseOrderList } from "./NightPhaseOrderList";
-import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
+import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 
 interface OwnerGameNightScreenProps {
   gameId: string;

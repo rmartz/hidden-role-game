@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getPlayerId, getLobbyId } from "@/lib/api";
-import { getPlayerName } from "@/lib/player-utils";
-import { parseGameMode } from "@/lib/game-modes";
+import { getPlayerName } from "@/lib/player";
+import { parseGameMode } from "@/lib/game/modes";
 import {
   useLeaveAndJoinLobby,
   useStoredLobbyQuery,

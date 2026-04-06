@@ -1,11 +1,11 @@
 "use client";
 
 import { GameStatus } from "@/lib/types";
-import { SecretVillainPhase } from "@/lib/game-modes/secret-villain/types";
-import { FAILED_ELECTION_THRESHOLD } from "@/lib/game-modes/secret-villain/types";
-import { SECRET_VILLAIN_COPY } from "@/lib/game-modes/secret-villain/copy";
+import { SecretVillainPhase } from "@/lib/game/modes/secret-villain/types";
+import { FAILED_ELECTION_THRESHOLD } from "@/lib/game/modes/secret-villain/types";
+import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
 import type { PlayerGameState } from "@/server/types";
-import type { SecretVillainPlayerGameState } from "@/lib/game-modes/secret-villain/player-state";
+import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
 import { BoardDisplay } from "./BoardDisplay";
 import { ElectionNominationView } from "./ElectionNominationView";
 import { ElectionVoteView } from "./ElectionVoteView";

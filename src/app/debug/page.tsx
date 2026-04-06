@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
 import type { GameConfig } from "@/server/types";
-import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game-modes/werewolf/timer-config";
-import { DEFAULT_WEREWOLF_MODE_CONFIG } from "@/lib/game-modes/werewolf/lobby-config";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
+import { DEFAULT_WEREWOLF_MODE_CONFIG } from "@/lib/game/modes/werewolf/lobby-config";
 import { GameConfigurationPanel } from "@/components/lobby";
 import { useAppSelector } from "@/store";
 import { selectRoleSlots } from "@/store/game-config-slice";

@@ -6,7 +6,7 @@ import {
   GAME_MODES,
   isGameModeEnabled,
   parseGameMode,
-} from "@/lib/game-modes";
+} from "@/lib/game/modes";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { setGameMode } from "@/store/game-config-slice";
 import { Label } from "@/components/ui/label";

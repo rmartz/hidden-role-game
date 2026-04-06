@@ -1,12 +1,12 @@
 import { afterEach, describe, it, expect, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import { SecretVillainConfigPanel } from "./SecretVillainConfigPanel";
-import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game-modes/secret-villain/timer-config";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
 import { GameMode } from "@/lib/types";
 import {
   SvBoardPreset,
   SpecialActionType,
-} from "@/lib/game-modes/secret-villain/types";
+} from "@/lib/game/modes/secret-villain/types";
 import { SECRET_VILLAIN_CONFIG_PANEL_COPY } from "./SecretVillainConfigPanel.copy";
 import { SECRET_VILLAIN_TIMER_CONFIG_PANEL_COPY } from "./SecretVillainTimerConfigPanel.copy";
 import { TIMER_CONFIG_COPY } from "../TimerConfigPanel.copy";

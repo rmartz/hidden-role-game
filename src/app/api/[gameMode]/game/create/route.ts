@@ -8,7 +8,7 @@ import {
   parseGameMode,
   toPublicLobby,
 } from "@/server/utils";
-import { getRoleSlotsRequired, isGameModeEnabled } from "@/lib/game-modes";
+import { getRoleSlotsRequired, isGameModeEnabled } from "@/lib/game/modes";
 
 export async function POST(
   request: Request,

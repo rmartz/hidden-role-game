@@ -4,9 +4,9 @@ import {
   WerewolfPhase,
   WerewolfRole,
   DEFAULT_WEREWOLF_TIMER_CONFIG,
-} from "@/lib/game-modes/werewolf";
-import type { WerewolfTurnState } from "@/lib/game-modes/werewolf";
-import type { WerewolfPlayerGameState } from "@/lib/game-modes/werewolf/player-state";
+} from "@/lib/game/modes/werewolf";
+import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import {
   extractDaytimeNightSummary,
   extractDaytimePlayerState,

@@ -5,7 +5,7 @@ import type { RoleSlot } from "@/server/types";
 import { ServerResponseStatus } from "@/server/types";
 import { getModeDefinition, createGame } from "@/server/game";
 import { errorResponse } from "@/server/utils";
-import { getRoleSlotsRequired, GAME_MODES } from "@/lib/game-modes";
+import { getRoleSlotsRequired, GAME_MODES } from "@/lib/game/modes";
 
 interface CreateDebugGameRequest {
   playerCount: number;

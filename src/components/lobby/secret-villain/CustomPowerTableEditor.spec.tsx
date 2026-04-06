@@ -1,7 +1,7 @@
 import { afterEach, describe, it, expect, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
-import { SpecialActionType } from "@/lib/game-modes/secret-villain/types";
-import type { SvCustomPowerConfig } from "@/lib/game-modes/secret-villain/types";
+import { SpecialActionType } from "@/lib/game/modes/secret-villain/types";
+import type { SvCustomPowerConfig } from "@/lib/game/modes/secret-villain/types";
 import { CustomPowerTableEditor } from "./CustomPowerTableEditor";
 import { SECRET_VILLAIN_CONFIG_PANEL_COPY } from "./SecretVillainConfigPanel.copy";
 

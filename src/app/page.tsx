@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { GameMode } from "@/lib/types";
-import { GAME_MODES } from "@/lib/game-modes";
+import { GAME_MODES } from "@/lib/game/modes";
 import { getLobbyId, getPlayerId } from "@/lib/api";
-import { getPlayerName } from "@/lib/player-utils";
+import { getPlayerName } from "@/lib/player";
 import { useCreateLobby, useJoinLobby, useStoredLobbyQuery } from "@/hooks";
 import { HOME_PAGE_COPY } from "./page.copy";
 import { Button } from "@/components/ui/button";

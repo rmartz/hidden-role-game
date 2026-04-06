@@ -10,10 +10,10 @@ import type {
   TimerConfig,
 } from "@/lib/types";
 import type { PlayerGameState, VisibleTeammate } from "@/server/types";
-import { GAME_MODES } from "@/lib/game-modes";
-import { getPlayer } from "@/lib/player-utils";
+import { GAME_MODES } from "@/lib/game/modes";
+import { getPlayer } from "@/lib/player";
 import { assignRoles, adjustRoleSlots } from "@/server/utils";
-import { buildRolesInPlay, buildGamePlayers } from "@/lib/game-initialization";
+import { buildRolesInPlay, buildGamePlayers } from "@/lib/game/initialization";
 import { GameMode } from "@/lib/types";
 
 export function getModeDefinition(gameMode: GameMode): GameModeConfig {

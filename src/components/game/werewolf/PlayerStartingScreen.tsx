@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import { GAME_MODES } from "@/lib/game-modes";
+import { GAME_MODES } from "@/lib/game/modes";
 import { GameStatus } from "@/lib/types";
 import type { PlayerGameState } from "@/server/types";
 import {

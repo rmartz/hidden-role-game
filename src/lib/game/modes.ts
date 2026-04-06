@@ -1,12 +1,12 @@
 import { GameMode } from "@/lib/types";
 import type { GameModeConfig, RoleSlot } from "@/lib/types";
-import { SECRET_VILLAIN_CONFIG } from "@/lib/game-modes/secret-villain";
-import { AVALON_CONFIG } from "@/lib/game-modes/avalon";
-import { WEREWOLF_CONFIG } from "@/lib/game-modes/werewolf";
+import { SECRET_VILLAIN_CONFIG } from "@/lib/game/modes/secret-villain";
+import { AVALON_CONFIG } from "@/lib/game/modes/avalon";
+import { WEREWOLF_CONFIG } from "@/lib/game/modes/werewolf";
 
-export { SecretVillainRole } from "@/lib/game-modes/secret-villain";
-export { AvalonRole } from "@/lib/game-modes/avalon";
-export { WerewolfRole } from "@/lib/game-modes/werewolf";
+export { SecretVillainRole } from "@/lib/game/modes/secret-villain";
+export { AvalonRole } from "@/lib/game/modes/avalon";
+export { WerewolfRole } from "@/lib/game/modes/werewolf";
 
 export function parseGameMode(value: string): GameMode | undefined {
   return (Object.values(GameMode) as string[]).includes(value)

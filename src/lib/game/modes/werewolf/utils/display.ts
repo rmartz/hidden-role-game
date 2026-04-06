@@ -8,7 +8,7 @@ import { isGroupPhaseKey, baseGroupPhaseKey, isRoleActive } from "./phase-keys";
 import { SMITE_PHASE_KEY, OLD_MAN_TIMER_KEY } from "./resolution";
 import type { PhaseKey } from "./phase-keys";
 import { targetPlayerIdOf } from "./targeting";
-import { getPlayerName } from "@/lib/player-utils";
+import { getPlayerName } from "@/lib/player";
 import type { NightStatusEntry, VisibleTeammate } from "@/server/types";
 
 export type { PhaseKey };

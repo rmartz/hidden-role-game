@@ -4,7 +4,7 @@ import {
   DEFAULT_GAME_MODE,
   isGameModeEnabled,
   parseGameMode,
-} from "@/lib/game-modes";
+} from "@/lib/game/modes";
 import { ServerResponseStatus, type CreateLobbyRequest } from "@/server/types";
 import { addLobby } from "@/server/lobby";
 import {

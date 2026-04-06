@@ -1,6 +1,6 @@
 "use client";
 
-import { getPlayerName } from "@/lib/player-utils";
+import { getPlayerName } from "@/lib/player";
 import type { PublicLobbyPlayer } from "@/server/types";
 
 interface WitchInformationPanelProps {

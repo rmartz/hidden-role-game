@@ -5,11 +5,11 @@ import {
   WerewolfPhase,
   WerewolfRole,
   DEFAULT_WEREWOLF_TIMER_CONFIG,
-} from "@/lib/game-modes/werewolf";
+} from "@/lib/game/modes/werewolf";
 import type {
   WerewolfTurnState,
   WerewolfModeConfig,
-} from "@/lib/game-modes/werewolf";
+} from "@/lib/game/modes/werewolf";
 import { extractDaytimeState, makeDaytimeGame } from "./helpers";
 
 describe("extractDaytimeNightSummary", () => {

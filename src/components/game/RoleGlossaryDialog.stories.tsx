@@ -6,7 +6,7 @@ import {
   WEREWOLF_ROLE_CATEGORY_ORDER,
   WEREWOLF_ROLE_CATEGORY_LABELS,
   WerewolfRoleCategory,
-} from "@/lib/game-modes/werewolf/roles";
+} from "@/lib/game/modes/werewolf/roles";
 
 const meta = {
   component: RoleGlossaryDialog,

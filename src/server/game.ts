@@ -24,7 +24,7 @@ import {
   buildPlayingStatus,
   buildAllPlayerStates,
   adjustRoleSlotsForPlayer as gameStateAdjustRoleSlotsForPlayer,
-} from "@/lib/game-state";
+} from "@/lib/game/state";
 
 export { getModeDefinition };
 

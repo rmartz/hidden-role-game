@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { Team } from "@/lib/types";
 import type { LobbyPlayer, RoleDefinition } from "@/lib/types";
-import { buildGamePlayers } from "@/lib/game-initialization";
+import { buildGamePlayers } from "@/lib/game/initialization";
 
 type TestWerewolfRole = RoleDefinition<string, Team> & {
   teamTargeting?: boolean;

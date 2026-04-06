@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/item";
 import { Card, CardContent } from "@/components/ui/card";
 import { RoleLabel } from "@/components/RoleLabel";
-import { WerewolfRole } from "@/lib/game-modes/werewolf/roles";
+import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import {
   PLAYER_VISIBILITY_COPY,
   ROLE_VISIBILITY_OVERRIDES,

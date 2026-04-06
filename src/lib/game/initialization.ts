@@ -8,7 +8,7 @@ import type {
   VisiblePlayer,
 } from "@/lib/types";
 import type { RoleInPlay } from "@/server/types";
-import { GAME_MODES } from "@/lib/game-modes";
+import { GAME_MODES } from "@/lib/game/modes";
 
 /**
  * Extended role properties used by buildGamePlayers for wake-phase and

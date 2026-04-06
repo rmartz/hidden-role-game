@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { getPlayerId, getLobbyId, getSessionId, saveGameId } from "@/lib/api";
 import { GameMode } from "@/lib/types";
-import { parseGameMode } from "@/lib/game-modes";
+import { parseGameMode } from "@/lib/game/modes";
 import {
   useLobbyQuery,
   useLobbyWebSocket,

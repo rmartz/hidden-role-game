@@ -7,7 +7,7 @@ import type {
   TimerConfig,
 } from "@/lib/types";
 import { DEFAULT_TIMER_CONFIG, GameMode } from "@/lib/types";
-import { GAME_MODES } from "@/lib/game-modes";
+import { GAME_MODES } from "@/lib/game/modes";
 import type { PublicLobby } from "@/server/types";
 
 export interface FirebaseLobbyPublic {

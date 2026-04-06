@@ -3,7 +3,7 @@ import { ServerResponseStatus } from "@/server/types";
 import { getLobby } from "@/lib/firebase/lobby";
 import { getGame } from "@/server/game";
 import { isValidSession } from "./lobby-helpers";
-import { parseGameMode } from "@/lib/game-modes";
+import { parseGameMode } from "@/lib/game/modes";
 
 export { parseGameMode };
 

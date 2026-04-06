@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { WerewolfPhase, WerewolfRole } from "@/lib/game-modes/werewolf";
+import { WerewolfPhase, WerewolfRole } from "@/lib/game/modes/werewolf";
 import { buildInitialTurnState } from "../services/initialization";
 
 describe("buildInitialTurnState (Werewolf)", () => {

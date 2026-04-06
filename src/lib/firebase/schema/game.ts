@@ -6,7 +6,7 @@ import type {
   TimerConfig,
 } from "@/lib/types";
 import { GameMode } from "@/lib/types";
-import { GAME_MODES } from "@/lib/game-modes";
+import { GAME_MODES } from "@/lib/game/modes";
 import type { FirebaseLobbyPlayer, FirebaseRoleSlot } from "./lobby";
 import {
   firebaseToRoleSlot,

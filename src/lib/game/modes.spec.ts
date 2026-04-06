@@ -6,7 +6,7 @@ import {
   GAME_MODES,
   isGameModeEnabled,
   parseGameMode,
-} from "./game-modes";
+} from "./modes";
 
 describe("GAME_MODES", () => {
   it("has a config for every GameMode enum value", () => {

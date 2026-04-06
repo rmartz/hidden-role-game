@@ -1,9 +1,9 @@
 "use client";
 
-import { WerewolfAction } from "@/lib/game-modes/werewolf";
+import { WerewolfAction } from "@/lib/game/modes/werewolf";
 import { Button } from "@/components/ui/button";
 import { useGameAction } from "@/hooks";
-import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
+import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 
 interface OwnerInvestigationConfirmProps {
   gameId: string;

@@ -1,13 +1,13 @@
 "use client";
 
-import { WerewolfAction } from "@/lib/game-modes/werewolf";
-import type { PhaseKey } from "@/lib/game-modes/werewolf";
+import { WerewolfAction } from "@/lib/game/modes/werewolf";
+import type { PhaseKey } from "@/lib/game/modes/werewolf";
 import { useGameAction } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import type { PublicLobbyPlayer } from "@/server/types";
-import { getPlayerName } from "@/lib/player-utils";
+import { getPlayerName } from "@/lib/player";
 import { ConfirmTargetButton } from "./ConfirmTargetButton";
-import { WEREWOLF_COPY } from "@/lib/game-modes/werewolf/copy";
+import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 
 interface AltruistActionPanelProps {
   gameId: string;

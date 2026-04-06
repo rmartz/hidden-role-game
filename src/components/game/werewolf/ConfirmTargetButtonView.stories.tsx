@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { ConfirmTargetButtonView } from "./ConfirmTargetButtonView";
-import { WerewolfRole } from "@/lib/game-modes/werewolf/roles";
+import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import { fn } from "storybook/test";
 
 const meta = {
