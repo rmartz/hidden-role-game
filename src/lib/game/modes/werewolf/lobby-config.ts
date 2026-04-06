@@ -1,6 +1,7 @@
 import { GameMode } from "@/lib/types";
 import type { BaseLobbyConfig, Game } from "@/lib/types";
 import type { WerewolfTimerConfig } from "./timer-config";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "./timer-config";
 
 /** Werewolf-specific mode configuration. */
 export interface WerewolfModeConfig {
@@ -33,6 +34,17 @@ export const DEFAULT_WEREWOLF_MODE_CONFIG: WerewolfModeConfig = {
  */
 export function getWerewolfModeConfig(game: Game): WerewolfModeConfig {
   return game.modeConfig as WerewolfModeConfig;
+}
+
+export function buildDefaultWerewolfLobbyConfig(
+  base: BaseLobbyConfig,
+): WerewolfLobbyConfig {
+  return {
+    ...base,
+    gameMode: GameMode.Werewolf,
+    timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
+    modeConfig: DEFAULT_WEREWOLF_MODE_CONFIG,
+  };
 }
 
 export function parseWerewolfModeConfig(

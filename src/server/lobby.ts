@@ -1,20 +1,10 @@
 import { randomUUID } from "crypto";
-import type { GameMode, Lobby, LobbyConfig } from "@/lib/types";
+import type { GameMode, Lobby } from "@/lib/types";
 import {
-  GameMode as GameModeEnum,
   RoleConfigMode as RoleConfigModeEnum,
   ShowRolesInPlay as ShowRolesInPlayEnum,
 } from "@/lib/types";
-import type { WerewolfLobbyConfig } from "@/lib/game/modes/werewolf/lobby-config";
-import { DEFAULT_WEREWOLF_MODE_CONFIG } from "@/lib/game/modes/werewolf/lobby-config";
-import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
-import type { SecretVillainLobbyConfig } from "@/lib/game/modes/secret-villain/lobby-config";
-import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-villain/lobby-config";
-import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
-import type { AvalonLobbyConfig } from "@/lib/game/modes/avalon/lobby-config";
-import { DEFAULT_AVALON_MODE_CONFIG } from "@/lib/game/modes/avalon/lobby-config";
-import { DEFAULT_TIMER_CONFIG } from "@/lib/types";
-import { getDefaultRoleSlots } from "@/lib/game/modes";
+import { GAME_MODES, getDefaultRoleSlots } from "@/lib/game/modes";
 import {
   addLobby as firebaseAddLobby,
   getLobby,
@@ -54,44 +44,19 @@ export async function startLobbyGame(
   return updated;
 }
 
-function buildDefaultLobbyConfig(gameMode: GameMode): LobbyConfig {
-  const base = {
-    roleConfigMode: RoleConfigModeEnum.Default,
-    roleSlots: getDefaultRoleSlots(gameMode, 1),
-    showConfigToPlayers: false,
-    showRolesInPlay: ShowRolesInPlayEnum.ConfiguredOnly,
-  };
-  switch (gameMode) {
-    case GameModeEnum.Werewolf:
-      return {
-        ...base,
-        gameMode,
-        timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
-        modeConfig: DEFAULT_WEREWOLF_MODE_CONFIG,
-      } satisfies WerewolfLobbyConfig;
-    case GameModeEnum.SecretVillain:
-      return {
-        ...base,
-        gameMode,
-        timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
-        modeConfig: DEFAULT_SECRET_VILLAIN_MODE_CONFIG,
-      } satisfies SecretVillainLobbyConfig;
-    case GameModeEnum.Avalon:
-      return {
-        ...base,
-        gameMode,
-        timerConfig: DEFAULT_TIMER_CONFIG,
-        modeConfig: DEFAULT_AVALON_MODE_CONFIG,
-      } satisfies AvalonLobbyConfig;
-  }
-}
-
 export async function addLobby(
   owner: { id: string; name: string; sessionId: string },
   gameMode: GameMode,
 ): Promise<Lobby> {
   const lobbyId = randomUUID();
-  const config = buildDefaultLobbyConfig(gameMode);
+  const base = {
+    gameMode,
+    roleConfigMode: RoleConfigModeEnum.Default,
+    roleSlots: getDefaultRoleSlots(gameMode, 1),
+    showConfigToPlayers: false,
+    showRolesInPlay: ShowRolesInPlayEnum.ConfiguredOnly,
+  };
+  const config = GAME_MODES[gameMode].buildDefaultLobbyConfig(base);
 
   const lobby: Lobby = {
     id: lobbyId,

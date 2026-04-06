@@ -1,0 +1,200 @@
+import { GameMode } from "@/lib/types";
+import type { Team } from "@/lib/types";
+import type { AnyNightAction, DaytimeVote } from "@/lib/game/modes/werewolf";
+import type { NightStatusEntry } from "@/server/types";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import {
+  type FirebaseBasePlayerState,
+  baseStateToFirebase,
+  baseStateFromFirebase,
+} from "./base";
+
+// ---------------------------------------------------------------------------
+// Werewolf-specific Firebase player state
+// ---------------------------------------------------------------------------
+
+export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
+  nightActions?: Record<string, AnyNightAction>;
+  myNightTarget?: string;
+  /** True when the player has intentionally chosen to skip their night action. */
+  myNightTargetSkipped?: boolean;
+  myNightTargetConfirmed?: boolean;
+  teamVotes?: (
+    | { playerName: string; targetPlayerId: string }
+    | { playerName: string; skipped: true }
+  )[];
+  suggestedTargetId?: string;
+  allAgreed?: boolean;
+  nightStatus?: NightStatusEntry[];
+  previousNightTargetId?: string;
+  investigationResult?: { targetPlayerId: string; isWerewolfTeam: boolean };
+  witchAbilityUsed?: boolean;
+  morticianAbilityEnded?: boolean;
+  priestWardActive?: boolean;
+  isSilenced?: boolean;
+  isHypnotized?: boolean;
+  activeTrial?: {
+    defendantId: string;
+    startedAt: number;
+    phase: string;
+    voteStartedAt?: number;
+    myVote?: DaytimeVote;
+    voteCount: number;
+    playerCount: number;
+    verdict?: "eliminated" | "innocent";
+    mustVoteGuilty?: boolean;
+    mustVoteInnocent?: boolean;
+    voteResults?: { playerName: string; vote: DaytimeVote }[];
+    eliminatedRole?: { id: string; name: string; team: string };
+  };
+  nominationsEnabled: boolean;
+  singleTrialPerDay: boolean;
+  revealProtections: boolean;
+  executionerTargetId?: string;
+  nominations?: { defendantId: string; nominatorIds: string[] }[];
+  myNominatedDefendantId?: string;
+  mirrorcasterCharged?: boolean;
+  oneEyedSeerLockedTargetId?: string;
+  elusiveSeerVillagerIds?: string[];
+  exposerReveal?: { playerName: string; roleName: string; team: string };
+  mySecondNightTarget?: string;
+  exposerAbilityUsed?: boolean;
+  hunterRevengePlayerId?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Werewolf serializer / deserializer
+// ---------------------------------------------------------------------------
+
+export function werewolfStateToFirebase(
+  state: WerewolfPlayerGameState,
+): FirebaseWerewolfPlayerState {
+  return {
+    ...baseStateToFirebase(state),
+    ...(state.nightActions ? { nightActions: state.nightActions } : {}),
+    ...(state.myNightTarget !== undefined
+      ? state.myNightTarget === null
+        ? { myNightTargetSkipped: true }
+        : { myNightTarget: state.myNightTarget }
+      : {}),
+    ...(state.myNightTargetConfirmed !== undefined
+      ? { myNightTargetConfirmed: state.myNightTargetConfirmed }
+      : {}),
+    ...(state.teamVotes?.length ? { teamVotes: state.teamVotes } : {}),
+    ...(state.suggestedTargetId !== undefined
+      ? { suggestedTargetId: state.suggestedTargetId }
+      : {}),
+    ...(state.allAgreed !== undefined ? { allAgreed: state.allAgreed } : {}),
+    ...(state.nightStatus?.length ? { nightStatus: state.nightStatus } : {}),
+    ...(state.previousNightTargetId
+      ? { previousNightTargetId: state.previousNightTargetId }
+      : {}),
+    ...(state.investigationResult
+      ? { investigationResult: state.investigationResult }
+      : {}),
+    ...(state.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
+    ...(state.morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),
+    ...(state.priestWardActive ? { priestWardActive: true } : {}),
+    ...(state.isSilenced ? { isSilenced: true } : {}),
+    ...(state.isHypnotized ? { isHypnotized: true } : {}),
+    ...(state.activeTrial ? { activeTrial: state.activeTrial } : {}),
+    nominationsEnabled: state.nominationsEnabled,
+    singleTrialPerDay: state.singleTrialPerDay,
+    revealProtections: state.revealProtections,
+    ...(state.executionerTargetId
+      ? { executionerTargetId: state.executionerTargetId }
+      : {}),
+    ...(state.nominations?.length ? { nominations: state.nominations } : {}),
+    ...(state.myNominatedDefendantId
+      ? { myNominatedDefendantId: state.myNominatedDefendantId }
+      : {}),
+    ...(state.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
+    ...(state.oneEyedSeerLockedTargetId
+      ? { oneEyedSeerLockedTargetId: state.oneEyedSeerLockedTargetId }
+      : {}),
+    ...(state.elusiveSeerVillagerIds?.length
+      ? { elusiveSeerVillagerIds: state.elusiveSeerVillagerIds }
+      : {}),
+    ...(state.exposerReveal ? { exposerReveal: state.exposerReveal } : {}),
+    ...(state.mySecondNightTarget
+      ? { mySecondNightTarget: state.mySecondNightTarget }
+      : {}),
+    ...(state.exposerAbilityUsed ? { exposerAbilityUsed: true } : {}),
+    ...(state.hunterRevengePlayerId
+      ? { hunterRevengePlayerId: state.hunterRevengePlayerId }
+      : {}),
+  };
+}
+
+export function werewolfStateFromFirebase(
+  raw: FirebaseWerewolfPlayerState,
+): WerewolfPlayerGameState {
+  return {
+    ...baseStateFromFirebase(raw),
+    gameMode: GameMode.Werewolf,
+    nominationsEnabled: raw.nominationsEnabled,
+    singleTrialPerDay: raw.singleTrialPerDay,
+    revealProtections: raw.revealProtections,
+    ...(raw.nightActions ? { nightActions: raw.nightActions } : {}),
+    ...(raw.myNightTargetSkipped
+      ? { myNightTarget: null }
+      : raw.myNightTarget !== undefined
+        ? { myNightTarget: raw.myNightTarget }
+        : {}),
+    ...(raw.myNightTargetConfirmed !== undefined
+      ? { myNightTargetConfirmed: raw.myNightTargetConfirmed }
+      : {}),
+    ...(raw.teamVotes?.length ? { teamVotes: raw.teamVotes } : {}),
+    ...(raw.suggestedTargetId !== undefined
+      ? { suggestedTargetId: raw.suggestedTargetId }
+      : {}),
+    ...(raw.allAgreed !== undefined ? { allAgreed: raw.allAgreed } : {}),
+    ...(raw.nightStatus?.length ? { nightStatus: raw.nightStatus } : {}),
+    ...(raw.previousNightTargetId
+      ? { previousNightTargetId: raw.previousNightTargetId }
+      : {}),
+    ...(raw.investigationResult
+      ? { investigationResult: raw.investigationResult }
+      : {}),
+    ...(raw.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
+    ...(raw.morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),
+    ...(raw.priestWardActive ? { priestWardActive: true } : {}),
+    ...(raw.isSilenced ? { isSilenced: true } : {}),
+    ...(raw.isHypnotized ? { isHypnotized: true } : {}),
+    ...(raw.activeTrial
+      ? {
+          activeTrial:
+            raw.activeTrial as WerewolfPlayerGameState["activeTrial"],
+        }
+      : {}),
+    ...(raw.executionerTargetId
+      ? { executionerTargetId: raw.executionerTargetId }
+      : {}),
+    ...(raw.nominations?.length ? { nominations: raw.nominations } : {}),
+    ...(raw.myNominatedDefendantId
+      ? { myNominatedDefendantId: raw.myNominatedDefendantId }
+      : {}),
+    ...(raw.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
+    ...(raw.oneEyedSeerLockedTargetId
+      ? { oneEyedSeerLockedTargetId: raw.oneEyedSeerLockedTargetId }
+      : {}),
+    ...(raw.elusiveSeerVillagerIds?.length
+      ? { elusiveSeerVillagerIds: raw.elusiveSeerVillagerIds }
+      : {}),
+    ...(raw.exposerReveal
+      ? {
+          exposerReveal: {
+            ...raw.exposerReveal,
+            team: raw.exposerReveal.team as Team,
+          },
+        }
+      : {}),
+    ...(raw.mySecondNightTarget
+      ? { mySecondNightTarget: raw.mySecondNightTarget }
+      : {}),
+    ...(raw.exposerAbilityUsed ? { exposerAbilityUsed: true } : {}),
+    ...(raw.hunterRevengePlayerId
+      ? { hunterRevengePlayerId: raw.hunterRevengePlayerId }
+      : {}),
+  } as WerewolfPlayerGameState;
+}
