@@ -102,7 +102,7 @@ export function BoardDisplay({
       <CardContent className="space-y-4">
         <TrackSlots filled={goodCardsPlayed} variant="good" />
 
-        <div>
+        <div className={powerLabels ? "pb-16" : undefined}>
           <p className="text-sm font-medium mb-1">{themeLabels.badTrack}</p>
           <TrackSlots
             filled={badCardsPlayed}
