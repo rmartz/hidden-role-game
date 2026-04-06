@@ -1,7 +1,7 @@
 import type { PlayerRoleAssignment } from "@/lib/types";
 import { TargetCategory } from "../types";
 import type { AnyNightAction, TargetablePlayer, TeamNightVote } from "../types";
-import { WerewolfRole, WEREWOLF_ROLES, getWerewolfRole } from "../roles";
+import { getWerewolfRole } from "../roles";
 import { isGroupPhaseKey, baseGroupPhaseKey } from "./phase-keys";
 
 /**
@@ -33,12 +33,14 @@ export function getTargetablePlayers(
 
   if (isGroupPhaseKey(activePhaseKey)) {
     if (myPlayerId) excludeIds.push(myPlayerId);
-    const primaryRole =
-      WEREWOLF_ROLES[baseGroupPhaseKey(activePhaseKey) as WerewolfRole];
+    const primaryRole = getWerewolfRole(baseGroupPhaseKey(activePhaseKey));
     for (const a of visibleRoleAssignments) {
       // When role info is present (narrator view), exclude same-team players.
       // When role is absent (player view with wake-partner/aware-of), exclude all.
-      if (!a.role || a.role.team === (primaryRole.team as string)) {
+      if (
+        !a.role ||
+        (primaryRole && a.role.team === (primaryRole.team as string))
+      ) {
         excludeIds.push(a.player.id);
       }
     }
@@ -78,8 +80,8 @@ export function getGroupPhasePlayerIds(
     .filter((a) => {
       if (deadPlayerIds.includes(a.playerId)) return false;
       if (a.roleDefinitionId === baseKey) return true;
-      const role = WEREWOLF_ROLES[a.roleDefinitionId as WerewolfRole];
-      return (role.wakesWith as string | undefined) === baseKey;
+      const role = getWerewolfRole(a.roleDefinitionId);
+      return (role?.wakesWith as string | undefined) === baseKey;
     })
     .map((a) => a.playerId);
 }
@@ -98,8 +100,8 @@ export function getGroupPhaseMemberIds(
   return roleAssignments
     .filter((a) => {
       if (a.roleDefinitionId === baseKey) return true;
-      const role = WEREWOLF_ROLES[a.roleDefinitionId as WerewolfRole];
-      return (role.wakesWith as string | undefined) === baseKey;
+      const role = getWerewolfRole(a.roleDefinitionId);
+      return (role?.wakesWith as string | undefined) === baseKey;
     })
     .map((a) => a.playerId);
 }

@@ -1,6 +1,6 @@
 import { GameStatus, Team } from "@/lib/types";
 import type { Game } from "@/lib/types";
-import { WerewolfRole, WEREWOLF_ROLES } from "../roles";
+import { WerewolfRole, getWerewolfRole } from "../roles";
 
 /**
  * Checks the current win condition for a Werewolf game.
@@ -36,7 +36,8 @@ export function checkWinCondition(
   let spoilerAlive = false;
 
   for (const assignment of aliveAssignments) {
-    const role = WEREWOLF_ROLES[assignment.roleDefinitionId as WerewolfRole];
+    const role = getWerewolfRole(assignment.roleDefinitionId);
+    if (!role) continue;
     if (role.id === WerewolfRole.Chupacabra) {
       chupacabraAlive = true;
     } else if (role.id === WerewolfRole.Spoiler) {

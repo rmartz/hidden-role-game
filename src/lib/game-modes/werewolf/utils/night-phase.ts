@@ -1,7 +1,7 @@
 import type { Game, PlayerRoleAssignment } from "@/lib/types";
 import { WakesAtNight, WerewolfPhase } from "../types";
 import type { WerewolfNighttimePhase } from "../types";
-import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
+import { WEREWOLF_ROLES, WerewolfRole, getWerewolfRole } from "../roles";
 import { isGroupPhaseKey, baseGroupPhaseKey } from "./phase-keys";
 import { currentTurnState } from "./game-state";
 
@@ -34,8 +34,8 @@ function hasAliveGroupParticipants(
   return roleAssignments.some((a) => {
     if (deadPlayerIds.has(a.playerId)) return false;
     if (a.roleDefinitionId === baseKey) return true;
-    const role = WEREWOLF_ROLES[a.roleDefinitionId as WerewolfRole];
-    return (role.wakesWith as string | undefined) === baseKey;
+    const role = getWerewolfRole(a.roleDefinitionId);
+    return (role?.wakesWith as string | undefined) === baseKey;
   });
 }
 
@@ -130,11 +130,10 @@ export function validateActiveNightPlayer(
     // Group phase — check caller is the primary role or a wakesWith participant.
     // Use the base key so suffixed repeat phases (e.g. ":2") match correctly.
     const baseKey = baseGroupPhaseKey(activePhaseKey);
-    const callerRole =
-      WEREWOLF_ROLES[callerAssignment.roleDefinitionId as WerewolfRole];
+    const callerRole = getWerewolfRole(callerAssignment.roleDefinitionId);
     const isParticipant =
-      (callerRole.id as string | undefined) === baseKey ||
-      (callerRole.wakesWith as string | undefined) === baseKey;
+      (callerRole?.id as string | undefined) === baseKey ||
+      (callerRole?.wakesWith as string | undefined) === baseKey;
     if (!isParticipant) return undefined;
     return { phase, activePhaseKey, isGroupPhase: true };
   }

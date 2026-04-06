@@ -14,7 +14,7 @@ import {
   checkWinCondition,
   WerewolfWinner,
 } from "../utils";
-import { WerewolfRole, WEREWOLF_ROLES, getWerewolfRole } from "../roles";
+import { WerewolfRole, getWerewolfRole } from "../roles";
 import { didWolfCubDie } from "./helpers";
 
 export const startDayAction: GameAction = {
@@ -47,8 +47,8 @@ export const startDayAction: GameAction = {
 
     // Old Man timer: fires after (#werewolves + 2) nights.
     const werewolfCount = game.roleAssignments.filter((a) => {
-      const roleDef = WEREWOLF_ROLES[a.roleDefinitionId as WerewolfRole];
-      return roleDef.isWerewolf === true;
+      const roleDef = getWerewolfRole(a.roleDefinitionId);
+      return roleDef?.isWerewolf === true;
     }).length;
     const oldManAssignment = game.roleAssignments.find(
       (a) => a.roleDefinitionId === (WerewolfRole.OldMan as string),
@@ -118,7 +118,7 @@ export const startDayAction: GameAction = {
         (a) => a.playerId === oesAction.targetPlayerId,
       );
       const oesTargetRoleDef = oesTargetAssignment
-        ? WEREWOLF_ROLES[oesTargetAssignment.roleDefinitionId as WerewolfRole]
+        ? getWerewolfRole(oesTargetAssignment.roleDefinitionId)
         : undefined;
       if (oesTargetRoleDef?.isWerewolf) {
         oneEyedSeerLockedTargetId = oesAction.targetPlayerId;
@@ -184,7 +184,7 @@ export const startDayAction: GameAction = {
             (a) => a.playerId === vigilanteAction.targetPlayerId,
           );
           const targetRole = targetAssignment
-            ? WEREWOLF_ROLES[targetAssignment.roleDefinitionId as WerewolfRole]
+            ? getWerewolfRole(targetAssignment.roleDefinitionId)
             : undefined;
           if (targetRole?.team === Team.Good) {
             newDeadIds.push(vigilanteAssignment.playerId);
@@ -208,7 +208,7 @@ export const startDayAction: GameAction = {
             (a) => a.playerId === morticianAction.targetPlayerId,
           );
           const targetRole = targetAssignment
-            ? WEREWOLF_ROLES[targetAssignment.roleDefinitionId as WerewolfRole]
+            ? getWerewolfRole(targetAssignment.roleDefinitionId)
             : undefined;
           if (targetRole?.isWerewolf) {
             morticianAbilityEnded = true;

@@ -11,7 +11,7 @@ import {
 import { WerewolfPhase, TargetCategory, isTeamNightAction } from "../types";
 import type { AnyNightAction, WerewolfTurnState } from "../types";
 import type { WerewolfRoleDefinition } from "../roles";
-import { WerewolfRole, WEREWOLF_ROLES } from "../roles";
+import { WerewolfRole, getWerewolfRole } from "../roles";
 import { WEREWOLF_COPY } from "../copy";
 
 function hasPriestActiveWard(ts: WerewolfTurnState | undefined): boolean {
@@ -367,7 +367,7 @@ function appendInvestigationResult(
     (a) => a.playerId === myAction.targetPlayerId,
   );
   const targetRoleDef = targetAssignment
-    ? WEREWOLF_ROLES[targetAssignment.roleDefinitionId as WerewolfRole]
+    ? getWerewolfRole(targetAssignment.roleDefinitionId)
     : undefined;
 
   if (myRoleDef.checksForSeer) {
@@ -390,7 +390,7 @@ function appendInvestigationResult(
       (a) => a.playerId === myAction.secondTargetPlayerId,
     );
     const secondRoleDef = secondAssignment
-      ? WEREWOLF_ROLES[secondAssignment.roleDefinitionId as WerewolfRole]
+      ? getWerewolfRole(secondAssignment.roleDefinitionId)
       : undefined;
     const sameTeam =
       targetRoleDef?.team !== Team.Neutral &&

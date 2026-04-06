@@ -1,7 +1,7 @@
 import { Team } from "@/lib/types";
 import { TargetCategory } from "../types";
 import type { AnyNightAction } from "../types";
-import { WerewolfRole, WEREWOLF_ROLES, getWerewolfRole } from "../roles";
+import { WerewolfRole, getWerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
 import { WEREWOLF_COPY } from "../copy";
 import { isGroupPhaseKey, baseGroupPhaseKey, isRoleActive } from "./phase-keys";
@@ -136,7 +136,7 @@ export function getInvestigationResultForNarrator(
     (a) => a.player.id === activeTarget,
   );
   if (!targetAssignment?.role) return undefined;
-  const roleDef = WEREWOLF_ROLES[targetAssignment.role.id as WerewolfRole];
+  const roleDef = getWerewolfRole(targetAssignment.role.id);
 
   if (activeRoleDef?.checksForSeer) {
     const isSeer = targetAssignment.role.id === (WerewolfRole.Seer as string);
@@ -152,7 +152,7 @@ export function getInvestigationResultForNarrator(
   if (activeRoleDef?.revealsExactRole) {
     return {
       targetName: activeTargetName ?? activeTarget,
-      isWerewolfTeam: roleDef.isWerewolf === true,
+      isWerewolfTeam: roleDef?.isWerewolf === true,
       resultLabel: targetAssignment.role.name,
     };
   }
@@ -162,13 +162,12 @@ export function getInvestigationResultForNarrator(
       (a) => a.player.id === secondTargetId,
     );
     if (!secondAssignment?.role) return undefined;
-    const secondRoleDef =
-      WEREWOLF_ROLES[secondAssignment.role.id as WerewolfRole];
+    const secondRoleDef = getWerewolfRole(secondAssignment.role.id);
     // Neutral players win individually, so treat them as never sharing a team.
     const sameTeam =
-      roleDef.team !== Team.Neutral &&
-      secondRoleDef.team !== Team.Neutral &&
-      roleDef.team === secondRoleDef.team;
+      roleDef?.team !== Team.Neutral &&
+      secondRoleDef?.team !== Team.Neutral &&
+      roleDef?.team === secondRoleDef?.team;
     return {
       targetName: activeTargetName ?? activeTarget,
       isWerewolfTeam: sameTeam,
@@ -181,7 +180,7 @@ export function getInvestigationResultForNarrator(
 
   return {
     targetName: activeTargetName ?? activeTarget,
-    isWerewolfTeam: roleDef.isWerewolf === true,
+    isWerewolfTeam: roleDef?.isWerewolf === true,
   };
 }
 

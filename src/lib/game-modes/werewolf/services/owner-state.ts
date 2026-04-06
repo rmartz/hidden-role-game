@@ -10,7 +10,12 @@ import { WerewolfPhase } from "../types";
 import { SMITE_PHASE_KEY, OLD_MAN_TIMER_KEY } from "../utils";
 import { getSilencedPlayerIds, getHypnotizedPlayerId } from "../utils";
 import { currentTurnState } from "../utils/game-state";
-import { WerewolfRole, WEREWOLF_ROLES, isWerewolfRole } from "../roles";
+import {
+  WerewolfRole,
+  WEREWOLF_ROLES,
+  isWerewolfRole,
+  getWerewolfRole,
+} from "../roles";
 
 /** Extracts nightActions from the current turnState, if present. */
 function extractNightActions(
@@ -103,9 +108,8 @@ export function extractDaytimeNightSummary(
     const revealedPlayer = game.players.find(
       (p) => p.id === exposerReveal.playerId,
     );
-    const revealedRoleDef =
-      WEREWOLF_ROLES[exposerReveal.roleId as WerewolfRole];
-    if (revealedPlayer) {
+    const revealedRoleDef = getWerewolfRole(exposerReveal.roleId);
+    if (revealedPlayer && revealedRoleDef) {
       result.exposerReveal = {
         playerName: revealedPlayer.name,
         roleName: revealedRoleDef.name,
@@ -215,7 +219,7 @@ export function extractDaytimePlayerState(
           (a) => a.playerId === activeTrial.defendantId,
         );
         const roleDef = assignment
-          ? WEREWOLF_ROLES[assignment.roleDefinitionId as WerewolfRole]
+          ? getWerewolfRole(assignment.roleDefinitionId)
           : undefined;
         if (roleDef) {
           result.activeTrial.eliminatedRole = {
