@@ -19,7 +19,7 @@ import {
   TargetCategory,
   getInvestigationResultForNarrator,
 } from "@/lib/game-modes/werewolf";
-import { WerewolfRole, getWerewolfRole } from "@/lib/game-modes/werewolf/roles";
+import { WerewolfRole, WEREWOLF_ROLES } from "@/lib/game-modes/werewolf/roles";
 import { isRoleActive } from "@/lib/game-modes/werewolf";
 import type {
   WerewolfTurnState,
@@ -116,10 +116,8 @@ export function OwnerGameNightScreen({
       if (!a.role) return false;
       if (a.role.id === baseActivePhaseKey) return true;
       if (isGroupPhase) {
-        const roleDef = getWerewolfRole(a.role.id);
-        return (
-          (roleDef?.wakesWith as string | undefined) === baseActivePhaseKey
-        );
+        const roleDef = WEREWOLF_ROLES[a.role.id as WerewolfRole];
+        return (roleDef.wakesWith as string | undefined) === baseActivePhaseKey;
       }
       return false;
     })

@@ -12,7 +12,7 @@ import {
   isRoleActive,
   getInterimAttackedPlayerIds,
 } from "../utils";
-import { WerewolfRole, getWerewolfRole } from "../roles";
+import { WerewolfRole, WEREWOLF_ROLES, getWerewolfRole } from "../roles";
 import { getPlayer } from "@/lib/player-utils";
 
 export const setNightTargetAction: GameAction = {
@@ -109,7 +109,7 @@ export const setNightTargetAction: GameAction = {
         (a) => a.playerId === callerId,
       );
       const callerRoleDef = callerAssignment
-        ? getWerewolfRole(callerAssignment.roleDefinitionId)
+        ? WEREWOLF_ROLES[callerAssignment.roleDefinitionId as WerewolfRole]
         : undefined;
       if (
         callerRoleDef?.targetCategory === TargetCategory.Attack ||
