@@ -23,7 +23,6 @@ import {
   buildGame,
   buildPlayingStatus,
   buildAllPlayerStates,
-  adjustRoleSlotsForPlayer as gameStateAdjustRoleSlotsForPlayer,
 } from "@/lib/game/state";
 
 export { getModeDefinition };
@@ -113,19 +112,4 @@ export async function applyAction(
 
   await writePlayerStates(result.game);
   return result;
-}
-
-/** Adjust role slots when a player joins or leaves. */
-export function adjustRoleSlotsForPlayer(
-  current: RoleSlot[],
-  gameMode: GameMode,
-  numPlayers: number,
-  operation: "add" | "remove",
-): RoleSlot[] {
-  return gameStateAdjustRoleSlotsForPlayer(
-    current,
-    gameMode,
-    numPlayers,
-    operation,
-  );
 }

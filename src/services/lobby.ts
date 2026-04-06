@@ -7,10 +7,10 @@ import type {
   ShowRolesInPlay,
   TimerConfig,
 } from "@/lib/types";
-import { modeConfigToFirebase } from "@/lib/firebase/schema";
 import { getAdminDatabase } from "@/lib/firebase/admin";
 import { ServerValue } from "firebase-admin/database";
 import {
+  modeConfigToFirebase,
   lobbyToFirebase,
   firebaseToLobby,
   type FirebaseLobbyPublic,

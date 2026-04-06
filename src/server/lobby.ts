@@ -49,6 +49,9 @@ export async function addLobby(
   gameMode: GameMode,
 ): Promise<Lobby> {
   const lobbyId = randomUUID();
+  // Cast required: LobbyConfig is a discriminated union whose timerConfig and
+  // modeConfig are narrowed per game mode, but gameMode is a runtime parameter
+  // so TypeScript cannot narrow the union statically here.
   const config = {
     gameMode,
     roleConfigMode: RoleConfigModeEnum.Default,
