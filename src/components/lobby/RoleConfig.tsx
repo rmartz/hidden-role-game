@@ -6,9 +6,11 @@ import type { RoleSlot } from "@/server/types";
 import { useAppSelector } from "@/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { RoleConfigEntry } from "./RoleConfigEntry";
 import { RoleConfigModePicker } from "./RoleConfigModePicker";
 import { ROLE_CONFIG_COPY } from "./RoleConfig.copy";
+import { searchRoles } from "./searchRoles";
 
 interface ReadOnlyProps {
   roleDefinitions: Record<string, RoleDefinition<string, Team>>;
@@ -39,6 +41,7 @@ export function RoleConfig(props: RoleConfigProps) {
     props;
 
   const [showAll, setShowAll] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const roleCounts = useAppSelector((s) => s.gameConfig.roleCounts);
   const roleMins = useAppSelector((s) => s.gameConfig.roleMins);
@@ -64,42 +67,53 @@ export function RoleConfig(props: RoleConfigProps) {
     return (roleCounts[roleId] ?? 0) > 0;
   }
 
-  const enabledRoles = allRoles.filter((r) => isRoleEnabled(r.id));
-  const disabledRoles = allRoles.filter((r) => !isRoleEnabled(r.id));
-  const hasHiddenRoles = disabledRoles.length > 0;
-
   const categoryOrder = props.categoryOrder;
   const categoryLabels = props.categoryLabels;
   const hasCategoryGrouping = !!categoryOrder;
 
-  const disabledByCategory = hasCategoryGrouping
-    ? categoryOrder.reduce<
-        {
-          category: string;
-          label: string;
-          roles: RoleDefinition<string, Team>[];
-        }[]
-      >((acc, cat) => {
-        const roles = disabledRoles.filter((r) => r.category === cat);
-        if (roles.length > 0) {
-          acc.push({
-            category: cat,
-            label: categoryLabels?.[cat] ?? cat,
-            roles,
-          });
-        }
-        return acc;
-      }, [])
-    : [];
+  const isSearching = searchQuery.trim() !== "";
 
-  const uncategorizedDisabled = hasCategoryGrouping
-    ? disabledRoles.filter(
-        (r) => !r.category || !categoryOrder.includes(r.category),
-      )
-    : disabledRoles;
+  const searchedRoles = isSearching
+    ? searchRoles(allRoles, searchQuery, { categoryLabels })
+    : allRoles;
 
-  const topListRoles =
-    showAll && !hasCategoryGrouping ? allRoles : enabledRoles;
+  const enabledRoles = searchedRoles.filter((r) => isRoleEnabled(r.id));
+  const disabledRoles = searchedRoles.filter((r) => !isRoleEnabled(r.id));
+  const hasHiddenRoles = !isSearching && disabledRoles.length > 0;
+
+  const disabledByCategory =
+    hasCategoryGrouping && !isSearching
+      ? categoryOrder.reduce<
+          {
+            category: string;
+            label: string;
+            roles: RoleDefinition<string, Team>[];
+          }[]
+        >((acc, cat) => {
+          const roles = disabledRoles.filter((r) => r.category === cat);
+          if (roles.length > 0) {
+            acc.push({
+              category: cat,
+              label: categoryLabels?.[cat] ?? cat,
+              roles,
+            });
+          }
+          return acc;
+        }, [])
+      : [];
+
+  const uncategorizedDisabled =
+    hasCategoryGrouping && !isSearching
+      ? disabledRoles.filter(
+          (r) => !r.category || !categoryOrder.includes(r.category),
+        )
+      : [];
+
+  const topListRoles = isSearching
+    ? searchedRoles
+    : showAll && !hasCategoryGrouping
+      ? allRoles
+      : enabledRoles;
 
   function toggleShowAll() {
     setShowAll((prev) => !prev);
@@ -118,35 +132,54 @@ export function RoleConfig(props: RoleConfigProps) {
                 : `Assign ${String(playerCount)} role${playerCount !== 1 ? "s" : ""} (${String(total)}/${String(playerCount)} assigned)`}
             </p>
           )}
+          <Input
+            type="search"
+            placeholder={ROLE_CONFIG_COPY.searchPlaceholder}
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+            }}
+            className="mt-1"
+          />
         </CardHeader>
         <CardContent>
-          <ul className="space-y-1 list-none p-0">
-            {topListRoles.map((role) =>
-              readOnly ? (
-                <RoleConfigEntry
-                  key={role.id}
-                  role={role}
-                  gameMode={gameMode}
-                  roleConfigMode={roleConfigMode}
-                  min={readOnlyMin[role.id] ?? 0}
-                  max={readOnlyMax[role.id] ?? 0}
-                  readOnly={true}
-                  dimmed={showAll && !isRoleEnabled(role.id)}
-                />
-              ) : (
-                <RoleConfigEntry
-                  key={role.id}
-                  role={role}
-                  gameMode={gameMode}
-                  roleConfigMode={roleConfigMode}
-                  readOnly={false}
-                  disabled={props.disabled}
-                  dimmed={!hasCategoryGrouping && !isRoleEnabled(role.id)}
-                />
-              ),
-            )}
-          </ul>
-          {hasCategoryGrouping && showAll && (
+          {isSearching && searchedRoles.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-2">
+              {ROLE_CONFIG_COPY.noSearchResults}
+            </p>
+          ) : (
+            <ul className="space-y-1 list-none p-0">
+              {topListRoles.map((role) =>
+                readOnly ? (
+                  <RoleConfigEntry
+                    key={role.id}
+                    role={role}
+                    gameMode={gameMode}
+                    roleConfigMode={roleConfigMode}
+                    min={readOnlyMin[role.id] ?? 0}
+                    max={readOnlyMax[role.id] ?? 0}
+                    readOnly={true}
+                    dimmed={!isSearching && showAll && !isRoleEnabled(role.id)}
+                  />
+                ) : (
+                  <RoleConfigEntry
+                    key={role.id}
+                    role={role}
+                    gameMode={gameMode}
+                    roleConfigMode={roleConfigMode}
+                    readOnly={false}
+                    disabled={props.disabled}
+                    dimmed={
+                      !isSearching &&
+                      !hasCategoryGrouping &&
+                      !isRoleEnabled(role.id)
+                    }
+                  />
+                ),
+              )}
+            </ul>
+          )}
+          {!isSearching && hasCategoryGrouping && showAll && (
             <>
               {disabledByCategory.map(({ category, label, roles }) => (
                 <div key={category} className="mt-4">
