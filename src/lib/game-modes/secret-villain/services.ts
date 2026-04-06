@@ -100,16 +100,18 @@ export const secretVillainServices: GameModeServices = {
   },
 
   extractPlayerState(game: Game, callerId: string): Record<string, unknown> {
-    const ts = currentTurnState(game);
-    if (!ts) return {};
-
     const result: Record<string, unknown> = {};
-    const { phase } = ts;
 
     // Pass the theme to the client for cosmetic label resolution.
+    // This must be set before the turnState guard so it's available during Starting status.
     if (isSecretVillainModeConfig(game.modeConfig) && game.modeConfig.theme) {
       result["svTheme"] = game.modeConfig.theme;
     }
+
+    const ts = currentTurnState(game);
+    if (!ts) return result;
+
+    const { phase } = ts;
 
     // Phase info — visible to all players.
     result["svPhase"] = buildPhaseInfo(phase);
