@@ -87,7 +87,6 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
   mySecondNightTarget?: string;
   exposerAbilityUsed?: boolean;
   hunterRevengePlayerId?: string;
-  altruistSave?: { savedPlayerId: string; altruistPlayerId: string };
 }
 
 // ---------------------------------------------------------------------------
@@ -158,20 +157,7 @@ function baseStateToFirebase(state: PlayerGameState): FirebaseBasePlayerState {
   };
 }
 
-function baseStateFromFirebase(raw: FirebaseBasePlayerState): {
-  status: GameStatusState;
-  gameMode: string;
-  lobbyId: string;
-  players: FirebaseLobbyPlayer[];
-  gameOwner: FirebaseLobbyPlayer | undefined;
-  myPlayerId: string | undefined;
-  myRole: { id: string; name: string; team: Team } | undefined;
-  visibleRoleAssignments: VisibleTeammate[];
-  rolesInPlay: RoleInPlay[] | undefined;
-  amDead: true | undefined;
-  deadPlayerIds: string[] | undefined;
-  timerConfig: TimerConfig;
-} {
+function baseStateFromFirebase(raw: FirebaseBasePlayerState) {
   return {
     status: JSON.parse(raw.statusJson) as GameStatusState,
     gameMode: raw.gameMode,
@@ -534,6 +520,9 @@ export function playerStateToFirebase(
 export function firebaseToPlayerState(
   raw: FirebasePlayerState,
 ): PlayerGameState {
+  // gameMode is typed as string on FirebaseBasePlayerState (Firebase boundary),
+  // so the discriminated union cannot be narrowed at compile time. Cast to
+  // GameMode for the switch and narrow each branch individually.
   switch (raw.gameMode as GameMode) {
     case GameMode.Werewolf:
       return werewolfStateFromFirebase(raw as FirebaseWerewolfPlayerState);
