@@ -5,6 +5,8 @@ import type { FinishedGameStatus } from "@/lib/types";
 import { SecretVillainWinner } from "@/lib/game/modes/secret-villain/utils/win-condition";
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
 import { getSvThemeLabels } from "@/lib/game/modes/secret-villain/themes";
+import type { SvThemeLabels } from "@/lib/game/modes/secret-villain/themes";
+import { SecretVillainRole } from "@/lib/game/modes/secret-villain/roles";
 import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
 import type { VisibleTeammate } from "@/server/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,16 +21,33 @@ export interface SecretVillainGameOverViewProps {
 
 interface RoleAssignmentListProps {
   assignments: VisibleTeammate[];
+  themeLabels: SvThemeLabels;
 }
 
-function RoleAssignmentList({ assignments }: RoleAssignmentListProps) {
+function themedRoleName(roleId: string, themeLabels: SvThemeLabels): string {
+  const roleMap: Partial<Record<SecretVillainRole, string>> = {
+    [SecretVillainRole.Good]: themeLabels.goodRole,
+    [SecretVillainRole.Bad]: themeLabels.badRole,
+    [SecretVillainRole.SpecialBad]: themeLabels.specialBadRole,
+  };
+  return roleMap[roleId as SecretVillainRole] ?? roleId;
+}
+
+function RoleAssignmentList({
+  assignments,
+  themeLabels,
+}: RoleAssignmentListProps) {
   if (assignments.length === 0) return null;
   return (
     <ul className="text-sm space-y-1">
       {assignments.map(({ player, role }) => (
         <li key={player.id} className="flex justify-between gap-4">
           <span>{player.name}</span>
-          {role && <span className="text-muted-foreground">{role.name}</span>}
+          {role && (
+            <span className="text-muted-foreground">
+              {themedRoleName(role.id, themeLabels)}
+            </span>
+          )}
         </li>
       ))}
     </ul>
@@ -75,7 +94,10 @@ export function SecretVillainGameOverView({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <RoleAssignmentList assignments={gameState.visibleRoleAssignments} />
+          <RoleAssignmentList
+            assignments={gameState.visibleRoleAssignments}
+            themeLabels={themeLabels}
+          />
         </CardContent>
       </Card>
       <Button
