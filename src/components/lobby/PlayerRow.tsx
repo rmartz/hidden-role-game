@@ -1,4 +1,5 @@
 import type { PublicLobbyPlayer } from "@/server/types";
+import { GripVerticalIcon } from "lucide-react";
 import { CheckmarkCircleRegular } from "@fluentui/react-icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -24,8 +25,12 @@ interface PlayerRowProps {
   showRemovePlayer: boolean;
   showMakeOwner: boolean;
   disabled: boolean;
+  draggable?: boolean;
   onRemovePlayer: (playerId: string) => void;
   onTransferOwner: (playerId: string) => void;
+  onDragStart?: (playerId: string) => void;
+  onDragOver?: (playerId: string) => void;
+  onDragEnd?: () => void;
 }
 
 export function PlayerRow({
@@ -37,11 +42,38 @@ export function PlayerRow({
   showRemovePlayer,
   showMakeOwner,
   disabled,
+  draggable,
   onRemovePlayer,
   onTransferOwner,
+  onDragStart,
+  onDragOver,
+  onDragEnd,
 }: PlayerRowProps) {
   return (
-    <li className="flex items-center gap-2 py-1">
+    <li
+      className={`flex items-center gap-2 py-1${draggable ? " select-none" : ""}`}
+      draggable={draggable}
+      onDragStart={
+        draggable
+          ? (e) => {
+              e.dataTransfer.effectAllowed = "move";
+              onDragStart?.(player.id);
+            }
+          : undefined
+      }
+      onDragOver={
+        draggable
+          ? (e) => {
+              e.preventDefault();
+              onDragOver?.(player.id);
+            }
+          : undefined
+      }
+      onDragEnd={draggable ? onDragEnd : undefined}
+    >
+      {draggable && (
+        <GripVerticalIcon className="h-4 w-4 text-muted-foreground shrink-0 cursor-grab" />
+      )}
       {isReady && (
         <CheckmarkCircleRegular className="text-green-600 h-5 w-5 shrink-0" />
       )}

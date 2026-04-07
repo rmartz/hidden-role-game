@@ -58,7 +58,21 @@ export const secretVillainServices: GameModeServices = {
     roleAssignments: PlayerRoleAssignment[],
     options?: Record<string, unknown>,
   ): SecretVillainTurnState {
-    const playerIds = shuffle(roleAssignments.map((a) => a.playerId));
+    const allPlayerIds = roleAssignments.map((a) => a.playerId);
+
+    // Use the lobby's playerOrder if provided (preserving the seating arrangement
+    // set in the lobby), otherwise fall back to a random shuffle.
+    const storedOrder = options?.["playerOrder"] as string[] | undefined;
+    let playerIds: string[];
+    if (storedOrder && storedOrder.length > 0) {
+      const knownIds = new Set(allPlayerIds);
+      const filtered = storedOrder.filter((id) => knownIds.has(id));
+      const missing = allPlayerIds.filter((id) => !filtered.includes(id));
+      playerIds = [...filtered, ...missing];
+    } else {
+      playerIds = shuffle(allPlayerIds);
+    }
+
     const firstPresidentId = playerIds[0];
     if (!firstPresidentId) {
       throw new Error("No players to initialize Secret Villain game");

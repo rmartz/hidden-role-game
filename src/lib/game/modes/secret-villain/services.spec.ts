@@ -145,6 +145,28 @@ describe("buildInitialTurnState", () => {
       SpecialActionType.Shoot,
     ]);
   });
+
+  it("uses playerOrder from options as president rotation when provided", () => {
+    const specifiedOrder = ["p5", "p3", "p1", "p4", "p2"];
+    const ts = secretVillainServices.buildInitialTurnState(assignments, {
+      playerOrder: specifiedOrder,
+    }) as SecretVillainTurnState;
+    expect(ts.presidentOrder).toEqual(specifiedOrder);
+    expect(ts.phase.presidentId).toBe("p5");
+  });
+
+  it("shuffles players when no playerOrder option is provided", () => {
+    // Run multiple times to confirm order is not deterministically the input order.
+    const results = new Set<string>();
+    for (let i = 0; i < 30; i++) {
+      const ts = secretVillainServices.buildInitialTurnState(
+        assignments,
+      ) as SecretVillainTurnState;
+      results.add(ts.presidentOrder.join(","));
+    }
+    // With 5 players there are 120 permutations — extremely unlikely to always match input.
+    expect(results.size).toBeGreaterThan(1);
+  });
 });
 
 describe("extractPlayerState", () => {

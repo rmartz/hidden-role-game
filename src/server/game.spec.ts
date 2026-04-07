@@ -14,6 +14,7 @@ function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
       { id: "player-1", name: "Alice", sessionId: "session-owner" },
       { id: "player-2", name: "Bob", sessionId: "session-bob" },
     ],
+    playerOrder: ["player-1", "player-2"],
     config: {
       gameMode: GameMode.SecretVillain,
       roleConfigMode: RoleConfigMode.Default,

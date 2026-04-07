@@ -14,6 +14,8 @@ export interface FirebaseLobbyPublic {
   ownerPlayerId: string;
   /** Optional — Firebase omits empty objects, though lobbies always have players. */
   players?: Record<string, FirebaseLobbyPlayer>;
+  /** Ordered list of player IDs defining seating positions. Firebase omits absent. */
+  playerOrder?: string[];
   config: FirebaseLobbyConfig;
   gameId: string | null;
   /** Player IDs that have readied up. Firebase omits empty arrays. */
@@ -71,6 +73,9 @@ export function lobbyToFirebase(lobby: Lobby): {
     public: {
       ownerPlayerId: ownerPlayer?.id ?? "",
       players,
+      ...(lobby.playerOrder.length > 0
+        ? { playerOrder: lobby.playerOrder }
+        : {}),
       config: lobbyConfigToFirebase(lobby.config),
       gameId: lobby.gameId ?? null,
       ...(lobby.readyPlayerIds.length > 0
@@ -123,10 +128,21 @@ export function firebaseToLobby(
     sessionId: sessions[p.id] ?? "",
   }));
 
+  // Reconstruct playerOrder: use stored order if present, otherwise fall back
+  // to the natural iteration order of the players record.
+  const knownIds = new Set(players.map((p) => p.id));
+  const storedOrder = (pub.playerOrder ?? []).filter((id) => knownIds.has(id));
+  const orderedIds = new Set(storedOrder);
+  const remainingIds = players
+    .map((p) => p.id)
+    .filter((id) => !orderedIds.has(id));
+  const playerOrder = [...storedOrder, ...remainingIds];
+
   return {
     id: lobbyId,
     ownerSessionId: priv.ownerSessionId,
     players,
+    playerOrder,
     config: firebaseToLobbyConfig(pub.config),
     readyPlayerIds: pub.readyPlayerIds ?? [],
     ...(pub.gameId ? { gameId: pub.gameId } : {}),
@@ -200,13 +216,24 @@ export function firebaseToPublicLobby(
   lobbyId: string,
   pub: FirebaseLobbyPublic,
 ): PublicLobby {
+  const players = Object.values(pub.players ?? {}).map((p) => ({
+    id: p.id,
+    name: p.name,
+  }));
+
+  const knownIds = new Set(players.map((p) => p.id));
+  const storedOrder = (pub.playerOrder ?? []).filter((id) => knownIds.has(id));
+  const orderedIds = new Set(storedOrder);
+  const remainingIds = players
+    .map((p) => p.id)
+    .filter((id) => !orderedIds.has(id));
+  const playerOrder = [...storedOrder, ...remainingIds];
+
   return {
     id: lobbyId,
     ownerPlayerId: pub.ownerPlayerId,
-    players: Object.values(pub.players ?? {}).map((p) => ({
-      id: p.id,
-      name: p.name,
-    })),
+    players,
+    playerOrder,
     config: firebaseToLobbyConfig(pub.config),
     readyPlayerIds: pub.readyPlayerIds ?? [],
     ...(pub.gameId ? { gameId: pub.gameId } : {}),

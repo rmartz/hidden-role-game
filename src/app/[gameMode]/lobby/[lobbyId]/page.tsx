@@ -11,6 +11,7 @@ import {
   useLobbyQuery,
   useLobbyWebSocket,
   useRemovePlayer,
+  useReorderPlayers,
   useStartGame,
   useToggleReady,
   useTransferOwner,
@@ -115,6 +116,7 @@ export default function LobbyPage() {
   const startGameMutation = useStartGame(lobbyId);
   const toggleReadyMutation = useToggleReady(lobbyId);
   const transferOwnerMutation = useTransferOwner(lobbyId);
+  const reorderPlayersMutation = useReorderPlayers(lobbyId);
   const { flushAsync: flushConfigSync } = useConfigSync(
     lobbyId,
     isOwner,
@@ -228,6 +230,9 @@ export default function LobbyPage() {
           }}
           onToggleReady={() => {
             toggleReadyMutation.mutate();
+          }}
+          onReorderPlayers={(playerOrder: string[]) => {
+            reorderPlayersMutation.mutate(playerOrder);
           }}
         />
       )}

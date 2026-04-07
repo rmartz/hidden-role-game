@@ -29,6 +29,7 @@ const baseLobby: PublicLobby = {
     { id: "p4", name: "Diana" },
     { id: "p5", name: "Eve" },
   ],
+  playerOrder: ["p1", "p2", "p3", "p4", "p5"],
   config: {
     gameMode: GameMode.Werewolf,
     roleConfigMode: RoleConfigMode.Default,
@@ -66,6 +67,7 @@ export const SinglePlayerOwner: Story = {
     lobby: {
       ...baseLobby,
       players: [{ id: "p1", name: "Alice" }],
+      playerOrder: ["p1"],
       readyPlayerIds: [],
     },
     userPlayerId: "p1",
