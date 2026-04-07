@@ -1,4 +1,3 @@
-import { sum } from "lodash";
 import { Team } from "@/lib/types";
 import type { GameModeConfig, ModeConfig } from "@/lib/types";
 import { isSecretVillainModeConfig } from "@/lib/types";
@@ -43,7 +42,9 @@ export const SECRET_VILLAIN_CONFIG = {
     modeConfig: ModeConfig,
   ): boolean {
     const rolePlayerCount = hasBoard(modeConfig) ? numPlayers - 1 : numPlayers;
-    return sum(Object.values(roleCounts)) === rolePlayerCount;
+    return (
+      Object.values(roleCounts).reduce((a, b) => a + b, 0) === rolePlayerCount
+    );
   },
 
   teamLabels: {

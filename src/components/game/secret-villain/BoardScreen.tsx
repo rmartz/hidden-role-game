@@ -37,10 +37,6 @@ export function BoardScreen({ gameState }: BoardScreenProps) {
     ? getPlayerName(players, svPhase.chancellorNomineeId)
     : undefined;
 
-  const eliminatedNames = (deadPlayerIds ?? []).map((id) =>
-    getPlayerName(players, id),
-  );
-
   return (
     <div className="p-6 max-w-2xl mx-auto space-y-6">
       <h1 className="text-3xl font-bold">
@@ -101,7 +97,7 @@ export function BoardScreen({ gameState }: BoardScreenProps) {
           <CardTitle>{SECRET_VILLAIN_COPY.boardScreen.eliminated}</CardTitle>
         </CardHeader>
         <CardContent>
-          {eliminatedNames.length === 0 ? (
+          {(deadPlayerIds ?? []).length === 0 ? (
             <p
               className="text-sm text-muted-foreground"
               data-testid="no-eliminated"
@@ -110,9 +106,9 @@ export function BoardScreen({ gameState }: BoardScreenProps) {
             </p>
           ) : (
             <ul className="text-sm space-y-1">
-              {eliminatedNames.map((name, i) => (
-                <li key={i} data-testid={`eliminated-player-${String(i)}`}>
-                  {name}
+              {(deadPlayerIds ?? []).map((id, i) => (
+                <li key={id} data-testid={`eliminated-player-${String(i)}`}>
+                  {getPlayerName(players, id)}
                 </li>
               ))}
             </ul>
