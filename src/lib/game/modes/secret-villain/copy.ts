@@ -119,6 +119,7 @@ export const SECRET_VILLAIN_COPY = {
       "Close your eyes and wait. The Bad team is identifying each other.",
     specialBadMessage:
       "Close your eyes and raise your thumb. The other Bad players will see you.",
+    specialBadAllyDescription: "This player is on the Bad team.",
     gameStartsIn: "Game begins in",
   },
   eliminated: "You have been eliminated.",
