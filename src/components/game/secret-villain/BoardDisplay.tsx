@@ -32,27 +32,34 @@ interface TrackSlotsProps {
   labels?: (string | undefined)[];
 }
 
+const SLOT_CLASSES = {
+  good: {
+    filled: "bg-green-500 border-green-600",
+    filledFinal: "bg-green-300 border-green-400",
+    empty: "border-green-400",
+    emptyFinal: "border-green-300 border-dashed",
+  },
+  bad: {
+    filled: "bg-red-500 border-red-600",
+    filledFinal: "bg-red-300 border-red-400",
+    empty: "border-red-400",
+    emptyFinal: "border-red-300 border-dashed",
+  },
+} as const;
+
 function slotClassName(
   isFilled: boolean,
   isFinal: boolean,
   variant: "good" | "bad",
 ): string {
-  if (isFilled) {
-    return isFinal
-      ? variant === "good"
-        ? "bg-green-300 border-green-400"
-        : "bg-red-300 border-red-400"
-      : variant === "good"
-        ? "bg-green-500 border-green-600"
-        : "bg-red-500 border-red-600";
-  }
-  return isFinal
-    ? variant === "good"
-      ? "border-green-300 border-dashed"
-      : "border-red-300 border-dashed"
-    : variant === "good"
-      ? "border-green-400"
-      : "border-red-400";
+  const state = isFilled
+    ? isFinal
+      ? "filledFinal"
+      : "filled"
+    : isFinal
+      ? "emptyFinal"
+      : "empty";
+  return SLOT_CLASSES[variant][state];
 }
 
 function TrackSlots({ filled, size, variant, labels }: TrackSlotsProps) {
