@@ -60,7 +60,9 @@ export function PlayerList({
   const dragSourceIdRef = useRef<string | undefined>(undefined);
   const pendingOrderRef = useRef<string[] | undefined>(undefined);
 
-  // Sync localOrder when lobby.playerOrder changes from the server
+  // Sync localOrder when lobby.playerOrder changes from the server.
+  // Trade-off: a real-time push mid-drag (e.g. another player joining) will
+  // reset the in-progress drag. This is an acceptable edge case.
   useEffect(() => {
     setLocalOrder(lobby.playerOrder);
   }, [lobby.playerOrder]);

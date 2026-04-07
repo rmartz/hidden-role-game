@@ -3,6 +3,7 @@ import { GripVerticalIcon } from "lucide-react";
 import { CheckmarkCircleRegular } from "@fluentui/react-icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -51,7 +52,7 @@ export function PlayerRow({
 }: PlayerRowProps) {
   return (
     <li
-      className={`flex items-center gap-2 py-1${draggable ? " select-none" : ""}`}
+      className={cn("flex items-center gap-2 py-1", draggable && "select-none")}
       draggable={draggable}
       onDragStart={
         draggable

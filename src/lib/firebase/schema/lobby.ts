@@ -9,6 +9,7 @@ import type {
 import { DEFAULT_TIMER_CONFIG, GameMode } from "@/lib/types";
 import { GAME_MODES } from "@/lib/game/modes";
 import type { PublicLobby } from "@/server/types";
+import { resolvePlayerOrder } from "@/lib/player-order";
 
 export interface FirebaseLobbyPublic {
   ownerPlayerId: string;
@@ -114,22 +115,6 @@ function lobbyConfigToFirebase(config: LobbyConfig): FirebaseLobbyConfig {
     timerConfig: config.timerConfig,
     ...(hasModeConfig ? { modeConfig: firebaseModeConfig } : {}),
   };
-}
-
-/**
- * Reconstructs a canonical player order from the stored Firebase order and the
- * current set of player IDs. Stored IDs that no longer exist are dropped; any
- * player ID not present in the stored order is appended at the end.
- */
-function resolvePlayerOrder(
-  storedOrder: string[] | undefined,
-  currentPlayerIds: string[],
-): string[] {
-  const knownIds = new Set(currentPlayerIds);
-  const filtered = (storedOrder ?? []).filter((id) => knownIds.has(id));
-  const filteredSet = new Set(filtered);
-  const remaining = currentPlayerIds.filter((id) => !filteredSet.has(id));
-  return [...filtered, ...remaining];
 }
 
 export function firebaseToLobby(

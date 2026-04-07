@@ -1,5 +1,6 @@
 import { isSecretVillainModeConfig } from "@/lib/types";
 import type { Game, GameModeServices, PlayerRoleAssignment } from "@/lib/types";
+import { resolvePlayerOrder } from "@/lib/player-order";
 import { SecretVillainRole } from "./roles";
 import {
   SecretVillainPhase,
@@ -53,26 +54,25 @@ function buildPhaseInfo(
   return base;
 }
 
+interface BuildTurnStateOptions {
+  playerOrder?: string[];
+  executionerTargetId?: string;
+}
+
 export const secretVillainServices: GameModeServices = {
   buildInitialTurnState(
     roleAssignments: PlayerRoleAssignment[],
     options?: Record<string, unknown>,
   ): SecretVillainTurnState {
+    const { playerOrder } = (options ?? {}) as BuildTurnStateOptions;
     const allPlayerIds = roleAssignments.map((a) => a.playerId);
 
     // Use the lobby's playerOrder if provided (preserving the seating arrangement
     // set in the lobby), otherwise fall back to a random shuffle.
-    const storedOrder = options?.["playerOrder"] as string[] | undefined;
-    let playerIds: string[];
-    if (storedOrder && storedOrder.length > 0) {
-      const knownIds = new Set(allPlayerIds);
-      const filtered = storedOrder.filter((id) => knownIds.has(id));
-      const filteredSet = new Set(filtered);
-      const missing = allPlayerIds.filter((id) => !filteredSet.has(id));
-      playerIds = [...filtered, ...missing];
-    } else {
-      playerIds = shuffle(allPlayerIds);
-    }
+    const playerIds =
+      playerOrder && playerOrder.length > 0
+        ? resolvePlayerOrder(playerOrder, allPlayerIds)
+        : shuffle(allPlayerIds);
 
     const firstPresidentId = playerIds[0];
     if (!firstPresidentId) {
