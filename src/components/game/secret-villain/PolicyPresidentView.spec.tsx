@@ -43,13 +43,9 @@ describe("PolicyPresidentView", () => {
     expect(screen.queryByText(SECRET_VILLAIN_COPY.policy.badCard)).toBeNull();
   });
 
-  it("shows 3 card buttons after drawing", () => {
+  it("shows 3 card columns after drawing", () => {
     render(<PolicyPresidentView {...defaultProps} />);
-    const goodButtons = screen.getAllByText(
-      SECRET_VILLAIN_COPY.policy.goodCard,
-    );
-    const badButtons = screen.getAllByText(SECRET_VILLAIN_COPY.policy.badCard);
-    expect(goodButtons.length + badButtons.length).toBe(3);
+    expect(screen.getAllByTestId(/^policy-card-column-/)).toHaveLength(3);
   });
 
   it("shows waiting message when not president", () => {
