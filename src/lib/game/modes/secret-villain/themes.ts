@@ -50,6 +50,8 @@ export interface SvThemeLabels {
   goodTeamMessage: string;
   /** Starting screen: message shown to the special bad player. */
   specialBadMessage: string;
+  /** Starting screen: description shown to the special bad when they can see their bad ally. */
+  specialBadAllyDescription: string;
 }
 
 export const SV_THEMES: Record<SvTheme, SvThemeLabels> = {
@@ -78,6 +80,7 @@ export const SV_THEMES: Record<SvTheme, SvThemeLabels> = {
       "Close your eyes and wait. The Bad team is identifying each other.",
     specialBadMessage:
       "Close your eyes and raise your thumb. The other Bad players will see you.",
+    specialBadAllyDescription: "This player is on the Bad team.",
   },
   [SvTheme.Original]: {
     name: "Original",
@@ -104,6 +107,7 @@ export const SV_THEMES: Record<SvTheme, SvThemeLabels> = {
       "Close your eyes and wait. The Fascist team is identifying each other.",
     specialBadMessage:
       "Close your eyes and raise your thumb. The other Fascists will see you.",
+    specialBadAllyDescription: "This player is a Fascist.",
   },
   [SvTheme.StarWars]: {
     name: "Star Wars",
@@ -130,6 +134,7 @@ export const SV_THEMES: Record<SvTheme, SvThemeLabels> = {
       "Close your eyes and wait. The Sith are identifying each other.",
     specialBadMessage:
       "Close your eyes and raise your thumb. The other Sith will see you.",
+    specialBadAllyDescription: "This player is a Sith Lord.",
   },
   [SvTheme.Business]: {
     name: "Business",
@@ -156,6 +161,7 @@ export const SV_THEMES: Record<SvTheme, SvThemeLabels> = {
       "Close your eyes and wait. Management is identifying each other.",
     specialBadMessage:
       "Close your eyes and raise your thumb. The other Management players will see you.",
+    specialBadAllyDescription: "This player is in on the Hustle.",
   },
 };
 

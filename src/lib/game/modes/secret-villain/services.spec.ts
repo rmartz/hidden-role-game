@@ -365,10 +365,8 @@ describe("extractPlayerState", () => {
   });
 
   it("Special Bad does not see Bad teammate in a multi-fascist game (3+ Bad team members)", () => {
-    // Standard 5-player game: 1 SpecialBad + 1 Bad + 3 Good — Bad team has 2 members
-    // The special-bad should NOT see the Bad player here (3-player bad team total
-    // is covered by the next test; the standard case has exactly 1 Bad + 1 SpecialBad)
-    // Here we add a second Bad player to make 3 Bad-team members total
+    // 7-player game with 3 Bad-team members total: 2 Bad + 1 SpecialBad.
+    // In this larger setup, the SpecialBad should NOT see the Bad players.
     const largeAssignments = [
       { playerId: "p1", roleDefinitionId: SecretVillainRole.Good },
       { playerId: "p2", roleDefinitionId: SecretVillainRole.Good },
@@ -384,11 +382,15 @@ describe("extractPlayerState", () => {
       sessionId: `session-${a.playerId}`,
       visiblePlayers: [],
     }));
+    const largeTurnState: SecretVillainTurnState = {
+      ...baseTurnState,
+      presidentOrder: largeAssignments.map((a) => a.playerId),
+    };
     const largeGame: Game = {
       id: "game-1",
       lobbyId: "lobby-1",
       gameMode: GameMode.SecretVillain,
-      status: { type: GameStatus.Playing, turnState: baseTurnState },
+      status: { type: GameStatus.Playing, turnState: largeTurnState },
       players: largePlayers,
       roleAssignments: largeAssignments,
       configuredRoleSlots: [],
