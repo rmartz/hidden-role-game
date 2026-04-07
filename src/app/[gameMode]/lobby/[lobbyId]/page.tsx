@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { getPlayerId, getLobbyId, getSessionId, saveGameId } from "@/lib/api";
 import { GameMode } from "@/lib/types";
 import { parseGameMode } from "@/lib/game/modes";
 import {
+  useLobbyErrorHandler,
   useLobbyQuery,
   useLobbyWebSocket,
   useRemovePlayer,
@@ -96,15 +97,12 @@ export default function LobbyPage() {
     prevGameIdRef.current = gameId;
   }, [gameId, actualGameMode, router]);
 
-  // If the lobby doesn't exist or the session is invalid, return to the home page.
-  useEffect(() => {
-    if (
-      fetchLobby.error?.message === "404" ||
-      fetchLobby.error?.message === "403"
-    ) {
-      router.push("/");
-    }
-  }, [fetchLobby.error, router]);
+  const handleSessionCleared = useCallback(() => {
+    setSessionId(undefined);
+    setStoredLobbyId(undefined);
+  }, []);
+
+  useLobbyErrorHandler(fetchLobby.error, lobbyId, handleSessionCleared);
 
   const removeMutation = useRemovePlayer(lobbyId, (targetPlayerId) => {
     if (targetPlayerId === myPlayerId) {

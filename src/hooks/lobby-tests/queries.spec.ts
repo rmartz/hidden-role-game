@@ -155,6 +155,24 @@ describe("useLobbyQuery", () => {
     expect(result.current.error?.message).toBe("404");
   });
 
+  it("throws on 403", async () => {
+    vi.mocked(api.getLobby).mockResolvedValue({
+      data: { status: ServerResponseStatus.Error, error: "Forbidden" },
+      httpStatus: 403,
+    });
+
+    const { wrapper } = createWrapper();
+    const { result } = renderHook(
+      () => useLobbyQuery("lobby-1", { enabled: true }),
+      { wrapper },
+    );
+
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true);
+    });
+    expect(result.current.error?.message).toBe("403");
+  });
+
   it("does not fetch when disabled", () => {
     const { wrapper } = createWrapper();
     renderHook(() => useLobbyQuery("lobby-1", { enabled: false }), { wrapper });
