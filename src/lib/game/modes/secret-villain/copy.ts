@@ -8,6 +8,11 @@ export const SECRET_VILLAIN_COPY = {
     [SvBoardPreset.Medium]: "7–8 Players",
     [SvBoardPreset.Small]: "5–6 Players",
   } satisfies Record<SvBoardPreset, string>,
+  actionGate: {
+    heading: "It's your turn",
+    description: "Take the device, then tap below when ready.",
+    begin: "Begin",
+  },
   board: {
     goodTrack: "Good Policies",
     badTrack: "Bad Policies",
