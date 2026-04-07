@@ -1,5 +1,5 @@
 import { afterEach, describe, it, expect, vi } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { PolicyChancellorView } from "./PolicyChancellorView";
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
 
@@ -16,6 +16,11 @@ const defaultProps = {
 describe("PolicyChancellorView", () => {
   it("shows 2 card buttons when chancellor", () => {
     render(<PolicyChancellorView {...defaultProps} />);
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: SECRET_VILLAIN_COPY.actionGate.begin,
+      }),
+    );
     const goodButtons = screen.getAllByText(
       SECRET_VILLAIN_COPY.policy.goodCard,
     );
@@ -31,6 +36,11 @@ describe("PolicyChancellorView", () => {
         onProposeVeto={vi.fn()}
       />,
     );
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: SECRET_VILLAIN_COPY.actionGate.begin,
+      }),
+    );
     expect(
       screen.getByRole("button", {
         name: SECRET_VILLAIN_COPY.policy.proposeVeto,
@@ -40,6 +50,11 @@ describe("PolicyChancellorView", () => {
 
   it("hides veto button when veto is not unlocked", () => {
     render(<PolicyChancellorView {...defaultProps} />);
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: SECRET_VILLAIN_COPY.actionGate.begin,
+      }),
+    );
     expect(
       screen.queryByRole("button", {
         name: SECRET_VILLAIN_COPY.policy.proposeVeto,
@@ -56,6 +71,11 @@ describe("PolicyChancellorView", () => {
         vetoResponse={false}
         onProposeVeto={vi.fn()}
       />,
+    );
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: SECRET_VILLAIN_COPY.actionGate.begin,
+      }),
     );
     expect(
       screen.getByText(SECRET_VILLAIN_COPY.policy.vetoRejected),
