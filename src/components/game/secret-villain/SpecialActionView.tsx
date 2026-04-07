@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
@@ -8,6 +9,7 @@ import type { SvTheme } from "@/lib/game/modes/secret-villain/themes";
 import { Team } from "@/lib/types";
 import { SpecialActionType } from "@/lib/game/modes/secret-villain/types";
 
+import { ActionGateView } from "./ActionGateView";
 import { InvestigationConsentView } from "./InvestigationConsentView";
 import { PlayerSelectionView } from "./PlayerSelectionView";
 import { PolicyPeekView } from "./PolicyPeekView";
@@ -94,6 +96,7 @@ export function SpecialActionView({
   peekedCards,
   svTheme,
 }: SpecialActionViewProps) {
+  const [revealed, setRevealed] = useState(false);
   const config = getActionConfig(actionType, svTheme);
 
   if (!isPresident) {
@@ -123,6 +126,12 @@ export function SpecialActionView({
         </CardContent>
       </Card>
     );
+  }
+
+  const needsGate =
+    actionType === SpecialActionType.PolicyPeek || !!investigationResult;
+  if (!revealed && needsGate) {
+    return <ActionGateView onReveal={() => { setRevealed(true); }} />;
   }
 
   // President: investigation result — show result with "Done" button.
