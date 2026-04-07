@@ -38,20 +38,22 @@ export function getPlayerGameState(
   const publicPlayers = game.players.map((p) => ({ id: p.id, name: p.name }));
 
   if (callerId === game.ownerPlayerId) {
-    const visibleRoleAssignments = game.roleAssignments.flatMap(
-      (assignment) => {
-        const player = playerById.get(assignment.playerId);
-        const role = roles[assignment.roleDefinitionId];
-        if (!player || !role) return [];
-        return [
-          {
-            player: { id: player.id, name: player.name },
-            reason: "revealed" as const,
-            role: { id: role.id, name: role.name, team: role.team },
-          },
-        ];
-      },
-    );
+    const seesRoles =
+      config.resolveOwnerSeesRoleAssignments?.(game.modeConfig) ?? true;
+    const visibleRoleAssignments = seesRoles
+      ? game.roleAssignments.flatMap((assignment) => {
+          const player = playerById.get(assignment.playerId);
+          const role = roles[assignment.roleDefinitionId];
+          if (!player || !role) return [];
+          return [
+            {
+              player: { id: player.id, name: player.name },
+              reason: "revealed" as const,
+              role: { id: role.id, name: role.name, team: role.team },
+            },
+          ];
+        })
+      : [];
     const modeState = services.extractPlayerState(game, callerId, undefined);
     return {
       status: game.status,

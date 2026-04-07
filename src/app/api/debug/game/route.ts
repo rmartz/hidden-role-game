@@ -45,17 +45,23 @@ export async function POST(request: Request): Promise<Response> {
     return errorResponse("playerCount must be between 2 and 20", 400);
   }
 
+  const resolvedModeConfig =
+    modeConfig ?? GAME_MODES[gameMode].defaultModeConfig;
+
   const coverError = validateRoleSlotsCoverPlayerCount(
     roleSlots,
     gameMode,
     playerCount,
+    resolvedModeConfig,
   );
   if (coverError) return errorResponse(coverError, 400);
 
   const modeError = validateRoleSlotsForMode(roleSlots, gameMode);
   if (modeError) return errorResponse(modeError, 400);
 
-  const { ownerTitle } = getModeDefinition(gameMode);
+  const definition = getModeDefinition(gameMode);
+  const ownerTitle =
+    definition.resolveOwnerTitle?.(resolvedModeConfig) ?? definition.ownerTitle;
 
   const players: LobbyPlayer[] = Array.from(
     { length: playerCount },
@@ -76,7 +82,7 @@ export async function POST(request: Request): Promise<Response> {
     showRolesInPlay,
     ownerPlayer?.id ?? undefined,
     { ...GAME_MODES[gameMode].defaultTimerConfig, ...timerConfig },
-    modeConfig ?? GAME_MODES[gameMode].defaultModeConfig,
+    resolvedModeConfig,
   );
 
   const debugPlayers: DebugPlayer[] = players.map((p) => ({

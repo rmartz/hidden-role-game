@@ -15,6 +15,11 @@ export interface SecretVillainModeConfig {
   customPowerTable?: SvCustomPowerConfig;
   /** Cosmetic theme for role/team/policy labels. */
   theme?: SvTheme;
+  /**
+   * When true, the lobby owner joins the game as the "Board" player — a
+   * shared-display observer who sees public state but no role assignments.
+   */
+  includeBoard?: boolean;
 }
 
 /** Secret Villain–specific lobby configuration. */
@@ -89,5 +94,6 @@ export function parseSecretVillainModeConfig(
     ...(isValidPreset ? { boardPreset: boardPreset as SvBoardPreset } : {}),
     ...(customPowerTable ? { customPowerTable } : {}),
     ...(isValidTheme ? { theme: theme as SvTheme } : {}),
+    ...(raw["includeBoard"] === true ? { includeBoard: true } : {}),
   };
 }

@@ -18,6 +18,7 @@ function computeIsValid(
   roleCounts: Record<string, number>,
   roleMins: Record<string, number>,
   roleMaxes: Record<string, number>,
+  modeConfig: ModeConfig,
 ): boolean {
   if (roleConfigMode === RoleConfigMode.Default) {
     return playerCount >= GAME_MODES[gameMode].minPlayers;
@@ -29,6 +30,9 @@ function computeIsValid(
   }
   // Custom mode
   const config = GAME_MODES[gameMode];
+  if (config.resolveIsValidRoleCount) {
+    return config.resolveIsValidRoleCount(playerCount, roleCounts, modeConfig);
+  }
   if (config.isValidRoleCount) {
     return config.isValidRoleCount(playerCount, roleCounts);
   }
@@ -92,6 +96,7 @@ function recomputeIsValid(state: GameConfigState): boolean {
     state.roleCounts,
     state.roleMins,
     state.roleMaxes,
+    state.modeConfig,
   );
 }
 
@@ -227,9 +232,13 @@ const gameConfigSlice = createSlice({
     setPlayerCount(state, action: PayloadAction<number>) {
       state.playerCount = Math.max(1, action.payload);
       if (state.roleConfigMode === RoleConfigMode.Default) {
-        const slots = GAME_MODES[state.gameMode].defaultRoleCount(
-          state.playerCount,
-        );
+        const modeDefinition = GAME_MODES[state.gameMode];
+        const effectiveCount =
+          modeDefinition.resolveRoleSlotsRequired?.(
+            state.playerCount,
+            state.modeConfig,
+          ) ?? state.playerCount;
+        const slots = modeDefinition.defaultRoleCount(effectiveCount);
         state.roleCounts = roleCountsFromSlots(slots);
         state.roleMins = roleMinsFromSlots(slots);
         state.roleMaxes = roleMaxesFromSlots(slots);
@@ -266,6 +275,19 @@ const gameConfigSlice = createSlice({
         ...state.modeConfig,
         [action.payload.key]: action.payload.value,
       } as ModeConfig;
+      if (state.roleConfigMode === RoleConfigMode.Default) {
+        const modeDefinition = GAME_MODES[state.gameMode];
+        const effectiveCount =
+          modeDefinition.resolveRoleSlotsRequired?.(
+            state.playerCount,
+            state.modeConfig,
+          ) ?? state.playerCount;
+        const slots = modeDefinition.defaultRoleCount(effectiveCount);
+        state.roleCounts = roleCountsFromSlots(slots);
+        state.roleMins = roleMinsFromSlots(slots);
+        state.roleMaxes = roleMaxesFromSlots(slots);
+      }
+      state.isValid = recomputeIsValid(state);
       state.syncVersion++;
     },
   },

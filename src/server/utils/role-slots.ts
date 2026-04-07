@@ -1,4 +1,4 @@
-import type { RoleSlot, GameMode } from "@/lib/types";
+import type { ModeConfig, RoleSlot, GameMode } from "@/lib/types";
 import { getModeDefinition } from "@/lib/game/state";
 import { getRoleSlotsRequired } from "@/lib/game/modes";
 
@@ -65,8 +65,9 @@ export function validateRoleSlotsCoverPlayerCount(
   roleSlots: RoleSlot[],
   gameMode: GameMode,
   playerCount: number,
+  modeConfig?: ModeConfig,
 ): string | undefined {
-  const required = getRoleSlotsRequired(gameMode, playerCount);
+  const required = getRoleSlotsRequired(gameMode, playerCount, modeConfig);
   const totalMin = roleSlots.reduce((sum, s) => sum + s.min, 0);
   const totalMax = roleSlots.reduce((sum, s) => sum + s.max, 0);
   if (totalMin > required || totalMax < required) {

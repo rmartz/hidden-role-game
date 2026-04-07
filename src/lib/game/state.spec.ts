@@ -127,6 +127,58 @@ describe("GameStateService.getPlayerGameState", () => {
 });
 
 // ---------------------------------------------------------------------------
+// getPlayerGameState — board player (Secret Villain includeBoard)
+// ---------------------------------------------------------------------------
+
+describe("GameStateService.getPlayerGameState — board player", () => {
+  it("returns empty visibleRoleAssignments for the board player", () => {
+    const game: Game = {
+      id: "game-1",
+      lobbyId: "lobby-1",
+      gameMode: GameMode.SecretVillain,
+      status: { type: GameStatus.Playing },
+      players: [makePlayer("board"), makePlayer("p1"), makePlayer("p2")],
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: "good" },
+        { playerId: "p2", roleDefinitionId: "bad" },
+      ],
+      configuredRoleSlots: DEFAULT_SLOTS,
+      showRolesInPlay: ShowRolesInPlay.RoleAndCount,
+      ownerPlayerId: "board",
+      modeConfig: { ...DEFAULT_SECRET_VILLAIN_MODE_CONFIG, includeBoard: true },
+      timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
+    };
+
+    const result = getPlayerGameState(game, "board");
+
+    expect(result?.visibleRoleAssignments).toEqual([]);
+  });
+
+  it("returns full visibleRoleAssignments for the owner when includeBoard is false", () => {
+    const game: Game = {
+      id: "game-1",
+      lobbyId: "lobby-1",
+      gameMode: GameMode.SecretVillain,
+      status: { type: GameStatus.Playing },
+      players: [makePlayer("narrator"), makePlayer("p1"), makePlayer("p2")],
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: "good" },
+        { playerId: "p2", roleDefinitionId: "bad" },
+      ],
+      configuredRoleSlots: DEFAULT_SLOTS,
+      showRolesInPlay: ShowRolesInPlay.RoleAndCount,
+      ownerPlayerId: "narrator",
+      modeConfig: DEFAULT_SECRET_VILLAIN_MODE_CONFIG,
+      timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
+    };
+
+    const result = getPlayerGameState(game, "narrator");
+
+    expect(result?.visibleRoleAssignments).toHaveLength(2);
+  });
+});
+
+// ---------------------------------------------------------------------------
 // getPlayerGameState — narrator nominationsEnabled
 // ---------------------------------------------------------------------------
 

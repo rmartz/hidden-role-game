@@ -1,4 +1,5 @@
 export { BoardDisplay } from "./BoardDisplay";
+export { BoardScreen } from "./BoardScreen";
 export { ElectionNominationView } from "./ElectionNominationView";
 export { ElectionResultView } from "./ElectionResultView";
 export { ElectionVoteView } from "./ElectionVoteView";
