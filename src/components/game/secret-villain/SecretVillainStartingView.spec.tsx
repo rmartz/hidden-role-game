@@ -51,7 +51,7 @@ describe("SecretVillainStartingView", () => {
     ).toBeDefined();
   });
 
-  it("shows special bad message for Special Bad player", () => {
+  it("shows special bad message for Special Bad player without visible allies", () => {
     const gameState = makeGameState({
       myPlayerId: "p1",
       myRole: {
@@ -59,10 +59,36 @@ describe("SecretVillainStartingView", () => {
         name: "Special Bad Role",
         team: Team.Bad,
       },
+      visibleRoleAssignments: [],
     });
     render(<SecretVillainStartingView gameState={gameState} />);
     expect(
       screen.getByText(SECRET_VILLAIN_COPY.starting.specialBadMessage),
+    ).toBeDefined();
+  });
+
+  it("shows Bad ally for Special Bad player with a visible teammate", () => {
+    const gameState = makeGameState({
+      myPlayerId: "p1",
+      myRole: {
+        id: "special-bad",
+        name: "Special Bad Role",
+        team: Team.Bad,
+      },
+      visibleRoleAssignments: [
+        {
+          player: { id: "p2", name: "Bob" },
+          reason: "aware-of",
+        },
+      ],
+    });
+    render(<SecretVillainStartingView gameState={gameState} />);
+    expect(
+      screen.getByText(SECRET_VILLAIN_COPY.starting.badTeamHeading),
+    ).toBeDefined();
+    expect(screen.getByText("Bob")).toBeDefined();
+    expect(
+      screen.getByText(SECRET_VILLAIN_COPY.starting.specialBadAllyDescription),
     ).toBeDefined();
   });
 
