@@ -1,4 +1,4 @@
-import { SvBoardPreset } from "./types";
+import { SvBoardPreset, SpecialActionType } from "./types";
 
 export const SECRET_VILLAIN_COPY = {
   boardPresets: {
@@ -13,6 +13,12 @@ export const SECRET_VILLAIN_COPY = {
     badTrack: "Bad Policies",
     failedElections: "Failed Elections",
     vetoUnlocked: "Veto Power Unlocked",
+    powerLabels: {
+      [SpecialActionType.InvestigateTeam]: "Investigate",
+      [SpecialActionType.PolicyPeek]: "Policy Peek",
+      [SpecialActionType.SpecialElection]: "Special Election",
+      [SpecialActionType.Shoot]: "Shoot",
+    } satisfies Record<SpecialActionType, string>,
   },
   election: {
     nominationHeading: "Nomination",
@@ -116,6 +122,7 @@ export const SECRET_VILLAIN_COPY = {
       "Close your eyes and wait. The Bad team is identifying each other.",
     specialBadMessage:
       "Close your eyes and raise your thumb. The other Bad players will see you.",
+    specialBadAllyDescription: "This player is on the Bad team.",
     gameStartsIn: "Game begins in",
   },
   eliminated: "You have been eliminated.",

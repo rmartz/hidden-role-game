@@ -29,8 +29,10 @@ export const FAILED_ELECTION_THRESHOLD = 3;
 /** Number of Bad cards that must be played before the Special Bad chancellor win condition activates. */
 export const BAD_CARDS_FOR_SPECIAL_BAD_WIN = 3;
 
-/** Number of cards to win for each team. */
-export const CARDS_TO_WIN = 5;
+/** Number of Good policy cards needed for the Good team to win via board condition. */
+export const GOOD_CARDS_TO_WIN = 5;
+/** Number of Bad policy cards needed for the Bad team to win via board condition. */
+export const BAD_CARDS_TO_WIN = 6;
 
 // ---------------------------------------------------------------------------
 // Special action types

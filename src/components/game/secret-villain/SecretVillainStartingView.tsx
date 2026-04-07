@@ -17,9 +17,14 @@ export interface SecretVillainStartingViewProps {
 interface BadTeamRevealProps {
   teammates: VisibleTeammate[];
   svTheme?: SvTheme;
+  description?: string;
 }
 
-function BadTeamReveal({ teammates, svTheme }: BadTeamRevealProps) {
+function BadTeamReveal({
+  teammates,
+  svTheme,
+  description,
+}: BadTeamRevealProps) {
   const themeLabels = getSvThemeLabels(svTheme);
   return (
     <Card className="mb-4">
@@ -28,7 +33,7 @@ function BadTeamReveal({ teammates, svTheme }: BadTeamRevealProps) {
       </CardHeader>
       <CardContent>
         <p className="text-sm text-muted-foreground mb-3">
-          {themeLabels.badTeamDescription}
+          {description ?? themeLabels.badTeamDescription}
         </p>
         <ul className="text-sm space-y-1">
           {teammates.map(({ player, role }) => (
@@ -74,6 +79,10 @@ export function SecretVillainStartingView({
       ? themeLabels.badTeamDescription
       : themeLabels.goodTeamMessage;
 
+  const badAllyDescription = isSpecialBad
+    ? themeLabels.specialBadAllyDescription
+    : undefined;
+
   return (
     <div className="p-5 max-w-lg mx-auto">
       <h1 className="text-2xl font-bold mb-2">
@@ -82,10 +91,14 @@ export function SecretVillainStartingView({
       <p className="text-lg mb-4">
         {SECRET_VILLAIN_COPY.starting.yourRole(roleName)}
       </p>
-      {isBadTeam && !isSpecialBad && badTeammates.length > 0 && (
-        <BadTeamReveal teammates={badTeammates} svTheme={gameState.svTheme} />
+      {isBadTeam && badTeammates.length > 0 && (
+        <BadTeamReveal
+          teammates={badTeammates}
+          svTheme={gameState.svTheme}
+          description={badAllyDescription}
+        />
       )}
-      {(isSpecialBad || !isBadTeam) && (
+      {(!isBadTeam || (isSpecialBad && badTeammates.length === 0)) && (
         <p className="text-sm text-muted-foreground mb-4">{roleMessage}</p>
       )}
       {secondsRemaining !== undefined && secondsRemaining > 0 && (

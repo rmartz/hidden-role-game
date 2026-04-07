@@ -109,5 +109,5 @@ Special actions are triggered when a Bad policy card is played and the board pos
 ## Win Conditions
 
 - **Good wins**: 5 Good policy cards played, or Special Bad eliminated via Shoot.
-- **Bad wins**: 5 Bad policy cards played, or Special Bad elected Chancellor after 3+ Bad cards played.
+- **Bad wins**: 6 Bad policy cards played, or Special Bad elected Chancellor after 3+ Bad cards played.
 - **Chaos (auto-play)**: 3 consecutive failed elections → top deck card played automatically, previous administration cleared.
