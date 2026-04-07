@@ -185,8 +185,11 @@ export function SecretVillainGameScreenView({
             />
           );
         }
+        const boardPlayerId = gameState.gameOwner?.id;
+        const nonVotingPlayerIds = boardPlayerId ? [boardPlayerId] : [];
+        const deadSet = new Set(gameState.deadPlayerIds ?? []);
         const aliveCount = players.filter(
-          (p) => !(gameState.deadPlayerIds ?? []).includes(p.id),
+          (p) => !deadSet.has(p.id) && p.id !== boardPlayerId,
         ).length;
         const allVoted = (gameState.electionVoteCount ?? 0) >= aliveCount;
 
@@ -208,6 +211,7 @@ export function SecretVillainGameScreenView({
             players={players}
             votedPlayerIds={gameState.votedPlayerIds}
             eliminatedPlayerIds={gameState.deadPlayerIds}
+            nonVotingPlayerIds={nonVotingPlayerIds}
             isPending={isPending}
             isEliminated={isEliminated}
           />

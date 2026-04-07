@@ -16,7 +16,7 @@ function makeSecretVillainState(
   roleConfigMode = RoleConfigMode.Default,
 ): GameConfigState {
   const config = {
-    gameMode: GameMode.SecretVillain,
+    gameMode: GameMode.SecretVillain as const,
     playerCount,
     roleConfigMode,
     roleSlots: GAME_MODES[GameMode.SecretVillain].defaultRoleCount(playerCount),

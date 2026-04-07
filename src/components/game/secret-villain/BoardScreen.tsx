@@ -77,7 +77,7 @@ export function BoardScreen({ gameState }: BoardScreenProps) {
           {chancellorNomineeName && !chancellorName && (
             <p className="text-sm" data-testid="chancellor-nominee-name">
               <span className="font-medium">
-                {SECRET_VILLAIN_COPY.boardScreen.chancellorNominee}:
+                {SECRET_VILLAIN_COPY.boardScreen.chancellor}:
               </span>{" "}
               {chancellorNomineeName}
             </p>

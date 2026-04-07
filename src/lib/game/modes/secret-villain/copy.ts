@@ -25,7 +25,6 @@ export const SECRET_VILLAIN_COPY = {
     currentPhase: "Current Phase",
     president: "President",
     chancellor: "Chancellor",
-    chancellorNominee: "Chancellor Nominee",
     phaseLabels: {
       [SecretVillainPhase.ElectionNomination]: "Election: Nomination",
       [SecretVillainPhase.ElectionVote]: "Election: Voting",
@@ -44,12 +43,13 @@ export const SECRET_VILLAIN_COPY = {
     confirmNomination: "Nominate",
     voteHeading: "Election",
     voteInstructions: (presidentName: string, chancellorName: string) =>
-      `${presidentName} has nominated ${chancellorName} for Chancellor.`,
+      `President: ${presidentName} \u00b7 Chancellor: ${chancellorName}`,
     castVote: "Cast your vote",
     aye: "Aye",
     no: "No",
     waitingForVotes: "Waiting for all players to vote\u2026",
     alreadyVoted: "Vote cast. Waiting for others\u2026",
+    allVoted: "All votes cast.",
     waitingForPlayers: (names: string[]) =>
       `Waiting for ${names.join(", ")}\u2026`,
     resolveVote: "Reveal Results",
