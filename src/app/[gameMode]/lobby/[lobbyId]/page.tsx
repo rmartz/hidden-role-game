@@ -1,18 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import {
-  clearSession,
-  getPlayerId,
-  getLobbyId,
-  getSessionId,
-  saveGameId,
-} from "@/lib/api";
+import { getPlayerId, getLobbyId, getSessionId, saveGameId } from "@/lib/api";
 import { GameMode } from "@/lib/types";
 import { parseGameMode } from "@/lib/game/modes";
 import {
+  useLobbyErrorHandler,
   useLobbyQuery,
   useLobbyWebSocket,
   useRemovePlayer,
@@ -102,28 +97,12 @@ export default function LobbyPage() {
     prevGameIdRef.current = gameId;
   }, [gameId, actualGameMode, router]);
 
-  // If the lobby doesn't exist, return to the home page.
-  // If the session is invalid for this lobby (403), the user was removed or
-  // their session expired. Cancel any in-flight request first so a concurrent
-  // poll carrying the stale session cannot re-trigger this handler after cleanup.
-  // Then clear the stale session — both localStorage (via clearSession) and the
-  // corresponding React state (sessionId/storedLobbyId) — and set the cached
-  // query data to null so the JoinPrompt renders immediately without waiting for
-  // another round-trip. The WebSocket subscription tears down on the next render
-  // when sessionId becomes undefined, so setting data directly (rather than
-  // removing the query) prevents a Firebase push in that gap from restoring
-  // stale lobby data before the subscription is gone.
-  useEffect(() => {
-    if (fetchLobby.error?.message === "404") {
-      router.push("/");
-    } else if (fetchLobby.error?.message === "403") {
-      void queryClient.cancelQueries({ queryKey: ["lobby", lobbyId] });
-      clearSession();
-      setSessionId(undefined);
-      setStoredLobbyId(undefined);
-      queryClient.setQueryData(["lobby", lobbyId], null);
-    }
-  }, [fetchLobby.error, router, lobbyId, queryClient]);
+  const handleSessionCleared = useCallback(() => {
+    setSessionId(undefined);
+    setStoredLobbyId(undefined);
+  }, []);
+
+  useLobbyErrorHandler(fetchLobby.error, lobbyId, handleSessionCleared);
 
   const removeMutation = useRemovePlayer(lobbyId, (targetPlayerId) => {
     if (targetPlayerId === myPlayerId) {

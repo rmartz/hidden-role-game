@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import {
@@ -161,4 +162,33 @@ export function useLobbyExistsQuery(lobbyId: string) {
     },
     retry: false,
   });
+}
+
+/**
+ * Handles 404/403 errors from useLobbyQuery.
+ *
+ * On 404: redirects to home (lobby no longer exists).
+ * On 403: cancels any in-flight request carrying the stale session, clears
+ * localStorage via clearSession, calls onSessionCleared so the caller can
+ * reset session-related React state, and sets query data to null so the
+ * JoinPrompt renders immediately without another round-trip.
+ */
+export function useLobbyErrorHandler(
+  error: Error | null | undefined,
+  lobbyId: string,
+  onSessionCleared: () => void,
+) {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (error?.message === "404") {
+      router.push("/");
+    } else if (error?.message === "403") {
+      void queryClient.cancelQueries({ queryKey: ["lobby", lobbyId] });
+      clearSession();
+      onSessionCleared();
+      queryClient.setQueryData(["lobby", lobbyId], null);
+    }
+  }, [error, router, lobbyId, queryClient, onSessionCleared]);
 }
