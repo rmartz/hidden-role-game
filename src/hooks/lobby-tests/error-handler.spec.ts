@@ -23,7 +23,9 @@ describe("useLobbyErrorHandler", () => {
     const onSessionCleared = vi.fn();
     const { wrapper } = createWrapper();
     renderHook(
-      () => { useLobbyErrorHandler(undefined, "lobby-1", onSessionCleared); },
+      () => {
+        useLobbyErrorHandler(undefined, "lobby-1", onSessionCleared);
+      },
       { wrapper },
     );
     expect(mockPush).not.toHaveBeenCalled();
@@ -35,7 +37,9 @@ describe("useLobbyErrorHandler", () => {
     const onSessionCleared = vi.fn();
     const { wrapper } = createWrapper();
     renderHook(
-      () => { useLobbyErrorHandler(new Error("404"), "lobby-1", onSessionCleared); },
+      () => {
+        useLobbyErrorHandler(new Error("404"), "lobby-1", onSessionCleared);
+      },
       { wrapper },
     );
     await waitFor(() => {
@@ -49,7 +53,9 @@ describe("useLobbyErrorHandler", () => {
     const onSessionCleared = vi.fn();
     const { wrapper, queryClient } = createWrapper();
     renderHook(
-      () => { useLobbyErrorHandler(new Error("403"), "lobby-1", onSessionCleared); },
+      () => {
+        useLobbyErrorHandler(new Error("403"), "lobby-1", onSessionCleared);
+      },
       { wrapper },
     );
     await waitFor(() => {
@@ -66,7 +72,9 @@ describe("useLobbyErrorHandler", () => {
     queryClient.setQueryData(["lobby", "lobby-1"], { id: "lobby-1" });
 
     renderHook(
-      () => { useLobbyErrorHandler(new Error("403"), "lobby-1", onSessionCleared); },
+      () => {
+        useLobbyErrorHandler(new Error("403"), "lobby-1", onSessionCleared);
+      },
       { wrapper },
     );
     await waitFor(() => {
@@ -78,7 +86,9 @@ describe("useLobbyErrorHandler", () => {
     const onSessionCleared = vi.fn();
     const { wrapper } = createWrapper();
     renderHook(
-      () => { useLobbyErrorHandler(new Error("500"), "lobby-1", onSessionCleared); },
+      () => {
+        useLobbyErrorHandler(new Error("500"), "lobby-1", onSessionCleared);
+      },
       { wrapper },
     );
     expect(mockPush).not.toHaveBeenCalled();
