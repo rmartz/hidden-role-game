@@ -2,14 +2,24 @@ import { afterEach, describe, it, expect } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import { BoardDisplay } from "./BoardDisplay";
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
+import { SpecialActionType } from "@/lib/game/modes/secret-villain/types";
 
 afterEach(cleanup);
+
+const defaultPowerTable = [
+  undefined,
+  undefined,
+  SpecialActionType.InvestigateTeam,
+  SpecialActionType.Shoot,
+  SpecialActionType.Shoot,
+];
 
 const defaultProps = {
   goodCardsPlayed: 0,
   badCardsPlayed: 0,
   failedElectionCount: 0,
   failedElectionThreshold: 3,
+  powerTable: defaultPowerTable,
 };
 
 describe("BoardDisplay", () => {
@@ -55,5 +65,45 @@ describe("BoardDisplay", () => {
       .getAllByTestId(/^election-dot-/)
       .filter((el) => el.getAttribute("data-filled") === "true");
     expect(filledDots).toHaveLength(2);
+  });
+
+  it("renders power labels for each bad slot when powerTable is provided", () => {
+    const powerTable = [
+      undefined,
+      undefined,
+      SpecialActionType.PolicyPeek,
+      SpecialActionType.Shoot,
+      SpecialActionType.Shoot,
+    ];
+    render(<BoardDisplay {...defaultProps} powerTable={powerTable} />);
+    expect(screen.getByTestId("bad-slot-label-2").textContent).toBe(
+      SECRET_VILLAIN_COPY.board.powerLabels[SpecialActionType.PolicyPeek],
+    );
+    expect(screen.getByTestId("bad-slot-label-3").textContent).toBe(
+      SECRET_VILLAIN_COPY.board.powerLabels[SpecialActionType.Shoot],
+    );
+  });
+
+  it("does not render labels for undefined power table slots", () => {
+    const powerTable = [
+      undefined,
+      SpecialActionType.InvestigateTeam,
+      undefined,
+      SpecialActionType.Shoot,
+      SpecialActionType.Shoot,
+    ];
+    render(<BoardDisplay {...defaultProps} powerTable={powerTable} />);
+    expect(screen.queryByTestId("bad-slot-label-0")).toBeNull();
+    expect(screen.queryByTestId("bad-slot-label-2")).toBeNull();
+  });
+
+  it("renders no label for slots with no power action", () => {
+    render(
+      <BoardDisplay
+        {...defaultProps}
+        powerTable={[undefined, undefined, undefined, undefined, undefined]}
+      />,
+    );
+    expect(screen.queryByTestId(/^bad-slot-label-/)).toBeNull();
   });
 });

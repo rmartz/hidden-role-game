@@ -5,7 +5,8 @@ import type { Game } from "@/lib/types";
 import {
   SecretVillainPhase,
   PolicyCard,
-  CARDS_TO_WIN,
+  GOOD_CARDS_TO_WIN,
+  BAD_CARDS_TO_WIN,
   SpecialActionType,
   SvBoardPreset,
 } from "../types";
@@ -247,7 +248,9 @@ describe("chancellorPlayAction", () => {
     });
 
     it("5th Good card triggers Good team win", () => {
-      const game = makeChancellorGame({ goodCardsPlayed: CARDS_TO_WIN - 1 });
+      const game = makeChancellorGame({
+        goodCardsPlayed: GOOD_CARDS_TO_WIN - 1,
+      });
       chancellorPlayAction.apply(game, { cardIndex: 0 }, "p3");
 
       expect(game.status.type).toBe(GameStatus.Finished);
@@ -256,9 +259,9 @@ describe("chancellorPlayAction", () => {
       }
     });
 
-    it("5th Bad card triggers Bad team win", () => {
+    it("6th Bad card triggers Bad team win", () => {
       const game = makeChancellorGame({
-        badCardsPlayed: CARDS_TO_WIN - 1,
+        badCardsPlayed: BAD_CARDS_TO_WIN - 1,
         phase: {
           type: SecretVillainPhase.PolicyChancellor,
           startedAt: 1000,

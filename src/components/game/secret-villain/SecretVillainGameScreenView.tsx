@@ -119,12 +119,13 @@ export function SecretVillainGameScreenView({
   const board = gameState.svBoard;
   const players = gameState.players;
 
-  const boardSection = board ? (
+  const boardSection = board?.powerTable ? (
     <BoardDisplay
       goodCardsPlayed={board.goodCardsPlayed}
       badCardsPlayed={board.badCardsPlayed}
       failedElectionCount={board.failedElectionCount}
       failedElectionThreshold={FAILED_ELECTION_THRESHOLD}
+      powerTable={board.powerTable}
       vetoUnlocked={gameState.vetoUnlocked}
       svTheme={gameState.svTheme}
     />

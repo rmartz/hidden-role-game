@@ -20,7 +20,10 @@ export async function POST(
 
   const { gameId } = auth.lobby;
   if (!gameId) {
-    return errorResponse("No active game", 409);
+    return Response.json({
+      status: ServerResponseStatus.Success,
+      data: { lobby: toPublicLobby(auth.lobby, sessionId) },
+    });
   }
 
   const game = await getGame(gameId);

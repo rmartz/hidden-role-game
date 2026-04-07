@@ -3,6 +3,7 @@ import type { BasePlayerGameState } from "@/server/types/game";
 import type {
   SecretVillainPhase,
   SpecialActionType,
+  SvPowerTable,
   ElectionVote,
 } from "./types";
 import type { SecretVillainTimerConfig } from "./timer-config";
@@ -19,11 +20,13 @@ export interface SvPhaseInfo {
   startedAt?: number;
 }
 
-/** Board state: policy cards played and failed election count. */
+/** Board state: policy cards played, failed election count, and power table. */
 export interface SvBoardState {
   goodCardsPlayed: number;
   badCardsPlayed: number;
   failedElectionCount: number;
+  /** Power triggered when each Bad card slot is played (index 0 = 1st Bad card). */
+  powerTable?: SvPowerTable;
 }
 
 /** Policy card state visible to the president or chancellor. */

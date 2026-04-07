@@ -70,7 +70,21 @@ interface WerewolfRoleDefinition {
 
 ## Night Phase Ordering
 
-Roles wake in the order they are defined in `WEREWOLF_ROLES`, subject to these rules:
+Roles wake in a consistent order determined by their `category`, following the rule **Bad team → Neutral team → Good team**, and within each team **Attack → Investigate → Protect → Special**. The full category order used for night phases is:
+
+1. `EvilKilling` (Bad — Attack): Werewolf group phase always goes first.
+2. `EvilSupport` (Bad — Support/Investigate): Minion (night 1 only), Wizard.
+3. `NeutralKilling` (Neutral — Attack): Chupacabra.
+4. `NeutralManipulation` (Neutral — no night action).
+5. `VillagerKilling` (Good — Attack): Mortician, Vigilante.
+6. `VillagerInvestigation` (Good — Investigate): Seer, Mystic Seer, One-Eyed Seer, Mentalist, Elusive Seer, etc.
+7. `VillagerProtection` (Good — Protect): Bodyguard, Doctor, Priest, Mirrorcaster.
+8. `VillagerSupport` (Good — Special): Mummy, Spellcaster, Mason, Sentinel.
+9. `VillagerHandicap` (Good — no night action).
+
+Within a category, the order is arbitrary. After all category-ordered roles, the Witch and Altruist always act last in that order.
+
+Additional rules applied before the ordering:
 
 1. Roles with `wakesAtNight: Never` are always skipped.
 2. Roles with `wakesAtNight: FirstNightOnly` are skipped on turn 2+.
@@ -78,6 +92,7 @@ Roles wake in the order they are defined in `WEREWOLF_ROLES`, subject to these r
 4. Roles with `wakesWith` do not get their own phase — they participate in the primary role's phase.
 5. The Witch acts **second-to-last**, after all other roles except the Altruist, so she can see current attacks before deciding.
 6. The Altruist always acts **last**, after the Witch, so it can intercept attacks (including Witch attacks) on its target.
+7. Extra group phases (e.g. Wolf Cub bonus attack) are inserted **immediately after** their corresponding base group phase, keeping both Werewolf phases consecutive.
 
 ## Default Role Distribution
 
@@ -126,7 +141,8 @@ graph LR
 
 ```mermaid
 flowchart TD
-    Start([For each role in WEREWOLF_ROLES]) --> WakesNever{wakesAtNight = Never?}
+    Start([Sort roles by NIGHT_PHASE_CATEGORY_ORDER]) --> Loop([For each role in sorted order])
+    Loop --> WakesNever{wakesAtNight = Never?}
     WakesNever -->|Yes| Skip[Skip]
     WakesNever -->|No| FirstNight{wakesAtNight = FirstNightOnly\nAND turn > 1?}
     FirstNight -->|Yes| Skip
@@ -135,7 +151,10 @@ flowchart TD
     WakesWith -->|No| Alive{Any alive participants\nor wakesWith participants?}
     Alive -->|No| Skip
     Alive -->|Yes| Add[Add phase key to order]
-    Add --> IsWitch{Is Witch?}
+    Add --> IsGroup{teamTargeting?}
+    IsGroup -->|Yes| AddExtra[Also insert matching\nextraGroupPhaseKeys\nconsecutively after]
+    AddExtra --> IsWitch{Is Witch?}
+    IsGroup -->|No| IsWitch
     IsWitch -->|Yes| MoveSecondLast[Move to second-to-last]
     IsWitch -->|No| IsAltruist{Is Altruist?}
     IsAltruist -->|Yes| MoveLast[Move to end of order]
