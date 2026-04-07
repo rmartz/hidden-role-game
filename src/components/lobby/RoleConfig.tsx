@@ -160,7 +160,11 @@ export function RoleConfig(props: RoleConfigProps) {
                     min={readOnlyMin[role.id] ?? 0}
                     max={readOnlyMax[role.id] ?? 0}
                     readOnly={true}
-                    dimmed={!isSearching && showAll && !isRoleEnabled(role.id)}
+                    dimmed={
+                      isSearching
+                        ? !isRoleEnabled(role.id)
+                        : showAll && !isRoleEnabled(role.id)
+                    }
                   />
                 ) : (
                   <RoleConfigEntry
@@ -171,9 +175,9 @@ export function RoleConfig(props: RoleConfigProps) {
                     readOnly={false}
                     disabled={props.disabled}
                     dimmed={
-                      !isSearching &&
-                      !hasCategoryGrouping &&
-                      !isRoleEnabled(role.id)
+                      isSearching
+                        ? !isRoleEnabled(role.id)
+                        : !hasCategoryGrouping && !isRoleEnabled(role.id)
                     }
                   />
                 ),

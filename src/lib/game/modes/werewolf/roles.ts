@@ -248,7 +248,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     awareOf: { roles: [WerewolfRole.Mason] },
     wakesAtNight: WakesAtNight.FirstNightOnly,
     targetCategory: TargetCategory.None,
-    aliases: ["freemason", "brother"],
+    aliases: ["brother", "freemason"],
     category: WerewolfRoleCategory.VillagerSupport,
   },
   [WerewolfRole.Mayor]: {
@@ -483,7 +483,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Good,
     wakesAtNight: WakesAtNight.Never,
     targetCategory: TargetCategory.None,
-    aliases: ["townsfolk", "town", "peasant"],
+    aliases: ["peasant", "town", "townsfolk"],
     category: WerewolfRoleCategory.VillagerSupport,
   },
   [WerewolfRole.Werewolf]: {
