@@ -104,18 +104,24 @@ export default function LobbyPage() {
 
   // If the lobby doesn't exist, return to the home page.
   // If the session is invalid for this lobby (403), the user was removed or
-  // their session expired. Clear the stale session — both localStorage (via
-  // clearSession) and the corresponding React state (sessionId/storedLobbyId)
-  // — then remove the cached query so the next fetch runs unauthenticated.
-  // An unauthenticated fetch returns null data, which shows the JoinPrompt.
+  // their session expired. Cancel any in-flight request first so a concurrent
+  // poll carrying the stale session cannot re-trigger this handler after cleanup.
+  // Then clear the stale session — both localStorage (via clearSession) and the
+  // corresponding React state (sessionId/storedLobbyId) — and set the cached
+  // query data to null so the JoinPrompt renders immediately without waiting for
+  // another round-trip. The WebSocket subscription tears down on the next render
+  // when sessionId becomes undefined, so setting data directly (rather than
+  // removing the query) prevents a Firebase push in that gap from restoring
+  // stale lobby data before the subscription is gone.
   useEffect(() => {
     if (fetchLobby.error?.message === "404") {
       router.push("/");
     } else if (fetchLobby.error?.message === "403") {
+      void queryClient.cancelQueries({ queryKey: ["lobby", lobbyId] });
       clearSession();
       setSessionId(undefined);
       setStoredLobbyId(undefined);
-      queryClient.removeQueries({ queryKey: ["lobby", lobbyId] });
+      queryClient.setQueryData(["lobby", lobbyId], null);
     }
   }, [fetchLobby.error, router, lobbyId, queryClient]);
 
