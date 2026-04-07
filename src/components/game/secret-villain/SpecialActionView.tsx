@@ -131,7 +131,13 @@ export function SpecialActionView({
   const needsGate =
     actionType === SpecialActionType.PolicyPeek || !!investigationResult;
   if (!revealed && needsGate) {
-    return <ActionGateView onReveal={() => { setRevealed(true); }} />;
+    return (
+      <ActionGateView
+        onReveal={() => {
+          setRevealed(true);
+        }}
+      />
+    );
   }
 
   // President: investigation result — show result with "Done" button.

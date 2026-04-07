@@ -72,7 +72,13 @@ export function PolicyChancellorView({
   }
 
   if (!revealed) {
-    return <ActionGateView onReveal={() => { setRevealed(true); }} />;
+    return (
+      <ActionGateView
+        onReveal={() => {
+          setRevealed(true);
+        }}
+      />
+    );
   }
 
   const vetoWasRejected = vetoProposed && vetoResponse === false;

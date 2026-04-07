@@ -52,7 +52,13 @@ export function PolicyPresidentView({
   }
 
   if (!revealed) {
-    return <ActionGateView onReveal={() => { setRevealed(true); }} />;
+    return (
+      <ActionGateView
+        onReveal={() => {
+          setRevealed(true);
+        }}
+      />
+    );
   }
 
   // Before drawing: show "Draw" button.
