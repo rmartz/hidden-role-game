@@ -26,7 +26,6 @@ export const castVoteAction: GameAction = {
     if (ts.deadPlayerIds.includes(callerId)) return false;
     if (!game.players.some((p) => p.id === callerId)) return false;
     if (activeTrial.defendantId === callerId) return false;
-    if (activeTrial.votes.some((v) => v.playerId === callerId)) return false;
     // Silenced players cannot vote in trials
     const silencedIds = getSilencedPlayerIds(ts);
     if (silencedIds.includes(callerId)) return false;
@@ -62,7 +61,10 @@ export const castVoteAction: GameAction = {
     const { activeTrial } = ts.phase;
     if (!activeTrial) return;
     const { vote } = payload as { vote: DaytimeVote };
-    activeTrial.votes = [...activeTrial.votes, { playerId: callerId, vote }];
+    activeTrial.votes = [
+      ...activeTrial.votes.filter((v) => v.playerId !== callerId),
+      { playerId: callerId, vote },
+    ];
 
     // When the Mummy votes, auto-cast the hypnotized player's vote to match
     const callerRoleId = game.roleAssignments.find(
@@ -71,17 +73,13 @@ export const castVoteAction: GameAction = {
     const hypnotizedId = getHypnotizedPlayerId(ts);
     const silencedIds = getSilencedPlayerIds(ts);
     if (callerRoleId === (WerewolfRole.Mummy as string) && hypnotizedId) {
-      const alreadyVoted = activeTrial.votes.some(
-        (v) => v.playerId === hypnotizedId,
-      );
       if (
-        !alreadyVoted &&
         !silencedIds.includes(hypnotizedId) &&
         !ts.deadPlayerIds.includes(hypnotizedId) &&
         hypnotizedId !== activeTrial.defendantId
       ) {
         activeTrial.votes = [
-          ...activeTrial.votes,
+          ...activeTrial.votes.filter((v) => v.playerId !== hypnotizedId),
           { playerId: hypnotizedId, vote },
         ];
       }

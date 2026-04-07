@@ -132,6 +132,7 @@ export default function DebugPage() {
         playerCount={playerCount}
         readOnly={false}
         isPending={isCreating}
+        showUnreleased={true}
         onStartGame={() => {
           void handleCreateGame();
         }}

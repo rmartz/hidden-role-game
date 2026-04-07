@@ -2,6 +2,7 @@
 
 import type { GameMode } from "@/lib/types";
 import {
+  ALL_GAME_MODES,
   ENABLED_GAME_MODES,
   GAME_MODES,
   isGameModeEnabled,
@@ -19,15 +20,25 @@ import {
 } from "@/components/ui/select";
 import { GAME_MODE_PICKER_COPY } from "./GameModePicker.copy";
 
-function isEnabledGameMode(value: string | null): value is GameMode {
-  if (value === null) return false;
-  const parsed = parseGameMode(value);
-  return parsed !== undefined && isGameModeEnabled(parsed);
+interface GameModePickerProps {
+  showUnreleased?: boolean;
 }
 
-export function GameModePicker() {
+function isSelectableGameMode(
+  value: string | null,
+  showUnreleased: boolean,
+): value is GameMode {
+  if (value === null) return false;
+  const parsed = parseGameMode(value);
+  return parsed !== undefined && (showUnreleased || isGameModeEnabled(parsed));
+}
+
+export function GameModePicker({
+  showUnreleased = false,
+}: GameModePickerProps) {
   const dispatch = useAppDispatch();
   const selectedGameMode = useAppSelector((s) => s.gameConfig.gameMode);
+  const availableModes = showUnreleased ? ALL_GAME_MODES : ENABLED_GAME_MODES;
 
   return (
     <div className="space-y-1">
@@ -35,14 +46,15 @@ export function GameModePicker() {
       <Select
         value={selectedGameMode}
         onValueChange={(value) => {
-          if (isEnabledGameMode(value)) dispatch(setGameMode(value));
+          if (isSelectableGameMode(value, showUnreleased))
+            dispatch(setGameMode(value));
         }}
       >
         <SelectTrigger className="w-48">
           <SelectValue>{GAME_MODES[selectedGameMode].name}</SelectValue>
         </SelectTrigger>
         <SelectContent>
-          {ENABLED_GAME_MODES.map((mode) => (
+          {availableModes.map((mode) => (
             <SelectItem key={mode} value={mode}>
               {GAME_MODES[mode].name}
             </SelectItem>

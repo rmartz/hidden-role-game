@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { GameMode } from "@/lib/types";
 import {
+  ALL_GAME_MODES,
   DEFAULT_GAME_MODE,
   ENABLED_GAME_MODES,
   GAME_MODES,
@@ -66,6 +67,20 @@ describe("DEFAULT_GAME_MODE", () => {
       .filter((m) => GAME_MODES[m].released)
       .sort((a, b) => GAME_MODES[a].name.localeCompare(GAME_MODES[b].name));
     expect(DEFAULT_GAME_MODE).toBe(releasedModes[0]);
+  });
+});
+
+describe("ALL_GAME_MODES", () => {
+  it("includes all game modes regardless of release status", () => {
+    for (const mode of Object.values(GameMode)) {
+      expect(ALL_GAME_MODES).toContain(mode);
+    }
+  });
+
+  it("is sorted alphabetically by name", () => {
+    const names = ALL_GAME_MODES.map((m) => GAME_MODES[m].name);
+    const sorted = [...names].sort((a, b) => a.localeCompare(b));
+    expect(names).toEqual(sorted);
   });
 });
 

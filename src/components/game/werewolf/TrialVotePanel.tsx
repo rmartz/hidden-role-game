@@ -159,7 +159,7 @@ export function TrialVotePanel({
           {trial.hypnotizedStatus}
         </p>
       )}
-      {canVote && !hasVoted && !isSilenced && !isHypnotized && (
+      {canVote && !isSilenced && !isHypnotized && (
         <div className="flex justify-center gap-4">
           <Button
             size="sm"

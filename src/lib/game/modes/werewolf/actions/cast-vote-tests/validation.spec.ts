@@ -78,11 +78,11 @@ describe("WerewolfAction.CastVote — isValid", () => {
     expect(action.isValid(game, "p2", { vote: "guilty" })).toBe(false);
   });
 
-  it("returns false when caller already voted", () => {
+  it("returns true when caller already voted (re-vote is allowed)", () => {
     const game = makePlayingGame(
       makeDayStateWithTrial({ votes: [{ playerId: "p2", vote: "guilty" }] }),
     );
-    expect(action.isValid(game, "p2", { vote: "innocent" })).toBe(false);
+    expect(action.isValid(game, "p2", { vote: "innocent" })).toBe(true);
   });
 
   it("returns false when caller is dead", () => {
