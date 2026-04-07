@@ -20,17 +20,24 @@ export const GAME_MODES: Record<GameMode, GameModeConfig> = {
   [GameMode.Werewolf]: WEREWOLF_CONFIG,
 };
 
-const isDev = process.env.NODE_ENV !== "production";
+const isPreviewOrDev =
+  process.env.NODE_ENV !== "production" ||
+  process.env["NEXT_PUBLIC_VERCEL_ENV"] === "preview";
 
 /** Returns whether a game mode is available in the current environment. */
 export function isGameModeEnabled(mode: GameMode): boolean {
-  return GAME_MODES[mode].released || isDev;
+  return GAME_MODES[mode].released || isPreviewOrDev;
 }
 
 /** Game modes available in the current environment, sorted alphabetically by name. */
 export const ENABLED_GAME_MODES: GameMode[] = Object.values(GameMode)
   .filter(isGameModeEnabled)
   .sort((a, b) => GAME_MODES[a].name.localeCompare(GAME_MODES[b].name));
+
+/** All game modes sorted alphabetically by name, regardless of release status. */
+export const ALL_GAME_MODES: GameMode[] = Object.values(GameMode).sort((a, b) =>
+  GAME_MODES[a].name.localeCompare(GAME_MODES[b].name),
+);
 
 /** The default game mode — first alphabetical released mode. */
 export const DEFAULT_GAME_MODE: GameMode =
