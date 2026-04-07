@@ -232,9 +232,13 @@ const gameConfigSlice = createSlice({
     setPlayerCount(state, action: PayloadAction<number>) {
       state.playerCount = Math.max(1, action.payload);
       if (state.roleConfigMode === RoleConfigMode.Default) {
-        const slots = GAME_MODES[state.gameMode].defaultRoleCount(
-          state.playerCount,
-        );
+        const modeDefinition = GAME_MODES[state.gameMode];
+        const effectiveCount =
+          modeDefinition.resolveRoleSlotsRequired?.(
+            state.playerCount,
+            state.modeConfig,
+          ) ?? state.playerCount;
+        const slots = modeDefinition.defaultRoleCount(effectiveCount);
         state.roleCounts = roleCountsFromSlots(slots);
         state.roleMins = roleMinsFromSlots(slots);
         state.roleMaxes = roleMaxesFromSlots(slots);
@@ -271,6 +275,19 @@ const gameConfigSlice = createSlice({
         ...state.modeConfig,
         [action.payload.key]: action.payload.value,
       } as ModeConfig;
+      if (state.roleConfigMode === RoleConfigMode.Default) {
+        const modeDefinition = GAME_MODES[state.gameMode];
+        const effectiveCount =
+          modeDefinition.resolveRoleSlotsRequired?.(
+            state.playerCount,
+            state.modeConfig,
+          ) ?? state.playerCount;
+        const slots = modeDefinition.defaultRoleCount(effectiveCount);
+        state.roleCounts = roleCountsFromSlots(slots);
+        state.roleMins = roleMinsFromSlots(slots);
+        state.roleMaxes = roleMaxesFromSlots(slots);
+      }
+      state.isValid = recomputeIsValid(state);
       state.syncVersion++;
     },
   },
