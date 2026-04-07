@@ -57,7 +57,7 @@ function slotClassName(
 
 function TrackSlots({ filled, size, variant, labels }: TrackSlotsProps) {
   return (
-    <div className="flex gap-2">
+    <div className="flex w-full justify-between">
       {Array.from({ length: size }, (_, i) => (
         <div key={i} className="relative">
           <div
