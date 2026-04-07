@@ -45,6 +45,7 @@ interface EditableProps {
   playerCount: number;
   readOnly: false;
   isPending: boolean;
+  showUnreleased?: boolean;
   onStartGame: () => void;
 }
 
@@ -52,6 +53,7 @@ type GameConfigurationPanelProps = ReadOnlyProps | EditableProps;
 
 export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
   const { config, playerCount, readOnly } = props;
+  const showUnreleased = readOnly ? false : (props.showUnreleased ?? false);
 
   const dispatch = useAppDispatch();
   const selectedGameMode = useAppSelector((s) => s.gameConfig.gameMode);
@@ -173,7 +175,7 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
           Game Mode: <strong>{GAME_MODES[config.gameMode].name}</strong>
         </p>
       ) : (
-        <GameModePicker />
+        <GameModePicker showUnreleased={showUnreleased} />
       )}
       <Card className="@container mb-5">
         <CardHeader>
