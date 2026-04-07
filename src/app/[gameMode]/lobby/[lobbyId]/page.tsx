@@ -3,7 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { getPlayerId, getLobbyId, getSessionId, saveGameId } from "@/lib/api";
+import {
+  clearSession,
+  getPlayerId,
+  getLobbyId,
+  getSessionId,
+  saveGameId,
+} from "@/lib/api";
 import { GameMode } from "@/lib/types";
 import { parseGameMode } from "@/lib/game/modes";
 import {
@@ -96,15 +102,20 @@ export default function LobbyPage() {
     prevGameIdRef.current = gameId;
   }, [gameId, actualGameMode, router]);
 
-  // If the lobby doesn't exist or the session is invalid, return to the home page.
+  // If the lobby doesn't exist, return to the home page.
+  // If the session is invalid for this lobby (403), the user was removed or
+  // their session expired. Clear the stale session so the next fetch returns
+  // a null lobby (unauthenticated), which shows the JoinPrompt in place.
   useEffect(() => {
-    if (
-      fetchLobby.error?.message === "404" ||
-      fetchLobby.error?.message === "403"
-    ) {
+    if (fetchLobby.error?.message === "404") {
       router.push("/");
+    } else if (fetchLobby.error?.message === "403") {
+      clearSession();
+      setSessionId(undefined);
+      setStoredLobbyId(undefined);
+      queryClient.removeQueries({ queryKey: ["lobby", lobbyId] });
     }
-  }, [fetchLobby.error, router]);
+  }, [fetchLobby.error, router, lobbyId, queryClient]);
 
   const removeMutation = useRemovePlayer(lobbyId, (targetPlayerId) => {
     if (targetPlayerId === myPlayerId) {
