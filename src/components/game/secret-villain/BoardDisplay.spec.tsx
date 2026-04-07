@@ -39,6 +39,26 @@ describe("BoardDisplay", () => {
     expect(filledBad).toHaveLength(2);
   });
 
+  it("renders 6 bad slots and 5 good slots", () => {
+    render(<BoardDisplay {...defaultProps} />);
+    expect(screen.getAllByTestId(/^bad-slot-\d+$/)).toHaveLength(6);
+    expect(screen.getAllByTestId(/^good-slot-\d+$/)).toHaveLength(5);
+  });
+
+  it("marks the last bad slot as final", () => {
+    render(<BoardDisplay {...defaultProps} />);
+    expect(screen.getByTestId("bad-slot-5").getAttribute("data-final")).toBe(
+      "true",
+    );
+  });
+
+  it("marks the last good slot as final", () => {
+    render(<BoardDisplay {...defaultProps} />);
+    expect(screen.getByTestId("good-slot-4").getAttribute("data-final")).toBe(
+      "true",
+    );
+  });
+
   it("shows veto badge when vetoUnlocked is true", () => {
     render(<BoardDisplay {...defaultProps} vetoUnlocked={true} />);
     expect(

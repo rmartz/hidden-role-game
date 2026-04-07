@@ -42,8 +42,18 @@ export const Empty: Story = {
 export const NearWin: Story = {
   args: {
     goodCardsPlayed: 4,
-    badCardsPlayed: 4,
+    badCardsPlayed: 5,
     failedElectionCount: 2,
+    failedElectionThreshold: 3,
+    powerTable: MEDIUM_POWER_TABLE,
+  },
+};
+
+export const FinalSlotFilled: Story = {
+  args: {
+    goodCardsPlayed: 5,
+    badCardsPlayed: 6,
+    failedElectionCount: 0,
     failedElectionThreshold: 3,
     powerTable: MEDIUM_POWER_TABLE,
   },
