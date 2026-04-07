@@ -38,10 +38,11 @@ describe("PUT /api/lobby/[lobbyId]/order", () => {
     };
     const alice = lobby.players[0];
     const bob = joinData.lobby.players.find((p) => p.id !== alice.id);
+    if (!bob) throw new Error("Bob not found in lobby");
 
     const res = await reorderPlayers(
       putRequest(`http://localhost/api/lobby/${lobby.id}/order`, aliceSession, {
-        playerOrder: [bob?.id ?? "", alice.id],
+        playerOrder: [bob.id, alice.id],
       }),
       makeParams(lobby.id),
     );
@@ -70,12 +71,13 @@ describe("PUT /api/lobby/[lobbyId]/order", () => {
     };
     const alice = lobby.players[0];
     const bob = joinData.lobby.players.find((p) => p.id !== alice.id);
+    if (!bob) throw new Error("Bob not found in lobby");
 
     const res = await reorderPlayers(
       putRequest(
         `http://localhost/api/lobby/${lobby.id}/order`,
         joinData.sessionId,
-        { playerOrder: [bob?.id ?? "", alice.id] },
+        { playerOrder: [bob.id, alice.id] },
       ),
       makeParams(lobby.id),
     );

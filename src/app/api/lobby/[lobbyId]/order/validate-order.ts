@@ -11,6 +11,10 @@ interface InvalidOrderResult {
 
 type ValidateOrderResult = ValidOrderResult | InvalidOrderResult;
 
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((v) => typeof v === "string");
+}
+
 /**
  * Parses and validates a raw request body against the current lobby player IDs.
  *
@@ -21,15 +25,12 @@ export function validatePlayerOrder(
   body: unknown,
   lobbyPlayers: { id: string }[],
 ): ValidateOrderResult {
-  if (
-    typeof body !== "object" ||
-    body === null ||
-    !("playerOrder" in body) ||
-    !Array.isArray((body as Record<string, unknown>).playerOrder) ||
-    !(body as Record<string, unknown[]>).playerOrder.every(
-      (v) => typeof v === "string",
-    )
-  ) {
+  const rawOrder =
+    typeof body === "object" && body !== null
+      ? (body as Record<string, unknown>)["playerOrder"]
+      : undefined;
+
+  if (!isStringArray(rawOrder)) {
     return {
       valid: false,
       error: "playerOrder must be an array of strings",
@@ -37,7 +38,7 @@ export function validatePlayerOrder(
     };
   }
 
-  const playerOrder = (body as Record<string, string[]>).playerOrder;
+  const playerOrder = rawOrder;
   const lobbyPlayerIds = new Set(lobbyPlayers.map((p) => p.id));
   const orderIds = new Set(playerOrder);
 

@@ -231,7 +231,7 @@ export default function LobbyPage() {
           onToggleReady={() => {
             toggleReadyMutation.mutate();
           }}
-          onReorderPlayers={(playerOrder: string[]) => {
+          onReorderPlayers={(playerOrder) => {
             reorderPlayersMutation.mutate(playerOrder);
           }}
         />
