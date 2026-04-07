@@ -117,49 +117,51 @@ export function BoardDisplay({
       <CardHeader>
         <CardTitle>{themeLabels.goodTrack}</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <TrackSlots
-          filled={goodCardsPlayed}
-          size={GOOD_CARDS_TO_WIN}
-          variant="good"
-        />
-
-        <div className="pb-16">
-          <p className="text-sm font-medium mb-1">{themeLabels.badTrack}</p>
+      <CardContent>
+        <div className="max-w-sm space-y-4">
           <TrackSlots
-            filled={badCardsPlayed}
-            size={BAD_CARDS_TO_WIN}
-            variant="bad"
-            labels={powerLabels}
+            filled={goodCardsPlayed}
+            size={GOOD_CARDS_TO_WIN}
+            variant="good"
           />
-        </div>
 
-        <div className="flex items-center gap-2">
-          <p className="text-sm font-medium">
-            {SECRET_VILLAIN_COPY.board.failedElections}
-          </p>
-          <div className="flex gap-1">
-            {Array.from({ length: failedElectionThreshold }, (_, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "size-3 rounded-full",
-                  i < failedElectionCount
-                    ? "bg-yellow-500"
-                    : "bg-muted-foreground/30",
-                )}
-                data-testid={`election-dot-${String(i)}`}
-                data-filled={i < failedElectionCount}
-              />
-            ))}
+          <div className="pb-16">
+            <p className="text-sm font-medium mb-1">{themeLabels.badTrack}</p>
+            <TrackSlots
+              filled={badCardsPlayed}
+              size={BAD_CARDS_TO_WIN}
+              variant="bad"
+              labels={powerLabels}
+            />
           </div>
-        </div>
 
-        {vetoUnlocked && (
-          <Badge variant="secondary" data-testid="veto-badge">
-            {SECRET_VILLAIN_COPY.board.vetoUnlocked}
-          </Badge>
-        )}
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-medium">
+              {SECRET_VILLAIN_COPY.board.failedElections}
+            </p>
+            <div className="flex gap-1">
+              {Array.from({ length: failedElectionThreshold }, (_, i) => (
+                <div
+                  key={i}
+                  className={cn(
+                    "size-3 rounded-full",
+                    i < failedElectionCount
+                      ? "bg-yellow-500"
+                      : "bg-muted-foreground/30",
+                  )}
+                  data-testid={`election-dot-${String(i)}`}
+                  data-filled={i < failedElectionCount}
+                />
+              ))}
+            </div>
+          </div>
+
+          {vetoUnlocked && (
+            <Badge variant="secondary" data-testid="veto-badge">
+              {SECRET_VILLAIN_COPY.board.vetoUnlocked}
+            </Badge>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
