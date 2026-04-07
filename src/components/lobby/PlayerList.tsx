@@ -67,7 +67,7 @@ export function PlayerList({
 
   const displayPlayers = localOrder
     .map((id) => playerMap.get(id))
-    .filter((p) => p !== undefined);
+    .filter((p): p is NonNullable<typeof p> => p !== undefined);
 
   function handleDragStart(playerId: string) {
     dragSourceIdRef.current = playerId;

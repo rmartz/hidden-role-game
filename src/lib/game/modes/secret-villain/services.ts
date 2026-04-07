@@ -67,7 +67,8 @@ export const secretVillainServices: GameModeServices = {
     if (storedOrder && storedOrder.length > 0) {
       const knownIds = new Set(allPlayerIds);
       const filtered = storedOrder.filter((id) => knownIds.has(id));
-      const missing = allPlayerIds.filter((id) => !filtered.includes(id));
+      const filteredSet = new Set(filtered);
+      const missing = allPlayerIds.filter((id) => !filteredSet.has(id));
       playerIds = [...filtered, ...missing];
     } else {
       playerIds = shuffle(allPlayerIds);
