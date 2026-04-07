@@ -53,15 +53,6 @@ export function PlayerRow({
   return (
     <li
       className={cn("flex items-center gap-2 py-1", draggable && "select-none")}
-      draggable={draggable}
-      onDragStart={
-        draggable
-          ? (e) => {
-              e.dataTransfer.effectAllowed = "move";
-              onDragStart?.(player.id);
-            }
-          : undefined
-      }
       onDragOver={
         draggable
           ? (e) => {
@@ -73,7 +64,17 @@ export function PlayerRow({
       onDragEnd={draggable ? onDragEnd : undefined}
     >
       {draggable && (
-        <GripVerticalIcon className="h-4 w-4 text-muted-foreground shrink-0 cursor-grab" />
+        <span
+          className="shrink-0 cursor-grab"
+          draggable
+          onDragStart={(e) => {
+            e.dataTransfer.effectAllowed = "move";
+            e.dataTransfer.setData("text/plain", player.id);
+            onDragStart?.(player.id);
+          }}
+        >
+          <GripVerticalIcon className="h-4 w-4 text-muted-foreground" />
+        </span>
       )}
       {isReady && (
         <CheckmarkCircleRegular className="text-green-600 h-5 w-5 shrink-0" />

@@ -16,6 +16,7 @@ import {
   type FirebaseLobbyPublic,
   type FirebaseLobbyPrivate,
 } from "@/lib/firebase/schema";
+import { resolvePlayerOrder } from "@/lib/player-order";
 
 function lobbyRef(lobbyId: string) {
   return getAdminDatabase().ref(`lobbies/${lobbyId}`);
@@ -108,8 +109,13 @@ export async function removePlayer(
     private: FirebaseLobbyPrivate;
   };
 
-  const currentOrder: string[] = data.public.playerOrder ?? [];
-  const updatedOrder = currentOrder.filter((id) => id !== playerId);
+  const remainingPlayerIds = Object.keys(data.public.players ?? {}).filter(
+    (id) => id !== playerId,
+  );
+  const updatedOrder = resolvePlayerOrder(
+    data.public.playerOrder,
+    remainingPlayerIds,
+  );
 
   await lobbyRef(lobbyId).update({
     [`public/players/${playerId}`]: null,
@@ -141,8 +147,11 @@ export async function addPlayer(
     private: FirebaseLobbyPrivate;
   };
 
-  const currentOrder: string[] = data.public.playerOrder ?? [];
-  const updatedOrder = [...currentOrder, player.id];
+  const existingPlayerIds = Object.keys(data.public.players ?? {});
+  const updatedOrder = [
+    ...resolvePlayerOrder(data.public.playerOrder, existingPlayerIds),
+    player.id,
+  ];
 
   await lobbyRef(lobbyId).update({
     [`public/players/${player.id}`]: { id: player.id, name: player.name },

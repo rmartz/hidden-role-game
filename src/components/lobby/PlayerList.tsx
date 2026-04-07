@@ -94,7 +94,10 @@ export function PlayerList({
     const finalOrder = pendingOrderRef.current ?? localOrder;
     pendingOrderRef.current = undefined;
     dragSourceIdRef.current = undefined;
-    if (onReorderPlayers) {
+    const unchanged =
+      finalOrder.length === lobby.playerOrder.length &&
+      finalOrder.every((id, i) => id === lobby.playerOrder[i]);
+    if (onReorderPlayers && !unchanged) {
       onReorderPlayers(finalOrder);
     }
   }
