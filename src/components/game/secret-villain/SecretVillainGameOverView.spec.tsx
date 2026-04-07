@@ -5,6 +5,7 @@ import { SecretVillainWinner } from "@/lib/game/modes/secret-villain/utils/win-c
 import { GameStatus, GameMode, Team } from "@/lib/types";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
+import { SvTheme, SV_THEMES } from "@/lib/game/modes/secret-villain/themes";
 import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
 
 afterEach(cleanup);
@@ -91,5 +92,61 @@ describe("SecretVillainGameOverView", () => {
     );
     expect(screen.getByText("Alice")).toBeDefined();
     expect(screen.getByText("Bob")).toBeDefined();
+  });
+
+  it("renders themed role names for the Original theme", () => {
+    const theme = SvTheme.Original;
+    const themeLabels = SV_THEMES[theme];
+    const gameState = makeGameState({
+      svTheme: theme,
+      visibleRoleAssignments: [
+        {
+          player: { id: "p1", name: "Alice" },
+          reason: "revealed" as const,
+          role: { id: "good", name: "Good Role", team: Team.Good },
+        },
+        {
+          player: { id: "p2", name: "Bob" },
+          reason: "revealed" as const,
+          role: { id: "bad", name: "Bad Role", team: Team.Bad },
+        },
+        {
+          player: { id: "p3", name: "Charlie" },
+          reason: "revealed" as const,
+          role: { id: "special-bad", name: "Special Bad Role", team: Team.Bad },
+        },
+      ],
+    });
+    render(
+      <SecretVillainGameOverView {...defaultProps} gameState={gameState} />,
+    );
+    expect(screen.getByText(themeLabels.goodRole)).toBeDefined();
+    expect(screen.getByText(themeLabels.badRole)).toBeDefined();
+    expect(screen.getByText(themeLabels.specialBadRole)).toBeDefined();
+  });
+
+  it("renders themed role names for the Star Wars theme", () => {
+    const theme = SvTheme.StarWars;
+    const themeLabels = SV_THEMES[theme];
+    const gameState = makeGameState({
+      svTheme: theme,
+      visibleRoleAssignments: [
+        {
+          player: { id: "p1", name: "Alice" },
+          reason: "revealed" as const,
+          role: { id: "good", name: "Good Role", team: Team.Good },
+        },
+        {
+          player: { id: "p2", name: "Bob" },
+          reason: "revealed" as const,
+          role: { id: "special-bad", name: "Special Bad Role", team: Team.Bad },
+        },
+      ],
+    });
+    render(
+      <SecretVillainGameOverView {...defaultProps} gameState={gameState} />,
+    );
+    expect(screen.getByText(themeLabels.goodRole)).toBeDefined();
+    expect(screen.getByText(themeLabels.specialBadRole)).toBeDefined();
   });
 });
