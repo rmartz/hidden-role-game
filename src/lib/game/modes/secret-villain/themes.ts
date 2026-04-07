@@ -161,7 +161,7 @@ export const SV_THEMES: Record<SvTheme, SvThemeLabels> = {
       "Close your eyes and wait. Management is identifying each other.",
     specialBadMessage:
       "Close your eyes and raise your thumb. The other Management players will see you.",
-    specialBadAllyDescription: "This player is in on the Hustle.",
+    specialBadAllyDescription: "This player is on the Management team.",
   },
 };
 
