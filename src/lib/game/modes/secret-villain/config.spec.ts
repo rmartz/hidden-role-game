@@ -3,11 +3,11 @@ import { GameMode } from "@/lib/types";
 import { SecretVillainRole } from "./roles";
 import { SECRET_VILLAIN_CONFIG } from "./config";
 
-const noBoard = { gameMode: GameMode.SecretVillain };
+const noBoard = { gameMode: GameMode.SecretVillain } as const;
 const withBoard = {
   gameMode: GameMode.SecretVillain,
-  includeBoard: true as const,
-};
+  includeBoard: true,
+} as const;
 
 describe("SECRET_VILLAIN_CONFIG.defaultRoleCount", () => {
   it("returns correct counts for minimum player count (5)", () => {

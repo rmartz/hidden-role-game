@@ -1,4 +1,4 @@
-import { SvBoardPreset, SpecialActionType } from "./types";
+import { SvBoardPreset, SpecialActionType, SecretVillainPhase } from "./types";
 
 export const SECRET_VILLAIN_COPY = {
   boardPresets: {
@@ -27,16 +27,14 @@ export const SECRET_VILLAIN_COPY = {
     chancellor: "Chancellor",
     chancellorNominee: "Chancellor Nominee",
     phaseLabels: {
-      "election-nomination": "Election: Nomination",
-      "election-vote": "Election: Voting",
-      "policy-president": "Policy: President",
-      "policy-chancellor": "Policy: Chancellor",
-      "special-action": "Presidential Power",
-    },
-    previousAdministration: "Previous Administration",
+      [SecretVillainPhase.ElectionNomination]: "Election: Nomination",
+      [SecretVillainPhase.ElectionVote]: "Election: Voting",
+      [SecretVillainPhase.PolicyPresident]: "Policy: President",
+      [SecretVillainPhase.PolicyChancellor]: "Policy: Chancellor",
+      [SecretVillainPhase.SpecialAction]: "Presidential Power",
+    } satisfies Record<SecretVillainPhase, string>,
     eliminated: "Eliminated Players",
     noEliminated: "None",
-    waitingForBoard: "Waiting for board player\u2026",
   },
   election: {
     nominationHeading: "Nomination",
@@ -139,9 +137,6 @@ export const SECRET_VILLAIN_COPY = {
       "Close your eyes and raise your thumb. The other Bad players will see you.",
     specialBadAllyDescription: "This player is on the Bad team.",
     gameStartsIn: "Game begins in",
-    boardHeading: "Game Starting",
-    boardDescription:
-      "You are the Board player. You see only public game state.",
   },
   eliminated: "You have been eliminated.",
   spectating: "You are spectating.",

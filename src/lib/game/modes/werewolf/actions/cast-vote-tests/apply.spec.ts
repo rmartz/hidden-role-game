@@ -124,7 +124,9 @@ describe("WerewolfAction.CastVote — apply (basic)", () => {
     ).turnState.phase;
     const p2Votes = phase.activeTrial.votes.filter((v) => v.playerId === "p2");
     expect(p2Votes).toHaveLength(1);
-    expect(p2Votes[0].vote).toBe("innocent");
+    const p2Vote = p2Votes[0];
+    if (!p2Vote) throw new Error("p2 vote not found");
+    expect(p2Vote.vote).toBe("innocent");
   });
 
   it("triggers Werewolves win when auto-resolve eliminates last non-Bad player", () => {

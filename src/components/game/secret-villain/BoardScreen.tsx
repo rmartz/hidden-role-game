@@ -20,10 +20,9 @@ export function BoardScreen({ gameState }: BoardScreenProps) {
   const { svPhase, svBoard, players, deadPlayerIds, vetoUnlocked, svTheme } =
     gameState;
 
-  const phaseLabel =
-    svPhase?.type !== undefined
-      ? SECRET_VILLAIN_COPY.boardScreen.phaseLabels[svPhase.type]
-      : undefined;
+  const phaseLabel = svPhase?.type
+    ? SECRET_VILLAIN_COPY.boardScreen.phaseLabels[svPhase.type]
+    : undefined;
 
   const presidentName = svPhase?.presidentId
     ? getPlayerName(players, svPhase.presidentId)
@@ -36,6 +35,8 @@ export function BoardScreen({ gameState }: BoardScreenProps) {
   const chancellorNomineeName = svPhase?.chancellorNomineeId
     ? getPlayerName(players, svPhase.chancellorNomineeId)
     : undefined;
+
+  const eliminatedIds = deadPlayerIds ?? [];
 
   return (
     <div className="p-6 max-w-2xl mx-auto space-y-6">
@@ -97,7 +98,7 @@ export function BoardScreen({ gameState }: BoardScreenProps) {
           <CardTitle>{SECRET_VILLAIN_COPY.boardScreen.eliminated}</CardTitle>
         </CardHeader>
         <CardContent>
-          {(deadPlayerIds ?? []).length === 0 ? (
+          {eliminatedIds.length === 0 ? (
             <p
               className="text-sm text-muted-foreground"
               data-testid="no-eliminated"
@@ -106,7 +107,7 @@ export function BoardScreen({ gameState }: BoardScreenProps) {
             </p>
           ) : (
             <ul className="text-sm space-y-1">
-              {(deadPlayerIds ?? []).map((id, i) => (
+              {eliminatedIds.map((id, i) => (
                 <li key={id} data-testid={`eliminated-player-${String(i)}`}>
                   {getPlayerName(players, id)}
                 </li>
