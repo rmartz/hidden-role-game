@@ -1,6 +1,10 @@
 import type { PlayerRoleAssignment } from "@/lib/types";
 import type { SecretVillainTurnState } from "../types";
-import { CARDS_TO_WIN, BAD_CARDS_FOR_SPECIAL_BAD_WIN } from "../types";
+import {
+  GOOD_CARDS_TO_WIN,
+  BAD_CARDS_TO_WIN,
+  BAD_CARDS_FOR_SPECIAL_BAD_WIN,
+} from "../types";
 import { SecretVillainRole } from "../roles";
 
 export enum SecretVillainWinner {
@@ -12,14 +16,14 @@ export interface WinConditionResult {
   winner: SecretVillainWinner;
 }
 
-/** Check board-based win conditions (5 Good or 5 Bad cards played). */
+/** Check board-based win conditions (5 Good or 6 Bad cards played). */
 export function checkBoardWinCondition(
   ts: SecretVillainTurnState,
 ): WinConditionResult | undefined {
-  if (ts.goodCardsPlayed >= CARDS_TO_WIN) {
+  if (ts.goodCardsPlayed >= GOOD_CARDS_TO_WIN) {
     return { winner: SecretVillainWinner.Good };
   }
-  if (ts.badCardsPlayed >= CARDS_TO_WIN) {
+  if (ts.badCardsPlayed >= BAD_CARDS_TO_WIN) {
     return { winner: SecretVillainWinner.Bad };
   }
   return undefined;

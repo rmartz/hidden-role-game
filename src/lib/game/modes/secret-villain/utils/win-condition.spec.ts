@@ -44,20 +44,20 @@ describe("checkBoardWinCondition", () => {
     });
   });
 
-  it("returns Bad when 5 Bad cards played", () => {
-    const ts = { ...baseTurnState, badCardsPlayed: 5 };
+  it("returns Bad when 6 Bad cards played", () => {
+    const ts = { ...baseTurnState, badCardsPlayed: 6 };
     expect(checkBoardWinCondition(ts)).toEqual({
       winner: SecretVillainWinner.Bad,
     });
   });
 
-  it("returns undefined when neither team has 5 cards", () => {
-    const ts = { ...baseTurnState, goodCardsPlayed: 3, badCardsPlayed: 4 };
+  it("returns undefined when neither team has reached their threshold", () => {
+    const ts = { ...baseTurnState, goodCardsPlayed: 4, badCardsPlayed: 5 };
     expect(checkBoardWinCondition(ts)).toBeUndefined();
   });
 
-  it("Good wins takes priority if both somehow reach 5", () => {
-    const ts = { ...baseTurnState, goodCardsPlayed: 5, badCardsPlayed: 5 };
+  it("Good wins takes priority if both somehow reach their threshold", () => {
+    const ts = { ...baseTurnState, goodCardsPlayed: 5, badCardsPlayed: 6 };
     expect(checkBoardWinCondition(ts)).toEqual({
       winner: SecretVillainWinner.Good,
     });
