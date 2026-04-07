@@ -46,16 +46,13 @@ export function PlayerList({
   const isCurrentUserReady = !!userPlayerId && readySet.has(userPlayerId);
 
   const playerMap = new Map(lobby.players.map((p) => [p.id, p]));
-  const orderedPlayers = lobby.playerOrder
-    .map((id) => playerMap.get(id))
-    .filter((p) => p !== undefined);
 
-  const allNonOwnerPlayers = lobby.players.filter(
+  const nonOwnerPlayers = lobby.players.filter(
     (p) => p.id !== lobby.ownerPlayerId,
   );
   const allPlayersReady =
-    allNonOwnerPlayers.length > 0 &&
-    allNonOwnerPlayers.every((p) => readySet.has(p.id));
+    nonOwnerPlayers.length > 0 &&
+    nonOwnerPlayers.every((p) => readySet.has(p.id));
 
   const [localOrder, setLocalOrder] = useState<string[]>(
     () => lobby.playerOrder,
@@ -122,7 +119,7 @@ export function PlayerList({
         )}
       </CardHeader>
       <CardContent>
-        {canReorder && orderedPlayers.length > 1 && (
+        {canReorder && displayPlayers.length > 1 && (
           <p className="text-xs text-muted-foreground mb-2">
             {PLAYER_LIST_COPY.dragHint}
           </p>
