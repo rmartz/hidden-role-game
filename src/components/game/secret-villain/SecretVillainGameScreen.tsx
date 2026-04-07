@@ -8,6 +8,7 @@ import { useAdvanceGame, useGameAction, useReturnToLobby } from "@/hooks";
 import { SecretVillainAction } from "@/lib/game/modes/secret-villain/actions";
 import { SpecialActionType } from "@/lib/game/modes/secret-villain/types";
 import { SecretVillainGameScreenView } from "./SecretVillainGameScreenView";
+import { BoardScreen } from "./BoardScreen";
 
 /** How long the Starting phase lasts before auto-advancing to Playing (seconds). */
 const STARTING_DURATION_SECONDS = 15;
@@ -68,6 +69,14 @@ export function SecretVillainGameScreen({
       clearInterval(interval);
     };
   }, [isStarting, startedAt, advanceGame]);
+
+  // Board player: no role, no actions — just the public board display.
+  const isBoardPlayer =
+    gameState.myPlayerId === undefined && gameState.gameOwner !== undefined;
+
+  if (isBoardPlayer) {
+    return <BoardScreen gameState={gameState} />;
+  }
 
   return (
     <SecretVillainGameScreenView

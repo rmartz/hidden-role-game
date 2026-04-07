@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { SecretVillainTimerConfigPanel } from "./SecretVillainTimerConfigPanel";
 import { SECRET_VILLAIN_CONFIG_PANEL_COPY } from "./SecretVillainConfigPanel.copy";
 import { CustomPowerTableEditor } from "./CustomPowerTableEditor";
@@ -95,6 +96,7 @@ export function SecretVillainConfigPanel({
 
   const currentTheme = modeConfig.theme ?? SvTheme.Default;
   const themeLabel = SV_THEMES[currentTheme].name;
+  const includeBoard = modeConfig.includeBoard ?? false;
 
   return (
     <div className="space-y-3">
@@ -156,6 +158,24 @@ export function SecretVillainConfigPanel({
           }
         />
       )}
+      <div className="flex items-start gap-2">
+        <Switch
+          id="include-board"
+          checked={includeBoard}
+          disabled={disabled ?? !onModeConfigFieldChange}
+          onCheckedChange={(checked) =>
+            onModeConfigFieldChange?.("includeBoard", checked)
+          }
+        />
+        <div>
+          <Label htmlFor="include-board" className="text-sm">
+            {SECRET_VILLAIN_CONFIG_PANEL_COPY.includeBoardLabel}
+          </Label>
+          <p className="text-xs text-muted-foreground">
+            {SECRET_VILLAIN_CONFIG_PANEL_COPY.includeBoardDescription}
+          </p>
+        </div>
+      </div>
       <SecretVillainTimerConfigPanel
         timerConfig={timerConfig}
         disabled={disabled}

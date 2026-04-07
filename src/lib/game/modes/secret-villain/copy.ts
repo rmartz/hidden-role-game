@@ -20,6 +20,24 @@ export const SECRET_VILLAIN_COPY = {
       [SpecialActionType.Shoot]: "Shoot",
     } satisfies Record<SpecialActionType, string>,
   },
+  boardScreen: {
+    heading: "Game Board",
+    currentPhase: "Current Phase",
+    president: "President",
+    chancellor: "Chancellor",
+    chancellorNominee: "Chancellor Nominee",
+    phaseLabels: {
+      "election-nomination": "Election: Nomination",
+      "election-vote": "Election: Voting",
+      "policy-president": "Policy: President",
+      "policy-chancellor": "Policy: Chancellor",
+      "special-action": "Presidential Power",
+    },
+    previousAdministration: "Previous Administration",
+    eliminated: "Eliminated Players",
+    noEliminated: "None",
+    waitingForBoard: "Waiting for board player\u2026",
+  },
   election: {
     nominationHeading: "Nomination",
     nominationInstructions: (presidentName: string) =>
@@ -121,6 +139,9 @@ export const SECRET_VILLAIN_COPY = {
       "Close your eyes and raise your thumb. The other Bad players will see you.",
     specialBadAllyDescription: "This player is on the Bad team.",
     gameStartsIn: "Game begins in",
+    boardHeading: "Game Starting",
+    boardDescription:
+      "You are the Board player. You see only public game state.",
   },
   eliminated: "You have been eliminated.",
   spectating: "You are spectating.",

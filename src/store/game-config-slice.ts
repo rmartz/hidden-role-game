@@ -18,6 +18,7 @@ function computeIsValid(
   roleCounts: Record<string, number>,
   roleMins: Record<string, number>,
   roleMaxes: Record<string, number>,
+  modeConfig?: ModeConfig,
 ): boolean {
   if (roleConfigMode === RoleConfigMode.Default) {
     return playerCount >= GAME_MODES[gameMode].minPlayers;
@@ -29,6 +30,9 @@ function computeIsValid(
   }
   // Custom mode
   const config = GAME_MODES[gameMode];
+  if (modeConfig && config.resolveIsValidRoleCount) {
+    return config.resolveIsValidRoleCount(playerCount, roleCounts, modeConfig);
+  }
   if (config.isValidRoleCount) {
     return config.isValidRoleCount(playerCount, roleCounts);
   }
@@ -92,6 +96,7 @@ function recomputeIsValid(state: GameConfigState): boolean {
     state.roleCounts,
     state.roleMins,
     state.roleMaxes,
+    state.modeConfig,
   );
 }
 
