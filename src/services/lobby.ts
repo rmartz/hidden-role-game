@@ -281,10 +281,14 @@ export async function reorderPlayers(
     private: FirebaseLobbyPrivate;
   };
 
+  const currentPlayerIds = Object.keys(data.public.players ?? {});
+  const reconciledOrder = resolvePlayerOrder(playerOrder, currentPlayerIds);
+
   await lobbyRef(lobbyId)
     .child("public/playerOrder")
-    .set(playerOrder.length > 0 ? playerOrder : null);
+    .set(reconciledOrder.length > 0 ? reconciledOrder : null);
 
-  data.public.playerOrder = playerOrder.length > 0 ? playerOrder : undefined;
+  data.public.playerOrder =
+    reconciledOrder.length > 0 ? reconciledOrder : undefined;
   return firebaseToLobby(lobbyId, data.public, data.private);
 }

@@ -85,7 +85,9 @@ export function PlayerList({
 
     const reordered = [...localOrder];
     reordered.splice(sourceIndex, 1);
-    reordered.splice(targetIndex, 0, sourceId);
+    const insertIndex =
+      sourceIndex < targetIndex ? targetIndex - 1 : targetIndex;
+    reordered.splice(insertIndex, 0, sourceId);
     pendingOrderRef.current = reordered;
     setLocalOrder(reordered);
   }
