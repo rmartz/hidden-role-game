@@ -104,8 +104,10 @@ export default function LobbyPage() {
 
   // If the lobby doesn't exist, return to the home page.
   // If the session is invalid for this lobby (403), the user was removed or
-  // their session expired. Clear the stale session so the next fetch returns
-  // a null lobby (unauthenticated), which shows the JoinPrompt in place.
+  // their session expired. Clear the stale session — both localStorage (via
+  // clearSession) and the corresponding React state (sessionId/storedLobbyId)
+  // — then remove the cached query so the next fetch runs unauthenticated.
+  // An unauthenticated fetch returns null data, which shows the JoinPrompt.
   useEffect(() => {
     if (fetchLobby.error?.message === "404") {
       router.push("/");
