@@ -2,7 +2,11 @@ import { afterEach, describe, it, expect } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import { BoardDisplay } from "./BoardDisplay";
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
-import { SpecialActionType } from "@/lib/game/modes/secret-villain/types";
+import {
+  BAD_CARDS_TO_WIN,
+  GOOD_CARDS_TO_WIN,
+  SpecialActionType,
+} from "@/lib/game/modes/secret-villain/types";
 
 afterEach(cleanup);
 
@@ -37,6 +41,32 @@ describe("BoardDisplay", () => {
       .getAllByTestId(/^bad-slot-/)
       .filter((el) => el.getAttribute("data-filled") === "true");
     expect(filledBad).toHaveLength(2);
+  });
+
+  it("renders the correct number of bad and good slots", () => {
+    render(<BoardDisplay {...defaultProps} />);
+    expect(screen.getAllByTestId(/^bad-slot-\d+$/)).toHaveLength(
+      BAD_CARDS_TO_WIN,
+    );
+    expect(screen.getAllByTestId(/^good-slot-\d+$/)).toHaveLength(
+      GOOD_CARDS_TO_WIN,
+    );
+  });
+
+  it("marks the last bad slot as final", () => {
+    render(<BoardDisplay {...defaultProps} />);
+    const badSlots = screen.getAllByTestId(/^bad-slot-\d+$/);
+    expect(badSlots[badSlots.length - 1].getAttribute("data-final")).toBe(
+      "true",
+    );
+  });
+
+  it("marks the last good slot as final", () => {
+    render(<BoardDisplay {...defaultProps} />);
+    const goodSlots = screen.getAllByTestId(/^good-slot-\d+$/);
+    expect(goodSlots[goodSlots.length - 1].getAttribute("data-final")).toBe(
+      "true",
+    );
   });
 
   it("shows veto badge when vetoUnlocked is true", () => {

@@ -179,7 +179,7 @@ export interface SecretVillainTurnState {
   currentPresidentIndex: number;
   /** Number of Good policy cards played on the board (0–5). */
   goodCardsPlayed: number;
-  /** Number of Bad policy cards played on the board (0–5). */
+  /** Number of Bad policy cards played on the board (0–6). */
   badCardsPlayed: number;
   /** The draw pile (face-down). Reshuffled from discards when exhausted. */
   deck: PolicyCard[];

@@ -9,6 +9,10 @@ import type {
   SvPowerTable,
   SpecialActionType,
 } from "@/lib/game/modes/secret-villain/types";
+import {
+  GOOD_CARDS_TO_WIN,
+  BAD_CARDS_TO_WIN,
+} from "@/lib/game/modes/secret-villain/types";
 import { cn } from "@/lib/utils";
 
 interface BoardDisplayProps {
@@ -21,32 +25,56 @@ interface BoardDisplayProps {
   svTheme?: SvTheme;
 }
 
-const TRACK_SIZE = 5;
-
 interface TrackSlotsProps {
   filled: number;
+  size: number;
   variant: "good" | "bad";
   labels?: (string | undefined)[];
 }
 
-function TrackSlots({ filled, variant, labels }: TrackSlotsProps) {
+const SLOT_CLASSES = {
+  good: {
+    filled: "bg-green-500 border-green-600",
+    filledFinal: "bg-green-300 border-green-400",
+    empty: "border-green-400",
+    emptyFinal: "border-green-300 border-dashed",
+  },
+  bad: {
+    filled: "bg-red-500 border-red-600",
+    filledFinal: "bg-red-300 border-red-400",
+    empty: "border-red-400",
+    emptyFinal: "border-red-300 border-dashed",
+  },
+} as const;
+
+function slotClassName(
+  isFilled: boolean,
+  isFinal: boolean,
+  variant: "good" | "bad",
+): string {
+  const state = isFilled
+    ? isFinal
+      ? "filledFinal"
+      : "filled"
+    : isFinal
+      ? "emptyFinal"
+      : "empty";
+  return SLOT_CLASSES[variant][state];
+}
+
+function TrackSlots({ filled, size, variant, labels }: TrackSlotsProps) {
   return (
-    <div className="flex gap-2">
-      {Array.from({ length: TRACK_SIZE }, (_, i) => (
+    <div className="flex w-full justify-between">
+      {Array.from({ length: size }, (_, i) => (
         <div key={i} className="relative">
           <div
             className={cn(
               "size-8 rounded border-2",
-              i < filled
-                ? variant === "good"
-                  ? "bg-green-500 border-green-600"
-                  : "bg-red-500 border-red-600"
-                : variant === "good"
-                  ? "border-green-400"
-                  : "border-red-400",
+              slotClassName(i < filled, i === size - 1, variant),
             )}
             data-testid={`${variant}-slot-${String(i)}`}
             data-filled={i < filled}
+            data-final={i === size - 1}
           />
           {labels?.[i] !== undefined && (
             <span
@@ -96,44 +124,51 @@ export function BoardDisplay({
       <CardHeader>
         <CardTitle>{themeLabels.goodTrack}</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <TrackSlots filled={goodCardsPlayed} variant="good" />
-
-        <div className="pb-16">
-          <p className="text-sm font-medium mb-1">{themeLabels.badTrack}</p>
+      <CardContent>
+        <div className="max-w-sm space-y-4">
           <TrackSlots
-            filled={badCardsPlayed}
-            variant="bad"
-            labels={powerLabels}
+            filled={goodCardsPlayed}
+            size={GOOD_CARDS_TO_WIN}
+            variant="good"
           />
-        </div>
 
-        <div className="flex items-center gap-2">
-          <p className="text-sm font-medium">
-            {SECRET_VILLAIN_COPY.board.failedElections}
-          </p>
-          <div className="flex gap-1">
-            {Array.from({ length: failedElectionThreshold }, (_, i) => (
-              <div
-                key={i}
-                className={cn(
-                  "size-3 rounded-full",
-                  i < failedElectionCount
-                    ? "bg-yellow-500"
-                    : "bg-muted-foreground/30",
-                )}
-                data-testid={`election-dot-${String(i)}`}
-                data-filled={i < failedElectionCount}
-              />
-            ))}
+          <div className="pb-16">
+            <p className="text-sm font-medium mb-1">{themeLabels.badTrack}</p>
+            <TrackSlots
+              filled={badCardsPlayed}
+              size={BAD_CARDS_TO_WIN}
+              variant="bad"
+              labels={powerLabels}
+            />
           </div>
-        </div>
 
-        {vetoUnlocked && (
-          <Badge variant="secondary" data-testid="veto-badge">
-            {SECRET_VILLAIN_COPY.board.vetoUnlocked}
-          </Badge>
-        )}
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-medium">
+              {SECRET_VILLAIN_COPY.board.failedElections}
+            </p>
+            <div className="flex gap-1">
+              {Array.from({ length: failedElectionThreshold }, (_, i) => (
+                <div
+                  key={i}
+                  className={cn(
+                    "size-3 rounded-full",
+                    i < failedElectionCount
+                      ? "bg-yellow-500"
+                      : "bg-muted-foreground/30",
+                  )}
+                  data-testid={`election-dot-${String(i)}`}
+                  data-filled={i < failedElectionCount}
+                />
+              ))}
+            </div>
+          </div>
+
+          {vetoUnlocked && (
+            <Badge variant="secondary" data-testid="veto-badge">
+              {SECRET_VILLAIN_COPY.board.vetoUnlocked}
+            </Badge>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
