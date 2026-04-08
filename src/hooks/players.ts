@@ -1,7 +1,12 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { removePlayer, toggleReady, transferOwner } from "@/lib/api";
+import {
+  removePlayer,
+  toggleReady,
+  transferOwner,
+  reorderPlayers,
+} from "@/lib/api";
 import { ServerResponseStatus } from "@/server/types";
 
 export function useRemovePlayer(
@@ -22,6 +27,17 @@ export function useToggleReady(lobbyId: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () => toggleReady(lobbyId),
+    onSuccess: (response) => {
+      if (response.status === ServerResponseStatus.Error) return;
+      queryClient.setQueryData(["lobby", lobbyId], response.data.lobby);
+    },
+  });
+}
+
+export function useReorderPlayers(lobbyId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (playerOrder: string[]) => reorderPlayers(lobbyId, playerOrder),
     onSuccess: (response) => {
       if (response.status === ServerResponseStatus.Error) return;
       queryClient.setQueryData(["lobby", lobbyId], response.data.lobby);

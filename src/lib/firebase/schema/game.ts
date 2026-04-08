@@ -30,6 +30,8 @@ export interface FirebaseGamePublic {
   /** Game-mode-specific config stored as a flat record. Firebase omits empty objects. */
   modeConfig?: Record<string, unknown>;
   executionerTargetId?: string;
+  /** Lobby seating order used to set president rotation. Firebase omits absent. */
+  playerOrder?: string[];
   /** Unix ms timestamp set server-side at game creation. Used for TTL cleanup. */
   createdAt?: number;
 }
@@ -71,6 +73,9 @@ export function gameToFirebase(game: Game): FirebaseGamePublic {
     ...(hasModeConfig ? { modeConfig: firebaseModeConfig } : {}),
     ...(game.executionerTargetId
       ? { executionerTargetId: game.executionerTargetId }
+      : {}),
+    ...(game.playerOrder && game.playerOrder.length > 0
+      ? { playerOrder: game.playerOrder }
       : {}),
   };
 }
@@ -115,6 +120,9 @@ export function firebaseToGame(
     modeConfig,
     ...(pub.executionerTargetId
       ? { executionerTargetId: pub.executionerTargetId }
+      : {}),
+    ...(pub.playerOrder && pub.playerOrder.length > 0
+      ? { playerOrder: pub.playerOrder }
       : {}),
   } as Game;
 }

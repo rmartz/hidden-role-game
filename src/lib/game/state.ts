@@ -199,6 +199,8 @@ export function buildGame(
   timerConfig: TimerConfig,
   /** Game-mode-specific config (e.g., nominationsEnabled for Werewolf). */
   modeConfig?: ModeConfig,
+  /** Lobby seating order, used to set president rotation in Secret Villain. */
+  playerOrder?: string[],
 ): Game {
   const config = getModeDefinition(gameMode);
   const { roles, services } = config;
@@ -230,6 +232,7 @@ export function buildGame(
     ownerPlayerId,
     timerConfig,
     modeConfig: modeConfig ?? config.defaultModeConfig,
+    ...(playerOrder && playerOrder.length > 0 ? { playerOrder } : {}),
     ...specialTargets,
   } as Game;
 }
@@ -244,6 +247,7 @@ export function buildPlayingStatus(game: Game): PlayingGameStatus {
     turnState: services.buildInitialTurnState(game.roleAssignments, {
       ...game.modeConfig,
       executionerTargetId: game.executionerTargetId,
+      ...(game.playerOrder ? { playerOrder: game.playerOrder } : {}),
     }),
   };
 }

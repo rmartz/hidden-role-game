@@ -44,6 +44,7 @@ export async function createGame(
   ownerPlayerId: string | undefined,
   timerConfig: TimerConfig,
   modeConfig?: ModeConfig,
+  playerOrder?: string[],
 ): Promise<Game> {
   const game = buildGame(
     randomUUID(),
@@ -55,6 +56,7 @@ export async function createGame(
     ownerPlayerId,
     timerConfig,
     modeConfig,
+    playerOrder,
   );
 
   await saveGame(game);

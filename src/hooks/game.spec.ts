@@ -76,6 +76,7 @@ describe("useStartGame", () => {
           id: "lobby-1",
           ownerPlayerId: "player-1",
           players: [],
+          playerOrder: [],
           config: {
             gameMode: GameMode.SecretVillain,
             roleConfigMode: RoleConfigMode.Default,

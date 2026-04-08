@@ -10,6 +10,7 @@ function makeBaseLobby(overrides: Partial<Lobby["config"]> = {}): Lobby {
     id: "lobby-1",
     ownerSessionId: "session-owner",
     players: [{ id: "owner", name: "Owner", sessionId: "session-owner" }],
+    playerOrder: ["owner"],
     readyPlayerIds: [],
     config: {
       gameMode: GameMode.Werewolf,

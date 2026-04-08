@@ -267,6 +267,8 @@ export interface BaseGame {
   ownerPlayerId?: string;
   /** Executioner: the player ID the Executioner must get eliminated at trial. */
   executionerTargetId?: string;
+  /** Lobby seating order: player IDs in position order, used to set president rotation in Secret Villain. */
+  playerOrder?: string[];
 }
 
 export interface WerewolfGame extends BaseGame {
@@ -342,6 +344,8 @@ export interface Lobby {
   id: string;
   ownerSessionId: string;
   players: LobbyPlayer[];
+  /** Ordered list of player IDs defining seating positions (index 0 = first seat). */
+  playerOrder: string[];
   config: LobbyConfig;
   gameId?: string;
   readyPlayerIds: string[];
