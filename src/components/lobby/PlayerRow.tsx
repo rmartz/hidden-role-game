@@ -67,36 +67,52 @@ export function PlayerRow({
       }
       onDragEnd={canDrag ? onDragEnd : undefined}
     >
-      {canDrag && (
+      {canReceiveDrop && (
         <span
-          className="shrink-0 cursor-grab"
-          draggable
-          onDragStart={(e) => {
-            e.dataTransfer.effectAllowed = "move";
-            e.dataTransfer.setData("text/plain", player.id);
-            const rowEl = (e.currentTarget as HTMLElement).closest("li");
-            if (rowEl) {
-              const clone = rowEl.cloneNode(true) as HTMLElement;
-              clone.style.position = "fixed";
-              clone.style.top = "-9999px";
-              clone.style.left = "0";
-              clone.style.width = `${String(rowEl.offsetWidth)}px`;
-              clone.style.pointerEvents = "none";
-              document.body.appendChild(clone);
-              e.dataTransfer.setDragImage(clone, 20, rowEl.offsetHeight / 2);
-              requestAnimationFrame(() => {
-                document.body.removeChild(clone);
-              });
-            }
-            onDragStart?.(player.id);
-          }}
+          className={cn(
+            "shrink-0 h-4 w-4",
+            canDrag ? "cursor-grab" : "invisible",
+          )}
+          draggable={canDrag}
+          onDragStart={
+            canDrag
+              ? (e) => {
+                  e.dataTransfer.effectAllowed = "move";
+                  e.dataTransfer.setData("text/plain", player.id);
+                  const rowEl = (e.currentTarget as HTMLElement).closest("li");
+                  if (rowEl) {
+                    const clone = rowEl.cloneNode(true) as HTMLElement;
+                    clone.style.position = "fixed";
+                    clone.style.top = "-9999px";
+                    clone.style.left = "0";
+                    clone.style.width = `${String(rowEl.offsetWidth)}px`;
+                    clone.style.pointerEvents = "none";
+                    document.body.appendChild(clone);
+                    e.dataTransfer.setDragImage(
+                      clone,
+                      20,
+                      rowEl.offsetHeight / 2,
+                    );
+                    requestAnimationFrame(() => {
+                      document.body.removeChild(clone);
+                    });
+                  }
+                  onDragStart?.(player.id);
+                }
+              : undefined
+          }
         >
-          <GripVerticalIcon className="h-4 w-4 text-muted-foreground" />
+          {canDrag && (
+            <GripVerticalIcon className="h-4 w-4 text-muted-foreground" />
+          )}
         </span>
       )}
-      {isReady && (
-        <CheckmarkCircleRegular className="text-green-600 h-5 w-5 shrink-0" />
-      )}
+      <CheckmarkCircleRegular
+        className={cn(
+          "h-5 w-5 shrink-0",
+          isReady ? "text-green-600" : "invisible",
+        )}
+      />
       <span>{player.name}</span>
       {player.id === ownerPlayerId && (
         <Badge variant="secondary">Lobby owner</Badge>
