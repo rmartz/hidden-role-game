@@ -26,7 +26,10 @@ interface PlayerRowProps {
   showRemovePlayer: boolean;
   showMakeOwner: boolean;
   disabled: boolean;
-  draggable?: boolean;
+  /** Show grip and allow this row to be dragged. */
+  canDrag?: boolean;
+  /** Accept dragover events so other players can be dropped here. */
+  canReceiveDrop?: boolean;
   onRemovePlayer: (playerId: string) => void;
   onTransferOwner: (playerId: string) => void;
   onDragStart?: (playerId: string) => void;
@@ -43,7 +46,8 @@ export function PlayerRow({
   showRemovePlayer,
   showMakeOwner,
   disabled,
-  draggable,
+  canDrag,
+  canReceiveDrop,
   onRemovePlayer,
   onTransferOwner,
   onDragStart,
@@ -52,18 +56,18 @@ export function PlayerRow({
 }: PlayerRowProps) {
   return (
     <li
-      className={cn("flex items-center gap-2 py-1", draggable && "select-none")}
+      className={cn("flex items-center gap-2 py-1", canDrag && "select-none")}
       onDragOver={
-        draggable
+        canReceiveDrop
           ? (e) => {
               e.preventDefault();
               onDragOver?.(player.id);
             }
           : undefined
       }
-      onDragEnd={draggable ? onDragEnd : undefined}
+      onDragEnd={canDrag ? onDragEnd : undefined}
     >
-      {draggable && (
+      {canDrag && (
         <span
           className="shrink-0 cursor-grab"
           draggable

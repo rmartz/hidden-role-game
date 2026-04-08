@@ -105,6 +105,14 @@ export function PlayerList({
   }
 
   const canReorder = !!onReorderPlayers && !disabled;
+  // Owners can drag any player; non-owners can only drag themselves.
+  const canDragRow = (playerId: string) =>
+    canReorder && (isOwner || playerId === userPlayerId);
+
+  const anyRowDraggable =
+    canReorder &&
+    displayPlayers.some((p) => canDragRow(p.id)) &&
+    displayPlayers.length > 1;
 
   return (
     <Card className="mb-5">
@@ -126,7 +134,7 @@ export function PlayerList({
         )}
       </CardHeader>
       <CardContent>
-        {canReorder && displayPlayers.length > 1 && (
+        {anyRowDraggable && (
           <p className="text-xs text-muted-foreground mb-2">
             {PLAYER_LIST_COPY.dragHint}
           </p>
@@ -143,7 +151,8 @@ export function PlayerList({
               showRemovePlayer={showRemovePlayer}
               showMakeOwner={showMakeOwner}
               disabled={disabled}
-              draggable={canReorder}
+              canDrag={canDragRow(player.id)}
+              canReceiveDrop={canReorder}
               onRemovePlayer={onRemovePlayer}
               onTransferOwner={onTransferOwner}
               onDragStart={handleDragStart}

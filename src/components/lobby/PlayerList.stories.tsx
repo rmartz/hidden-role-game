@@ -14,6 +14,7 @@ const meta = {
     onRemovePlayer: noop,
     onTransferOwner: noop,
     onToggleReady: noop,
+    onReorderPlayers: fn(),
   },
 } satisfies Meta<typeof PlayerList>;
 
@@ -48,7 +49,7 @@ const baseLobby: PublicLobby = {
   readyPlayerIds: ["p2", "p4"],
 };
 
-export const WithSeveralPlayers: Story = {
+export const PlayerView: Story = {
   args: {
     lobby: baseLobby,
     userPlayerId: "p3",
@@ -63,7 +64,7 @@ export const WithSeveralPlayers: Story = {
   },
 };
 
-export const WithDragToReorder: Story = {
+export const OwnerView: Story = {
   args: {
     lobby: baseLobby,
     userPlayerId: "p1",
@@ -75,7 +76,6 @@ export const WithDragToReorder: Story = {
     isFetching: false,
     disabled: false,
     isReadyPending: false,
-    onReorderPlayers: fn(),
   },
 };
 
