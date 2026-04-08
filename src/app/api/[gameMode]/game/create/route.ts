@@ -58,6 +58,7 @@ export async function POST(
     prereqs.ownerPlayerId,
     lobby.config.timerConfig,
     lobby.config.modeConfig,
+    lobby.playerOrder,
   );
 
   const updated = await startLobbyGame(lobbyId, game.id);

@@ -16,6 +16,7 @@ export function toPublicLobby(
     id: lobby.id,
     ownerPlayerId: owner?.id ?? "",
     players: lobby.players.map((p) => ({ id: p.id, name: p.name })),
+    playerOrder: lobby.playerOrder,
     config: {
       gameMode: lobby.config.gameMode,
       roleConfigMode: lobby.config.roleConfigMode,

@@ -166,6 +166,35 @@ export interface GameModeConfig {
   readonly released: boolean;
   readonly minPlayers: number;
   readonly ownerTitle: string | null;
+  /**
+   * Returns the owner title for a specific game configuration.
+   * Use this instead of `ownerTitle` when the title can vary per-game
+   * (e.g. an optional Board player whose presence is controlled by modeConfig).
+   * Falls back to `ownerTitle` when not implemented.
+   */
+  resolveOwnerTitle?(modeConfig: ModeConfig): string | null;
+  /**
+   * Returns whether the owner player should see all role assignments.
+   * When false (e.g. Board player), only public state is shown.
+   * Default: true (Narrator pattern).
+   */
+  resolveOwnerSeesRoleAssignments?(modeConfig: ModeConfig): boolean;
+  /**
+   * Returns the number of role slots required for a specific game configuration.
+   * Use when slot count depends on modeConfig (e.g. optional Board player).
+   * Falls back to `roleSlotsRequired` when not implemented.
+   */
+  resolveRoleSlotsRequired?(numPlayers: number, modeConfig: ModeConfig): number;
+  /**
+   * Returns whether the current role counts are valid for a specific game configuration.
+   * Use when validity depends on modeConfig (e.g. optional Board player).
+   * Falls back to `isValidRoleCount` when not implemented.
+   */
+  resolveIsValidRoleCount?(
+    numPlayers: number,
+    roleCounts: Record<string, number>,
+    modeConfig: ModeConfig,
+  ): boolean;
   readonly roles: Record<string, RoleDefinition<string, Team>>;
   readonly teamLabels: Partial<Record<Team, string>>;
   defaultRoleCount(numPlayers: number): RoleSlot[];
@@ -238,6 +267,8 @@ export interface BaseGame {
   ownerPlayerId?: string;
   /** Executioner: the player ID the Executioner must get eliminated at trial. */
   executionerTargetId?: string;
+  /** Lobby seating order: player IDs in position order, used to set president rotation in Secret Villain. */
+  playerOrder?: string[];
 }
 
 export interface WerewolfGame extends BaseGame {
@@ -313,6 +344,8 @@ export interface Lobby {
   id: string;
   ownerSessionId: string;
   players: LobbyPlayer[];
+  /** Ordered list of player IDs defining seating positions (index 0 = first seat). */
+  playerOrder: string[];
   config: LobbyConfig;
   gameId?: string;
   readyPlayerIds: string[];

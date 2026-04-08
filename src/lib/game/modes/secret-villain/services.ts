@@ -1,5 +1,6 @@
 import { isSecretVillainModeConfig } from "@/lib/types";
 import type { Game, GameModeServices, PlayerRoleAssignment } from "@/lib/types";
+import { resolvePlayerOrder } from "@/lib/player-order";
 import { SecretVillainRole } from "./roles";
 import {
   SecretVillainPhase,
@@ -53,12 +54,26 @@ function buildPhaseInfo(
   return base;
 }
 
+interface BuildTurnStateOptions {
+  playerOrder?: string[];
+  executionerTargetId?: string;
+}
+
 export const secretVillainServices: GameModeServices = {
   buildInitialTurnState(
     roleAssignments: PlayerRoleAssignment[],
     options?: Record<string, unknown>,
   ): SecretVillainTurnState {
-    const playerIds = shuffle(roleAssignments.map((a) => a.playerId));
+    const { playerOrder } = (options ?? {}) as BuildTurnStateOptions;
+    const allPlayerIds = roleAssignments.map((a) => a.playerId);
+
+    // Use the lobby's playerOrder if provided (preserving the seating arrangement
+    // set in the lobby), otherwise fall back to a random shuffle.
+    const playerIds =
+      playerOrder && playerOrder.length > 0
+        ? resolvePlayerOrder(playerOrder, allPlayerIds)
+        : shuffle(allPlayerIds);
+
     const firstPresidentId = playerIds[0];
     if (!firstPresidentId) {
       throw new Error("No players to initialize Secret Villain game");

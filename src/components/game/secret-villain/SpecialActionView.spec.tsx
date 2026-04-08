@@ -1,5 +1,5 @@
 import { afterEach, describe, it, expect, vi } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { SpecialActionView } from "./SpecialActionView";
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
 import { SpecialActionType } from "@/lib/game/modes/secret-villain/types";
@@ -79,6 +79,11 @@ describe("SpecialActionView", () => {
         peekedCards={["good", "bad", "bad"]}
       />,
     );
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: SECRET_VILLAIN_COPY.actionGate.begin,
+      }),
+    );
     const goodCards = screen.getAllByText(SECRET_VILLAIN_COPY.policy.goodCard);
     const badCards = screen.getAllByText(SECRET_VILLAIN_COPY.policy.badCard);
     expect(goodCards.length + badCards.length).toBe(3);
@@ -98,6 +103,11 @@ describe("SpecialActionView", () => {
         investigationResult={{ targetPlayerId: "p2", team: "Bad" }}
       />,
     );
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: SECRET_VILLAIN_COPY.actionGate.begin,
+      }),
+    );
     expect(
       screen.getByText(
         SECRET_VILLAIN_COPY.specialAction.investigateResult("Bob", "Bad"),
@@ -112,6 +122,11 @@ describe("SpecialActionView", () => {
         investigationResult={{ targetPlayerId: "p2", team: "bad" }}
         onResolve={vi.fn()}
       />,
+    );
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: SECRET_VILLAIN_COPY.actionGate.begin,
+      }),
     );
     expect(
       screen.getByRole("button", {
@@ -143,6 +158,11 @@ describe("SpecialActionView", () => {
         onResolve={vi.fn()}
       />,
     );
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: SECRET_VILLAIN_COPY.actionGate.begin,
+      }),
+    );
     expect(
       screen.getByRole("button", {
         name: SECRET_VILLAIN_COPY.specialAction.policyPeekConfirm,
@@ -158,6 +178,11 @@ describe("SpecialActionView", () => {
         actionType={SpecialActionType.PolicyPeek}
         onPeek={onPeek}
       />,
+    );
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: SECRET_VILLAIN_COPY.actionGate.begin,
+      }),
     );
     expect(
       screen.getByRole("button", {
@@ -178,6 +203,11 @@ describe("SpecialActionView", () => {
         actionType={SpecialActionType.PolicyPeek}
         onPeek={vi.fn()}
       />,
+    );
+    fireEvent.click(
+      screen.getByRole("button", {
+        name: SECRET_VILLAIN_COPY.actionGate.begin,
+      }),
     );
     expect(screen.queryByText("Alice")).toBeNull();
     expect(screen.queryByText("Bob")).toBeNull();

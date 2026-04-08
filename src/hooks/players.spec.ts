@@ -10,6 +10,7 @@ const mockLobby: PublicLobby = {
   id: "lobby-1",
   ownerPlayerId: "player-2",
   players: [],
+  playerOrder: [],
   config: {
     gameMode: GameMode.Werewolf,
     roleConfigMode: RoleConfigMode.Default,

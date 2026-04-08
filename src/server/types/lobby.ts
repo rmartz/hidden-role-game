@@ -56,6 +56,8 @@ export interface PublicLobby {
   id: string;
   ownerPlayerId: string;
   players: PublicLobbyPlayer[];
+  /** Ordered list of player IDs defining seating positions (index 0 = first seat). */
+  playerOrder: string[];
   config: GameConfig;
   gameId?: string;
   readyPlayerIds: string[];

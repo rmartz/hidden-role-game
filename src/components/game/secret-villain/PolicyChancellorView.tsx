@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
 import { getSvThemeLabels } from "@/lib/game/modes/secret-villain/themes";
 import type { SvTheme } from "@/lib/game/modes/secret-villain/themes";
 import { cn } from "@/lib/utils";
+import { ActionGateView } from "./ActionGateView";
 
 interface PolicyChancellorViewProps {
   remainingCards: string[];
@@ -36,6 +38,7 @@ export function PolicyChancellorView({
   chancellorName,
   svTheme,
 }: PolicyChancellorViewProps) {
+  const [revealed, setRevealed] = useState(false);
   const themeLabels = getSvThemeLabels(svTheme);
 
   if (!isChancellor) {
@@ -65,6 +68,16 @@ export function PolicyChancellorView({
           </p>
         </CardContent>
       </Card>
+    );
+  }
+
+  if (!revealed) {
+    return (
+      <ActionGateView
+        onReveal={() => {
+          setRevealed(true);
+        }}
+      />
     );
   }
 

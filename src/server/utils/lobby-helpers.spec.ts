@@ -13,6 +13,7 @@ function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
       { id: "player-1", name: "Alice", sessionId: "session-owner" },
       { id: "player-2", name: "Bob", sessionId: "session-bob" },
     ],
+    playerOrder: ["player-1", "player-2"],
     config: {
       gameMode: GameMode.SecretVillain,
       roleConfigMode: RoleConfigMode.Default,
@@ -46,6 +47,12 @@ describe("isValidSession", () => {
 });
 
 describe("toPublicLobby", () => {
+  it("includes playerOrder in the public lobby", () => {
+    const lobby = makeLobby({ playerOrder: ["player-2", "player-1"] });
+    const result = toPublicLobby(lobby);
+    expect(result.playerOrder).toEqual(["player-2", "player-1"]);
+  });
+
   it("strips sessionId from all players", () => {
     const lobby = makeLobby();
     const result = toPublicLobby(lobby);

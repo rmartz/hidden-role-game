@@ -1,4 +1,4 @@
-import { SvBoardPreset, SpecialActionType } from "./types";
+import { SvBoardPreset, SpecialActionType, SecretVillainPhase } from "./types";
 
 export const SECRET_VILLAIN_COPY = {
   boardPresets: {
@@ -8,6 +8,11 @@ export const SECRET_VILLAIN_COPY = {
     [SvBoardPreset.Medium]: "7–8 Players",
     [SvBoardPreset.Small]: "5–6 Players",
   } satisfies Record<SvBoardPreset, string>,
+  actionGate: {
+    heading: "It's your turn",
+    description: "Take the device, then tap below when ready.",
+    begin: "Begin",
+  },
   board: {
     goodTrack: "Good Policies",
     badTrack: "Bad Policies",
@@ -20,6 +25,21 @@ export const SECRET_VILLAIN_COPY = {
       [SpecialActionType.Shoot]: "Shoot",
     } satisfies Record<SpecialActionType, string>,
   },
+  boardScreen: {
+    heading: "Game Board",
+    currentPhase: "Current Phase",
+    president: "President",
+    chancellor: "Chancellor",
+    phaseLabels: {
+      [SecretVillainPhase.ElectionNomination]: "Election: Nomination",
+      [SecretVillainPhase.ElectionVote]: "Election: Voting",
+      [SecretVillainPhase.PolicyPresident]: "Policy: President",
+      [SecretVillainPhase.PolicyChancellor]: "Policy: Chancellor",
+      [SecretVillainPhase.SpecialAction]: "Presidential Power",
+    } satisfies Record<SecretVillainPhase, string>,
+    eliminated: "Eliminated Players",
+    noEliminated: "None",
+  },
   election: {
     nominationHeading: "Nomination",
     nominationInstructions: (presidentName: string) =>
@@ -28,12 +48,13 @@ export const SECRET_VILLAIN_COPY = {
     confirmNomination: "Nominate",
     voteHeading: "Election",
     voteInstructions: (presidentName: string, chancellorName: string) =>
-      `${presidentName} has nominated ${chancellorName} for Chancellor.`,
+      `President: ${presidentName} \u00b7 Chancellor: ${chancellorName}`,
     castVote: "Cast your vote",
     aye: "Aye",
     no: "No",
     waitingForVotes: "Waiting for all players to vote\u2026",
     alreadyVoted: "Vote cast. Waiting for others\u2026",
+    allVoted: "All votes cast.",
     waitingForPlayers: (names: string[]) =>
       `Waiting for ${names.join(", ")}\u2026`,
     resolveVote: "Reveal Results",

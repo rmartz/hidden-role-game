@@ -9,11 +9,14 @@ import type {
 import { DEFAULT_TIMER_CONFIG, GameMode } from "@/lib/types";
 import { GAME_MODES } from "@/lib/game/modes";
 import type { PublicLobby } from "@/server/types";
+import { resolvePlayerOrder } from "@/lib/player-order";
 
 export interface FirebaseLobbyPublic {
   ownerPlayerId: string;
   /** Optional — Firebase omits empty objects, though lobbies always have players. */
   players?: Record<string, FirebaseLobbyPlayer>;
+  /** Ordered list of player IDs defining seating positions. Firebase omits absent. */
+  playerOrder?: string[];
   config: FirebaseLobbyConfig;
   gameId: string | null;
   /** Player IDs that have readied up. Firebase omits empty arrays. */
@@ -71,6 +74,9 @@ export function lobbyToFirebase(lobby: Lobby): {
     public: {
       ownerPlayerId: ownerPlayer?.id ?? "",
       players,
+      ...(lobby.playerOrder.length > 0
+        ? { playerOrder: lobby.playerOrder }
+        : {}),
       config: lobbyConfigToFirebase(lobby.config),
       gameId: lobby.gameId ?? null,
       ...(lobby.readyPlayerIds.length > 0
@@ -127,6 +133,10 @@ export function firebaseToLobby(
     id: lobbyId,
     ownerSessionId: priv.ownerSessionId,
     players,
+    playerOrder: resolvePlayerOrder(
+      pub.playerOrder,
+      players.map((p) => p.id),
+    ),
     config: firebaseToLobbyConfig(pub.config),
     readyPlayerIds: pub.readyPlayerIds ?? [],
     ...(pub.gameId ? { gameId: pub.gameId } : {}),
@@ -200,13 +210,19 @@ export function firebaseToPublicLobby(
   lobbyId: string,
   pub: FirebaseLobbyPublic,
 ): PublicLobby {
+  const players = Object.values(pub.players ?? {}).map((p) => ({
+    id: p.id,
+    name: p.name,
+  }));
+
   return {
     id: lobbyId,
     ownerPlayerId: pub.ownerPlayerId,
-    players: Object.values(pub.players ?? {}).map((p) => ({
-      id: p.id,
-      name: p.name,
-    })),
+    players,
+    playerOrder: resolvePlayerOrder(
+      pub.playerOrder,
+      players.map((p) => p.id),
+    ),
     config: firebaseToLobbyConfig(pub.config),
     readyPlayerIds: pub.readyPlayerIds ?? [],
     ...(pub.gameId ? { gameId: pub.gameId } : {}),
