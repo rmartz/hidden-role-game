@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Fragment } from "react";
+import { useState, useEffect, Fragment } from "react";
 import type { PublicLobby } from "@/server/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -69,6 +69,9 @@ export function PlayerList({
     nonOwnerPlayers.length > 0 &&
     nonOwnerPlayers.every((p) => readySet.has(p.id));
 
+  const [committedOrder, setCommittedOrder] = useState<string[]>(
+    () => lobby.playerOrder,
+  );
   const [dragSourceId, setDragSourceId] = useState<string | undefined>(
     undefined,
   );
@@ -77,7 +80,15 @@ export function PlayerList({
     undefined,
   );
 
-  const displayPlayers = lobby.playerOrder
+  // Sync committedOrder when the server sends a new order, but not while a
+  // drag is in progress (to avoid resetting a mid-drag interaction).
+  useEffect(() => {
+    if (!dragSourceId) {
+      setCommittedOrder(lobby.playerOrder);
+    }
+  }, [lobby.playerOrder, dragSourceId]);
+
+  const displayPlayers = committedOrder
     .map((id) => playerMap.get(id))
     .filter((p): p is NonNullable<typeof p> => p !== undefined);
 
@@ -97,15 +108,16 @@ export function PlayerList({
   function handleDragEnd() {
     if (dragSourceId && dropBeforeId !== undefined) {
       const finalOrder = computeDropOrder(
-        lobby.playerOrder,
+        committedOrder,
         dragSourceId,
         dropBeforeId,
       );
       const unchanged =
-        finalOrder.length === lobby.playerOrder.length &&
-        finalOrder.every((id, i) => id === lobby.playerOrder[i]);
-      if (onReorderPlayers && !unchanged) {
-        onReorderPlayers(finalOrder);
+        finalOrder.length === committedOrder.length &&
+        finalOrder.every((id, i) => id === committedOrder[i]);
+      if (!unchanged) {
+        setCommittedOrder(finalOrder);
+        onReorderPlayers?.(finalOrder);
       }
     }
     setDragSourceId(undefined);
@@ -155,7 +167,7 @@ export function PlayerList({
               {dropBeforeId === player.id && dropBeforeId !== dragSourceId && (
                 <li
                   aria-hidden="true"
-                  className="h-0.5 bg-primary rounded-full mx-1"
+                  className="h-0.5 bg-primary rounded-full mx-[10%]"
                 />
               )}
               <PlayerRow
@@ -180,7 +192,7 @@ export function PlayerList({
           {dragSourceId && dropBeforeId === null && (
             <li
               aria-hidden="true"
-              className="h-0.5 bg-primary rounded-full mx-1"
+              className="h-0.5 bg-primary rounded-full mx-[10%]"
             />
           )}
           {dragSourceId && (
