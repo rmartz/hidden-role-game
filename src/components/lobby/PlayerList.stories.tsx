@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { fn } from "storybook/test";
 import { PlayerList } from "./PlayerList";
 import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
@@ -59,6 +60,22 @@ export const WithSeveralPlayers: Story = {
     isFetching: false,
     disabled: false,
     isReadyPending: false,
+  },
+};
+
+export const WithDragToReorder: Story = {
+  args: {
+    lobby: baseLobby,
+    userPlayerId: "p1",
+    isOwner: true,
+    showLeave: false,
+    showRemovePlayer: true,
+    showMakeOwner: true,
+    showRefresh: false,
+    isFetching: false,
+    disabled: false,
+    isReadyPending: false,
+    onReorderPlayers: fn(),
   },
 };
 
