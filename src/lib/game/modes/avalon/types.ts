@@ -7,6 +7,11 @@ export enum QuestCard {
   Fail = "fail",
 }
 
+export enum TeamVote {
+  Approve = "approve",
+  Reject = "reject",
+}
+
 // ---------------------------------------------------------------------------
 // Phase enum
 // ---------------------------------------------------------------------------
@@ -19,6 +24,20 @@ export enum AvalonPhase {
 }
 
 // ---------------------------------------------------------------------------
+// Shared record types
+// ---------------------------------------------------------------------------
+
+export interface PlayerVote {
+  playerId: string;
+  vote: TeamVote;
+}
+
+export interface PlayerQuestCard {
+  playerId: string;
+  card: QuestCard;
+}
+
+// ---------------------------------------------------------------------------
 // Phase types (discriminated union members)
 // ---------------------------------------------------------------------------
 
@@ -26,7 +45,6 @@ export enum AvalonPhase {
 export interface TeamProposalPhase {
   type: AvalonPhase.TeamProposal;
   leaderId: string;
-  questNumber: number;
   teamSize: number;
   proposedTeam?: string[];
 }
@@ -36,7 +54,7 @@ export interface TeamVotePhase {
   type: AvalonPhase.TeamVote;
   leaderId: string;
   proposedTeam: string[];
-  votes: { playerId: string; vote: "approve" | "reject" }[];
+  votes: PlayerVote[];
   /** Set once all votes are cast. True if approvals strictly exceed rejections. */
   passed?: boolean;
 }
@@ -44,8 +62,9 @@ export interface TeamVotePhase {
 /** Approved team members play Success or Fail cards. */
 export interface QuestPhase {
   type: AvalonPhase.Quest;
+  leaderId: string;
   teamPlayerIds: string[];
-  cards: { playerId: string; card: QuestCard }[];
+  cards: PlayerQuestCard[];
   /** Number of Fail cards played. Set once all cards are submitted. */
   failCount?: number;
   /** Set once the quest is resolved. */
@@ -87,7 +106,7 @@ export interface QuestResult {
 // ---------------------------------------------------------------------------
 
 export interface AvalonTurnState {
-  /** Current quest number (1–5). */
+  /** Current quest number (1–5, 1-based). */
   questNumber: number;
   /** Current game phase. */
   phase: AvalonTurnPhase;
@@ -101,6 +120,6 @@ export interface AvalonTurnState {
   consecutiveRejections: number;
   /** Array of 5 team sizes based on player count. */
   questTeamSizes: [number, number, number, number, number];
-  /** Quest indices (0-based) that require 2 Fail cards to fail (Quest 4 at 7+ players). */
+  /** Quest numbers (1-based) that require 2 Fail cards to fail (Quest 4 at 7+ players). */
   requiresTwoFails: number[];
 }
