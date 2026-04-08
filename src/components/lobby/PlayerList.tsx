@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect, useRef, Fragment } from "react";
 import type { PublicLobby } from "@/server/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -80,19 +80,25 @@ export function PlayerList({
     undefined,
   );
 
-  // Sync committedOrder when the server sends a new order, but not while a
-  // drag is in progress (to avoid resetting a mid-drag interaction).
+  // Track drag-in-progress in a ref so the effect below only depends on
+  // lobby.playerOrder — otherwise clearing dragSourceId state on drop would
+  // re-trigger the effect and overwrite the just-committed optimistic order.
+  const isDraggingRef = useRef(false);
+
+  // Sync committedOrder when the server sends a new player order, but not
+  // while a drag is in progress to avoid disrupting a mid-drag interaction.
   useEffect(() => {
-    if (!dragSourceId) {
+    if (!isDraggingRef.current) {
       setCommittedOrder(lobby.playerOrder);
     }
-  }, [lobby.playerOrder, dragSourceId]);
+  }, [lobby.playerOrder]);
 
   const displayPlayers = committedOrder
     .map((id) => playerMap.get(id))
     .filter((p): p is NonNullable<typeof p> => p !== undefined);
 
   function handleDragStart(playerId: string) {
+    isDraggingRef.current = true;
     setDragSourceId(playerId);
   }
 
@@ -120,6 +126,7 @@ export function PlayerList({
         onReorderPlayers?.(finalOrder);
       }
     }
+    isDraggingRef.current = false;
     setDragSourceId(undefined);
     setDropBeforeId(undefined);
   }
