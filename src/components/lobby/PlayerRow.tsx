@@ -67,6 +67,12 @@ export function PlayerRow({
       }
       onDragEnd={canDrag ? onDragEnd : undefined}
     >
+      <CheckmarkCircleRegular
+        className={cn(
+          "h-5 w-5 shrink-0",
+          isReady ? "text-green-600" : "invisible",
+        )}
+      />
       {canReceiveDrop && (
         <span
           className={cn(
@@ -107,12 +113,6 @@ export function PlayerRow({
           )}
         </span>
       )}
-      <CheckmarkCircleRegular
-        className={cn(
-          "h-5 w-5 shrink-0",
-          isReady ? "text-green-600" : "invisible",
-        )}
-      />
       <span>{player.name}</span>
       {player.id === ownerPlayerId && (
         <Badge variant="secondary">Lobby owner</Badge>
