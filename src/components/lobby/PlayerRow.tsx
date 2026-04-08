@@ -113,105 +113,115 @@ export function PlayerRow({
           )}
         </span>
       )}
-      <span>{player.name}</span>
+      <span className="flex-1 min-w-0 truncate">{player.name}</span>
       {player.id === ownerPlayerId && (
-        <Badge variant="secondary">Lobby owner</Badge>
+        <Badge variant="secondary" className="shrink-0">
+          Lobby owner
+        </Badge>
       )}
-      {isCurrentUser && showLeave && (
-        <AlertDialog>
-          <AlertDialogTrigger
-            render={<Button variant="outline" size="sm" disabled={disabled} />}
-          >
-            {PLAYER_ROW_COPY.leaveButton}
-          </AlertDialogTrigger>
-          <AlertDialogContent size="sm">
-            <AlertDialogHeader>
-              <AlertDialogTitle>{PLAYER_ROW_COPY.leaveTitle}</AlertDialogTitle>
-              <AlertDialogDescription>
-                {PLAYER_ROW_COPY.leaveDescription}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>
-                {PLAYER_ROW_COPY.leaveCancel}
-              </AlertDialogCancel>
-              <AlertDialogAction
-                variant="destructive"
-                onClick={() => {
-                  onRemovePlayer(player.id);
-                }}
-              >
-                {PLAYER_ROW_COPY.leaveConfirm}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      )}
-      {!isCurrentUser && showRemovePlayer && (
-        <AlertDialog>
-          <AlertDialogTrigger
-            render={
-              <Button variant="destructive" size="sm" disabled={disabled} />
-            }
-          >
-            {PLAYER_ROW_COPY.removeButton}
-          </AlertDialogTrigger>
-          <AlertDialogContent size="sm">
-            <AlertDialogHeader>
-              <AlertDialogTitle>
-                {PLAYER_ROW_COPY.removeTitle(player.name)}
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                {PLAYER_ROW_COPY.removeDescription}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>
-                {PLAYER_ROW_COPY.removeCancel}
-              </AlertDialogCancel>
-              <AlertDialogAction
-                variant="destructive"
-                onClick={() => {
-                  onRemovePlayer(player.id);
-                }}
-              >
-                {PLAYER_ROW_COPY.removeConfirm}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      )}
-      {!isCurrentUser && showMakeOwner && (
-        <AlertDialog>
-          <AlertDialogTrigger
-            render={<Button variant="outline" size="sm" disabled={disabled} />}
-          >
-            {PLAYER_ROW_COPY.makeOwnerButton}
-          </AlertDialogTrigger>
-          <AlertDialogContent size="sm">
-            <AlertDialogHeader>
-              <AlertDialogTitle>
-                {PLAYER_ROW_COPY.transferTitle(player.name)}
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                {PLAYER_ROW_COPY.transferDescription}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>
-                {PLAYER_ROW_COPY.transferCancel}
-              </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() => {
-                  onTransferOwner(player.id);
-                }}
-              >
-                {PLAYER_ROW_COPY.transferConfirm}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      )}
+      <div className="ml-auto flex items-center gap-2 shrink-0">
+        {isCurrentUser && showLeave && (
+          <AlertDialog>
+            <AlertDialogTrigger
+              render={
+                <Button variant="outline" size="sm" disabled={disabled} />
+              }
+            >
+              {PLAYER_ROW_COPY.leaveButton}
+            </AlertDialogTrigger>
+            <AlertDialogContent size="sm">
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  {PLAYER_ROW_COPY.leaveTitle}
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  {PLAYER_ROW_COPY.leaveDescription}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>
+                  {PLAYER_ROW_COPY.leaveCancel}
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  variant="destructive"
+                  onClick={() => {
+                    onRemovePlayer(player.id);
+                  }}
+                >
+                  {PLAYER_ROW_COPY.leaveConfirm}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+        {!isCurrentUser && showRemovePlayer && (
+          <AlertDialog>
+            <AlertDialogTrigger
+              render={
+                <Button variant="destructive" size="sm" disabled={disabled} />
+              }
+            >
+              {PLAYER_ROW_COPY.removeButton}
+            </AlertDialogTrigger>
+            <AlertDialogContent size="sm">
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  {PLAYER_ROW_COPY.removeTitle(player.name)}
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  {PLAYER_ROW_COPY.removeDescription}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>
+                  {PLAYER_ROW_COPY.removeCancel}
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  variant="destructive"
+                  onClick={() => {
+                    onRemovePlayer(player.id);
+                  }}
+                >
+                  {PLAYER_ROW_COPY.removeConfirm}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+        {!isCurrentUser && showMakeOwner && (
+          <AlertDialog>
+            <AlertDialogTrigger
+              render={
+                <Button variant="outline" size="sm" disabled={disabled} />
+              }
+            >
+              {PLAYER_ROW_COPY.makeOwnerButton}
+            </AlertDialogTrigger>
+            <AlertDialogContent size="sm">
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  {PLAYER_ROW_COPY.transferTitle(player.name)}
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  {PLAYER_ROW_COPY.transferDescription}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>
+                  {PLAYER_ROW_COPY.transferCancel}
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    onTransferOwner(player.id);
+                  }}
+                >
+                  {PLAYER_ROW_COPY.transferConfirm}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+      </div>
     </li>
   );
 }
