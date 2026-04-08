@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, Fragment } from "react";
 import type { PublicLobby } from "@/server/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import { PlayerRow } from "./PlayerRow";
 import { PLAYER_LIST_COPY } from "./PlayerList.copy";
 
@@ -23,6 +24,20 @@ interface PlayerListProps {
   onTransferOwner: (playerId: string) => void;
   onToggleReady: () => void;
   onReorderPlayers?: (playerOrder: string[]) => void;
+}
+
+// dropBeforeId: string = insert before that player, null = insert at end
+function computeDropOrder(
+  currentOrder: string[],
+  sourceId: string,
+  dropBeforeId: string | null,
+): string[] {
+  const without = currentOrder.filter((id) => id !== sourceId);
+  if (dropBeforeId === null) return [...without, sourceId];
+  const insertAt = without.indexOf(dropBeforeId);
+  return insertAt === -1
+    ? [...without, sourceId]
+    : [...without.slice(0, insertAt), sourceId, ...without.slice(insertAt)];
 }
 
 export function PlayerList({
@@ -54,54 +69,47 @@ export function PlayerList({
     nonOwnerPlayers.length > 0 &&
     nonOwnerPlayers.every((p) => readySet.has(p.id));
 
-  const [localOrder, setLocalOrder] = useState<string[]>(
-    () => lobby.playerOrder,
+  const [dragSourceId, setDragSourceId] = useState<string | undefined>(
+    undefined,
   );
-  const dragSourceIdRef = useRef<string | undefined>(undefined);
-  const pendingOrderRef = useRef<string[] | undefined>(undefined);
+  // null = drop at end of list, undefined = no active drop target
+  const [dropBeforeId, setDropBeforeId] = useState<string | null | undefined>(
+    undefined,
+  );
 
-  // Sync localOrder when lobby.playerOrder changes from the server.
-  // Trade-off: a real-time push mid-drag (e.g. another player joining) will
-  // reset the in-progress drag. This is an acceptable edge case.
-  useEffect(() => {
-    setLocalOrder(lobby.playerOrder);
-  }, [lobby.playerOrder]);
-
-  const displayPlayers = localOrder
+  const displayPlayers = lobby.playerOrder
     .map((id) => playerMap.get(id))
     .filter((p): p is NonNullable<typeof p> => p !== undefined);
 
   function handleDragStart(playerId: string) {
-    dragSourceIdRef.current = playerId;
+    setDragSourceId(playerId);
   }
 
   function handleDragOver(targetPlayerId: string) {
-    const sourceId = dragSourceIdRef.current;
-    if (!sourceId || sourceId === targetPlayerId) return;
+    setDropBeforeId(targetPlayerId);
+  }
 
-    const sourceIndex = localOrder.indexOf(sourceId);
-    const targetIndex = localOrder.indexOf(targetPlayerId);
-    if (sourceIndex === -1 || targetIndex === -1) return;
-
-    const reordered = [...localOrder];
-    reordered.splice(sourceIndex, 1);
-    const insertIndex =
-      sourceIndex < targetIndex ? targetIndex - 1 : targetIndex;
-    reordered.splice(insertIndex, 0, sourceId);
-    pendingOrderRef.current = reordered;
-    setLocalOrder(reordered);
+  function handleDragOverEnd(e: React.DragEvent) {
+    e.preventDefault();
+    setDropBeforeId(null);
   }
 
   function handleDragEnd() {
-    const finalOrder = pendingOrderRef.current ?? localOrder;
-    pendingOrderRef.current = undefined;
-    dragSourceIdRef.current = undefined;
-    const unchanged =
-      finalOrder.length === lobby.playerOrder.length &&
-      finalOrder.every((id, i) => id === lobby.playerOrder[i]);
-    if (onReorderPlayers && !unchanged) {
-      onReorderPlayers(finalOrder);
+    if (dragSourceId && dropBeforeId !== undefined) {
+      const finalOrder = computeDropOrder(
+        lobby.playerOrder,
+        dragSourceId,
+        dropBeforeId,
+      );
+      const unchanged =
+        finalOrder.length === lobby.playerOrder.length &&
+        finalOrder.every((id, i) => id === lobby.playerOrder[i]);
+      if (onReorderPlayers && !unchanged) {
+        onReorderPlayers(finalOrder);
+      }
     }
+    setDragSourceId(undefined);
+    setDropBeforeId(undefined);
   }
 
   const canReorder = !!onReorderPlayers && !disabled;
@@ -113,6 +121,10 @@ export function PlayerList({
     canReorder &&
     displayPlayers.some((p) => canDragRow(p.id)) &&
     displayPlayers.length > 1;
+
+  const dragHint = isOwner
+    ? PLAYER_LIST_COPY.dragHint
+    : PLAYER_LIST_COPY.dragHintSelf;
 
   return (
     <Card className="mb-5">
@@ -135,31 +147,49 @@ export function PlayerList({
       </CardHeader>
       <CardContent>
         {anyRowDraggable && (
-          <p className="text-xs text-muted-foreground mb-2">
-            {PLAYER_LIST_COPY.dragHint}
-          </p>
+          <p className="text-xs text-muted-foreground mb-2">{dragHint}</p>
         )}
-        <ul className="space-y-1">
+        <ul className={cn("space-y-1", dragSourceId && "select-none")}>
           {displayPlayers.map((player) => (
-            <PlayerRow
-              key={player.id}
-              player={player}
-              ownerPlayerId={lobby.ownerPlayerId}
-              isCurrentUser={player.id === userPlayerId}
-              isReady={readySet.has(player.id)}
-              showLeave={showLeave}
-              showRemovePlayer={showRemovePlayer}
-              showMakeOwner={showMakeOwner}
-              disabled={disabled}
-              canDrag={canDragRow(player.id)}
-              canReceiveDrop={canReorder}
-              onRemovePlayer={onRemovePlayer}
-              onTransferOwner={onTransferOwner}
-              onDragStart={handleDragStart}
-              onDragOver={handleDragOver}
-              onDragEnd={handleDragEnd}
-            />
+            <Fragment key={player.id}>
+              {dropBeforeId === player.id && dropBeforeId !== dragSourceId && (
+                <li
+                  aria-hidden="true"
+                  className="h-0.5 bg-primary rounded-full mx-1"
+                />
+              )}
+              <PlayerRow
+                player={player}
+                ownerPlayerId={lobby.ownerPlayerId}
+                isCurrentUser={player.id === userPlayerId}
+                isReady={readySet.has(player.id)}
+                showLeave={showLeave}
+                showRemovePlayer={showRemovePlayer}
+                showMakeOwner={showMakeOwner}
+                disabled={disabled}
+                canDrag={canDragRow(player.id)}
+                canReceiveDrop={canReorder}
+                onRemovePlayer={onRemovePlayer}
+                onTransferOwner={onTransferOwner}
+                onDragStart={handleDragStart}
+                onDragOver={handleDragOver}
+                onDragEnd={handleDragEnd}
+              />
+            </Fragment>
           ))}
+          {dragSourceId && dropBeforeId === null && (
+            <li
+              aria-hidden="true"
+              className="h-0.5 bg-primary rounded-full mx-1"
+            />
+          )}
+          {dragSourceId && (
+            <li
+              aria-hidden="true"
+              className="h-4"
+              onDragOver={handleDragOverEnd}
+            />
+          )}
         </ul>
         {!isOwner && (
           <Button

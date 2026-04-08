@@ -74,6 +74,20 @@ export function PlayerRow({
           onDragStart={(e) => {
             e.dataTransfer.effectAllowed = "move";
             e.dataTransfer.setData("text/plain", player.id);
+            const rowEl = (e.currentTarget as HTMLElement).closest("li");
+            if (rowEl) {
+              const clone = rowEl.cloneNode(true) as HTMLElement;
+              clone.style.position = "fixed";
+              clone.style.top = "-9999px";
+              clone.style.left = "0";
+              clone.style.width = `${String(rowEl.offsetWidth)}px`;
+              clone.style.pointerEvents = "none";
+              document.body.appendChild(clone);
+              e.dataTransfer.setDragImage(clone, 20, rowEl.offsetHeight / 2);
+              requestAnimationFrame(() => {
+                document.body.removeChild(clone);
+              });
+            }
             onDragStart?.(player.id);
           }}
         >

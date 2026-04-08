@@ -6,4 +6,5 @@ export const PLAYER_LIST_COPY = {
   notReadyButton: "Not Ready",
   allPlayersReady: "All players ready!",
   dragHint: "Drag to reorder players",
+  dragHintSelf: "Drag to reorder yourself",
 } as const;
