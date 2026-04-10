@@ -16,12 +16,36 @@ export enum ClockworkPhase {
  *
  * Most Clocktower night actions involve choosing a single target; the
  * Storyteller then mediates information delivery manually.
- * Role-specific sub-issues (e.g. Fortune Teller's second target) will
- * extend this as needed.
+ * Role-specific extensions (e.g. Fortune Teller's second target) should
+ * extend this interface per role as needed.
+ *
+ * Keyed by role ID in `ClockworkNightPhase.nightActions` — assumes one active
+ * instance per role ID per night.
  */
 export interface ClockworkNightAction {
   /** The primary player ID targeted by this role's night action. */
   targetPlayerId?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Nomination types
+// ---------------------------------------------------------------------------
+
+export interface ClockworkNominationVote {
+  /** The voting player's ID. */
+  playerId: string;
+  /** True if the player voted to execute the nominee. */
+  voted: boolean;
+}
+
+/** A single nomination made during a day phase, with its running vote tally. */
+export interface ClockworkNomination {
+  /** The player who called the nomination. */
+  nominatorId: string;
+  /** The player nominated for execution. */
+  nomineeId: string;
+  /** Votes cast for this nomination in player order. */
+  votes: ClockworkNominationVote[];
 }
 
 // ---------------------------------------------------------------------------
@@ -40,45 +64,39 @@ export interface ClockworkNightAction {
  *      Chef (first night only), Empath, Fortune Teller, Undertaker,
  *      Ravenkeeper (on death only)
  */
-export interface NightPhase {
+export interface ClockworkNightPhase {
   type: ClockworkPhase.Night;
   /** Index into the night action order for the currently active step. */
   currentActionIndex: number;
-  /** Night actions submitted this night. Key is the role ID of the acting role. */
+  /**
+   * Night actions submitted this night. Key is the role ID of the acting role.
+   * Assumes one active instance per role ID per night.
+   */
   nightActions: Record<string, ClockworkNightAction>;
 }
 
 /** Day phase — open discussion, nominations, and voting. */
-export interface DayPhase {
+export interface ClockworkDayPhase {
   type: ClockworkPhase.Day;
+  /** All nominations made today, in the order they were called. */
+  nominations: ClockworkNomination[];
+  /**
+   * Player IDs who have already nominated today.
+   * Each player may only nominate once per day.
+   */
+  nominatedByPlayerIds: string[];
+  /**
+   * Player ID executed today, if any.
+   * Prevents further executions this day phase.
+   */
+  executedToday?: string;
 }
 
 // ---------------------------------------------------------------------------
 // Turn phase union
 // ---------------------------------------------------------------------------
 
-export type ClockworkTurnPhase = NightPhase | DayPhase;
-
-// ---------------------------------------------------------------------------
-// Nomination types
-// ---------------------------------------------------------------------------
-
-export interface NominationVote {
-  /** The voting player's ID. */
-  playerId: string;
-  /** True if the player voted to execute the nominee. */
-  voted: boolean;
-}
-
-/** A single nomination made during a day phase, with its running vote tally. */
-export interface ClockworkNomination {
-  /** The player who called the nomination. */
-  nominatorId: string;
-  /** The player nominated for execution. */
-  nomineeId: string;
-  /** Votes cast for this nomination in player order. */
-  votes: NominationVote[];
-}
+export type ClockworkTurnPhase = ClockworkNightPhase | ClockworkDayPhase;
 
 // ---------------------------------------------------------------------------
 // Turn state
@@ -115,16 +133,4 @@ export interface ClockworkTurnState {
    * trigger (when the Demon dies with 5+ players alive).
    */
   demonPlayerId: string;
-  /**
-   * Player ID executed today, if any.
-   * Prevents further executions this day phase.
-   */
-  executedToday?: string;
-  /** All nominations made today, in the order they were called. */
-  nominations: ClockworkNomination[];
-  /**
-   * Player IDs who have already nominated today.
-   * Each player may only nominate once per day.
-   */
-  nominatedByPlayerIds: string[];
 }
