@@ -112,8 +112,8 @@ describe("POST /api/game/create", () => {
   it("should allow starting an Avalon game with Avalon role slots", async () => {
     const { lobbyId, aliceSession } = await setupLobbyWithPlayers("avalon");
     await configureRoleSlots(lobbyId, aliceSession, [
-      { roleId: "avalon-good", min: 1, max: 1 },
-      { roleId: "avalon-bad", min: 1, max: 1 },
+      { roleId: "avalon-merlin", min: 1, max: 1 },
+      { roleId: "avalon-minion", min: 1, max: 1 },
     ]);
 
     const res = await startGame(

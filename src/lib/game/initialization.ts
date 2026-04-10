@@ -79,6 +79,7 @@ export function buildGamePlayers<R extends RoleDefinition<string, Team>>(
     if (myRole?.awareOf) {
       const awareOfTeams = new Set(myRole.awareOf.teams ?? []);
       const awareOfRoles = new Set(myRole.awareOf.roles ?? []);
+      const excludeRoles = new Set(myRole.awareOf.excludeRoles ?? []);
       const awareOfWerewolves = myRole.awareOf.werewolves === true;
       for (const other of roleAssignments) {
         if (other.playerId === assignment.playerId) continue;
@@ -87,7 +88,8 @@ export function buildGamePlayers<R extends RoleDefinition<string, Team>>(
           | (R & ExtendedRoleProperties)
           | undefined;
         if (!otherRole) continue;
-        const matchedByTeam = awareOfTeams.has(otherRole.team);
+        const matchedByTeam =
+          awareOfTeams.has(otherRole.team) && !excludeRoles.has(otherRole.id);
         const matchedByRole = awareOfRoles.has(otherRole.id);
         const matchedByWerewolf =
           awareOfWerewolves && otherRole.isWerewolf === true;
@@ -96,8 +98,11 @@ export function buildGamePlayers<R extends RoleDefinition<string, Team>>(
           // - Matched by specific role name (you see "the Seer" — you know the role)
           // - awareOf.revealRole is explicitly true (opt-in per role definition)
           // Team-only and werewolf-aware matching do NOT reveal specific roles.
+          // awareOf.revealRole: false suppresses role revelation even for role
+          // matches (e.g. Percival sees Merlin/Morgana but cannot distinguish them).
           const revealRole =
-            matchedByRole || myRole.awareOf.revealRole === true;
+            myRole.awareOf.revealRole === true ||
+            (myRole.awareOf.revealRole !== false && matchedByRole);
           visiblePlayers.push({
             playerId: other.playerId,
             reason: "aware-of",
