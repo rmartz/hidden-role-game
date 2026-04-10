@@ -2,7 +2,7 @@
 // Phase enum
 // ---------------------------------------------------------------------------
 
-export enum ClockworkPhase {
+export enum ClocktowerPhase {
   Night = "night",
   Day = "day",
 }
@@ -19,10 +19,10 @@ export enum ClockworkPhase {
  * Role-specific extensions (e.g. Fortune Teller's second target) should
  * extend this interface per role as needed.
  *
- * Keyed by role ID in `ClockworkNightPhase.nightActions` — assumes one active
+ * Keyed by role ID in `ClocktowerNightPhase.nightActions` — assumes one active
  * instance per role ID per night.
  */
-export interface ClockworkNightAction {
+export interface ClocktowerNightAction {
   /** The primary player ID targeted by this role's night action. */
   targetPlayerId?: string;
 }
@@ -31,7 +31,7 @@ export interface ClockworkNightAction {
 // Nomination types
 // ---------------------------------------------------------------------------
 
-export interface ClockworkNominationVote {
+export interface ClocktowerNominationVote {
   /** The voting player's ID. */
   playerId: string;
   /** True if the player voted to execute the nominee. */
@@ -39,13 +39,13 @@ export interface ClockworkNominationVote {
 }
 
 /** A single nomination made during a day phase, with its running vote tally. */
-export interface ClockworkNomination {
+export interface ClocktowerNomination {
   /** The player who called the nomination. */
   nominatorId: string;
   /** The player nominated for execution. */
   nomineeId: string;
   /** Votes cast for this nomination in player order. */
-  votes: ClockworkNominationVote[];
+  votes: ClocktowerNominationVote[];
 }
 
 // ---------------------------------------------------------------------------
@@ -64,22 +64,22 @@ export interface ClockworkNomination {
  *      Chef (first night only), Empath, Fortune Teller, Undertaker,
  *      Ravenkeeper (on death only)
  */
-export interface ClockworkNightPhase {
-  type: ClockworkPhase.Night;
+export interface ClocktowerNightPhase {
+  type: ClocktowerPhase.Night;
   /** Index into the night action order for the currently active step. */
   currentActionIndex: number;
   /**
    * Night actions submitted this night. Key is the role ID of the acting role.
    * Assumes one active instance per role ID per night.
    */
-  nightActions: Record<string, ClockworkNightAction>;
+  nightActions: Record<string, ClocktowerNightAction>;
 }
 
 /** Day phase — open discussion, nominations, and voting. */
-export interface ClockworkDayPhase {
-  type: ClockworkPhase.Day;
+export interface ClocktowerDayPhase {
+  type: ClocktowerPhase.Day;
   /** All nominations made today, in the order they were called. */
-  nominations: ClockworkNomination[];
+  nominations: ClocktowerNomination[];
   /**
    * Player IDs who have already nominated today.
    * Each player may only nominate once per day.
@@ -96,17 +96,17 @@ export interface ClockworkDayPhase {
 // Turn phase union
 // ---------------------------------------------------------------------------
 
-export type ClockworkTurnPhase = ClockworkNightPhase | ClockworkDayPhase;
+export type ClocktowerTurnPhase = ClocktowerNightPhase | ClocktowerDayPhase;
 
 // ---------------------------------------------------------------------------
 // Turn state
 // ---------------------------------------------------------------------------
 
-export interface ClockworkTurnState {
+export interface ClocktowerTurnState {
   /** Current day/night number (increments each night). */
   turn: number;
   /** Current game phase. */
-  phase: ClockworkTurnPhase;
+  phase: ClocktowerTurnPhase;
   /**
    * Seated player order. Determines neighbor relationships used by
    * neighbor-based abilities (e.g. Empath, Chef).
