@@ -16,6 +16,7 @@ import {
   type FirebaseLobbyPublic,
   type FirebaseLobbyPrivate,
 } from "@/lib/firebase/schema";
+import { resolvePlayerOrder } from "@/lib/player-order";
 
 function lobbyRef(lobbyId: string) {
   return getAdminDatabase().ref(`lobbies/${lobbyId}`);
@@ -108,9 +109,18 @@ export async function removePlayer(
     private: FirebaseLobbyPrivate;
   };
 
+  const remainingPlayerIds = Object.keys(data.public.players ?? {}).filter(
+    (id) => id !== playerId,
+  );
+  const updatedOrder = resolvePlayerOrder(
+    data.public.playerOrder,
+    remainingPlayerIds,
+  );
+
   await lobbyRef(lobbyId).update({
     [`public/players/${playerId}`]: null,
     [`private/playerSessions/${playerId}`]: null,
+    "public/playerOrder": updatedOrder.length > 0 ? updatedOrder : null,
   });
 
   data.public.players = Object.fromEntries(
@@ -121,6 +131,7 @@ export async function removePlayer(
       ([id]) => id !== playerId,
     ),
   );
+  data.public.playerOrder = updatedOrder.length > 0 ? updatedOrder : undefined;
   return firebaseToLobby(lobbyId, data.public, data.private);
 }
 
@@ -136,9 +147,16 @@ export async function addPlayer(
     private: FirebaseLobbyPrivate;
   };
 
+  const existingPlayerIds = Object.keys(data.public.players ?? {});
+  const updatedOrder = [
+    ...resolvePlayerOrder(data.public.playerOrder, existingPlayerIds),
+    player.id,
+  ];
+
   await lobbyRef(lobbyId).update({
     [`public/players/${player.id}`]: { id: player.id, name: player.name },
     [`private/playerSessions/${player.id}`]: player.sessionId,
+    "public/playerOrder": updatedOrder,
   });
 
   (data.public.players ??= {})[player.id] = {
@@ -146,6 +164,7 @@ export async function addPlayer(
     name: player.name,
   };
   (data.private.playerSessions ??= {})[player.id] = player.sessionId;
+  data.public.playerOrder = updatedOrder;
   return firebaseToLobby(lobbyId, data.public, data.private);
 }
 
@@ -242,5 +261,34 @@ export async function updateConfig(
     await lobbyRef(lobbyId).update(updates);
   }
 
+  return firebaseToLobby(lobbyId, data.public, data.private);
+}
+
+/**
+ * Persists a new player ordering for a lobby. The provided `playerOrder` must
+ * contain exactly the IDs of all current lobby players. Returns the updated
+ * lobby, or undefined if the lobby does not exist.
+ */
+export async function reorderPlayers(
+  lobbyId: string,
+  playerOrder: string[],
+): Promise<Lobby | undefined> {
+  const snap = await lobbyRef(lobbyId).once("value");
+  if (!snap.exists()) return undefined;
+
+  const data = snap.val() as {
+    public: FirebaseLobbyPublic;
+    private: FirebaseLobbyPrivate;
+  };
+
+  const currentPlayerIds = Object.keys(data.public.players ?? {});
+  const reconciledOrder = resolvePlayerOrder(playerOrder, currentPlayerIds);
+
+  await lobbyRef(lobbyId)
+    .child("public/playerOrder")
+    .set(reconciledOrder.length > 0 ? reconciledOrder : null);
+
+  data.public.playerOrder =
+    reconciledOrder.length > 0 ? reconciledOrder : undefined;
   return firebaseToLobby(lobbyId, data.public, data.private);
 }

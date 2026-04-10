@@ -17,6 +17,7 @@ import {
   clearGameId,
   clearReadyPlayerIds,
   setLobbyGameId,
+  reorderPlayers,
 } from "@/services/lobby";
 
 export {
@@ -27,6 +28,7 @@ export {
   toggleReady,
   updateConfig,
   clearGameId,
+  reorderPlayers,
 };
 
 /**
@@ -62,6 +64,7 @@ export async function addLobby(
     id: lobbyId,
     ownerSessionId: owner.sessionId,
     players: [owner],
+    playerOrder: [owner.id],
     config,
     readyPlayerIds: [],
   };

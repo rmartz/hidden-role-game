@@ -33,10 +33,10 @@ describe("ElectionVoteView", () => {
     ).toBeDefined();
   });
 
-  it("shows waiting text after voting", () => {
+  it("shows all-voted text after voting when no players prop is provided", () => {
     render(<ElectionVoteView {...defaultProps} myVote="no" />);
     expect(
-      screen.getByText(SECRET_VILLAIN_COPY.election.alreadyVoted),
+      screen.getByText(SECRET_VILLAIN_COPY.election.allVoted),
     ).toBeDefined();
   });
 
@@ -109,6 +109,44 @@ describe("ElectionVoteView", () => {
       screen.getByText(
         SECRET_VILLAIN_COPY.election.waitingForPlayers(["Bob", "Charlie"]),
       ),
+    ).toBeDefined();
+  });
+
+  it("shows all-voted text when all players have voted", () => {
+    const players = [
+      { id: "p1", name: "Alice" },
+      { id: "p2", name: "Bob" },
+    ];
+    render(
+      <ElectionVoteView
+        {...defaultProps}
+        myVote="aye"
+        players={players}
+        votedPlayerIds={["p1", "p2"]}
+      />,
+    );
+    expect(
+      screen.getByText(SECRET_VILLAIN_COPY.election.allVoted),
+    ).toBeDefined();
+  });
+
+  it("excludes non-voting players (e.g. board player) from pending voter list", () => {
+    const players = [
+      { id: "board", name: "Board" },
+      { id: "p1", name: "Alice" },
+      { id: "p2", name: "Bob" },
+    ];
+    render(
+      <ElectionVoteView
+        {...defaultProps}
+        myVote="aye"
+        players={players}
+        votedPlayerIds={["p1", "p2"]}
+        nonVotingPlayerIds={["board"]}
+      />,
+    );
+    expect(
+      screen.getByText(SECRET_VILLAIN_COPY.election.allVoted),
     ).toBeDefined();
   });
 

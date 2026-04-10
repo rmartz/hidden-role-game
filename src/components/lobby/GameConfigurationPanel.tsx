@@ -85,13 +85,19 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
   const activeGameMode = readOnly ? config.gameMode : selectedGameMode;
   const activeModeConfig = GAME_MODES[activeGameMode];
   const roleDefinitions = activeModeConfig.roles;
-  const ownerTitle = activeModeConfig.ownerTitle;
-  const roleSlotsRequired = getRoleSlotsRequired(activeGameMode, playerCount);
+  const activeTimerConfig = readOnly ? config.timerConfig : timerConfig;
+  const activeModeConfigData = readOnly ? config.modeConfig : modeConfig;
+  const ownerTitle =
+    activeModeConfig.resolveOwnerTitle?.(activeModeConfigData) ??
+    activeModeConfig.ownerTitle;
+  const roleSlotsRequired = getRoleSlotsRequired(
+    activeGameMode,
+    playerCount,
+    activeModeConfigData,
+  );
   const disabled = readOnly ? true : props.isPending;
   const isWerewolf = activeGameMode === GameMode.Werewolf;
 
-  const activeTimerConfig = readOnly ? config.timerConfig : timerConfig;
-  const activeModeConfigData = readOnly ? config.modeConfig : modeConfig;
   const onTimerConfigChange = readOnly
     ? undefined
     : (value: TimerConfig) => dispatch(setTimerConfig(value));

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { fn } from "storybook/test";
 import { PlayerList } from "./PlayerList";
 import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
@@ -13,6 +14,7 @@ const meta = {
     onRemovePlayer: noop,
     onTransferOwner: noop,
     onToggleReady: noop,
+    onReorderPlayers: fn(),
   },
 } satisfies Meta<typeof PlayerList>;
 
@@ -29,6 +31,7 @@ const baseLobby: PublicLobby = {
     { id: "p4", name: "Diana" },
     { id: "p5", name: "Eve" },
   ],
+  playerOrder: ["p1", "p2", "p3", "p4", "p5"],
   config: {
     gameMode: GameMode.Werewolf,
     roleConfigMode: RoleConfigMode.Default,
@@ -46,7 +49,7 @@ const baseLobby: PublicLobby = {
   readyPlayerIds: ["p2", "p4"],
 };
 
-export const WithSeveralPlayers: Story = {
+export const PlayerView: Story = {
   args: {
     lobby: baseLobby,
     userPlayerId: "p3",
@@ -61,11 +64,27 @@ export const WithSeveralPlayers: Story = {
   },
 };
 
+export const OwnerView: Story = {
+  args: {
+    lobby: baseLobby,
+    userPlayerId: "p1",
+    isOwner: true,
+    showLeave: false,
+    showRemovePlayer: true,
+    showMakeOwner: true,
+    showRefresh: false,
+    isFetching: false,
+    disabled: false,
+    isReadyPending: false,
+  },
+};
+
 export const SinglePlayerOwner: Story = {
   args: {
     lobby: {
       ...baseLobby,
       players: [{ id: "p1", name: "Alice" }],
+      playerOrder: ["p1"],
       readyPlayerIds: [],
     },
     userPlayerId: "p1",

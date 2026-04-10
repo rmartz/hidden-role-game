@@ -25,6 +25,8 @@ interface ElectionVoteViewProps {
   votedPlayerIds?: string[];
   /** Player IDs who are eliminated (cannot vote). */
   eliminatedPlayerIds?: string[];
+  /** Player IDs who cannot vote for non-elimination reasons (e.g. board player). */
+  nonVotingPlayerIds?: string[];
   isPending?: boolean;
   isEliminated?: boolean;
 }
@@ -44,6 +46,7 @@ export function ElectionVoteView({
   players,
   votedPlayerIds,
   eliminatedPlayerIds,
+  nonVotingPlayerIds,
   isPending,
   isEliminated,
 }: ElectionVoteViewProps) {
@@ -59,16 +62,21 @@ export function ElectionVoteView({
   const canResolve = allVoted === true || timerExpired;
 
   const votedSet = new Set(votedPlayerIds ?? []);
-  const eliminatedSet = new Set(eliminatedPlayerIds ?? []);
+  const excludedSet = new Set([
+    ...(eliminatedPlayerIds ?? []),
+    ...(nonVotingPlayerIds ?? []),
+  ]);
   const pendingPlayers = (players ?? []).filter(
-    (p) => !votedSet.has(p.id) && !eliminatedSet.has(p.id),
+    (p) => !votedSet.has(p.id) && !excludedSet.has(p.id),
   );
   const waitingText =
-    pendingPlayers.length > 0 && pendingPlayers.length <= PENDING_NAME_THRESHOLD
-      ? SECRET_VILLAIN_COPY.election.waitingForPlayers(
-          pendingPlayers.map((p) => p.name),
-        )
-      : SECRET_VILLAIN_COPY.election.alreadyVoted;
+    pendingPlayers.length === 0
+      ? SECRET_VILLAIN_COPY.election.allVoted
+      : pendingPlayers.length <= PENDING_NAME_THRESHOLD
+        ? SECRET_VILLAIN_COPY.election.waitingForPlayers(
+            pendingPlayers.map((p) => p.name),
+          )
+        : SECRET_VILLAIN_COPY.election.alreadyVoted;
 
   return (
     <Card>

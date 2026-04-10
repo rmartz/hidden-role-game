@@ -99,4 +99,24 @@ describe("parseSecretVillainModeConfig", () => {
     const result = parseSecretVillainModeConfig({});
     expect(result.theme).toBeUndefined();
   });
+
+  it("parses includeBoard: true", () => {
+    const result = parseSecretVillainModeConfig({ includeBoard: true });
+    expect(result.includeBoard).toBe(true);
+  });
+
+  it("omits includeBoard when false", () => {
+    const result = parseSecretVillainModeConfig({ includeBoard: false });
+    expect(result.includeBoard).toBeUndefined();
+  });
+
+  it("omits includeBoard when not present", () => {
+    const result = parseSecretVillainModeConfig({});
+    expect(result.includeBoard).toBeUndefined();
+  });
+
+  it("ignores non-boolean includeBoard", () => {
+    const result = parseSecretVillainModeConfig({ includeBoard: "yes" });
+    expect(result.includeBoard).toBeUndefined();
+  });
 });

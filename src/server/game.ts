@@ -44,6 +44,7 @@ export async function createGame(
   ownerPlayerId: string | undefined,
   timerConfig: TimerConfig,
   modeConfig?: ModeConfig,
+  playerOrder?: string[],
 ): Promise<Game> {
   const game = buildGame(
     randomUUID(),
@@ -55,6 +56,7 @@ export async function createGame(
     ownerPlayerId,
     timerConfig,
     modeConfig,
+    playerOrder,
   );
 
   await saveGame(game);
@@ -129,7 +131,10 @@ export function validateGameStartPrerequisites(
   if (lobby.config.gameMode !== gameMode) {
     return { error: "Game mode does not match lobby configuration" };
   }
-  const { ownerTitle } = getModeDefinition(gameMode);
+  const definition = getModeDefinition(gameMode);
+  const modeConfig = lobby.config.modeConfig;
+  const ownerTitle =
+    definition.resolveOwnerTitle?.(modeConfig) ?? definition.ownerTitle;
   const ownerPlayerId = ownerTitle
     ? lobby.players.find((p) => p.sessionId === lobby.ownerSessionId)?.id
     : undefined;

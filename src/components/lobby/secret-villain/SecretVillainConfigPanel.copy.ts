@@ -8,4 +8,7 @@ export const SECRET_VILLAIN_CONFIG_PANEL_COPY = {
   powerInvestigateTeam: "Investigate Team",
   powerPolicyPeek: "Policy Peek",
   powerSpecialElection: "Special Election",
+  includeBoardLabel: "Include Board player",
+  includeBoardDescription:
+    "Adds a shared-display observer who sees the game board but no role assignments.",
 } as const;
