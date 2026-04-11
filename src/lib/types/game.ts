@@ -114,12 +114,13 @@ export interface RoleDefinition<
   description?: string;
   /**
    * Players matching these criteria are visible.
-   * By default only identity is revealed. Set `revealRole: true` to also
-   * reveal the exact role of matched players. Set `revealRole: false` to
-   * suppress role revelation even when matched by specific role (e.g. Percival
-   * sees Merlin and Morgana but cannot distinguish them).
-   * `excludeRoles` removes specific roles from team-based matching (e.g.
-   * Merlin excludes Mordred from Evil team awareness; Evil roles exclude Oberon).
+   * - Team matches (`teams`) reveal identity only, not role.
+   * - Role matches (`roles`) reveal the exact role by default. Set
+   *   `revealRole: false` to suppress this (e.g. Percival sees Merlin and
+   *   Morgana but cannot tell them apart). Set `revealRole: true` to force
+   *   role revelation even for team matches.
+   * - `excludeRoles` removes specific roles from team-based matching (e.g.
+   *   Merlin excludes Mordred from Evil team awareness; Evil roles exclude Oberon).
    */
   awareOf?: {
     teams?: T[];
