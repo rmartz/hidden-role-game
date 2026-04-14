@@ -118,9 +118,11 @@ export function RoleConfigEntry(props: RoleConfigEntryProps) {
             minValue={0}
           />
         </div>
-      ) : (
-        <span className="text-sm text-muted-foreground">{count}</span>
-      )}
+      ) : count > 0 ? (
+        <span className="text-sm italic text-muted-foreground">
+          {ROLE_CONFIG_ENTRY_COPY.activeLabel}
+        </span>
+      ) : null}
     </li>
   );
 }

@@ -61,12 +61,33 @@ const defaultProps = {
   readOnly: true as const,
 };
 
+function clickShowAll() {
+  fireEvent.click(screen.getByText(ROLE_CONFIG_COPY.showAllRoles));
+}
+
 describe("RoleConfig search", () => {
-  it("renders the search input", () => {
+  it("does not render the search input before Show all roles is clicked", () => {
     renderWithStore(<RoleConfig {...defaultProps} />);
+    expect(
+      screen.queryByPlaceholderText(ROLE_CONFIG_COPY.searchPlaceholder),
+    ).toBeNull();
+  });
+
+  it("renders the search input after Show all roles is clicked", () => {
+    renderWithStore(<RoleConfig {...defaultProps} />);
+    clickShowAll();
     expect(
       screen.getByPlaceholderText(ROLE_CONFIG_COPY.searchPlaceholder),
     ).toBeDefined();
+  });
+
+  it("hides the search input when Show fewer roles is clicked", () => {
+    renderWithStore(<RoleConfig {...defaultProps} />);
+    clickShowAll();
+    fireEvent.click(screen.getByText(ROLE_CONFIG_COPY.hideExtraRoles));
+    expect(
+      screen.queryByPlaceholderText(ROLE_CONFIG_COPY.searchPlaceholder),
+    ).toBeNull();
   });
 
   it("shows all enabled roles when search is empty", () => {
@@ -78,6 +99,7 @@ describe("RoleConfig search", () => {
 
   it("filters the role list when a search query is entered", () => {
     renderWithStore(<RoleConfig {...defaultProps} />);
+    clickShowAll();
     const input = screen.getByPlaceholderText(
       ROLE_CONFIG_COPY.searchPlaceholder,
     );
@@ -89,6 +111,7 @@ describe("RoleConfig search", () => {
 
   it("shows the no-results message when search matches nothing", () => {
     renderWithStore(<RoleConfig {...defaultProps} />);
+    clickShowAll();
     const input = screen.getByPlaceholderText(
       ROLE_CONFIG_COPY.searchPlaceholder,
     );
@@ -98,6 +121,7 @@ describe("RoleConfig search", () => {
 
   it("includes disabled roles in search results", () => {
     renderWithStore(<RoleConfig {...defaultProps} />);
+    clickShowAll();
     const input = screen.getByPlaceholderText(
       ROLE_CONFIG_COPY.searchPlaceholder,
     );
@@ -108,6 +132,7 @@ describe("RoleConfig search", () => {
 
   it("dims disabled roles during search", () => {
     renderWithStore(<RoleConfig {...defaultProps} />);
+    clickShowAll();
     const input = screen.getByPlaceholderText(
       ROLE_CONFIG_COPY.searchPlaceholder,
     );
@@ -119,11 +144,24 @@ describe("RoleConfig search", () => {
 
   it("does not dim enabled roles during search", () => {
     renderWithStore(<RoleConfig {...defaultProps} />);
+    clickShowAll();
     const input = screen.getByPlaceholderText(
       ROLE_CONFIG_COPY.searchPlaceholder,
     );
     fireEvent.change(input, { target: { value: "role" } });
     const alphaItem = screen.getByText(roleA.name).closest("li");
     expect(alphaItem?.className).not.toContain("text-muted-foreground");
+  });
+
+  it("clears the search query when Show fewer roles is clicked", () => {
+    renderWithStore(<RoleConfig {...defaultProps} />);
+    clickShowAll();
+    const input = screen.getByPlaceholderText(
+      ROLE_CONFIG_COPY.searchPlaceholder,
+    );
+    fireEvent.change(input, { target: { value: "Alpha" } });
+    fireEvent.click(screen.getByText(ROLE_CONFIG_COPY.hideExtraRoles));
+    // Collapsed view should show enabled roles again (not just the search match)
+    expect(screen.getByText(roleC.name)).toBeDefined();
   });
 });
