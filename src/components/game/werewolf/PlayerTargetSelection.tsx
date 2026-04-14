@@ -32,7 +32,6 @@ interface PlayerTargetSelectionProps {
   attackedPlayerIds?: string[];
   myPlayerId?: string;
   previousNightTargetId?: string;
-  secondTargets?: readonly (readonly [TargetablePlayer, boolean])[];
   mySecondNightTarget?: string;
   requiresSecondTarget?: boolean;
   mirrorcasterCharged?: boolean;
@@ -55,12 +54,15 @@ export function PlayerTargetSelection({
   attackedPlayerIds,
   myPlayerId,
   previousNightTargetId,
-  secondTargets,
   mySecondNightTarget,
   requiresSecondTarget = false,
   mirrorcasterCharged,
 }: PlayerTargetSelectionProps) {
   const action = useGameAction(gameId);
+  const isMentalistSelectionComplete =
+    myNightTarget !== null &&
+    myNightTarget !== undefined &&
+    mySecondNightTarget !== undefined;
 
   const isWitchAbilityUsedOnly =
     confirmPhaseKey === WerewolfRole.Witch && witchAbilityUsed && !isConfirmed;
@@ -136,8 +138,60 @@ export function PlayerTargetSelection({
               {targets.map(([player, isSelected]) => (
                 <Button
                   key={player.id}
-                  variant={isSelected ? "default" : "outline"}
+                  variant={
+                    isSelected || mySecondNightTarget === player.id
+                      ? "default"
+                      : "outline"
+                  }
                   onClick={() => {
+                    if (requiresSecondTarget) {
+                      if (player.id === myNightTarget) {
+                        if (mySecondNightTarget !== undefined) return;
+                        action.mutate({
+                          actionId: WerewolfAction.SetNightTarget,
+                          payload: {
+                            targetPlayerId: undefined,
+                          },
+                        });
+                        return;
+                      }
+
+                      if (player.id === mySecondNightTarget) {
+                        action.mutate({
+                          actionId: WerewolfAction.SetNightTarget,
+                          payload: {
+                            targetPlayerId: undefined,
+                            isSecondTarget: true,
+                          },
+                        });
+                        return;
+                      }
+
+                      if (
+                        myNightTarget === null ||
+                        myNightTarget === undefined
+                      ) {
+                        action.mutate({
+                          actionId: WerewolfAction.SetNightTarget,
+                          payload: {
+                            targetPlayerId: player.id,
+                          },
+                        });
+                        return;
+                      }
+
+                      if (mySecondNightTarget === undefined) {
+                        action.mutate({
+                          actionId: WerewolfAction.SetNightTarget,
+                          payload: {
+                            targetPlayerId: player.id,
+                            isSecondTarget: true,
+                          },
+                        });
+                      }
+                      return;
+                    }
+
                     action.mutate({
                       actionId: WerewolfAction.SetNightTarget,
                       payload: {
@@ -149,7 +203,11 @@ export function PlayerTargetSelection({
                     action.isPending ||
                     isConfirmed ||
                     player.id === previousNightTargetId ||
-                    (isWitchSelfDisabled && player.id === myPlayerId)
+                    (isWitchSelfDisabled && player.id === myPlayerId) ||
+                    (requiresSecondTarget &&
+                      isMentalistSelectionComplete &&
+                      player.id !== myNightTarget &&
+                      player.id !== mySecondNightTarget)
                   }
                 >
                   {player.name}
@@ -180,42 +238,15 @@ export function PlayerTargetSelection({
             </div>
           )}
 
-          {requiresSecondTarget && !isConfirmed && myNightTarget != null && (
-            <>
-              <h2 className="text-lg font-semibold mb-2 mt-4 text-center">
-                {WEREWOLF_COPY.mentalist.chooseSecondTarget}
-              </h2>
-              <div className="flex flex-col gap-2 max-w-sm mx-auto">
-                {(secondTargets ?? []).map(([player, isSelected]) => (
-                  <Button
-                    key={player.id}
-                    variant={isSelected ? "default" : "outline"}
-                    onClick={() => {
-                      action.mutate({
-                        actionId: WerewolfAction.SetNightTarget,
-                        payload: {
-                          targetPlayerId: isSelected ? undefined : player.id,
-                          isSecondTarget: true,
-                        },
-                      });
-                    }}
-                    disabled={action.isPending}
-                  >
-                    {player.name}
-                  </Button>
-                ))}
-              </div>
-            </>
-          )}
-
           <ConfirmTargetButton
             gameId={gameId}
             roleId={confirmPhaseKey}
             hasTarget={hasTarget}
             hasDecided={
               requiresSecondTarget
-                ? myNightTarget !== undefined &&
-                  mySecondNightTarget !== undefined
+                ? myNightTarget === null ||
+                  (myNightTarget !== undefined &&
+                    mySecondNightTarget !== undefined)
                 : isGroupPhase || myNightTarget !== undefined
             }
             isConfirmed={isConfirmed}

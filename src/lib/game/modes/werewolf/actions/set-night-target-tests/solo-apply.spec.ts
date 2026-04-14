@@ -125,5 +125,68 @@ describe("WerewolfAction.SetNightTarget", () => {
         targetPlayerId: "p1",
       });
     });
+
+    describe("Mentalist target exclusivity", () => {
+      it("clears both selected players when switching to no target", () => {
+        const game = makePlayingGame(
+          makeNightState({
+            turn: 2,
+            nightPhaseOrder: [WerewolfRole.Mentalist],
+            currentPhaseIndex: 0,
+            nightActions: {
+              [WerewolfRole.Mentalist]: {
+                targetPlayerId: "p1",
+                secondTargetPlayerId: "p3",
+              },
+            },
+          }),
+          {
+            roleAssignments: [
+              { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+              { playerId: "p2", roleDefinitionId: WerewolfRole.Mentalist },
+              { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+              { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+              { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+            ],
+          },
+        );
+        action.apply(game, { targetPlayerId: null }, "p2");
+        const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+        const phase = ts.phase as WerewolfNighttimePhase;
+        expect(phase.nightActions[WerewolfRole.Mentalist]).toEqual({
+          skipped: true,
+        });
+      });
+
+      it("replaces no-target selection when choosing a player", () => {
+        const game = makePlayingGame(
+          makeNightState({
+            turn: 2,
+            nightPhaseOrder: [WerewolfRole.Mentalist],
+            currentPhaseIndex: 0,
+            nightActions: {
+              [WerewolfRole.Mentalist]: {
+                skipped: true,
+              },
+            },
+          }),
+          {
+            roleAssignments: [
+              { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+              { playerId: "p2", roleDefinitionId: WerewolfRole.Mentalist },
+              { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+              { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+              { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+            ],
+          },
+        );
+        action.apply(game, { targetPlayerId: "p1" }, "p2");
+        const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+        const phase = ts.phase as WerewolfNighttimePhase;
+        expect(phase.nightActions[WerewolfRole.Mentalist]).toEqual({
+          targetPlayerId: "p1",
+        });
+      });
+    });
   });
 });

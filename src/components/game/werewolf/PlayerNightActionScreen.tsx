@@ -85,25 +85,6 @@ export function PlayerNightActionScreen({
   const isMentalist =
     !isGroupPhase &&
     gameState.myRole?.id === (WerewolfRole.Mentalist as string);
-  const allSecondTargets = isMentalist
-    ? getTargetablePlayers(
-        gameState.players,
-        gameState.gameOwner?.id,
-        deadPlayerIds,
-        activePhaseKey ?? "",
-        gameState.myPlayerId,
-        gameState.visibleRoleAssignments,
-      )
-        .filter((player) => player.id !== gameState.myNightTarget)
-        .map(
-          (player) =>
-            [player, gameState.mySecondNightTarget === player.id] as const,
-        )
-    : undefined;
-  const secondTargets =
-    isMentalist && isConfirmed
-      ? (allSecondTargets ?? []).filter(([, isSelected]) => isSelected)
-      : allSecondTargets;
 
   const isAltruist =
     !isGroupPhase && gameState.myRole?.id === (WerewolfRole.Altruist as string);
@@ -203,7 +184,6 @@ export function PlayerNightActionScreen({
             attackedPlayerIds={attackedPlayerIds}
             myPlayerId={gameState.myPlayerId}
             previousNightTargetId={gameState.previousNightTargetId}
-            secondTargets={secondTargets}
             mySecondNightTarget={gameState.mySecondNightTarget}
             requiresSecondTarget={isMentalist}
             mirrorcasterCharged={gameState.mirrorcasterCharged}

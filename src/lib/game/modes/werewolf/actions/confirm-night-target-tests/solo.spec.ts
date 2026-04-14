@@ -98,6 +98,80 @@ describe("WerewolfAction.ConfirmNightTarget", () => {
       const game = makePlayingGame(dayTurnState);
       expect(action.isValid(game, "p2", null)).toBe(false);
     });
+
+    describe("Mentalist dual target behavior", () => {
+      it("returns false when only one target is selected", () => {
+        const game = makePlayingGame(
+          makeNightState({
+            turn: 2,
+            nightPhaseOrder: [WerewolfRole.Mentalist],
+            currentPhaseIndex: 0,
+            nightActions: {
+              [WerewolfRole.Mentalist]: { targetPlayerId: "p1" },
+            },
+          }),
+          {
+            roleAssignments: [
+              { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+              { playerId: "p2", roleDefinitionId: WerewolfRole.Mentalist },
+              { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+              { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+              { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+            ],
+          },
+        );
+        expect(action.isValid(game, "p2", null)).toBe(false);
+      });
+
+      it("returns true when two targets are selected", () => {
+        const game = makePlayingGame(
+          makeNightState({
+            turn: 2,
+            nightPhaseOrder: [WerewolfRole.Mentalist],
+            currentPhaseIndex: 0,
+            nightActions: {
+              [WerewolfRole.Mentalist]: {
+                targetPlayerId: "p1",
+                secondTargetPlayerId: "p3",
+              },
+            },
+          }),
+          {
+            roleAssignments: [
+              { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+              { playerId: "p2", roleDefinitionId: WerewolfRole.Mentalist },
+              { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+              { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+              { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+            ],
+          },
+        );
+        expect(action.isValid(game, "p2", null)).toBe(true);
+      });
+
+      it("returns true when Mentalist chooses no target", () => {
+        const game = makePlayingGame(
+          makeNightState({
+            turn: 2,
+            nightPhaseOrder: [WerewolfRole.Mentalist],
+            currentPhaseIndex: 0,
+            nightActions: {
+              [WerewolfRole.Mentalist]: { skipped: true },
+            },
+          }),
+          {
+            roleAssignments: [
+              { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+              { playerId: "p2", roleDefinitionId: WerewolfRole.Mentalist },
+              { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+              { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+              { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+            ],
+          },
+        );
+        expect(action.isValid(game, "p2", null)).toBe(true);
+      });
+    });
   });
 
   describe("apply (solo)", () => {
