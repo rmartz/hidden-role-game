@@ -99,6 +99,7 @@ export enum TrialPhase {
   Defense = "defense",
   Voting = "voting",
 }
+export type NightOutcomeRevealStep = "hidden" | "killed" | "all";
 
 export enum TrialVerdict {
   Eliminated = "eliminated",
@@ -131,7 +132,7 @@ export interface WerewolfDaytimePhase {
   /** Resolved attack/protect outcomes, computed when transitioning to day. */
   nightResolution?: NightResolutionEvent[];
   /** Public reveal stage for night outcomes when manual reveal is enabled. */
-  nightOutcomeRevealStep?: "hidden" | "killed" | "all";
+  nightOutcomeRevealStep?: NightOutcomeRevealStep;
   /** Player IDs smited by the narrator during the preceding night. */
   smitedPlayerIds?: string[];
   /** Player IDs marked by the narrator for elimination after the next night. */

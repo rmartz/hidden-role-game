@@ -6,6 +6,7 @@ import { getWerewolfModeConfig } from "../lobby-config";
 import type {
   AltruistInterceptedNightResolutionEvent,
   AnyNightAction,
+  NightOutcomeRevealStep,
 } from "../types";
 import { TrialVerdict, WerewolfPhase } from "../types";
 import { SMITE_PHASE_KEY, OLD_MAN_TIMER_KEY } from "../utils";
@@ -18,8 +19,6 @@ import {
   getWerewolfRole,
 } from "../roles";
 
-type NightOutcomeRevealStep = "hidden" | "killed" | "all";
-
 function resolveNightOutcomeRevealStep(game: Game): NightOutcomeRevealStep {
   const ts = currentTurnState(game);
   if (ts?.phase.type !== WerewolfPhase.Daytime) return "all";
@@ -27,19 +26,11 @@ function resolveNightOutcomeRevealStep(game: Game): NightOutcomeRevealStep {
   return ts.phase.nightOutcomeRevealStep ?? "hidden";
 }
 
-function canPublicSeeKilledOutcomes(
-  game: Game,
-  step: NightOutcomeRevealStep,
-): boolean {
-  if (getWerewolfModeConfig(game).autoRevealNightOutcome ?? true) return true;
+function canPublicSeeKilledOutcomes(step: NightOutcomeRevealStep): boolean {
   return step === "killed" || step === "all";
 }
 
-function canPublicSeeStatusOutcomes(
-  game: Game,
-  step: NightOutcomeRevealStep,
-): boolean {
-  if (getWerewolfModeConfig(game).autoRevealNightOutcome ?? true) return true;
+function canPublicSeeStatusOutcomes(step: NightOutcomeRevealStep): boolean {
   return step === "all";
 }
 
@@ -79,14 +70,8 @@ export function extractDaytimeNightSummary(
   const phase = ts.phase;
   const nightOutcomeRevealStep = resolveNightOutcomeRevealStep(game);
   const callerIsOwner = callerId === game.ownerPlayerId;
-  const showKilledToAll = canPublicSeeKilledOutcomes(
-    game,
-    nightOutcomeRevealStep,
-  );
-  const showStatusToAll = canPublicSeeStatusOutcomes(
-    game,
-    nightOutcomeRevealStep,
-  );
+  const showKilledToAll = canPublicSeeKilledOutcomes(nightOutcomeRevealStep);
+  const showStatusToAll = canPublicSeeStatusOutcomes(nightOutcomeRevealStep);
 
   const altruistIntercept = (phase.nightResolution ?? []).find(
     (e): e is AltruistInterceptedNightResolutionEvent =>
@@ -322,6 +307,12 @@ export function extractOwnerState(
 
 export { extractNightActions, extractDeadPlayerIds };
 
+/**
+ * Returns dead players visible to a specific caller.
+ * During manual night-outcome reveal, newly killed players remain hidden from
+ * other players until the narrator reveals eliminations, while the affected
+ * player and narrator still see their own elimination immediately.
+ */
 export function extractVisibleDeadPlayerIds(
   game: Game,
   callerId: string,
@@ -330,9 +321,9 @@ export function extractVisibleDeadPlayerIds(
   if (ts?.phase.type !== WerewolfPhase.Daytime) {
     return ts?.deadPlayerIds ?? [];
   }
+  if (callerId === game.ownerPlayerId) return ts.deadPlayerIds;
 
   const showKilledToAll = canPublicSeeKilledOutcomes(
-    game,
     resolveNightOutcomeRevealStep(game),
   );
   if (showKilledToAll) return ts.deadPlayerIds;

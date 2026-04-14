@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { GameMode, GameStatus } from "@/lib/types";
+import type { Game } from "@/lib/types";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
-import type { WerewolfTurnState } from "../types";
+import type { WerewolfDaytimePhase, WerewolfTurnState } from "../types";
 import { WerewolfPhase } from "../types";
 import { makePlayingGame, dayTurnState } from "./test-helpers";
 
@@ -25,6 +26,17 @@ function makeDaytimeTurnState(
     },
     deadPlayerIds: [],
   };
+}
+
+function getDaytimePhase(game: Game): WerewolfDaytimePhase {
+  if (game.status.type !== GameStatus.Playing) {
+    throw new Error("Expected playing game status");
+  }
+  const turnState = game.status.turnState as WerewolfTurnState;
+  if (turnState.phase.type !== WerewolfPhase.Daytime) {
+    throw new Error("Expected daytime phase");
+  }
+  return turnState.phase;
 }
 
 describe("WerewolfAction.RevealNightOutcomeStep", () => {
@@ -57,13 +69,7 @@ describe("WerewolfAction.RevealNightOutcomeStep", () => {
       },
     );
     action.apply(game, null, "owner-1");
-    if (game.status.type === GameStatus.Playing) {
-      const ts = game.status.turnState as WerewolfTurnState;
-      expect(ts.phase.type).toBe(WerewolfPhase.Daytime);
-      if (ts.phase.type === WerewolfPhase.Daytime) {
-        expect(ts.phase.nightOutcomeRevealStep).toBe("killed");
-      }
-    }
+    expect(getDaytimePhase(game).nightOutcomeRevealStep).toBe("killed");
   });
 
   it("advances from killed to all", () => {
@@ -82,13 +88,7 @@ describe("WerewolfAction.RevealNightOutcomeStep", () => {
       },
     );
     action.apply(game, null, "owner-1");
-    if (game.status.type === GameStatus.Playing) {
-      const ts = game.status.turnState as WerewolfTurnState;
-      expect(ts.phase.type).toBe(WerewolfPhase.Daytime);
-      if (ts.phase.type === WerewolfPhase.Daytime) {
-        expect(ts.phase.nightOutcomeRevealStep).toBe("all");
-      }
-    }
+    expect(getDaytimePhase(game).nightOutcomeRevealStep).toBe("all");
   });
 
   it("jumps from hidden to all when only status outcomes exist", () => {
@@ -107,12 +107,6 @@ describe("WerewolfAction.RevealNightOutcomeStep", () => {
       },
     );
     action.apply(game, null, "owner-1");
-    if (game.status.type === GameStatus.Playing) {
-      const ts = game.status.turnState as WerewolfTurnState;
-      expect(ts.phase.type).toBe(WerewolfPhase.Daytime);
-      if (ts.phase.type === WerewolfPhase.Daytime) {
-        expect(ts.phase.nightOutcomeRevealStep).toBe("all");
-      }
-    }
+    expect(getDaytimePhase(game).nightOutcomeRevealStep).toBe("all");
   });
 });
