@@ -1,8 +1,10 @@
+import { useEffect, useState } from "react";
 import type { PublicLobbyPlayer } from "@/server/types";
 import { GripVerticalIcon } from "lucide-react";
 import { CheckmarkCircleRegular } from "@fluentui/react-icons";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import {
   AlertDialog,
@@ -26,12 +28,14 @@ interface PlayerRowProps {
   showRemovePlayer: boolean;
   showMakeOwner: boolean;
   disabled: boolean;
+  isRenamePending: boolean;
   /** Show grip and allow this row to be dragged. */
   canDrag?: boolean;
   /** Accept dragover events so other players can be dropped here. */
   canReceiveDrop?: boolean;
   onRemovePlayer: (playerId: string) => void;
   onTransferOwner: (playerId: string) => void;
+  onRenamePlayer: (playerName: string) => void;
   onDragStart?: (playerId: string) => void;
   onDragOver?: (playerId: string) => void;
   onDragEnd?: () => void;
@@ -46,14 +50,22 @@ export function PlayerRow({
   showRemovePlayer,
   showMakeOwner,
   disabled,
+  isRenamePending,
   canDrag,
   canReceiveDrop,
   onRemovePlayer,
   onTransferOwner,
+  onRenamePlayer,
   onDragStart,
   onDragOver,
   onDragEnd,
 }: PlayerRowProps) {
+  const [renameValue, setRenameValue] = useState(player.name);
+
+  useEffect(() => {
+    setRenameValue(player.name);
+  }, [player.name]);
+
   return (
     <li
       className={cn("flex items-center gap-2 py-1", canDrag && "select-none")}
@@ -120,6 +132,57 @@ export function PlayerRow({
         </Badge>
       )}
       <div className="ml-auto flex items-center gap-2 shrink-0">
+        {isCurrentUser && (
+          <AlertDialog>
+            <AlertDialogTrigger
+              render={
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={disabled || isRenamePending}
+                />
+              }
+            >
+              {PLAYER_ROW_COPY.renameButton}
+            </AlertDialogTrigger>
+            <AlertDialogContent size="sm">
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  {PLAYER_ROW_COPY.renameTitle}
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  {PLAYER_ROW_COPY.renameDescription}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <Input
+                value={renameValue}
+                onChange={(event) => {
+                  setRenameValue(event.target.value);
+                }}
+                placeholder={PLAYER_ROW_COPY.renamePlaceholder}
+              />
+              <AlertDialogFooter>
+                <AlertDialogCancel
+                  onClick={() => {
+                    setRenameValue(player.name);
+                  }}
+                >
+                  {PLAYER_ROW_COPY.renameCancel}
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  disabled={renameValue.trim() === ""}
+                  onClick={() => {
+                    onRenamePlayer(renameValue);
+                  }}
+                >
+                  {isRenamePending
+                    ? PLAYER_ROW_COPY.renamingButton
+                    : PLAYER_ROW_COPY.renameConfirm}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
         {isCurrentUser && showLeave && (
           <AlertDialog>
             <AlertDialogTrigger

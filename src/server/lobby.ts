@@ -18,6 +18,7 @@ import {
   clearReadyPlayerIds,
   setLobbyGameId,
   reorderPlayers,
+  renamePlayer,
 } from "@/services/lobby";
 
 export {
@@ -29,6 +30,7 @@ export {
   updateConfig,
   clearGameId,
   reorderPlayers,
+  renamePlayer,
 };
 
 /**
@@ -89,6 +91,26 @@ export function validatePlayerJoin(
   const incomingKey = playerNameKey(displayName);
   const isDuplicate = lobby.players.some(
     (p) => playerNameKey(p.name) === incomingKey,
+  );
+  if (isDuplicate) {
+    return "A player with that name is already in the lobby";
+  }
+  return undefined;
+}
+
+/**
+ * Validates that a player can rename themselves in a lobby: checks duplicate
+ * display names while allowing the current player to keep their existing name.
+ * Returns an error message, or undefined if valid.
+ */
+export function validatePlayerRename(
+  lobby: Lobby,
+  playerId: string,
+  displayName: string,
+): string | undefined {
+  const incomingKey = playerNameKey(displayName);
+  const isDuplicate = lobby.players.some(
+    (p) => p.id !== playerId && playerNameKey(p.name) === incomingKey,
   );
   if (isDuplicate) {
     return "A player with that name is already in the lobby";

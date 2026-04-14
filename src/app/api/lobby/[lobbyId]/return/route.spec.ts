@@ -3,12 +3,14 @@ import { POST as returnToLobby } from "./route";
 import { POST as createLobby } from "../../create/route";
 import { POST as joinLobby } from "../join/route";
 import { PUT as updateConfig } from "../config/route";
+import { PUT as renamePlayer } from "../players/[playerId]/route";
 import { POST as startGame } from "@/app/api/[gameMode]/game/create/route";
 import { updateGameStatus } from "@/services/game";
 import { GameStatus } from "@/lib/types";
 import {
   postRequest,
   makeLobbyParams as makeParams,
+  makePlayerParams,
   makeCreateGameParams,
 } from "@/app/api/test-utils";
 
@@ -180,6 +182,42 @@ describe("POST /api/lobby/[lobbyId]/return", () => {
     const body = await res.json();
     expect(body.status).toBe("success");
     expect(body.data.lobby.gameId).toBeUndefined();
+  });
+
+  it("should allow renaming again after returning to lobby", async () => {
+    const { lobbyId, aliceSession } = await setupFinishedGame();
+
+    const returnRes = await returnToLobby(
+      new Request(`http://localhost/api/lobby/${lobbyId}/return`, {
+        method: "POST",
+        headers: { "x-session-id": aliceSession },
+      }),
+      makeParams(lobbyId),
+    );
+    expect(returnRes.status).toBe(200);
+    const returnBody = await returnRes.json();
+    const aliceId = (
+      returnBody.data.lobby.players as { id: string; name: string }[]
+    ).find((player) => player.name === "Alice")?.id;
+    expect(aliceId).toBeDefined();
+
+    const renameRes = await renamePlayer(
+      new Request(`http://localhost/api/lobby/${lobbyId}/players/${aliceId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "x-session-id": aliceSession,
+        },
+        body: JSON.stringify({ playerName: "Alice Renamed" }),
+      }),
+      makePlayerParams(lobbyId, aliceId!),
+    );
+    expect(renameRes.status).toBe(200);
+    const renameBody = await renameRes.json();
+    const renamedAlice = (
+      renameBody.data.lobby.players as { name: string }[]
+    ).find((player) => player.name === "Alice Renamed");
+    expect(renamedAlice).toBeDefined();
   });
 
   it("should succeed for a second player after the first already returned to lobby", async () => {

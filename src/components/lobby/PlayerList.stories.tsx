@@ -13,8 +13,10 @@ const meta = {
     onRefetch: noop,
     onRemovePlayer: noop,
     onTransferOwner: noop,
+    onRenamePlayer: noop,
     onToggleReady: noop,
     onReorderPlayers: fn(),
+    isRenamePending: false,
   },
 } satisfies Meta<typeof PlayerList>;
 
