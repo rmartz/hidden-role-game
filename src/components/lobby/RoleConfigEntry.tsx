@@ -20,6 +20,7 @@ interface ReadOnlyProps {
   max: number;
   readOnly: true;
   dimmed?: boolean;
+  showingAll?: boolean;
 }
 
 interface EditableProps {
@@ -29,12 +30,14 @@ interface EditableProps {
   readOnly: false;
   disabled: boolean;
   dimmed?: boolean;
+  showingAll?: boolean;
 }
 
 type RoleConfigEntryProps = ReadOnlyProps | EditableProps;
 
 export function RoleConfigEntry(props: RoleConfigEntryProps) {
-  const { role, gameMode, roleConfigMode, readOnly, dimmed } = props;
+  const { role, gameMode, roleConfigMode, readOnly, dimmed, showingAll } =
+    props;
 
   const dispatch = useAppDispatch();
   const count = useAppSelector((s) => s.gameConfig.roleCounts[role.id] ?? 0);
@@ -118,10 +121,12 @@ export function RoleConfigEntry(props: RoleConfigEntryProps) {
             minValue={0}
           />
         </div>
-      ) : count > 0 ? (
+      ) : showingAll && count > 0 ? (
         <span className="text-sm italic text-muted-foreground">
           {ROLE_CONFIG_ENTRY_COPY.activeLabel}
         </span>
+      ) : count > 0 ? (
+        <span className="text-sm text-muted-foreground">{count}</span>
       ) : null}
     </li>
   );

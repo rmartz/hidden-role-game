@@ -114,3 +114,36 @@ describe("searchRoles", () => {
     expect(result).toEqual([minimal]);
   });
 });
+
+describe("searchRoles — Werewolf role aliases", () => {
+  // Import is resolved at module load time via Vitest's path alias support
+  it("finds Doctor by 'healer' alias", async () => {
+    const { WEREWOLF_ROLES } = await import("@/lib/game/modes/werewolf/roles");
+    const roles = Object.values(WEREWOLF_ROLES) as RoleDefinition<
+      string,
+      Team
+    >[];
+    const result = searchRoles(roles, "healer");
+    expect(result.some((r) => r.name === "Doctor")).toBe(true);
+  });
+
+  it("finds Seer by 'oracle' alias", async () => {
+    const { WEREWOLF_ROLES } = await import("@/lib/game/modes/werewolf/roles");
+    const roles = Object.values(WEREWOLF_ROLES) as RoleDefinition<
+      string,
+      Team
+    >[];
+    const result = searchRoles(roles, "oracle");
+    expect(result.some((r) => r.name === "Seer")).toBe(true);
+  });
+
+  it("finds Werewolf by 'wolf' alias", async () => {
+    const { WEREWOLF_ROLES } = await import("@/lib/game/modes/werewolf/roles");
+    const roles = Object.values(WEREWOLF_ROLES) as RoleDefinition<
+      string,
+      Team
+    >[];
+    const result = searchRoles(roles, "wolf");
+    expect(result.some((r) => r.name === "Werewolf")).toBe(true);
+  });
+});

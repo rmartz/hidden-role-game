@@ -136,6 +136,7 @@ export function RoleConfig(props: RoleConfigProps) {
             <Input
               type="search"
               placeholder={ROLE_CONFIG_COPY.searchPlaceholder}
+              aria-label={ROLE_CONFIG_COPY.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
@@ -178,6 +179,7 @@ export function RoleConfig(props: RoleConfigProps) {
                           readOnly={false}
                           disabled={props.disabled}
                           dimmed={isDimmedRole(role)}
+                          showingAll={showAll}
                         />
                       ),
                     )}
@@ -211,6 +213,7 @@ export function RoleConfig(props: RoleConfigProps) {
                           readOnly={false}
                           disabled={props.disabled}
                           dimmed={isDimmedRole(role)}
+                          showingAll={showAll}
                         />
                       ),
                     )}
@@ -241,6 +244,7 @@ export function RoleConfig(props: RoleConfigProps) {
                     readOnly={false}
                     disabled={props.disabled}
                     dimmed={isDimmedRole(role)}
+                    showingAll={showAll}
                   />
                 ),
               )}
