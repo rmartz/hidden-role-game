@@ -12,6 +12,8 @@ export interface WerewolfModeConfig {
   singleTrialPerDay: boolean;
   /** When true, the night summary reveals players who were attacked but saved by protection. */
   revealProtections: boolean;
+  /** When true, a killed player's role is revealed during the game. */
+  showRolesOnDeath?: boolean;
 }
 
 /** Werewolf-specific lobby configuration. */
@@ -26,6 +28,7 @@ export const DEFAULT_WEREWOLF_MODE_CONFIG: WerewolfModeConfig = {
   nominationsEnabled: true,
   singleTrialPerDay: true,
   revealProtections: true,
+  showRolesOnDeath: true,
 };
 
 /**
@@ -64,5 +67,9 @@ export function parseWerewolfModeConfig(
       typeof raw["revealProtections"] === "boolean"
         ? raw["revealProtections"]
         : DEFAULT_WEREWOLF_MODE_CONFIG.revealProtections,
+    showRolesOnDeath:
+      typeof raw["showRolesOnDeath"] === "boolean"
+        ? raw["showRolesOnDeath"]
+        : DEFAULT_WEREWOLF_MODE_CONFIG.showRolesOnDeath,
   };
 }

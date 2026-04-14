@@ -10,6 +10,7 @@ import {
 } from "@/lib/types";
 import type { ModeConfigField, TimerConfig } from "@/lib/types";
 import type { WerewolfTimerConfig } from "@/lib/game/modes/werewolf/timer-config";
+import { DEFAULT_WEREWOLF_MODE_CONFIG } from "@/lib/game/modes/werewolf/lobby-config";
 import type { SecretVillainTimerConfig } from "@/lib/game/modes/secret-villain/timer-config";
 import {
   WEREWOLF_ROLE_CATEGORY_LABELS,
@@ -134,6 +135,10 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
       nominationEnabled={activeModeConfigData.nominationsEnabled}
       singleTrialPerDay={activeModeConfigData.singleTrialPerDay}
       revealProtections={activeModeConfigData.revealProtections}
+      showRolesOnDeath={
+        activeModeConfigData.showRolesOnDeath ??
+        DEFAULT_WEREWOLF_MODE_CONFIG.showRolesOnDeath
+      }
       disabled={disabled}
       onWerewolfTimerConfigChange={
         onTimerConfigChange as
@@ -153,6 +158,11 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
       onRevealProtectionsChange={
         onModeConfigFieldChange
           ? (v: boolean) => onModeConfigFieldChange("revealProtections", v)
+          : undefined
+      }
+      onShowRolesOnDeathChange={
+        onModeConfigFieldChange
+          ? (v: boolean) => onModeConfigFieldChange("showRolesOnDeath", v)
           : undefined
       }
     />
