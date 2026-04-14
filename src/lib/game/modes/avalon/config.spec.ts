@@ -7,18 +7,18 @@ describe("AVALON_CONFIG.defaultRoleCount", () => {
     const slots = AVALON_CONFIG.defaultRoleCount(5);
     const counts = Object.fromEntries(slots.map((s) => [s.roleId, s.min]));
 
-    expect(counts[AvalonRole.Bad]).toBe(2);
-    expect(counts[AvalonRole.SpecialGood]).toBe(1);
-    expect(counts[AvalonRole.Good]).toBe(2);
+    expect(counts[AvalonRole.MinionOfMordred]).toBe(2);
+    expect(counts[AvalonRole.Merlin]).toBe(1);
+    expect(counts[AvalonRole.LoyalServant]).toBe(2);
   });
 
   it("returns correct counts for 10 players", () => {
     const slots = AVALON_CONFIG.defaultRoleCount(10);
     const counts = Object.fromEntries(slots.map((s) => [s.roleId, s.min]));
 
-    expect(counts[AvalonRole.Bad]).toBe(4);
-    expect(counts[AvalonRole.SpecialGood]).toBe(1);
-    expect(counts[AvalonRole.Good]).toBe(5);
+    expect(counts[AvalonRole.MinionOfMordred]).toBe(4);
+    expect(counts[AvalonRole.Merlin]).toBe(1);
+    expect(counts[AvalonRole.LoyalServant]).toBe(5);
   });
 
   it("total slot count always equals numPlayers", () => {
@@ -28,19 +28,19 @@ describe("AVALON_CONFIG.defaultRoleCount", () => {
     }
   });
 
-  it("always has exactly 1 special-good role", () => {
+  it("always has exactly 1 Merlin", () => {
     for (let n = 5; n <= 12; n++) {
       const slots = AVALON_CONFIG.defaultRoleCount(n);
       const counts = Object.fromEntries(slots.map((s) => [s.roleId, s.min]));
-      expect(counts[AvalonRole.SpecialGood]).toBe(1);
+      expect(counts[AvalonRole.Merlin]).toBe(1);
     }
   });
 
-  it("bad count is approximately half of players", () => {
+  it("evil count is approximately half of players", () => {
     for (let n = 5; n <= 12; n++) {
       const slots = AVALON_CONFIG.defaultRoleCount(n);
       const counts = Object.fromEntries(slots.map((s) => [s.roleId, s.min]));
-      expect(counts[AvalonRole.Bad]).toBe(Math.floor((n - 1) / 2));
+      expect(counts[AvalonRole.MinionOfMordred]).toBe(Math.floor((n - 1) / 2));
     }
   });
 });

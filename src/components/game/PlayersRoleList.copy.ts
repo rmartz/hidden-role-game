@@ -1,5 +1,6 @@
 import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import { SecretVillainRole } from "@/lib/game/modes/secret-villain/roles";
+import { AvalonRole } from "@/lib/game/modes/avalon/roles";
 
 export const PLAYER_VISIBILITY_COPY = {
   wakePartnerHeading: "Players who wake with you",
@@ -62,6 +63,31 @@ export const ROLE_VISIBILITY_OVERRIDES: Partial<
     awareOfHeading: "Your allies",
     awareOfDescription:
       "You know who is on the Bad team and who the Special Bad is.",
+  },
+  [AvalonRole.Percival]: {
+    awareOfHeading: "Merlin or Morgana",
+    awareOfDescription:
+      "One of these players is Merlin. The other may be Morgana.",
+  },
+  [AvalonRole.Merlin]: {
+    awareOfHeading: "The Evil team",
+    awareOfDescription: "These players are Evil. Do not reveal that you know.",
+  },
+  [AvalonRole.MinionOfMordred]: {
+    awareOfHeading: "Your allies",
+    awareOfDescription: "These players are on the Evil team.",
+  },
+  [AvalonRole.Assassin]: {
+    awareOfHeading: "Your allies",
+    awareOfDescription: "These players are on the Evil team.",
+  },
+  [AvalonRole.Morgana]: {
+    awareOfHeading: "Your allies",
+    awareOfDescription: "These players are on the Evil team.",
+  },
+  [AvalonRole.Mordred]: {
+    awareOfHeading: "Your allies",
+    awareOfDescription: "These players are on the Evil team.",
   },
 };
 
