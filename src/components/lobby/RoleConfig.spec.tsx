@@ -7,7 +7,6 @@ import { GameMode, RoleConfigMode, Team } from "@/lib/types";
 import type { RoleDefinition } from "@/lib/types";
 import { RoleConfig } from "./RoleConfig";
 import { ROLE_CONFIG_COPY } from "./RoleConfig.copy";
-import { ROLE_CONFIG_ENTRY_COPY } from "./RoleConfigEntry.copy";
 
 afterEach(cleanup);
 
@@ -164,55 +163,5 @@ describe("RoleConfig search", () => {
     fireEvent.click(screen.getByText(ROLE_CONFIG_COPY.hideExtraRoles));
     // Collapsed view should show enabled roles again (not just the search match)
     expect(screen.getByText(roleC.name)).toBeDefined();
-  });
-});
-
-describe("RoleConfig Default mode — active label vs count", () => {
-  const editableProps = {
-    roleDefinitions,
-    playerCount: 5,
-    gameMode: GameMode.Werewolf,
-    roleConfigMode: RoleConfigMode.Default,
-    readOnly: false as const,
-    disabled: false,
-  };
-
-  function makeStoreWithCount(roleId: string, count: number) {
-    const store = makeStore();
-    // Dispatch enough increments to reach the desired count
-    for (let i = 0; i < count; i++) {
-      store.dispatch({
-        type: "gameConfig/incrementRoleCount",
-        payload: roleId,
-      });
-    }
-    return store;
-  }
-
-  it("shows numeric count when collapsed", () => {
-    const store = makeStoreWithCount(roleA.id, 2);
-    render(
-      <Provider store={store}>
-        <RoleConfig {...editableProps} />
-      </Provider>,
-    );
-    expect(screen.getByText("2")).toBeDefined();
-    expect(screen.queryByText(ROLE_CONFIG_ENTRY_COPY.activeLabel)).toBeNull();
-  });
-
-  it("shows Active label when expanded", () => {
-    const store = makeStoreWithCount(roleA.id, 2);
-    render(
-      <Provider store={store}>
-        <RoleConfig {...editableProps} />
-      </Provider>,
-    );
-    clickShowAll();
-    // The role entry for Alpha should show "Active", not a number
-    const alphaItem = screen.getByText(roleA.name).closest("li");
-    expect(alphaItem?.textContent).toContain(
-      ROLE_CONFIG_ENTRY_COPY.activeLabel,
-    );
-    expect(alphaItem?.textContent).not.toMatch(/\b2\b/);
   });
 });

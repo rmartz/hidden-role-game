@@ -179,7 +179,6 @@ export function RoleConfig(props: RoleConfigProps) {
                           readOnly={false}
                           disabled={props.disabled}
                           dimmed={isDimmedRole(role)}
-                          showingAll={showAll}
                         />
                       ),
                     )}
@@ -213,7 +212,6 @@ export function RoleConfig(props: RoleConfigProps) {
                           readOnly={false}
                           disabled={props.disabled}
                           dimmed={isDimmedRole(role)}
-                          showingAll={showAll}
                         />
                       ),
                     )}
@@ -244,7 +242,6 @@ export function RoleConfig(props: RoleConfigProps) {
                     readOnly={false}
                     disabled={props.disabled}
                     dimmed={isDimmedRole(role)}
-                    showingAll={showAll}
                   />
                 ),
               )}
