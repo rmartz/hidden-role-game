@@ -110,14 +110,11 @@ export function getPlayerGameState(
   const deadPlayerIds =
     (modeState["deadPlayerIds"] as string[] | undefined) ?? [];
   const isFinished = game.status.type === GameStatus.Finished;
-  const revealRolesOnDeath =
-    game.gameMode !== GameMode.Werewolf
-      ? true
-      : (getWerewolfModeConfig(game).showRolesOnDeath ??
-        DEFAULT_WEREWOLF_MODE_CONFIG.showRolesOnDeath);
   const revealIds = isFinished
     ? game.roleAssignments.map((a) => a.playerId)
-    : revealRolesOnDeath
+    : game.gameMode !== GameMode.Werewolf ||
+        (getWerewolfModeConfig(game).showRolesOnDeath ??
+          DEFAULT_WEREWOLF_MODE_CONFIG.showRolesOnDeath)
       ? deadPlayerIds
       : [];
 
