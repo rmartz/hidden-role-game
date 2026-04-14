@@ -139,8 +139,8 @@ describe("GET /api/game/[gameId]", () => {
         },
         body: JSON.stringify({
           roleSlots: [
-            { roleId: "avalon-special-good", min: 1, max: 1 },
-            { roleId: "avalon-bad", min: 1, max: 1 },
+            { roleId: "avalon-merlin", min: 1, max: 1 },
+            { roleId: "avalon-minion", min: 1, max: 1 },
           ],
         }),
       }),
@@ -177,16 +177,18 @@ describe("GET /api/game/[gameId]", () => {
     );
     const bobBody = await bobRes.json();
 
-    const specialGoodPlayer =
-      aliceBody.data.myRole.id === "avalon-special-good"
+    const merlinPlayer =
+      aliceBody.data.myRole.id === "avalon-merlin"
         ? aliceBody.data
         : bobBody.data;
-    const badPlayer =
-      aliceBody.data.myRole.id === "avalon-bad" ? aliceBody.data : bobBody.data;
+    const minionPlayer =
+      aliceBody.data.myRole.id === "avalon-minion"
+        ? aliceBody.data
+        : bobBody.data;
 
-    expect(specialGoodPlayer.visibleRoleAssignments).toHaveLength(1);
-    expect(specialGoodPlayer.visibleRoleAssignments[0].reason).toBe("aware-of");
-    expect(specialGoodPlayer.visibleRoleAssignments[0].role).toBeUndefined();
-    expect(badPlayer.visibleRoleAssignments).toHaveLength(0);
+    expect(merlinPlayer.visibleRoleAssignments).toHaveLength(1);
+    expect(merlinPlayer.visibleRoleAssignments[0].reason).toBe("aware-of");
+    expect(merlinPlayer.visibleRoleAssignments[0].role).toBeUndefined();
+    expect(minionPlayer.visibleRoleAssignments).toHaveLength(0);
   });
 });
