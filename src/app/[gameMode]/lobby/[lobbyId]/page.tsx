@@ -236,7 +236,7 @@ export default function LobbyPage() {
               transferOwnerMutation.mutate(playerId);
             });
           }}
-          onRenamePlayer={(playerName: string) => {
+          onRenamePlayer={(playerName) => {
             renameMutation.mutate(playerName);
           }}
           isRenamePending={renameMutation.isPending}

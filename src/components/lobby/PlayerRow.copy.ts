@@ -16,7 +16,6 @@ export const PLAYER_ROW_COPY = {
   renameDescription: "Update your player name for this lobby.",
   renamePlaceholder: "Enter a new name",
   renameConfirm: "Rename",
-  renamingButton: "Renaming...",
   renameCancel: "Cancel",
   leaveButton: "Leave",
   renameButton: "Rename",

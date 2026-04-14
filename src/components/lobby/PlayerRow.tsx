@@ -175,9 +175,7 @@ export function PlayerRow({
                     onRenamePlayer(renameValue);
                   }}
                 >
-                  {isRenamePending
-                    ? PLAYER_ROW_COPY.renamingButton
-                    : PLAYER_ROW_COPY.renameConfirm}
+                  {PLAYER_ROW_COPY.renameConfirm}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
