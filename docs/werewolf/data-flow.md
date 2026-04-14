@@ -33,13 +33,14 @@ The Narrator's session is stored separately and receives a different (fuller) `P
 
 ### Werewolf Game Settings (WerewolfPlayerGameState)
 
-| Field                  | Narrator | Players | Description                                          |
-| ---------------------- | -------- | ------- | ---------------------------------------------------- |
-| `nominationsEnabled`   | ✓        | ✓       | Whether player nominations for trial are enabled     |
-| `trialsPerDay`         | ✓        | ✓       | Max number of trials allowed per day (0 = unlimited) |
-| `concludedTrialsCount` | ✓        | ✓       | Number of trials concluded so far this day phase     |
-| `revealProtections`    | ✓        | ✓       | Whether night summary reveals protection saves       |
-| `hiddenRoleCount`      | ✓        | ✓       | Number of roles drawn but not assigned at game start |
+| Field                    | Narrator | Players | Description                                                              |
+| ------------------------ | -------- | ------- | ------------------------------------------------------------------------ |
+| `nominationsEnabled`     | ✓        | ✓       | Whether player nominations for trial are enabled                         |
+| `trialsPerDay`           | ✓        | ✓       | Max number of trials allowed per day (0 = unlimited)                     |
+| `concludedTrialsCount`   | ✓        | ✓       | Number of trials concluded so far this day phase                         |
+| `revealProtections`      | ✓        | ✓       | Whether night summary reveals protection saves                           |
+| `hiddenRoleCount`        | ✓        | ✓       | Number of roles drawn but not assigned at game start                     |
+| `autoRevealNightOutcome` | ✓        | ✓       | Whether kills/silences are revealed to everyone immediately at day start |
 
 ### Narrator-Only (Nighttime)
 

@@ -15,6 +15,7 @@ interface WerewolfConfigPanelProps {
   revealProtections: boolean;
   showRolesOnDeath: boolean;
   hiddenRole: boolean;
+  autoRevealNightOutcome: boolean;
   disabled?: boolean;
   onWerewolfTimerConfigChange?: (config: WerewolfTimerConfig) => void;
   onNominationEnabledChange?: (value: boolean) => void;
@@ -22,6 +23,7 @@ interface WerewolfConfigPanelProps {
   onRevealProtectionsChange?: (value: boolean) => void;
   onShowRolesOnDeathChange?: (value: boolean) => void;
   onHiddenRoleChange?: (value: boolean) => void;
+  onAutoRevealNightOutcomeChange?: (value: boolean) => void;
 }
 
 export function WerewolfConfigPanel({
@@ -31,6 +33,7 @@ export function WerewolfConfigPanel({
   revealProtections,
   showRolesOnDeath,
   hiddenRole,
+  autoRevealNightOutcome,
   disabled,
   onWerewolfTimerConfigChange,
   onNominationEnabledChange,
@@ -38,6 +41,7 @@ export function WerewolfConfigPanel({
   onRevealProtectionsChange,
   onShowRolesOnDeathChange,
   onHiddenRoleChange,
+  onAutoRevealNightOutcomeChange,
 }: WerewolfConfigPanelProps) {
   function handleTrialsPerDayChange(direction: IncrementDirection) {
     if (!onTrialsPerDayChange) return;
@@ -103,6 +107,17 @@ export function WerewolfConfigPanel({
         />
         <Label htmlFor="hidden-role">
           {WEREWOLF_CONFIG_PANEL_COPY.hiddenRole}
+        </Label>
+      </div>
+      <div className="flex items-center gap-2">
+        <Switch
+          id="auto-reveal-night-outcome"
+          checked={autoRevealNightOutcome}
+          disabled={disabled ?? !onAutoRevealNightOutcomeChange}
+          onCheckedChange={onAutoRevealNightOutcomeChange}
+        />
+        <Label htmlFor="auto-reveal-night-outcome">
+          {WEREWOLF_CONFIG_PANEL_COPY.autoRevealNightOutcome}
         </Label>
       </div>
       <WerewolfTimerConfigPanel

@@ -7,4 +7,5 @@ export const WEREWOLF_CONFIG_PANEL_COPY = {
     "Reveal when a player was attacked but saved by a protector",
   showRolesOnDeath: "Reveal a player's role when they are killed",
   hiddenRole: "Include one hidden unassigned role (Narrator-only secret)",
+  autoRevealNightOutcome: "Automatically reveal night eliminations and silence",
 } as const;

@@ -52,6 +52,7 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
   trialsPerDay: number;
   concludedTrialsCount?: number;
   revealProtections: boolean;
+  autoRevealNightOutcome?: boolean;
   executionerTargetId?: string;
   nominations?: { defendantId: string; nominatorIds: string[] }[];
   myNominatedDefendantId?: string;
@@ -109,6 +110,7 @@ export function werewolfStateToFirebase(
       ? { concludedTrialsCount: state.concludedTrialsCount }
       : {}),
     revealProtections: state.revealProtections,
+    autoRevealNightOutcome: state.autoRevealNightOutcome ?? true,
     ...(state.executionerTargetId
       ? { executionerTargetId: state.executionerTargetId }
       : {}),
@@ -152,6 +154,7 @@ export function werewolfStateFromFirebase(
       ? { concludedTrialsCount: raw.concludedTrialsCount }
       : {}),
     revealProtections: raw.revealProtections,
+    autoRevealNightOutcome: raw.autoRevealNightOutcome ?? true,
     ...(raw.nightActions ? { nightActions: raw.nightActions } : {}),
     ...(raw.myNightTargetSkipped
       ? { myNightTarget: null }

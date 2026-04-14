@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { GameStatus } from "@/lib/types";
+import { GameMode, GameStatus } from "@/lib/types";
 import type {
   WerewolfTurnState,
   WerewolfDaytimePhase,
@@ -59,6 +59,38 @@ describe("WerewolfAction.StartDay — basic apply", () => {
     const phase = ts.phase as { startedAt: number };
     expect(phase.startedAt).toBeGreaterThanOrEqual(before);
     expect(phase.startedAt).toBeLessThanOrEqual(after);
+  });
+
+  it("sets nightOutcomeRevealStep to all when auto reveal is enabled", () => {
+    const game = makePlayingGame(nightTurnState, {
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: false,
+        singleTrialPerDay: true,
+        revealProtections: true,
+        autoRevealNightOutcome: true,
+      },
+    });
+    action.apply(game, null, "owner-1");
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    const phase = ts.phase as WerewolfDaytimePhase;
+    expect(phase.nightOutcomeRevealStep).toBe("all");
+  });
+
+  it("sets nightOutcomeRevealStep to hidden when auto reveal is disabled", () => {
+    const game = makePlayingGame(nightTurnState, {
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: false,
+        singleTrialPerDay: true,
+        revealProtections: true,
+        autoRevealNightOutcome: false,
+      },
+    });
+    action.apply(game, null, "owner-1");
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    const phase = ts.phase as WerewolfDaytimePhase;
+    expect(phase.nightOutcomeRevealStep).toBe("hidden");
   });
 
   it("resolves night actions and adds killed players to deadPlayerIds", () => {

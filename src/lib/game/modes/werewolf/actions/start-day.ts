@@ -16,6 +16,7 @@ import {
 } from "../utils";
 import { WerewolfRole, getWerewolfRole } from "../roles";
 import { didWolfCubDie } from "./helpers";
+import { getWerewolfModeConfig } from "../lobby-config";
 
 export const startDayAction: GameAction = {
   isValid(game: Game, callerId: string) {
@@ -282,6 +283,10 @@ export const startDayAction: GameAction = {
 
     const wolfCubDied =
       ts.wolfCubDied === true || didWolfCubDie(newDeadIds, game);
+    const nightOutcomeRevealStep = getWerewolfModeConfig(game)
+      .autoRevealNightOutcome
+      ? "all"
+      : "hidden";
     game.status = {
       type: GameStatus.Playing,
       turnState: {
@@ -290,6 +295,7 @@ export const startDayAction: GameAction = {
           type: WerewolfPhase.Daytime,
           startedAt: Date.now(),
           nightActions: nightPhase.nightActions,
+          nightOutcomeRevealStep,
           ...(nightResolution.length > 0 ? { nightResolution } : {}),
           ...(nightPhase.smitedPlayerIds?.length
             ? { smitedPlayerIds: nightPhase.smitedPlayerIds }

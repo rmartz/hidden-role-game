@@ -27,6 +27,7 @@ function makeWerewolfState(
     nominationsEnabled: true,
     trialsPerDay: 0,
     revealProtections: true,
+    autoRevealNightOutcome: true,
     ...overrides,
   };
 }
@@ -67,6 +68,7 @@ describe("Werewolf player state round-trip", () => {
       nominationsEnabled: false,
       trialsPerDay: 1,
       revealProtections: false,
+      autoRevealNightOutcome: false,
     });
     const result = firebaseToPlayerState(
       playerStateToFirebase(state),
@@ -74,6 +76,7 @@ describe("Werewolf player state round-trip", () => {
     expect(result.nominationsEnabled).toBe(false);
     expect(result.trialsPerDay).toBe(1);
     expect(result.revealProtections).toBe(false);
+    expect(result.autoRevealNightOutcome).toBe(false);
   });
 
   it("serializes myNightTarget null as myNightTargetSkipped", () => {

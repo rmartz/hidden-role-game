@@ -16,6 +16,7 @@ import {
   extractOwnerState,
   extractNightActions,
   extractDeadPlayerIds,
+  extractVisibleDeadPlayerIds,
   extractDaytimeNightSummary,
   extractDaytimePlayerState,
 } from "./owner-state";
@@ -37,6 +38,7 @@ function extractNonOwnerState(
   const daytimePlayerState = extractDaytimePlayerState(game, callerId);
 
   const amDead = deadPlayerIds.includes(callerId);
+  const visibleDeadPlayerIds = extractVisibleDeadPlayerIds(game, callerId);
 
   // Executioner: surface the target so the player knows who to get eliminated,
   // and mark the target as visible (name only, no role).
@@ -56,7 +58,9 @@ function extractNonOwnerState(
     ...daytimeNightState,
     ...daytimePlayerState,
     ...(amDead ? { amDead: true } : {}),
-    ...(deadPlayerIds.length > 0 ? { deadPlayerIds } : {}),
+    ...(visibleDeadPlayerIds.length > 0
+      ? { deadPlayerIds: visibleDeadPlayerIds }
+      : {}),
     ...executionerState,
   };
 }
@@ -103,6 +107,8 @@ export const werewolfServices: GameModeServices = {
       nominationsEnabled: wwConfig.nominationsEnabled as unknown,
       trialsPerDay: wwConfig.trialsPerDay as unknown,
       revealProtections: wwConfig.revealProtections as unknown,
+      autoRevealNightOutcome: (wwConfig.autoRevealNightOutcome ??
+        true) as unknown,
     };
   },
 };
@@ -111,6 +117,7 @@ export {
   extractOwnerState,
   extractNightActions,
   extractDeadPlayerIds,
+  extractVisibleDeadPlayerIds,
   extractDaytimeNightSummary,
   extractDaytimePlayerState,
 } from "./owner-state";

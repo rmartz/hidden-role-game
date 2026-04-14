@@ -51,6 +51,10 @@ export function OwnerGameDayScreen({
     action.mutate({ actionId: WerewolfAction.StartNight });
   }, [action]);
 
+  const handleRevealNightOutcomeStep = useCallback(() => {
+    action.mutate({ actionId: WerewolfAction.RevealNightOutcomeStep });
+  }, [action]);
+
   const handleEndGame = useCallback(() => {
     action.mutate({ actionId: WerewolfAction.EndGame });
   }, [action]);
@@ -76,6 +80,21 @@ export function OwnerGameDayScreen({
         .map((r) => modeConfig.roles[r.id])
         .filter((r) => r !== undefined)
     : Object.values(modeConfig.roles);
+  const hasKilledOutcome = (daytimePhase.nightResolution ?? []).some(
+    (event) => event.type === "killed" && event.died,
+  );
+  const hasStatusOutcome = (daytimePhase.nightResolution ?? []).some(
+    (event) => event.type === "silenced" || event.type === "hypnotized",
+  );
+  const revealStep = daytimePhase.nightOutcomeRevealStep ?? "all";
+  const showRevealButton =
+    !(gameState.autoRevealNightOutcome ?? true) &&
+    revealStep !== "all" &&
+    (hasKilledOutcome || hasStatusOutcome);
+  const revealLabel =
+    revealStep === "hidden" && hasKilledOutcome
+      ? WEREWOLF_COPY.narrator.revealNightEliminations
+      : WEREWOLF_COPY.narrator.revealNightStatus;
 
   return (
     <div className="p-5 max-w-4xl mx-auto">
@@ -104,6 +123,17 @@ export function OwnerGameDayScreen({
           disabled={action.isPending || hunterRevengePending || hasActiveTrial}
           icon={<WeatherMoonRegular />}
         >
+          {showRevealButton && (
+            <div className="mb-3 flex justify-center">
+              <Button
+                variant="outline"
+                onClick={handleRevealNightOutcomeStep}
+                disabled={action.isPending}
+              >
+                {revealLabel}
+              </Button>
+            </div>
+          )}
           {activeTrial && (
             <OwnerTrialPanel
               gameId={gameId}

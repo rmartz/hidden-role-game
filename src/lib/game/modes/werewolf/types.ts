@@ -130,6 +130,8 @@ export interface WerewolfDaytimePhase {
   nightActions: Record<string, AnyNightAction>;
   /** Resolved attack/protect outcomes, computed when transitioning to day. */
   nightResolution?: NightResolutionEvent[];
+  /** Public reveal stage for night outcomes when manual reveal is enabled. */
+  nightOutcomeRevealStep?: "hidden" | "killed" | "all";
   /** Player IDs smited by the narrator during the preceding night. */
   smitedPlayerIds?: string[];
   /** Player IDs marked by the narrator for elimination after the next night. */

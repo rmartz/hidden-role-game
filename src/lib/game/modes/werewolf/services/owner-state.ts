@@ -18,6 +18,31 @@ import {
   getWerewolfRole,
 } from "../roles";
 
+type NightOutcomeRevealStep = "hidden" | "killed" | "all";
+
+function resolveNightOutcomeRevealStep(game: Game): NightOutcomeRevealStep {
+  const ts = currentTurnState(game);
+  if (ts?.phase.type !== WerewolfPhase.Daytime) return "all";
+  if (getWerewolfModeConfig(game).autoRevealNightOutcome ?? true) return "all";
+  return ts.phase.nightOutcomeRevealStep ?? "hidden";
+}
+
+function canPublicSeeKilledOutcomes(
+  game: Game,
+  step: NightOutcomeRevealStep,
+): boolean {
+  if (getWerewolfModeConfig(game).autoRevealNightOutcome ?? true) return true;
+  return step === "killed" || step === "all";
+}
+
+function canPublicSeeStatusOutcomes(
+  game: Game,
+  step: NightOutcomeRevealStep,
+): boolean {
+  if (getWerewolfModeConfig(game).autoRevealNightOutcome ?? true) return true;
+  return step === "all";
+}
+
 /** Extracts nightActions from the current turnState, if present. */
 function extractNightActions(
   game: Game,
@@ -52,6 +77,16 @@ export function extractDaytimeNightSummary(
   const ts = currentTurnState(game);
   if (ts?.phase.type !== WerewolfPhase.Daytime) return {};
   const phase = ts.phase;
+  const nightOutcomeRevealStep = resolveNightOutcomeRevealStep(game);
+  const callerIsOwner = callerId === game.ownerPlayerId;
+  const showKilledToAll = canPublicSeeKilledOutcomes(
+    game,
+    nightOutcomeRevealStep,
+  );
+  const showStatusToAll = canPublicSeeStatusOutcomes(
+    game,
+    nightOutcomeRevealStep,
+  );
 
   const altruistIntercept = (phase.nightResolution ?? []).find(
     (e): e is AltruistInterceptedNightResolutionEvent =>
@@ -62,6 +97,9 @@ export function extractDaytimeNightSummary(
     phase.nightResolution ?? []
   ).flatMap((e): DaytimeNightStatusEntry[] => {
     if (e.type === "killed" && e.died) {
+      const canSeeKilled =
+        callerIsOwner || showKilledToAll || e.targetPlayerId === callerId;
+      if (!canSeeKilled) return [];
       // Altruist death: emit altruist-sacrifice with savedPlayerId.
       if (e.targetPlayerId === altruistIntercept?.altruistPlayerId) {
         return [
@@ -92,9 +130,15 @@ export function extractDaytimeNightSummary(
     }
     if (e.type === "tough-guy-absorbed" && e.targetPlayerId === callerId)
       return [{ targetPlayerId: e.targetPlayerId, effect: "survived" }];
-    if (e.type === "silenced")
+    if (
+      e.type === "silenced" &&
+      (callerIsOwner || showStatusToAll || e.targetPlayerId === callerId)
+    )
       return [{ targetPlayerId: e.targetPlayerId, effect: "silenced" }];
-    if (e.type === "hypnotized")
+    if (
+      e.type === "hypnotized" &&
+      (callerIsOwner || showStatusToAll || e.targetPlayerId === callerId)
+    )
       return [{ targetPlayerId: e.targetPlayerId, effect: "hypnotized" }];
     return [];
   });
@@ -277,3 +321,34 @@ export function extractOwnerState(
 }
 
 export { extractNightActions, extractDeadPlayerIds };
+
+export function extractVisibleDeadPlayerIds(
+  game: Game,
+  callerId: string,
+): string[] {
+  const ts = currentTurnState(game);
+  if (ts?.phase.type !== WerewolfPhase.Daytime) {
+    return ts?.deadPlayerIds ?? [];
+  }
+
+  const showKilledToAll = canPublicSeeKilledOutcomes(
+    game,
+    resolveNightOutcomeRevealStep(game),
+  );
+  if (showKilledToAll) return ts.deadPlayerIds;
+
+  const deadThisNight = new Set<string>();
+  for (const event of ts.phase.nightResolution ?? []) {
+    if (event.type === "killed" && event.died) {
+      deadThisNight.add(event.targetPlayerId);
+    }
+  }
+
+  const visible = ts.deadPlayerIds.filter(
+    (playerId) => !deadThisNight.has(playerId),
+  );
+  if (deadThisNight.has(callerId) && !visible.includes(callerId)) {
+    visible.push(callerId);
+  }
+  return visible;
+}

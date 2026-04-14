@@ -17,11 +17,13 @@ const DEFAULT_ARGS = {
   revealProtections: true,
   showRolesOnDeath: true,
   hiddenRole: false,
+  autoRevealNightOutcome: true,
   onWerewolfTimerConfigChange: fn(),
   onNominationEnabledChange: fn(),
   onTrialsPerDayChange: fn(),
   onRevealProtectionsChange: fn(),
   onShowRolesOnDeathChange: fn(),
+  onAutoRevealNightOutcomeChange: fn(),
 } as Story["args"];
 
 export const Default: Story = {
@@ -30,14 +32,21 @@ export const Default: Story = {
 
 export const RolesHiddenOnDeath: Story = {
   args: {
-    ...Default.args,
+    ...DEFAULT_ARGS,
     showRolesOnDeath: false,
+  },
+};
+
+export const ManualRevealNightOutcomes: Story = {
+  args: {
+    ...DEFAULT_ARGS,
+    autoRevealNightOutcome: false,
   },
 };
 
 export const ReadOnly: Story = {
   args: {
-    ...Default.args,
+    ...DEFAULT_ARGS,
     disabled: true,
   },
 };
