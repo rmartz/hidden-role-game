@@ -31,10 +31,11 @@ export async function PUT(
     return errorResponse("Unknown game mode", 400);
   }
 
-  if (body.roleBuckets !== undefined && body.gameMode !== undefined) {
+  if (body.roleBuckets !== undefined) {
+    const bucketGameMode = body.gameMode ?? auth.lobby.config.gameMode;
     const bucketError = validateRoleBucketsForMode(
       body.roleBuckets,
-      body.gameMode,
+      bucketGameMode,
     );
     if (bucketError) return errorResponse(bucketError, 400);
   }

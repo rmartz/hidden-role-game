@@ -37,7 +37,25 @@ function computeIsValid(
       modeDefinition.resolveRoleSlotsRequired?.(playerCount, modeConfig) ??
       modeDefinition.roleSlotsRequired?.(playerCount) ??
       playerCount;
-    return totalPlayerCount === required;
+    if (totalPlayerCount !== required) return false;
+    // Each advanced bucket must be feasible: required roles ≤ playerCount and
+    // enough draw capacity to fill every slot.
+    for (const bucket of roleBuckets) {
+      if (isSimpleRoleBucket(bucket)) continue;
+      let requiredCount = 0;
+      let maxCapacity = 0;
+      for (const slot of bucket.roles) {
+        if (slot.max !== undefined && slot.max < slot.min) return false;
+        requiredCount += slot.min;
+        maxCapacity += slot.max ?? bucket.playerCount;
+      }
+      if (
+        requiredCount > bucket.playerCount ||
+        maxCapacity < bucket.playerCount
+      )
+        return false;
+    }
+    return true;
   }
   // Custom mode
   const config = GAME_MODES[gameMode];
@@ -269,6 +287,7 @@ const gameConfigSlice = createSlice({
         const slotTyped = slot as RoleBucketSlot;
         if (action.payload.unique) {
           slotTyped.max = 1;
+          slotTyped.min = Math.min(slotTyped.min, 1); // clamp min ≤ max
         } else {
           delete slotTyped.max;
         }
@@ -289,7 +308,9 @@ const gameConfigSlice = createSlice({
       if (!bucket || isSimpleRoleBucket(bucket)) return;
       const slot = bucket.roles.find((r) => r.roleId === action.payload.roleId);
       if (slot) {
-        slot.min = Math.max(0, action.payload.min);
+        const clamped = Math.max(0, action.payload.min);
+        slot.min =
+          slot.max !== undefined ? Math.min(clamped, slot.max) : clamped;
         state.isValid = recomputeIsValid(state);
         state.syncVersion++;
       }

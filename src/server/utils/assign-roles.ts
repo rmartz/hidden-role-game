@@ -48,6 +48,16 @@ function drawFromBucket(bucket: RoleBucket): string[] {
 
   fisherYates(possible);
   const numExtra = bucket.playerCount - required.length;
+  if (numExtra < 0) {
+    throw new Error(
+      `Bucket requires ${String(required.length)} roles but only has space for ${String(bucket.playerCount)} players`,
+    );
+  }
+  if (possible.length < numExtra) {
+    throw new Error(
+      `Bucket can only draw ${String(required.length + possible.length)} roles for ${String(bucket.playerCount)} players`,
+    );
+  }
   return [...required, ...possible.slice(0, numExtra)];
 }
 

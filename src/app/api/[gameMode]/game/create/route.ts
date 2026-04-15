@@ -46,6 +46,7 @@ export async function POST(
     buckets,
     gameMode,
     lobby.players.length,
+    lobby.config.modeConfig,
   );
   if (bucketCoverError) return errorResponse(bucketCoverError, 400);
 
