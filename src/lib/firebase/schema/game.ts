@@ -3,16 +3,13 @@ import type {
   GamePlayer,
   GameStatusState,
   PlayerRoleAssignment,
+  RoleBucket,
   TimerConfig,
 } from "@/lib/types";
 import { GameMode } from "@/lib/types";
 import { GAME_MODES } from "@/lib/game/modes";
-import type { FirebaseLobbyPlayer, FirebaseRoleSlot } from "./lobby";
-import {
-  firebaseToRoleSlot,
-  modeConfigToFirebase,
-  parseTimerConfig,
-} from "./lobby";
+import type { FirebaseLobbyPlayer, FirebaseRoleBucket } from "./lobby";
+import { modeConfigToFirebase, parseTimerConfig } from "./lobby";
 
 export interface FirebaseGamePublic {
   lobbyId: string;
@@ -22,8 +19,10 @@ export interface FirebaseGamePublic {
   players: Record<string, FirebaseLobbyPlayer>;
   /** { [playerId]: roleDefinitionId } — optional since Firebase omits empty objects. */
   roleAssignments?: Record<string, string>;
-  /** Optional — Firebase omits empty arrays. */
-  configuredRoleSlots?: FirebaseRoleSlot[];
+  /** Optional — Firebase omits empty objects. */
+  configuredRoleBuckets?: Record<string, FirebaseRoleBucket>;
+  /** Optional — kept for migration shim of old game documents. */
+  configuredRoleSlots?: { roleId: string; min: number; max: number }[];
   showRolesInPlay: string;
   ownerPlayerId: string | null;
   timerConfig: TimerConfig;
@@ -34,6 +33,28 @@ export interface FirebaseGamePublic {
   playerOrder?: string[];
   /** Unix ms timestamp set server-side at game creation. Used for TTL cleanup. */
   createdAt?: number;
+}
+
+function roleBucketToFirebase(bucket: RoleBucket): FirebaseRoleBucket {
+  const roles: Record<string, { roleId: string; min: number; max?: number }> =
+    {};
+  bucket.roles.forEach((slot, i) => {
+    roles[String(i)] = {
+      roleId: slot.roleId,
+      min: slot.min,
+      ...(slot.max !== undefined ? { max: slot.max } : {}),
+    };
+  });
+  return { playerCount: bucket.playerCount, roles };
+}
+
+function firebaseToRoleBucket(bucket: FirebaseRoleBucket): RoleBucket {
+  const roles = Object.values(bucket.roles ?? {}).map((s) => ({
+    roleId: s.roleId,
+    min: s.min,
+    ...(s.max !== undefined ? { max: s.max } : {}),
+  }));
+  return { playerCount: bucket.playerCount, roles };
 }
 
 export function gameToFirebase(game: Game): FirebaseGamePublic {
@@ -56,17 +77,19 @@ export function gameToFirebase(game: Game): FirebaseGamePublic {
   const firebaseModeConfig = modeConfigToFirebase(game.modeConfig);
   const hasModeConfig = Object.keys(firebaseModeConfig).length > 0;
 
+  const hasBuckets = game.configuredRoleBuckets.length > 0;
+  const configuredRoleBuckets: Record<string, FirebaseRoleBucket> = {};
+  game.configuredRoleBuckets.forEach((bucket, i) => {
+    configuredRoleBuckets[String(i)] = roleBucketToFirebase(bucket);
+  });
+
   return {
     lobbyId: game.lobbyId,
     gameMode: game.gameMode,
     status: JSON.stringify(game.status),
     players,
     roleAssignments,
-    configuredRoleSlots: game.configuredRoleSlots.map((s) => ({
-      roleId: s.roleId,
-      min: s.min,
-      max: s.max,
-    })),
+    ...(hasBuckets ? { configuredRoleBuckets } : {}),
     showRolesInPlay: game.showRolesInPlay,
     ownerPlayerId: game.ownerPlayerId ?? null,
     timerConfig: game.timerConfig,
@@ -98,6 +121,27 @@ export function firebaseToGame(
   // Cast required: Game is a discriminated union keyed on gameMode, but we
   // construct from runtime Firebase data where the discriminant is a string.
   // This is the single boundary-cast location for Game deserialization.
+
+  let configuredRoleBuckets: RoleBucket[];
+  if (
+    pub.configuredRoleBuckets &&
+    Object.keys(pub.configuredRoleBuckets).length > 0
+  ) {
+    configuredRoleBuckets = Object.values(pub.configuredRoleBuckets).map(
+      firebaseToRoleBucket,
+    );
+  } else if (pub.configuredRoleSlots && pub.configuredRoleSlots.length > 0) {
+    // Migration shim: convert old configuredRoleSlots format to roleBuckets
+    configuredRoleBuckets = pub.configuredRoleSlots
+      .filter((s) => s.min > 0)
+      .map((s) => ({
+        playerCount: s.min,
+        roles: [{ roleId: s.roleId, min: 1 }],
+      }));
+  } else {
+    configuredRoleBuckets = [];
+  }
+
   return {
     id: gameId,
     lobbyId: pub.lobbyId,
@@ -105,9 +149,7 @@ export function firebaseToGame(
     status: JSON.parse(pub.status) as GameStatusState,
     players: gamePlayers,
     roleAssignments,
-    configuredRoleSlots: (pub.configuredRoleSlots ?? []).map(
-      firebaseToRoleSlot,
-    ),
+    configuredRoleBuckets,
     showRolesInPlay: pub.showRolesInPlay as Game["showRolesInPlay"],
     ownerPlayerId: pub.ownerPlayerId ?? undefined,
     // The TypeScript type says TimerConfig, but old Firebase documents may

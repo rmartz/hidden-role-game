@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { assignRoles } from "./assign-roles";
-import type { LobbyPlayer } from "@/lib/types";
+import { assignRolesFromBuckets } from "./assign-roles";
+import type { LobbyPlayer, RoleBucket } from "@/lib/types";
 
 function makePlayers(count: number): LobbyPlayer[] {
   return Array.from({ length: count }, (_, i) => ({
@@ -10,15 +10,15 @@ function makePlayers(count: number): LobbyPlayer[] {
   }));
 }
 
-describe("assignRoles", () => {
+describe("assignRolesFromBuckets", () => {
   it("assigns exactly one role per player", () => {
     const players = makePlayers(3);
-    const roleSlots = [
-      { roleId: "good", min: 2, max: 2 },
-      { roleId: "bad", min: 1, max: 1 },
+    const buckets: RoleBucket[] = [
+      { playerCount: 2, roles: [{ roleId: "good", min: 1 }] },
+      { playerCount: 1, roles: [{ roleId: "bad", min: 1 }] },
     ];
 
-    const assignments = assignRoles(players, roleSlots);
+    const assignments = assignRolesFromBuckets(players, buckets);
 
     expect(assignments).toHaveLength(3);
     expect(assignments.map((a) => a.playerId)).toEqual(
@@ -26,14 +26,14 @@ describe("assignRoles", () => {
     );
   });
 
-  it("uses all roles from the expanded slots exactly once", () => {
+  it("uses all roles from the buckets exactly as specified", () => {
     const players = makePlayers(4);
-    const roleSlots = [
-      { roleId: "good", min: 3, max: 3 },
-      { roleId: "bad", min: 1, max: 1 },
+    const buckets: RoleBucket[] = [
+      { playerCount: 3, roles: [{ roleId: "good", min: 1 }] },
+      { playerCount: 1, roles: [{ roleId: "bad", min: 1 }] },
     ];
 
-    const assignments = assignRoles(players, roleSlots);
+    const assignments = assignRolesFromBuckets(players, buckets);
     const assignedRoles = assignments.map((a) => a.roleDefinitionId).sort();
 
     expect(assignedRoles).toEqual(["bad", "good", "good", "good"]);
@@ -41,14 +41,14 @@ describe("assignRoles", () => {
 
   it("shuffles roles across repeated calls", () => {
     const players = makePlayers(6);
-    const roleSlots = [
-      { roleId: "good", min: 3, max: 3 },
-      { roleId: "bad", min: 3, max: 3 },
+    const buckets: RoleBucket[] = [
+      { playerCount: 3, roles: [{ roleId: "good", min: 1 }] },
+      { playerCount: 3, roles: [{ roleId: "bad", min: 1 }] },
     ];
 
     const results = new Set<string>();
     for (let i = 0; i < 20; i++) {
-      const assignments = assignRoles(players, roleSlots);
+      const assignments = assignRolesFromBuckets(players, buckets);
       results.add(assignments.map((a) => a.roleDefinitionId).join(","));
     }
 
@@ -57,11 +57,13 @@ describe("assignRoles", () => {
     expect(results.size).toBeGreaterThan(1);
   });
 
-  it("works with a single role type", () => {
+  it("works with a single role type bucket", () => {
     const players = makePlayers(2);
-    const roleSlots = [{ roleId: "good", min: 2, max: 2 }];
+    const buckets: RoleBucket[] = [
+      { playerCount: 2, roles: [{ roleId: "good", min: 1 }] },
+    ];
 
-    const assignments = assignRoles(players, roleSlots);
+    const assignments = assignRolesFromBuckets(players, buckets);
 
     expect(assignments).toHaveLength(2);
     expect(assignments.every((a) => a.roleDefinitionId === "good")).toBe(true);

@@ -138,9 +138,9 @@ describe("GET /api/game/[gameId]", () => {
           "x-session-id": aliceSession,
         },
         body: JSON.stringify({
-          roleSlots: [
-            { roleId: "avalon-merlin", min: 1, max: 1 },
-            { roleId: "avalon-minion", min: 1, max: 1 },
+          roleBuckets: [
+            { playerCount: 1, roles: [{ roleId: "avalon-merlin", min: 1 }] },
+            { playerCount: 1, roles: [{ roleId: "avalon-minion", min: 1 }] },
           ],
         }),
       }),

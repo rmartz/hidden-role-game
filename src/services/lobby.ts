@@ -3,7 +3,6 @@ import type {
   GameMode,
   ModeConfig,
   RoleBucket,
-  RoleSlot,
   RoleConfigMode,
   ShowRolesInPlay,
   TimerConfig,
@@ -207,7 +206,6 @@ export async function updateConfig(
     showRolesInPlay?: ShowRolesInPlay;
     roleConfigMode?: RoleConfigMode;
     gameMode?: GameMode;
-    roleSlots?: RoleSlot[];
     roleBuckets?: RoleBucket[];
     timerConfig?: TimerConfig;
     modeConfig?: ModeConfig;
@@ -240,15 +238,6 @@ export async function updateConfig(
   ) {
     updates["public/config/gameMode"] = config.gameMode;
     data.public.config.gameMode = config.gameMode;
-  }
-  if (config.roleSlots !== undefined) {
-    const slots = config.roleSlots.map((s) => ({
-      roleId: s.roleId,
-      min: s.min,
-      max: s.max,
-    }));
-    updates["public/config/roleSlots"] = slots;
-    data.public.config.roleSlots = slots;
   }
   if (config.roleBuckets !== undefined) {
     const buckets: Record<string, FirebaseRoleBucket> = {};

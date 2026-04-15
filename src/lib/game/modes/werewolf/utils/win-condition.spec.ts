@@ -20,7 +20,7 @@ function makeGame(
       visiblePlayers: [],
     })),
     roleAssignments,
-    configuredRoleSlots: [],
+    configuredRoleBuckets: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner",
     modeConfig: {

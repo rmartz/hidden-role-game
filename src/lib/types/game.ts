@@ -82,7 +82,6 @@ export enum RoleConfigMode {
   Default = "Default",
   Custom = "Custom",
   Advanced = "Advanced",
-  Buckets = "Buckets",
 }
 
 // --- Show Roles In Play Options ---
@@ -208,7 +207,7 @@ export interface GameModeConfig {
   ): boolean;
   readonly roles: Record<string, RoleDefinition<string, Team>>;
   readonly teamLabels: Partial<Record<Team, string>>;
-  defaultRoleCount(numPlayers: number): RoleSlot[];
+  defaultRoleCount(numPlayers: number): RoleBucket[];
   /**
    * Returns the number of role slots that must be filled for a game with
    * numPlayers total players. Game modes that reserve one player as a non-role
@@ -243,12 +242,6 @@ export interface GameModeConfig {
 export interface PlayerRoleAssignment {
   playerId: string;
   roleDefinitionId: string;
-}
-
-export interface RoleSlot {
-  roleId: string;
-  min: number;
-  max: number;
 }
 
 /**
@@ -294,7 +287,7 @@ export interface BaseGame {
   status: GameStatusState;
   players: GamePlayer[];
   roleAssignments: PlayerRoleAssignment[];
-  configuredRoleSlots: RoleSlot[];
+  configuredRoleBuckets: RoleBucket[];
   showRolesInPlay: ShowRolesInPlay;
   ownerPlayerId?: string;
   /** Executioner: the player ID the Executioner must get eliminated at trial. */
@@ -358,9 +351,7 @@ export const DEFAULT_TIMER_CONFIG: TimerConfig = {
 /** Shared lobby config fields. Game-mode-specific variants extend this. */
 export interface BaseLobbyConfig {
   roleConfigMode: RoleConfigMode;
-  roleSlots: RoleSlot[];
-  /** Present only in Buckets mode. */
-  roleBuckets?: RoleBucket[];
+  roleBuckets: RoleBucket[];
   showConfigToPlayers: boolean;
   showRolesInPlay: ShowRolesInPlay;
 }

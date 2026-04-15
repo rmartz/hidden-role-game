@@ -7,7 +7,6 @@ import {
   errorResponse,
   toPublicLobby,
   validateRoleBucketsForMode,
-  validateRoleSlotsForMode,
 } from "@/server/utils";
 
 export async function PUT(
@@ -30,11 +29,6 @@ export async function PUT(
     !Object.values(GameMode).includes(body.gameMode)
   ) {
     return errorResponse("Unknown game mode", 400);
-  }
-
-  if (body.roleSlots !== undefined && body.gameMode !== undefined) {
-    const modeError = validateRoleSlotsForMode(body.roleSlots, body.gameMode);
-    if (modeError) return errorResponse(modeError, 400);
   }
 
   if (body.roleBuckets !== undefined && body.gameMode !== undefined) {

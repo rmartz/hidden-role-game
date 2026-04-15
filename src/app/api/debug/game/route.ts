@@ -1,20 +1,24 @@
 import { randomUUID } from "crypto";
 import { GameMode, ShowRolesInPlay } from "@/lib/types";
-import type { LobbyPlayer, ModeConfig, TimerConfig } from "@/lib/types";
-import type { RoleSlot } from "@/server/types";
+import type {
+  LobbyPlayer,
+  ModeConfig,
+  RoleBucket,
+  TimerConfig,
+} from "@/lib/types";
 import { ServerResponseStatus } from "@/server/types";
 import { getModeDefinition, createGame } from "@/server/game";
 import {
   errorResponse,
-  validateRoleSlotsForMode,
-  validateRoleSlotsCoverPlayerCount,
+  validateRoleBucketsForMode,
+  validateRoleBucketsCoverPlayerCount,
 } from "@/server/utils";
 import { GAME_MODES } from "@/lib/game/modes";
 
 interface CreateDebugGameRequest {
   playerCount: number;
   gameMode: GameMode;
-  roleSlots: RoleSlot[];
+  roleBuckets: RoleBucket[];
   showRolesInPlay: ShowRolesInPlay;
   timerConfig: TimerConfig;
   modeConfig?: ModeConfig;
@@ -31,7 +35,7 @@ export async function POST(request: Request): Promise<Response> {
   const {
     playerCount,
     gameMode,
-    roleSlots,
+    roleBuckets,
     showRolesInPlay,
     timerConfig,
     modeConfig,
@@ -48,15 +52,15 @@ export async function POST(request: Request): Promise<Response> {
   const resolvedModeConfig =
     modeConfig ?? GAME_MODES[gameMode].defaultModeConfig;
 
-  const coverError = validateRoleSlotsCoverPlayerCount(
-    roleSlots,
+  const coverError = validateRoleBucketsCoverPlayerCount(
+    roleBuckets,
     gameMode,
     playerCount,
     resolvedModeConfig,
   );
   if (coverError) return errorResponse(coverError, 400);
 
-  const modeError = validateRoleSlotsForMode(roleSlots, gameMode);
+  const modeError = validateRoleBucketsForMode(roleBuckets, gameMode);
   if (modeError) return errorResponse(modeError, 400);
 
   const definition = getModeDefinition(gameMode);
@@ -77,7 +81,7 @@ export async function POST(request: Request): Promise<Response> {
   const game = await createGame(
     `debug-${randomUUID()}`,
     players,
-    roleSlots,
+    roleBuckets,
     gameMode,
     showRolesInPlay,
     ownerPlayer?.id ?? undefined,

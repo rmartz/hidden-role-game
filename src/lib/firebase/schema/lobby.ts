@@ -5,7 +5,6 @@ import type {
   ModeConfig,
   RoleBucket,
   RoleBucketSlot,
-  RoleSlot,
   TimerConfig,
 } from "@/lib/types";
 import { DEFAULT_TIMER_CONFIG, GameMode } from "@/lib/types";
@@ -37,9 +36,9 @@ export interface FirebaseLobbyPlayer {
 export interface FirebaseLobbyConfig {
   gameMode: string;
   roleConfigMode: string;
-  /** Optional — Firebase omits empty arrays, so may be absent. */
+  /** Optional — Firebase omits empty arrays; kept for migration shim of old documents. */
   roleSlots?: FirebaseRoleSlot[];
-  /** Optional — present only when roleConfigMode is Buckets. */
+  /** Optional — Firebase omits empty objects. */
   roleBuckets?: Record<string, FirebaseRoleBucket>;
   showConfigToPlayers: boolean;
   showRolesInPlay: string;
@@ -48,7 +47,7 @@ export interface FirebaseLobbyConfig {
   modeConfig?: Record<string, unknown>;
 }
 
-export interface FirebaseRoleSlot {
+interface FirebaseRoleSlot {
   roleId: string;
   min: number;
   max: number;
@@ -141,21 +140,14 @@ function firebaseToRoleBucket(bucket: FirebaseRoleBucket): RoleBucket {
 function lobbyConfigToFirebase(config: LobbyConfig): FirebaseLobbyConfig {
   const firebaseModeConfig = modeConfigToFirebase(config.modeConfig);
   const hasModeConfig = Object.keys(firebaseModeConfig).length > 0;
-  const hasBuckets = config.roleBuckets && config.roleBuckets.length > 0;
+  const hasBuckets = config.roleBuckets.length > 0;
   const firebaseBuckets: Record<string, FirebaseRoleBucket> = {};
-  if (hasBuckets) {
-    (config.roleBuckets ?? []).forEach((bucket, i) => {
-      firebaseBuckets[String(i)] = roleBucketToFirebase(bucket);
-    });
-  }
+  config.roleBuckets.forEach((bucket, i) => {
+    firebaseBuckets[String(i)] = roleBucketToFirebase(bucket);
+  });
   return {
     gameMode: config.gameMode,
     roleConfigMode: config.roleConfigMode,
-    roleSlots: config.roleSlots.map((s) => ({
-      roleId: s.roleId,
-      min: s.min,
-      max: s.max,
-    })),
     ...(hasBuckets ? { roleBuckets: firebaseBuckets } : {}),
     showConfigToPlayers: config.showConfigToPlayers,
     showRolesInPlay: config.showRolesInPlay,
@@ -200,13 +192,24 @@ function firebaseToLobbyConfig(config: FirebaseLobbyConfig): LobbyConfig {
   // Cast required: LobbyConfig is a discriminated union keyed on gameMode, but
   // we construct from runtime Firebase data where the discriminant is a string.
   // This is the single boundary-cast location for LobbyConfig deserialization.
-  const roleBuckets = config.roleBuckets
-    ? Object.values(config.roleBuckets).map(firebaseToRoleBucket)
-    : [];
+  let roleBuckets: RoleBucket[];
+  if (config.roleBuckets && Object.keys(config.roleBuckets).length > 0) {
+    roleBuckets = Object.values(config.roleBuckets).map(firebaseToRoleBucket);
+  } else if (config.roleSlots && config.roleSlots.length > 0) {
+    // Migration shim: convert old roleSlots format to roleBuckets
+    roleBuckets = config.roleSlots
+      .filter((s) => s.min > 0)
+      .map((s) => ({
+        playerCount: s.min,
+        roles: [{ roleId: s.roleId, min: 1 }],
+      }));
+  } else {
+    roleBuckets = [];
+  }
+
   return {
     gameMode,
     roleConfigMode: config.roleConfigMode as LobbyConfig["roleConfigMode"],
-    roleSlots: (config.roleSlots ?? []).map(firebaseToRoleSlot),
     roleBuckets,
     showConfigToPlayers: config.showConfigToPlayers,
     showRolesInPlay: config.showRolesInPlay as LobbyConfig["showRolesInPlay"],
@@ -215,10 +218,6 @@ function firebaseToLobbyConfig(config: FirebaseLobbyConfig): LobbyConfig {
     ),
     modeConfig,
   } as LobbyConfig;
-}
-
-export function firebaseToRoleSlot(s: FirebaseRoleSlot): RoleSlot {
-  return { roleId: s.roleId, min: s.min, max: s.max };
 }
 
 /**

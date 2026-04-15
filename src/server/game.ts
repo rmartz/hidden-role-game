@@ -6,7 +6,6 @@ import type {
   LobbyPlayer,
   ModeConfig,
   RoleBucket,
-  RoleSlot,
   GameMode,
   ShowRolesInPlay,
   TimerConfig,
@@ -39,27 +38,25 @@ async function writePlayerStates(game: Game): Promise<void> {
 export async function createGame(
   lobbyId: string,
   players: LobbyPlayer[],
-  roleSlots: RoleSlot[],
+  roleBuckets: RoleBucket[],
   gameMode: GameMode,
   showRolesInPlay: ShowRolesInPlay,
   ownerPlayerId: string | undefined,
   timerConfig: TimerConfig,
   modeConfig?: ModeConfig,
   playerOrder?: string[],
-  roleBuckets?: RoleBucket[],
 ): Promise<Game> {
   const game = buildGame(
     randomUUID(),
     lobbyId,
     players,
-    roleSlots,
+    roleBuckets,
     gameMode,
     showRolesInPlay,
     ownerPlayerId,
     timerConfig,
     modeConfig,
     playerOrder,
-    roleBuckets,
   );
 
   await saveGame(game);

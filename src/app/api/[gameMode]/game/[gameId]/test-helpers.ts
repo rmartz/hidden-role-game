@@ -35,9 +35,9 @@ export async function setupStartedSecretVillainGame() {
         "x-session-id": aliceSession,
       },
       body: JSON.stringify({
-        roleSlots: [
-          { roleId: "good", min: 1, max: 1 },
-          { roleId: "bad", min: 1, max: 1 },
+        roleBuckets: [
+          { playerCount: 1, roles: [{ roleId: "good", min: 1 }] },
+          { playerCount: 1, roles: [{ roleId: "bad", min: 1 }] },
         ],
       }),
     }),

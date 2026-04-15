@@ -7,7 +7,6 @@ import type {
   ModeConfigField,
   RoleBucket,
   RoleBucketSlot,
-  RoleSlot,
   TimerConfig,
 } from "@/lib/types";
 import type { GameConfig } from "@/server/types";
@@ -18,8 +17,6 @@ function computeIsValid(
   playerCount: number,
   roleConfigMode: RoleConfigMode,
   roleCounts: Record<string, number>,
-  roleMins: Record<string, number>,
-  roleMaxes: Record<string, number>,
   roleBuckets: RoleBucket[],
   modeConfig: ModeConfig,
 ): boolean {
@@ -27,11 +24,6 @@ function computeIsValid(
     return playerCount >= GAME_MODES[gameMode].minPlayers;
   }
   if (roleConfigMode === RoleConfigMode.Advanced) {
-    const totalMin = sum(Object.values(roleMins));
-    const totalMax = sum(Object.values(roleMaxes));
-    return totalMin <= playerCount && totalMax >= playerCount;
-  }
-  if (roleConfigMode === RoleConfigMode.Buckets) {
     if (roleBuckets.length === 0) return false;
     const totalPlayerCount = sum(roleBuckets.map((b) => b.playerCount));
     const modeDefinition = GAME_MODES[gameMode];
@@ -52,16 +44,28 @@ function computeIsValid(
   return sum(Object.values(roleCounts)) === playerCount;
 }
 
-function roleCountsFromSlots(slots: RoleSlot[]): Record<string, number> {
-  return Object.fromEntries(slots.map((s) => [s.roleId, s.min]));
+function roleCountsFromBuckets(buckets: RoleBucket[]): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const bucket of buckets) {
+    const firstRole = bucket.roles[0];
+    if (bucket.roles.length === 1 && firstRole) {
+      // single-role bucket = Default/Custom representation
+      counts[firstRole.roleId] =
+        (counts[firstRole.roleId] ?? 0) + bucket.playerCount;
+    }
+  }
+  return counts;
 }
 
-function roleMinsFromSlots(slots: RoleSlot[]): Record<string, number> {
-  return Object.fromEntries(slots.map((s) => [s.roleId, s.min]));
-}
-
-function roleMaxesFromSlots(slots: RoleSlot[]): Record<string, number> {
-  return Object.fromEntries(slots.map((s) => [s.roleId, s.max]));
+function roleBucketsFromCounts(
+  roleCounts: Record<string, number>,
+): RoleBucket[] {
+  return Object.entries(roleCounts)
+    .filter(([, count]) => count > 0)
+    .map(([roleId, count]) => ({
+      playerCount: count,
+      roles: [{ roleId, min: 1 }],
+    }));
 }
 
 export interface GameConfigState {
@@ -70,11 +74,7 @@ export interface GameConfigState {
   roleConfigMode: RoleConfigMode;
   /** Used for Custom mode (exact counts, min === max). */
   roleCounts: Record<string, number>;
-  /** Used for Advanced mode min bounds. */
-  roleMins: Record<string, number>;
-  /** Used for Advanced mode max bounds. */
-  roleMaxes: Record<string, number>;
-  /** Used for Buckets mode. */
+  /** Used for Default/Custom/Advanced modes. */
   roleBuckets: RoleBucket[];
   showConfigToPlayers: boolean;
   showRolesInPlay: ShowRolesInPlay;
@@ -93,8 +93,6 @@ const initialState: GameConfigState = {
   playerCount: 5,
   roleConfigMode: RoleConfigMode.Default,
   roleCounts: {},
-  roleMins: {},
-  roleMaxes: {},
   roleBuckets: [],
   showConfigToPlayers: false,
   showRolesInPlay: ShowRolesInPlay.None,
@@ -110,8 +108,6 @@ function recomputeIsValid(state: GameConfigState): boolean {
     state.playerCount,
     state.roleConfigMode,
     state.roleCounts,
-    state.roleMins,
-    state.roleMaxes,
     state.roleBuckets,
     state.modeConfig,
   );
@@ -130,14 +126,12 @@ const gameConfigSlice = createSlice({
       state.gameMode = config.gameMode;
       state.playerCount = playerCount;
       state.roleConfigMode = config.roleConfigMode;
-      const slots =
-        config.roleSlots && config.roleSlots.length > 0
-          ? config.roleSlots
+      const buckets =
+        config.roleBuckets.length > 0
+          ? config.roleBuckets
           : GAME_MODES[config.gameMode].defaultRoleCount(playerCount);
-      state.roleCounts = roleCountsFromSlots(slots);
-      state.roleMins = roleMinsFromSlots(slots);
-      state.roleMaxes = roleMaxesFromSlots(slots);
-      state.roleBuckets = config.roleBuckets ?? [];
+      state.roleCounts = roleCountsFromBuckets(buckets);
+      state.roleBuckets = buckets;
       state.showConfigToPlayers = config.showConfigToPlayers;
       state.showRolesInPlay = config.showRolesInPlay;
       state.timerConfig = config.timerConfig;
@@ -148,11 +142,9 @@ const gameConfigSlice = createSlice({
     setGameMode(state, action: PayloadAction<GameMode>) {
       state.gameMode = action.payload;
       const modeConfig = GAME_MODES[action.payload];
-      const slots = modeConfig.defaultRoleCount(state.playerCount);
-      state.roleCounts = roleCountsFromSlots(slots);
-      state.roleMins = roleMinsFromSlots(slots);
-      state.roleMaxes = roleMaxesFromSlots(slots);
-      state.roleBuckets = [];
+      const buckets = modeConfig.defaultRoleCount(state.playerCount);
+      state.roleCounts = roleCountsFromBuckets(buckets);
+      state.roleBuckets = buckets;
       state.timerConfig = modeConfig.defaultTimerConfig;
       state.modeConfig = modeConfig.defaultModeConfig;
       state.isValid = recomputeIsValid(state);
@@ -160,35 +152,21 @@ const gameConfigSlice = createSlice({
     },
 
     setRoleConfigMode(state, action: PayloadAction<RoleConfigMode>) {
-      const prev = state.roleConfigMode;
       state.roleConfigMode = action.payload;
 
       if (action.payload === RoleConfigMode.Default) {
         // Reset to game mode defaults
-        const slots = GAME_MODES[state.gameMode].defaultRoleCount(
+        const buckets = GAME_MODES[state.gameMode].defaultRoleCount(
           state.playerCount,
         );
-        state.roleCounts = roleCountsFromSlots(slots);
-        state.roleMins = roleMinsFromSlots(slots);
-        state.roleMaxes = roleMaxesFromSlots(slots);
-        state.roleBuckets = [];
-      } else if (
-        action.payload === RoleConfigMode.Advanced &&
-        prev !== RoleConfigMode.Advanced
-      ) {
-        // Seed min/max from current counts
-        state.roleMins = { ...state.roleCounts };
-        state.roleMaxes = { ...state.roleCounts };
-      } else if (
-        action.payload === RoleConfigMode.Custom &&
-        prev === RoleConfigMode.Advanced
-      ) {
-        // Collapse Advanced to Custom using mins
-        state.roleCounts = { ...state.roleMins };
-        state.roleMaxes = { ...state.roleMins };
-      } else if (action.payload === RoleConfigMode.Buckets) {
+        state.roleCounts = roleCountsFromBuckets(buckets);
+        state.roleBuckets = buckets;
+      } else if (action.payload === RoleConfigMode.Advanced) {
         // Start with an empty bucket — user builds from scratch
         state.roleBuckets = [];
+      } else {
+        // Custom — sync buckets from current counts
+        state.roleBuckets = roleBucketsFromCounts(state.roleCounts);
       }
 
       state.isValid = recomputeIsValid(state);
@@ -198,8 +176,7 @@ const gameConfigSlice = createSlice({
     incrementRoleCount(state, action: PayloadAction<string>) {
       const roleId = action.payload;
       state.roleCounts[roleId] = (state.roleCounts[roleId] ?? 0) + 1;
-      state.roleMins[roleId] = state.roleCounts[roleId];
-      state.roleMaxes[roleId] = state.roleCounts[roleId];
+      state.roleBuckets = roleBucketsFromCounts(state.roleCounts);
       state.isValid = recomputeIsValid(state);
       state.syncVersion++;
     },
@@ -210,8 +187,7 @@ const gameConfigSlice = createSlice({
         0,
         (state.roleCounts[roleId] ?? 0) - 1,
       );
-      state.roleMins[roleId] = state.roleCounts[roleId];
-      state.roleMaxes[roleId] = state.roleCounts[roleId];
+      state.roleBuckets = roleBucketsFromCounts(state.roleCounts);
       state.isValid = recomputeIsValid(state);
       state.syncVersion++;
     },
@@ -222,32 +198,7 @@ const gameConfigSlice = createSlice({
     ) {
       const { roleId, count } = action.payload;
       state.roleCounts[roleId] = Math.max(0, count);
-      state.roleMins[roleId] = state.roleCounts[roleId];
-      state.roleMaxes[roleId] = state.roleCounts[roleId];
-      state.isValid = recomputeIsValid(state);
-      state.syncVersion++;
-    },
-
-    setRoleMin(state, action: PayloadAction<{ roleId: string; min: number }>) {
-      const { roleId, min } = action.payload;
-      state.roleMins[roleId] = Math.max(0, min);
-      // Ensure max >= min
-      state.roleMaxes[roleId] = Math.max(
-        state.roleMaxes[roleId] ?? 0,
-        state.roleMins[roleId],
-      );
-      state.isValid = recomputeIsValid(state);
-      state.syncVersion++;
-    },
-
-    setRoleMax(state, action: PayloadAction<{ roleId: string; max: number }>) {
-      const { roleId, max } = action.payload;
-      state.roleMaxes[roleId] = Math.max(0, max);
-      // Ensure min <= max
-      state.roleMins[roleId] = Math.min(
-        state.roleMins[roleId] ?? 0,
-        state.roleMaxes[roleId],
-      );
+      state.roleBuckets = roleBucketsFromCounts(state.roleCounts);
       state.isValid = recomputeIsValid(state);
       state.syncVersion++;
     },
@@ -357,10 +308,9 @@ const gameConfigSlice = createSlice({
             state.playerCount,
             state.modeConfig,
           ) ?? state.playerCount;
-        const slots = modeDefinition.defaultRoleCount(effectiveCount);
-        state.roleCounts = roleCountsFromSlots(slots);
-        state.roleMins = roleMinsFromSlots(slots);
-        state.roleMaxes = roleMaxesFromSlots(slots);
+        const buckets = modeDefinition.defaultRoleCount(effectiveCount);
+        state.roleCounts = roleCountsFromBuckets(buckets);
+        state.roleBuckets = buckets;
       }
       state.isValid = recomputeIsValid(state);
       state.syncVersion++;
@@ -401,10 +351,9 @@ const gameConfigSlice = createSlice({
             state.playerCount,
             state.modeConfig,
           ) ?? state.playerCount;
-        const slots = modeDefinition.defaultRoleCount(effectiveCount);
-        state.roleCounts = roleCountsFromSlots(slots);
-        state.roleMins = roleMinsFromSlots(slots);
-        state.roleMaxes = roleMaxesFromSlots(slots);
+        const buckets = modeDefinition.defaultRoleCount(effectiveCount);
+        state.roleCounts = roleCountsFromBuckets(buckets);
+        state.roleBuckets = buckets;
       }
       state.isValid = recomputeIsValid(state);
       state.syncVersion++;
@@ -412,31 +361,14 @@ const gameConfigSlice = createSlice({
   },
 });
 
-export const selectRoleSlots = createSelector(
-  (state: GameConfigState) => state.roleConfigMode,
-  (state: GameConfigState) => state.roleCounts,
-  (state: GameConfigState) => state.roleMins,
-  (state: GameConfigState) => state.roleMaxes,
-  (roleConfigMode, roleCounts, roleMins, roleMaxes): RoleSlot[] => {
-    if (roleConfigMode === RoleConfigMode.Advanced) {
-      return Object.keys(roleMins)
-        .filter((id) => (roleMaxes[id] ?? 0) > 0)
-        .map((id) => ({
-          roleId: id,
-          min: roleMins[id] ?? 0,
-          max: roleMaxes[id] ?? 0,
-        }));
-    }
-    // Buckets mode: flat slots are not meaningful — return empty; use selectRoleBuckets instead.
-    if (roleConfigMode === RoleConfigMode.Buckets) return [];
-    return Object.entries(roleCounts)
-      .filter(([, count]) => count > 0)
-      .map(([roleId, count]) => ({ roleId, min: count, max: count }));
-  },
-);
-
 export const selectRoleBuckets = (state: GameConfigState): RoleBucket[] =>
   state.roleBuckets;
+
+// Kept for backward compat with any callers that still reference it — returns empty array now.
+export const selectRoleSlots = createSelector(
+  (state: GameConfigState) => state.roleBuckets,
+  (): never[] => [],
+);
 
 export const {
   loadConfig,
@@ -445,8 +377,6 @@ export const {
   incrementRoleCount,
   decrementRoleCount,
   setRoleCount,
-  setRoleMin,
-  setRoleMax,
   addBucket,
   removeBucket,
   setBucketPlayerCount,

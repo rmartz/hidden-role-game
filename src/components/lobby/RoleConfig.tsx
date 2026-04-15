@@ -1,8 +1,7 @@
 import { sum } from "lodash";
 import { useState } from "react";
-import type { GameMode, RoleDefinition, Team } from "@/lib/types";
+import type { GameMode, RoleBucket, RoleDefinition, Team } from "@/lib/types";
 import { RoleConfigMode } from "@/lib/types";
-import type { RoleSlot } from "@/server/types";
 import { useAppSelector } from "@/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,7 +12,7 @@ import { ROLE_CONFIG_COPY } from "./RoleConfig.copy";
 
 interface ReadOnlyProps {
   roleDefinitions: Record<string, RoleDefinition<string, Team>>;
-  roleSlots?: RoleSlot[];
+  roleBuckets?: RoleBucket[];
   roleConfigMode: RoleConfigMode;
   playerCount: number;
   gameMode: GameMode;
@@ -42,27 +41,28 @@ export function RoleConfig(props: RoleConfigProps) {
   const [showAll, setShowAll] = useState(false);
 
   const roleCounts = useAppSelector((s) => s.gameConfig.roleCounts);
-  const roleMins = useAppSelector((s) => s.gameConfig.roleMins);
-  const roleMaxes = useAppSelector((s) => s.gameConfig.roleMaxes);
 
   const isAdvanced = roleConfigMode === RoleConfigMode.Advanced;
-  const isBuckets = roleConfigMode === RoleConfigMode.Buckets;
 
-  const readOnlyMin = readOnly
-    ? Object.fromEntries((props.roleSlots ?? []).map((s) => [s.roleId, s.min]))
-    : {};
-  const readOnlyMax = readOnly
-    ? Object.fromEntries((props.roleSlots ?? []).map((s) => [s.roleId, s.max]))
-    : {};
+  const readOnlyBuckets = readOnly ? (props.roleBuckets ?? []) : [];
+  const readOnlyMin = Object.fromEntries(
+    readOnlyBuckets.flatMap((b) => b.roles.map((s) => [s.roleId, s.min])),
+  );
+  const readOnlyMax = Object.fromEntries(
+    readOnlyBuckets.flatMap((b) =>
+      b.roles.flatMap((s) => (s.max !== undefined ? [[s.roleId, s.max]] : [])),
+    ),
+  );
 
-  const total = readOnly ? 0 : sum(Object.values(roleCounts));
+  const total =
+    !readOnly && roleConfigMode === RoleConfigMode.Custom
+      ? sum(Object.values(roleCounts))
+      : 0;
 
   const allRoles = Object.values(roleDefinitions);
 
   function isRoleEnabled(roleId: string): boolean {
-    if (readOnly) return (readOnlyMax[roleId] ?? 0) > 0;
-    if (roleConfigMode === RoleConfigMode.Advanced)
-      return (roleMaxes[roleId] ?? 0) > 0;
+    if (readOnly) return (readOnlyMin[roleId] ?? 0) > 0;
     return (roleCounts[roleId] ?? 0) > 0;
   }
 
@@ -113,23 +113,21 @@ export function RoleConfig(props: RoleConfigProps) {
       <Card>
         <CardHeader>
           <CardTitle>Configure Roles</CardTitle>
-          {!readOnly && !isBuckets && (
+          {!readOnly && !isAdvanced && (
             <p className="text-sm text-muted-foreground">
-              {isAdvanced
-                ? `Assign ${String(playerCount)} role${playerCount !== 1 ? "s" : ""} (min total: ${String(sum(Object.values(roleMins)))}, max total: ${String(sum(Object.values(roleMaxes)))})`
-                : `Assign ${String(playerCount)} role${playerCount !== 1 ? "s" : ""} (${String(total)}/${String(playerCount)} assigned)`}
+              {`Assign ${String(playerCount)} role${playerCount !== 1 ? "s" : ""} (${String(total)}/${String(playerCount)} assigned)`}
             </p>
           )}
         </CardHeader>
         <CardContent>
-          {!readOnly && isBuckets && (
+          {!readOnly && isAdvanced && (
             <RoleBucketConfig
               roleDefinitions={roleDefinitions}
               gameMode={gameMode}
               disabled={props.disabled}
             />
           )}
-          {(!isBuckets || readOnly) && (
+          {(!isAdvanced || readOnly) && (
             <>
               <ul className="space-y-1 list-none p-0">
                 {topListRoles.map((role) =>

@@ -1,4 +1,3 @@
-import { RoleConfigMode } from "@/lib/types";
 import { ServerResponseStatus } from "@/server/types";
 import type { CreateGameRequest } from "@/server/types";
 import { startLobbyGame } from "@/server/lobby";
@@ -10,8 +9,6 @@ import {
   toPublicLobby,
   validateRoleBucketsCoverPlayerCount,
   validateRoleBucketsForMode,
-  validateRoleSlotsForMode,
-  validateRoleSlotsCoverPlayerCount,
 } from "@/server/utils";
 import { isGameModeEnabled } from "@/lib/game/modes";
 
@@ -40,46 +37,28 @@ export async function POST(
     return errorResponse(prereqs.error, 409);
   }
 
-  const useBuckets =
-    lobby.config.roleConfigMode === RoleConfigMode.Buckets &&
-    (lobby.config.roleBuckets?.length ?? 0) > 0;
+  const buckets = lobby.config.roleBuckets;
 
-  if (useBuckets) {
-    const buckets = lobby.config.roleBuckets ?? [];
-    const bucketModeError = validateRoleBucketsForMode(buckets, gameMode);
-    if (bucketModeError) return errorResponse(bucketModeError, 400);
+  const bucketModeError = validateRoleBucketsForMode(buckets, gameMode);
+  if (bucketModeError) return errorResponse(bucketModeError, 400);
 
-    const bucketCoverError = validateRoleBucketsCoverPlayerCount(
-      buckets,
-      gameMode,
-      lobby.players.length,
-    );
-    if (bucketCoverError) return errorResponse(bucketCoverError, 400);
-  } else {
-    const roleSlots = lobby.config.roleSlots;
-
-    const coverError = validateRoleSlotsCoverPlayerCount(
-      roleSlots,
-      gameMode,
-      lobby.players.length,
-    );
-    if (coverError) return errorResponse(coverError, 400);
-
-    const modeError = validateRoleSlotsForMode(roleSlots, gameMode);
-    if (modeError) return errorResponse(modeError, 400);
-  }
+  const bucketCoverError = validateRoleBucketsCoverPlayerCount(
+    buckets,
+    gameMode,
+    lobby.players.length,
+  );
+  if (bucketCoverError) return errorResponse(bucketCoverError, 400);
 
   const game = await createGame(
     lobbyId,
     lobby.players,
-    lobby.config.roleSlots,
+    buckets,
     gameMode,
     lobby.config.showRolesInPlay,
     prereqs.ownerPlayerId,
     lobby.config.timerConfig,
     lobby.config.modeConfig,
     lobby.playerOrder,
-    useBuckets ? lobby.config.roleBuckets : undefined,
   );
 
   const updated = await startLobbyGame(lobbyId, game.id);
