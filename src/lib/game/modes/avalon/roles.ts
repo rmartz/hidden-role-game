@@ -19,15 +19,9 @@ export function defaultRoleCount(numPlayers: number): RoleBucket[] {
   const bad = Math.floor((n - 1) / 2);
   const good = n - bad;
   return [
-    { playerCount: 1, roles: [{ roleId: AvalonRole.Merlin, min: 1 }] },
-    {
-      playerCount: good - 1,
-      roles: [{ roleId: AvalonRole.LoyalServant, min: 1 }],
-    },
-    {
-      playerCount: bad,
-      roles: [{ roleId: AvalonRole.MinionOfMordred, min: 1 }],
-    },
+    { playerCount: 1, roleId: AvalonRole.Merlin },
+    { playerCount: good - 1, roleId: AvalonRole.LoyalServant },
+    { playerCount: bad, roleId: AvalonRole.MinionOfMordred },
   ];
 }
 

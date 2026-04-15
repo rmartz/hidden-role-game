@@ -15,12 +15,9 @@ export function defaultRoleCount(numPlayers: number): RoleBucket[] {
   const bad = Math.floor((n - 1) / 2) - 1;
   const good = n - specialBad - bad;
   return [
-    {
-      playerCount: specialBad,
-      roles: [{ roleId: SecretVillainRole.SpecialBad, min: 1 }],
-    },
-    { playerCount: bad, roles: [{ roleId: SecretVillainRole.Bad, min: 1 }] },
-    { playerCount: good, roles: [{ roleId: SecretVillainRole.Good, min: 1 }] },
+    { playerCount: specialBad, roleId: SecretVillainRole.SpecialBad },
+    { playerCount: bad, roleId: SecretVillainRole.Bad },
+    { playerCount: good, roleId: SecretVillainRole.Good },
   ];
 }
 

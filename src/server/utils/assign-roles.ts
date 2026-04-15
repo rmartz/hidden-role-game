@@ -3,6 +3,7 @@ import type {
   PlayerRoleAssignment,
   RoleBucket,
 } from "@/lib/types";
+import { isSimpleRoleBucket } from "@/lib/types";
 
 function fisherYates(arr: string[]): void {
   for (let i = arr.length - 1; i > 0; i--) {
@@ -16,17 +17,23 @@ function fisherYates(arr: string[]): void {
 }
 
 /**
- * Draws `count` role IDs from one bucket's role pool.
+ * Draws `playerCount` role IDs from one bucket's role pool.
  *
- * For each role slot:
+ * Simple buckets always draw `playerCount` copies of their single role.
+ *
+ * Advanced buckets use min/max constraints per slot:
  *   - `min` copies are required (guaranteed drawn).
- *   - Unique roles (max: 1): at most `max - min` additional copies in the possible pool.
- *   - Non-unique roles (max: undefined): `count` additional copies in the possible pool,
+ *   - Unique roles (max set): at most `max - min` additional copies in the possible pool.
+ *   - Non-unique roles (max: undefined): `playerCount` copies in the possible pool,
  *     giving them a chance to fill any remaining slots.
  *
- * The possible pool is shuffled and the first `count - required` entries are taken.
+ * The possible pool is shuffled and the first `playerCount - required` entries are taken.
  */
 function drawFromBucket(bucket: RoleBucket): string[] {
+  if (isSimpleRoleBucket(bucket)) {
+    return Array.from({ length: bucket.playerCount }, () => bucket.roleId);
+  }
+
   const required: string[] = [];
   const possible: string[] = [];
   for (const slot of bucket.roles) {

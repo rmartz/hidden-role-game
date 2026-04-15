@@ -1,4 +1,5 @@
 import type { ModeConfig, RoleBucket, GameMode } from "@/lib/types";
+import { isSimpleRoleBucket } from "@/lib/types";
 import { getModeDefinition } from "@/lib/game/state";
 import { getRoleSlotsRequired } from "@/lib/game/modes";
 
@@ -12,9 +13,11 @@ export function validateRoleBucketsForMode(
 ): string | undefined {
   const { roles } = getModeDefinition(gameMode);
   for (const bucket of buckets) {
-    for (const slot of bucket.roles) {
-      if (!(slot.roleId in roles)) {
-        return `Unknown role: ${slot.roleId}`;
+    if (isSimpleRoleBucket(bucket)) {
+      if (!(bucket.roleId in roles)) return `Unknown role: ${bucket.roleId}`;
+    } else {
+      for (const slot of bucket.roles) {
+        if (!(slot.roleId in roles)) return `Unknown role: ${slot.roleId}`;
       }
     }
   }

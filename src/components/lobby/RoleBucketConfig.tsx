@@ -1,6 +1,12 @@
 "use client";
 
-import type { RoleBucket, RoleDefinition, Team, GameMode } from "@/lib/types";
+import type {
+  AdvancedRoleBucket,
+  RoleDefinition,
+  Team,
+  GameMode,
+} from "@/lib/types";
+import { isSimpleRoleBucket } from "@/lib/types";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   addBucket,
@@ -41,32 +47,36 @@ export function RoleBucketConfig({
 
   return (
     <div className="space-y-4">
-      {buckets.map((bucket, bucketIndex) => (
-        <BucketEditor
-          key={bucketIndex}
-          bucket={bucket}
-          bucketIndex={bucketIndex}
-          allRoles={allRoles}
-          gameMode={gameMode}
-          disabled={disabled}
-          onRemove={() => dispatch(removeBucket(bucketIndex))}
-          onSetPlayerCount={(count) =>
-            dispatch(setBucketPlayerCount({ bucketIndex, playerCount: count }))
-          }
-          onAddRole={(roleId) =>
-            dispatch(addRoleToBucket({ bucketIndex, roleId }))
-          }
-          onRemoveRole={(roleId) =>
-            dispatch(removeRoleFromBucket({ bucketIndex, roleId }))
-          }
-          onSetUnique={(roleId, unique) =>
-            dispatch(setBucketRoleUnique({ bucketIndex, roleId, unique }))
-          }
-          onSetMin={(roleId, min) =>
-            dispatch(setBucketRoleMin({ bucketIndex, roleId, min }))
-          }
-        />
-      ))}
+      {buckets
+        .filter((b): b is AdvancedRoleBucket => !isSimpleRoleBucket(b))
+        .map((bucket, bucketIndex) => (
+          <BucketEditor
+            key={bucketIndex}
+            bucket={bucket}
+            bucketIndex={bucketIndex}
+            allRoles={allRoles}
+            gameMode={gameMode}
+            disabled={disabled}
+            onRemove={() => dispatch(removeBucket(bucketIndex))}
+            onSetPlayerCount={(count) =>
+              dispatch(
+                setBucketPlayerCount({ bucketIndex, playerCount: count }),
+              )
+            }
+            onAddRole={(roleId) =>
+              dispatch(addRoleToBucket({ bucketIndex, roleId }))
+            }
+            onRemoveRole={(roleId) =>
+              dispatch(removeRoleFromBucket({ bucketIndex, roleId }))
+            }
+            onSetUnique={(roleId, unique) =>
+              dispatch(setBucketRoleUnique({ bucketIndex, roleId, unique }))
+            }
+            onSetMin={(roleId, min) =>
+              dispatch(setBucketRoleMin({ bucketIndex, roleId, min }))
+            }
+          />
+        ))}
       <Button
         variant="outline"
         size="sm"
@@ -80,7 +90,7 @@ export function RoleBucketConfig({
 }
 
 interface BucketEditorProps {
-  bucket: RoleBucket;
+  bucket: AdvancedRoleBucket;
   bucketIndex: number;
   allRoles: RoleDefinition<string, Team>[];
   gameMode: GameMode;

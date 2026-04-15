@@ -256,13 +256,25 @@ export interface RoleBucketSlot {
   max?: number;
 }
 
+/** A bucket that always assigns exactly `playerCount` copies of a single role. */
+export interface SimpleRoleBucket {
+  playerCount: number;
+  roleId: string;
+}
+
 /**
- * A role bucket groups a set of roles that together fill `playerCount` players.
- * Used in Buckets mode to define independent role pools with their own draw rules.
+ * A bucket with a multi-role pool that draws `playerCount` roles using
+ * min/max constraints per slot. Used in Advanced mode.
  */
-export interface RoleBucket {
+export interface AdvancedRoleBucket {
   playerCount: number;
   roles: RoleBucketSlot[];
+}
+
+export type RoleBucket = SimpleRoleBucket | AdvancedRoleBucket;
+
+export function isSimpleRoleBucket(b: RoleBucket): b is SimpleRoleBucket {
+  return "roleId" in b;
 }
 
 export type VisibilityReason = "wake-partner" | "aware-of";

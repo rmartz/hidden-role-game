@@ -1,16 +1,15 @@
 import { describe, it, expect } from "vitest";
 import type { RoleBucket } from "@/lib/types";
+import { isSimpleRoleBucket } from "@/lib/types";
 import { AvalonRole } from "./roles";
 import { AVALON_CONFIG } from "./config";
 
-/** Helper: convert single-role buckets to { roleId: playerCount } map */
+/** Helper: convert simple role buckets to { roleId: playerCount } map */
 function bucketCounts(buckets: RoleBucket[]): Record<string, number> {
   const counts: Record<string, number> = {};
   for (const b of buckets) {
-    const firstRole = b.roles[0];
-    if (b.roles.length === 1 && firstRole) {
-      counts[firstRole.roleId] =
-        (counts[firstRole.roleId] ?? 0) + b.playerCount;
+    if (isSimpleRoleBucket(b)) {
+      counts[b.roleId] = (counts[b.roleId] ?? 0) + b.playerCount;
     }
   }
   return counts;

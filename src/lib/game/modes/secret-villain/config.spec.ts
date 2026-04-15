@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import type { RoleBucket } from "@/lib/types";
-import { GameMode } from "@/lib/types";
+import { GameMode, isSimpleRoleBucket } from "@/lib/types";
 import { SecretVillainRole } from "./roles";
 import { SECRET_VILLAIN_CONFIG } from "./config";
 
@@ -10,14 +10,12 @@ const withBoard = {
   includeBoard: true,
 } as const;
 
-/** Helper: convert single-role buckets to { roleId: playerCount } map */
+/** Helper: convert simple role buckets to { roleId: playerCount } map */
 function bucketCounts(buckets: RoleBucket[]): Record<string, number> {
   const counts: Record<string, number> = {};
   for (const b of buckets) {
-    const firstRole = b.roles[0];
-    if (b.roles.length === 1 && firstRole) {
-      const roleId = firstRole.roleId;
-      counts[roleId] = (counts[roleId] ?? 0) + b.playerCount;
+    if (isSimpleRoleBucket(b)) {
+      counts[b.roleId] = (counts[b.roleId] ?? 0) + b.playerCount;
     }
   }
   return counts;

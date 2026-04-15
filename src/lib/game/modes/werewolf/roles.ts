@@ -124,15 +124,9 @@ export function defaultRoleCount(numPlayers: number): RoleBucket[] {
   const werewolves = Math.max(1, Math.floor((n - 3) / 3));
   const villagers = n - werewolves - 1;
   return [
-    {
-      playerCount: werewolves,
-      roles: [{ roleId: WerewolfRole.Werewolf, min: 1 }],
-    },
-    {
-      playerCount: villagers,
-      roles: [{ roleId: WerewolfRole.Villager, min: 1 }],
-    },
-    { playerCount: 1, roles: [{ roleId: WerewolfRole.Seer, min: 1 }] },
+    { playerCount: werewolves, roleId: WerewolfRole.Werewolf },
+    { playerCount: villagers, roleId: WerewolfRole.Villager },
+    { playerCount: 1, roleId: WerewolfRole.Seer },
   ];
 }
 

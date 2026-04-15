@@ -1,12 +1,18 @@
 import { createSlice, createSelector } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { sum } from "lodash";
-import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
+import {
+  GameMode,
+  RoleConfigMode,
+  ShowRolesInPlay,
+  isSimpleRoleBucket,
+} from "@/lib/types";
 import type {
   ModeConfig,
   ModeConfigField,
   RoleBucket,
   RoleBucketSlot,
+  SimpleRoleBucket,
   TimerConfig,
 } from "@/lib/types";
 import type { GameConfig } from "@/server/types";
@@ -47,25 +53,20 @@ function computeIsValid(
 function roleCountsFromBuckets(buckets: RoleBucket[]): Record<string, number> {
   const counts: Record<string, number> = {};
   for (const bucket of buckets) {
-    const firstRole = bucket.roles[0];
-    if (bucket.roles.length === 1 && firstRole) {
-      // single-role bucket = Default/Custom representation
-      counts[firstRole.roleId] =
-        (counts[firstRole.roleId] ?? 0) + bucket.playerCount;
+    if (isSimpleRoleBucket(bucket)) {
+      counts[bucket.roleId] = (counts[bucket.roleId] ?? 0) + bucket.playerCount;
     }
+    // Advanced multi-role buckets don't map to a simple per-role count
   }
   return counts;
 }
 
 function roleBucketsFromCounts(
   roleCounts: Record<string, number>,
-): RoleBucket[] {
+): SimpleRoleBucket[] {
   return Object.entries(roleCounts)
     .filter(([, count]) => count > 0)
-    .map(([roleId, count]) => ({
-      playerCount: count,
-      roles: [{ roleId, min: 1 }],
-    }));
+    .map(([roleId, count]) => ({ playerCount: count, roleId }));
 }
 
 export interface GameConfigState {
@@ -232,10 +233,8 @@ const gameConfigSlice = createSlice({
       action: PayloadAction<{ bucketIndex: number; roleId: string }>,
     ) {
       const bucket = state.roleBuckets[action.payload.bucketIndex];
-      if (
-        bucket &&
-        !bucket.roles.some((r) => r.roleId === action.payload.roleId)
-      ) {
+      if (!bucket || isSimpleRoleBucket(bucket)) return;
+      if (!bucket.roles.some((r) => r.roleId === action.payload.roleId)) {
         bucket.roles.push({ roleId: action.payload.roleId, min: 0, max: 1 });
         state.isValid = recomputeIsValid(state);
         state.syncVersion++;
@@ -247,13 +246,12 @@ const gameConfigSlice = createSlice({
       action: PayloadAction<{ bucketIndex: number; roleId: string }>,
     ) {
       const bucket = state.roleBuckets[action.payload.bucketIndex];
-      if (bucket) {
-        bucket.roles = bucket.roles.filter(
-          (r) => r.roleId !== action.payload.roleId,
-        );
-        state.isValid = recomputeIsValid(state);
-        state.syncVersion++;
-      }
+      if (!bucket || isSimpleRoleBucket(bucket)) return;
+      bucket.roles = bucket.roles.filter(
+        (r) => r.roleId !== action.payload.roleId,
+      );
+      state.isValid = recomputeIsValid(state);
+      state.syncVersion++;
     },
 
     setBucketRoleUnique(
@@ -265,9 +263,8 @@ const gameConfigSlice = createSlice({
       }>,
     ) {
       const bucket = state.roleBuckets[action.payload.bucketIndex];
-      const slot = bucket?.roles.find(
-        (r) => r.roleId === action.payload.roleId,
-      );
+      if (!bucket || isSimpleRoleBucket(bucket)) return;
+      const slot = bucket.roles.find((r) => r.roleId === action.payload.roleId);
       if (slot) {
         const slotTyped = slot as RoleBucketSlot;
         if (action.payload.unique) {
@@ -289,9 +286,8 @@ const gameConfigSlice = createSlice({
       }>,
     ) {
       const bucket = state.roleBuckets[action.payload.bucketIndex];
-      const slot = bucket?.roles.find(
-        (r) => r.roleId === action.payload.roleId,
-      );
+      if (!bucket || isSimpleRoleBucket(bucket)) return;
+      const slot = bucket.roles.find((r) => r.roleId === action.payload.roleId);
       if (slot) {
         slot.min = Math.max(0, action.payload.min);
         state.isValid = recomputeIsValid(state);

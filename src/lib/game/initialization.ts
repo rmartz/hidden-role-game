@@ -1,4 +1,4 @@
-import { ShowRolesInPlay, Team } from "@/lib/types";
+import { ShowRolesInPlay, Team, isSimpleRoleBucket } from "@/lib/types";
 import type {
   Game,
   GamePlayer,
@@ -124,18 +124,28 @@ export function buildGamePlayers<R extends RoleDefinition<string, Team>>(
 export function buildRolesInPlay(game: Game): RoleInPlay[] | undefined {
   const { roles } = GAME_MODES[game.gameMode];
 
-  // Build a role display map from buckets: aggregate min across all buckets
+  // Build a role display map from buckets: aggregate counts across all buckets.
+  // Simple buckets always contribute exactly playerCount of a single role.
+  // Advanced buckets contribute per-slot min/max (undefined max = non-unique).
   const roleDisplayMap = new Map<string, { min: number; max?: number }>();
   for (const bucket of game.configuredRoleBuckets) {
-    for (const slot of bucket.roles) {
-      const existing = roleDisplayMap.get(slot.roleId);
-      roleDisplayMap.set(slot.roleId, {
-        min: (existing?.min ?? 0) + slot.min,
-        max:
-          slot.max !== undefined && existing?.max !== undefined
-            ? existing.max + slot.max
-            : undefined,
+    if (isSimpleRoleBucket(bucket)) {
+      const existing = roleDisplayMap.get(bucket.roleId);
+      roleDisplayMap.set(bucket.roleId, {
+        min: (existing?.min ?? 0) + bucket.playerCount,
+        max: (existing?.max ?? 0) + bucket.playerCount,
       });
+    } else {
+      for (const slot of bucket.roles) {
+        const existing = roleDisplayMap.get(slot.roleId);
+        roleDisplayMap.set(slot.roleId, {
+          min: (existing?.min ?? 0) + slot.min,
+          max:
+            slot.max !== undefined && existing?.max !== undefined
+              ? existing.max + slot.max
+              : undefined,
+        });
+      }
     }
   }
 

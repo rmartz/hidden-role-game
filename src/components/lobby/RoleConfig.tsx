@@ -1,7 +1,7 @@
 import { sum } from "lodash";
 import { useState } from "react";
 import type { GameMode, RoleBucket, RoleDefinition, Team } from "@/lib/types";
-import { RoleConfigMode } from "@/lib/types";
+import { RoleConfigMode, isSimpleRoleBucket } from "@/lib/types";
 import { useAppSelector } from "@/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -46,11 +46,19 @@ export function RoleConfig(props: RoleConfigProps) {
 
   const readOnlyBuckets = readOnly ? (props.roleBuckets ?? []) : [];
   const readOnlyMin = Object.fromEntries(
-    readOnlyBuckets.flatMap((b) => b.roles.map((s) => [s.roleId, s.min])),
+    readOnlyBuckets.flatMap((b) =>
+      isSimpleRoleBucket(b)
+        ? [[b.roleId, b.playerCount]]
+        : b.roles.map((s) => [s.roleId, s.min]),
+    ),
   );
   const readOnlyMax = Object.fromEntries(
     readOnlyBuckets.flatMap((b) =>
-      b.roles.flatMap((s) => (s.max !== undefined ? [[s.roleId, s.max]] : [])),
+      isSimpleRoleBucket(b)
+        ? [[b.roleId, b.playerCount]]
+        : b.roles.flatMap((s) =>
+            s.max !== undefined ? [[s.roleId, s.max]] : [],
+          ),
     ),
   );
 

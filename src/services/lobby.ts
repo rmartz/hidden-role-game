@@ -13,6 +13,7 @@ import {
   modeConfigToFirebase,
   lobbyToFirebase,
   firebaseToLobby,
+  roleBucketToFirebase,
   type FirebaseLobbyPublic,
   type FirebaseLobbyPrivate,
   type FirebaseRoleBucket,
@@ -242,18 +243,7 @@ export async function updateConfig(
   if (config.roleBuckets !== undefined) {
     const buckets: Record<string, FirebaseRoleBucket> = {};
     config.roleBuckets.forEach((bucket, i) => {
-      const roles: Record<
-        string,
-        { roleId: string; min: number; max?: number }
-      > = {};
-      bucket.roles.forEach((slot, j) => {
-        roles[String(j)] = {
-          roleId: slot.roleId,
-          min: slot.min,
-          ...(slot.max !== undefined ? { max: slot.max } : {}),
-        };
-      });
-      buckets[String(i)] = { playerCount: bucket.playerCount, roles };
+      buckets[String(i)] = roleBucketToFirebase(bucket);
     });
     updates["public/config/roleBuckets"] =
       config.roleBuckets.length > 0 ? buckets : null;

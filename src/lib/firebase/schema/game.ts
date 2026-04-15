@@ -4,11 +4,16 @@ import type {
   GameStatusState,
   PlayerRoleAssignment,
   RoleBucket,
+  RoleBucketSlot,
   TimerConfig,
 } from "@/lib/types";
-import { GameMode } from "@/lib/types";
+import { GameMode, isSimpleRoleBucket } from "@/lib/types";
 import { GAME_MODES } from "@/lib/game/modes";
-import type { FirebaseLobbyPlayer, FirebaseRoleBucket } from "./lobby";
+import type {
+  FirebaseLobbyPlayer,
+  FirebaseRoleBucket,
+  FirebaseRoleBucketSlot,
+} from "./lobby";
 import { modeConfigToFirebase, parseTimerConfig } from "./lobby";
 
 export interface FirebaseGamePublic {
@@ -21,8 +26,6 @@ export interface FirebaseGamePublic {
   roleAssignments?: Record<string, string>;
   /** Optional — Firebase omits empty objects. */
   configuredRoleBuckets?: Record<string, FirebaseRoleBucket>;
-  /** Optional — kept for migration shim of old game documents. */
-  configuredRoleSlots?: { roleId: string; min: number; max: number }[];
   showRolesInPlay: string;
   ownerPlayerId: string | null;
   timerConfig: TimerConfig;
@@ -36,8 +39,10 @@ export interface FirebaseGamePublic {
 }
 
 function roleBucketToFirebase(bucket: RoleBucket): FirebaseRoleBucket {
-  const roles: Record<string, { roleId: string; min: number; max?: number }> =
-    {};
+  if (isSimpleRoleBucket(bucket)) {
+    return { playerCount: bucket.playerCount, roleId: bucket.roleId };
+  }
+  const roles: Record<string, FirebaseRoleBucketSlot> = {};
   bucket.roles.forEach((slot, i) => {
     roles[String(i)] = {
       roleId: slot.roleId,
@@ -49,7 +54,10 @@ function roleBucketToFirebase(bucket: RoleBucket): FirebaseRoleBucket {
 }
 
 function firebaseToRoleBucket(bucket: FirebaseRoleBucket): RoleBucket {
-  const roles = Object.values(bucket.roles ?? {}).map((s) => ({
+  if ("roleId" in bucket) {
+    return { playerCount: bucket.playerCount, roleId: bucket.roleId };
+  }
+  const roles: RoleBucketSlot[] = Object.values(bucket.roles).map((s) => ({
     roleId: s.roleId,
     min: s.min,
     ...(s.max !== undefined ? { max: s.max } : {}),
@@ -121,26 +129,9 @@ export function firebaseToGame(
   // Cast required: Game is a discriminated union keyed on gameMode, but we
   // construct from runtime Firebase data where the discriminant is a string.
   // This is the single boundary-cast location for Game deserialization.
-
-  let configuredRoleBuckets: RoleBucket[];
-  if (
-    pub.configuredRoleBuckets &&
-    Object.keys(pub.configuredRoleBuckets).length > 0
-  ) {
-    configuredRoleBuckets = Object.values(pub.configuredRoleBuckets).map(
-      firebaseToRoleBucket,
-    );
-  } else if (pub.configuredRoleSlots && pub.configuredRoleSlots.length > 0) {
-    // Migration shim: convert old configuredRoleSlots format to roleBuckets
-    configuredRoleBuckets = pub.configuredRoleSlots
-      .filter((s) => s.min > 0)
-      .map((s) => ({
-        playerCount: s.min,
-        roles: [{ roleId: s.roleId, min: 1 }],
-      }));
-  } else {
-    configuredRoleBuckets = [];
-  }
+  const configuredRoleBuckets: RoleBucket[] = pub.configuredRoleBuckets
+    ? Object.values(pub.configuredRoleBuckets).map(firebaseToRoleBucket)
+    : [];
 
   return {
     id: gameId,
