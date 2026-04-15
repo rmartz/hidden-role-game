@@ -82,6 +82,7 @@ export enum RoleConfigMode {
   Default = "Default",
   Custom = "Custom",
   Advanced = "Advanced",
+  Buckets = "Buckets",
 }
 
 // --- Show Roles In Play Options ---
@@ -250,6 +251,27 @@ export interface RoleSlot {
   max: number;
 }
 
+/**
+ * A single role entry within a role bucket.
+ * `min` is the guaranteed minimum count from this bucket.
+ * `max` is undefined for non-unique roles (unlimited copies); set to a number
+ * for unique roles (e.g. max: 1 means at most one copy drawn from this bucket).
+ */
+export interface RoleBucketSlot {
+  roleId: string;
+  min: number;
+  max?: number;
+}
+
+/**
+ * A role bucket groups a set of roles that together fill `playerCount` players.
+ * Used in Buckets mode to define independent role pools with their own draw rules.
+ */
+export interface RoleBucket {
+  playerCount: number;
+  roles: RoleBucketSlot[];
+}
+
 export type VisibilityReason = "wake-partner" | "aware-of";
 
 export interface VisiblePlayer {
@@ -337,6 +359,8 @@ export const DEFAULT_TIMER_CONFIG: TimerConfig = {
 export interface BaseLobbyConfig {
   roleConfigMode: RoleConfigMode;
   roleSlots: RoleSlot[];
+  /** Present only in Buckets mode. */
+  roleBuckets?: RoleBucket[];
   showConfigToPlayers: boolean;
   showRolesInPlay: ShowRolesInPlay;
 }

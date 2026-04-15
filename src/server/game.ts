@@ -5,6 +5,7 @@ import type {
   Lobby,
   LobbyPlayer,
   ModeConfig,
+  RoleBucket,
   RoleSlot,
   GameMode,
   ShowRolesInPlay,
@@ -45,6 +46,7 @@ export async function createGame(
   timerConfig: TimerConfig,
   modeConfig?: ModeConfig,
   playerOrder?: string[],
+  roleBuckets?: RoleBucket[],
 ): Promise<Game> {
   const game = buildGame(
     randomUUID(),
@@ -57,6 +59,7 @@ export async function createGame(
     timerConfig,
     modeConfig,
     playerOrder,
+    roleBuckets,
   );
 
   await saveGame(game);

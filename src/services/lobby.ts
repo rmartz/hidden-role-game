@@ -2,6 +2,7 @@ import type {
   Lobby,
   GameMode,
   ModeConfig,
+  RoleBucket,
   RoleSlot,
   RoleConfigMode,
   ShowRolesInPlay,
@@ -15,6 +16,7 @@ import {
   firebaseToLobby,
   type FirebaseLobbyPublic,
   type FirebaseLobbyPrivate,
+  type FirebaseRoleBucket,
 } from "@/lib/firebase/schema";
 import { resolvePlayerOrder } from "@/lib/player-order";
 
@@ -206,6 +208,7 @@ export async function updateConfig(
     roleConfigMode?: RoleConfigMode;
     gameMode?: GameMode;
     roleSlots?: RoleSlot[];
+    roleBuckets?: RoleBucket[];
     timerConfig?: TimerConfig;
     modeConfig?: ModeConfig;
   },
@@ -246,6 +249,27 @@ export async function updateConfig(
     }));
     updates["public/config/roleSlots"] = slots;
     data.public.config.roleSlots = slots;
+  }
+  if (config.roleBuckets !== undefined) {
+    const buckets: Record<string, FirebaseRoleBucket> = {};
+    config.roleBuckets.forEach((bucket, i) => {
+      const roles: Record<
+        string,
+        { roleId: string; min: number; max?: number }
+      > = {};
+      bucket.roles.forEach((slot, j) => {
+        roles[String(j)] = {
+          roleId: slot.roleId,
+          min: slot.min,
+          ...(slot.max !== undefined ? { max: slot.max } : {}),
+        };
+      });
+      buckets[String(i)] = { playerCount: bucket.playerCount, roles };
+    });
+    updates["public/config/roleBuckets"] =
+      config.roleBuckets.length > 0 ? buckets : null;
+    data.public.config.roleBuckets =
+      config.roleBuckets.length > 0 ? buckets : undefined;
   }
   if (config.timerConfig !== undefined) {
     updates["public/config/timerConfig"] = config.timerConfig;

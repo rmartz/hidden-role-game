@@ -6,6 +6,7 @@ import {
   authenticateLobby,
   errorResponse,
   toPublicLobby,
+  validateRoleBucketsForMode,
   validateRoleSlotsForMode,
 } from "@/server/utils";
 
@@ -34,6 +35,14 @@ export async function PUT(
   if (body.roleSlots !== undefined && body.gameMode !== undefined) {
     const modeError = validateRoleSlotsForMode(body.roleSlots, body.gameMode);
     if (modeError) return errorResponse(modeError, 400);
+  }
+
+  if (body.roleBuckets !== undefined && body.gameMode !== undefined) {
+    const bucketError = validateRoleBucketsForMode(
+      body.roleBuckets,
+      body.gameMode,
+    );
+    if (bucketError) return errorResponse(bucketError, 400);
   }
 
   const updated = await updateConfig(lobbyId, body);
