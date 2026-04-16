@@ -277,6 +277,7 @@ describe("WerewolfAction.StartTrial — trialsPerDay", () => {
         nominationsEnabled: false,
         trialsPerDay: 1,
         revealProtections: true,
+        hiddenRoleCount: 0,
         showRolesOnDeath: true,
       },
     });
@@ -293,6 +294,7 @@ describe("WerewolfAction.StartTrial — trialsPerDay", () => {
         trialsPerDay: 2,
         revealProtections: true,
         showRolesOnDeath: true,
+        hiddenRoleCount: 0,
       },
     });
     expect(action.isValid(game, "owner-1", { defendantId: "p4" })).toBe(true);
@@ -308,6 +310,7 @@ describe("WerewolfAction.StartTrial — trialsPerDay", () => {
         trialsPerDay: 2,
         revealProtections: true,
         showRolesOnDeath: true,
+        hiddenRoleCount: 0,
       },
     });
     expect(action.isValid(game, "owner-1", { defendantId: "p4" })).toBe(false);
@@ -322,6 +325,7 @@ describe("WerewolfAction.StartTrial — trialsPerDay", () => {
         nominationsEnabled: false,
         trialsPerDay: 0,
         revealProtections: true,
+        hiddenRoleCount: 0,
         showRolesOnDeath: true,
       },
     });

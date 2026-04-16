@@ -73,6 +73,11 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   executionerTargetId?: string;
   /** Hunter revenge pending: the Hunter's player ID. Narrator-only. */
   hunterRevengePlayerId?: string;
+  /**
+   * Role IDs that were randomly removed from the game at start (Narrator-only).
+   * Present only when hiddenRoleCount > 0 in modeConfig.
+   */
+  hiddenRoleIds?: string[];
   /** Current nominations for trial. */
   nominations?: { defendantId: string; nominatorIds: string[] }[];
   /** The defendant this player has nominated. */

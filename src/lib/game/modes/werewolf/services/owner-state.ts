@@ -1,4 +1,5 @@
 import type { Game } from "@/lib/types";
+import { GameMode } from "@/lib/types";
 import type { DaytimeNightStatusEntry } from "@/server/types";
 import type { WerewolfPlayerGameState } from "../player-state";
 import { getWerewolfModeConfig } from "../lobby-config";
@@ -257,6 +258,12 @@ export function extractOwnerState(
   const callerId = game.ownerPlayerId ?? "";
   const daytimeNightState = extractDaytimeNightSummary(game, callerId);
 
+  // hiddenRoleIds is only present on WerewolfGame when hiddenRoleCount > 0.
+  const hiddenRoleIds =
+    game.gameMode === GameMode.Werewolf && game.hiddenRoleIds?.length
+      ? game.hiddenRoleIds
+      : undefined;
+
   return {
     ...(nightActions ? { nightActions } : {}),
     ...daytimeNightState,
@@ -265,6 +272,7 @@ export function extractOwnerState(
     ...(game.executionerTargetId
       ? { executionerTargetId: game.executionerTargetId }
       : {}),
+    ...(hiddenRoleIds ? { hiddenRoleIds } : {}),
   };
 }
 

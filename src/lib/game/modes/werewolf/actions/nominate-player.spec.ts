@@ -45,6 +45,7 @@ describe("WerewolfAction.NominatePlayer — apply", () => {
         nominationsEnabled: true,
         trialsPerDay: 1,
         revealProtections: true,
+        hiddenRoleCount: 0,
         showRolesOnDeath: true,
       },
     });
@@ -69,6 +70,7 @@ describe("WerewolfAction.NominatePlayer — apply", () => {
           nominationsEnabled: true,
           trialsPerDay: 1,
           revealProtections: true,
+          hiddenRoleCount: 0,
           showRolesOnDeath: true,
         },
       },
@@ -101,6 +103,7 @@ describe("WerewolfAction.NominatePlayer — apply", () => {
           nominationsEnabled: true,
           trialsPerDay: 1,
           revealProtections: true,
+          hiddenRoleCount: 0,
           showRolesOnDeath: true,
         },
       },
@@ -124,6 +127,7 @@ describe("WerewolfAction.NominatePlayer — apply", () => {
           nominationsEnabled: true,
           trialsPerDay: 1,
           revealProtections: true,
+          hiddenRoleCount: 0,
           showRolesOnDeath: true,
         },
       },
@@ -144,6 +148,7 @@ describe("WerewolfAction.NominatePlayer — apply", () => {
         nominationsEnabled: true,
         trialsPerDay: 1,
         revealProtections: true,
+        hiddenRoleCount: 0,
         showRolesOnDeath: true,
       },
     });
@@ -172,6 +177,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         nominationsEnabled: true,
         trialsPerDay: 1,
         revealProtections: true,
+        hiddenRoleCount: 0,
         showRolesOnDeath: true,
       },
     });
@@ -185,6 +191,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         nominationsEnabled: true,
         trialsPerDay: 1,
         revealProtections: true,
+        hiddenRoleCount: 0,
         showRolesOnDeath: true,
       },
     });
@@ -198,6 +205,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         nominationsEnabled: true,
         trialsPerDay: 1,
         revealProtections: true,
+        hiddenRoleCount: 0,
         showRolesOnDeath: true,
       },
     });
@@ -226,6 +234,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         nominationsEnabled: true,
         trialsPerDay: 1,
         revealProtections: true,
+        hiddenRoleCount: 0,
         showRolesOnDeath: true,
       },
     });
@@ -255,6 +264,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         nominationsEnabled: true,
         trialsPerDay: 0,
         revealProtections: true,
+        hiddenRoleCount: 0,
         showRolesOnDeath: true,
       },
     });
@@ -272,6 +282,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         nominationsEnabled: true,
         trialsPerDay: 1,
         revealProtections: true,
+        hiddenRoleCount: 0,
         showRolesOnDeath: true,
       },
     });
@@ -289,6 +300,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         nominationsEnabled: true,
         trialsPerDay: 1,
         revealProtections: true,
+        hiddenRoleCount: 0,
         showRolesOnDeath: true,
       },
     });
@@ -302,6 +314,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         nominationsEnabled: true,
         trialsPerDay: 1,
         revealProtections: true,
+        hiddenRoleCount: 0,
         showRolesOnDeath: true,
       },
     });
@@ -315,6 +328,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         nominationsEnabled: true,
         trialsPerDay: 1,
         revealProtections: true,
+        hiddenRoleCount: 0,
         showRolesOnDeath: true,
       },
     });
@@ -330,6 +344,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
           nominationsEnabled: true,
           trialsPerDay: 1,
           revealProtections: true,
+          hiddenRoleCount: 0,
           showRolesOnDeath: true,
         },
       },
@@ -348,6 +363,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         nominationsEnabled: true,
         trialsPerDay: 1,
         revealProtections: true,
+        hiddenRoleCount: 0,
         showRolesOnDeath: true,
       },
     });
@@ -363,6 +379,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
           nominationsEnabled: true,
           trialsPerDay: 1,
           revealProtections: true,
+          hiddenRoleCount: 0,
           showRolesOnDeath: true,
         },
       },
@@ -383,6 +400,7 @@ describe("WerewolfAction.NominatePlayer — trialsPerDay", () => {
         nominationsEnabled: true,
         trialsPerDay: 1,
         revealProtections: true,
+        hiddenRoleCount: 0,
         showRolesOnDeath: true,
       },
     });
@@ -399,6 +417,7 @@ describe("WerewolfAction.NominatePlayer — trialsPerDay", () => {
         trialsPerDay: 2,
         revealProtections: true,
         showRolesOnDeath: true,
+        hiddenRoleCount: 0,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p4" })).toBe(true);
@@ -414,6 +433,7 @@ describe("WerewolfAction.NominatePlayer — trialsPerDay", () => {
         trialsPerDay: 2,
         revealProtections: true,
         showRolesOnDeath: true,
+        hiddenRoleCount: 0,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p4" })).toBe(false);
@@ -428,6 +448,7 @@ describe("WerewolfAction.NominatePlayer — trialsPerDay", () => {
         nominationsEnabled: true,
         trialsPerDay: 0,
         revealProtections: true,
+        hiddenRoleCount: 0,
         showRolesOnDeath: true,
       },
     });

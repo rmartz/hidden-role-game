@@ -2,8 +2,9 @@ import type {
   LobbyPlayer,
   PlayerRoleAssignment,
   RoleBucket,
+  RoleDefinition,
 } from "@/lib/types";
-import { isSimpleRoleBucket } from "@/lib/types";
+import { Team, isSimpleRoleBucket } from "@/lib/types";
 
 function fisherYates(arr: string[]): void {
   for (let i = arr.length - 1; i > 0; i--) {
@@ -70,4 +71,83 @@ export function assignRolesFromBuckets(
       throw new Error(`No role for player at index ${String(i)}`);
     return { playerId: p.id, roleDefinitionId };
   });
+}
+
+function isSafeToHide(
+  candidateIndex: number,
+  roleIds: string[],
+  roles: Record<string, RoleDefinition<string, Team>>,
+): boolean {
+  const candidateRoleId = roleIds[candidateIndex];
+  if (!candidateRoleId)
+    throw new Error(
+      `candidateIndex ${String(candidateIndex)} is out of bounds for roleIds of length ${String(roleIds.length)}. This is a programming error.`,
+    );
+  const candidateRole = roles[candidateRoleId];
+  if (!candidateRole)
+    throw new Error(
+      `Role "${candidateRoleId}" is not defined in the roles registry. Cannot determine team for hidden role selection.`,
+    );
+  const isBadOrNeutral =
+    candidateRole.team === Team.Bad || candidateRole.team === Team.Neutral;
+  if (!isBadOrNeutral) return true;
+
+  const badOrNeutralRemaining = roleIds.filter((id, i) => {
+    if (i === candidateIndex) return false;
+    const r = roles[id];
+    if (!r)
+      throw new Error(
+        `Role "${id}" is not defined in the roles registry. Cannot determine team for hidden role selection.`,
+      );
+    return r.team === Team.Bad || r.team === Team.Neutral;
+  });
+  return badOrNeutralRemaining.length >= 1;
+}
+
+export function assignRolesFromBucketsWithHidden(
+  players: LobbyPlayer[],
+  buckets: RoleBucket[],
+  hiddenCount: number,
+  roles: Record<string, RoleDefinition<string, Team>>,
+): { assignments: PlayerRoleAssignment[]; hiddenRoleIds: string[] } {
+  const allRoleIds: string[] = [];
+  for (const bucket of buckets) {
+    allRoleIds.push(...drawFromBucket(bucket));
+  }
+  fisherYates(allRoleIds);
+
+  if (allRoleIds.length !== players.length + hiddenCount) {
+    throw new Error(
+      `Expected ${String(players.length + hiddenCount)} roles for ${String(players.length)} players + ${String(hiddenCount)} hidden, got ${String(allRoleIds.length)}`,
+    );
+  }
+
+  const hiddenRoleIds: string[] = [];
+  const remainingRoleIds = [...allRoleIds];
+
+  for (let i = 0; i < hiddenCount; i++) {
+    const safeIndices = remainingRoleIds
+      .map((_, idx) => idx)
+      .filter((idx) => isSafeToHide(idx, remainingRoleIds, roles));
+    if (safeIndices.length === 0) {
+      throw new Error(
+        "Cannot hide any more roles: removing any remaining role would leave no Bad or Neutral roles in the game.",
+      );
+    }
+    const candidateIndex = safeIndices.reduce((chosen, idx, pos) =>
+      Math.random() < 1 / (pos + 1) ? idx : chosen,
+    );
+    const [hidden] = remainingRoleIds.splice(candidateIndex, 1);
+    if (!hidden) throw new Error("Unexpected empty splice result");
+    hiddenRoleIds.push(hidden);
+  }
+
+  const assignments = players.map((p, i) => {
+    const roleDefinitionId = remainingRoleIds[i];
+    if (roleDefinitionId === undefined)
+      throw new Error(`No role for player at index ${String(i)}`);
+    return { playerId: p.id, roleDefinitionId };
+  });
+
+  return { assignments, hiddenRoleIds };
 }

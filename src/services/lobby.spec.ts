@@ -23,6 +23,7 @@ function makeBaseLobby(overrides: Partial<Lobby["config"]> = {}): Lobby {
         nominationsEnabled: false,
         trialsPerDay: 1,
         revealProtections: true,
+        hiddenRoleCount: 0,
         showRolesOnDeath: true,
       },
       timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
@@ -41,6 +42,7 @@ describe("updateConfig — nominationsEnabled", () => {
         nominationsEnabled: true,
         trialsPerDay: 1,
         revealProtections: true,
+        hiddenRoleCount: 0,
         showRolesOnDeath: true,
       },
     });
@@ -58,6 +60,7 @@ describe("updateConfig — nominationsEnabled", () => {
           nominationsEnabled: true,
           trialsPerDay: 1,
           revealProtections: true,
+          hiddenRoleCount: 0,
           showRolesOnDeath: true,
         },
       }),
@@ -69,6 +72,7 @@ describe("updateConfig — nominationsEnabled", () => {
         nominationsEnabled: false,
         trialsPerDay: 1,
         revealProtections: true,
+        hiddenRoleCount: 0,
         showRolesOnDeath: true,
       },
     });
@@ -86,6 +90,7 @@ describe("updateConfig — nominationsEnabled", () => {
           nominationsEnabled: true,
           trialsPerDay: 1,
           revealProtections: true,
+          hiddenRoleCount: 0,
           showRolesOnDeath: true,
         },
       }),
@@ -96,6 +101,7 @@ describe("updateConfig — nominationsEnabled", () => {
         nominationsEnabled: false,
         trialsPerDay: 1,
         revealProtections: true,
+        hiddenRoleCount: 0,
         showRolesOnDeath: true,
       },
     });
@@ -115,6 +121,7 @@ describe("updateConfig — nominationsEnabled", () => {
           nominationsEnabled: true,
           trialsPerDay: 1,
           revealProtections: true,
+          hiddenRoleCount: 0,
           showRolesOnDeath: true,
         },
       }),
@@ -136,6 +143,7 @@ describe("updateConfig — nominationsEnabled", () => {
         nominationsEnabled: true,
         trialsPerDay: 1,
         revealProtections: true,
+        hiddenRoleCount: 0,
         showRolesOnDeath: true,
       },
     });

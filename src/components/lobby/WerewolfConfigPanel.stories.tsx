@@ -16,6 +16,7 @@ const DEFAULT_ARGS = {
   trialsPerDay: 1,
   revealProtections: true,
   showRolesOnDeath: true,
+  hiddenRole: false,
   onWerewolfTimerConfigChange: fn(),
   onNominationEnabledChange: fn(),
   onTrialsPerDayChange: fn(),

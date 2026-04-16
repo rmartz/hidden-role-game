@@ -1,10 +1,14 @@
 "use client";
 
 import { useMemo } from "react";
-import { GameStatus } from "@/lib/types";
+import { GameStatus, GameMode } from "@/lib/types";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { GameRolesList, PlayersRoleList } from "@/components/game";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { RoleLabel } from "@/components/RoleLabel";
+import { GAME_MODES } from "@/lib/game/modes";
 import { OwnerHeader } from "./OwnerHeader";
+import { OWNER_STARTING_SCREEN_COPY } from "./OwnerStartingScreen.copy";
 
 interface OwnerStartingScreenProps {
   gameState: WerewolfPlayerGameState;
@@ -32,6 +36,11 @@ export function OwnerStartingScreen({
     onTimerTrigger: onStart,
   };
 
+  const hiddenRoles = (gameState.hiddenRoleIds ?? []).flatMap((roleId) => {
+    const role = GAME_MODES[GameMode.Werewolf].roles[roleId];
+    return role ? [role] : [];
+  });
+
   return (
     <div className="p-5 max-w-4xl mx-auto">
       <OwnerHeader
@@ -45,6 +54,30 @@ export function OwnerStartingScreen({
         gameMode={gameState.gameMode}
         executionerTargetId={gameState.executionerTargetId}
       />
+      {hiddenRoles.length > 0 && (
+        <Card className="mb-5 border-amber-500 dark:border-amber-600">
+          <CardHeader>
+            <CardTitle className="text-amber-700 dark:text-amber-400">
+              {OWNER_STARTING_SCREEN_COPY.hiddenRolesTitle}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-3">
+              {OWNER_STARTING_SCREEN_COPY.hiddenRolesDescription}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {hiddenRoles.map((role, i) => (
+                <RoleLabel
+                  key={`${role.id}-${String(i)}`}
+                  role={role}
+                  gameMode={GameMode.Werewolf}
+                  showTeam
+                />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
       <GameRolesList
         roles={gameState.rolesInPlay ?? []}
         gameMode={gameState.gameMode}

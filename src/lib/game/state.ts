@@ -12,7 +12,10 @@ import type {
 import type { PlayerGameState, VisibleTeammate } from "@/server/types";
 import { GAME_MODES } from "@/lib/game/modes";
 import { getPlayer } from "@/lib/player";
-import { assignRolesFromBuckets } from "@/server/utils";
+import {
+  assignRolesFromBuckets,
+  assignRolesFromBucketsWithHidden,
+} from "@/server/utils";
 import { buildRolesInPlay, buildGamePlayers } from "@/lib/game/initialization";
 import { GameMode } from "@/lib/types";
 
@@ -206,10 +209,25 @@ export function buildGame(
   const config = getModeDefinition(gameMode);
   const { roles, services } = config;
 
+  const resolvedModeConfig = modeConfig ?? config.defaultModeConfig;
   const rolePlayers = ownerPlayerId
     ? players.filter((p) => p.id !== ownerPlayerId)
     : players;
-  const roleAssignments = assignRolesFromBuckets(rolePlayers, roleBuckets);
+
+  const hiddenCount = config.resolveHiddenRoleCount?.(resolvedModeConfig) ?? 0;
+
+  const { assignments: roleAssignments, hiddenRoleIds } =
+    hiddenCount > 0
+      ? assignRolesFromBucketsWithHidden(
+          rolePlayers,
+          roleBuckets,
+          hiddenCount,
+          roles,
+        )
+      : {
+          assignments: assignRolesFromBuckets(rolePlayers, roleBuckets),
+          hiddenRoleIds: undefined,
+        };
 
   const ownerPlayer = ownerPlayerId ? getPlayer(players, ownerPlayerId) : null;
   const gamePlayers: GamePlayer[] = [
@@ -232,8 +250,9 @@ export function buildGame(
     showRolesInPlay,
     ownerPlayerId,
     timerConfig,
-    modeConfig: modeConfig ?? config.defaultModeConfig,
+    modeConfig: resolvedModeConfig,
     ...(playerOrder && playerOrder.length > 0 ? { playerOrder } : {}),
+    ...(hiddenRoleIds && hiddenRoleIds.length > 0 ? { hiddenRoleIds } : {}),
     ...specialTargets,
   } as Game;
 }
