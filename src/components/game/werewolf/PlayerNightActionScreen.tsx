@@ -60,6 +60,8 @@ export function PlayerNightActionScreen({
   }));
   const suggestedTargetId = gameState.suggestedTargetId;
   const allAgreed = gameState.allAgreed ?? false;
+  const isMentalist =
+    !isGroupPhase && gameState.myRole?.id === WerewolfRole.Mentalist;
 
   const allTargets = getTargetablePlayers(
     gameState.players,
@@ -71,7 +73,11 @@ export function PlayerNightActionScreen({
   ).map((player) => [player, gameState.myNightTarget === player.id] as const);
 
   const targets = isConfirmed
-    ? allTargets.filter(([, isSelected]) => isSelected)
+    ? allTargets.filter(
+        ([player, isSelected]) =>
+          isSelected ||
+          (isMentalist && player.id === gameState.mySecondNightTarget),
+      )
     : allTargets;
 
   // For group phases (Werewolf, Wolf Cub waking together), use the phase key;
@@ -82,31 +88,8 @@ export function PlayerNightActionScreen({
     .filter((e) => e.effect === "attacked")
     .map((e) => e.targetPlayerId);
 
-  const isMentalist =
-    !isGroupPhase &&
-    gameState.myRole?.id === (WerewolfRole.Mentalist as string);
-  const allSecondTargets = isMentalist
-    ? getTargetablePlayers(
-        gameState.players,
-        gameState.gameOwner?.id,
-        deadPlayerIds,
-        activePhaseKey ?? "",
-        gameState.myPlayerId,
-        gameState.visibleRoleAssignments,
-      )
-        .filter((player) => player.id !== gameState.myNightTarget)
-        .map(
-          (player) =>
-            [player, gameState.mySecondNightTarget === player.id] as const,
-        )
-    : undefined;
-  const secondTargets =
-    isMentalist && isConfirmed
-      ? (allSecondTargets ?? []).filter(([, isSelected]) => isSelected)
-      : allSecondTargets;
-
   const isAltruist =
-    !isGroupPhase && gameState.myRole?.id === (WerewolfRole.Altruist as string);
+    !isGroupPhase && gameState.myRole?.id === WerewolfRole.Altruist;
 
   const isExposerAbilityUsed =
     !isGroupPhase &&
@@ -203,7 +186,6 @@ export function PlayerNightActionScreen({
             attackedPlayerIds={attackedPlayerIds}
             myPlayerId={gameState.myPlayerId}
             previousNightTargetId={gameState.previousNightTargetId}
-            secondTargets={secondTargets}
             mySecondNightTarget={gameState.mySecondNightTarget}
             requiresSecondTarget={isMentalist}
             mirrorcasterCharged={gameState.mirrorcasterCharged}
