@@ -47,6 +47,7 @@ describe("WerewolfAction.StartNight", () => {
           nominationsEnabled: false,
           singleTrialPerDay: true,
           revealProtections: true,
+          showRolesOnDeath: true,
         },
         timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
       };
@@ -191,6 +192,7 @@ describe("StartNight — Wolf Cub bonus phase lifecycle", () => {
         nominationsEnabled: false,
         singleTrialPerDay: true,
         revealProtections: true,
+        showRolesOnDeath: true,
       },
       timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     };

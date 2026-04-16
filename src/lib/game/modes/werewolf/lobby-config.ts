@@ -13,7 +13,7 @@ export interface WerewolfModeConfig {
   /** When true, the night summary reveals players who were attacked but saved by protection. */
   revealProtections: boolean;
   /** When true, a killed player's role is revealed during the game. */
-  showRolesOnDeath?: boolean;
+  showRolesOnDeath: boolean;
 }
 
 /** Werewolf-specific lobby configuration. */
@@ -23,9 +23,7 @@ export interface WerewolfLobbyConfig extends BaseLobbyConfig {
   modeConfig: WerewolfModeConfig;
 }
 
-export const DEFAULT_WEREWOLF_MODE_CONFIG: WerewolfModeConfig & {
-  showRolesOnDeath: boolean;
-} = {
+export const DEFAULT_WEREWOLF_MODE_CONFIG: WerewolfModeConfig = {
   gameMode: GameMode.Werewolf,
   nominationsEnabled: true,
   singleTrialPerDay: true,

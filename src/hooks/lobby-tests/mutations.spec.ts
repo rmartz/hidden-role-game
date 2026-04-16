@@ -43,6 +43,7 @@ const mockLobby: PublicLobby = {
       nominationsEnabled: false,
       singleTrialPerDay: true,
       revealProtections: true,
+      showRolesOnDeath: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   },

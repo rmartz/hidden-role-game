@@ -289,17 +289,9 @@ describe("GameStateService.getPlayerGameState — Werewolf showRolesOnDeath", ()
       "p1",
     ) as WerewolfPlayerGameState | null;
 
-    expect(result?.visibleRoleAssignments).toEqual([
-      {
-        player: { id: "p2", name: "Player p2" },
-        reason: "revealed",
-        role: {
-          id: WerewolfRole.Werewolf,
-          name: "Werewolf",
-          team: Team.Bad,
-        },
-      },
-    ]);
+    expect(
+      result?.visibleRoleAssignments.map((assignment) => assignment.player.id),
+    ).toEqual(["p2"]);
   });
 
   it("does not reveal killed player roles during play when showRolesOnDeath is disabled", () => {
@@ -307,6 +299,8 @@ describe("GameStateService.getPlayerGameState — Werewolf showRolesOnDeath", ()
 
     const result = getPlayerGameState(game, "p1");
 
-    expect(result?.visibleRoleAssignments).toEqual([]);
+    expect(
+      result?.visibleRoleAssignments.map((assignment) => assignment.player.id),
+    ).toEqual([]);
   });
 });

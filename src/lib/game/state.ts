@@ -11,7 +11,6 @@ import type {
 } from "@/lib/types";
 import type { PlayerGameState, VisibleTeammate } from "@/server/types";
 import { GAME_MODES } from "@/lib/game/modes";
-import { DEFAULT_WEREWOLF_MODE_CONFIG } from "@/lib/game/modes/werewolf/lobby-config";
 import { getWerewolfModeConfig } from "@/lib/game/modes/werewolf/lobby-config";
 import { getPlayer } from "@/lib/player";
 import { assignRolesFromBuckets } from "@/server/utils";
@@ -112,8 +111,7 @@ export function getPlayerGameState(
   const isFinished = game.status.type === GameStatus.Finished;
   const shouldRevealDeadRoles =
     game.gameMode !== GameMode.Werewolf ||
-    (getWerewolfModeConfig(game).showRolesOnDeath ??
-      DEFAULT_WEREWOLF_MODE_CONFIG.showRolesOnDeath);
+    getWerewolfModeConfig(game).showRolesOnDeath;
   const revealIds = isFinished
     ? game.roleAssignments.map((a) => a.playerId)
     : shouldRevealDeadRoles

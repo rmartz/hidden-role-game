@@ -62,6 +62,7 @@ describe("validateGameStartPrerequisites", () => {
           nominationsEnabled: false,
           singleTrialPerDay: false,
           revealProtections: false,
+          showRolesOnDeath: true,
         },
         timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
       },

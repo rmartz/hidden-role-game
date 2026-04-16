@@ -45,6 +45,7 @@ describe("WerewolfAction.NominatePlayer — apply", () => {
         nominationsEnabled: true,
         singleTrialPerDay: true,
         revealProtections: true,
+        showRolesOnDeath: true,
       },
     });
     action.apply(game, { defendantId: "p3" }, "p2");
@@ -68,6 +69,7 @@ describe("WerewolfAction.NominatePlayer — apply", () => {
           nominationsEnabled: true,
           singleTrialPerDay: true,
           revealProtections: true,
+          showRolesOnDeath: true,
         },
       },
     );
@@ -99,6 +101,7 @@ describe("WerewolfAction.NominatePlayer — apply", () => {
           nominationsEnabled: true,
           singleTrialPerDay: true,
           revealProtections: true,
+          showRolesOnDeath: true,
         },
       },
     );
@@ -121,6 +124,7 @@ describe("WerewolfAction.NominatePlayer — apply", () => {
           nominationsEnabled: true,
           singleTrialPerDay: true,
           revealProtections: true,
+          showRolesOnDeath: true,
         },
       },
     );
@@ -140,6 +144,7 @@ describe("WerewolfAction.NominatePlayer — apply", () => {
         nominationsEnabled: true,
         singleTrialPerDay: true,
         revealProtections: true,
+        showRolesOnDeath: true,
       },
     });
     action.apply(game, { defendantId: "p3" }, "p2");
@@ -167,6 +172,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         nominationsEnabled: true,
         singleTrialPerDay: true,
         revealProtections: true,
+        showRolesOnDeath: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(true);
@@ -179,6 +185,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         nominationsEnabled: true,
         singleTrialPerDay: true,
         revealProtections: true,
+        showRolesOnDeath: true,
       },
     });
     expect(action.isValid(game, "owner-1", { defendantId: "p3" })).toBe(false);
@@ -191,6 +198,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         nominationsEnabled: true,
         singleTrialPerDay: true,
         revealProtections: true,
+        showRolesOnDeath: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(false);
@@ -218,6 +226,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         nominationsEnabled: true,
         singleTrialPerDay: true,
         revealProtections: true,
+        showRolesOnDeath: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(false);
@@ -246,6 +255,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         nominationsEnabled: true,
         singleTrialPerDay: false,
         revealProtections: true,
+        showRolesOnDeath: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(true);
@@ -262,6 +272,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         nominationsEnabled: true,
         singleTrialPerDay: true,
         revealProtections: true,
+        showRolesOnDeath: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(false);
@@ -278,6 +289,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         nominationsEnabled: true,
         singleTrialPerDay: true,
         revealProtections: true,
+        showRolesOnDeath: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(false);
@@ -290,6 +302,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         nominationsEnabled: true,
         singleTrialPerDay: true,
         revealProtections: true,
+        showRolesOnDeath: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p2" })).toBe(false);
@@ -302,6 +315,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         nominationsEnabled: true,
         singleTrialPerDay: true,
         revealProtections: true,
+        showRolesOnDeath: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "owner-1" })).toBe(false);
@@ -316,6 +330,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
           nominationsEnabled: true,
           singleTrialPerDay: true,
           revealProtections: true,
+          showRolesOnDeath: true,
         },
       },
     );
@@ -333,6 +348,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         nominationsEnabled: true,
         singleTrialPerDay: true,
         revealProtections: true,
+        showRolesOnDeath: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(false);
@@ -347,6 +363,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
           nominationsEnabled: true,
           singleTrialPerDay: true,
           revealProtections: true,
+          showRolesOnDeath: true,
         },
       },
     );
@@ -372,6 +389,7 @@ describe("WerewolfAction.NominatePlayer — singleTrialPerDay", () => {
         nominationsEnabled: true,
         singleTrialPerDay: true,
         revealProtections: true,
+        showRolesOnDeath: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p4" })).toBe(false);
@@ -392,6 +410,7 @@ describe("WerewolfAction.NominatePlayer — singleTrialPerDay", () => {
         nominationsEnabled: true,
         singleTrialPerDay: false,
         revealProtections: true,
+        showRolesOnDeath: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p4" })).toBe(true);
