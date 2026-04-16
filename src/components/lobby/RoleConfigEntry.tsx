@@ -48,6 +48,7 @@ export function RoleConfigEntry(props: RoleConfigEntryProps) {
   return (
     <li
       className={`py-1 grid grid-cols-[1fr_auto] items-center gap-2 ${dimmed ? "text-muted-foreground" : ""}`}
+      data-dimmed={dimmed}
     >
       <span className="flex items-center gap-1">
         <RoleLabel role={role} gameMode={gameMode} />
@@ -63,9 +64,9 @@ export function RoleConfigEntry(props: RoleConfigEntryProps) {
             minValue={0}
           />
         </div>
-      ) : (
+      ) : count > 0 ? (
         <span className="text-sm text-muted-foreground">{count}</span>
-      )}
+      ) : null}
     </li>
   );
 }
