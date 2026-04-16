@@ -5,7 +5,7 @@ import {
   RoleConfigMode as RoleConfigModeEnum,
   ShowRolesInPlay as ShowRolesInPlayEnum,
 } from "@/lib/types";
-import { GAME_MODES, getDefaultRoleSlots } from "@/lib/game/modes";
+import { GAME_MODES, getDefaultRoleBuckets } from "@/lib/game/modes";
 import {
   addLobby as firebaseAddLobby,
   getLobby,
@@ -54,7 +54,7 @@ export async function addLobby(
   const lobbyId = randomUUID();
   const base = {
     roleConfigMode: RoleConfigModeEnum.Default,
-    roleSlots: getDefaultRoleSlots(gameMode, 1),
+    roleBuckets: getDefaultRoleBuckets(gameMode, 1),
     showConfigToPlayers: false,
     showRolesInPlay: ShowRolesInPlayEnum.ConfiguredOnly,
   };

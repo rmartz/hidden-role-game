@@ -207,7 +207,7 @@ export interface GameModeConfig {
   ): boolean;
   readonly roles: Record<string, RoleDefinition<string, Team>>;
   readonly teamLabels: Partial<Record<Team, string>>;
-  defaultRoleCount(numPlayers: number): RoleSlot[];
+  defaultRoleCount(numPlayers: number): RoleBucket[];
   /**
    * Returns the number of role slots that must be filled for a game with
    * numPlayers total players. Game modes that reserve one player as a non-role
@@ -244,10 +244,38 @@ export interface PlayerRoleAssignment {
   roleDefinitionId: string;
 }
 
-export interface RoleSlot {
+/**
+ * A single role entry within an advanced role bucket.
+ * `max` is undefined for non-unique roles (can fill the whole bucket);
+ * set to a number to cap how many copies can be drawn
+ * (e.g. max: 1 means at most one copy drawn from this bucket).
+ */
+export interface RoleBucketSlot {
   roleId: string;
-  min: number;
-  max: number;
+  max?: number;
+}
+
+/** A bucket that always assigns exactly `playerCount` copies of a single role. */
+export interface SimpleRoleBucket {
+  playerCount: number;
+  roleId: string;
+}
+
+/**
+ * A bucket with a multi-role pool that draws `playerCount` roles using
+ * min/max constraints per slot. Used in Advanced mode.
+ */
+export interface AdvancedRoleBucket {
+  playerCount: number;
+  roles: RoleBucketSlot[];
+  /** Optional display name shown in the config UI and post-game lobby. */
+  name?: string;
+}
+
+export type RoleBucket = SimpleRoleBucket | AdvancedRoleBucket;
+
+export function isSimpleRoleBucket(b: RoleBucket): b is SimpleRoleBucket {
+  return "roleId" in b;
 }
 
 export type VisibilityReason = "wake-partner" | "aware-of";
@@ -272,7 +300,7 @@ export interface BaseGame {
   status: GameStatusState;
   players: GamePlayer[];
   roleAssignments: PlayerRoleAssignment[];
-  configuredRoleSlots: RoleSlot[];
+  configuredRoleBuckets: RoleBucket[];
   showRolesInPlay: ShowRolesInPlay;
   ownerPlayerId?: string;
   /** Executioner: the player ID the Executioner must get eliminated at trial. */
@@ -336,7 +364,7 @@ export const DEFAULT_TIMER_CONFIG: TimerConfig = {
 /** Shared lobby config fields. Game-mode-specific variants extend this. */
 export interface BaseLobbyConfig {
   roleConfigMode: RoleConfigMode;
-  roleSlots: RoleSlot[];
+  roleBuckets: RoleBucket[];
   showConfigToPlayers: boolean;
   showRolesInPlay: ShowRolesInPlay;
 }

@@ -1,5 +1,5 @@
 import { Team } from "@/lib/types";
-import type { RoleDefinition, RoleSlot } from "@/lib/types";
+import type { RoleBucket, RoleDefinition } from "@/lib/types";
 
 export enum AvalonRole {
   Assassin = "avalon-assassin",
@@ -14,14 +14,14 @@ export enum AvalonRole {
 
 export const MIN_PLAYERS = 5;
 
-export function defaultRoleCount(numPlayers: number): RoleSlot[] {
+export function defaultRoleCount(numPlayers: number): RoleBucket[] {
   const n = Math.max(numPlayers, MIN_PLAYERS);
   const bad = Math.floor((n - 1) / 2);
   const good = n - bad;
   return [
-    { roleId: AvalonRole.Merlin, min: 1, max: 1 },
-    { roleId: AvalonRole.LoyalServant, min: good - 1, max: good - 1 },
-    { roleId: AvalonRole.MinionOfMordred, min: bad, max: bad },
+    { playerCount: 1, roleId: AvalonRole.Merlin },
+    { playerCount: good - 1, roleId: AvalonRole.LoyalServant },
+    { playerCount: bad, roleId: AvalonRole.MinionOfMordred },
   ];
 }
 

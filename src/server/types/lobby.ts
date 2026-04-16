@@ -1,7 +1,7 @@
 import { GameMode } from "@/lib/types";
 import type {
   ModeConfig,
-  RoleSlot,
+  RoleBucket,
   RoleConfigMode,
   ShowRolesInPlay,
   TimerConfig,
@@ -22,7 +22,7 @@ export interface BaseGameConfig {
   roleConfigMode: RoleConfigMode;
   showConfigToPlayers: boolean;
   showRolesInPlay: ShowRolesInPlay;
-  roleSlots?: RoleSlot[];
+  roleBuckets: RoleBucket[];
 }
 
 export interface WerewolfGameConfig extends BaseGameConfig {
@@ -77,7 +77,7 @@ export interface UpdateLobbyConfigRequest {
   showRolesInPlay?: ShowRolesInPlay;
   roleConfigMode?: RoleConfigMode;
   gameMode?: GameMode;
-  roleSlots?: RoleSlot[];
+  roleBuckets?: RoleBucket[];
   timerConfig?: TimerConfig;
   modeConfig?: ModeConfig;
 }
