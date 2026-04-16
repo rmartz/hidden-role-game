@@ -235,8 +235,13 @@ function makeWerewolfDeathRevealGame(showRolesOnDeath: boolean): Game {
       { playerId: "p2", roleDefinitionId: WerewolfRole.Werewolf },
     ],
     configuredRoleBuckets: [
-      { playerCount: 1, roles: [{ roleId: WerewolfRole.Seer }] },
-      { playerCount: 1, roles: [{ roleId: WerewolfRole.Werewolf }] },
+      {
+        playerCount: 2,
+        roles: [
+          { roleId: WerewolfRole.Seer },
+          { roleId: WerewolfRole.Werewolf },
+        ],
+      },
     ],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "narrator",
