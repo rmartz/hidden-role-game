@@ -107,6 +107,8 @@ export function RoleConfig(props: RoleConfigProps) {
       }, [])
     : [];
 
+  // Non-categorized mode passes [] here; ExpandedRoleList uses disabledRoles for
+  // the flat list and never reads uncategorizedDisabled in that path.
   const uncategorizedDisabled = hasCategoryGrouping
     ? disabledRoles.filter(
         (r) => !r.category || !categoryOrder.includes(r.category),
@@ -181,7 +183,6 @@ export function RoleConfig(props: RoleConfigProps) {
           )}
           {!isAdvanced && (
             <>
-              {/* Active roles — always visible regardless of search or expansion state. */}
               <ul className="space-y-1 list-none p-0">
                 {enabledRoles.map((role) => (
                   <RoleListEntry
@@ -198,7 +199,6 @@ export function RoleConfig(props: RoleConfigProps) {
               </ul>
               {hasExtraRoles && (
                 <>
-                  {/* Toggle sits between active roles and the extra-roles section. */}
                   <Button
                     variant="ghost"
                     size="sm"
@@ -212,7 +212,6 @@ export function RoleConfig(props: RoleConfigProps) {
                   </Button>
                   {showAll && (
                     <>
-                      {/* Search input — only visible when expanded. */}
                       <Input
                         type="search"
                         placeholder={ROLE_CONFIG_COPY.searchPlaceholder}

@@ -41,16 +41,6 @@ export function ExpandedRoleList({
   const noResults = isSearching && searchResults.length === 0;
   const flatRoles = isSearching ? searchResults : disabledRoles;
 
-  const entryProps = (role: RoleDefinition<string, Team>) => ({
-    role,
-    gameMode,
-    roleConfigMode,
-    dimmed: true as const,
-    readOnly,
-    count: counts[role.id] ?? 0,
-    disabled: formDisabled,
-  });
-
   return noResults ? (
     <p className="text-sm text-muted-foreground py-2">
       {ROLE_CONFIG_COPY.noSearchResults}
@@ -64,7 +54,16 @@ export function ExpandedRoleList({
           </p>
           <ul className="space-y-1 list-none p-0">
             {roles.map((role) => (
-              <RoleListEntry key={role.id} {...entryProps(role)} />
+              <RoleListEntry
+                key={role.id}
+                role={role}
+                gameMode={gameMode}
+                roleConfigMode={roleConfigMode}
+                dimmed={true}
+                readOnly={readOnly}
+                count={counts[role.id] ?? 0}
+                disabled={formDisabled}
+              />
             ))}
           </ul>
         </div>
@@ -76,7 +75,16 @@ export function ExpandedRoleList({
           </p>
           <ul className="space-y-1 list-none p-0">
             {uncategorizedDisabled.map((role) => (
-              <RoleListEntry key={role.id} {...entryProps(role)} />
+              <RoleListEntry
+                key={role.id}
+                role={role}
+                gameMode={gameMode}
+                roleConfigMode={roleConfigMode}
+                dimmed={true}
+                readOnly={readOnly}
+                count={counts[role.id] ?? 0}
+                disabled={formDisabled}
+              />
             ))}
           </ul>
         </div>
@@ -85,7 +93,16 @@ export function ExpandedRoleList({
   ) : (
     <ul className="space-y-1 list-none p-0 mt-1">
       {flatRoles.map((role) => (
-        <RoleListEntry key={role.id} {...entryProps(role)} />
+        <RoleListEntry
+          key={role.id}
+          role={role}
+          gameMode={gameMode}
+          roleConfigMode={roleConfigMode}
+          dimmed={true}
+          readOnly={readOnly}
+          count={counts[role.id] ?? 0}
+          disabled={formDisabled}
+        />
       ))}
     </ul>
   );
