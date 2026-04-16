@@ -305,6 +305,7 @@ const gameConfigSlice = createSlice({
       if (!bucket || isSimpleRoleBucket(bucket)) return;
       const modeRoles = GAME_MODES[state.gameMode].roles;
       for (const slot of bucket.roles) {
+        // Inherently unique roles are always capped at 1 — skip the toggle logic.
         if (modeRoles[slot.roleId]?.unique === true) {
           slot.max = 1;
           continue;

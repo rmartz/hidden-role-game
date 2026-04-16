@@ -36,8 +36,6 @@ export function Incrementer({
         onClick={handleDecrement}
         disabled={
           disabled === true || (minValue !== undefined && value <= minValue)
-            ? true
-            : undefined
         }
       >
         −
@@ -51,8 +49,6 @@ export function Incrementer({
         onClick={handleIncrement}
         disabled={
           disabled === true || (maxValue !== undefined && value >= maxValue)
-            ? true
-            : undefined
         }
       >
         +
