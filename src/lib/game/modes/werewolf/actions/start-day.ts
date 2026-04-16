@@ -1,10 +1,6 @@
 import { GameStatus, Team } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
-import {
-  NightOutcomeRevealStep,
-  WerewolfPhase,
-  isTeamNightAction,
-} from "../types";
+import { WerewolfPhase, isTeamNightAction } from "../types";
 import type {
   AttackNightResolutionEvent,
   NightAction,
@@ -21,6 +17,7 @@ import {
 import { WerewolfRole, getWerewolfRole } from "../roles";
 import { didWolfCubDie } from "./helpers";
 import { getWerewolfModeConfig } from "../lobby-config";
+import { getOrderedAffectedPlayerIds } from "../services";
 
 export const startDayAction: GameAction = {
   isValid(game: Game, callerId: string) {
@@ -287,10 +284,9 @@ export const startDayAction: GameAction = {
 
     const wolfCubDied =
       ts.wolfCubDied === true || didWolfCubDie(newDeadIds, game);
-    const nightOutcomeRevealStep = getWerewolfModeConfig(game)
-      .autoRevealNightOutcome
-      ? NightOutcomeRevealStep.All
-      : NightOutcomeRevealStep.Hidden;
+    const revealedPlayerIds = getWerewolfModeConfig(game).autoRevealNightOutcome
+      ? getOrderedAffectedPlayerIds(nightResolution)
+      : [];
     game.status = {
       type: GameStatus.Playing,
       turnState: {
@@ -299,7 +295,7 @@ export const startDayAction: GameAction = {
           type: WerewolfPhase.Daytime,
           startedAt: Date.now(),
           nightActions: nightPhase.nightActions,
-          nightOutcomeRevealStep,
+          revealedPlayerIds,
           ...(nightResolution.length > 0 ? { nightResolution } : {}),
           ...(nightPhase.smitedPlayerIds?.length
             ? { smitedPlayerIds: nightPhase.smitedPlayerIds }

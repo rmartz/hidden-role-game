@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 import type { Game } from "@/lib/types";
 import {
-  NightOutcomeRevealStep,
   WerewolfPhase,
   WerewolfRole,
   DEFAULT_WEREWOLF_TIMER_CONFIG,
@@ -157,7 +156,7 @@ describe("extractDaytimeNightSummary", () => {
   it("hides killed and silenced outcomes from other players before reveal", () => {
     const game = makeDaytimeGame({
       modeConfig: { autoRevealNightOutcome: false },
-      nightOutcomeRevealStep: NightOutcomeRevealStep.Hidden,
+      revealedPlayerIds: [],
       nightResolution: [
         {
           type: "killed" as const,
@@ -187,7 +186,7 @@ describe("extractDaytimeNightSummary", () => {
   it("hides newly killed players from the public dead list before reveal", () => {
     const game = makeDaytimeGame({
       modeConfig: { autoRevealNightOutcome: false },
-      nightOutcomeRevealStep: NightOutcomeRevealStep.Hidden,
+      revealedPlayerIds: [],
       nightResolution: [
         {
           type: "killed" as const,
@@ -207,7 +206,7 @@ describe("extractDaytimeNightSummary", () => {
   it("shows the narrator full night outcomes even before reveal", () => {
     const game = makeDaytimeGame({
       modeConfig: { autoRevealNightOutcome: false },
-      nightOutcomeRevealStep: NightOutcomeRevealStep.Hidden,
+      revealedPlayerIds: [],
       nightResolution: [
         {
           type: "killed" as const,

@@ -1,7 +1,6 @@
 import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 import type { Game } from "@/lib/types";
 import {
-  NightOutcomeRevealStep,
   WerewolfPhase,
   WerewolfRole,
   DEFAULT_WEREWOLF_TIMER_CONFIG,
@@ -41,10 +40,7 @@ export function makeDaytimeGame(
       WerewolfTurnState["phase"],
       { type: WerewolfPhase.Daytime }
     >["nightResolution"];
-    nightOutcomeRevealStep: Extract<
-      WerewolfTurnState["phase"],
-      { type: WerewolfPhase.Daytime }
-    >["nightOutcomeRevealStep"];
+    revealedPlayerIds: string[];
     deadPlayerIds: string[];
     modeConfig: Partial<WerewolfModeConfig>;
   }> = {},
@@ -59,19 +55,14 @@ export function makeDaytimeGame(
     autoRevealNightOutcome: true,
     ...(overrides.modeConfig ?? {}),
   };
-  const nightOutcomeRevealStep =
-    overrides.nightOutcomeRevealStep ??
-    (modeConfig.autoRevealNightOutcome
-      ? undefined
-      : NightOutcomeRevealStep.Hidden);
   const turnState: WerewolfTurnState = {
     turn: 2,
     phase: {
       type: WerewolfPhase.Daytime,
       startedAt: 1000,
       nightActions: overrides.nightActions ?? {},
-      ...(nightOutcomeRevealStep !== undefined
-        ? { nightOutcomeRevealStep }
+      ...(overrides.revealedPlayerIds !== undefined
+        ? { revealedPlayerIds: overrides.revealedPlayerIds }
         : {}),
       ...(overrides.nightResolution !== undefined
         ? { nightResolution: overrides.nightResolution }

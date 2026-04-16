@@ -3,17 +3,12 @@ import { GameMode, GameStatus } from "@/lib/types";
 import type { Game } from "@/lib/types";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
 import type { WerewolfDaytimePhase, WerewolfTurnState } from "../types";
-import { NightOutcomeRevealStep, WerewolfPhase } from "../types";
+import { WerewolfPhase } from "../types";
 import { makePlayingGame, dayTurnState } from "./test-helpers";
 
 function makeDaytimeTurnState(
-  revealStep: NightOutcomeRevealStep,
-  nightResolution: NonNullable<
-    Extract<
-      WerewolfTurnState["phase"],
-      { type: WerewolfPhase.Daytime }
-    >["nightResolution"]
-  >,
+  nightResolution: NonNullable<WerewolfDaytimePhase["nightResolution"]>,
+  revealedPlayerIds: string[] = [],
 ): WerewolfTurnState {
   return {
     turn: 1,
@@ -21,8 +16,8 @@ function makeDaytimeTurnState(
       type: WerewolfPhase.Daytime,
       startedAt: 1000,
       nightActions: {},
-      nightOutcomeRevealStep: revealStep,
       nightResolution,
+      ...(revealedPlayerIds.length > 0 ? { revealedPlayerIds } : {}),
     },
     deadPlayerIds: [],
   };
@@ -39,6 +34,16 @@ function getDaytimePhase(game: Game): WerewolfDaytimePhase {
   return turnState.phase;
 }
 
+const manualRevealConfig = {
+  modeConfig: {
+    gameMode: GameMode.Werewolf,
+    nominationsEnabled: false,
+    trialsPerDay: 2,
+    revealProtections: true,
+    autoRevealNightOutcome: false,
+  },
+} as const;
+
 describe("WerewolfAction.RevealNightOutcomeStep", () => {
   const action = WEREWOLF_ACTIONS[WerewolfAction.RevealNightOutcomeStep];
 
@@ -47,9 +52,44 @@ describe("WerewolfAction.RevealNightOutcomeStep", () => {
     expect(action.isValid(game, "owner-1", null)).toBe(false);
   });
 
-  it("advances from hidden to killed when there are killed outcomes", () => {
+  it("is invalid when there are no affected players", () => {
     const game = makePlayingGame(
-      makeDaytimeTurnState(NightOutcomeRevealStep.Hidden, [
+      makeDaytimeTurnState([
+        {
+          type: "killed",
+          targetPlayerId: "p2",
+          attackedBy: ["p1"],
+          protectedBy: ["p3"],
+          died: false,
+        },
+      ]),
+      manualRevealConfig,
+    );
+    expect(action.isValid(game, "owner-1", null)).toBe(false);
+  });
+
+  it("is invalid when all affected players are already revealed", () => {
+    const game = makePlayingGame(
+      makeDaytimeTurnState(
+        [
+          {
+            type: "killed",
+            targetPlayerId: "p2",
+            attackedBy: ["p1"],
+            protectedBy: [],
+            died: true,
+          },
+        ],
+        ["p2"],
+      ),
+      manualRevealConfig,
+    );
+    expect(action.isValid(game, "owner-1", null)).toBe(false);
+  });
+
+  it("reveals the first affected player on first press", () => {
+    const game = makePlayingGame(
+      makeDaytimeTurnState([
         {
           type: "killed",
           targetPlayerId: "p2",
@@ -57,62 +97,61 @@ describe("WerewolfAction.RevealNightOutcomeStep", () => {
           protectedBy: [],
           died: true,
         },
-      ]),
-      {
-        modeConfig: {
-          gameMode: GameMode.Werewolf,
-          nominationsEnabled: false,
-          trialsPerDay: 2,
-          revealProtections: true,
-          autoRevealNightOutcome: false,
-        },
-      },
-    );
-    action.apply(game, null, "owner-1");
-    expect(getDaytimePhase(game).nightOutcomeRevealStep).toBe(
-      NightOutcomeRevealStep.Killed,
-    );
-  });
-
-  it("advances from killed to all", () => {
-    const game = makePlayingGame(
-      makeDaytimeTurnState(NightOutcomeRevealStep.Killed, [
         { type: "silenced", targetPlayerId: "p3" },
       ]),
-      {
-        modeConfig: {
-          gameMode: GameMode.Werewolf,
-          nominationsEnabled: false,
-          trialsPerDay: 2,
-          revealProtections: true,
-          autoRevealNightOutcome: false,
-        },
-      },
+      manualRevealConfig,
     );
     action.apply(game, null, "owner-1");
-    expect(getDaytimePhase(game).nightOutcomeRevealStep).toBe(
-      NightOutcomeRevealStep.All,
-    );
+    expect(getDaytimePhase(game).revealedPlayerIds).toEqual(["p2"]);
   });
 
-  it("jumps from hidden to all when only status outcomes exist", () => {
+  it("reveals the next affected player on subsequent press", () => {
     const game = makePlayingGame(
-      makeDaytimeTurnState(NightOutcomeRevealStep.Hidden, [
-        { type: "silenced", targetPlayerId: "p3" },
-      ]),
-      {
-        modeConfig: {
-          gameMode: GameMode.Werewolf,
-          nominationsEnabled: false,
-          trialsPerDay: 2,
-          revealProtections: true,
-          autoRevealNightOutcome: false,
-        },
-      },
+      makeDaytimeTurnState(
+        [
+          {
+            type: "killed",
+            targetPlayerId: "p2",
+            attackedBy: ["p1"],
+            protectedBy: [],
+            died: true,
+          },
+          { type: "silenced", targetPlayerId: "p3" },
+        ],
+        ["p2"],
+      ),
+      manualRevealConfig,
     );
     action.apply(game, null, "owner-1");
-    expect(getDaytimePhase(game).nightOutcomeRevealStep).toBe(
-      NightOutcomeRevealStep.All,
+    expect(getDaytimePhase(game).revealedPlayerIds).toEqual(["p2", "p3"]);
+  });
+
+  it("reveals status-only outcome on first press when no kills occurred", () => {
+    const game = makePlayingGame(
+      makeDaytimeTurnState([{ type: "silenced", targetPlayerId: "p3" }]),
+      manualRevealConfig,
     );
+    action.apply(game, null, "owner-1");
+    expect(getDaytimePhase(game).revealedPlayerIds).toEqual(["p3"]);
+  });
+
+  it("is valid after partial reveal when more players remain", () => {
+    const game = makePlayingGame(
+      makeDaytimeTurnState(
+        [
+          {
+            type: "killed",
+            targetPlayerId: "p2",
+            attackedBy: ["p1"],
+            protectedBy: [],
+            died: true,
+          },
+          { type: "silenced", targetPlayerId: "p3" },
+        ],
+        ["p2"],
+      ),
+      manualRevealConfig,
+    );
+    expect(action.isValid(game, "owner-1", null)).toBe(true);
   });
 });

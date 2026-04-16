@@ -7,7 +7,7 @@ import type {
   AltruistInterceptedNightResolutionEvent,
   AnyNightAction,
 } from "../types";
-import { NightOutcomeRevealStep, TrialVerdict, WerewolfPhase } from "../types";
+import { TrialVerdict, WerewolfPhase } from "../types";
 import { SMITE_PHASE_KEY, OLD_MAN_TIMER_KEY } from "../utils";
 import { getSilencedPlayerIds, getHypnotizedPlayerId } from "../utils";
 import { currentTurnState } from "../utils/game-state";
@@ -17,25 +17,16 @@ import {
   isWerewolfRole,
   getWerewolfRole,
 } from "../roles";
+import { getOrderedAffectedPlayerIds } from "./night-outcome";
 
-function resolveNightOutcomeRevealStep(game: Game): NightOutcomeRevealStep {
+/** Returns the set of player IDs whose night outcomes are publicly visible. */
+function resolveRevealedPlayerIds(game: Game): Set<string> {
   const ts = currentTurnState(game);
-  if (ts?.phase.type !== WerewolfPhase.Daytime)
-    return NightOutcomeRevealStep.All;
-  if (getWerewolfModeConfig(game).autoRevealNightOutcome)
-    return NightOutcomeRevealStep.All;
-  return ts.phase.nightOutcomeRevealStep ?? NightOutcomeRevealStep.Hidden;
-}
-
-function canPublicSeeKilledOutcomes(step: NightOutcomeRevealStep): boolean {
-  return (
-    step === NightOutcomeRevealStep.Killed ||
-    step === NightOutcomeRevealStep.All
-  );
-}
-
-function canPublicSeeStatusOutcomes(step: NightOutcomeRevealStep): boolean {
-  return step === NightOutcomeRevealStep.All;
+  if (ts?.phase.type !== WerewolfPhase.Daytime) return new Set();
+  if (getWerewolfModeConfig(game).autoRevealNightOutcome) {
+    return new Set(getOrderedAffectedPlayerIds(ts.phase.nightResolution ?? []));
+  }
+  return new Set(ts.phase.revealedPlayerIds ?? []);
 }
 
 /** Extracts nightActions from the current turnState, if present. */
@@ -72,23 +63,22 @@ export function extractDaytimeNightSummary(
   const ts = currentTurnState(game);
   if (ts?.phase.type !== WerewolfPhase.Daytime) return {};
   const phase = ts.phase;
-  const nightOutcomeRevealStep = resolveNightOutcomeRevealStep(game);
+  const revealedPlayerIds = resolveRevealedPlayerIds(game);
   const callerIsOwner = callerId === game.ownerPlayerId;
-  const showKilledToAll = canPublicSeeKilledOutcomes(nightOutcomeRevealStep);
-  const showStatusToAll = canPublicSeeStatusOutcomes(nightOutcomeRevealStep);
 
   const altruistIntercept = (phase.nightResolution ?? []).find(
     (e): e is AltruistInterceptedNightResolutionEvent =>
       e.type === "altruist-intercepted",
   );
 
+  const canSeeOutcomeFor = (playerId: string) =>
+    callerIsOwner || revealedPlayerIds.has(playerId) || playerId === callerId;
+
   const nightStatus: DaytimeNightStatusEntry[] = (
     phase.nightResolution ?? []
   ).flatMap((e): DaytimeNightStatusEntry[] => {
     if (e.type === "killed" && e.died) {
-      const canSeeKilled =
-        callerIsOwner || showKilledToAll || e.targetPlayerId === callerId;
-      if (!canSeeKilled) return [];
+      if (!canSeeOutcomeFor(e.targetPlayerId)) return [];
       // Altruist death: emit altruist-sacrifice with savedPlayerId.
       if (e.targetPlayerId === altruistIntercept?.altruistPlayerId) {
         return [
@@ -119,15 +109,9 @@ export function extractDaytimeNightSummary(
     }
     if (e.type === "tough-guy-absorbed" && e.targetPlayerId === callerId)
       return [{ targetPlayerId: e.targetPlayerId, effect: "survived" }];
-    if (
-      e.type === "silenced" &&
-      (callerIsOwner || showStatusToAll || e.targetPlayerId === callerId)
-    )
+    if (e.type === "silenced" && canSeeOutcomeFor(e.targetPlayerId))
       return [{ targetPlayerId: e.targetPlayerId, effect: "silenced" }];
-    if (
-      e.type === "hypnotized" &&
-      (callerIsOwner || showStatusToAll || e.targetPlayerId === callerId)
-    )
+    if (e.type === "hypnotized" && canSeeOutcomeFor(e.targetPlayerId))
       return [{ targetPlayerId: e.targetPlayerId, effect: "hypnotized" }];
     return [];
   });
@@ -327,11 +311,7 @@ export function extractVisibleDeadPlayerIds(
   }
   if (callerId === game.ownerPlayerId) return ts.deadPlayerIds;
 
-  const showKilledToAll = canPublicSeeKilledOutcomes(
-    resolveNightOutcomeRevealStep(game),
-  );
-  if (showKilledToAll) return ts.deadPlayerIds;
-
+  const revealedPlayerIds = resolveRevealedPlayerIds(game);
   const deadThisNight = new Set<string>();
   for (const event of ts.phase.nightResolution ?? []) {
     if (event.type === "killed" && event.died) {
@@ -339,10 +319,12 @@ export function extractVisibleDeadPlayerIds(
     }
   }
 
+  // Deaths from previous nights are always visible; this night's kills are
+  // visible only once the narrator reveals that player (or they see themselves).
   const visible = ts.deadPlayerIds.filter(
-    (playerId) => !deadThisNight.has(playerId),
+    (id) => !deadThisNight.has(id) || revealedPlayerIds.has(id),
   );
-  if (deadThisNight.has(callerId)) {
+  if (deadThisNight.has(callerId) && !revealedPlayerIds.has(callerId)) {
     return [...visible, callerId];
   }
   return visible;

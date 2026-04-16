@@ -199,8 +199,14 @@ export const WEREWOLF_COPY = {
     mentalistDifferentTeams: "on different teams",
     restoreAbility: "Restore Ability",
     bypassAbility: "Override",
-    revealNightEliminations: "Reveal Eliminations",
-    revealNightStatus: "Reveal Silenced/Hypnotized",
+    revealNextOutcome: (name: string) => `Reveal — ${name}`,
+    nextOutcomeHint: (name: string, effect: string) =>
+      `Next: ${name} (${effect})`,
+    revealEffect: {
+      killed: "killed",
+      silenced: "silenced",
+      hypnotized: "hypnotized",
+    },
   },
   mirrorcaster: {
     protectMode: "Protect Mode — Choose a player to shield.",

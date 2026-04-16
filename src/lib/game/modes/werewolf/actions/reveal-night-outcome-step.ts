@@ -1,27 +1,8 @@
 import type { Game, GameAction } from "@/lib/types";
-import { hasKilledOutcome, hasStatusOutcome } from "../services";
-import { NightOutcomeRevealStep, WerewolfPhase } from "../types";
-import type { WerewolfDaytimePhase } from "../types";
+import { getOrderedAffectedPlayerIds } from "../services";
+import { WerewolfPhase } from "../types";
 import { currentTurnState, isOwnerPlaying } from "../utils";
 import { getWerewolfModeConfig } from "../lobby-config";
-
-/**
- * Advance reveal progression:
- * hidden -> killed -> all
- * If no kills occurred, hidden jumps directly to all.
- */
-function resolveNextRevealStep(
-  currentStep: NightOutcomeRevealStep,
-  phase: WerewolfDaytimePhase,
-): NightOutcomeRevealStep {
-  const hasKilled = hasKilledOutcome(phase);
-
-  if (currentStep === NightOutcomeRevealStep.Hidden) {
-    if (hasKilled) return NightOutcomeRevealStep.Killed;
-    return NightOutcomeRevealStep.All;
-  }
-  return NightOutcomeRevealStep.All;
-}
 
 export const revealNightOutcomeStepAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {
@@ -31,20 +12,24 @@ export const revealNightOutcomeStepAction: GameAction = {
     const ts = currentTurnState(game);
     if (ts?.phase.type !== WerewolfPhase.Daytime) return false;
     const phase = ts.phase;
-    const hasRevealableOutcome =
-      hasKilledOutcome(phase) || hasStatusOutcome(phase);
-    if (!hasRevealableOutcome) return false;
-    return (
-      (phase.nightOutcomeRevealStep ?? NightOutcomeRevealStep.Hidden) !==
-      NightOutcomeRevealStep.All
+    const affectedIds = getOrderedAffectedPlayerIds(
+      phase.nightResolution ?? [],
     );
+    if (affectedIds.length === 0) return false;
+    const revealed = new Set(phase.revealedPlayerIds ?? []);
+    return affectedIds.some((id) => !revealed.has(id));
   },
   apply(game: Game) {
     const ts = currentTurnState(game);
     if (ts?.phase.type !== WerewolfPhase.Daytime) return;
     const phase = ts.phase;
-    const currentStep =
-      phase.nightOutcomeRevealStep ?? NightOutcomeRevealStep.Hidden;
-    phase.nightOutcomeRevealStep = resolveNextRevealStep(currentStep, phase);
+    const affectedIds = getOrderedAffectedPlayerIds(
+      phase.nightResolution ?? [],
+    );
+    const revealed = new Set(phase.revealedPlayerIds ?? []);
+    const nextId = affectedIds.find((id) => !revealed.has(id));
+    if (nextId) {
+      phase.revealedPlayerIds = [...(phase.revealedPlayerIds ?? []), nextId];
+    }
   },
 };

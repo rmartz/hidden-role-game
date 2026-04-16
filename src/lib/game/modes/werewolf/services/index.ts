@@ -125,4 +125,10 @@ export {
   selectExecutionerTarget,
   buildInitialTurnState,
 } from "./initialization";
-export { hasKilledOutcome, hasStatusOutcome } from "./night-outcome";
+export {
+  hasKilledOutcome,
+  hasStatusOutcome,
+  getOrderedAffectedPlayers,
+  getOrderedAffectedPlayerIds,
+} from "./night-outcome";
+export type { AffectedPlayerOutcome } from "./night-outcome";

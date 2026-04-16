@@ -4,11 +4,9 @@ import { useCallback, useMemo } from "react";
 import { WeatherMoonRegular } from "@fluentui/react-icons";
 import { GAME_MODES } from "@/lib/game/modes";
 import {
-  NightOutcomeRevealStep,
   WerewolfAction,
   WerewolfPhase,
-  hasKilledOutcome,
-  hasStatusOutcome,
+  getOrderedAffectedPlayers,
 } from "@/lib/game/modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
@@ -86,18 +84,14 @@ export function OwnerGameDayScreen({
         .map((r) => modeConfig.roles[r.id])
         .filter((r) => r !== undefined)
     : Object.values(modeConfig.roles);
-  const killedOutcomeExists = hasKilledOutcome(daytimePhase);
-  const statusOutcomeExists = hasStatusOutcome(daytimePhase);
-  const revealStep =
-    daytimePhase.nightOutcomeRevealStep ?? NightOutcomeRevealStep.All;
-  const showRevealButton =
-    !gameState.autoRevealNightOutcome &&
-    revealStep !== NightOutcomeRevealStep.All &&
-    (killedOutcomeExists || statusOutcomeExists);
-  const revealLabel =
-    revealStep === NightOutcomeRevealStep.Hidden && killedOutcomeExists
-      ? WEREWOLF_COPY.narrator.revealNightEliminations
-      : WEREWOLF_COPY.narrator.revealNightStatus;
+  const affectedPlayers = getOrderedAffectedPlayers(
+    daytimePhase.nightResolution ?? [],
+  );
+  const revealedPlayerIds = new Set(daytimePhase.revealedPlayerIds ?? []);
+  const nextToReveal = affectedPlayers.find(
+    (p) => !revealedPlayerIds.has(p.playerId),
+  );
+  const isManualReveal = !gameState.autoRevealNightOutcome;
 
   return (
     <div className="p-5 max-w-4xl mx-auto">
@@ -137,12 +131,23 @@ export function OwnerGameDayScreen({
             />
           )}
         </OwnerAdvanceCard>
-        {showRevealButton && (
+        {isManualReveal && nextToReveal && (
           <OwnerAdvanceCard
-            label={revealLabel}
+            label={WEREWOLF_COPY.narrator.revealNextOutcome(
+              gameState.players.find((p) => p.id === nextToReveal.playerId)
+                ?.name ?? nextToReveal.playerId,
+            )}
             onAdvance={handleRevealNightOutcomeStep}
             disabled={action.isPending}
-          />
+          >
+            <p className="text-sm text-muted-foreground mb-2">
+              {WEREWOLF_COPY.narrator.nextOutcomeHint(
+                gameState.players.find((p) => p.id === nextToReveal.playerId)
+                  ?.name ?? nextToReveal.playerId,
+                WEREWOLF_COPY.narrator.revealEffect[nextToReveal.effect],
+              )}
+            </p>
+          </OwnerAdvanceCard>
         )}
         <NightOutcomeSummary
           events={daytimePhase.nightResolution ?? []}
