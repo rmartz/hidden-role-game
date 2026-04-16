@@ -205,13 +205,10 @@ export function PlayerTargetSelectionView({
               ? WEREWOLF_COPY.targetSelection.noAction
               : isConfirmed
                 ? WEREWOLF_COPY.targetSelection.yourTarget
-                : WEREWOLF_COPY.targetSelection.chooseTarget}
+                : shouldShowMentalistSecondTargetHeading
+                  ? WEREWOLF_COPY.mentalist.chooseSecondTarget
+                  : WEREWOLF_COPY.targetSelection.chooseTarget}
           </h2>
-          {shouldShowMentalistSecondTargetHeading && (
-            <h3 className="text-lg font-semibold mb-2 mt-4 text-center">
-              {WEREWOLF_COPY.mentalist.chooseSecondTarget}
-            </h3>
-          )}
           {!(isConfirmed && myNightTarget === null) && (
             <div className="flex flex-col gap-2 max-w-sm mx-auto">
               {targets.map(([player, isSelected]) => (

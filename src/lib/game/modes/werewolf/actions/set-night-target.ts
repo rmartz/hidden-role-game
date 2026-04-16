@@ -247,10 +247,23 @@ export const setNightTargetAction: GameAction = {
           }
         }
       } else if (targetPlayerId === undefined) {
-        // Clear: remove the action entirely (back to undecided state).
-        phase.nightActions = Object.fromEntries(
-          Object.entries(phase.nightActions).filter(([k]) => k !== phaseKey),
-        );
+        const existing = phase.nightActions[phaseKey];
+        if (
+          existing &&
+          !("votes" in existing) &&
+          !existing.skipped &&
+          existing.secondTargetPlayerId
+        ) {
+          // Preserve the second target when only clearing the primary target.
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { targetPlayerId: _, ...rest } = existing;
+          phase.nightActions[phaseKey] = rest;
+        } else {
+          // Clear: remove the action entirely (back to undecided state).
+          phase.nightActions = Object.fromEntries(
+            Object.entries(phase.nightActions).filter(([k]) => k !== phaseKey),
+          );
+        }
       } else if (targetPlayerId === null) {
         // Intentional skip.
         phase.nightActions[phaseKey] = { skipped: true };
