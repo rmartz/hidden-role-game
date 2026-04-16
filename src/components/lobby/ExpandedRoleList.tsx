@@ -41,13 +41,29 @@ export function ExpandedRoleList({
   const noResults = isSearching && searchResults.length === 0;
   const flatRoles = isSearching ? searchResults : disabledRoles;
 
+  const searchResultIds = new Set(searchResults.map((r) => r.id));
+
+  const visibleByCategory = isSearching
+    ? disabledByCategory
+        .map(({ category, label, roles }) => ({
+          category,
+          label,
+          roles: roles.filter((r) => searchResultIds.has(r.id)),
+        }))
+        .filter(({ roles }) => roles.length > 0)
+    : disabledByCategory;
+
+  const visibleUncategorized = isSearching
+    ? uncategorizedDisabled.filter((r) => searchResultIds.has(r.id))
+    : uncategorizedDisabled;
+
   return noResults ? (
     <p className="text-sm text-muted-foreground py-2">
       {ROLE_CONFIG_COPY.noSearchResults}
     </p>
-  ) : hasCategoryGrouping && !isSearching ? (
+  ) : hasCategoryGrouping ? (
     <>
-      {disabledByCategory.map(({ category, label, roles }) => (
+      {visibleByCategory.map(({ category, label, roles }) => (
         <div key={category} className="mt-4">
           <p className="text-xs font-semibold text-muted-foreground mb-1">
             {label}
@@ -68,13 +84,13 @@ export function ExpandedRoleList({
           </ul>
         </div>
       ))}
-      {uncategorizedDisabled.length > 0 && (
+      {visibleUncategorized.length > 0 && (
         <div className="mt-4">
           <p className="text-xs font-semibold text-muted-foreground mb-1">
             {ROLE_CONFIG_COPY.uncategorizedLabel}
           </p>
           <ul className="space-y-1 list-none p-0">
-            {uncategorizedDisabled.map((role) => (
+            {visibleUncategorized.map((role) => (
               <RoleListEntry
                 key={role.id}
                 role={role}
