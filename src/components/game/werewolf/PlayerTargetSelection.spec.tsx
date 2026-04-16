@@ -214,6 +214,7 @@ describe("PlayerTargetSelection", () => {
         hasTarget={true}
         allAgreed={false}
         myNightTarget="p2"
+        mySecondNightTarget={undefined}
         requiresSecondTarget={true}
       />,
     );
