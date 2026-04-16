@@ -6,7 +6,6 @@ export * from "./LobbyConflictResolution";
 export * from "./PlayerList";
 export * from "./PlayerList.copy";
 export * from "./PlayerRow";
-export * from "./RoleBucketConfig";
 export * from "./RoleConfig";
 export * from "./RoleConfigEntry";
 export * from "./RoleConfigModePicker";

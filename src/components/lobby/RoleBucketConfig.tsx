@@ -44,43 +44,103 @@ export function RoleBucketConfig({
 }: RoleBucketConfigProps) {
   const dispatch = useAppDispatch();
   const buckets = useAppSelector((s) => s.gameConfig.roleBuckets);
-  const allRoles = Object.values(roleDefinitions);
+  const advancedBuckets = buckets.filter(
+    (b): b is AdvancedRoleBucket => !isSimpleRoleBucket(b),
+  );
 
   return (
+    <RoleBucketConfigView
+      buckets={advancedBuckets}
+      allRoles={Object.values(roleDefinitions)}
+      gameMode={gameMode}
+      disabled={disabled}
+      onAddBucket={() => {
+        dispatch(addBucket());
+      }}
+      onRemoveBucket={(i) => {
+        dispatch(removeBucket(i));
+      }}
+      onSetBucketName={(i, name) => {
+        dispatch(setBucketName({ bucketIndex: i, name }));
+      }}
+      onSetBucketPlayerCount={(i, count) => {
+        dispatch(setBucketPlayerCount({ bucketIndex: i, playerCount: count }));
+      }}
+      onAddRole={(i, roleId) => {
+        dispatch(addRoleToBucket({ bucketIndex: i, roleId }));
+      }}
+      onRemoveRole={(i, roleId) => {
+        dispatch(removeRoleFromBucket({ bucketIndex: i, roleId }));
+      }}
+      onSetUnique={(i, roleId, unique) => {
+        dispatch(setBucketRoleUnique({ bucketIndex: i, roleId, unique }));
+      }}
+    />
+  );
+}
+
+export interface RoleBucketConfigViewProps {
+  buckets: AdvancedRoleBucket[];
+  allRoles: RoleDefinition<string, Team>[];
+  gameMode: GameMode;
+  disabled: boolean;
+  onAddBucket: () => void;
+  onRemoveBucket: (bucketIndex: number) => void;
+  onSetBucketName: (bucketIndex: number, name: string) => void;
+  onSetBucketPlayerCount: (bucketIndex: number, count: number) => void;
+  onAddRole: (bucketIndex: number, roleId: string) => void;
+  onRemoveRole: (bucketIndex: number, roleId: string) => void;
+  onSetUnique: (bucketIndex: number, roleId: string, unique: boolean) => void;
+}
+
+export function RoleBucketConfigView({
+  buckets,
+  allRoles,
+  gameMode,
+  disabled,
+  onAddBucket,
+  onRemoveBucket,
+  onSetBucketName,
+  onSetBucketPlayerCount,
+  onAddRole,
+  onRemoveRole,
+  onSetUnique,
+}: RoleBucketConfigViewProps) {
+  return (
     <div className="space-y-4">
-      {buckets
-        .filter((b): b is AdvancedRoleBucket => !isSimpleRoleBucket(b))
-        .map((bucket, bucketIndex) => (
-          <BucketEditor
-            key={bucketIndex}
-            bucket={bucket}
-            bucketIndex={bucketIndex}
-            allRoles={allRoles}
-            gameMode={gameMode}
-            disabled={disabled}
-            onRemove={() => dispatch(removeBucket(bucketIndex))}
-            onSetName={(name) => dispatch(setBucketName({ bucketIndex, name }))}
-            onSetPlayerCount={(count) =>
-              dispatch(
-                setBucketPlayerCount({ bucketIndex, playerCount: count }),
-              )
-            }
-            onAddRole={(roleId) =>
-              dispatch(addRoleToBucket({ bucketIndex, roleId }))
-            }
-            onRemoveRole={(roleId) =>
-              dispatch(removeRoleFromBucket({ bucketIndex, roleId }))
-            }
-            onSetUnique={(roleId, unique) =>
-              dispatch(setBucketRoleUnique({ bucketIndex, roleId, unique }))
-            }
-          />
-        ))}
+      {buckets.map((bucket, bucketIndex) => (
+        <BucketEditor
+          key={bucketIndex}
+          bucket={bucket}
+          bucketIndex={bucketIndex}
+          allRoles={allRoles}
+          gameMode={gameMode}
+          disabled={disabled}
+          onRemove={() => {
+            onRemoveBucket(bucketIndex);
+          }}
+          onSetName={(name) => {
+            onSetBucketName(bucketIndex, name);
+          }}
+          onSetPlayerCount={(count) => {
+            onSetBucketPlayerCount(bucketIndex, count);
+          }}
+          onAddRole={(roleId) => {
+            onAddRole(bucketIndex, roleId);
+          }}
+          onRemoveRole={(roleId) => {
+            onRemoveRole(bucketIndex, roleId);
+          }}
+          onSetUnique={(roleId, unique) => {
+            onSetUnique(bucketIndex, roleId, unique);
+          }}
+        />
+      ))}
       <Button
         variant="outline"
         size="sm"
         disabled={disabled}
-        onClick={() => dispatch(addBucket())}
+        onClick={onAddBucket}
       >
         {ROLE_BUCKET_CONFIG_COPY.addBucket}
       </Button>

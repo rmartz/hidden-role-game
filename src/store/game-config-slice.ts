@@ -263,7 +263,7 @@ const gameConfigSlice = createSlice({
       const bucket = state.roleBuckets[action.payload.bucketIndex];
       if (!bucket || isSimpleRoleBucket(bucket)) return;
       if (!bucket.roles.some((r) => r.roleId === action.payload.roleId)) {
-        bucket.roles.push({ roleId: action.payload.roleId, max: 1 });
+        bucket.roles.push({ roleId: action.payload.roleId });
         state.isValid = recomputeIsValid(state);
         state.syncVersion++;
       }

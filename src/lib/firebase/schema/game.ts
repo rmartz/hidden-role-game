@@ -4,17 +4,17 @@ import type {
   GameStatusState,
   PlayerRoleAssignment,
   RoleBucket,
-  RoleBucketSlot,
   TimerConfig,
 } from "@/lib/types";
-import { GameMode, isSimpleRoleBucket } from "@/lib/types";
+import { GameMode } from "@/lib/types";
 import { GAME_MODES } from "@/lib/game/modes";
-import type {
-  FirebaseLobbyPlayer,
-  FirebaseRoleBucket,
-  FirebaseRoleBucketSlot,
+import type { FirebaseLobbyPlayer, FirebaseRoleBucket } from "./lobby";
+import {
+  firebaseToRoleBucket,
+  modeConfigToFirebase,
+  parseTimerConfig,
+  roleBucketToFirebase,
 } from "./lobby";
-import { modeConfigToFirebase, parseTimerConfig } from "./lobby";
 
 export interface FirebaseGamePublic {
   lobbyId: string;
@@ -36,39 +36,6 @@ export interface FirebaseGamePublic {
   playerOrder?: string[];
   /** Unix ms timestamp set server-side at game creation. Used for TTL cleanup. */
   createdAt?: number;
-}
-
-function roleBucketToFirebase(bucket: RoleBucket): FirebaseRoleBucket {
-  if (isSimpleRoleBucket(bucket)) {
-    return { playerCount: bucket.playerCount, roleId: bucket.roleId };
-  }
-  const roles: Record<string, FirebaseRoleBucketSlot> = {};
-  bucket.roles.forEach((slot, i) => {
-    roles[String(i)] = {
-      roleId: slot.roleId,
-      ...(slot.max !== undefined ? { max: slot.max } : {}),
-    };
-  });
-  return {
-    playerCount: bucket.playerCount,
-    roles,
-    ...(bucket.name !== undefined ? { name: bucket.name } : {}),
-  };
-}
-
-function firebaseToRoleBucket(bucket: FirebaseRoleBucket): RoleBucket {
-  if ("roleId" in bucket) {
-    return { playerCount: bucket.playerCount, roleId: bucket.roleId };
-  }
-  const roles: RoleBucketSlot[] = Object.values(bucket.roles).map((s) => ({
-    roleId: s.roleId,
-    ...(s.max !== undefined ? { max: s.max } : {}),
-  }));
-  return {
-    playerCount: bucket.playerCount,
-    roles,
-    ...(bucket.name !== undefined ? { name: bucket.name } : {}),
-  };
 }
 
 export function gameToFirebase(game: Game): FirebaseGamePublic {

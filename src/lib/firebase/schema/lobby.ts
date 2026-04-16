@@ -136,7 +136,7 @@ export function roleBucketToFirebase(bucket: RoleBucket): FirebaseRoleBucket {
   };
 }
 
-function firebaseToRoleBucket(bucket: FirebaseRoleBucket): RoleBucket {
+export function firebaseToRoleBucket(bucket: FirebaseRoleBucket): RoleBucket {
   if ("roleId" in bucket) {
     return { playerCount: bucket.playerCount, roleId: bucket.roleId };
   }
