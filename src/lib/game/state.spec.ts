@@ -327,10 +327,7 @@ describe("GameStateService.getPlayerGameState — Werewolf showRolesOnDeath", ()
   it("keeps narrator role visibility when showRolesOnDeath is disabled", () => {
     const game = makeWerewolfDeathRevealGame(false);
 
-    const result = getPlayerGameState(
-      game,
-      "narrator",
-    ) as WerewolfPlayerGameState | null;
+    const result = getPlayerGameState(game, "narrator");
 
     expect(
       result?.visibleRoleAssignments.map((assignment) => assignment.player.id),
