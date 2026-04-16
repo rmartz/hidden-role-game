@@ -385,6 +385,20 @@ describe("WerewolfAction.NominatePlayer — trialsPerDay", () => {
     expect(action.isValid(game, "p2", { defendantId: "p4" })).toBe(true);
   });
 
+  it("blocks nomination when concludedTrialsCount equals the default limit of 2", () => {
+    const ds = makeDayState();
+    (ds.phase as WerewolfDaytimePhase).concludedTrialsCount = 2;
+    const game = makePlayingGame(ds, {
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: true,
+        trialsPerDay: 2,
+        revealProtections: true,
+      },
+    });
+    expect(action.isValid(game, "p2", { defendantId: "p4" })).toBe(false);
+  });
+
   it("allows nomination when trialsPerDay is 0 (unlimited)", () => {
     const ds = makeDayState();
     (ds.phase as WerewolfDaytimePhase).concludedTrialsCount = 5;

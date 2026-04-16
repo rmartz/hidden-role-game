@@ -296,6 +296,20 @@ describe("WerewolfAction.StartTrial — trialsPerDay", () => {
     expect(action.isValid(game, "owner-1", { defendantId: "p4" })).toBe(true);
   });
 
+  it("blocks starting a trial when concludedTrialsCount equals the default limit of 2", () => {
+    const ds = makeDayState();
+    (ds.phase as WerewolfDaytimePhase).concludedTrialsCount = 2;
+    const game = makePlayingGame(ds, {
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: false,
+        trialsPerDay: 2,
+        revealProtections: true,
+      },
+    });
+    expect(action.isValid(game, "owner-1", { defendantId: "p4" })).toBe(false);
+  });
+
   it("allows starting a trial when trialsPerDay is 0 (unlimited)", () => {
     const ds = makeDayState();
     (ds.phase as WerewolfDaytimePhase).concludedTrialsCount = 5;
