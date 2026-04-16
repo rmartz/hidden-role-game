@@ -15,8 +15,7 @@ interface ReadOnlyProps {
   role: RoleDefinition<string, Team>;
   gameMode: GameMode;
   roleConfigMode: RoleConfigMode;
-  min: number;
-  max: number;
+  count: number;
   readOnly: true;
   dimmed?: boolean;
 }
@@ -54,7 +53,7 @@ export function RoleConfigEntry(props: RoleConfigEntryProps) {
         <RoleLabel role={role} gameMode={gameMode} />
       </span>
       {readOnly ? (
-        <span className="text-sm">{props.min}</span>
+        <span className="text-sm">{props.count}</span>
       ) : roleConfigMode === RoleConfigMode.Custom ? (
         <div className="flex items-center gap-1">
           <Incrementer

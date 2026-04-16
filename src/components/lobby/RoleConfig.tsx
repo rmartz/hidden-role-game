@@ -51,18 +51,9 @@ export function RoleConfig(props: RoleConfigProps) {
   const isAdvanced = roleConfigMode === RoleConfigMode.Advanced;
 
   const readOnlyBuckets = readOnly ? (props.roleBuckets ?? []) : [];
-  const readOnlyMin = Object.fromEntries(
+  const readOnlyCounts = Object.fromEntries(
     readOnlyBuckets.flatMap((b) =>
       isSimpleRoleBucket(b) ? [[b.roleId, b.playerCount]] : [],
-    ),
-  );
-  const readOnlyMax = Object.fromEntries(
-    readOnlyBuckets.flatMap((b) =>
-      isSimpleRoleBucket(b)
-        ? [[b.roleId, b.playerCount]]
-        : b.roles.flatMap((s) =>
-            s.max !== undefined ? [[s.roleId, s.max]] : [],
-          ),
     ),
   );
 
@@ -74,7 +65,7 @@ export function RoleConfig(props: RoleConfigProps) {
   const allRoles = Object.values(roleDefinitions);
 
   function isRoleEnabled(roleId: string): boolean {
-    if (readOnly) return (readOnlyMin[roleId] ?? 0) > 0;
+    if (readOnly) return (readOnlyCounts[roleId] ?? 0) > 0;
     return (roleCounts[roleId] ?? 0) > 0;
   }
 
@@ -161,8 +152,7 @@ export function RoleConfig(props: RoleConfigProps) {
                                 role={roleDef}
                                 gameMode={gameMode}
                                 roleConfigMode={roleConfigMode}
-                                min={0}
-                                max={slot.max ?? bucket.playerCount}
+                                count={slot.max ?? bucket.playerCount}
                                 readOnly={true}
                               />
                             ) : (
@@ -188,8 +178,7 @@ export function RoleConfig(props: RoleConfigProps) {
                       role={role}
                       gameMode={gameMode}
                       roleConfigMode={roleConfigMode}
-                      min={readOnlyMin[role.id] ?? 0}
-                      max={readOnlyMax[role.id] ?? 0}
+                      count={readOnlyCounts[role.id] ?? 0}
                       readOnly={true}
                       dimmed={showAll && !isRoleEnabled(role.id)}
                     />
@@ -221,8 +210,7 @@ export function RoleConfig(props: RoleConfigProps) {
                               role={role}
                               gameMode={gameMode}
                               roleConfigMode={roleConfigMode}
-                              min={readOnlyMin[role.id] ?? 0}
-                              max={readOnlyMax[role.id] ?? 0}
+                              count={readOnlyCounts[role.id] ?? 0}
                               readOnly={true}
                               dimmed
                             />
@@ -253,8 +241,7 @@ export function RoleConfig(props: RoleConfigProps) {
                               role={role}
                               gameMode={gameMode}
                               roleConfigMode={roleConfigMode}
-                              min={readOnlyMin[role.id] ?? 0}
-                              max={readOnlyMax[role.id] ?? 0}
+                              count={readOnlyCounts[role.id] ?? 0}
                               readOnly={true}
                               dimmed
                             />
