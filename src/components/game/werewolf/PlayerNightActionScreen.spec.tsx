@@ -7,6 +7,10 @@ import type { WerewolfNighttimePhase } from "@/lib/game/modes/werewolf";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { PlayerNightActionScreen } from "./PlayerNightActionScreen";
 
+interface PlayerTargetSelectionPropsForTest {
+  targets: readonly (readonly [{ id: string }, boolean])[];
+}
+
 const { playerTargetSelectionMock } = vi.hoisted(() => ({
   playerTargetSelectionMock: vi.fn(),
 }));
@@ -85,9 +89,12 @@ describe("PlayerNightActionScreen", () => {
       />,
     );
 
-    const props = playerTargetSelectionMock.mock.calls[0]?.[0] as {
-      targets: readonly (readonly [{ id: string }, boolean])[];
-    };
+    const props = playerTargetSelectionMock.mock.calls[0]
+      ? (playerTargetSelectionMock.mock
+          .calls[0][0] as PlayerTargetSelectionPropsForTest)
+      : undefined;
+    if (!props)
+      throw new Error("Expected PlayerTargetSelection to be rendered");
     const targetIds = props.targets.map(([player]) => player.id);
 
     expect(targetIds).toEqual(["p2", "p3"]);

@@ -4,6 +4,8 @@ import type { TargetablePlayer } from "@/lib/game/modes/werewolf";
 import { WerewolfRole } from "@/lib/game/modes/werewolf";
 import { PlayerTargetSelection } from "./PlayerTargetSelection";
 
+type TargetSelectionTuple = readonly [TargetablePlayer, boolean];
+
 const { mutateMock } = vi.hoisted(() => ({
   mutateMock: vi.fn(),
 }));
@@ -49,12 +51,12 @@ describe("PlayerTargetSelection", () => {
           { id: "p3", name: "Charlie" },
           { id: "p4", name: "Dave" },
         ]}
-        targets={targetPlayers.map(
+        targets={targetPlayers.map<TargetSelectionTuple>(
           (player) =>
-            [player, player.id === "p2"] as const satisfies readonly [
-              TargetablePlayer,
-              boolean,
-            ],
+            [
+              player,
+              player.id === "p2",
+            ] as const satisfies TargetSelectionTuple,
         )}
         isConfirmed={false}
         isGroupPhase={false}
