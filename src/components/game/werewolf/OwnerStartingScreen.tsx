@@ -37,11 +37,11 @@ export function OwnerStartingScreen({
     onTimerTrigger: onStart,
   };
 
-  const hiddenRoleInfos = useMemo(() => {
+  const hiddenRoles = useMemo(() => {
     const roles = GAME_MODES[GameMode.Werewolf].roles;
     return (gameState.hiddenRoleIds ?? []).flatMap((roleId) => {
       const role = roles[roleId];
-      return role ? [{ id: role.id, name: role.name, team: role.team }] : [];
+      return role ? [role] : [];
     });
   }, [gameState.hiddenRoleIds]);
 
@@ -58,7 +58,7 @@ export function OwnerStartingScreen({
         gameMode={gameState.gameMode}
         executionerTargetId={gameState.executionerTargetId}
       />
-      {hiddenRoleInfos.length > 0 && (
+      {hiddenRoles.length > 0 && (
         <Card className="mb-5 border-amber-500 dark:border-amber-600">
           <CardHeader>
             <CardTitle className="text-amber-700 dark:text-amber-400">
@@ -70,9 +70,9 @@ export function OwnerStartingScreen({
               {OWNER_STARTING_SCREEN_COPY.hiddenRolesDescription}
             </p>
             <div className="flex flex-wrap gap-2">
-              {hiddenRoleInfos.map((role, i) => (
+              {hiddenRoles.map((role) => (
                 <RoleLabel
-                  key={`${role.id}-${String(i)}`}
+                  key={role.id}
                   role={role}
                   gameMode={GameMode.Werewolf}
                   showTeam

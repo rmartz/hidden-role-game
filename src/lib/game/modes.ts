@@ -49,6 +49,8 @@ export function getDefaultRoleBuckets(
 ): RoleBucket[] {
   const config = GAME_MODES[gameMode];
   const effectivePlayerCount = Math.max(playerCount, config.minPlayers);
+  // Uses `roleSlotsRequired` (not `resolveRoleSlotsRequired`) because this is
+  // called at lobby creation before any modeConfig is set (hiddenRoleCount = 0).
   const roleSlotsCount =
     config.roleSlotsRequired?.(effectivePlayerCount) ?? effectivePlayerCount;
   return config.defaultRoleCount(roleSlotsCount);

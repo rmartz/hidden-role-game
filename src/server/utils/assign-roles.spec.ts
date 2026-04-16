@@ -222,4 +222,19 @@ describe("assignRolesFromBucketsWithHidden", () => {
       assignRolesFromBucketsWithHidden(players, buckets, 1, mockRoles),
     ).toThrow();
   });
+
+  it("throws when a bucket contains an unknown role ID", () => {
+    // 1 player + 1 hidden = 2 total: [bad, unknown-role-id].
+    // Either the unknown is the candidate (throws immediately) or the bad role
+    // is the candidate and the filter encounters the unknown (also throws).
+    const players = makePlayers(1);
+    const buckets: RoleBucket[] = [
+      { playerCount: 1, roleId: "bad" },
+      { playerCount: 1, roleId: "unknown-role-id" },
+    ];
+
+    expect(() =>
+      assignRolesFromBucketsWithHidden(players, buckets, 1, mockRoles),
+    ).toThrow(/not defined in the roles registry/);
+  });
 });

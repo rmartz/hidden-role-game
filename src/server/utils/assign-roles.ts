@@ -85,7 +85,10 @@ function isSafeToHide(
   const candidateRoleId = roleIds[candidateIndex];
   if (!candidateRoleId) return true; // candidateIndex is out of bounds (should not happen given caller uses findIndex)
   const candidateRole = roles[candidateRoleId];
-  if (!candidateRole) return true; // Unknown role — allow removal
+  if (!candidateRole)
+    throw new Error(
+      `Role "${candidateRoleId}" is not defined in the roles registry. Cannot determine team for hidden role selection.`,
+    );
   const isBadOrNeutral =
     candidateRole.team === Team.Bad || candidateRole.team === Team.Neutral;
   if (!isBadOrNeutral) return true; // Good roles can always be removed
@@ -94,7 +97,11 @@ function isSafeToHide(
   const badOrNeutralRemaining = roleIds.filter((id, i) => {
     if (i === candidateIndex) return false; // skip this occurrence
     const r = roles[id];
-    return r && (r.team === Team.Bad || r.team === Team.Neutral);
+    if (!r)
+      throw new Error(
+        `Role "${id}" is not defined in the roles registry. Cannot determine team for hidden role selection.`,
+      );
+    return r.team === Team.Bad || r.team === Team.Neutral;
   });
   return badOrNeutralRemaining.length >= 1;
 }

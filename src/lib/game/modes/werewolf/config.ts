@@ -59,4 +59,10 @@ export const WEREWOLF_CONFIG = {
     const required = numPlayers - 1 + hiddenRoleCountFromConfig(modeConfig);
     return sum(Object.values(roleCounts)) === required;
   },
+  /**
+   * Returns the number of hidden roles to draw, from the Werewolf mode config.
+   */
+  resolveHiddenRoleCount(modeConfig: ModeConfig): number {
+    return hiddenRoleCountFromConfig(modeConfig);
+  },
 } satisfies GameModeConfig;

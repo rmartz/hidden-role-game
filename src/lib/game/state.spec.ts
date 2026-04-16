@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { getPlayerGameState } from "./state";
+import { getPlayerGameState, buildGame } from "./state";
 import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
-import type { Game, GamePlayer, RoleBucket } from "@/lib/types";
+import type { Game, GamePlayer, LobbyPlayer, RoleBucket } from "@/lib/types";
+import type { WerewolfGame } from "@/lib/types";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
 import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-villain/lobby-config";
@@ -234,5 +235,108 @@ describe("GameStateService.getPlayerGameState — narrator nominationsEnabled", 
     const result = getPlayerGameState(game, "narrator");
     expect(result?.myPlayerId).toBeUndefined();
     expect(result?.myRole).toBeUndefined();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// buildGame — hidden role integration
+// ---------------------------------------------------------------------------
+
+function makeWerewolfLobbyPlayer(id: string): LobbyPlayer {
+  return { id, name: `Player ${id}`, sessionId: `session-${id}` };
+}
+
+describe("buildGame — Werewolf hidden roles", () => {
+  it("assigns exactly rolePlayers.length role assignments and hides the extra role", () => {
+    const narrator = makeWerewolfLobbyPlayer("narrator");
+    const players = [
+      narrator,
+      makeWerewolfLobbyPlayer("p1"),
+      makeWerewolfLobbyPlayer("p2"),
+      makeWerewolfLobbyPlayer("p3"),
+      makeWerewolfLobbyPlayer("p4"),
+      makeWerewolfLobbyPlayer("p5"),
+      makeWerewolfLobbyPlayer("p6"),
+    ];
+    // 6 role-players + 1 hidden = 7 buckets needed
+    const buckets: RoleBucket[] = [
+      { playerCount: 1, roleId: "werewolf-werewolf" },
+      { playerCount: 5, roleId: "werewolf-villager" },
+      { playerCount: 1, roleId: "werewolf-seer" },
+    ];
+    const modeConfig = {
+      gameMode: GameMode.Werewolf,
+      nominationsEnabled: false,
+      singleTrialPerDay: true,
+      revealProtections: true,
+      hiddenRoleCount: 1,
+    };
+
+    const game = buildGame(
+      "g1",
+      "l1",
+      players,
+      buckets,
+      GameMode.Werewolf,
+      ShowRolesInPlay.None,
+      "narrator",
+      DEFAULT_WEREWOLF_TIMER_CONFIG,
+      modeConfig,
+    ) as WerewolfGame;
+
+    // 6 role-players → exactly 6 assignments
+    expect(game.roleAssignments).toHaveLength(6);
+    // narrator is not assigned a role
+    expect(game.roleAssignments.every((a) => a.playerId !== "narrator")).toBe(
+      true,
+    );
+    // exactly 1 hidden role ID
+    expect(game.hiddenRoleIds).toHaveLength(1);
+    // assigned + hidden = 7 total (all buckets consumed)
+    const allRoleIds = [
+      ...game.roleAssignments.map((a) => a.roleDefinitionId),
+      ...(game.hiddenRoleIds ?? []),
+    ];
+    expect(allRoleIds).toHaveLength(7);
+  });
+
+  it("does not set hiddenRoleIds when hiddenRoleCount is 0", () => {
+    const narrator = makeWerewolfLobbyPlayer("narrator");
+    const players = [
+      narrator,
+      makeWerewolfLobbyPlayer("p1"),
+      makeWerewolfLobbyPlayer("p2"),
+      makeWerewolfLobbyPlayer("p3"),
+      makeWerewolfLobbyPlayer("p4"),
+      makeWerewolfLobbyPlayer("p5"),
+      makeWerewolfLobbyPlayer("p6"),
+    ];
+    const buckets: RoleBucket[] = [
+      { playerCount: 1, roleId: "werewolf-werewolf" },
+      { playerCount: 4, roleId: "werewolf-villager" },
+      { playerCount: 1, roleId: "werewolf-seer" },
+    ];
+    const modeConfig = {
+      gameMode: GameMode.Werewolf,
+      nominationsEnabled: false,
+      singleTrialPerDay: true,
+      revealProtections: true,
+      hiddenRoleCount: 0,
+    };
+
+    const game = buildGame(
+      "g2",
+      "l1",
+      players,
+      buckets,
+      GameMode.Werewolf,
+      ShowRolesInPlay.None,
+      "narrator",
+      DEFAULT_WEREWOLF_TIMER_CONFIG,
+      modeConfig,
+    ) as WerewolfGame;
+
+    expect(game.roleAssignments).toHaveLength(6);
+    expect(game.hiddenRoleIds).toBeUndefined();
   });
 });

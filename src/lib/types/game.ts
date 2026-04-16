@@ -205,6 +205,12 @@ export interface GameModeConfig {
     roleCounts: Record<string, number>,
     modeConfig: ModeConfig,
   ): boolean;
+  /**
+   * Returns the number of hidden (unassigned) roles to draw at game start for
+   * a specific game configuration. Hidden roles are visible only to the narrator.
+   * Returns 0 when not implemented (no hidden roles).
+   */
+  resolveHiddenRoleCount?(modeConfig: ModeConfig): number;
   readonly roles: Record<string, RoleDefinition<string, Team>>;
   readonly teamLabels: Partial<Record<Team, string>>;
   defaultRoleCount(numPlayers: number): RoleBucket[];

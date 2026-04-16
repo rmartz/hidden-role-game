@@ -9,7 +9,6 @@ import type {
   RoleBucket,
   TimerConfig,
 } from "@/lib/types";
-import { isWerewolfModeConfig } from "@/lib/types";
 import type { PlayerGameState, VisibleTeammate } from "@/server/types";
 import { GAME_MODES } from "@/lib/game/modes";
 import { getPlayer } from "@/lib/player";
@@ -214,12 +213,8 @@ export function buildGame(
     ? players.filter((p) => p.id !== ownerPlayerId)
     : players;
 
-  // Handle hidden unassigned roles (Werewolf-specific).
-  const hiddenCount =
-    isWerewolfModeConfig(resolvedModeConfig) &&
-    resolvedModeConfig.hiddenRoleCount > 0
-      ? resolvedModeConfig.hiddenRoleCount
-      : 0;
+  // Handle hidden unassigned roles (delegated to the mode config).
+  const hiddenCount = config.resolveHiddenRoleCount?.(resolvedModeConfig) ?? 0;
 
   let roleAssignments;
   let hiddenRoleIds: string[] | undefined;
