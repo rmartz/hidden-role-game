@@ -18,7 +18,7 @@ function makePlayingGame(
     status: { type: GameStatus.Playing, turnState },
     players: [],
     roleAssignments: [],
-    configuredRoleSlots: [],
+    configuredRoleBuckets: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner-1",
     modeConfig: {
@@ -69,7 +69,7 @@ describe("isOwnerPlaying", () => {
       status: { type: GameStatus.Starting },
       players: [],
       roleAssignments: [],
-      configuredRoleSlots: [],
+      configuredRoleBuckets: [],
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner-1",
       modeConfig: {
@@ -103,7 +103,7 @@ describe("currentTurnState", () => {
       status: { type: GameStatus.Starting },
       players: [],
       roleAssignments: [],
-      configuredRoleSlots: [],
+      configuredRoleBuckets: [],
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner-1",
       modeConfig: {
@@ -125,7 +125,7 @@ describe("currentTurnState", () => {
       status: { type: GameStatus.Playing },
       players: [],
       roleAssignments: [],
-      configuredRoleSlots: [],
+      configuredRoleBuckets: [],
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner-1",
       modeConfig: {

@@ -19,7 +19,8 @@ function makeSecretVillainState(
     gameMode: GameMode.SecretVillain as const,
     playerCount,
     roleConfigMode,
-    roleSlots: GAME_MODES[GameMode.SecretVillain].defaultRoleCount(playerCount),
+    roleBuckets:
+      GAME_MODES[GameMode.SecretVillain].defaultRoleCount(playerCount),
     showConfigToPlayers: false,
     showRolesInPlay: ShowRolesInPlay.None,
     timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,

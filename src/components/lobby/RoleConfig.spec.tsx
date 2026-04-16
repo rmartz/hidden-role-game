@@ -48,15 +48,15 @@ const roleDefinitions: Record<string, RoleDefinition<string, Team>> = {
   [roleC.id]: roleC,
 };
 
+// roleA and roleC are enabled (playerCount: 1); roleB is absent (count defaults to 0 = disabled)
 const defaultProps = {
   roleDefinitions,
   playerCount: 5,
   gameMode: GameMode.Werewolf,
   roleConfigMode: RoleConfigMode.Custom,
-  roleSlots: [
-    { roleId: roleA.id, min: 1, max: 1 },
-    { roleId: roleB.id, min: 0, max: 0 },
-    { roleId: roleC.id, min: 1, max: 1 },
+  roleBuckets: [
+    { roleId: roleA.id, playerCount: 1 },
+    { roleId: roleC.id, playerCount: 1 },
   ],
   readOnly: true as const,
 };
@@ -126,7 +126,7 @@ describe("RoleConfig search", () => {
       ROLE_CONFIG_COPY.searchPlaceholder,
     );
     fireEvent.change(input, { target: { value: "tricky" } });
-    // roleB matches "tricky" in its summary even though it is disabled (max=0)
+    // roleB matches "tricky" in its summary even though it is disabled (count=0)
     expect(screen.getByText(roleB.name)).toBeDefined();
   });
 

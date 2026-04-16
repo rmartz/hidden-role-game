@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { GameMode } from "@/lib/types";
+import type { RoleBucket } from "@/lib/types";
+import { GameMode, isSimpleRoleBucket } from "@/lib/types";
 import { SecretVillainRole } from "./roles";
 import { SECRET_VILLAIN_CONFIG } from "./config";
 
@@ -9,10 +10,21 @@ const withBoard = {
   includeBoard: true,
 } as const;
 
+/** Helper: convert simple role buckets to { roleId: playerCount } map */
+function bucketCounts(buckets: RoleBucket[]): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const b of buckets) {
+    if (isSimpleRoleBucket(b)) {
+      counts[b.roleId] = (counts[b.roleId] ?? 0) + b.playerCount;
+    }
+  }
+  return counts;
+}
+
 describe("SECRET_VILLAIN_CONFIG.defaultRoleCount", () => {
   it("returns correct counts for minimum player count (5)", () => {
-    const slots = SECRET_VILLAIN_CONFIG.defaultRoleCount(5);
-    const counts = Object.fromEntries(slots.map((s) => [s.roleId, s.min]));
+    const buckets = SECRET_VILLAIN_CONFIG.defaultRoleCount(5);
+    const counts = bucketCounts(buckets);
 
     expect(counts[SecretVillainRole.SpecialBad]).toBe(1);
     expect(counts[SecretVillainRole.Bad]).toBe(1);
@@ -20,33 +32,33 @@ describe("SECRET_VILLAIN_CONFIG.defaultRoleCount", () => {
   });
 
   it("returns correct counts for 10 players", () => {
-    const slots = SECRET_VILLAIN_CONFIG.defaultRoleCount(10);
-    const counts = Object.fromEntries(slots.map((s) => [s.roleId, s.min]));
+    const buckets = SECRET_VILLAIN_CONFIG.defaultRoleCount(10);
+    const counts = bucketCounts(buckets);
 
     expect(counts[SecretVillainRole.SpecialBad]).toBe(1);
     expect(counts[SecretVillainRole.Bad]).toBe(3);
     expect(counts[SecretVillainRole.Good]).toBe(6);
   });
 
-  it("total slot count always equals numPlayers", () => {
+  it("total player count always equals numPlayers", () => {
     for (let n = 5; n <= 12; n++) {
-      const slots = SECRET_VILLAIN_CONFIG.defaultRoleCount(n);
-      expect(slots.reduce((sum, s) => sum + s.min, 0)).toBe(n);
+      const buckets = SECRET_VILLAIN_CONFIG.defaultRoleCount(n);
+      expect(buckets.reduce((sum, b) => sum + b.playerCount, 0)).toBe(n);
     }
   });
 
   it("always has exactly 1 special-bad role", () => {
     for (let n = 5; n <= 12; n++) {
-      const slots = SECRET_VILLAIN_CONFIG.defaultRoleCount(n);
-      const counts = Object.fromEntries(slots.map((s) => [s.roleId, s.min]));
+      const buckets = SECRET_VILLAIN_CONFIG.defaultRoleCount(n);
+      const counts = bucketCounts(buckets);
       expect(counts[SecretVillainRole.SpecialBad]).toBe(1);
     }
   });
 
   it("bad count is approximately half of players minus the special bad", () => {
     for (let n = 5; n <= 12; n++) {
-      const slots = SECRET_VILLAIN_CONFIG.defaultRoleCount(n);
-      const counts = Object.fromEntries(slots.map((s) => [s.roleId, s.min]));
+      const buckets = SECRET_VILLAIN_CONFIG.defaultRoleCount(n);
+      const counts = bucketCounts(buckets);
       expect(counts[SecretVillainRole.Bad]).toBe(Math.floor((n - 1) / 2) - 1);
     }
   });

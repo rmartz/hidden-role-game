@@ -14,6 +14,7 @@ const mockLobby: PublicLobby = {
   config: {
     gameMode: GameMode.Werewolf,
     roleConfigMode: RoleConfigMode.Default,
+    roleBuckets: [],
     showConfigToPlayers: false,
     showRolesInPlay: ShowRolesInPlay.RoleAndCount,
     modeConfig: {
@@ -30,10 +31,11 @@ const mockLobby: PublicLobby = {
 vi.mock("@/lib/api", () => ({
   removePlayer: vi.fn(),
   transferOwner: vi.fn(),
+  renamePlayer: vi.fn(),
 }));
 
 import * as api from "@/lib/api";
-import { useRemovePlayer, useTransferOwner } from "./players";
+import { useRemovePlayer, useTransferOwner, useRenamePlayer } from "./players";
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -138,5 +140,41 @@ describe("useTransferOwner", () => {
     });
 
     expect(invalidateSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe("useRenamePlayer", () => {
+  it("renames the current player and updates cached lobby data", async () => {
+    const renamedLobby: PublicLobby = {
+      ...mockLobby,
+      players: [{ id: "player-2", name: "Alice Renamed" }],
+    };
+    vi.mocked(api.renamePlayer).mockResolvedValue({
+      status: ServerResponseStatus.Success,
+      data: { lobby: renamedLobby },
+    });
+
+    const { queryClient, wrapper } = createWrapper();
+    const { result } = renderHook(
+      () => useRenamePlayer("lobby-1", "player-2"),
+      { wrapper },
+    );
+
+    act(() => {
+      result.current.mutate("Alice Renamed");
+    });
+
+    await waitFor(() => {
+      expect(result.current.isSuccess).toBe(true);
+    });
+
+    expect(api.renamePlayer).toHaveBeenCalledWith(
+      "lobby-1",
+      "player-2",
+      "Alice Renamed",
+    );
+    expect(queryClient.getQueryData(["lobby", "lobby-1"])).toEqual(
+      renamedLobby,
+    );
   });
 });

@@ -15,7 +15,7 @@ function makeBaseLobby(overrides: Partial<Lobby["config"]> = {}): Lobby {
     config: {
       gameMode: GameMode.Werewolf,
       roleConfigMode: RoleConfigMode.Custom,
-      roleSlots: [],
+      roleBuckets: [],
       showConfigToPlayers: false,
       showRolesInPlay: ShowRolesInPlay.None,
       modeConfig: {

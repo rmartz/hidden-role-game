@@ -44,7 +44,7 @@ export function makeMentalistGame(
       { playerId: "p3", roleDefinitionId: p3Role },
       { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
     ],
-    configuredRoleSlots: [],
+    configuredRoleBuckets: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: undefined,
     modeConfig: {

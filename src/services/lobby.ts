@@ -2,7 +2,7 @@ import type {
   Lobby,
   GameMode,
   ModeConfig,
-  RoleSlot,
+  RoleBucket,
   RoleConfigMode,
   ShowRolesInPlay,
   TimerConfig,
@@ -13,8 +13,10 @@ import {
   modeConfigToFirebase,
   lobbyToFirebase,
   firebaseToLobby,
+  roleBucketToFirebase,
   type FirebaseLobbyPublic,
   type FirebaseLobbyPrivate,
+  type FirebaseRoleBucket,
 } from "@/lib/firebase/schema";
 import { resolvePlayerOrder } from "@/lib/player-order";
 
@@ -168,6 +170,29 @@ export async function addPlayer(
   return firebaseToLobby(lobbyId, data.public, data.private);
 }
 
+export async function renamePlayer(
+  lobbyId: string,
+  playerId: string,
+  playerName: string,
+): Promise<Lobby | undefined> {
+  const snap = await lobbyRef(lobbyId).once("value");
+  if (!snap.exists()) return undefined;
+
+  const data = snap.val() as {
+    public: FirebaseLobbyPublic;
+    private: FirebaseLobbyPrivate;
+  };
+
+  if (!data.public.players?.[playerId]) return undefined;
+
+  await lobbyRef(lobbyId)
+    .child(`public/players/${playerId}/name`)
+    .set(playerName);
+
+  data.public.players[playerId].name = playerName;
+  return firebaseToLobby(lobbyId, data.public, data.private);
+}
+
 export async function toggleReady(
   lobbyId: string,
   playerId: string,
@@ -205,7 +230,7 @@ export async function updateConfig(
     showRolesInPlay?: ShowRolesInPlay;
     roleConfigMode?: RoleConfigMode;
     gameMode?: GameMode;
-    roleSlots?: RoleSlot[];
+    roleBuckets?: RoleBucket[];
     timerConfig?: TimerConfig;
     modeConfig?: ModeConfig;
   },
@@ -238,14 +263,15 @@ export async function updateConfig(
     updates["public/config/gameMode"] = config.gameMode;
     data.public.config.gameMode = config.gameMode;
   }
-  if (config.roleSlots !== undefined) {
-    const slots = config.roleSlots.map((s) => ({
-      roleId: s.roleId,
-      min: s.min,
-      max: s.max,
-    }));
-    updates["public/config/roleSlots"] = slots;
-    data.public.config.roleSlots = slots;
+  if (config.roleBuckets !== undefined) {
+    const buckets: Record<string, FirebaseRoleBucket> = {};
+    config.roleBuckets.forEach((bucket, i) => {
+      buckets[String(i)] = roleBucketToFirebase(bucket);
+    });
+    updates["public/config/roleBuckets"] =
+      config.roleBuckets.length > 0 ? buckets : null;
+    data.public.config.roleBuckets =
+      config.roleBuckets.length > 0 ? buckets : undefined;
   }
   if (config.timerConfig !== undefined) {
     updates["public/config/timerConfig"] = config.timerConfig;

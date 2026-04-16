@@ -1,20 +1,26 @@
 import { sum } from "lodash";
 import { useState } from "react";
-import type { GameMode, RoleDefinition, Team } from "@/lib/types";
-import { RoleConfigMode } from "@/lib/types";
-import type { RoleSlot } from "@/server/types";
+import type {
+  AdvancedRoleBucket,
+  GameMode,
+  RoleBucket,
+  RoleDefinition,
+  Team,
+} from "@/lib/types";
+import { RoleConfigMode, isSimpleRoleBucket } from "@/lib/types";
 import { useAppSelector } from "@/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { RoleConfigEntry } from "./RoleConfigEntry";
 import { RoleConfigModePicker } from "./RoleConfigModePicker";
+import { RoleBucketConfig } from "./RoleBucketConfig";
 import { ROLE_CONFIG_COPY } from "./RoleConfig.copy";
 import { searchRoles } from "./searchRoles";
 
 interface ReadOnlyProps {
   roleDefinitions: Record<string, RoleDefinition<string, Team>>;
-  roleSlots?: RoleSlot[];
+  roleBuckets?: RoleBucket[];
   roleConfigMode: RoleConfigMode;
   playerCount: number;
   gameMode: GameMode;
@@ -44,19 +50,20 @@ export function RoleConfig(props: RoleConfigProps) {
   const [searchQuery, setSearchQuery] = useState("");
 
   const roleCounts = useAppSelector((s) => s.gameConfig.roleCounts);
-  const roleMins = useAppSelector((s) => s.gameConfig.roleMins);
-  const roleMaxes = useAppSelector((s) => s.gameConfig.roleMaxes);
 
   const isAdvanced = roleConfigMode === RoleConfigMode.Advanced;
 
-  const readOnlyMin = readOnly
-    ? Object.fromEntries((props.roleSlots ?? []).map((s) => [s.roleId, s.min]))
-    : {};
-  const readOnlyMax = readOnly
-    ? Object.fromEntries((props.roleSlots ?? []).map((s) => [s.roleId, s.max]))
-    : {};
+  const readOnlyBuckets = readOnly ? (props.roleBuckets ?? []) : [];
+  const readOnlyCounts = Object.fromEntries(
+    readOnlyBuckets.flatMap((b) =>
+      isSimpleRoleBucket(b) ? [[b.roleId, b.playerCount]] : [],
+    ),
+  );
 
-  const total = readOnly ? 0 : sum(Object.values(roleCounts));
+  const total =
+    !readOnly && roleConfigMode === RoleConfigMode.Custom
+      ? sum(Object.values(roleCounts))
+      : 0;
 
   const allRoles = Object.values(roleDefinitions);
   const categoryOrder = props.categoryOrder;
@@ -64,9 +71,7 @@ export function RoleConfig(props: RoleConfigProps) {
   const hasCategoryGrouping = !!categoryOrder;
 
   function isRoleEnabled(roleId: string): boolean {
-    if (readOnly) return (readOnlyMax[roleId] ?? 0) > 0;
-    if (roleConfigMode === RoleConfigMode.Advanced)
-      return (roleMaxes[roleId] ?? 0) > 0;
+    if (readOnly) return (readOnlyCounts[roleId] ?? 0) > 0;
     return (roleCounts[roleId] ?? 0) > 0;
   }
 
@@ -125,14 +130,12 @@ export function RoleConfig(props: RoleConfigProps) {
       <Card>
         <CardHeader>
           <CardTitle>{ROLE_CONFIG_COPY.title}</CardTitle>
-          {!readOnly && (
+          {!readOnly && !isAdvanced && (
             <p className="text-sm text-muted-foreground">
-              {isAdvanced
-                ? `Assign ${String(playerCount)} role${playerCount !== 1 ? "s" : ""} (min total: ${String(sum(Object.values(roleMins)))}, max total: ${String(sum(Object.values(roleMaxes)))})`
-                : `Assign ${String(playerCount)} role${playerCount !== 1 ? "s" : ""} (${String(total)}/${String(playerCount)} assigned)`}
+              {`Assign ${String(playerCount)} role${playerCount !== 1 ? "s" : ""} (${String(total)}/${String(playerCount)} assigned)`}
             </p>
           )}
-          {showAll && (
+          {showAll && !isAdvanced && (
             <Input
               type="search"
               placeholder={ROLE_CONFIG_COPY.searchPlaceholder}
@@ -146,118 +149,164 @@ export function RoleConfig(props: RoleConfigProps) {
           )}
         </CardHeader>
         <CardContent>
-          {noResults ? (
-            <p className="text-sm text-muted-foreground py-2">
-              {ROLE_CONFIG_COPY.noSearchResults}
-            </p>
-          ) : hasCategoryGrouping ? (
-            <div className="space-y-4">
-              {categoryGroups.map(({ category, label, roles }) => (
-                <div key={category}>
-                  <p className="text-xs font-semibold text-muted-foreground mb-1">
-                    {label}
-                  </p>
-                  <ul className="space-y-1 list-none p-0">
-                    {roles.map((role) =>
-                      readOnly ? (
-                        <RoleConfigEntry
-                          key={role.id}
-                          role={role}
-                          gameMode={gameMode}
-                          roleConfigMode={roleConfigMode}
-                          min={readOnlyMin[role.id] ?? 0}
-                          max={readOnlyMax[role.id] ?? 0}
-                          readOnly={true}
-                          dimmed={isDimmedRole(role)}
-                        />
-                      ) : (
-                        <RoleConfigEntry
-                          key={role.id}
-                          role={role}
-                          gameMode={gameMode}
-                          roleConfigMode={roleConfigMode}
-                          readOnly={false}
-                          disabled={props.disabled}
-                          dimmed={isDimmedRole(role)}
-                        />
-                      ),
-                    )}
-                  </ul>
-                </div>
-              ))}
-              {uncategorizedVisible.length > 0 && (
-                <div>
-                  <p className="text-xs font-semibold text-muted-foreground mb-1">
-                    {ROLE_CONFIG_COPY.uncategorizedLabel}
-                  </p>
-                  <ul className="space-y-1 list-none p-0">
-                    {uncategorizedVisible.map((role) =>
-                      readOnly ? (
-                        <RoleConfigEntry
-                          key={role.id}
-                          role={role}
-                          gameMode={gameMode}
-                          roleConfigMode={roleConfigMode}
-                          min={readOnlyMin[role.id] ?? 0}
-                          max={readOnlyMax[role.id] ?? 0}
-                          readOnly={true}
-                          dimmed={isDimmedRole(role)}
-                        />
-                      ) : (
-                        <RoleConfigEntry
-                          key={role.id}
-                          role={role}
-                          gameMode={gameMode}
-                          roleConfigMode={roleConfigMode}
-                          readOnly={false}
-                          disabled={props.disabled}
-                          dimmed={isDimmedRole(role)}
-                        />
-                      ),
-                    )}
-                  </ul>
-                </div>
-              )}
-            </div>
-          ) : (
-            <ul className="space-y-1 list-none p-0">
-              {flatVisible.map((role) =>
-                readOnly ? (
-                  <RoleConfigEntry
-                    key={role.id}
-                    role={role}
-                    gameMode={gameMode}
-                    roleConfigMode={roleConfigMode}
-                    min={readOnlyMin[role.id] ?? 0}
-                    max={readOnlyMax[role.id] ?? 0}
-                    readOnly={true}
-                    dimmed={isDimmedRole(role)}
-                  />
-                ) : (
-                  <RoleConfigEntry
-                    key={role.id}
-                    role={role}
-                    gameMode={gameMode}
-                    roleConfigMode={roleConfigMode}
-                    readOnly={false}
-                    disabled={props.disabled}
-                    dimmed={isDimmedRole(role)}
-                  />
-                ),
-              )}
+          {!readOnly && isAdvanced && (
+            <RoleBucketConfig
+              roleDefinitions={roleDefinitions}
+              gameMode={gameMode}
+              disabled={props.disabled}
+            />
+          )}
+          {readOnly && isAdvanced && (
+            <ul className="space-y-3 list-none p-0">
+              {readOnlyBuckets
+                .filter((b): b is AdvancedRoleBucket => !isSimpleRoleBucket(b))
+                .map((bucket, i) => (
+                  <li key={i} className="border rounded-md p-3 space-y-1">
+                    <p className="text-sm font-medium">
+                      {bucket.name ?? ROLE_CONFIG_COPY.bucketLabel(i)}
+                    </p>
+                    <ul className="space-y-0.5 list-none p-0">
+                      {bucket.roles.map((slot) => {
+                        const roleDef = roleDefinitions[slot.roleId];
+                        return (
+                          <li
+                            key={slot.roleId}
+                            className="flex items-center gap-2"
+                          >
+                            {roleDef ? (
+                              <RoleConfigEntry
+                                role={roleDef}
+                                gameMode={gameMode}
+                                roleConfigMode={roleConfigMode}
+                                count={slot.max ?? bucket.playerCount}
+                                readOnly={true}
+                              />
+                            ) : (
+                              <span className="text-sm text-muted-foreground">
+                                {slot.roleId}
+                              </span>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </li>
+                ))}
             </ul>
           )}
-          {hasDisabledRoles && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="mt-2 w-full"
-              onClick={toggleShowAll}
-            >
-              {showAll
-                ? ROLE_CONFIG_COPY.hideExtraRoles
-                : ROLE_CONFIG_COPY.showAllRoles}
-            </Button>
+          {!isAdvanced && (
+            <>
+              {noResults ? (
+                <p className="text-sm text-muted-foreground py-2">
+                  {ROLE_CONFIG_COPY.noSearchResults}
+                </p>
+              ) : hasCategoryGrouping ? (
+                <div className="space-y-4">
+                  {categoryGroups.map(({ category, label, roles }) => (
+                    <div key={category}>
+                      <p className="text-xs font-semibold text-muted-foreground mb-1">
+                        {label}
+                      </p>
+                      <ul className="space-y-1 list-none p-0">
+                        {roles.map((role) =>
+                          readOnly ? (
+                            <RoleConfigEntry
+                              key={role.id}
+                              role={role}
+                              gameMode={gameMode}
+                              roleConfigMode={roleConfigMode}
+                              count={readOnlyCounts[role.id] ?? 0}
+                              readOnly={true}
+                              dimmed={isDimmedRole(role)}
+                            />
+                          ) : (
+                            <RoleConfigEntry
+                              key={role.id}
+                              role={role}
+                              gameMode={gameMode}
+                              roleConfigMode={roleConfigMode}
+                              readOnly={false}
+                              disabled={props.disabled}
+                              dimmed={isDimmedRole(role)}
+                            />
+                          ),
+                        )}
+                      </ul>
+                    </div>
+                  ))}
+                  {uncategorizedVisible.length > 0 && (
+                    <div>
+                      <p className="text-xs font-semibold text-muted-foreground mb-1">
+                        {ROLE_CONFIG_COPY.uncategorizedLabel}
+                      </p>
+                      <ul className="space-y-1 list-none p-0">
+                        {uncategorizedVisible.map((role) =>
+                          readOnly ? (
+                            <RoleConfigEntry
+                              key={role.id}
+                              role={role}
+                              gameMode={gameMode}
+                              roleConfigMode={roleConfigMode}
+                              count={readOnlyCounts[role.id] ?? 0}
+                              readOnly={true}
+                              dimmed={isDimmedRole(role)}
+                            />
+                          ) : (
+                            <RoleConfigEntry
+                              key={role.id}
+                              role={role}
+                              gameMode={gameMode}
+                              roleConfigMode={roleConfigMode}
+                              readOnly={false}
+                              disabled={props.disabled}
+                              dimmed={isDimmedRole(role)}
+                            />
+                          ),
+                        )}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <ul className="space-y-1 list-none p-0">
+                  {flatVisible.map((role) =>
+                    readOnly ? (
+                      <RoleConfigEntry
+                        key={role.id}
+                        role={role}
+                        gameMode={gameMode}
+                        roleConfigMode={roleConfigMode}
+                        count={readOnlyCounts[role.id] ?? 0}
+                        readOnly={true}
+                        dimmed={isDimmedRole(role)}
+                      />
+                    ) : (
+                      <RoleConfigEntry
+                        key={role.id}
+                        role={role}
+                        gameMode={gameMode}
+                        roleConfigMode={roleConfigMode}
+                        readOnly={false}
+                        disabled={props.disabled}
+                        dimmed={isDimmedRole(role)}
+                      />
+                    ),
+                  )}
+                </ul>
+              )}
+              {hasDisabledRoles && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mt-2 w-full"
+                  onClick={toggleShowAll}
+                >
+                  {showAll
+                    ? ROLE_CONFIG_COPY.hideExtraRoles
+                    : ROLE_CONFIG_COPY.showAllRoles}
+                </Button>
+              )}
+            </>
           )}
         </CardContent>
       </Card>

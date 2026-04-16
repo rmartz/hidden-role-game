@@ -39,7 +39,7 @@ describe("WerewolfAction.StartNight", () => {
         status: { type: GameStatus.Starting },
         players: [],
         roleAssignments: [],
-        configuredRoleSlots: [],
+        configuredRoleBuckets: [],
         showRolesInPlay: ShowRolesInPlay.None,
         ownerPlayerId: "owner-1",
         modeConfig: {
@@ -183,7 +183,7 @@ describe("StartNight — Wolf Cub bonus phase lifecycle", () => {
         { playerId: "p3", roleDefinitionId: WerewolfRole.Seer },
         { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
       ],
-      configuredRoleSlots: [],
+      configuredRoleBuckets: [],
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner-1",
       modeConfig: {

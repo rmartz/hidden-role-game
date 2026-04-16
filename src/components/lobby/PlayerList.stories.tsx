@@ -13,8 +13,10 @@ const meta = {
     onRefetch: noop,
     onRemovePlayer: noop,
     onTransferOwner: noop,
+    onRenamePlayer: noop,
     onToggleReady: noop,
     onReorderPlayers: fn(),
+    isRenamePending: false,
   },
 } satisfies Meta<typeof PlayerList>;
 
@@ -37,7 +39,7 @@ const baseLobby: PublicLobby = {
     roleConfigMode: RoleConfigMode.Default,
     showConfigToPlayers: true,
     showRolesInPlay: ShowRolesInPlay.AssignedRolesOnly,
-    roleSlots: [],
+    roleBuckets: [],
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     modeConfig: {
       gameMode: GameMode.Werewolf,

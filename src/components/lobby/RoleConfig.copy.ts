@@ -5,4 +5,5 @@ export const ROLE_CONFIG_COPY = {
   searchPlaceholder: "Search roles…",
   noSearchResults: "No roles match your search.",
   uncategorizedLabel: "Other",
+  bucketLabel: (index: number) => `Bucket ${String(index + 1)}`,
 } as const;
