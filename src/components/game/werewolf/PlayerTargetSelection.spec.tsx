@@ -298,6 +298,37 @@ describe("PlayerTargetSelection", () => {
     });
   });
 
+  it("shows choose-second-target heading after first Mentalist target is deselected", () => {
+    render(
+      <PlayerTargetSelection
+        gameId="game-1"
+        players={[
+          { id: "p1", name: "Alice" },
+          { id: "p2", name: "Bob" },
+          { id: "p3", name: "Charlie" },
+        ]}
+        targets={[
+          [{ id: "p2", name: "Bob" }, false],
+          [{ id: "p3", name: "Charlie" }, false],
+        ]}
+        isConfirmed={false}
+        isGroupPhase={false}
+        confirmPhaseKey={WerewolfRole.Mentalist}
+        hasTarget={false}
+        allAgreed={false}
+        myNightTarget={undefined}
+        mySecondNightTarget="p3"
+        requiresSecondTarget={true}
+      />,
+    );
+
+    expect(
+      screen.getByRole("heading", {
+        name: WEREWOLF_COPY.mentalist.chooseSecondTarget,
+      }),
+    ).toBeDefined();
+  });
+
   it("shows choose-second-target heading after first Mentalist target is selected", () => {
     render(
       <PlayerTargetSelection
