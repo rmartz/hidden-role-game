@@ -9,10 +9,7 @@ import {
 } from "@/lib/game/modes/werewolf";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { PlayerNightActionScreen } from "./PlayerNightActionScreen";
-
-interface PlayerTargetSelectionPropsForTest {
-  targets: readonly (readonly [{ id: string }, boolean])[];
-}
+import type { PlayerTargetSelectionProps } from "./PlayerTargetSelection";
 
 const { playerTargetSelectionMock } = vi.hoisted(() => ({
   playerTargetSelectionMock: vi.fn(),
@@ -98,9 +95,62 @@ describe("PlayerNightActionScreen", () => {
     const [firstCall] = playerTargetSelectionMock.mock.calls;
     if (!firstCall)
       throw new Error("Expected PlayerTargetSelection to be rendered");
-    const props = firstCall[0] as PlayerTargetSelectionPropsForTest;
+    const props = firstCall[0] as PlayerTargetSelectionProps;
     const targetIds = props.targets.map(([player]) => player.id);
 
     expect(targetIds).toEqual(["p2", "p3"]);
+  });
+
+  it("keeps only the selected target visible for confirmed non-Mentalist roles", () => {
+    const gameState: WerewolfPlayerGameState = {
+      gameMode: GameMode.Werewolf,
+      status: { type: GameStatus.Playing },
+      lobbyId: "lobby-1",
+      players: [
+        { id: "p1", name: "Alice" },
+        { id: "p2", name: "Bob" },
+        { id: "p3", name: "Charlie" },
+      ],
+      visibleRoleAssignments: [],
+      timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
+      nominationsEnabled: true,
+      singleTrialPerDay: false,
+      revealProtections: true,
+      myPlayerId: "p1",
+      myRole: {
+        id: WerewolfRole.Seer,
+        name: "Seer",
+        team: Team.Good,
+      },
+      myNightTarget: "p2",
+      mySecondNightTarget: "p3",
+      myNightTargetConfirmed: true,
+    };
+
+    const phase: WerewolfNighttimePhase = {
+      type: WerewolfPhase.Nighttime,
+      startedAt: Date.now(),
+      nightPhaseOrder: [WerewolfRole.Seer],
+      currentPhaseIndex: 0,
+      nightActions: {},
+    };
+
+    render(
+      <PlayerNightActionScreen
+        gameId="game-1"
+        gameState={gameState}
+        phase={phase}
+        turn={2}
+        deadPlayerIds={[]}
+      />,
+    );
+
+    const [firstCall] = playerTargetSelectionMock.mock.calls;
+    if (!firstCall)
+      throw new Error("Expected PlayerTargetSelection to be rendered");
+    const props = firstCall[0] as PlayerTargetSelectionProps;
+    const targetIds = props.targets.map(([player]) => player.id);
+
+    expect(targetIds).toEqual(["p2"]);
   });
 });

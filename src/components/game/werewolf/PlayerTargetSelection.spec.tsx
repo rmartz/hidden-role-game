@@ -79,6 +79,81 @@ describe("PlayerTargetSelection", () => {
     });
   });
 
+  it("handles intermediate Mentalist state after first-target deselect", () => {
+    const targetPlayers: TargetablePlayer[] = [
+      { id: "p2", name: "Bob" },
+      { id: "p3", name: "Charlie" },
+      { id: "p4", name: "Dave" },
+    ];
+    const { rerender } = render(
+      <PlayerTargetSelection
+        gameId="game-1"
+        players={[
+          { id: "p1", name: "Alice" },
+          { id: "p2", name: "Bob" },
+          { id: "p3", name: "Charlie" },
+          { id: "p4", name: "Dave" },
+        ]}
+        targets={targetPlayers.map<TargetSelectionTuple>((player) => [
+          player,
+          player.id === "p2",
+        ])}
+        isConfirmed={false}
+        isGroupPhase={false}
+        confirmPhaseKey={WerewolfRole.Mentalist}
+        hasTarget={true}
+        allAgreed={false}
+        myNightTarget="p2"
+        mySecondNightTarget="p3"
+        requiresSecondTarget={true}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Bob" }));
+
+    expect(mutateMock).toHaveBeenCalledWith({
+      actionId: WerewolfAction.SetNightTarget,
+      payload: {
+        targetPlayerId: undefined,
+      },
+    });
+
+    mutateMock.mockClear();
+
+    rerender(
+      <PlayerTargetSelection
+        gameId="game-1"
+        players={[
+          { id: "p1", name: "Alice" },
+          { id: "p2", name: "Bob" },
+          { id: "p3", name: "Charlie" },
+          { id: "p4", name: "Dave" },
+        ]}
+        targets={targetPlayers.map<TargetSelectionTuple>((player) => [
+          player,
+          false,
+        ])}
+        isConfirmed={false}
+        isGroupPhase={false}
+        confirmPhaseKey={WerewolfRole.Mentalist}
+        hasTarget={false}
+        allAgreed={false}
+        myNightTarget={undefined}
+        mySecondNightTarget="p3"
+        requiresSecondTarget={true}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Dave" }));
+
+    expect(mutateMock).toHaveBeenCalledWith({
+      actionId: WerewolfAction.SetNightTarget,
+      payload: {
+        targetPlayerId: "p4",
+      },
+    });
+  });
+
   it("allows deselecting the second-selected Mentalist target", () => {
     const targetPlayers: TargetablePlayer[] = [
       { id: "p2", name: "Bob" },
