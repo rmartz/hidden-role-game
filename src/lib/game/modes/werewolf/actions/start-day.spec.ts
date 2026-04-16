@@ -66,7 +66,7 @@ describe("WerewolfAction.StartDay — basic apply", () => {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: false,
-        singleTrialPerDay: true,
+        trialsPerDay: 2,
         revealProtections: true,
         autoRevealNightOutcome: true,
       },
@@ -82,7 +82,7 @@ describe("WerewolfAction.StartDay — basic apply", () => {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: false,
-        singleTrialPerDay: true,
+        trialsPerDay: 2,
         revealProtections: true,
         autoRevealNightOutcome: false,
       },

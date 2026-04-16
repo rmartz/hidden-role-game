@@ -62,7 +62,7 @@ describe("WerewolfAction.RevealNightOutcomeStep", () => {
         modeConfig: {
           gameMode: GameMode.Werewolf,
           nominationsEnabled: false,
-          singleTrialPerDay: true,
+          trialsPerDay: 2,
           revealProtections: true,
           autoRevealNightOutcome: false,
         },
@@ -81,7 +81,7 @@ describe("WerewolfAction.RevealNightOutcomeStep", () => {
         modeConfig: {
           gameMode: GameMode.Werewolf,
           nominationsEnabled: false,
-          singleTrialPerDay: true,
+          trialsPerDay: 2,
           revealProtections: true,
           autoRevealNightOutcome: false,
         },
@@ -100,7 +100,7 @@ describe("WerewolfAction.RevealNightOutcomeStep", () => {
         modeConfig: {
           gameMode: GameMode.Werewolf,
           nominationsEnabled: false,
-          singleTrialPerDay: true,
+          trialsPerDay: 2,
           revealProtections: true,
           autoRevealNightOutcome: false,
         },
