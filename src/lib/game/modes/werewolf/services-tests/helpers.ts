@@ -74,7 +74,7 @@ export function makeDaytimeGame(
     modeConfig: {
       gameMode: GameMode.Werewolf,
       nominationsEnabled: false,
-      singleTrialPerDay: true,
+      trialsPerDay: 1,
       revealProtections: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
@@ -123,7 +123,7 @@ export function makeDaytimeGameWithTrial(callerRoleId: WerewolfRole): Game {
     modeConfig: {
       gameMode: GameMode.Werewolf,
       nominationsEnabled: false,
-      singleTrialPerDay: true,
+      trialsPerDay: 1,
       revealProtections: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
@@ -170,7 +170,7 @@ export function makeDaytimeGameWithNominations(
     modeConfig: {
       gameMode: GameMode.Werewolf,
       nominationsEnabled,
-      singleTrialPerDay: true,
+      trialsPerDay: 1,
       revealProtections: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,

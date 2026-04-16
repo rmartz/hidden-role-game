@@ -11,6 +11,7 @@ import {
   WEREWOLF_ROLE_CATEGORY_ORDER,
 } from "@/lib/game/modes/werewolf/roles";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { isNominationsBlocked } from "@/lib/game/modes/werewolf/player-state";
 import { useGameAction } from "@/hooks";
 import {
   GameRolesList,
@@ -68,9 +69,7 @@ export function OwnerGameDayScreen({
   const modeConfig = GAME_MODES[gameState.gameMode];
   const activeTrial = daytimePhase.activeTrial;
   const hasActiveTrial = !!activeTrial && !activeTrial.verdict;
-  const trialConcluded = !!activeTrial?.verdict;
-  const nominationsBlocked =
-    hasActiveTrial || (gameState.singleTrialPerDay && trialConcluded);
+  const nominationsBlocked = isNominationsBlocked(gameState);
   const hunterRevengePending = !!gameState.hunterRevengePlayerId;
   const glossaryRoles = gameState.rolesInPlay?.length
     ? gameState.rolesInPlay
@@ -102,7 +101,7 @@ export function OwnerGameDayScreen({
         <OwnerAdvanceCard
           label="Start Next Night"
           onAdvance={handleAdvance}
-          disabled={action.isPending || hunterRevengePending}
+          disabled={action.isPending || hunterRevengePending || hasActiveTrial}
           icon={<WeatherMoonRegular />}
         >
           {activeTrial && (
@@ -139,6 +138,7 @@ export function OwnerGameDayScreen({
           nominations={gameState.nominations ?? []}
           deadPlayerIds={gameState.deadPlayerIds}
           gameOwnerId={gameState.gameOwner?.id}
+          hideUnnominatedSection
         />
       )}
       <OwnerPlayerActionsGrid
@@ -149,6 +149,7 @@ export function OwnerGameDayScreen({
         gameOwnerId={gameState.gameOwner?.id}
         isDaytime
         trialBlocked={nominationsBlocked}
+        smitedPlayerIds={gameState.pendingSmitePlayerIds}
         executionerTargetId={gameState.executionerTargetId}
       />
       <GameRolesList

@@ -19,6 +19,8 @@ interface NominationPanelProps {
   myNominatedDefendantId?: string;
   deadPlayerIds?: string[];
   gameOwnerId?: string;
+  /** When true, the section listing un-nominated players is hidden. */
+  hideUnnominatedSection?: boolean;
 }
 
 export function NominationPanel({
@@ -31,6 +33,7 @@ export function NominationPanel({
   myNominatedDefendantId,
   deadPlayerIds,
   gameOwnerId,
+  hideUnnominatedSection,
 }: NominationPanelProps) {
   const action = useGameAction(gameId);
   const { nomination } = WEREWOLF_COPY;
@@ -120,7 +123,7 @@ export function NominationPanel({
           </ul>
         </>
       )}
-      {unnominatedPlayers.length > 0 && (
+      {!hideUnnominatedSection && unnominatedPlayers.length > 0 && (
         <>
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2 mt-4">
             {nomination.nominateSectionHeading}

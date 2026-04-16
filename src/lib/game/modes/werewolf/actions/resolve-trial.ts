@@ -1,7 +1,7 @@
 import { GameStatus } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
 import type { ActiveTrial, WerewolfTurnState } from "../types";
-import { WerewolfPhase } from "../types";
+import { TrialVerdict, WerewolfPhase } from "../types";
 import {
   currentTurnState,
   isOwnerPlaying,
@@ -34,7 +34,16 @@ export function applyTrialVerdict(
 
   // Strictly more Guilty than Innocent → eliminated; ties/abstentions → innocent
   const eliminated = guiltyCount > innocentCount;
-  activeTrial.verdict = eliminated ? "eliminated" : "innocent";
+  activeTrial.verdict = eliminated
+    ? TrialVerdict.Eliminated
+    : TrialVerdict.Innocent;
+
+  // Increment the concluded-trials counter. Done here so all paths that call
+  // applyTrialVerdict (resolveTrialAction, castVoteAction auto-resolve,
+  // skipDefenseAction auto-resolve) are counted consistently.
+  if (ts.phase.type === WerewolfPhase.Daytime) {
+    ts.phase.concludedTrialsCount = (ts.phase.concludedTrialsCount ?? 0) + 1;
+  }
 
   if (eliminated) {
     const { defendantId } = activeTrial;
@@ -66,7 +75,7 @@ export const resolveTrialAction: GameAction = {
     if (!activeTrial) return;
     applyTrialVerdict(activeTrial, ts, game);
 
-    if (activeTrial.verdict === "eliminated") {
+    if (activeTrial.verdict === TrialVerdict.Eliminated) {
       const { defendantId } = activeTrial;
 
       // Executioner wins if their target was eliminated and the Executioner is alive.
