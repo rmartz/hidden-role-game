@@ -44,6 +44,7 @@ describe("extractDaytimeNightSummary", () => {
         nominationsEnabled: false,
         trialsPerDay: 1,
         revealProtections: true,
+        showRolesOnDeath: true,
       },
       timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     };
@@ -113,6 +114,7 @@ describe("extractDaytimeNightSummary", () => {
     game.modeConfig = {
       ...(game.modeConfig as WerewolfModeConfig),
       revealProtections: false,
+      showRolesOnDeath: true,
     };
 
     const result = extractDaytimeState(game, "player-1");
