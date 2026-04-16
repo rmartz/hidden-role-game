@@ -15,9 +15,10 @@ import {
   setBucketName,
   addRoleToBucket,
   removeRoleFromBucket,
-  setBucketRoleUnique,
+  setBucketUnique,
 } from "@/store/game-config-slice";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
@@ -47,11 +48,15 @@ export function RoleBucketConfig({
   const advancedBuckets = buckets.filter(
     (b): b is AdvancedRoleBucket => !isSimpleRoleBucket(b),
   );
+  const allRoles = Object.values(roleDefinitions);
+  const inherentlyUniqueRoleIds = allRoles
+    .filter((r) => r.unique)
+    .map((r) => r.id);
 
   return (
     <RoleBucketConfigView
       buckets={advancedBuckets}
-      allRoles={Object.values(roleDefinitions)}
+      allRoles={allRoles}
       gameMode={gameMode}
       disabled={disabled}
       onAddBucket={() => {
@@ -66,14 +71,22 @@ export function RoleBucketConfig({
       onSetBucketPlayerCount={(i, count) => {
         dispatch(setBucketPlayerCount({ bucketIndex: i, playerCount: count }));
       }}
-      onAddRole={(i, roleId) => {
-        dispatch(addRoleToBucket({ bucketIndex: i, roleId }));
+      onAddRole={(i, roleId, isUnique, bucketIsUnique) => {
+        dispatch(
+          addRoleToBucket({ bucketIndex: i, roleId, isUnique, bucketIsUnique }),
+        );
       }}
       onRemoveRole={(i, roleId) => {
         dispatch(removeRoleFromBucket({ bucketIndex: i, roleId }));
       }}
-      onSetUnique={(i, roleId, unique) => {
-        dispatch(setBucketRoleUnique({ bucketIndex: i, roleId, unique }));
+      onSetBucketUnique={(i, unique) => {
+        dispatch(
+          setBucketUnique({
+            bucketIndex: i,
+            unique,
+            inherentlyUniqueRoleIds,
+          }),
+        );
       }}
     />
   );
@@ -88,9 +101,14 @@ export interface RoleBucketConfigViewProps {
   onRemoveBucket: (bucketIndex: number) => void;
   onSetBucketName: (bucketIndex: number, name: string) => void;
   onSetBucketPlayerCount: (bucketIndex: number, count: number) => void;
-  onAddRole: (bucketIndex: number, roleId: string) => void;
+  onAddRole: (
+    bucketIndex: number,
+    roleId: string,
+    isUnique: boolean,
+    bucketIsUnique: boolean,
+  ) => void;
   onRemoveRole: (bucketIndex: number, roleId: string) => void;
-  onSetUnique: (bucketIndex: number, roleId: string, unique: boolean) => void;
+  onSetBucketUnique: (bucketIndex: number, unique: boolean) => void;
 }
 
 export function RoleBucketConfigView({
@@ -104,7 +122,7 @@ export function RoleBucketConfigView({
   onSetBucketPlayerCount,
   onAddRole,
   onRemoveRole,
-  onSetUnique,
+  onSetBucketUnique,
 }: RoleBucketConfigViewProps) {
   return (
     <div className="space-y-4">
@@ -125,14 +143,14 @@ export function RoleBucketConfigView({
           onSetPlayerCount={(count) => {
             onSetBucketPlayerCount(bucketIndex, count);
           }}
-          onAddRole={(roleId) => {
-            onAddRole(bucketIndex, roleId);
+          onAddRole={(roleId, isUnique, bucketIsUnique) => {
+            onAddRole(bucketIndex, roleId, isUnique, bucketIsUnique);
           }}
           onRemoveRole={(roleId) => {
             onRemoveRole(bucketIndex, roleId);
           }}
-          onSetUnique={(roleId, unique) => {
-            onSetUnique(bucketIndex, roleId, unique);
+          onSetBucketUnique={(unique) => {
+            onSetBucketUnique(bucketIndex, unique);
           }}
         />
       ))}
@@ -157,9 +175,13 @@ interface BucketEditorProps {
   onRemove: () => void;
   onSetName: (name: string) => void;
   onSetPlayerCount: (count: number) => void;
-  onAddRole: (roleId: string) => void;
+  onAddRole: (
+    roleId: string,
+    isUnique: boolean,
+    bucketIsUnique: boolean,
+  ) => void;
   onRemoveRole: (roleId: string) => void;
-  onSetUnique: (roleId: string, unique: boolean) => void;
+  onSetBucketUnique: (unique: boolean) => void;
 }
 
 function BucketEditor({
@@ -173,10 +195,18 @@ function BucketEditor({
   onSetPlayerCount,
   onAddRole,
   onRemoveRole,
-  onSetUnique,
+  onSetBucketUnique,
 }: BucketEditorProps) {
   const assignedRoleIds = new Set(bucket.roles.map((r) => r.roleId));
   const availableRoles = allRoles.filter((r) => !assignedRoleIds.has(r.id));
+
+  const nonUniqueSlots = bucket.roles.filter((slot) => {
+    const roleDef = allRoles.find((r) => r.id === slot.roleId);
+    return !roleDef?.unique;
+  });
+  const hasNonUniqueRoles = nonUniqueSlots.length > 0;
+  const bucketIsUnique =
+    hasNonUniqueRoles && nonUniqueSlots.every((s) => s.max !== undefined);
 
   return (
     <div className="border rounded-md p-3 space-y-3">
@@ -240,42 +270,51 @@ function BucketEditor({
                       {slot.roleId}
                     </span>
                   )}
+                  {roleDef?.unique && (
+                    <Badge variant="secondary" className="text-xs shrink-0">
+                      {ROLE_BUCKET_CONFIG_COPY.uniqueBadge}
+                    </Badge>
+                  )}
                 </span>
-                <div className="flex items-center gap-3 shrink-0">
-                  <label className="flex items-center gap-1.5 cursor-pointer">
-                    <Checkbox
-                      checked={slot.max !== undefined}
-                      onCheckedChange={(checked) => {
-                        onSetUnique(slot.roleId, checked);
-                      }}
-                      disabled={disabled}
-                    />
-                    <span className="text-xs">
-                      {ROLE_BUCKET_CONFIG_COPY.unique}
-                    </span>
-                  </label>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    disabled={disabled}
-                    onClick={() => {
-                      onRemoveRole(slot.roleId);
-                    }}
-                  >
-                    {ROLE_BUCKET_CONFIG_COPY.removeRole}
-                  </Button>
-                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  disabled={disabled}
+                  onClick={() => {
+                    onRemoveRole(slot.roleId);
+                  }}
+                >
+                  {ROLE_BUCKET_CONFIG_COPY.removeRole}
+                </Button>
               </li>
             );
           })}
         </ul>
       )}
 
+      {hasNonUniqueRoles && (
+        <label className="flex items-center gap-1.5 cursor-pointer">
+          <Checkbox
+            checked={bucketIsUnique}
+            onCheckedChange={(checked) => {
+              onSetBucketUnique(checked);
+            }}
+            disabled={disabled}
+          />
+          <span className="text-xs">
+            {ROLE_BUCKET_CONFIG_COPY.bucketUnique}
+          </span>
+        </label>
+      )}
+
       {availableRoles.length > 0 && (
         <Select
           disabled={disabled}
           onValueChange={(roleId) => {
-            if (roleId) onAddRole(roleId as string);
+            if (!roleId) return;
+            const id = roleId as string;
+            const roleDef = allRoles.find((r) => r.id === id);
+            onAddRole(id, roleDef?.unique === true, bucketIsUnique);
           }}
         >
           <SelectTrigger className="w-48 h-8 text-sm">

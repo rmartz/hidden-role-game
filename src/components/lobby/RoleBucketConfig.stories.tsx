@@ -7,8 +7,8 @@ import type { AdvancedRoleBucket, RoleDefinition } from "@/lib/types";
 const mockRoles: RoleDefinition<string, Team>[] = [
   { id: "villager", name: "Villager", team: Team.Good },
   { id: "werewolf", name: "Werewolf", team: Team.Bad },
-  { id: "seer", name: "Seer", team: Team.Good },
-  { id: "doctor", name: "Doctor", team: Team.Good },
+  { id: "seer", name: "Seer", team: Team.Good, unique: true },
+  { id: "doctor", name: "Doctor", team: Team.Good, unique: true },
 ];
 
 const emptyBucket: AdvancedRoleBucket = {
@@ -41,7 +41,7 @@ const meta = {
     onSetBucketPlayerCount: fn(),
     onAddRole: fn(),
     onRemoveRole: fn(),
-    onSetUnique: fn(),
+    onSetBucketUnique: fn(),
   },
 } satisfies Meta<typeof RoleBucketConfigView>;
 
@@ -78,6 +78,33 @@ export const UnnamedBuckets: Story = {
     buckets: [
       { playerCount: 2, roles: [{ roleId: "villager" }] },
       { playerCount: 1, roles: [{ roleId: "werewolf", max: 1 }] },
+    ],
+  },
+};
+
+export const MixedUniqueness: Story = {
+  args: {
+    buckets: [
+      {
+        playerCount: 3,
+        name: "Mixed",
+        roles: [{ roleId: "villager" }, { roleId: "seer", max: 1 }],
+      },
+    ],
+  },
+};
+
+export const AllUniqueBucket: Story = {
+  args: {
+    buckets: [
+      {
+        playerCount: 2,
+        name: "Special",
+        roles: [
+          { roleId: "villager", max: 1 },
+          { roleId: "werewolf", max: 1 },
+        ],
+      },
     ],
   },
 };

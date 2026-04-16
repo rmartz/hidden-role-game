@@ -130,6 +130,12 @@ export interface RoleDefinition<
   };
   /** Used to group roles in the role config UI and glossary. */
   category?: string;
+  /**
+   * When true, only one player may hold this role in a game. Applies to roles
+   * that wake alone with unique individual mechanics — having two would cause
+   * broken or clunky narrator interactions.
+   */
+  unique?: true;
 }
 
 /**
