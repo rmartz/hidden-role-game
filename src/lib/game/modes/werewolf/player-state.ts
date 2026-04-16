@@ -6,6 +6,7 @@ import type {
   NightStatusEntry,
 } from "@/server/types/game";
 import type { AnyNightAction, DaytimeVote } from "./types";
+import { TrialVerdict } from "./types";
 
 /**
  * Werewolf-specific extension of PlayerGameState. Includes all fields that
@@ -91,7 +92,7 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
     myVote?: DaytimeVote;
     voteCount: number;
     playerCount: number;
-    verdict?: "eliminated" | "innocent";
+    verdict?: TrialVerdict;
     mustVoteGuilty?: boolean;
     mustVoteInnocent?: boolean;
     voteResults?: { playerName: string; vote: DaytimeVote }[];

@@ -94,6 +94,11 @@ export type DaytimeVote = "guilty" | "innocent";
 
 export type TrialPhase = "defense" | "voting";
 
+export enum TrialVerdict {
+  Eliminated = "eliminated",
+  Innocent = "innocent",
+}
+
 export interface ActiveTrial {
   defendantId: string;
   /** Unix epoch ms when the trial started. */
@@ -103,7 +108,7 @@ export interface ActiveTrial {
   /** Unix epoch ms when the voting phase began. Set when transitioning from defense to voting. */
   voteStartedAt?: number;
   votes: { playerId: string; vote: DaytimeVote }[];
-  verdict?: "eliminated" | "innocent";
+  verdict?: TrialVerdict;
 }
 
 export interface Nomination {

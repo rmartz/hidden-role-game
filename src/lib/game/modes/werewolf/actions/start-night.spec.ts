@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 import type { Game } from "@/lib/types";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "../timer-config";
-import { WerewolfPhase } from "../types";
+import { WerewolfPhase, TrialVerdict } from "../types";
 import type {
   WerewolfTurnState,
   WerewolfNighttimePhase,
@@ -89,7 +89,7 @@ describe("WerewolfAction.StartNight", () => {
             startedAt: 2000,
             phase: "voting",
             votes: [],
-            verdict: "innocent",
+            verdict: TrialVerdict.Innocent,
           },
         },
         deadPlayerIds: [],

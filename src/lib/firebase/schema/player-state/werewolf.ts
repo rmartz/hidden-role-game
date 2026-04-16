@@ -1,6 +1,7 @@
 import { GameMode } from "@/lib/types";
 import type { Team } from "@/lib/types";
 import type { AnyNightAction, DaytimeVote } from "@/lib/game/modes/werewolf";
+import { TrialVerdict } from "@/lib/game/modes/werewolf";
 import type { NightStatusEntry } from "@/server/types";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import {
@@ -41,7 +42,7 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
     myVote?: DaytimeVote;
     voteCount: number;
     playerCount: number;
-    verdict?: "eliminated" | "innocent";
+    verdict?: TrialVerdict;
     mustVoteGuilty?: boolean;
     mustVoteInnocent?: boolean;
     voteResults?: { playerName: string; vote: DaytimeVote }[];
