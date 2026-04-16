@@ -5,18 +5,17 @@ import type { PhaseKey, TargetablePlayer } from "@/lib/game/modes/werewolf";
 import { useGameAction } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import type { PublicLobbyPlayer } from "@/server/types";
-import { ConfirmTargetButton } from "./ConfirmTargetButton";
+import { ConfirmTargetButtonView } from "./ConfirmTargetButtonView";
 import { WitchInformationPanel } from "./WitchInformationPanel";
-import { GroupTargetSuggestion } from "./GroupTargetSuggestion";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import { getPlayerName } from "@/lib/player";
 
 interface TeamVoteDisplay {
   playerName: string;
   targetName: string;
 }
 
-export interface PlayerTargetSelectionProps {
-  gameId: string;
+export interface PlayerTargetSelectionViewProps {
   players: PublicLobbyPlayer[];
   targets: readonly (readonly [TargetablePlayer, boolean])[];
   isConfirmed: boolean;
@@ -35,10 +34,19 @@ export interface PlayerTargetSelectionProps {
   mySecondNightTarget?: string;
   requiresSecondTarget?: boolean;
   mirrorcasterCharged?: boolean;
+  isPending: boolean;
+  onMutate: (params: { actionId: string; payload?: unknown }) => void;
+  onConfirm: () => void;
 }
 
-export function PlayerTargetSelection({
-  gameId,
+export interface PlayerTargetSelectionProps extends Omit<
+  PlayerTargetSelectionViewProps,
+  "isPending" | "onMutate" | "onConfirm"
+> {
+  gameId: string;
+}
+
+export function PlayerTargetSelectionView({
   players,
   targets,
   isConfirmed,
@@ -57,8 +65,10 @@ export function PlayerTargetSelection({
   mySecondNightTarget,
   requiresSecondTarget = false,
   mirrorcasterCharged,
-}: PlayerTargetSelectionProps) {
-  const action = useGameAction(gameId);
+  isPending,
+  onMutate,
+  onConfirm,
+}: PlayerTargetSelectionViewProps) {
   const hasFirstMentalistTarget =
     myNightTarget !== null && myNightTarget !== undefined;
   const isMentalistSelectionComplete =
@@ -79,43 +89,33 @@ export function PlayerTargetSelection({
   const handleTargetClick = (player: TargetablePlayer, isSelected: boolean) => {
     if (requiresSecondTarget) {
       if (player.id === myNightTarget) {
-        action.mutate({
+        onMutate({
           actionId: WerewolfAction.SetNightTarget,
-          payload: {
-            targetPlayerId: undefined,
-          },
+          payload: { targetPlayerId: undefined },
         });
         return;
       }
 
       if (player.id === mySecondNightTarget) {
-        action.mutate({
+        onMutate({
           actionId: WerewolfAction.SetNightTarget,
-          payload: {
-            targetPlayerId: undefined,
-            isSecondTarget: true,
-          },
+          payload: { targetPlayerId: undefined, isSecondTarget: true },
         });
         return;
       }
 
       if (!hasFirstMentalistTarget) {
-        action.mutate({
+        onMutate({
           actionId: WerewolfAction.SetNightTarget,
-          payload: {
-            targetPlayerId: player.id,
-          },
+          payload: { targetPlayerId: player.id },
         });
         return;
       }
 
       if (mySecondNightTarget === undefined) {
-        action.mutate({
+        onMutate({
           actionId: WerewolfAction.SetNightTarget,
-          payload: {
-            targetPlayerId: player.id,
-            isSecondTarget: true,
-          },
+          payload: { targetPlayerId: player.id, isSecondTarget: true },
         });
         return;
       }
@@ -123,13 +123,15 @@ export function PlayerTargetSelection({
       return;
     }
 
-    action.mutate({
+    onMutate({
       actionId: WerewolfAction.SetNightTarget,
-      payload: {
-        targetPlayerId: isSelected ? undefined : player.id,
-      },
+      payload: { targetPlayerId: isSelected ? undefined : player.id },
     });
   };
+
+  const suggestedName = suggestedTargetId
+    ? (getPlayerName(players, suggestedTargetId) ?? suggestedTargetId)
+    : undefined;
 
   return (
     <div>
@@ -173,14 +175,29 @@ export function PlayerTargetSelection({
               ) : (
                 <p className="text-xs text-muted-foreground">No votes yet.</p>
               )}
-              {suggestedTargetId && (
-                <GroupTargetSuggestion
-                  gameId={gameId}
-                  players={players}
-                  suggestedTargetId={suggestedTargetId}
-                  myNightTarget={myNightTarget}
-                  isConfirmed={isConfirmed}
-                />
+              {suggestedTargetId && suggestedName && (
+                <div className="mt-2 pt-2 border-t">
+                  <p className="text-xs mb-1.5">
+                    {WEREWOLF_COPY.targetSelection.suggestedTarget(
+                      suggestedName,
+                    )}
+                  </p>
+                  {myNightTarget !== suggestedTargetId && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => {
+                        onMutate({
+                          actionId: WerewolfAction.SetNightTarget,
+                          payload: { targetPlayerId: suggestedTargetId },
+                        });
+                      }}
+                      disabled={isPending}
+                    >
+                      {WEREWOLF_COPY.targetSelection.approveTarget}
+                    </Button>
+                  )}
+                </div>
               )}
             </div>
           )}
@@ -193,9 +210,9 @@ export function PlayerTargetSelection({
                 : WEREWOLF_COPY.targetSelection.chooseTarget}
           </h2>
           {shouldShowMentalistSecondTargetHeading && (
-            <h2 className="text-lg font-semibold mb-2 mt-4 text-center">
+            <h3 className="text-lg font-semibold mb-2 mt-4 text-center">
               {WEREWOLF_COPY.mentalist.chooseSecondTarget}
-            </h2>
+            </h3>
           )}
           {!(isConfirmed && myNightTarget === null) && (
             <div className="flex flex-col gap-2 max-w-sm mx-auto">
@@ -211,7 +228,7 @@ export function PlayerTargetSelection({
                     handleTargetClick(player, isSelected);
                   }}
                   disabled={
-                    action.isPending ||
+                    isPending ||
                     isConfirmed ||
                     player.id === previousNightTargetId ||
                     (isWitchSelfDisabled && player.id === myPlayerId) ||
@@ -231,7 +248,7 @@ export function PlayerTargetSelection({
                 <Button
                   variant={myNightTarget === null ? "default" : "outline"}
                   onClick={() => {
-                    action.mutate({
+                    onMutate({
                       actionId: WerewolfAction.SetNightTarget,
                       payload: {
                         targetPlayerId:
@@ -239,7 +256,7 @@ export function PlayerTargetSelection({
                       },
                     });
                   }}
-                  disabled={action.isPending}
+                  disabled={isPending}
                 >
                   {myNightTarget === null
                     ? WEREWOLF_COPY.targetSelection.noTarget_selected
@@ -249,8 +266,7 @@ export function PlayerTargetSelection({
             </div>
           )}
 
-          <ConfirmTargetButton
-            gameId={gameId}
+          <ConfirmTargetButtonView
             roleId={confirmPhaseKey}
             hasTarget={hasTarget}
             hasDecided={
@@ -273,9 +289,28 @@ export function PlayerTargetSelection({
                 : undefined
             }
             mirrorcasterCharged={mirrorcasterCharged}
+            isPending={isPending}
+            onConfirm={onConfirm}
           />
         </>
       )}
     </div>
+  );
+}
+
+export function PlayerTargetSelection({
+  gameId,
+  ...props
+}: PlayerTargetSelectionProps) {
+  const action = useGameAction(gameId);
+  return (
+    <PlayerTargetSelectionView
+      {...props}
+      isPending={action.isPending}
+      onMutate={action.mutate}
+      onConfirm={() => {
+        action.mutate({ actionId: WerewolfAction.ConfirmNightTarget });
+      }}
+    />
   );
 }
