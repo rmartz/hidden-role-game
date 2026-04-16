@@ -15,6 +15,7 @@ import {
   WEREWOLF_ROLE_CATEGORY_LABELS,
   WEREWOLF_ROLE_CATEGORY_ORDER,
 } from "@/lib/game/modes/werewolf/roles";
+import { DEFAULT_WEREWOLF_MODE_CONFIG } from "@/lib/game/modes/werewolf/lobby-config";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   loadConfig,
@@ -134,7 +135,11 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
       nominationEnabled={activeModeConfigData.nominationsEnabled}
       singleTrialPerDay={activeModeConfigData.singleTrialPerDay}
       revealProtections={activeModeConfigData.revealProtections}
-      showRolesOnDeath={activeModeConfigData.showRolesOnDeath ?? true}
+      showRolesOnDeath={
+        activeModeConfigData.showRolesOnDeath ??
+        DEFAULT_WEREWOLF_MODE_CONFIG.showRolesOnDeath ??
+        true
+      }
       disabled={disabled}
       onWerewolfTimerConfigChange={
         onTimerConfigChange as
