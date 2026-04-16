@@ -13,11 +13,13 @@ interface WerewolfConfigPanelProps {
   nominationEnabled: boolean;
   trialsPerDay: number;
   revealProtections: boolean;
+  showRolesOnDeath: boolean;
   disabled?: boolean;
   onWerewolfTimerConfigChange?: (config: WerewolfTimerConfig) => void;
   onNominationEnabledChange?: (value: boolean) => void;
   onTrialsPerDayChange?: (value: number) => void;
   onRevealProtectionsChange?: (value: boolean) => void;
+  onShowRolesOnDeathChange?: (value: boolean) => void;
 }
 
 export function WerewolfConfigPanel({
@@ -25,11 +27,13 @@ export function WerewolfConfigPanel({
   nominationEnabled,
   trialsPerDay,
   revealProtections,
+  showRolesOnDeath,
   disabled,
   onWerewolfTimerConfigChange,
   onNominationEnabledChange,
   onTrialsPerDayChange,
   onRevealProtectionsChange,
+  onShowRolesOnDeathChange,
 }: WerewolfConfigPanelProps) {
   function handleTrialsPerDayChange(direction: IncrementDirection) {
     if (!onTrialsPerDayChange) return;
@@ -73,6 +77,17 @@ export function WerewolfConfigPanel({
         />
         <Label htmlFor="reveal-protections">
           {WEREWOLF_CONFIG_PANEL_COPY.revealProtections}
+        </Label>
+      </div>
+      <div className="flex items-center gap-2">
+        <Switch
+          id="show-roles-on-death"
+          checked={showRolesOnDeath}
+          disabled={disabled ?? !onShowRolesOnDeathChange}
+          onCheckedChange={onShowRolesOnDeathChange}
+        />
+        <Label htmlFor="show-roles-on-death">
+          {WEREWOLF_CONFIG_PANEL_COPY.showRolesOnDeath}
         </Label>
       </div>
       <WerewolfTimerConfigPanel

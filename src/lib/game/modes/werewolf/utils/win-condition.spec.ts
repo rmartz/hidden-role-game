@@ -28,6 +28,7 @@ function makeGame(
       nominationsEnabled: false,
       trialsPerDay: 1,
       revealProtections: true,
+      showRolesOnDeath: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   };
