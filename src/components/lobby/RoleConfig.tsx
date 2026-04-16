@@ -188,7 +188,8 @@ export function RoleConfig(props: RoleConfigProps) {
   // repeating the readOnly discriminant inline.
   const entryReadOnly = props.readOnly;
   const entryDisabled = !props.readOnly ? props.disabled : false;
-  const getCount = (id: string) => readOnlyCounts[id] ?? 0;
+  const getCount = (id: string) =>
+    readOnly ? (readOnlyCounts[id] ?? 0) : (roleCounts[id] ?? 0);
 
   function toggleShowAll() {
     if (showAll) setSearchQuery("");
