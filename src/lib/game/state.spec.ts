@@ -253,6 +253,16 @@ function makeWerewolfDeathRevealGame(showRolesOnDeath: boolean): Game {
   };
 }
 
+function makeFinishedWerewolfDeathRevealGame(showRolesOnDeath: boolean): Game {
+  return {
+    ...makeWerewolfDeathRevealGame(showRolesOnDeath),
+    status: {
+      type: GameStatus.Finished,
+      winner: Team.Good,
+    },
+  };
+}
+
 describe("GameStateService.getPlayerGameState — narrator nominationsEnabled", () => {
   it("narrator state has nominationsEnabled true when enabled on game", () => {
     const game = makeNarratorGame(true);
@@ -302,5 +312,28 @@ describe("GameStateService.getPlayerGameState — Werewolf showRolesOnDeath", ()
     expect(
       result?.visibleRoleAssignments.map((assignment) => assignment.player.id),
     ).toEqual([]);
+  });
+
+  it("reveals role assignments at game over when showRolesOnDeath is disabled", () => {
+    const game = makeFinishedWerewolfDeathRevealGame(false);
+
+    const result = getPlayerGameState(game, "p1");
+
+    expect(
+      result?.visibleRoleAssignments.map((assignment) => assignment.player.id),
+    ).toEqual(["p2"]);
+  });
+
+  it("keeps narrator role visibility when showRolesOnDeath is disabled", () => {
+    const game = makeWerewolfDeathRevealGame(false);
+
+    const result = getPlayerGameState(
+      game,
+      "narrator",
+    ) as WerewolfPlayerGameState | null;
+
+    expect(
+      result?.visibleRoleAssignments.map((assignment) => assignment.player.id),
+    ).toEqual(["p1", "p2"]);
   });
 });
