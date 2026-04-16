@@ -60,7 +60,7 @@ describe("validateGameStartPrerequisites", () => {
         modeConfig: {
           gameMode: GameMode.Werewolf,
           nominationsEnabled: false,
-          singleTrialPerDay: false,
+          trialsPerDay: 0,
           revealProtections: false,
           showRolesOnDeath: true,
         },

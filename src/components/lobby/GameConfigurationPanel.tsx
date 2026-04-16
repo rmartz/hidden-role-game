@@ -132,7 +132,7 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
     <WerewolfConfigPanel
       timerConfig={activeTimerConfig as WerewolfTimerConfig}
       nominationEnabled={activeModeConfigData.nominationsEnabled}
-      singleTrialPerDay={activeModeConfigData.singleTrialPerDay}
+      trialsPerDay={activeModeConfigData.trialsPerDay}
       revealProtections={activeModeConfigData.revealProtections}
       showRolesOnDeath={activeModeConfigData.showRolesOnDeath}
       disabled={disabled}
@@ -146,9 +146,9 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
           ? (v: boolean) => onModeConfigFieldChange("nominationsEnabled", v)
           : undefined
       }
-      onSingleTrialPerDayChange={
+      onTrialsPerDayChange={
         onModeConfigFieldChange
-          ? (v: boolean) => onModeConfigFieldChange("singleTrialPerDay", v)
+          ? (v: number) => onModeConfigFieldChange("trialsPerDay", v)
           : undefined
       }
       onRevealProtectionsChange={

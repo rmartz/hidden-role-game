@@ -2,8 +2,12 @@ import { describe, it, expect } from "vitest";
 import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 import type { Game } from "@/lib/types";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "../timer-config";
-import { WerewolfPhase } from "../types";
-import type { WerewolfTurnState, WerewolfNighttimePhase } from "../types";
+import { WerewolfPhase, TrialVerdict } from "../types";
+import type {
+  WerewolfTurnState,
+  WerewolfNighttimePhase,
+  WerewolfDaytimePhase,
+} from "../types";
 import { WerewolfRole } from "../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
 import { makePlayingGame, nightTurnState, dayTurnState } from "./test-helpers";
@@ -45,13 +49,54 @@ describe("WerewolfAction.StartNight", () => {
         modeConfig: {
           gameMode: GameMode.Werewolf,
           nominationsEnabled: false,
-          singleTrialPerDay: true,
+          trialsPerDay: 1,
           revealProtections: true,
           showRolesOnDeath: true,
         },
         timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
       };
       expect(action.isValid(game, "owner-1", null)).toBe(false);
+    });
+
+    it("returns false when a trial is active and has no verdict yet", () => {
+      const dayWithActiveTrial: WerewolfTurnState = {
+        turn: 1,
+        phase: {
+          type: WerewolfPhase.Daytime,
+          startedAt: 1000,
+          nightActions: {},
+          activeTrial: {
+            defendantId: "p2",
+            startedAt: 2000,
+            phase: "voting",
+            votes: [],
+          },
+        },
+        deadPlayerIds: [],
+      };
+      const game = makePlayingGame(dayWithActiveTrial);
+      expect(action.isValid(game, "owner-1", null)).toBe(false);
+    });
+
+    it("returns true when a trial is active and has a verdict", () => {
+      const dayWithResolvedTrial: WerewolfTurnState = {
+        turn: 1,
+        phase: {
+          type: WerewolfPhase.Daytime,
+          startedAt: 1000,
+          nightActions: {},
+          activeTrial: {
+            defendantId: "p2",
+            startedAt: 2000,
+            phase: "voting",
+            votes: [],
+            verdict: TrialVerdict.Innocent,
+          },
+        },
+        deadPlayerIds: [],
+      };
+      const game = makePlayingGame(dayWithResolvedTrial);
+      expect(action.isValid(game, "owner-1", null)).toBe(true);
     });
   });
 
@@ -89,6 +134,61 @@ describe("WerewolfAction.StartNight", () => {
       expect(phase.startedAt).toBeGreaterThanOrEqual(before);
       expect(phase.startedAt).toBeLessThanOrEqual(after);
     });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// StartNight — pending daytime smites are carried into the night phase
+// ---------------------------------------------------------------------------
+
+describe("StartNight — pendingSmitePlayerIds carry-over", () => {
+  const action = WEREWOLF_ACTIONS[WerewolfAction.StartNight];
+
+  it("carries pending daytime smites into smitedPlayerIds on the night phase", () => {
+    const dayWithPendingSmite: WerewolfTurnState = {
+      turn: 1,
+      phase: {
+        type: WerewolfPhase.Daytime,
+        startedAt: 1000,
+        nightActions: {},
+        pendingSmitePlayerIds: ["p2"],
+      } as WerewolfDaytimePhase,
+      deadPlayerIds: [],
+    };
+    const game = makePlayingGame(dayWithPendingSmite);
+    action.apply(game, null, "owner-1");
+
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    const phase = ts.phase as WerewolfNighttimePhase;
+    expect(phase.smitedPlayerIds).toEqual(["p2"]);
+  });
+
+  it("does not include already-dead players in the carried-over smites", () => {
+    const dayWithPendingSmite: WerewolfTurnState = {
+      turn: 1,
+      phase: {
+        type: WerewolfPhase.Daytime,
+        startedAt: 1000,
+        nightActions: {},
+        pendingSmitePlayerIds: ["p2", "p3"],
+      } as WerewolfDaytimePhase,
+      deadPlayerIds: ["p3"],
+    };
+    const game = makePlayingGame(dayWithPendingSmite);
+    action.apply(game, null, "owner-1");
+
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    const phase = ts.phase as WerewolfNighttimePhase;
+    expect(phase.smitedPlayerIds).toEqual(["p2"]);
+  });
+
+  it("does not set smitedPlayerIds when there are no pending smites", () => {
+    const game = makePlayingGame(dayTurnState);
+    action.apply(game, null, "owner-1");
+
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    const phase = ts.phase as WerewolfNighttimePhase;
+    expect(phase.smitedPlayerIds).toBeUndefined();
   });
 });
 
@@ -190,7 +290,7 @@ describe("StartNight — Wolf Cub bonus phase lifecycle", () => {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: false,
-        singleTrialPerDay: true,
+        trialsPerDay: 1,
         revealProtections: true,
         showRolesOnDeath: true,
       },

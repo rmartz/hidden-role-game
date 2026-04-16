@@ -8,8 +8,8 @@ export interface WerewolfModeConfig {
   gameMode: GameMode.Werewolf;
   /** Whether player nominations for trial are enabled. */
   nominationsEnabled: boolean;
-  /** When true, only one trial is allowed per day phase. */
-  singleTrialPerDay: boolean;
+  /** Maximum number of trials allowed per day phase. 0 means unlimited. */
+  trialsPerDay: number;
   /** When true, the night summary reveals players who were attacked but saved by protection. */
   revealProtections: boolean;
   /** When true, a killed player's role is revealed during the game. */
@@ -26,7 +26,8 @@ export interface WerewolfLobbyConfig extends BaseLobbyConfig {
 export const DEFAULT_WEREWOLF_MODE_CONFIG: WerewolfModeConfig = {
   gameMode: GameMode.Werewolf,
   nominationsEnabled: true,
-  singleTrialPerDay: true,
+  // 2 allows a re-trial if the first ends in acquittal, without unlimited churn.
+  trialsPerDay: 2,
   revealProtections: true,
   showRolesOnDeath: true,
 };
@@ -53,16 +54,27 @@ export function buildDefaultWerewolfLobbyConfig(
 export function parseWerewolfModeConfig(
   raw: Record<string, unknown>,
 ): WerewolfModeConfig {
+  // Backward-compat: old config used a boolean `singleTrialPerDay` (true = 1 trial/day).
+  const legacySingleTrial =
+    typeof raw["singleTrialPerDay"] === "boolean"
+      ? raw["singleTrialPerDay"]
+        ? 1
+        : 0
+      : undefined;
+  const rawTrialsPerDay = raw["trialsPerDay"];
+  const trialsPerDay =
+    typeof rawTrialsPerDay === "number" &&
+    Number.isFinite(rawTrialsPerDay) &&
+    rawTrialsPerDay >= 0
+      ? Math.floor(rawTrialsPerDay)
+      : (legacySingleTrial ?? DEFAULT_WEREWOLF_MODE_CONFIG.trialsPerDay);
   return {
     gameMode: GameMode.Werewolf,
     nominationsEnabled:
       typeof raw["nominationsEnabled"] === "boolean"
         ? raw["nominationsEnabled"]
         : DEFAULT_WEREWOLF_MODE_CONFIG.nominationsEnabled,
-    singleTrialPerDay:
-      typeof raw["singleTrialPerDay"] === "boolean"
-        ? raw["singleTrialPerDay"]
-        : DEFAULT_WEREWOLF_MODE_CONFIG.singleTrialPerDay,
+    trialsPerDay,
     revealProtections:
       typeof raw["revealProtections"] === "boolean"
         ? raw["revealProtections"]

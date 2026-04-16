@@ -24,7 +24,7 @@ function makePlayingGame(
     modeConfig: {
       gameMode: GameMode.Werewolf,
       nominationsEnabled: false,
-      singleTrialPerDay: true,
+      trialsPerDay: 1,
       revealProtections: true,
       showRolesOnDeath: true,
     },
@@ -76,7 +76,7 @@ describe("isOwnerPlaying", () => {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: false,
-        singleTrialPerDay: true,
+        trialsPerDay: 1,
         revealProtections: true,
         showRolesOnDeath: true,
       },
@@ -111,7 +111,7 @@ describe("currentTurnState", () => {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: false,
-        singleTrialPerDay: true,
+        trialsPerDay: 1,
         revealProtections: true,
         showRolesOnDeath: true,
       },
@@ -134,7 +134,7 @@ describe("currentTurnState", () => {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: false,
-        singleTrialPerDay: true,
+        trialsPerDay: 1,
         revealProtections: true,
         showRolesOnDeath: true,
       },

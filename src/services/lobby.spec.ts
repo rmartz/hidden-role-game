@@ -21,7 +21,7 @@ function makeBaseLobby(overrides: Partial<Lobby["config"]> = {}): Lobby {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: false,
-        singleTrialPerDay: true,
+        trialsPerDay: 1,
         revealProtections: true,
         showRolesOnDeath: true,
       },
@@ -39,7 +39,7 @@ describe("updateConfig — nominationsEnabled", () => {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: true,
-        singleTrialPerDay: true,
+        trialsPerDay: 1,
         revealProtections: true,
         showRolesOnDeath: true,
       },
@@ -56,7 +56,7 @@ describe("updateConfig — nominationsEnabled", () => {
         modeConfig: {
           gameMode: GameMode.Werewolf,
           nominationsEnabled: true,
-          singleTrialPerDay: true,
+          trialsPerDay: 1,
           revealProtections: true,
           showRolesOnDeath: true,
         },
@@ -67,7 +67,7 @@ describe("updateConfig — nominationsEnabled", () => {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: false,
-        singleTrialPerDay: true,
+        trialsPerDay: 1,
         revealProtections: true,
         showRolesOnDeath: true,
       },
@@ -84,7 +84,7 @@ describe("updateConfig — nominationsEnabled", () => {
         modeConfig: {
           gameMode: GameMode.Werewolf,
           nominationsEnabled: true,
-          singleTrialPerDay: true,
+          trialsPerDay: 1,
           revealProtections: true,
           showRolesOnDeath: true,
         },
@@ -94,7 +94,7 @@ describe("updateConfig — nominationsEnabled", () => {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: false,
-        singleTrialPerDay: true,
+        trialsPerDay: 1,
         revealProtections: true,
         showRolesOnDeath: true,
       },
@@ -113,7 +113,7 @@ describe("updateConfig — nominationsEnabled", () => {
         modeConfig: {
           gameMode: GameMode.Werewolf,
           nominationsEnabled: true,
-          singleTrialPerDay: true,
+          trialsPerDay: 1,
           revealProtections: true,
           showRolesOnDeath: true,
         },
@@ -134,7 +134,7 @@ describe("updateConfig — nominationsEnabled", () => {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: true,
-        singleTrialPerDay: true,
+        trialsPerDay: 1,
         revealProtections: true,
         showRolesOnDeath: true,
       },

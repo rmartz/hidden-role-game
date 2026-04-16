@@ -32,7 +32,7 @@ describe("WerewolfAction.WithdrawNomination", () => {
           modeConfig: {
             gameMode: GameMode.Werewolf,
             nominationsEnabled: true,
-            singleTrialPerDay: true,
+            trialsPerDay: 1,
             revealProtections: true,
             showRolesOnDeath: true,
           },
@@ -46,7 +46,7 @@ describe("WerewolfAction.WithdrawNomination", () => {
         modeConfig: {
           gameMode: GameMode.Werewolf,
           nominationsEnabled: true,
-          singleTrialPerDay: true,
+          trialsPerDay: 1,
           revealProtections: true,
           showRolesOnDeath: true,
         },
@@ -61,7 +61,7 @@ describe("WerewolfAction.WithdrawNomination", () => {
           modeConfig: {
             gameMode: GameMode.Werewolf,
             nominationsEnabled: true,
-            singleTrialPerDay: true,
+            trialsPerDay: 1,
             revealProtections: true,
             showRolesOnDeath: true,
           },
@@ -91,7 +91,7 @@ describe("WerewolfAction.WithdrawNomination", () => {
         modeConfig: {
           gameMode: GameMode.Werewolf,
           nominationsEnabled: true,
-          singleTrialPerDay: true,
+          trialsPerDay: 1,
           revealProtections: true,
           showRolesOnDeath: true,
         },
@@ -115,7 +115,7 @@ describe("WerewolfAction.WithdrawNomination", () => {
         modeConfig: {
           gameMode: GameMode.Werewolf,
           nominationsEnabled: true,
-          singleTrialPerDay: true,
+          trialsPerDay: 1,
           revealProtections: true,
           showRolesOnDeath: true,
         },
@@ -135,7 +135,7 @@ describe("WerewolfAction.WithdrawNomination", () => {
           modeConfig: {
             gameMode: GameMode.Werewolf,
             nominationsEnabled: true,
-            singleTrialPerDay: true,
+            trialsPerDay: 1,
             revealProtections: true,
             showRolesOnDeath: true,
           },
@@ -166,7 +166,7 @@ describe("WerewolfAction.WithdrawNomination", () => {
           modeConfig: {
             gameMode: GameMode.Werewolf,
             nominationsEnabled: true,
-            singleTrialPerDay: true,
+            trialsPerDay: 1,
             revealProtections: true,
             showRolesOnDeath: true,
           },

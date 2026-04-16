@@ -2,7 +2,11 @@
 
 import { useCallback, useState } from "react";
 import type { DaytimeVote } from "@/lib/game/modes/werewolf";
-import { WEREWOLF_COPY, WerewolfAction } from "@/lib/game/modes/werewolf";
+import {
+  WEREWOLF_COPY,
+  WerewolfAction,
+  TrialVerdict,
+} from "@/lib/game/modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { useGameAction } from "@/hooks";
@@ -52,7 +56,7 @@ export function TrialVotePanel({
     return msgs[Math.floor(Math.random() * msgs.length)];
   });
   const verdictLabel = activeTrial.verdict
-    ? activeTrial.verdict === "eliminated"
+    ? activeTrial.verdict === TrialVerdict.Eliminated
       ? trial.verdictLabelEliminated
       : trial.verdictLabelInnocent
     : undefined;
@@ -98,13 +102,16 @@ export function TrialVotePanel({
           ))}
         </ul>
       )}
-      {activeTrial.verdict === "eliminated" && activeTrial.eliminatedRole && (
-        <p className="text-sm text-muted-foreground">
-          {trial.eliminatedWereRole(defendantName)}{" "}
-          <span className="font-medium">{activeTrial.eliminatedRole.name}</span>
-          {trial.eliminatedRoleSuffix}
-        </p>
-      )}
+      {activeTrial.verdict === TrialVerdict.Eliminated &&
+        activeTrial.eliminatedRole && (
+          <p className="text-sm text-muted-foreground">
+            {trial.eliminatedWereRole(defendantName)}{" "}
+            <span className="font-medium">
+              {activeTrial.eliminatedRole.name}
+            </span>
+            {trial.eliminatedRoleSuffix}
+          </p>
+        )}
     </>
   ) : activeTrial.phase === "defense" ? (
     <>

@@ -204,7 +204,7 @@ function makeNarratorGame(nominationsEnabled = false): Game {
     modeConfig: {
       gameMode: GameMode.Werewolf,
       nominationsEnabled,
-      singleTrialPerDay: true,
+      trialsPerDay: 1,
       revealProtections: true,
       showRolesOnDeath: true,
     },

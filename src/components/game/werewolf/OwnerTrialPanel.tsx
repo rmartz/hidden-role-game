@@ -2,7 +2,11 @@
 
 import { useCallback } from "react";
 import type { ActiveTrial } from "@/lib/game/modes/werewolf";
-import { WEREWOLF_COPY, WerewolfAction } from "@/lib/game/modes/werewolf";
+import {
+  WEREWOLF_COPY,
+  WerewolfAction,
+  TrialVerdict,
+} from "@/lib/game/modes/werewolf";
 import type { PublicLobbyPlayer } from "@/server/types/lobby";
 import { useGameAction } from "@/hooks";
 import { GameTimer } from "@/components/game";
@@ -51,7 +55,7 @@ export function OwnerTrialPanel({
 
   const { trial } = WEREWOLF_COPY;
   const verdictLabel = activeTrial.verdict
-    ? activeTrial.verdict === "eliminated"
+    ? activeTrial.verdict === TrialVerdict.Eliminated
       ? trial.verdictLabelEliminated
       : trial.verdictLabelInnocent
     : undefined;
