@@ -1,4 +1,5 @@
 export * from "./ConfigurationToggles";
+export * from "./ExpandedRoleList";
 export * from "./GameConfigurationPanel";
 export * from "./GameModePicker";
 export * from "./JoinPrompt";
@@ -9,6 +10,7 @@ export * from "./PlayerRow";
 export * from "./RoleConfig";
 export * from "./RoleConfigEntry";
 export * from "./RoleConfigModePicker";
+export * from "./RoleListEntry";
 export * from "./ShareLobby";
 export * from "./ShowRolesInPlayPicker";
 export * from "./TimerConfigPanel";
