@@ -67,7 +67,7 @@ function clickShowAll() {
 
 describe("RoleConfig collapsed view", () => {
   it("shows only enabled roles (flat list) regardless of category grouping", () => {
-    const categoryedProps = {
+    const categorizedProps = {
       ...defaultProps,
       categoryOrder: ["cat-a", "cat-b"],
       categoryLabels: { "cat-a": "Category A", "cat-b": "Category B" },
@@ -77,7 +77,7 @@ describe("RoleConfig collapsed view", () => {
         [roleC.id]: { ...roleC, category: "cat-a" },
       },
     };
-    renderWithStore(<RoleConfig {...categoryedProps} />);
+    renderWithStore(<RoleConfig {...categorizedProps} />);
     // Enabled roles (A and C) are visible; disabled role (B) is hidden
     expect(screen.getByText(roleA.name)).toBeDefined();
     expect(screen.queryByText(roleB.name)).toBeNull();

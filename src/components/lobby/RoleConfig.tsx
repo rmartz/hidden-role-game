@@ -239,7 +239,9 @@ export function RoleConfig(props: RoleConfigProps) {
                   )}
                 </ul>
               ) : (
-                // Collapsed or expanded + no search: flat enabled roles at top.
+                // Not searching: flat enabled roles at top.
+                // When collapsed (!showAll), disabled roles are not shown at all.
+                // When expanded (!showAll is false), disabled roles appear below.
                 <>
                   <ul className="space-y-1 list-none p-0">
                     {enabledRoles.map((role) =>
