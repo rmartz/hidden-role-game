@@ -6,6 +6,8 @@ import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-s
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
 import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-villain/lobby-config";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
+import { WerewolfPhase, WerewolfRole } from "@/lib/game/modes/werewolf";
+import { DEFAULT_WEREWOLF_MODE_CONFIG } from "@/lib/game/modes/werewolf/lobby-config";
 
 const DEFAULT_BUCKETS: RoleBucket[] = [
   { playerCount: 1, roles: [{ roleId: "good" }] },
@@ -204,8 +206,60 @@ function makeNarratorGame(nominationsEnabled = false): Game {
       nominationsEnabled,
       trialsPerDay: 1,
       revealProtections: true,
+      showRolesOnDeath: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
+  };
+}
+
+function makeWerewolfDeathRevealGame(showRolesOnDeath: boolean): Game {
+  return {
+    id: "werewolf-game-1",
+    lobbyId: "lobby-1",
+    gameMode: GameMode.Werewolf,
+    status: {
+      type: GameStatus.Playing,
+      turnState: {
+        turn: 1,
+        deadPlayerIds: ["p2"],
+        phase: {
+          type: WerewolfPhase.Daytime,
+          startedAt: 1000,
+          nightActions: {},
+        },
+      },
+    },
+    players: [makePlayer("narrator"), makePlayer("p1"), makePlayer("p2")],
+    roleAssignments: [
+      { playerId: "p1", roleDefinitionId: WerewolfRole.Seer },
+      { playerId: "p2", roleDefinitionId: WerewolfRole.Werewolf },
+    ],
+    configuredRoleBuckets: [
+      {
+        playerCount: 2,
+        roles: [
+          { roleId: WerewolfRole.Seer },
+          { roleId: WerewolfRole.Werewolf },
+        ],
+      },
+    ],
+    showRolesInPlay: ShowRolesInPlay.None,
+    ownerPlayerId: "narrator",
+    modeConfig: {
+      ...DEFAULT_WEREWOLF_MODE_CONFIG,
+      showRolesOnDeath,
+    },
+    timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
+  };
+}
+
+function makeFinishedWerewolfDeathRevealGame(showRolesOnDeath: boolean): Game {
+  return {
+    ...makeWerewolfDeathRevealGame(showRolesOnDeath),
+    status: {
+      type: GameStatus.Finished,
+      winner: Team.Good,
+    },
   };
 }
 
@@ -233,5 +287,50 @@ describe("GameStateService.getPlayerGameState — narrator nominationsEnabled", 
     const result = getPlayerGameState(game, "narrator");
     expect(result?.myPlayerId).toBeUndefined();
     expect(result?.myRole).toBeUndefined();
+  });
+});
+
+describe("GameStateService.getPlayerGameState — Werewolf showRolesOnDeath", () => {
+  it("reveals killed player roles during play when showRolesOnDeath is enabled", () => {
+    const game = makeWerewolfDeathRevealGame(true);
+
+    const result = getPlayerGameState(
+      game,
+      "p1",
+    ) as WerewolfPlayerGameState | null;
+
+    expect(
+      result?.visibleRoleAssignments.map((assignment) => assignment.player.id),
+    ).toEqual(["p2"]);
+  });
+
+  it("does not reveal killed player roles during play when showRolesOnDeath is disabled", () => {
+    const game = makeWerewolfDeathRevealGame(false);
+
+    const result = getPlayerGameState(game, "p1");
+
+    expect(
+      result?.visibleRoleAssignments.map((assignment) => assignment.player.id),
+    ).toEqual([]);
+  });
+
+  it("reveals role assignments at game over when showRolesOnDeath is disabled", () => {
+    const game = makeFinishedWerewolfDeathRevealGame(false);
+
+    const result = getPlayerGameState(game, "p1");
+
+    expect(
+      result?.visibleRoleAssignments.map((assignment) => assignment.player.id),
+    ).toEqual(["p2"]);
+  });
+
+  it("keeps narrator role visibility when showRolesOnDeath is disabled", () => {
+    const game = makeWerewolfDeathRevealGame(false);
+
+    const result = getPlayerGameState(game, "narrator");
+
+    expect(
+      result?.visibleRoleAssignments.map((assignment) => assignment.player.id),
+    ).toEqual(["p1", "p2"]);
   });
 });

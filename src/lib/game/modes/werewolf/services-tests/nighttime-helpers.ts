@@ -52,6 +52,7 @@ export function makeNighttimeGame(
       nominationsEnabled: false,
       trialsPerDay: 1,
       revealProtections: true,
+      showRolesOnDeath: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   };
@@ -101,6 +102,7 @@ export function makeNighttimeGameWithBonusPhase(
       nominationsEnabled: false,
       trialsPerDay: 1,
       revealProtections: true,
+      showRolesOnDeath: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   };

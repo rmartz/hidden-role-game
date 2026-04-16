@@ -46,6 +46,7 @@ const baseLobby: PublicLobby = {
       nominationsEnabled: true,
       trialsPerDay: 1,
       revealProtections: true,
+      showRolesOnDeath: true,
     },
   },
   readyPlayerIds: ["p2", "p4"],

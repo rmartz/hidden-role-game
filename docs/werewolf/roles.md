@@ -121,7 +121,7 @@ Visibility is determined by two mechanisms:
 | Sentinel  | The Seer                                 | `awareOf: { roles: [Seer] }`                                                 |
 | Werewolf  | Other Werewolves, Wolf Cubs, Lone Wolves | Wake-phase partners (`teamTargeting`)                                        |
 | Wolf Cub  | All Werewolf wake-phase participants     | `wakesWith: Werewolf`                                                        |
-| Dead      | Roles revealed to all players            | Automatic on death                                                           |
+| Dead      | Roles revealed to all players            | Controlled by lobby setting (default: on)                                    |
 | Narrator  | All role assignments                     | Always                                                                       |
 
 Note: Werewolves do **not** see the Minion or Wizard. Those roles are Team Bad but have no wake-phase connection to the Werewolf group.
