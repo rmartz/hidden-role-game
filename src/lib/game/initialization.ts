@@ -1,4 +1,4 @@
-import { ShowRolesInPlay, Team } from "@/lib/types";
+import { ShowRolesInPlay, Team, isSimpleRoleBucket } from "@/lib/types";
 import type {
   Game,
   GamePlayer,
@@ -123,24 +123,45 @@ export function buildGamePlayers<R extends RoleDefinition<string, Team>>(
  */
 export function buildRolesInPlay(game: Game): RoleInPlay[] | undefined {
   const { roles } = GAME_MODES[game.gameMode];
-  const slotMap = new Map(game.configuredRoleSlots.map((s) => [s.roleId, s]));
+
+  // Build a role display map from buckets: aggregate counts across all buckets.
+  // Simple buckets always contribute exactly playerCount of a single role (min = max).
+  // Advanced buckets contribute per-slot max (undefined max = non-unique, min is always 0).
+  const roleDisplayMap = new Map<string, { min: number; max?: number }>();
+  for (const bucket of game.configuredRoleBuckets) {
+    if (isSimpleRoleBucket(bucket)) {
+      const existing = roleDisplayMap.get(bucket.roleId);
+      roleDisplayMap.set(bucket.roleId, {
+        min: (existing?.min ?? 0) + bucket.playerCount,
+        max: (existing?.max ?? 0) + bucket.playerCount,
+      });
+    } else {
+      for (const slot of bucket.roles) {
+        const existing = roleDisplayMap.get(slot.roleId);
+        const slotMax = slot.max ?? bucket.playerCount;
+        roleDisplayMap.set(slot.roleId, {
+          min: existing?.min ?? 0,
+          max: existing?.max !== undefined ? existing.max + slotMax : slotMax,
+        });
+      }
+    }
+  }
 
   switch (game.showRolesInPlay) {
     case ShowRolesInPlay.None:
       return undefined;
 
     case ShowRolesInPlay.ConfiguredOnly:
-      return game.configuredRoleSlots.flatMap((slot) => {
-        if (slot.max === 0) return [];
-        const role = roles[slot.roleId];
+      return [...roleDisplayMap.entries()].flatMap(([roleId, entry]) => {
+        const role = roles[roleId];
         if (!role) return [];
         return [
           {
             id: role.id,
             name: role.name,
             team: role.team,
-            min: slot.min,
-            max: slot.max,
+            min: entry.min,
+            max: entry.max ?? entry.min,
           },
         ];
       });
@@ -151,15 +172,15 @@ export function buildRolesInPlay(game: Game): RoleInPlay[] | undefined {
         if (seen.has(a.roleDefinitionId)) return [];
         seen.add(a.roleDefinitionId);
         const role = roles[a.roleDefinitionId];
-        const slot = slotMap.get(a.roleDefinitionId);
+        const entry = roleDisplayMap.get(a.roleDefinitionId);
         if (!role) return [];
         return [
           {
             id: role.id,
             name: role.name,
             team: role.team,
-            min: slot?.min ?? 0,
-            max: slot?.max ?? 0,
+            min: entry?.min ?? 0,
+            max: entry?.max ?? entry?.min ?? 0,
           },
         ];
       });
@@ -175,15 +196,15 @@ export function buildRolesInPlay(game: Game): RoleInPlay[] | undefined {
       }
       return [...counts.entries()].flatMap(([roleId, count]) => {
         const role = roles[roleId];
-        const slot = slotMap.get(roleId);
+        const entry = roleDisplayMap.get(roleId);
         if (!role) return [];
         return [
           {
             id: role.id,
             name: role.name,
             team: role.team,
-            min: slot?.min ?? 0,
-            max: slot?.max ?? 0,
+            min: entry?.min ?? 0,
+            max: entry?.max ?? entry?.min ?? 0,
             count,
           },
         ];

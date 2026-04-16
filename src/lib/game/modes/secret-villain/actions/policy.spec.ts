@@ -74,7 +74,7 @@ function makePolicyGame(
       { playerId: "p4", roleDefinitionId: SecretVillainRole.Bad },
       { playerId: "p5", roleDefinitionId: SecretVillainRole.SpecialBad },
     ],
-    configuredRoleSlots: [],
+    configuredRoleBuckets: [],
     showRolesInPlay: ShowRolesInPlay.None,
     timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
     modeConfig: { gameMode: GameMode.SecretVillain },

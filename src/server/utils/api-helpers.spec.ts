@@ -43,7 +43,7 @@ function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
     config: {
       gameMode: GameMode.SecretVillain,
       roleConfigMode: RoleConfigMode.Default,
-      roleSlots: [],
+      roleBuckets: [],
       showConfigToPlayers: false,
       showRolesInPlay: ShowRolesInPlay.None,
       modeConfig: DEFAULT_SECRET_VILLAIN_MODE_CONFIG,
@@ -70,7 +70,7 @@ function makeGame(overrides: Partial<Game> = {}): Game {
     status: { type: GameStatus.Playing },
     players,
     roleAssignments: [],
-    configuredRoleSlots: [],
+    configuredRoleBuckets: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: undefined,
     modeConfig: DEFAULT_SECRET_VILLAIN_MODE_CONFIG,

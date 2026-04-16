@@ -11,7 +11,7 @@ export function toPublicLobby(
 ): PublicLobby {
   const owner = lobby.players.find((p) => p.sessionId === lobby.ownerSessionId);
   const isOwner = callerSessionId === lobby.ownerSessionId;
-  const showRoleSlots = isOwner || lobby.config.showConfigToPlayers;
+  const showRoleBuckets = isOwner || lobby.config.showConfigToPlayers;
   return {
     id: lobby.id,
     ownerPlayerId: owner?.id ?? "",
@@ -24,7 +24,7 @@ export function toPublicLobby(
       showRolesInPlay: lobby.config.showRolesInPlay,
       timerConfig: lobby.config.timerConfig,
       modeConfig: lobby.config.modeConfig,
-      ...(showRoleSlots ? { roleSlots: lobby.config.roleSlots } : {}),
+      roleBuckets: showRoleBuckets ? lobby.config.roleBuckets : [],
     } as GameConfig,
     readyPlayerIds: lobby.readyPlayerIds,
     ...(lobby.gameId && { gameId: lobby.gameId }),

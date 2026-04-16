@@ -35,6 +35,7 @@ const mockLobby: PublicLobby = {
   config: {
     gameMode: GameMode.Werewolf,
     roleConfigMode: RoleConfigMode.Default,
+    roleBuckets: [],
     showConfigToPlayers: false,
     showRolesInPlay: ShowRolesInPlay.RoleAndCount,
     modeConfig: {

@@ -7,7 +7,7 @@ import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-c
 import { DEFAULT_WEREWOLF_MODE_CONFIG } from "@/lib/game/modes/werewolf/lobby-config";
 import { GameConfigurationPanel } from "@/components/lobby";
 import { useAppSelector } from "@/store";
-import { selectRoleSlots } from "@/store/game-config-slice";
+import { selectRoleBuckets } from "@/store/game-config-slice";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import type { DebugPlayer } from "@/app/api/debug/game/route";
@@ -17,7 +17,7 @@ import type { GameInfo } from "./DebugGameView";
 const DEFAULT_CONFIG: GameConfig = {
   gameMode: GameMode.Werewolf,
   roleConfigMode: RoleConfigMode.Default,
-  roleSlots: [],
+  roleBuckets: [],
   showConfigToPlayers: false,
   showRolesInPlay: ShowRolesInPlay.None,
   timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
@@ -30,7 +30,7 @@ export default function DebugPage() {
   const [error, setError] = useState<string | null>(null);
   const [gameInfo, setGameInfo] = useState<GameInfo | null>(null);
   const gameMode = useAppSelector((s) => s.gameConfig.gameMode);
-  const roleSlots = useAppSelector((s) => selectRoleSlots(s.gameConfig));
+  const roleBuckets = useAppSelector((s) => selectRoleBuckets(s.gameConfig));
   const showRolesInPlay = useAppSelector((s) => s.gameConfig.showRolesInPlay);
   const timerConfig = useAppSelector((s) => s.gameConfig.timerConfig);
   const modeConfig = useAppSelector((s) => s.gameConfig.modeConfig);
@@ -45,7 +45,7 @@ export default function DebugPage() {
         body: JSON.stringify({
           playerCount,
           gameMode,
-          roleSlots,
+          roleBuckets,
           showRolesInPlay,
           timerConfig,
           modeConfig,

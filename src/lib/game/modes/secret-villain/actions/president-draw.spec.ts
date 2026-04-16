@@ -42,7 +42,7 @@ function makeGame(ts: SecretVillainTurnState): Game {
       { playerId: "p1", roleDefinitionId: "good" },
       { playerId: "p2", roleDefinitionId: "bad" },
     ],
-    configuredRoleSlots: [],
+    configuredRoleBuckets: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: undefined,
     timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,

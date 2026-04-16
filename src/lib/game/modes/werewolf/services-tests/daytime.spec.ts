@@ -36,7 +36,7 @@ describe("extractDaytimeNightSummary", () => {
       roleAssignments: [
         { playerId: "p2", roleDefinitionId: WerewolfRole.Seer },
       ],
-      configuredRoleSlots: [],
+      configuredRoleBuckets: [],
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: undefined,
       modeConfig: {

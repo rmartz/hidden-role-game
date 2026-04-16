@@ -1,20 +1,20 @@
 import { describe, it, expect } from "vitest";
 import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
-import type { Game, RoleSlot } from "@/lib/types";
+import type { Game, RoleBucket } from "@/lib/types";
 import { SecretVillainRole } from "@/lib/game/modes/secret-villain";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
 import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-villain/lobby-config";
 import { buildRolesInPlay } from "../initialization";
 
-const DEFAULT_SLOTS: RoleSlot[] = [
-  { roleId: SecretVillainRole.Good, min: 1, max: 1 },
-  { roleId: SecretVillainRole.Bad, min: 1, max: 1 },
+const DEFAULT_BUCKETS: RoleBucket[] = [
+  { playerCount: 1, roles: [{ roleId: SecretVillainRole.Good }] },
+  { playerCount: 1, roles: [{ roleId: SecretVillainRole.Bad }] },
 ];
 
 function makeSecretVillainGame(
   roleAssignments: Game["roleAssignments"],
   showRolesInPlay: ShowRolesInPlay = ShowRolesInPlay.RoleAndCount,
-  configuredRoleSlots: RoleSlot[] = DEFAULT_SLOTS,
+  configuredRoleBuckets: RoleBucket[] = DEFAULT_BUCKETS,
 ): Game {
   const players = roleAssignments.map((a) => ({
     id: a.playerId,
@@ -29,7 +29,7 @@ function makeSecretVillainGame(
     status: { type: GameStatus.Playing },
     players,
     roleAssignments,
-    configuredRoleSlots,
+    configuredRoleBuckets,
     showRolesInPlay,
     ownerPlayerId: undefined,
     modeConfig: DEFAULT_SECRET_VILLAIN_MODE_CONFIG,
@@ -56,8 +56,8 @@ describe("GameInitializationService.buildRolesInPlay", () => {
       ],
       ShowRolesInPlay.RoleAndCount,
       [
-        { roleId: SecretVillainRole.Good, min: 2, max: 2 },
-        { roleId: SecretVillainRole.Bad, min: 1, max: 1 },
+        { playerCount: 2, roles: [{ roleId: SecretVillainRole.Good }] },
+        { playerCount: 1, roles: [{ roleId: SecretVillainRole.Bad }] },
       ],
     );
 
@@ -79,8 +79,8 @@ describe("GameInitializationService.buildRolesInPlay", () => {
   });
 
   it("returns unique roles without count for AssignedRolesOnly", () => {
-    const slots: RoleSlot[] = [
-      { roleId: SecretVillainRole.Good, min: 1, max: 3 },
+    const buckets: RoleBucket[] = [
+      { playerCount: 2, roles: [{ roleId: SecretVillainRole.Good }] },
     ];
     const game = makeSecretVillainGame(
       [
@@ -88,7 +88,7 @@ describe("GameInitializationService.buildRolesInPlay", () => {
         { playerId: "p2", roleDefinitionId: SecretVillainRole.Good },
       ],
       ShowRolesInPlay.AssignedRolesOnly,
-      slots,
+      buckets,
     );
 
     const result = buildRolesInPlay(game);
@@ -98,43 +98,42 @@ describe("GameInitializationService.buildRolesInPlay", () => {
       id: SecretVillainRole.Good,
       name: "Good Role",
       team: Team.Good,
-      min: 1,
-      max: 3,
+      min: 0,
+      max: 2,
     });
     expect(result?.[0]).not.toHaveProperty("count");
   });
 
-  it("returns configured slots for ConfiguredOnly", () => {
-    const slots: RoleSlot[] = [
-      { roleId: SecretVillainRole.Good, min: 2, max: 4 },
-      { roleId: SecretVillainRole.Bad, min: 0, max: 2 },
+  it("returns configured roles for ConfiguredOnly", () => {
+    const buckets: RoleBucket[] = [
+      { playerCount: 2, roles: [{ roleId: SecretVillainRole.Good }] },
+      { playerCount: 1, roles: [{ roleId: SecretVillainRole.Bad }] },
     ];
     const game = makeSecretVillainGame(
       [{ playerId: "p1", roleDefinitionId: SecretVillainRole.Good }],
       ShowRolesInPlay.ConfiguredOnly,
-      slots,
+      buckets,
     );
 
     const result = buildRolesInPlay(game);
 
     expect(result).toHaveLength(2);
     expect(result).toContainEqual(
-      expect.objectContaining({ id: SecretVillainRole.Good, min: 2, max: 4 }),
+      expect.objectContaining({ id: SecretVillainRole.Good, min: 0 }),
     );
     expect(result).toContainEqual(
-      expect.objectContaining({ id: SecretVillainRole.Bad, min: 0, max: 2 }),
+      expect.objectContaining({ id: SecretVillainRole.Bad, min: 0 }),
     );
   });
 
-  it("ConfiguredOnly excludes slots with max === 0", () => {
-    const slots: RoleSlot[] = [
-      { roleId: SecretVillainRole.Good, min: 1, max: 3 },
-      { roleId: SecretVillainRole.Bad, min: 0, max: 0 },
+  it("ConfiguredOnly shows all roles present in configuredRoleBuckets", () => {
+    const buckets: RoleBucket[] = [
+      { playerCount: 3, roles: [{ roleId: SecretVillainRole.Good }] },
     ];
     const game = makeSecretVillainGame(
       [{ playerId: "p1", roleDefinitionId: SecretVillainRole.Good }],
       ShowRolesInPlay.ConfiguredOnly,
-      slots,
+      buckets,
     );
 
     const result = buildRolesInPlay(game);

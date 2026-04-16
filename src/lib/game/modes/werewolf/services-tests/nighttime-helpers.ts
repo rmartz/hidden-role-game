@@ -44,7 +44,7 @@ export function makeNighttimeGame(
       { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
       { playerId: "p3", roleDefinitionId: WerewolfRole.Witch },
     ],
-    configuredRoleSlots: [],
+    configuredRoleBuckets: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: undefined,
     modeConfig: {
@@ -93,7 +93,7 @@ export function makeNighttimeGameWithBonusPhase(
       { playerId: "w2", roleDefinitionId: WerewolfRole.Werewolf },
       { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
     ],
-    configuredRoleSlots: [],
+    configuredRoleBuckets: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: undefined,
     modeConfig: {

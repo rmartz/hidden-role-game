@@ -6,7 +6,7 @@ import {
   authenticateLobby,
   errorResponse,
   toPublicLobby,
-  validateRoleSlotsForMode,
+  validateRoleBucketsForMode,
 } from "@/server/utils";
 
 export async function PUT(
@@ -31,9 +31,13 @@ export async function PUT(
     return errorResponse("Unknown game mode", 400);
   }
 
-  if (body.roleSlots !== undefined && body.gameMode !== undefined) {
-    const modeError = validateRoleSlotsForMode(body.roleSlots, body.gameMode);
-    if (modeError) return errorResponse(modeError, 400);
+  if (body.roleBuckets !== undefined) {
+    const bucketGameMode = body.gameMode ?? auth.lobby.config.gameMode;
+    const bucketError = validateRoleBucketsForMode(
+      body.roleBuckets,
+      bucketGameMode,
+    );
+    if (bucketError) return errorResponse(bucketError, 400);
   }
 
   const updated = await updateConfig(lobbyId, body);

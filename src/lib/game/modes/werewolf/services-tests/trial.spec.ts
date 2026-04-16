@@ -67,7 +67,7 @@ describe("extractDaytimePlayerState — playerCount excludes silenced", () => {
         { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
         { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
       ],
-      configuredRoleSlots: [],
+      configuredRoleBuckets: [],
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner",
       modeConfig: {
@@ -115,7 +115,7 @@ describe("extractDaytimePlayerState — playerCount excludes silenced", () => {
         { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
         { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
       ],
-      configuredRoleSlots: [],
+      configuredRoleBuckets: [],
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner",
       modeConfig: {

@@ -22,7 +22,7 @@ function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
     config: {
       gameMode: GameMode.SecretVillain,
       roleConfigMode: RoleConfigMode.Default,
-      roleSlots: [],
+      roleBuckets: [],
       showConfigToPlayers: false,
       showRolesInPlay: ShowRolesInPlay.None,
       modeConfig: DEFAULT_SECRET_VILLAIN_MODE_CONFIG,
