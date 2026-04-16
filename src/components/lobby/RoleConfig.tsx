@@ -42,38 +42,6 @@ interface EditableProps {
 
 type RoleConfigProps = ReadOnlyProps | EditableProps;
 
-function renderEntry(
-  role: RoleDefinition<string, Team>,
-  props: RoleConfigProps,
-  readOnlyCounts: Record<string, number>,
-  dimmed: boolean,
-) {
-  if (props.readOnly) {
-    return (
-      <RoleConfigEntry
-        key={role.id}
-        role={role}
-        gameMode={props.gameMode}
-        roleConfigMode={props.roleConfigMode}
-        count={readOnlyCounts[role.id] ?? 0}
-        readOnly={true}
-        dimmed={dimmed}
-      />
-    );
-  }
-  return (
-    <RoleConfigEntry
-      key={role.id}
-      role={role}
-      gameMode={props.gameMode}
-      roleConfigMode={props.roleConfigMode}
-      readOnly={false}
-      disabled={props.disabled}
-      dimmed={dimmed}
-    />
-  );
-}
-
 export function RoleConfig(props: RoleConfigProps) {
   const { roleDefinitions, playerCount, gameMode, roleConfigMode, readOnly } =
     props;
@@ -107,11 +75,44 @@ export function RoleConfig(props: RoleConfigProps) {
     return (roleCounts[roleId] ?? 0) > 0;
   }
 
+  // renderRole is computed once from the readOnly discriminant so call sites don't
+  // need to repeat the branch.
+  const renderRole = props.readOnly
+    ? (role: RoleDefinition<string, Team>, dimmed: boolean) => (
+        <RoleConfigEntry
+          key={role.id}
+          role={role}
+          gameMode={gameMode}
+          roleConfigMode={roleConfigMode}
+          count={readOnlyCounts[role.id] ?? 0}
+          readOnly={true}
+          dimmed={dimmed}
+        />
+      )
+    : (role: RoleDefinition<string, Team>, dimmed: boolean) => (
+        <RoleConfigEntry
+          key={role.id}
+          role={role}
+          gameMode={gameMode}
+          roleConfigMode={roleConfigMode}
+          readOnly={false}
+          disabled={props.disabled}
+          dimmed={dimmed}
+        />
+      );
+
   const enabledRoles = allRoles.filter((r) => isRoleEnabled(r.id));
   const disabledRoles = allRoles.filter((r) => !isRoleEnabled(r.id));
   const hasExtraRoles = disabledRoles.length > 0;
 
   const isSearching = showAll && searchQuery.trim() !== "";
+
+  // Search only applies to the extra (disabled) roles — active roles are always visible.
+  const searchResults = isSearching
+    ? searchRoles(disabledRoles, searchQuery, { categoryLabels })
+    : [];
+
+  const noResults = isSearching && searchResults.length === 0;
 
   // Disabled roles grouped by category — only used in expanded + no-search + categorized state.
   const disabledByCategory = hasCategoryGrouping
@@ -124,11 +125,7 @@ export function RoleConfig(props: RoleConfigProps) {
       >((acc, cat) => {
         const roles = disabledRoles.filter((r) => r.category === cat);
         if (roles.length > 0)
-          acc.push({
-            category: cat,
-            label: categoryLabels?.[cat] ?? cat,
-            roles,
-          });
+          acc.push({ category: cat, label: categoryLabels?.[cat] ?? cat, roles });
         return acc;
       }, [])
     : [];
@@ -138,12 +135,6 @@ export function RoleConfig(props: RoleConfigProps) {
         (r) => !r.category || !categoryOrder.includes(r.category),
       )
     : [];
-
-  const searchResults = isSearching
-    ? searchRoles(allRoles, searchQuery, { categoryLabels })
-    : [];
-
-  const noResults = isSearching && searchResults.length === 0;
 
   function toggleShowAll() {
     if (showAll) setSearchQuery("");
@@ -160,18 +151,6 @@ export function RoleConfig(props: RoleConfigProps) {
             <p className="text-sm text-muted-foreground">
               {`Assign ${String(playerCount)} role${playerCount !== 1 ? "s" : ""} (${String(total)}/${String(playerCount)} assigned)`}
             </p>
-          )}
-          {showAll && !isAdvanced && (
-            <Input
-              type="search"
-              placeholder={ROLE_CONFIG_COPY.searchPlaceholder}
-              aria-label={ROLE_CONFIG_COPY.searchPlaceholder}
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-              }}
-              className="mt-1"
-            />
           )}
         </CardHeader>
         <CardContent>
@@ -222,82 +201,80 @@ export function RoleConfig(props: RoleConfigProps) {
           )}
           {!isAdvanced && (
             <>
-              {noResults ? (
-                <p className="text-sm text-muted-foreground py-2">
-                  {ROLE_CONFIG_COPY.noSearchResults}
-                </p>
-              ) : isSearching ? (
-                // Expanded + active search: flat list of matching roles, disabled ones dimmed.
-                <ul className="space-y-1 list-none p-0">
-                  {searchResults.map((role) =>
-                    renderEntry(
-                      role,
-                      props,
-                      readOnlyCounts,
-                      !isRoleEnabled(role.id),
-                    ),
-                  )}
-                </ul>
-              ) : (
-                // Not searching: flat enabled roles at top.
-                // When collapsed (!showAll), disabled roles are not shown at all.
-                // When expanded (!showAll is false), disabled roles appear below.
+              {/* Active roles — always visible regardless of search or expansion state. */}
+              <ul className="space-y-1 list-none p-0">
+                {enabledRoles.map((role) => renderRole(role, false))}
+              </ul>
+              {hasExtraRoles && (
                 <>
-                  <ul className="space-y-1 list-none p-0">
-                    {enabledRoles.map((role) =>
-                      renderEntry(role, props, readOnlyCounts, false),
-                    )}
-                  </ul>
-                  {showAll && hasCategoryGrouping && (
-                    // Expanded + no search + categorized: disabled roles grouped by category.
+                  {/* Toggle sits between active roles and the extra-roles section. */}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="mt-2 w-full"
+                    onClick={toggleShowAll}
+                  >
+                    {showAll
+                      ? ROLE_CONFIG_COPY.hideExtraRoles
+                      : ROLE_CONFIG_COPY.showAllRoles}
+                  </Button>
+                  {showAll && (
                     <>
-                      {disabledByCategory.map(({ category, label, roles }) => (
-                        <div key={category} className="mt-4">
-                          <p className="text-xs font-semibold text-muted-foreground mb-1">
-                            {label}
-                          </p>
-                          <ul className="space-y-1 list-none p-0">
-                            {roles.map((role) =>
-                              renderEntry(role, props, readOnlyCounts, true),
-                            )}
-                          </ul>
-                        </div>
-                      ))}
-                      {uncategorizedDisabled.length > 0 && (
-                        <div className="mt-4">
-                          <p className="text-xs font-semibold text-muted-foreground mb-1">
-                            {ROLE_CONFIG_COPY.uncategorizedLabel}
-                          </p>
-                          <ul className="space-y-1 list-none p-0">
-                            {uncategorizedDisabled.map((role) =>
-                              renderEntry(role, props, readOnlyCounts, true),
-                            )}
-                          </ul>
-                        </div>
+                      {/* Search input — only visible when expanded. */}
+                      <Input
+                        type="search"
+                        placeholder={ROLE_CONFIG_COPY.searchPlaceholder}
+                        aria-label={ROLE_CONFIG_COPY.searchPlaceholder}
+                        value={searchQuery}
+                        onChange={(e) => {
+                          setSearchQuery(e.target.value);
+                        }}
+                        className="mt-2"
+                      />
+                      {noResults ? (
+                        <p className="text-sm text-muted-foreground py-2">
+                          {ROLE_CONFIG_COPY.noSearchResults}
+                        </p>
+                      ) : isSearching ? (
+                        // Expanded + active search: flat list of matching disabled roles, dimmed.
+                        <ul className="space-y-1 list-none p-0 mt-1">
+                          {searchResults.map((role) => renderRole(role, true))}
+                        </ul>
+                      ) : hasCategoryGrouping ? (
+                        // Expanded + no search + categorized: disabled roles grouped by category.
+                        <>
+                          {disabledByCategory.map(({ category, label, roles }) => (
+                            <div key={category} className="mt-4">
+                              <p className="text-xs font-semibold text-muted-foreground mb-1">
+                                {label}
+                              </p>
+                              <ul className="space-y-1 list-none p-0">
+                                {roles.map((role) => renderRole(role, true))}
+                              </ul>
+                            </div>
+                          ))}
+                          {uncategorizedDisabled.length > 0 && (
+                            <div className="mt-4">
+                              <p className="text-xs font-semibold text-muted-foreground mb-1">
+                                {ROLE_CONFIG_COPY.uncategorizedLabel}
+                              </p>
+                              <ul className="space-y-1 list-none p-0">
+                                {uncategorizedDisabled.map((role) =>
+                                  renderRole(role, true),
+                                )}
+                              </ul>
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        // Expanded + no search + uncategorized: disabled roles appended flat.
+                        <ul className="space-y-1 list-none p-0 mt-1">
+                          {disabledRoles.map((role) => renderRole(role, true))}
+                        </ul>
                       )}
                     </>
                   )}
-                  {showAll && !hasCategoryGrouping && (
-                    // Expanded + no search + uncategorized: disabled roles appended flat.
-                    <ul className="space-y-1 list-none p-0 mt-1">
-                      {disabledRoles.map((role) =>
-                        renderEntry(role, props, readOnlyCounts, true),
-                      )}
-                    </ul>
-                  )}
                 </>
-              )}
-              {hasExtraRoles && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="mt-2 w-full"
-                  onClick={toggleShowAll}
-                >
-                  {showAll
-                    ? ROLE_CONFIG_COPY.hideExtraRoles
-                    : ROLE_CONFIG_COPY.showAllRoles}
-                </Button>
               )}
             </>
           )}
