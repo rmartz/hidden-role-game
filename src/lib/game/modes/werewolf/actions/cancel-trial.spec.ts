@@ -1,12 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { WerewolfPhase } from "../types";
+import { WerewolfPhase, TrialVerdict } from "../types";
 import type { WerewolfTurnState, WerewolfDaytimePhase } from "../types";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
 import { makePlayingGame } from "./test-helpers";
 
 function makeDayStateWithTrial(
   phase: "defense" | "voting",
-  verdict?: "eliminated" | "innocent",
+  verdict?: TrialVerdict,
 ): WerewolfTurnState {
   return {
     turn: 1,
@@ -42,7 +42,7 @@ describe("WerewolfAction.CancelTrial", () => {
 
     it("returns false after verdict", () => {
       const game = makePlayingGame(
-        makeDayStateWithTrial("voting", "eliminated"),
+        makeDayStateWithTrial("voting", TrialVerdict.Eliminated),
       );
       expect(action.isValid(game, "owner-1", null)).toBe(false);
     });

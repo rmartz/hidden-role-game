@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { WerewolfPhase } from "../../types";
+import { WerewolfPhase, TrialVerdict } from "../../types";
 import type { WerewolfTurnState } from "../../types";
 import { WerewolfRole } from "../../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "../index";
@@ -105,7 +105,7 @@ describe("WerewolfAction.CastVote — apply (Mummy, hypnotized, Mayor)", () => {
         turnState: { phase: { activeTrial: { verdict?: string } } };
       }
     ).turnState.phase;
-    expect(phase.activeTrial.verdict).toBe("eliminated");
+    expect(phase.activeTrial.verdict).toBe(TrialVerdict.Eliminated);
   });
 
   it("Mayor double-vote tips a tie to guilty via auto-resolve", () => {
@@ -141,6 +141,6 @@ describe("WerewolfAction.CastVote — apply (Mummy, hypnotized, Mayor)", () => {
         turnState: { phase: { activeTrial: { verdict?: string } } };
       }
     ).turnState.phase;
-    expect(phase.activeTrial.verdict).toBe("eliminated");
+    expect(phase.activeTrial.verdict).toBe(TrialVerdict.Eliminated);
   });
 });

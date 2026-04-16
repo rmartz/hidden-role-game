@@ -265,43 +265,59 @@ describe("WerewolfAction.StartTrial — silenced, hypnotized, and auto-resolve",
   });
 });
 
-describe("WerewolfAction.StartTrial — singleTrialPerDay", () => {
+describe("WerewolfAction.StartTrial — trialsPerDay", () => {
   const action = WEREWOLF_ACTIONS[WerewolfAction.StartTrial];
 
-  it("blocks starting a trial after one has concluded", () => {
+  it("blocks starting a trial when the trials-per-day limit has been reached", () => {
     const ds = makeDayState();
-    (ds.phase as WerewolfDaytimePhase).activeTrial = {
-      defendantId: "p3",
-      startedAt: 2000,
-      phase: "voting",
-      votes: [{ playerId: "p4", vote: "guilty" }],
-      verdict: "eliminated",
-    };
+    (ds.phase as WerewolfDaytimePhase).concludedTrialsCount = 1;
     const game = makePlayingGame(ds, {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: false,
-        singleTrialPerDay: true,
+        trialsPerDay: 1,
         revealProtections: true,
       },
     });
     expect(action.isValid(game, "owner-1", { defendantId: "p4" })).toBe(false);
   });
 
-  it("allows starting a trial after one has concluded when singleTrialPerDay is false", () => {
+  it("allows starting a trial when the trials-per-day limit has not been reached", () => {
     const ds = makeDayState();
-    (ds.phase as WerewolfDaytimePhase).activeTrial = {
-      defendantId: "p3",
-      startedAt: 2000,
-      phase: "voting",
-      votes: [{ playerId: "p4", vote: "guilty" }],
-      verdict: "eliminated",
-    };
+    (ds.phase as WerewolfDaytimePhase).concludedTrialsCount = 1;
     const game = makePlayingGame(ds, {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: false,
-        singleTrialPerDay: false,
+        trialsPerDay: 2,
+        revealProtections: true,
+      },
+    });
+    expect(action.isValid(game, "owner-1", { defendantId: "p4" })).toBe(true);
+  });
+
+  it("blocks starting a trial when concludedTrialsCount equals the default limit of 2", () => {
+    const ds = makeDayState();
+    (ds.phase as WerewolfDaytimePhase).concludedTrialsCount = 2;
+    const game = makePlayingGame(ds, {
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: false,
+        trialsPerDay: 2,
+        revealProtections: true,
+      },
+    });
+    expect(action.isValid(game, "owner-1", { defendantId: "p4" })).toBe(false);
+  });
+
+  it("allows starting a trial when trialsPerDay is 0 (unlimited)", () => {
+    const ds = makeDayState();
+    (ds.phase as WerewolfDaytimePhase).concludedTrialsCount = 5;
+    const game = makePlayingGame(ds, {
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: false,
+        trialsPerDay: 0,
         revealProtections: true,
       },
     });

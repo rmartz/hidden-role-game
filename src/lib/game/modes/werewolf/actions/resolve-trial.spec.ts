@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { GameStatus } from "@/lib/types";
-import { WerewolfPhase } from "../types";
+import { WerewolfPhase, TrialVerdict } from "../types";
 import type { WerewolfTurnState } from "../types";
 import { WerewolfRole } from "../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
@@ -152,7 +152,7 @@ describe("WerewolfAction.ResolveTrial", () => {
           };
         }
       ).turnState.phase;
-      expect(ts.activeTrial.verdict).toBe("eliminated");
+      expect(ts.activeTrial.verdict).toBe(TrialVerdict.Eliminated);
     });
 
     it("Mayor vote counts double — tips a tie to innocent", () => {
@@ -180,7 +180,7 @@ describe("WerewolfAction.ResolveTrial", () => {
           };
         }
       ).turnState.phase;
-      expect(ts.activeTrial.verdict).toBe("innocent");
+      expect(ts.activeTrial.verdict).toBe(TrialVerdict.Innocent);
     });
 
     it("does not end game when defendant is found innocent", () => {

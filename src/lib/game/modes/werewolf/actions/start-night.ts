@@ -1,6 +1,7 @@
 import { GameStatus } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase } from "../types";
+import type { WerewolfDaytimePhase } from "../types";
 import {
   buildNightPhaseOrder,
   currentTurnState,
@@ -16,11 +17,14 @@ export const startNightAction: GameAction = {
     if (ts?.phase.type !== WerewolfPhase.Daytime) return false;
     // Cannot advance to night while Hunter revenge is pending
     if (ts.hunterRevengePlayerId) return false;
+    // Cannot advance to night while a trial is actively ongoing
+    if (ts.phase.activeTrial && !ts.phase.activeTrial.verdict) return false;
     return true;
   },
   apply(game: Game) {
     const ts = currentTurnState(game);
     if (!ts) return;
+    const dayPhase = ts.phase as WerewolfDaytimePhase;
     const nextTurn = ts.turn + 1;
     // If a Wolf Cub died last turn, Werewolves get an extra phase this night.
     // Use a suffixed key so the second phase has its own nightActions entry.
@@ -33,6 +37,11 @@ export const startNightAction: GameAction = {
       ts.deadPlayerIds,
       extraGroupPhaseKeys,
     );
+    // Carry over any pending daytime smites into the night phase so they are
+    // resolved at the end of this night (in start-day).
+    const pendingSmites = dayPhase.pendingSmitePlayerIds?.filter(
+      (id) => !ts.deadPlayerIds.includes(id),
+    );
     game.status = {
       type: GameStatus.Playing,
       turnState: {
@@ -43,6 +52,7 @@ export const startNightAction: GameAction = {
           nightPhaseOrder,
           currentPhaseIndex: 0,
           nightActions: {},
+          ...(pendingSmites?.length ? { smitedPlayerIds: pendingSmites } : {}),
         },
         deadPlayerIds: ts.deadPlayerIds,
         ...(ts.witchAbilityUsed ? { witchAbilityUsed: true } : {}),

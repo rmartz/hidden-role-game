@@ -94,6 +94,11 @@ export type DaytimeVote = "guilty" | "innocent";
 
 export type TrialPhase = "defense" | "voting";
 
+export enum TrialVerdict {
+  Eliminated = "eliminated",
+  Innocent = "innocent",
+}
+
 export interface ActiveTrial {
   defendantId: string;
   /** Unix epoch ms when the trial started. */
@@ -103,7 +108,7 @@ export interface ActiveTrial {
   /** Unix epoch ms when the voting phase began. Set when transitioning from defense to voting. */
   voteStartedAt?: number;
   votes: { playerId: string; vote: DaytimeVote }[];
-  verdict?: "eliminated" | "innocent";
+  verdict?: TrialVerdict;
 }
 
 export interface Nomination {
@@ -121,10 +126,14 @@ export interface WerewolfDaytimePhase {
   nightResolution?: NightResolutionEvent[];
   /** Player IDs smited by the narrator during the preceding night. */
   smitedPlayerIds?: string[];
+  /** Player IDs marked by the narrator for elimination after the next night. */
+  pendingSmitePlayerIds?: string[];
   /** Active elimination trial, if one has been called by the narrator. */
   activeTrial?: ActiveTrial;
   /** Player nominations for trial. Each player holds at most one nomination. */
   nominations?: Nomination[];
+  /** Number of trials that have concluded (with a verdict) this day phase. */
+  concludedTrialsCount?: number;
 }
 
 export type WerewolfTurnPhase = WerewolfNighttimePhase | WerewolfDaytimePhase;

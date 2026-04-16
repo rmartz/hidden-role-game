@@ -6,6 +6,7 @@ import type {
   NightStatusEntry,
 } from "@/server/types/game";
 import type { AnyNightAction, DaytimeVote } from "./types";
+import { TrialVerdict } from "./types";
 
 /**
  * Werewolf-specific extension of PlayerGameState. Includes all fields that
@@ -18,8 +19,10 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   timerConfig: WerewolfTimerConfig;
   /** Whether player nominations for trial are enabled in this game. */
   nominationsEnabled: boolean;
-  /** When true, only one trial is allowed per day phase. */
-  singleTrialPerDay: boolean;
+  /** Maximum number of trials allowed per day phase. 0 means unlimited. */
+  trialsPerDay: number;
+  /** Number of trials that have concluded this day phase. */
+  concludedTrialsCount?: number;
   /** When true, the night summary reveals players who were attacked but saved by protection. */
   revealProtections: boolean;
   /** All night targets keyed by phase key. Only populated for the narrator/owner. */
@@ -74,6 +77,8 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   nominations?: { defendantId: string; nominatorIds: string[] }[];
   /** The defendant this player has nominated. */
   myNominatedDefendantId?: string;
+  /** Player IDs pending elimination at the end of the next night (narrator daytime smite). */
+  pendingSmitePlayerIds?: string[];
   /** True if the player is silenced this day. */
   isSilenced?: boolean;
   /** True if the player is hypnotized by the Mummy. */
@@ -87,10 +92,26 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
     myVote?: DaytimeVote;
     voteCount: number;
     playerCount: number;
-    verdict?: "eliminated" | "innocent";
+    verdict?: TrialVerdict;
     mustVoteGuilty?: boolean;
     mustVoteInnocent?: boolean;
     voteResults?: { playerName: string; vote: DaytimeVote }[];
     eliminatedRole?: { id: string; name: string; team: Team };
   };
+}
+
+/**
+ * Returns true when no new nominations can be started — either a trial is
+ * active (no verdict yet) or the per-day trial cap has been reached.
+ */
+export function isNominationsBlocked(
+  gameState: WerewolfPlayerGameState,
+): boolean {
+  const hasActiveTrial =
+    !!gameState.activeTrial && !gameState.activeTrial.verdict;
+  return (
+    hasActiveTrial ||
+    (gameState.trialsPerDay > 0 &&
+      (gameState.concludedTrialsCount ?? 0) >= gameState.trialsPerDay)
+  );
 }
