@@ -89,7 +89,7 @@ export function PlayerNightActionScreen({
     .map((e) => e.targetPlayerId);
 
   const isAltruist =
-    !isGroupPhase && gameState.myRole?.id === (WerewolfRole.Altruist as string);
+    !isGroupPhase && gameState.myRole?.id === WerewolfRole.Altruist;
 
   const isExposerAbilityUsed =
     !isGroupPhase &&

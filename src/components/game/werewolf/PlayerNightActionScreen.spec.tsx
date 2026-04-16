@@ -61,7 +61,7 @@ describe("PlayerNightActionScreen", () => {
       visibleRoleAssignments: [],
       timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
       nominationsEnabled: true,
-      singleTrialPerDay: false,
+      trialsPerDay: 1,
       revealProtections: true,
       myPlayerId: "p1",
       myRole: {
@@ -92,9 +92,9 @@ describe("PlayerNightActionScreen", () => {
       />,
     );
 
-    const [firstCall] = playerTargetSelectionMock.mock.calls;
-    if (!firstCall)
-      throw new Error("Expected PlayerTargetSelection to be rendered");
+    const firstCall = playerTargetSelectionMock.mock.calls[0];
+    expect(firstCall).toBeDefined();
+    if (firstCall === undefined) return;
     const props = firstCall[0] as PlayerTargetSelectionProps;
     const targetIds = props.targets.map(([player]) => player.id);
 
@@ -114,7 +114,7 @@ describe("PlayerNightActionScreen", () => {
       visibleRoleAssignments: [],
       timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
       nominationsEnabled: true,
-      singleTrialPerDay: false,
+      trialsPerDay: 1,
       revealProtections: true,
       myPlayerId: "p1",
       myRole: {
@@ -145,9 +145,9 @@ describe("PlayerNightActionScreen", () => {
       />,
     );
 
-    const [firstCall] = playerTargetSelectionMock.mock.calls;
-    if (!firstCall)
-      throw new Error("Expected PlayerTargetSelection to be rendered");
+    const firstCall = playerTargetSelectionMock.mock.calls[0];
+    expect(firstCall).toBeDefined();
+    if (firstCall === undefined) return;
     const props = firstCall[0] as PlayerTargetSelectionProps;
     const targetIds = props.targets.map(([player]) => player.id);
 

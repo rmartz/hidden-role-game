@@ -110,7 +110,7 @@ export function PlayerTargetSelection({
       return;
     }
 
-    if (myNightTarget === null || myNightTarget === undefined) {
+    if (!hasFirstMentalistTarget) {
       action.mutate({
         actionId: WerewolfAction.SetNightTarget,
         payload: {
