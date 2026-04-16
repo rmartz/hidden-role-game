@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { GameStatus } from "@/lib/types";
-import { WerewolfPhase, TrialVerdict } from "../types";
+import { WerewolfPhase, TrialVerdict, DaytimeVote, TrialPhase } from "../types";
 import type { WerewolfTurnState } from "../types";
 import { WerewolfRole } from "../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
@@ -13,7 +13,7 @@ import { makePlayingGame } from "./test-helpers";
 
 function makeDayStateWithPendingTrial(
   defendantId: string,
-  votes: { playerId: string; vote: "guilty" | "innocent" }[],
+  votes: { playerId: string; vote: DaytimeVote }[],
   deadPlayerIds: string[] = [],
 ): WerewolfTurnState {
   return {
@@ -25,7 +25,7 @@ function makeDayStateWithPendingTrial(
       activeTrial: {
         defendantId,
         startedAt: 2000,
-        phase: "voting" as const,
+        phase: TrialPhase.Voting,
         votes,
       },
     },
@@ -47,7 +47,7 @@ describe("WerewolfAction.ResolveTrial", () => {
           activeTrial: {
             defendantId: "p1",
             startedAt: 2000,
-            phase: "defense",
+            phase: TrialPhase.Defense,
             votes: [],
           },
         },
@@ -64,7 +64,7 @@ describe("WerewolfAction.ResolveTrial", () => {
       // p2 gets guilty verdict → 1 bad vs 1 good → Werewolves win
       const game = makePlayingGame(
         makeDayStateWithPendingTrial("p2", [
-          { playerId: "p3", vote: "guilty" },
+          { playerId: "p3", vote: DaytimeVote.Guilty },
         ]),
         {
           players: [
@@ -91,8 +91,8 @@ describe("WerewolfAction.ResolveTrial", () => {
       // p1 gets guilty verdict → 2 good remain → Village wins
       const game = makePlayingGame(
         makeDayStateWithPendingTrial("p1", [
-          { playerId: "p2", vote: "guilty" },
-          { playerId: "p3", vote: "guilty" },
+          { playerId: "p2", vote: DaytimeVote.Guilty },
+          { playerId: "p3", vote: DaytimeVote.Guilty },
         ]),
         {
           players: [
@@ -118,8 +118,8 @@ describe("WerewolfAction.ResolveTrial", () => {
       // 1 bad (p1) + 3 good (p2=defendant, p3, p4) — eliminating p2 leaves 1v2, no win
       const game = makePlayingGame(
         makeDayStateWithPendingTrial("p2", [
-          { playerId: "p3", vote: "guilty" },
-          { playerId: "p4", vote: "guilty" },
+          { playerId: "p3", vote: DaytimeVote.Guilty },
+          { playerId: "p4", vote: DaytimeVote.Guilty },
         ]),
       );
       action.apply(game, {}, "owner-1");
@@ -131,8 +131,8 @@ describe("WerewolfAction.ResolveTrial", () => {
       // Use 5 players so elimination does not trigger a win condition.
       const game = makePlayingGame(
         makeDayStateWithPendingTrial("p4", [
-          { playerId: "p2", vote: "guilty" },
-          { playerId: "p3", vote: "innocent" },
+          { playerId: "p2", vote: DaytimeVote.Guilty },
+          { playerId: "p3", vote: DaytimeVote.Innocent },
         ]),
         {
           roleAssignments: [
@@ -159,8 +159,8 @@ describe("WerewolfAction.ResolveTrial", () => {
       // p2 votes guilty, p3 (Mayor) votes innocent → 1 guilty vs 2 innocent → innocent
       const game = makePlayingGame(
         makeDayStateWithPendingTrial("p4", [
-          { playerId: "p2", vote: "guilty" },
-          { playerId: "p3", vote: "innocent" },
+          { playerId: "p2", vote: DaytimeVote.Guilty },
+          { playerId: "p3", vote: DaytimeVote.Innocent },
         ]),
         {
           roleAssignments: [
@@ -187,7 +187,7 @@ describe("WerewolfAction.ResolveTrial", () => {
       // 1 bad (p1) + 2 good (p2=defendant, p3=voter) — p2 innocent, game continues
       const game = makePlayingGame(
         makeDayStateWithPendingTrial("p2", [
-          { playerId: "p3", vote: "innocent" },
+          { playerId: "p3", vote: DaytimeVote.Innocent },
         ]),
         {
           players: [
@@ -208,8 +208,8 @@ describe("WerewolfAction.ResolveTrial", () => {
 
     it("clears One-Eyed Seer lock when locked target is eliminated by trial", () => {
       const ts = makeDayStateWithPendingTrial("p3", [
-        { playerId: "p4", vote: "guilty" },
-        { playerId: "p5", vote: "guilty" },
+        { playerId: "p4", vote: DaytimeVote.Guilty },
+        { playerId: "p5", vote: DaytimeVote.Guilty },
       ]);
       ts.oneEyedSeerLockedTargetId = "p3";
       const game = makePlayingGame(ts);
@@ -221,8 +221,8 @@ describe("WerewolfAction.ResolveTrial", () => {
 
     it("consumes priest ward when warded player is eliminated by trial", () => {
       const ts = makeDayStateWithPendingTrial("p3", [
-        { playerId: "p4", vote: "guilty" },
-        { playerId: "p5", vote: "guilty" },
+        { playerId: "p4", vote: DaytimeVote.Guilty },
+        { playerId: "p5", vote: DaytimeVote.Guilty },
       ]);
       ts.priestWards = { p3: "p2", p4: "p2" };
       const game = makePlayingGame(ts);
@@ -235,8 +235,8 @@ describe("WerewolfAction.ResolveTrial", () => {
     it("sets hunterRevengePlayerId when Hunter is eliminated by trial", () => {
       const game = makePlayingGame(
         makeDayStateWithPendingTrial("p2", [
-          { playerId: "p3", vote: "guilty" },
-          { playerId: "p4", vote: "guilty" },
+          { playerId: "p3", vote: DaytimeVote.Guilty },
+          { playerId: "p4", vote: DaytimeVote.Guilty },
         ]),
         {
           roleAssignments: [
@@ -260,7 +260,7 @@ describe("WerewolfAction.ResolveTrial", () => {
       // But hunter revenge should defer the check
       const game = makePlayingGame(
         makeDayStateWithPendingTrial("p2", [
-          { playerId: "p3", vote: "guilty" },
+          { playerId: "p3", vote: DaytimeVote.Guilty },
         ]),
         {
           players: [
@@ -285,8 +285,8 @@ describe("WerewolfAction.ResolveTrial", () => {
     it("Tanner voted out at trial ends game with Tanner winner", () => {
       const game = makePlayingGame(
         makeDayStateWithPendingTrial("p3", [
-          { playerId: "p2", vote: "guilty" },
-          { playerId: "p4", vote: "guilty" },
+          { playerId: "p2", vote: DaytimeVote.Guilty },
+          { playerId: "p4", vote: DaytimeVote.Guilty },
         ]),
         {
           roleAssignments: [
@@ -307,8 +307,8 @@ describe("WerewolfAction.ResolveTrial", () => {
 
     it("Executioner wins when their target is voted out", () => {
       const ts = makeDayStateWithPendingTrial("p2", [
-        { playerId: "p3", vote: "guilty" },
-        { playerId: "p4", vote: "guilty" },
+        { playerId: "p3", vote: DaytimeVote.Guilty },
+        { playerId: "p4", vote: DaytimeVote.Guilty },
       ]);
       ts.executionerTargetId = "p2";
       const game = makePlayingGame(ts, {
@@ -329,8 +329,8 @@ describe("WerewolfAction.ResolveTrial", () => {
 
     it("non-target player voted out does not trigger Executioner win", () => {
       const ts = makeDayStateWithPendingTrial("p4", [
-        { playerId: "p2", vote: "guilty" },
-        { playerId: "p3", vote: "guilty" },
+        { playerId: "p2", vote: DaytimeVote.Guilty },
+        { playerId: "p3", vote: DaytimeVote.Guilty },
       ]);
       ts.executionerTargetId = "p2";
       const game = makePlayingGame(ts, {

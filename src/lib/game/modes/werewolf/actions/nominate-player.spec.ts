@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { GameMode } from "@/lib/types";
-import { WerewolfPhase, TrialVerdict } from "../types";
+import { WerewolfPhase, TrialVerdict, TrialPhase } from "../types";
 import type { WerewolfTurnState, WerewolfDaytimePhase } from "../types";
 import { WerewolfRole } from "../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
@@ -214,7 +214,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         activeTrial: {
           defendantId: "p1",
           startedAt: 2000,
-          phase: "defense",
+          phase: TrialPhase.Defense,
           votes: [],
         },
       },
@@ -242,7 +242,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         activeTrial: {
           defendantId: "p1",
           startedAt: 2000,
-          phase: "voting",
+          phase: TrialPhase.Voting,
           votes: [],
           verdict: TrialVerdict.Innocent,
         },

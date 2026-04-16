@@ -6,6 +6,8 @@ import {
   WEREWOLF_COPY,
   WerewolfAction,
   TrialVerdict,
+  TrialPhase,
+  DaytimeVote,
 } from "@/lib/game/modes/werewolf";
 import type { PublicLobbyPlayer } from "@/server/types/lobby";
 import { useGameAction } from "@/hooks";
@@ -35,10 +37,10 @@ export function OwnerTrialPanel({
   const playerById = new Map(players.map((p) => [p.id, p]));
 
   const guiltyCount = activeTrial.votes.filter(
-    (v) => v.vote === "guilty",
+    (v) => v.vote === DaytimeVote.Guilty,
   ).length;
   const innocentCount = activeTrial.votes.filter(
-    (v) => v.vote === "innocent",
+    (v) => v.vote === DaytimeVote.Innocent,
   ).length;
 
   const handleResolve = useCallback(() => {
@@ -75,7 +77,7 @@ export function OwnerTrialPanel({
             {trial.guiltyInnocentCount(guiltyCount, innocentCount)}
           </p>
         </>
-      ) : activeTrial.phase === "defense" ? (
+      ) : activeTrial.phase === TrialPhase.Defense ? (
         <>
           <p className="font-semibold mb-2">
             {trial.defenseHeading(defendantName)}

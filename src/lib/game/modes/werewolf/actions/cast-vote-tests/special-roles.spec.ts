@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { WerewolfPhase, TrialVerdict } from "../../types";
+import {
+  WerewolfPhase,
+  TrialVerdict,
+  DaytimeVote,
+  TrialPhase,
+} from "../../types";
 import type { WerewolfTurnState } from "../../types";
 import { WerewolfRole } from "../../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "../index";
@@ -8,7 +13,7 @@ import { makePlayingGame } from "../test-helpers";
 function makeDayStateWithTrial(
   overrides: Partial<{
     defendantId: string;
-    votes: { playerId: string; vote: "guilty" | "innocent" }[];
+    votes: { playerId: string; vote: DaytimeVote }[];
     deadPlayerIds: string[];
   }> = {},
 ): WerewolfTurnState {
@@ -21,7 +26,7 @@ function makeDayStateWithTrial(
       activeTrial: {
         defendantId: overrides.defendantId ?? "p1",
         startedAt: 2000,
-        phase: "voting" as const,
+        phase: TrialPhase.Voting,
         votes: overrides.votes ?? [],
       },
     },
@@ -55,7 +60,7 @@ describe("WerewolfAction.CastVote — apply (Mummy, hypnotized, Mayor)", () => {
         { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
       ],
     });
-    action.apply(game, { vote: "guilty" }, "p2");
+    action.apply(game, { vote: DaytimeVote.Guilty }, "p2");
     const phase = (
       game.status as {
         turnState: {
@@ -67,7 +72,7 @@ describe("WerewolfAction.CastVote — apply (Mummy, hypnotized, Mayor)", () => {
     ).turnState.phase;
     expect(phase.activeTrial.votes).toContainEqual({
       playerId: "p3",
-      vote: "guilty",
+      vote: DaytimeVote.Guilty,
     });
   });
 
@@ -75,7 +80,7 @@ describe("WerewolfAction.CastVote — apply (Mummy, hypnotized, Mayor)", () => {
     const ts = makeDayStateWithTrial({
       defendantId: "p5",
       deadPlayerIds: ["p4"],
-      votes: [{ playerId: "p1", vote: "guilty" }],
+      votes: [{ playerId: "p1", vote: DaytimeVote.Guilty }],
     });
     (
       ts.phase as Extract<typeof ts.phase, { type: WerewolfPhase.Daytime }>
@@ -98,8 +103,8 @@ describe("WerewolfAction.CastVote — apply (Mummy, hypnotized, Mayor)", () => {
         { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
       ],
     });
-    action.apply(game, { vote: "guilty" }, "p2");
-    action.apply(game, { vote: "guilty" }, "p3");
+    action.apply(game, { vote: DaytimeVote.Guilty }, "p2");
+    action.apply(game, { vote: DaytimeVote.Guilty }, "p3");
     const phase = (
       game.status as {
         turnState: { phase: { activeTrial: { verdict?: string } } };
@@ -113,9 +118,9 @@ describe("WerewolfAction.CastVote — apply (Mummy, hypnotized, Mayor)", () => {
       makeDayStateWithTrial({
         defendantId: "p3",
         votes: [
-          { playerId: "p1", vote: "guilty" },
-          { playerId: "p4", vote: "innocent" },
-          { playerId: "p5", vote: "innocent" },
+          { playerId: "p1", vote: DaytimeVote.Guilty },
+          { playerId: "p4", vote: DaytimeVote.Innocent },
+          { playerId: "p5", vote: DaytimeVote.Innocent },
         ],
       }),
       {
@@ -135,7 +140,7 @@ describe("WerewolfAction.CastVote — apply (Mummy, hypnotized, Mayor)", () => {
         ],
       },
     );
-    action.apply(game, { vote: "guilty" }, "p2");
+    action.apply(game, { vote: DaytimeVote.Guilty }, "p2");
     const phase = (
       game.status as {
         turnState: { phase: { activeTrial: { verdict?: string } } };

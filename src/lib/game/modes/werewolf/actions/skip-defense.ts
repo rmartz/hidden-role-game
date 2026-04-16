@@ -1,5 +1,5 @@
 import type { Game, GameAction } from "@/lib/types";
-import { WerewolfPhase } from "../types";
+import { WerewolfPhase, TrialPhase } from "../types";
 import { currentTurnState, isOwnerPlaying, checkWinCondition } from "../utils";
 import { applyTrialVerdict } from "./resolve-trial";
 
@@ -11,7 +11,7 @@ export const skipDefenseAction: GameAction = {
     if (ts.phase.type !== WerewolfPhase.Daytime) return false;
     const { activeTrial } = ts.phase;
     if (!activeTrial) return false;
-    return activeTrial.phase === "defense";
+    return activeTrial.phase === TrialPhase.Defense;
   },
   apply(game: Game) {
     const ts = currentTurnState(game);
@@ -19,7 +19,7 @@ export const skipDefenseAction: GameAction = {
     const { activeTrial } = ts.phase;
     if (!activeTrial) return;
 
-    activeTrial.phase = "voting";
+    activeTrial.phase = TrialPhase.Voting;
     activeTrial.voteStartedAt = Date.now();
 
     // Auto-resolve if precast votes already cover all eligible voters

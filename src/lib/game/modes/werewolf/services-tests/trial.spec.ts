@@ -5,6 +5,8 @@ import {
   WerewolfPhase,
   WerewolfRole,
   DEFAULT_WEREWOLF_TIMER_CONFIG,
+  TrialPhase,
+  DaytimeVote,
 } from "@/lib/game/modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
 import { extractDaytimeState, makeDaytimeGameWithTrial } from "./helpers";
@@ -36,8 +38,8 @@ describe("extractDaytimePlayerState — playerCount excludes silenced", () => {
     const activeTrial = {
       defendantId: "p1",
       startedAt: 2000,
-      phase: "voting" as const,
-      votes: [] as { playerId: string; vote: "guilty" | "innocent" }[],
+      phase: TrialPhase.Voting,
+      votes: [] as { playerId: string; vote: DaytimeVote }[],
     };
     const turnState: WerewolfTurnState = {
       turn: 1,
@@ -87,8 +89,8 @@ describe("extractDaytimePlayerState — playerCount excludes silenced", () => {
     const activeTrial = {
       defendantId: "p1",
       startedAt: 2000,
-      phase: "voting" as const,
-      votes: [] as { playerId: string; vote: "guilty" | "innocent" }[],
+      phase: TrialPhase.Voting,
+      votes: [] as { playerId: string; vote: DaytimeVote }[],
     };
     const turnState: WerewolfTurnState = {
       turn: 1,
