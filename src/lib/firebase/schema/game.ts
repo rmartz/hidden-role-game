@@ -83,9 +83,7 @@ export function gameToFirebase(game: Game): FirebaseGamePublic {
     ...(game.playerOrder && game.playerOrder.length > 0
       ? { playerOrder: game.playerOrder }
       : {}),
-    ...("hiddenRoleIds" in game &&
-    Array.isArray(game.hiddenRoleIds) &&
-    game.hiddenRoleIds.length > 0
+    ...(game.gameMode === GameMode.Werewolf && game.hiddenRoleIds?.length
       ? { hiddenRoleIds: game.hiddenRoleIds }
       : {}),
   };

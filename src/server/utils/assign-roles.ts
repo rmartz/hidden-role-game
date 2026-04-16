@@ -83,7 +83,10 @@ function isSafeToHide(
   roles: Record<string, RoleDefinition<string, Team>>,
 ): boolean {
   const candidateRoleId = roleIds[candidateIndex];
-  if (!candidateRoleId) return true; // candidateIndex is out of bounds (should not happen given caller uses findIndex)
+  if (!candidateRoleId)
+    throw new Error(
+      `candidateIndex ${String(candidateIndex)} is out of bounds for roleIds of length ${String(roleIds.length)}. This is a programming error.`,
+    );
   const candidateRole = roles[candidateRoleId];
   if (!candidateRole)
     throw new Error(

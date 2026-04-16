@@ -267,7 +267,7 @@ describe("buildGame — Werewolf hidden roles", () => {
     const modeConfig = {
       gameMode: GameMode.Werewolf,
       nominationsEnabled: false,
-      singleTrialPerDay: true,
+      trialsPerDay: 2,
       revealProtections: true,
       hiddenRoleCount: 1,
     };
@@ -319,7 +319,7 @@ describe("buildGame — Werewolf hidden roles", () => {
     const modeConfig = {
       gameMode: GameMode.Werewolf,
       nominationsEnabled: false,
-      singleTrialPerDay: true,
+      trialsPerDay: 2,
       revealProtections: true,
       hiddenRoleCount: 0,
     };

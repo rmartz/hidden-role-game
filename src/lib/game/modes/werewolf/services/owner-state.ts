@@ -1,4 +1,5 @@
 import type { Game } from "@/lib/types";
+import { GameMode } from "@/lib/types";
 import type { DaytimeNightStatusEntry } from "@/server/types";
 import type { WerewolfPlayerGameState } from "../player-state";
 import { getWerewolfModeConfig } from "../lobby-config";
@@ -259,9 +260,7 @@ export function extractOwnerState(
 
   // hiddenRoleIds is only present on WerewolfGame when hiddenRoleCount > 0.
   const hiddenRoleIds =
-    "hiddenRoleIds" in game &&
-    Array.isArray(game.hiddenRoleIds) &&
-    game.hiddenRoleIds.length > 0
+    game.gameMode === GameMode.Werewolf && game.hiddenRoleIds?.length
       ? game.hiddenRoleIds
       : undefined;
 

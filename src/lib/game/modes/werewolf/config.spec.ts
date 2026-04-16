@@ -9,7 +9,7 @@ import type { WerewolfModeConfig } from "./lobby-config";
 const defaultModeConfig: WerewolfModeConfig = {
   gameMode: GameMode.Werewolf,
   nominationsEnabled: true,
-  singleTrialPerDay: true,
+  trialsPerDay: 2,
   revealProtections: true,
   hiddenRoleCount: 0,
 };
