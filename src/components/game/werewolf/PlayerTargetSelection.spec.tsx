@@ -237,7 +237,7 @@ describe("PlayerTargetSelection", () => {
     });
   });
 
-  it("sets first Mentalist target from skip state without second-target flag", () => {
+  it("sets first Mentalist target without second-target flag", () => {
     render(
       <PlayerTargetSelection
         gameId="game-1"
@@ -255,7 +255,7 @@ describe("PlayerTargetSelection", () => {
         confirmPhaseKey={WerewolfRole.Mentalist}
         hasTarget={false}
         allAgreed={false}
-        myNightTarget={null}
+        myNightTarget={undefined}
         requiresSecondTarget={true}
       />,
     );

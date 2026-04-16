@@ -76,68 +76,57 @@ export function PlayerTargetSelection({
     hasFirstMentalistTarget &&
     mySecondNightTarget === undefined;
 
-  const handleStandardTargetClick = (
-    player: TargetablePlayer,
-    isSelected: boolean,
-  ) => {
+  const handleTargetClick = (player: TargetablePlayer, isSelected: boolean) => {
+    if (requiresSecondTarget) {
+      if (player.id === myNightTarget) {
+        action.mutate({
+          actionId: WerewolfAction.SetNightTarget,
+          payload: {
+            targetPlayerId: undefined,
+          },
+        });
+        return;
+      }
+
+      if (player.id === mySecondNightTarget) {
+        action.mutate({
+          actionId: WerewolfAction.SetNightTarget,
+          payload: {
+            targetPlayerId: undefined,
+            isSecondTarget: true,
+          },
+        });
+        return;
+      }
+
+      if (!hasFirstMentalistTarget) {
+        action.mutate({
+          actionId: WerewolfAction.SetNightTarget,
+          payload: {
+            targetPlayerId: player.id,
+          },
+        });
+        return;
+      }
+
+      if (mySecondNightTarget === undefined) {
+        action.mutate({
+          actionId: WerewolfAction.SetNightTarget,
+          payload: {
+            targetPlayerId: player.id,
+            isSecondTarget: true,
+          },
+        });
+      }
+      return;
+    }
+
     action.mutate({
       actionId: WerewolfAction.SetNightTarget,
       payload: {
         targetPlayerId: isSelected ? undefined : player.id,
       },
     });
-  };
-
-  const handleMentalistTargetClick = (player: TargetablePlayer) => {
-    if (player.id === myNightTarget) {
-      action.mutate({
-        actionId: WerewolfAction.SetNightTarget,
-        payload: {
-          targetPlayerId: undefined,
-        },
-      });
-      return;
-    }
-
-    if (player.id === mySecondNightTarget) {
-      action.mutate({
-        actionId: WerewolfAction.SetNightTarget,
-        payload: {
-          targetPlayerId: undefined,
-          isSecondTarget: true,
-        },
-      });
-      return;
-    }
-
-    if (!hasFirstMentalistTarget) {
-      action.mutate({
-        actionId: WerewolfAction.SetNightTarget,
-        payload: {
-          targetPlayerId: player.id,
-        },
-      });
-      return;
-    }
-
-    if (mySecondNightTarget === undefined) {
-      action.mutate({
-        actionId: WerewolfAction.SetNightTarget,
-        payload: {
-          targetPlayerId: player.id,
-          isSecondTarget: true,
-        },
-      });
-    }
-  };
-
-  const handleTargetClick = (player: TargetablePlayer, isSelected: boolean) => {
-    if (requiresSecondTarget) {
-      handleMentalistTargetClick(player);
-      return;
-    }
-
-    handleStandardTargetClick(player, isSelected);
   };
 
   return (
@@ -202,9 +191,9 @@ export function PlayerTargetSelection({
                 : WEREWOLF_COPY.targetSelection.chooseTarget}
           </h2>
           {shouldShowMentalistSecondTargetHeading && (
-            <h3 className="text-lg font-semibold mb-2 mt-4 text-center">
+            <h2 className="text-lg font-semibold mb-2 mt-4 text-center">
               {WEREWOLF_COPY.mentalist.chooseSecondTarget}
-            </h3>
+            </h2>
           )}
           {!(isConfirmed && myNightTarget === null) && (
             <div className="flex flex-col gap-2 max-w-sm mx-auto">
