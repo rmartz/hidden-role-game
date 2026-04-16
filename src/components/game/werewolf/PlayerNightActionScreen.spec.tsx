@@ -89,12 +89,10 @@ describe("PlayerNightActionScreen", () => {
       />,
     );
 
-    const props = playerTargetSelectionMock.mock.calls[0]
-      ? (playerTargetSelectionMock.mock
-          .calls[0][0] as PlayerTargetSelectionPropsForTest)
-      : undefined;
-    if (!props)
+    const [firstCall] = playerTargetSelectionMock.mock.calls;
+    if (!firstCall)
       throw new Error("Expected PlayerTargetSelection to be rendered");
+    const props = firstCall[0] as PlayerTargetSelectionPropsForTest;
     const targetIds = props.targets.map(([player]) => player.id);
 
     expect(targetIds).toEqual(["p2", "p3"]);
