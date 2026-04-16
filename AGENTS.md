@@ -28,10 +28,8 @@ pnpm build-storybook  # Build static Storybook
 
 - **Source files**: Keep under ~200 lines (split at ~240). Large files should be split by logical concern.
 - **Test files**: Keep under ~300 lines (split at ~360). Use `.spec.ts` / `.spec.tsx` extension (not `.test.ts`). When splitting, organize into a `{module}-tests/` directory with domain-specific files (e.g., `resolution-tests/altruist.spec.ts`).
-- **Components**: Each component file must contain exactly one component and its associated props interface. All component props must be defined as an explicitly named interface (e.g., `interface PlayerListProps`), never inline in the function signature. Delegate complex logic to utility functions or sub-components.
+- **Components**: A component file contains its primary component and props interface. A sub-component may be co-located in the same file if it owns no hooks, state, effects, or context, and is used only by the parent component in that file — e.g., a context wrapper, structural template, or props alias. A sub-component must be in its own file when any of these are true: it owns hooks, state, effects, or context; it is referenced from multiple parents; or it is substantial enough to warrant its own stories or tests (e.g., list items, row components, panels, form sections). All component props must be defined as an explicitly named interface (e.g., `interface PlayerListProps`), never inline in the function signature.
 - **Type files**: Convert large type files into barrel-exported directories with one file per logical domain (e.g., `lobby.ts`, `game.ts`, `player.ts`).
-- **Utility files**: Split by the type of operation or domain they serve.
-- **Service files**: Extract complex logic areas into focused utility functions or smaller services.
 - Barrel `index.ts` exports for all component/module directories.
 - Use named exports, not default exports (except for Next.js pages and Redux slices).
 
@@ -46,13 +44,11 @@ pnpm build-storybook  # Build static Storybook
 ## User-Facing Text
 
 - All user-facing strings must be stored in a co-located copy file (e.g., `ComponentName.copy.ts` or `copy.ts`) for internationalization (i18n) readiness.
-- Do not hardcode display strings inline in components.
 - Copy files export a single `as const` object named `{SCOPE}_COPY` (e.g., `WEREWOLF_COPY`, `HOME_PAGE_COPY`, `GAME_TIMER_COPY`).
 
 ## Documentation
 
 - When adding or modifying roles, actions, game settings, or data flow in a game mode, update the corresponding docs in `docs/<game-mode>/` (`roles.md`, `actions.md`, `data-flow.md`).
-- Keep documentation in sync with the code — outdated docs are worse than no docs.
 
 ## React / Next.js Standards
 
@@ -69,8 +65,7 @@ pnpm build-storybook  # Build static Storybook
 
 ### JSX
 
-- **No imperative logic inside JSX.** All conditional logic and variable declarations must be computed in the component body before the `return` statement, or extracted into a dedicated child component. Simple functional expressions are fine in JSX — inline arrow functions, ternaries, and `.map()` calls that return JSX directly are all permitted. What is prohibited is multi-statement blocks: declaring intermediate variables and then returning a value inside JSX.
-- JSX should only contain simple functional expressions: `items.map(item => <Item key={item.id} {...item} />)`.
+- **No imperative logic inside JSX.** Imperative logic means anything that requires a statement rather than an expression: `const`/`let` declarations, `if`/`switch` blocks, loops, or any sequence of statements that produces a result through side effects. All such logic must live in the component body before the `return` statement, or be extracted into a child component. Expressions of any complexity are permitted directly in JSX — ternaries, logical operators (`&&`, `||`, `??`), method chains (`.map()`, `.filter()`, `.find()`), nested function calls, and template literals are all fine as long as they form a single expression with no intermediate bindings.
 
 ### Component Structure
 
