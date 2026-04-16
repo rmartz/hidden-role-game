@@ -101,7 +101,7 @@ export const werewolfServices: GameModeServices = {
     return {
       ...modeState,
       nominationsEnabled: wwConfig.nominationsEnabled as unknown,
-      singleTrialPerDay: wwConfig.singleTrialPerDay as unknown,
+      trialsPerDay: wwConfig.trialsPerDay as unknown,
       revealProtections: wwConfig.revealProtections as unknown,
     };
   },

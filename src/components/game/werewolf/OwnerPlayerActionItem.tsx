@@ -128,6 +128,48 @@ export function OwnerPlayerActionItem({
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
+        {isSmited ? (
+          <Button
+            variant="outline"
+            size="xs"
+            onClick={handleUnsmite}
+            disabled={action.isPending}
+          >
+            {WEREWOLF_COPY.smite.undo}
+          </Button>
+        ) : (
+          <AlertDialog>
+            <AlertDialogTrigger
+              render={
+                <Button
+                  variant="outline"
+                  size="xs"
+                  disabled={action.isPending}
+                />
+              }
+            >
+              {WEREWOLF_COPY.narrator.smite}
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  {WEREWOLF_COPY.smite.confirmTitle}
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  {WEREWOLF_COPY.smite.confirmDayDescription(playerName)}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>
+                  {WEREWOLF_COPY.smite.confirmCancel}
+                </AlertDialogCancel>
+                <AlertDialogAction onClick={handleSmite}>
+                  {WEREWOLF_COPY.smite.confirmAction}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
       </div>
     );
   }

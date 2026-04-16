@@ -39,7 +39,7 @@ const mockLobby: PublicLobby = {
     modeConfig: {
       gameMode: GameMode.Werewolf,
       nominationsEnabled: false,
-      singleTrialPerDay: true,
+      trialsPerDay: 1,
       revealProtections: true,
       hiddenRoleCount: 0,
     },

@@ -25,7 +25,7 @@ function makeWerewolfState(
     gameMode: GameMode.Werewolf,
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     nominationsEnabled: true,
-    singleTrialPerDay: false,
+    trialsPerDay: 0,
     revealProtections: true,
     ...overrides,
   };
@@ -65,14 +65,14 @@ describe("Werewolf player state round-trip", () => {
   it("preserves required Werewolf settings", () => {
     const state = makeWerewolfState({
       nominationsEnabled: false,
-      singleTrialPerDay: true,
+      trialsPerDay: 1,
       revealProtections: false,
     });
     const result = firebaseToPlayerState(
       playerStateToFirebase(state),
     ) as WerewolfPlayerGameState;
     expect(result.nominationsEnabled).toBe(false);
-    expect(result.singleTrialPerDay).toBe(true);
+    expect(result.trialsPerDay).toBe(1);
     expect(result.revealProtections).toBe(false);
   });
 

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { GameStatus } from "@/lib/types";
-import { WerewolfPhase } from "../types";
+import { WerewolfPhase, TrialVerdict } from "../types";
 import type { WerewolfTurnState } from "../types";
 import { WerewolfRole } from "../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
@@ -97,7 +97,7 @@ describe("WerewolfAction.SkipDefense", () => {
         WerewolfTurnState["phase"],
         { type: WerewolfPhase.Daytime }
       >;
-      expect(phase.activeTrial?.verdict).toBe("innocent");
+      expect(phase.activeTrial?.verdict).toBe(TrialVerdict.Innocent);
     });
 
     it("triggers win condition when auto-resolve eliminates last non-Bad player", () => {

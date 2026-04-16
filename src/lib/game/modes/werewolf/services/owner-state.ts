@@ -6,7 +6,7 @@ import type {
   AltruistInterceptedNightResolutionEvent,
   AnyNightAction,
 } from "../types";
-import { WerewolfPhase } from "../types";
+import { TrialVerdict, WerewolfPhase } from "../types";
 import { SMITE_PHASE_KEY, OLD_MAN_TIMER_KEY } from "../utils";
 import { getSilencedPlayerIds, getHypnotizedPlayerId } from "../utils";
 import { currentTurnState } from "../utils/game-state";
@@ -153,6 +153,11 @@ export function extractDaytimePlayerState(
     }
   }
 
+  // Narrator-only: pending daytime smites.
+  if (callerId === game.ownerPlayerId && phase.pendingSmitePlayerIds?.length) {
+    result.pendingSmitePlayerIds = phase.pendingSmitePlayerIds;
+  }
+
   // Executioner target.
   const callerExecutionerAssignment = game.roleAssignments.find(
     (a) =>
@@ -214,7 +219,7 @@ export function extractDaytimePlayerState(
         vote: v.vote,
       }));
 
-      if (activeTrial.verdict === "eliminated") {
+      if (activeTrial.verdict === TrialVerdict.Eliminated) {
         const assignment = game.roleAssignments.find(
           (a) => a.playerId === activeTrial.defendantId,
         );
@@ -230,6 +235,11 @@ export function extractDaytimePlayerState(
         }
       }
     }
+  }
+
+  // Concluded trials count for this day.
+  if (phase.concludedTrialsCount) {
+    result.concludedTrialsCount = phase.concludedTrialsCount;
   }
 
   return result;

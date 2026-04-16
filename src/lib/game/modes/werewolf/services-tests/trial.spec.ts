@@ -73,7 +73,7 @@ describe("extractDaytimePlayerState — playerCount excludes silenced", () => {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: false,
-        singleTrialPerDay: true,
+        trialsPerDay: 1,
         revealProtections: true,
         hiddenRoleCount: 0,
       },
@@ -122,7 +122,7 @@ describe("extractDaytimePlayerState — playerCount excludes silenced", () => {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: false,
-        singleTrialPerDay: true,
+        trialsPerDay: 1,
         revealProtections: true,
         hiddenRoleCount: 0,
       },

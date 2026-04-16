@@ -97,7 +97,7 @@ Additional resolution steps:
 
 **Who:** Narrator only
 **When:** During Daytime
-**Effect:** Starts a trial against a defendant. Pre-populates forced votes (Village Idiot = guilty, Pacifist = innocent). Clears nominations. Blocked by `singleTrialPerDay` if a trial has already concluded this day.
+**Effect:** Starts a trial against a defendant. Pre-populates forced votes (Village Idiot = guilty, Pacifist = innocent). Clears nominations. Blocked when `concludedTrialsCount >= trialsPerDay` (and `trialsPerDay > 0`).
 
 **Payload:** `{ defendantId: string }`
 
@@ -144,8 +144,8 @@ Additional resolution steps:
 ### `smite-player`
 
 **Who:** Narrator only
-**When:** During Nighttime
-**Effect:** Marks a player for death by mysterious forces. Smite bypasses all protections (Bodyguard, Doctor, Priest ward, Witch).
+**When:** During Nighttime or Daytime
+**Effect:** During nighttime, marks a player for death at start of day (bypasses all protections). During daytime, marks a player to be eliminated at the end of the next night.
 
 **Payload:** `{ playerId: string }`
 
@@ -154,7 +154,7 @@ Additional resolution steps:
 ### `unsmite-player`
 
 **Who:** Narrator only
-**When:** During Nighttime
+**When:** During Nighttime or Daytime
 **Effect:** Removes a pending smite from a player.
 
 **Payload:** `{ playerId: string }`
@@ -165,7 +165,7 @@ Additional resolution steps:
 
 **Who:** Player
 **When:** During Daytime
-**Effect:** Nominates a defendant for trial. When the nomination count reaches the threshold, a trial is automatically started. Blocked by `singleTrialPerDay` if a trial has already concluded this day.
+**Effect:** Nominates a defendant for trial. When the nomination count reaches the threshold, a trial is automatically started. Blocked when `concludedTrialsCount >= trialsPerDay` (and `trialsPerDay > 0`).
 
 **Payload:** `{ defendantId: string }`
 
