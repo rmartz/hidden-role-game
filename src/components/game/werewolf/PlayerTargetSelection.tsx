@@ -59,10 +59,10 @@ export function PlayerTargetSelection({
   mirrorcasterCharged,
 }: PlayerTargetSelectionProps) {
   const action = useGameAction(gameId);
+  const hasFirstMentalistTarget =
+    myNightTarget !== null && myNightTarget !== undefined;
   const isMentalistSelectionComplete =
-    myNightTarget !== null &&
-    myNightTarget !== undefined &&
-    mySecondNightTarget !== undefined;
+    hasFirstMentalistTarget && mySecondNightTarget !== undefined;
 
   const isWitchAbilityUsedOnly =
     confirmPhaseKey === WerewolfRole.Witch && witchAbilityUsed && !isConfirmed;
@@ -73,8 +73,7 @@ export function PlayerTargetSelection({
     !(attackedPlayerIds ?? []).includes(myPlayerId);
   const shouldShowMentalistSecondTargetHeading =
     requiresSecondTarget &&
-    myNightTarget !== null &&
-    myNightTarget !== undefined &&
+    hasFirstMentalistTarget &&
     mySecondNightTarget === undefined;
 
   const handleStandardTargetClick = (
@@ -203,9 +202,9 @@ export function PlayerTargetSelection({
                 : WEREWOLF_COPY.targetSelection.chooseTarget}
           </h2>
           {shouldShowMentalistSecondTargetHeading && (
-            <h2 className="text-lg font-semibold mb-2 mt-4 text-center">
+            <h3 className="text-lg font-semibold mb-2 mt-4 text-center">
               {WEREWOLF_COPY.mentalist.chooseSecondTarget}
-            </h2>
+            </h3>
           )}
           {!(isConfirmed && myNightTarget === null) && (
             <div className="flex flex-col gap-2 max-w-sm mx-auto">

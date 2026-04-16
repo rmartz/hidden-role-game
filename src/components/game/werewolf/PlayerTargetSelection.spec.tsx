@@ -270,6 +270,41 @@ describe("PlayerTargetSelection", () => {
     });
   });
 
+  it("sets second Mentalist target when first is already selected", () => {
+    render(
+      <PlayerTargetSelection
+        gameId="game-1"
+        players={[
+          { id: "p1", name: "Alice" },
+          { id: "p2", name: "Bob" },
+          { id: "p3", name: "Charlie" },
+        ]}
+        targets={[
+          [{ id: "p2", name: "Bob" }, true],
+          [{ id: "p3", name: "Charlie" }, false],
+        ]}
+        isConfirmed={false}
+        isGroupPhase={false}
+        confirmPhaseKey={WerewolfRole.Mentalist}
+        hasTarget={true}
+        allAgreed={false}
+        myNightTarget="p2"
+        mySecondNightTarget={undefined}
+        requiresSecondTarget={true}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Charlie" }));
+
+    expect(mutateMock).toHaveBeenCalledWith({
+      actionId: WerewolfAction.SetNightTarget,
+      payload: {
+        targetPlayerId: "p3",
+        isSecondTarget: true,
+      },
+    });
+  });
+
   it("shows choose-second-target heading after first Mentalist target is selected", () => {
     render(
       <PlayerTargetSelection

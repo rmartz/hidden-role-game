@@ -61,8 +61,7 @@ export function PlayerNightActionScreen({
   const suggestedTargetId = gameState.suggestedTargetId;
   const allAgreed = gameState.allAgreed ?? false;
   const isMentalist =
-    !isGroupPhase &&
-    gameState.myRole?.id === (WerewolfRole.Mentalist as string);
+    !isGroupPhase && gameState.myRole?.id === WerewolfRole.Mentalist;
 
   const allTargets = getTargetablePlayers(
     gameState.players,
