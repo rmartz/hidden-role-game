@@ -42,13 +42,20 @@ interface EditableProps {
 
 type RoleConfigProps = ReadOnlyProps | EditableProps;
 
+interface CategoryGroup {
+  category: string;
+  label: string;
+  roles: RoleDefinition<string, Team>[];
+}
+
 interface RoleListEntryProps {
   role: RoleDefinition<string, Team>;
   gameMode: GameMode;
   roleConfigMode: RoleConfigMode;
   dimmed: boolean;
   readOnly: boolean;
-  count: number;
+  /** Only consumed in readOnly mode; ignored by the editable branch. */
+  count?: number;
   disabled: boolean;
 }
 
@@ -66,7 +73,7 @@ function RoleListEntry({
       role={role}
       gameMode={gameMode}
       roleConfigMode={roleConfigMode}
-      count={count}
+      count={count ?? 0}
       readOnly={true}
       dimmed={dimmed}
     />
@@ -79,6 +86,123 @@ function RoleListEntry({
       disabled={disabled}
       dimmed={dimmed}
     />
+  );
+}
+
+interface ExpandedRoleListProps {
+  noResults: boolean;
+  isSearching: boolean;
+  hasCategoryGrouping: boolean;
+  searchResultsByCategory: CategoryGroup[];
+  uncategorizedSearchResults: RoleDefinition<string, Team>[];
+  searchResults: RoleDefinition<string, Team>[];
+  disabledByCategory: CategoryGroup[];
+  uncategorizedDisabled: RoleDefinition<string, Team>[];
+  disabledRoles: RoleDefinition<string, Team>[];
+  gameMode: GameMode;
+  roleConfigMode: RoleConfigMode;
+  readOnly: boolean;
+  getCount: (id: string) => number;
+  disabled: boolean;
+}
+
+function ExpandedRoleList({
+  noResults,
+  isSearching,
+  hasCategoryGrouping,
+  searchResultsByCategory,
+  uncategorizedSearchResults,
+  searchResults,
+  disabledByCategory,
+  uncategorizedDisabled,
+  disabledRoles,
+  gameMode,
+  roleConfigMode,
+  readOnly,
+  getCount,
+  disabled,
+}: ExpandedRoleListProps) {
+  if (noResults) {
+    return (
+      <p className="text-sm text-muted-foreground py-2">
+        {ROLE_CONFIG_COPY.noSearchResults}
+      </p>
+    );
+  }
+
+  // Pick the right data source based on whether a search is active.
+  const categorizedGroups = isSearching
+    ? searchResultsByCategory
+    : disabledByCategory;
+  const uncategorizedRoles = isSearching
+    ? uncategorizedSearchResults
+    : uncategorizedDisabled;
+  const flatRoles = isSearching ? searchResults : disabledRoles;
+
+  if (hasCategoryGrouping) {
+    return (
+      <>
+        {categorizedGroups.map(({ category, label, roles }) => (
+          <div key={category} className="mt-4">
+            <p className="text-xs font-semibold text-muted-foreground mb-1">
+              {label}
+            </p>
+            <ul className="space-y-1 list-none p-0">
+              {roles.map((role) => (
+                <RoleListEntry
+                  key={role.id}
+                  role={role}
+                  gameMode={gameMode}
+                  roleConfigMode={roleConfigMode}
+                  dimmed={true}
+                  readOnly={readOnly}
+                  count={getCount(role.id)}
+                  disabled={disabled}
+                />
+              ))}
+            </ul>
+          </div>
+        ))}
+        {uncategorizedRoles.length > 0 && (
+          <div className="mt-4">
+            <p className="text-xs font-semibold text-muted-foreground mb-1">
+              {ROLE_CONFIG_COPY.uncategorizedLabel}
+            </p>
+            <ul className="space-y-1 list-none p-0">
+              {uncategorizedRoles.map((role) => (
+                <RoleListEntry
+                  key={role.id}
+                  role={role}
+                  gameMode={gameMode}
+                  roleConfigMode={roleConfigMode}
+                  dimmed={true}
+                  readOnly={readOnly}
+                  count={getCount(role.id)}
+                  disabled={disabled}
+                />
+              ))}
+            </ul>
+          </div>
+        )}
+      </>
+    );
+  }
+
+  return (
+    <ul className="space-y-1 list-none p-0 mt-1">
+      {flatRoles.map((role) => (
+        <RoleListEntry
+          key={role.id}
+          role={role}
+          gameMode={gameMode}
+          roleConfigMode={roleConfigMode}
+          dimmed={true}
+          readOnly={readOnly}
+          count={getCount(role.id)}
+          disabled={disabled}
+        />
+      ))}
+    </ul>
   );
 }
 
@@ -297,141 +421,22 @@ export function RoleConfig(props: RoleConfigProps) {
                         }}
                         className="mt-2"
                       />
-                      {noResults ? (
-                        <p className="text-sm text-muted-foreground py-2">
-                          {ROLE_CONFIG_COPY.noSearchResults}
-                        </p>
-                      ) : isSearching && hasCategoryGrouping ? (
-                        // Expanded + active search + categorized: results grouped by category,
-                        // empty categories hidden.
-                        <>
-                          {searchResultsByCategory.map(
-                            ({ category, label, roles }) => (
-                              <div key={category} className="mt-4">
-                                <p className="text-xs font-semibold text-muted-foreground mb-1">
-                                  {label}
-                                </p>
-                                <ul className="space-y-1 list-none p-0">
-                                  {roles.map((role) => (
-                                    <RoleListEntry
-                                      key={role.id}
-                                      role={role}
-                                      gameMode={gameMode}
-                                      roleConfigMode={entryRoleConfigMode}
-                                      dimmed={true}
-                                      readOnly={entryReadOnly}
-                                      count={getCount(role.id)}
-                                      disabled={entryDisabled}
-                                    />
-                                  ))}
-                                </ul>
-                              </div>
-                            ),
-                          )}
-                          {uncategorizedSearchResults.length > 0 && (
-                            <div className="mt-4">
-                              <p className="text-xs font-semibold text-muted-foreground mb-1">
-                                {ROLE_CONFIG_COPY.uncategorizedLabel}
-                              </p>
-                              <ul className="space-y-1 list-none p-0">
-                                {uncategorizedSearchResults.map((role) => (
-                                  <RoleListEntry
-                                    key={role.id}
-                                    role={role}
-                                    gameMode={gameMode}
-                                    roleConfigMode={entryRoleConfigMode}
-                                    dimmed={true}
-                                    readOnly={entryReadOnly}
-                                    count={getCount(role.id)}
-                                    disabled={entryDisabled}
-                                  />
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                        </>
-                      ) : isSearching ? (
-                        // Expanded + active search + uncategorized: flat list of matching
-                        // disabled roles, dimmed.
-                        <ul className="space-y-1 list-none p-0 mt-1">
-                          {searchResults.map((role) => (
-                            <RoleListEntry
-                              key={role.id}
-                              role={role}
-                              gameMode={gameMode}
-                              roleConfigMode={entryRoleConfigMode}
-                              dimmed={true}
-                              readOnly={entryReadOnly}
-                              count={getCount(role.id)}
-                              disabled={entryDisabled}
-                            />
-                          ))}
-                        </ul>
-                      ) : hasCategoryGrouping ? (
-                        // Expanded + no search + categorized: disabled roles grouped by category.
-                        <>
-                          {disabledByCategory.map(
-                            ({ category, label, roles }) => (
-                              <div key={category} className="mt-4">
-                                <p className="text-xs font-semibold text-muted-foreground mb-1">
-                                  {label}
-                                </p>
-                                <ul className="space-y-1 list-none p-0">
-                                  {roles.map((role) => (
-                                    <RoleListEntry
-                                      key={role.id}
-                                      role={role}
-                                      gameMode={gameMode}
-                                      roleConfigMode={entryRoleConfigMode}
-                                      dimmed={true}
-                                      readOnly={entryReadOnly}
-                                      count={getCount(role.id)}
-                                      disabled={entryDisabled}
-                                    />
-                                  ))}
-                                </ul>
-                              </div>
-                            ),
-                          )}
-                          {uncategorizedDisabled.length > 0 && (
-                            <div className="mt-4">
-                              <p className="text-xs font-semibold text-muted-foreground mb-1">
-                                {ROLE_CONFIG_COPY.uncategorizedLabel}
-                              </p>
-                              <ul className="space-y-1 list-none p-0">
-                                {uncategorizedDisabled.map((role) => (
-                                  <RoleListEntry
-                                    key={role.id}
-                                    role={role}
-                                    gameMode={gameMode}
-                                    roleConfigMode={entryRoleConfigMode}
-                                    dimmed={true}
-                                    readOnly={entryReadOnly}
-                                    count={getCount(role.id)}
-                                    disabled={entryDisabled}
-                                  />
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                        </>
-                      ) : (
-                        // Expanded + no search + uncategorized: disabled roles appended flat.
-                        <ul className="space-y-1 list-none p-0 mt-1">
-                          {disabledRoles.map((role) => (
-                            <RoleListEntry
-                              key={role.id}
-                              role={role}
-                              gameMode={gameMode}
-                              roleConfigMode={entryRoleConfigMode}
-                              dimmed={true}
-                              readOnly={entryReadOnly}
-                              count={getCount(role.id)}
-                              disabled={entryDisabled}
-                            />
-                          ))}
-                        </ul>
-                      )}
+                      <ExpandedRoleList
+                        noResults={noResults}
+                        isSearching={isSearching}
+                        hasCategoryGrouping={hasCategoryGrouping}
+                        searchResultsByCategory={searchResultsByCategory}
+                        uncategorizedSearchResults={uncategorizedSearchResults}
+                        searchResults={searchResults}
+                        disabledByCategory={disabledByCategory}
+                        uncategorizedDisabled={uncategorizedDisabled}
+                        disabledRoles={disabledRoles}
+                        gameMode={gameMode}
+                        roleConfigMode={entryRoleConfigMode}
+                        readOnly={entryReadOnly}
+                        getCount={getCount}
+                        disabled={entryDisabled}
+                      />
                     </>
                   )}
                 </>
