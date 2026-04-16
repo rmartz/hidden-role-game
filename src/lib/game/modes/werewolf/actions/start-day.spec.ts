@@ -77,6 +77,7 @@ describe("WerewolfAction.StartDay — basic apply", () => {
           nominationsEnabled: false,
           trialsPerDay: 2,
           revealProtections: true,
+          showRolesOnDeath: true,
           autoRevealNightOutcome: true,
         },
       },
@@ -95,6 +96,7 @@ describe("WerewolfAction.StartDay — basic apply", () => {
         nominationsEnabled: false,
         trialsPerDay: 2,
         revealProtections: true,
+        showRolesOnDeath: true,
         autoRevealNightOutcome: false,
       },
     });

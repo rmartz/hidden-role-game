@@ -7,6 +7,7 @@ import {
   DEFAULT_WEREWOLF_TIMER_CONFIG,
 } from "@/lib/game/modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
+import type { WerewolfModeConfig } from "@/lib/game/modes/werewolf/lobby-config";
 import { extractDaytimeState, makeDaytimeGame } from "./helpers";
 import { extractVisibleDeadPlayerIds } from "../services/owner-state";
 

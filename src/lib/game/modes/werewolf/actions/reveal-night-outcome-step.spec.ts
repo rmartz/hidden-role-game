@@ -40,6 +40,7 @@ const manualRevealConfig = {
     nominationsEnabled: false,
     trialsPerDay: 2,
     revealProtections: true,
+    showRolesOnDeath: true,
     autoRevealNightOutcome: false,
   },
 } as const;
