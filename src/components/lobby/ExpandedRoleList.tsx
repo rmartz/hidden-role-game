@@ -12,8 +12,6 @@ export interface CategoryGroup {
 export interface ExpandedRoleListProps {
   isSearching: boolean;
   hasCategoryGrouping: boolean;
-  searchResultsByCategory: CategoryGroup[];
-  uncategorizedSearchResults: RoleDefinition<string, Team>[];
   searchResults: RoleDefinition<string, Team>[];
   disabledByCategory: CategoryGroup[];
   uncategorizedDisabled: RoleDefinition<string, Team>[];
@@ -30,8 +28,6 @@ export interface ExpandedRoleListProps {
 export function ExpandedRoleList({
   isSearching,
   hasCategoryGrouping,
-  searchResultsByCategory,
-  uncategorizedSearchResults,
   searchResults,
   disabledByCategory,
   uncategorizedDisabled,
@@ -43,58 +39,44 @@ export function ExpandedRoleList({
   formDisabled,
 }: ExpandedRoleListProps) {
   const noResults = isSearching && searchResults.length === 0;
-  const categorizedGroups = isSearching
-    ? searchResultsByCategory
-    : disabledByCategory;
-  const uncategorizedRoles = isSearching
-    ? uncategorizedSearchResults
-    : uncategorizedDisabled;
   const flatRoles = isSearching ? searchResults : disabledRoles;
+
+  const entryProps = (role: RoleDefinition<string, Team>) => ({
+    role,
+    gameMode,
+    roleConfigMode,
+    dimmed: true as const,
+    readOnly,
+    count: counts[role.id] ?? 0,
+    disabled: formDisabled,
+  });
 
   return noResults ? (
     <p className="text-sm text-muted-foreground py-2">
       {ROLE_CONFIG_COPY.noSearchResults}
     </p>
-  ) : hasCategoryGrouping ? (
+  ) : hasCategoryGrouping && !isSearching ? (
     <>
-      {categorizedGroups.map(({ category, label, roles }) => (
+      {disabledByCategory.map(({ category, label, roles }) => (
         <div key={category} className="mt-4">
           <p className="text-xs font-semibold text-muted-foreground mb-1">
             {label}
           </p>
           <ul className="space-y-1 list-none p-0">
             {roles.map((role) => (
-              <RoleListEntry
-                key={role.id}
-                role={role}
-                gameMode={gameMode}
-                roleConfigMode={roleConfigMode}
-                dimmed={true}
-                readOnly={readOnly}
-                count={counts[role.id] ?? 0}
-                disabled={formDisabled}
-              />
+              <RoleListEntry key={role.id} {...entryProps(role)} />
             ))}
           </ul>
         </div>
       ))}
-      {uncategorizedRoles.length > 0 && (
+      {uncategorizedDisabled.length > 0 && (
         <div className="mt-4">
           <p className="text-xs font-semibold text-muted-foreground mb-1">
             {ROLE_CONFIG_COPY.uncategorizedLabel}
           </p>
           <ul className="space-y-1 list-none p-0">
-            {uncategorizedRoles.map((role) => (
-              <RoleListEntry
-                key={role.id}
-                role={role}
-                gameMode={gameMode}
-                roleConfigMode={roleConfigMode}
-                dimmed={true}
-                readOnly={readOnly}
-                count={counts[role.id] ?? 0}
-                disabled={formDisabled}
-              />
+            {uncategorizedDisabled.map((role) => (
+              <RoleListEntry key={role.id} {...entryProps(role)} />
             ))}
           </ul>
         </div>
@@ -103,16 +85,7 @@ export function ExpandedRoleList({
   ) : (
     <ul className="space-y-1 list-none p-0 mt-1">
       {flatRoles.map((role) => (
-        <RoleListEntry
-          key={role.id}
-          role={role}
-          gameMode={gameMode}
-          roleConfigMode={roleConfigMode}
-          dimmed={true}
-          readOnly={readOnly}
-          count={counts[role.id] ?? 0}
-          disabled={formDisabled}
-        />
+        <RoleListEntry key={role.id} {...entryProps(role)} />
       ))}
     </ul>
   );

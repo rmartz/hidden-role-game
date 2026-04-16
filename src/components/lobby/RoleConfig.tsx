@@ -71,7 +71,7 @@ export function RoleConfig(props: RoleConfigProps) {
   const allRoles = Object.values(roleDefinitions);
   const categoryOrder = props.categoryOrder;
   const categoryLabels = props.categoryLabels;
-  const hasCategoryGrouping = !!categoryOrder;
+  const hasCategoryGrouping = !!categoryOrder && categoryOrder.length > 0;
   // Explicit type annotation prevents TypeScript narrowing roleConfigMode inside
   // the !isAdvanced JSX block from making it incompatible with RoleListEntryProps.
   const entryRoleConfigMode: RoleConfigMode = roleConfigMode;
@@ -109,26 +109,6 @@ export function RoleConfig(props: RoleConfigProps) {
 
   const uncategorizedDisabled = hasCategoryGrouping
     ? disabledRoles.filter(
-        (r) => !r.category || !categoryOrder.includes(r.category),
-      )
-    : [];
-
-  // Search results grouped by category — only non-empty categories are included.
-  const searchResultsByCategory = hasCategoryGrouping
-    ? categoryOrder.reduce<CategoryGroup[]>((acc, cat) => {
-        const roles = searchResults.filter((r) => r.category === cat);
-        if (roles.length > 0)
-          acc.push({
-            category: cat,
-            label: categoryLabels?.[cat] ?? cat,
-            roles,
-          });
-        return acc;
-      }, [])
-    : [];
-
-  const uncategorizedSearchResults = hasCategoryGrouping
-    ? searchResults.filter(
         (r) => !r.category || !categoryOrder.includes(r.category),
       )
     : [];
@@ -224,6 +204,7 @@ export function RoleConfig(props: RoleConfigProps) {
                     size="sm"
                     className="mt-2 w-full"
                     onClick={toggleShowAll}
+                    disabled={entryDisabled}
                   >
                     {showAll
                       ? ROLE_CONFIG_COPY.hideExtraRoles
@@ -241,12 +222,11 @@ export function RoleConfig(props: RoleConfigProps) {
                           setSearchQuery(e.target.value);
                         }}
                         className="mt-2"
+                        disabled={entryDisabled}
                       />
                       <ExpandedRoleList
                         isSearching={isSearching}
                         hasCategoryGrouping={hasCategoryGrouping}
-                        searchResultsByCategory={searchResultsByCategory}
-                        uncategorizedSearchResults={uncategorizedSearchResults}
                         searchResults={searchResults}
                         disabledByCategory={disabledByCategory}
                         uncategorizedDisabled={uncategorizedDisabled}

@@ -58,8 +58,6 @@ const SHARED = {
   formDisabled: false,
   isSearching: false,
   searchResults: [],
-  searchResultsByCategory: [],
-  uncategorizedSearchResults: [],
 };
 
 export const FlatNoSearch: Story = {
@@ -144,14 +142,6 @@ export const ActiveSearch: Story = {
     ],
     uncategorizedDisabled: [villager],
     searchResults: [seer],
-    searchResultsByCategory: [
-      {
-        category: "villager-investigation",
-        label: CATEGORY_LABELS["villager-investigation"],
-        roles: [seer],
-      },
-    ],
-    uncategorizedSearchResults: [],
   },
 };
 
@@ -164,7 +154,5 @@ export const NoResults: Story = {
     disabledByCategory: [],
     uncategorizedDisabled: [],
     searchResults: [],
-    searchResultsByCategory: [],
-    uncategorizedSearchResults: [],
   },
 };
