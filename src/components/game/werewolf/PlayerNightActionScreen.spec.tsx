@@ -3,7 +3,10 @@ import { cleanup, render } from "@testing-library/react";
 import { GameMode, GameStatus, Team } from "@/lib/types";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
 import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
-import type { WerewolfNighttimePhase } from "@/lib/game/modes/werewolf";
+import {
+  WerewolfPhase,
+  type WerewolfNighttimePhase,
+} from "@/lib/game/modes/werewolf";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { PlayerNightActionScreen } from "./PlayerNightActionScreen";
 
@@ -60,6 +63,9 @@ describe("PlayerNightActionScreen", () => {
       ],
       visibleRoleAssignments: [],
       timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
+      nominationsEnabled: true,
+      singleTrialPerDay: false,
+      revealProtections: true,
       myPlayerId: "p1",
       myRole: {
         id: WerewolfRole.Mentalist,
@@ -72,7 +78,7 @@ describe("PlayerNightActionScreen", () => {
     };
 
     const phase: WerewolfNighttimePhase = {
-      type: "Nighttime",
+      type: WerewolfPhase.Nighttime,
       startedAt: Date.now(),
       nightPhaseOrder: [WerewolfRole.Mentalist],
       currentPhaseIndex: 0,
