@@ -8,6 +8,8 @@ interface IncrementerProps {
   disabled?: boolean;
   minValue?: number;
   maxValue?: number;
+  /** Label to display instead of "0" when value is zero. */
+  zeroLabel?: string;
 }
 
 export function Incrementer({
@@ -16,6 +18,7 @@ export function Incrementer({
   disabled,
   minValue,
   maxValue,
+  zeroLabel,
 }: IncrementerProps) {
   function handleDecrement() {
     onChange("decrement");
@@ -35,7 +38,9 @@ export function Incrementer({
       >
         −
       </Button>
-      <span className="w-4 text-center text-xs">{value}</span>
+      <span className="w-4 text-center text-xs">
+        {value === 0 && zeroLabel ? zeroLabel : value}
+      </span>
       <Button
         variant="outline"
         size="icon-xs"
