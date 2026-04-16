@@ -120,16 +120,18 @@ describe("RoleConfig search", () => {
     expect(screen.getByText(roleC.name)).toBeDefined();
   });
 
-  it("filters the role list when a search query is entered", () => {
+  it("hides non-matching disabled roles when a search query is entered", () => {
     renderWithStore(<RoleConfig {...defaultProps} />);
     clickShowAll();
     const input = screen.getByPlaceholderText(
       ROLE_CONFIG_COPY.searchPlaceholder,
     );
     fireEvent.change(input, { target: { value: "Alpha" } });
+    // Enabled roles are always visible regardless of search
     expect(screen.getByText(roleA.name)).toBeDefined();
+    expect(screen.getByText(roleC.name)).toBeDefined();
+    // roleB is disabled and does not match "Alpha" → not shown
     expect(screen.queryByText(roleB.name)).toBeNull();
-    expect(screen.queryByText(roleC.name)).toBeNull();
   });
 
   it("shows the no-results message when search matches nothing", () => {
@@ -159,10 +161,10 @@ describe("RoleConfig search", () => {
     const input = screen.getByPlaceholderText(
       ROLE_CONFIG_COPY.searchPlaceholder,
     );
-    fireEvent.change(input, { target: { value: "role" } });
-    // All three roles match "role" in their IDs/descriptions; roleB is disabled
+    fireEvent.change(input, { target: { value: "tricky" } });
+    // roleB is disabled and matches "tricky" → appears in search results, dimmed
     const betaItem = screen.getByText(roleB.name).closest("li");
-    expect(betaItem?.className).toContain("text-muted-foreground");
+    expect(betaItem?.getAttribute("data-dimmed")).toBe("true");
   });
 
   it("does not dim enabled roles during search", () => {
@@ -171,9 +173,10 @@ describe("RoleConfig search", () => {
     const input = screen.getByPlaceholderText(
       ROLE_CONFIG_COPY.searchPlaceholder,
     );
-    fireEvent.change(input, { target: { value: "role" } });
+    fireEvent.change(input, { target: { value: "tricky" } });
+    // roleA is enabled and always shown at the top — never dimmed
     const alphaItem = screen.getByText(roleA.name).closest("li");
-    expect(alphaItem?.className).not.toContain("text-muted-foreground");
+    expect(alphaItem?.getAttribute("data-dimmed")).toBe("false");
   });
 
   it("clears the search query when Show fewer roles is clicked", () => {
