@@ -110,7 +110,8 @@ export function getPlayerGameState(
   const isFinished = game.status.type === GameStatus.Finished;
   const revealIds = isFinished
     ? game.roleAssignments.map((a) => a.playerId)
-    : deadPlayerIds;
+    : (config.resolveRevealDeadPlayerIds?.(game, deadPlayerIds) ??
+      deadPlayerIds);
 
   // Reveal dead players' (or all players', if game over) roles.
   const visiblePlayerIds = new Set(

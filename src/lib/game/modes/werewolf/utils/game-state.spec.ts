@@ -26,6 +26,7 @@ function makePlayingGame(
       nominationsEnabled: false,
       trialsPerDay: 1,
       revealProtections: true,
+      showRolesOnDeath: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     ...overrides,
@@ -77,6 +78,7 @@ describe("isOwnerPlaying", () => {
         nominationsEnabled: false,
         trialsPerDay: 1,
         revealProtections: true,
+        showRolesOnDeath: true,
       },
       timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     };
@@ -111,6 +113,7 @@ describe("currentTurnState", () => {
         nominationsEnabled: false,
         trialsPerDay: 1,
         revealProtections: true,
+        showRolesOnDeath: true,
       },
       timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     };
@@ -133,6 +136,7 @@ describe("currentTurnState", () => {
         nominationsEnabled: false,
         trialsPerDay: 1,
         revealProtections: true,
+        showRolesOnDeath: true,
       },
       timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     };

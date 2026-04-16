@@ -76,6 +76,7 @@ export function makeDaytimeGame(
       nominationsEnabled: false,
       trialsPerDay: 1,
       revealProtections: true,
+      showRolesOnDeath: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   };
@@ -125,6 +126,7 @@ export function makeDaytimeGameWithTrial(callerRoleId: WerewolfRole): Game {
       nominationsEnabled: false,
       trialsPerDay: 1,
       revealProtections: true,
+      showRolesOnDeath: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   };
@@ -172,6 +174,7 @@ export function makeDaytimeGameWithNominations(
       nominationsEnabled,
       trialsPerDay: 1,
       revealProtections: true,
+      showRolesOnDeath: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   };
