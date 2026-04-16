@@ -240,7 +240,7 @@ function BucketEditor({
       ) : (
         <ul className="space-y-1 list-none p-0">
           {bucket.roles.map((slot) => {
-            const roleDef = allRoles.find((r) => r.id === slot.roleId);
+            const roleDef = roleDefById.get(slot.roleId);
             return (
               <li
                 key={slot.roleId}

@@ -94,7 +94,7 @@ export const MixedUniqueness: Story = {
   },
 };
 
-export const AllUniqueBucket: Story = {
+export const AllCappedBucket: Story = {
   args: {
     buckets: [
       {
