@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { searchRoles } from "./searchRoles";
-import type { RoleDefinition, Team } from "@/lib/types";
-import { Team as TeamEnum } from "@/lib/types";
+import type { RoleDefinition } from "@/lib/types";
+import { Team } from "@/lib/types";
 
 function makeRole(
   overrides: Partial<RoleDefinition<string, Team>>,
@@ -9,7 +9,7 @@ function makeRole(
   return {
     id: "test-role",
     name: "Test Role",
-    team: TeamEnum.Good,
+    team: Team.Good,
     ...overrides,
   };
 }

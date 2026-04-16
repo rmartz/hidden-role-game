@@ -191,3 +191,40 @@ describe("RoleConfig search", () => {
     expect(screen.getByText(roleC.name)).toBeDefined();
   });
 });
+
+describe("RoleConfig expanded view", () => {
+  it("shows disabled roles as a flat list when expanded with no search (uncategorized)", () => {
+    // defaultProps has no categoryOrder; roleB is disabled
+    renderWithStore(<RoleConfig {...defaultProps} />);
+    // roleB is hidden in the collapsed view
+    expect(screen.queryByText(roleB.name)).toBeNull();
+    clickShowAll();
+    // roleB is visible in the expanded + no-search + uncategorized state
+    expect(screen.getByText(roleB.name)).toBeDefined();
+  });
+
+  it("shows only categories with matching roles during active search (categorized)", () => {
+    const categorizedProps = {
+      ...defaultProps,
+      categoryOrder: ["cat-a", "cat-b"],
+      categoryLabels: { "cat-a": "Category A", "cat-b": "Category B" },
+      roleDefinitions: {
+        // roleA and roleC are enabled (in roleBuckets), roleB is disabled
+        [roleA.id]: { ...roleA, category: "cat-a" },
+        [roleB.id]: { ...roleB, category: "cat-b" }, // matches "tricky"
+        [roleC.id]: { ...roleC, category: "cat-a" },
+      },
+    };
+    renderWithStore(<RoleConfig {...categorizedProps} />);
+    clickShowAll();
+    const input = screen.getByPlaceholderText(
+      ROLE_CONFIG_COPY.searchPlaceholder,
+    );
+    fireEvent.change(input, { target: { value: "tricky" } });
+    // roleB (cat-b) matches "tricky" → Category B heading shown
+    expect(screen.getByText("Category B")).toBeDefined();
+    // No disabled roles in cat-a match → Category A heading not shown
+    expect(screen.queryByText("Category A")).toBeNull();
+    expect(screen.getByText(roleB.name)).toBeDefined();
+  });
+});
