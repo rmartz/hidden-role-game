@@ -18,16 +18,8 @@ vi.mock("@/hooks", () => ({
   }),
 }));
 
-vi.mock("./ConfirmTargetButton", () => ({
-  ConfirmTargetButton: () => <button type="button">confirm</button>,
-}));
-
 vi.mock("./WitchInformationPanel", () => ({
   WitchInformationPanel: () => <div>witch-info</div>,
-}));
-
-vi.mock("./GroupTargetSuggestion", () => ({
-  GroupTargetSuggestion: () => <div>group-target-suggestion</div>,
 }));
 
 afterEach(() => {

@@ -117,9 +117,7 @@ export function PlayerTargetSelectionView({
           actionId: WerewolfAction.SetNightTarget,
           payload: { targetPlayerId: player.id, isSecondTarget: true },
         });
-        return;
       }
-      // Both Mentalist targets already selected — no-op (button should be disabled).
       return;
     }
 
