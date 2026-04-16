@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { PublicLobbyPlayer } from "@/server/types";
 import { GripVerticalIcon } from "lucide-react";
 import { CheckmarkCircleRegular } from "@fluentui/react-icons";
@@ -41,6 +41,70 @@ interface PlayerRowProps {
   onDragEnd?: () => void;
 }
 
+interface RenamePlayerDialogProps {
+  playerName: string;
+  disabled: boolean;
+  isPending: boolean;
+  onRename: (name: string) => void;
+}
+
+function RenamePlayerDialog({
+  playerName,
+  disabled,
+  isPending,
+  onRename,
+}: RenamePlayerDialogProps) {
+  const [renameValue, setRenameValue] = useState(playerName);
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger
+        render={
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={disabled || isPending}
+          />
+        }
+      >
+        {PLAYER_ROW_COPY.renameButton}
+      </AlertDialogTrigger>
+      <AlertDialogContent size="sm">
+        <AlertDialogHeader>
+          <AlertDialogTitle>{PLAYER_ROW_COPY.renameTitle}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {PLAYER_ROW_COPY.renameDescription}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <Input
+          value={renameValue}
+          onChange={(event) => {
+            setRenameValue(event.target.value);
+          }}
+          placeholder={PLAYER_ROW_COPY.renamePlaceholder}
+        />
+        <AlertDialogFooter>
+          <AlertDialogCancel
+            onClick={() => {
+              setRenameValue(playerName);
+            }}
+          >
+            {PLAYER_ROW_COPY.renameCancel}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            disabled={renameValue.trim() === ""}
+            onClick={() => {
+              onRename(renameValue);
+            }}
+          >
+            {PLAYER_ROW_COPY.renameConfirm}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
 export function PlayerRow({
   player,
   ownerPlayerId,
@@ -60,12 +124,6 @@ export function PlayerRow({
   onDragOver,
   onDragEnd,
 }: PlayerRowProps) {
-  const [renameValue, setRenameValue] = useState(player.name);
-
-  useEffect(() => {
-    setRenameValue(player.name);
-  }, [player.name]);
-
   return (
     <li
       className={cn("flex items-center gap-2 py-1", canDrag && "select-none")}
@@ -133,53 +191,12 @@ export function PlayerRow({
       )}
       <div className="ml-auto flex items-center gap-2 shrink-0">
         {isCurrentUser && (
-          <AlertDialog>
-            <AlertDialogTrigger
-              render={
-                <Button
-                  variant="outline"
-                  size="sm"
-                  disabled={disabled || isRenamePending}
-                />
-              }
-            >
-              {PLAYER_ROW_COPY.renameButton}
-            </AlertDialogTrigger>
-            <AlertDialogContent size="sm">
-              <AlertDialogHeader>
-                <AlertDialogTitle>
-                  {PLAYER_ROW_COPY.renameTitle}
-                </AlertDialogTitle>
-                <AlertDialogDescription>
-                  {PLAYER_ROW_COPY.renameDescription}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <Input
-                value={renameValue}
-                onChange={(event) => {
-                  setRenameValue(event.target.value);
-                }}
-                placeholder={PLAYER_ROW_COPY.renamePlaceholder}
-              />
-              <AlertDialogFooter>
-                <AlertDialogCancel
-                  onClick={() => {
-                    setRenameValue(player.name);
-                  }}
-                >
-                  {PLAYER_ROW_COPY.renameCancel}
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  disabled={renameValue.trim() === ""}
-                  onClick={() => {
-                    onRenamePlayer(renameValue);
-                  }}
-                >
-                  {PLAYER_ROW_COPY.renameConfirm}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <RenamePlayerDialog
+            playerName={player.name}
+            disabled={disabled}
+            isPending={isRenamePending}
+            onRename={onRenamePlayer}
+          />
         )}
         {isCurrentUser && showLeave && (
           <AlertDialog>
