@@ -184,10 +184,10 @@ function BucketEditor({
   const assignedRoleIds = new Set(bucket.roles.map((r) => r.roleId));
   const availableRoles = allRoles.filter((r) => !assignedRoleIds.has(r.id));
 
-  const nonUniqueSlots = bucket.roles.filter((slot) => {
-    const roleDef = allRoles.find((r) => r.id === slot.roleId);
-    return !roleDef?.unique;
-  });
+  const roleDefById = new Map(allRoles.map((r) => [r.id, r]));
+  const nonUniqueSlots = bucket.roles.filter(
+    (slot) => !roleDefById.get(slot.roleId)?.unique,
+  );
   const hasNonUniqueRoles = nonUniqueSlots.length > 0;
   const bucketIsUnique =
     hasNonUniqueRoles && nonUniqueSlots.every((s) => s.max === 1);

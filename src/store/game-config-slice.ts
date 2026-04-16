@@ -305,7 +305,10 @@ const gameConfigSlice = createSlice({
       if (!bucket || isSimpleRoleBucket(bucket)) return;
       const modeRoles = GAME_MODES[state.gameMode].roles;
       for (const slot of bucket.roles) {
-        if (modeRoles[slot.roleId]?.unique === true) continue;
+        if (modeRoles[slot.roleId]?.unique === true) {
+          slot.max = 1;
+          continue;
+        }
         if (action.payload.unique) {
           slot.max = 1;
         } else if (slot.max === 1) {
