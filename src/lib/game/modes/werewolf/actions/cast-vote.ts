@@ -34,7 +34,6 @@ export const castVoteAction: GameAction = {
     const { vote } = payload as { vote?: unknown };
     if (typeof vote !== "string" || !VALID_VOTES.includes(vote as DaytimeVote))
       return false;
-    const typedVote = vote as DaytimeVote;
     const callerRoleId = game.roleAssignments.find(
       (a) => a.playerId === callerId,
     )?.roleDefinitionId;
@@ -43,7 +42,7 @@ export const castVoteAction: GameAction = {
       callerRoleId !== undefined &&
       isWerewolfRole(callerRoleId) &&
       WEREWOLF_ROLES[callerRoleId].alwaysVotesGuilty &&
-      typedVote !== DaytimeVote.Guilty
+      (vote as DaytimeVote) !== DaytimeVote.Guilty
     )
       return false;
     // Roles with alwaysVotesInnocent must always vote innocent
@@ -51,7 +50,7 @@ export const castVoteAction: GameAction = {
       callerRoleId !== undefined &&
       isWerewolfRole(callerRoleId) &&
       WEREWOLF_ROLES[callerRoleId].alwaysVotesInnocent &&
-      typedVote !== DaytimeVote.Innocent
+      (vote as DaytimeVote) !== DaytimeVote.Innocent
     )
       return false;
     return true;
