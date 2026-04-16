@@ -130,6 +130,8 @@ export interface RoleDefinition<
   };
   /** Used to group roles in the role config UI and glossary. */
   category?: string;
+  /** Alternative names or terms this role can be found by when searching. */
+  aliases?: string[];
 }
 
 /**

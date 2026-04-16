@@ -179,6 +179,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Protect,
     preventSelfTarget: true,
+    aliases: ["healer", "medic"],
     category: WerewolfRoleCategory.VillagerProtection,
   },
   [WerewolfRole.ElusiveSeer]: {
@@ -224,6 +225,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Good,
     wakesAtNight: WakesAtNight.Never,
     targetCategory: TargetCategory.None,
+    aliases: ["gunslinger"],
     category: WerewolfRoleCategory.VillagerKilling,
   },
   [WerewolfRole.LoneWolf]: {
@@ -250,6 +252,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     awareOf: { roles: [WerewolfRole.Mason] },
     wakesAtNight: WakesAtNight.FirstNightOnly,
     targetCategory: TargetCategory.None,
+    aliases: ["brother", "freemason"],
     category: WerewolfRoleCategory.VillagerSupport,
   },
   [WerewolfRole.Mayor]: {
@@ -285,6 +288,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     awareOf: { werewolves: true },
     wakesAtNight: WakesAtNight.FirstNightOnly,
     targetCategory: TargetCategory.None,
+    aliases: ["servant", "thrall"],
     category: WerewolfRoleCategory.EvilSupport,
   },
   [WerewolfRole.Mirrorcaster]: {
@@ -389,6 +393,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Good,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Investigate,
+    aliases: ["oracle", "prophet"],
     category: WerewolfRoleCategory.VillagerInvestigation,
   },
   [WerewolfRole.Sentinel]: {
@@ -482,6 +487,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Good,
     wakesAtNight: WakesAtNight.Never,
     targetCategory: TargetCategory.None,
+    aliases: ["peasant", "town", "townsfolk"],
     category: WerewolfRoleCategory.VillagerSupport,
   },
   [WerewolfRole.Werewolf]: {
@@ -495,6 +501,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Attack,
     teamTargeting: true,
+    aliases: ["wolf", "wolves"],
     category: WerewolfRoleCategory.EvilKilling,
   },
   [WerewolfRole.Witch]: {
@@ -506,6 +513,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     team: Team.Good,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Special,
+    aliases: ["potion"],
     category: WerewolfRoleCategory.VillagerProtection,
   },
   [WerewolfRole.Wizard]: {

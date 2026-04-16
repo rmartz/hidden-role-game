@@ -3,7 +3,6 @@ export * from "./ConfirmTargetButtonView";
 export * from "./WerewolfGameScreen";
 export * from "./PlayerRoleDisplay";
 export * from "./PlayerStatusLists";
-export * from "./GroupTargetSuggestion";
 export * from "./GameOverScreen";
 export * from "./GameOverScreenView";
 export * from "./HunterRevengePanel";
