@@ -6,6 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { WEREWOLF_CONFIG_PANEL_COPY } from "./WerewolfConfigPanel.copy";
 import { WerewolfTimerConfigPanel } from "./WerewolfTimerConfigPanel";
 import { Incrementer } from "./Incrementer";
+import type { IncrementDirection } from "./Incrementer";
 
 interface WerewolfConfigPanelProps {
   timerConfig: WerewolfTimerConfig;
@@ -30,6 +31,13 @@ export function WerewolfConfigPanel({
   onTrialsPerDayChange,
   onRevealProtectionsChange,
 }: WerewolfConfigPanelProps) {
+  function handleTrialsPerDayChange(direction: IncrementDirection) {
+    if (!onTrialsPerDayChange) return;
+    onTrialsPerDayChange(
+      direction === "increment" ? trialsPerDay + 1 : trialsPerDay - 1,
+    );
+  }
+
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
@@ -49,12 +57,7 @@ export function WerewolfConfigPanel({
           minValue={0}
           maxValue={10}
           disabled={disabled ?? !onTrialsPerDayChange}
-          onChange={(direction) => {
-            if (!onTrialsPerDayChange) return;
-            onTrialsPerDayChange(
-              direction === "increment" ? trialsPerDay + 1 : trialsPerDay - 1,
-            );
-          }}
+          onChange={handleTrialsPerDayChange}
         />
         <Label>{WEREWOLF_CONFIG_PANEL_COPY.trialsPerDay}</Label>
       </div>
