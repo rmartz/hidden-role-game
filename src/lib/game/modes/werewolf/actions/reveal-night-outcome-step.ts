@@ -37,7 +37,8 @@ function resolveNextRevealStep(
 }
 
 export const revealNightOutcomeStepAction: GameAction = {
-  isValid(game: Game, callerId: string) {
+  isValid(game: Game, callerId: string, payload: unknown) {
+    void payload;
     if (!isOwnerPlaying(game, callerId)) return false;
     if (getWerewolfModeConfig(game).autoRevealNightOutcome) return false;
     const ts = currentTurnState(game);

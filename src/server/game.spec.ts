@@ -64,6 +64,7 @@ describe("validateGameStartPrerequisites", () => {
           revealProtections: false,
           hiddenRoleCount: 0,
           showRolesOnDeath: true,
+          autoRevealNightOutcome: true,
         },
         timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
       },

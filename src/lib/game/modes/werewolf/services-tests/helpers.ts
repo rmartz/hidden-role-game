@@ -8,6 +8,7 @@ import {
   DaytimeVote,
 } from "@/lib/game/modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
+import type { WerewolfModeConfig } from "@/lib/game/modes/werewolf";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import {
   extractDaytimeNightSummary,
@@ -39,7 +40,12 @@ export function makeDaytimeGame(
       WerewolfTurnState["phase"],
       { type: WerewolfPhase.Daytime }
     >["nightResolution"];
+    nightOutcomeRevealStep: Extract<
+      WerewolfTurnState["phase"],
+      { type: WerewolfPhase.Daytime }
+    >["nightOutcomeRevealStep"];
     deadPlayerIds: string[];
+    modeConfig: Partial<WerewolfModeConfig>;
   }> = {},
 ): Game {
   const turnState: WerewolfTurnState = {
@@ -48,6 +54,9 @@ export function makeDaytimeGame(
       type: WerewolfPhase.Daytime,
       startedAt: 1000,
       nightActions: overrides.nightActions ?? {},
+      ...(overrides.nightOutcomeRevealStep !== undefined
+        ? { nightOutcomeRevealStep: overrides.nightOutcomeRevealStep }
+        : {}),
       ...(overrides.nightResolution !== undefined
         ? { nightResolution: overrides.nightResolution }
         : {}),
@@ -81,6 +90,7 @@ export function makeDaytimeGame(
       hiddenRoleCount: 0,
       showRolesOnDeath: true,
       autoRevealNightOutcome: true,
+      ...(overrides.modeConfig ?? {}),
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   };

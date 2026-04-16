@@ -107,8 +107,7 @@ export const werewolfServices: GameModeServices = {
       nominationsEnabled: wwConfig.nominationsEnabled as unknown,
       trialsPerDay: wwConfig.trialsPerDay as unknown,
       revealProtections: wwConfig.revealProtections as unknown,
-      autoRevealNightOutcome: (wwConfig.autoRevealNightOutcome ??
-        true) as unknown,
+      autoRevealNightOutcome: wwConfig.autoRevealNightOutcome as unknown,
     };
   },
 };

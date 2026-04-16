@@ -79,6 +79,7 @@ describe("extractDaytimePlayerState — playerCount excludes silenced", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
       timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     };
@@ -129,6 +130,7 @@ describe("extractDaytimePlayerState — playerCount excludes silenced", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
       timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     };

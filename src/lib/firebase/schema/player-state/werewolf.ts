@@ -110,7 +110,7 @@ export function werewolfStateToFirebase(
       ? { concludedTrialsCount: state.concludedTrialsCount }
       : {}),
     revealProtections: state.revealProtections,
-    autoRevealNightOutcome: state.autoRevealNightOutcome ?? true,
+    autoRevealNightOutcome: state.autoRevealNightOutcome,
     ...(state.executionerTargetId
       ? { executionerTargetId: state.executionerTargetId }
       : {}),

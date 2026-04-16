@@ -51,6 +51,7 @@ const baseGameState: WerewolfPlayerGameState = {
   nominationsEnabled: false,
   trialsPerDay: 1,
   revealProtections: true,
+  autoRevealNightOutcome: true,
   timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
 };
 

@@ -18,13 +18,13 @@ import {
   GameTimer,
   RoleGlossaryDialog,
 } from "@/components/game";
-import { Button } from "@/components/ui/button";
 import { OwnerAdvanceCard } from "./OwnerAdvanceCard";
 import { NightOutcomeSummary } from "./NightOutcomeSummary";
 import { NominationPanel } from "./NominationPanel";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
 import { OwnerTrialPanel } from "./OwnerTrialPanel";
 import { HunterRevengePanel } from "./HunterRevengePanel";
+import { Button } from "@/components/ui/button";
 
 interface OwnerGameDayScreenProps {
   gameId: string;
@@ -88,7 +88,7 @@ export function OwnerGameDayScreen({
   );
   const revealStep = daytimePhase.nightOutcomeRevealStep ?? "all";
   const showRevealButton =
-    !(gameState.autoRevealNightOutcome ?? true) &&
+    !gameState.autoRevealNightOutcome &&
     revealStep !== "all" &&
     (hasKilledOutcome || hasStatusOutcome);
   const revealLabel =
@@ -123,17 +123,6 @@ export function OwnerGameDayScreen({
           disabled={action.isPending || hunterRevengePending || hasActiveTrial}
           icon={<WeatherMoonRegular />}
         >
-          {showRevealButton && (
-            <div className="mb-3 flex justify-center">
-              <Button
-                variant="outline"
-                onClick={handleRevealNightOutcomeStep}
-                disabled={action.isPending}
-              >
-                {revealLabel}
-              </Button>
-            </div>
-          )}
           {activeTrial && (
             <OwnerTrialPanel
               gameId={gameId}
@@ -145,6 +134,13 @@ export function OwnerGameDayScreen({
             />
           )}
         </OwnerAdvanceCard>
+        {showRevealButton && (
+          <OwnerAdvanceCard
+            label={revealLabel}
+            onAdvance={handleRevealNightOutcomeStep}
+            disabled={action.isPending}
+          />
+        )}
         <NightOutcomeSummary
           events={daytimePhase.nightResolution ?? []}
           players={gameState.players}

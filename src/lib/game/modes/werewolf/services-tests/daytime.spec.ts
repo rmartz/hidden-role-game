@@ -6,10 +6,7 @@ import {
   WerewolfRole,
   DEFAULT_WEREWOLF_TIMER_CONFIG,
 } from "@/lib/game/modes/werewolf";
-import type {
-  WerewolfTurnState,
-  WerewolfModeConfig,
-} from "@/lib/game/modes/werewolf";
+import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
 import { extractDaytimeState, makeDaytimeGame } from "./helpers";
 import { extractVisibleDeadPlayerIds } from "../services/owner-state";
 
@@ -104,6 +101,7 @@ describe("extractDaytimeNightSummary", () => {
 
   it("nightStatus omits protected entry when revealProtections is false", () => {
     const game = makeDaytimeGame({
+      modeConfig: { revealProtections: false },
       nightResolution: [
         {
           type: "killed" as const,
@@ -157,6 +155,8 @@ describe("extractDaytimeNightSummary", () => {
 
   it("hides killed and silenced outcomes from other players before reveal", () => {
     const game = makeDaytimeGame({
+      modeConfig: { autoRevealNightOutcome: false },
+      nightOutcomeRevealStep: "hidden",
       nightResolution: [
         {
           type: "killed" as const,
@@ -169,17 +169,6 @@ describe("extractDaytimeNightSummary", () => {
       ],
       deadPlayerIds: ["p2"],
     });
-    game.modeConfig = {
-      ...(game.modeConfig as WerewolfModeConfig),
-      autoRevealNightOutcome: false,
-    };
-    const turnState =
-      game.status.type === GameStatus.Playing
-        ? (game.status.turnState as WerewolfTurnState)
-        : undefined;
-    if (turnState?.phase.type === WerewolfPhase.Daytime) {
-      turnState.phase.nightOutcomeRevealStep = "hidden";
-    }
 
     const observerResult = extractDaytimeState(game, "p1");
     const killedResult = extractDaytimeState(game, "p2");
@@ -196,6 +185,8 @@ describe("extractDaytimeNightSummary", () => {
 
   it("hides newly killed players from the public dead list before reveal", () => {
     const game = makeDaytimeGame({
+      modeConfig: { autoRevealNightOutcome: false },
+      nightOutcomeRevealStep: "hidden",
       nightResolution: [
         {
           type: "killed" as const,
@@ -207,19 +198,32 @@ describe("extractDaytimeNightSummary", () => {
       ],
       deadPlayerIds: ["p2"],
     });
-    game.modeConfig = {
-      ...(game.modeConfig as WerewolfModeConfig),
-      autoRevealNightOutcome: false,
-    };
-    const turnState =
-      game.status.type === GameStatus.Playing
-        ? (game.status.turnState as WerewolfTurnState)
-        : undefined;
-    if (turnState?.phase.type === WerewolfPhase.Daytime) {
-      turnState.phase.nightOutcomeRevealStep = "hidden";
-    }
 
     expect(extractVisibleDeadPlayerIds(game, "p1")).toEqual([]);
     expect(extractVisibleDeadPlayerIds(game, "p2")).toEqual(["p2"]);
+  });
+
+  it("shows the narrator full night outcomes even before reveal", () => {
+    const game = makeDaytimeGame({
+      modeConfig: { autoRevealNightOutcome: false },
+      nightOutcomeRevealStep: "hidden",
+      nightResolution: [
+        {
+          type: "killed" as const,
+          targetPlayerId: "p2",
+          attackedBy: ["p1"],
+          protectedBy: [],
+          died: true,
+        },
+        { type: "silenced" as const, targetPlayerId: "p3" },
+      ],
+      deadPlayerIds: ["p2"],
+    });
+
+    const narratorResult = extractDaytimeState(game, "owner");
+    expect(narratorResult.nightStatus).toEqual([
+      { targetPlayerId: "p2", effect: "killed" },
+      { targetPlayerId: "p3", effect: "silenced" },
+    ]);
   });
 });

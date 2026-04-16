@@ -22,7 +22,7 @@ import {
 function resolveNightOutcomeRevealStep(game: Game): NightOutcomeRevealStep {
   const ts = currentTurnState(game);
   if (ts?.phase.type !== WerewolfPhase.Daytime) return "all";
-  if (getWerewolfModeConfig(game).autoRevealNightOutcome ?? true) return "all";
+  if (getWerewolfModeConfig(game).autoRevealNightOutcome) return "all";
   return ts.phase.nightOutcomeRevealStep ?? "hidden";
 }
 
@@ -338,8 +338,8 @@ export function extractVisibleDeadPlayerIds(
   const visible = ts.deadPlayerIds.filter(
     (playerId) => !deadThisNight.has(playerId),
   );
-  if (deadThisNight.has(callerId) && !visible.includes(callerId)) {
-    visible.push(callerId);
+  if (deadThisNight.has(callerId)) {
+    return [...visible, callerId];
   }
   return visible;
 }

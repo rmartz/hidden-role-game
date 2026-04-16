@@ -209,6 +209,7 @@ function makeNarratorGame(nominationsEnabled = false): Game {
       revealProtections: true,
       hiddenRoleCount: 0,
       showRolesOnDeath: true,
+      autoRevealNightOutcome: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   };

@@ -25,6 +25,7 @@ function makeBaseLobby(overrides: Partial<Lobby["config"]> = {}): Lobby {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
       timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
       ...overrides,
@@ -44,6 +45,7 @@ describe("updateConfig — nominationsEnabled", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
     });
 
@@ -62,6 +64,7 @@ describe("updateConfig — nominationsEnabled", () => {
           revealProtections: true,
           hiddenRoleCount: 0,
           showRolesOnDeath: true,
+          autoRevealNightOutcome: true,
         },
       }),
     );
@@ -74,6 +77,7 @@ describe("updateConfig — nominationsEnabled", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
     });
 
@@ -92,6 +96,7 @@ describe("updateConfig — nominationsEnabled", () => {
           revealProtections: true,
           hiddenRoleCount: 0,
           showRolesOnDeath: true,
+          autoRevealNightOutcome: true,
         },
       }),
     );
@@ -103,6 +108,7 @@ describe("updateConfig — nominationsEnabled", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
     });
 
@@ -123,6 +129,7 @@ describe("updateConfig — nominationsEnabled", () => {
           revealProtections: true,
           hiddenRoleCount: 0,
           showRolesOnDeath: true,
+          autoRevealNightOutcome: true,
         },
       }),
     );
@@ -145,6 +152,7 @@ describe("updateConfig — nominationsEnabled", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
     });
 
