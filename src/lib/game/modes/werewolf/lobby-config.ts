@@ -52,7 +52,6 @@ export function parseWerewolfModeConfig(
   raw: Record<string, unknown>,
 ): WerewolfModeConfig {
   // Backward-compat: old config used a boolean `singleTrialPerDay` (true = 1 trial/day).
-  // Backward-compat: old config used a boolean `singleTrialPerDay` (true = 1 trial/day).
   const legacySingleTrial =
     typeof raw["singleTrialPerDay"] === "boolean"
       ? raw["singleTrialPerDay"]

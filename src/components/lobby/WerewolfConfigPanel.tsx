@@ -33,9 +33,9 @@ export function WerewolfConfigPanel({
 }: WerewolfConfigPanelProps) {
   function handleTrialsPerDayChange(direction: IncrementDirection) {
     if (!onTrialsPerDayChange) return;
-    onTrialsPerDayChange(
-      direction === "increment" ? trialsPerDay + 1 : trialsPerDay - 1,
-    );
+    const next =
+      direction === "increment" ? trialsPerDay + 1 : trialsPerDay - 1;
+    onTrialsPerDayChange(Math.max(0, next));
   }
 
   return (
