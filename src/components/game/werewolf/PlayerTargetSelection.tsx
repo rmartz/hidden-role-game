@@ -117,7 +117,9 @@ export function PlayerTargetSelection({
             isSecondTarget: true,
           },
         });
+        return;
       }
+      // Both Mentalist targets already selected — no-op (button should be disabled).
       return;
     }
 

@@ -229,6 +229,7 @@ describe("PlayerTargetSelection", () => {
       }),
     );
 
+    // null is the explicit "skip" sentinel, distinct from undefined ("no selection").
     expect(mutateMock).toHaveBeenCalledWith({
       actionId: WerewolfAction.SetNightTarget,
       payload: {
