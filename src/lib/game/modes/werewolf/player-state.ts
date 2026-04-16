@@ -13,6 +13,22 @@ import { TrialVerdict } from "./types";
  * only exist in Werewolf games. Components receiving Werewolf game state
  * should type their props as WerewolfPlayerGameState.
  */
+/**
+ * Returns true when no new nominations can be started — either a trial is
+ * active (no verdict yet) or the per-day trial cap has been reached.
+ */
+export function isNominationsBlocked(
+  gameState: WerewolfPlayerGameState,
+): boolean {
+  const hasActiveTrial =
+    !!gameState.activeTrial && !gameState.activeTrial.verdict;
+  return (
+    hasActiveTrial ||
+    (gameState.trialsPerDay > 0 &&
+      (gameState.concludedTrialsCount ?? 0) >= gameState.trialsPerDay)
+  );
+}
+
 export interface WerewolfPlayerGameState extends BasePlayerGameState {
   gameMode: GameMode.Werewolf;
   /** Override base timerConfig with Werewolf-specific timer fields. */

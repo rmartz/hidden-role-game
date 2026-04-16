@@ -38,6 +38,13 @@ export function applyTrialVerdict(
     ? TrialVerdict.Eliminated
     : TrialVerdict.Innocent;
 
+  // Increment the concluded-trials counter. Done here so all paths that call
+  // applyTrialVerdict (resolveTrialAction, castVoteAction auto-resolve,
+  // skipDefenseAction auto-resolve) are counted consistently.
+  if (ts.phase.type === WerewolfPhase.Daytime) {
+    ts.phase.concludedTrialsCount = (ts.phase.concludedTrialsCount ?? 0) + 1;
+  }
+
   if (eliminated) {
     const { defendantId } = activeTrial;
     if (!ts.deadPlayerIds.includes(defendantId)) {
@@ -67,9 +74,6 @@ export const resolveTrialAction: GameAction = {
     const { activeTrial } = ts.phase;
     if (!activeTrial) return;
     applyTrialVerdict(activeTrial, ts, game);
-
-    // Increment the count of concluded trials for this day.
-    ts.phase.concludedTrialsCount = (ts.phase.concludedTrialsCount ?? 0) + 1;
 
     if (activeTrial.verdict === TrialVerdict.Eliminated) {
       const { defendantId } = activeTrial;

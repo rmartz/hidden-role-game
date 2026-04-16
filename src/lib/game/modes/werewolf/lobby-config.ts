@@ -52,22 +52,27 @@ export function parseWerewolfModeConfig(
   raw: Record<string, unknown>,
 ): WerewolfModeConfig {
   // Backward-compat: old config used a boolean `singleTrialPerDay` (true = 1 trial/day).
+  // Backward-compat: old config used a boolean `singleTrialPerDay` (true = 1 trial/day).
   const legacySingleTrial =
     typeof raw["singleTrialPerDay"] === "boolean"
       ? raw["singleTrialPerDay"]
         ? 1
         : 0
       : undefined;
+  const rawTrialsPerDay = raw["trialsPerDay"];
+  const trialsPerDay =
+    typeof rawTrialsPerDay === "number" &&
+    Number.isFinite(rawTrialsPerDay) &&
+    rawTrialsPerDay >= 0
+      ? Math.floor(rawTrialsPerDay)
+      : (legacySingleTrial ?? DEFAULT_WEREWOLF_MODE_CONFIG.trialsPerDay);
   return {
     gameMode: GameMode.Werewolf,
     nominationsEnabled:
       typeof raw["nominationsEnabled"] === "boolean"
         ? raw["nominationsEnabled"]
         : DEFAULT_WEREWOLF_MODE_CONFIG.nominationsEnabled,
-    trialsPerDay:
-      typeof raw["trialsPerDay"] === "number"
-        ? raw["trialsPerDay"]
-        : (legacySingleTrial ?? DEFAULT_WEREWOLF_MODE_CONFIG.trialsPerDay),
+    trialsPerDay,
     revealProtections:
       typeof raw["revealProtections"] === "boolean"
         ? raw["revealProtections"]

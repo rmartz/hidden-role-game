@@ -56,7 +56,9 @@ export function WerewolfConfigPanel({
           value={trialsPerDay}
           minValue={0}
           maxValue={10}
-          disabled={disabled ?? !onTrialsPerDayChange}
+          disabled={
+            disabled === true || !onTrialsPerDayChange ? true : undefined
+          }
           onChange={handleTrialsPerDayChange}
           zeroLabel={WEREWOLF_CONFIG_PANEL_COPY.trialsPerDayUnlimited}
         />

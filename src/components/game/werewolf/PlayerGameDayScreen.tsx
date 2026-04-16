@@ -10,6 +10,7 @@ import {
   WEREWOLF_ROLE_CATEGORY_ORDER,
 } from "@/lib/game/modes/werewolf/roles";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { isNominationsBlocked } from "@/lib/game/modes/werewolf/player-state";
 import { getPlayerName } from "@/lib/player";
 import { GameTimer, RoleGlossaryDialog } from "@/components/game";
 import { NominationPanel } from "./NominationPanel";
@@ -48,12 +49,7 @@ export function PlayerGameDayScreen({
         .filter((r) => r !== undefined)
     : Object.values(modeConfig.roles);
 
-  const hasActiveTrial =
-    !!gameState.activeTrial && !gameState.activeTrial.verdict;
-  const nominationsBlocked =
-    hasActiveTrial ||
-    (gameState.trialsPerDay > 0 &&
-      (gameState.concludedTrialsCount ?? 0) >= gameState.trialsPerDay);
+  const nominationsBlocked = isNominationsBlocked(gameState);
 
   return (
     <div className="p-5 max-w-lg mx-auto">

@@ -11,6 +11,7 @@ import {
   WEREWOLF_ROLE_CATEGORY_ORDER,
 } from "@/lib/game/modes/werewolf/roles";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { isNominationsBlocked } from "@/lib/game/modes/werewolf/player-state";
 import { useGameAction } from "@/hooks";
 import {
   GameRolesList,
@@ -68,10 +69,7 @@ export function OwnerGameDayScreen({
   const modeConfig = GAME_MODES[gameState.gameMode];
   const activeTrial = daytimePhase.activeTrial;
   const hasActiveTrial = !!activeTrial && !activeTrial.verdict;
-  const nominationsBlocked =
-    hasActiveTrial ||
-    (gameState.trialsPerDay > 0 &&
-      (gameState.concludedTrialsCount ?? 0) >= gameState.trialsPerDay);
+  const nominationsBlocked = isNominationsBlocked(gameState);
   const hunterRevengePending = !!gameState.hunterRevengePlayerId;
   const glossaryRoles = gameState.rolesInPlay?.length
     ? gameState.rolesInPlay
