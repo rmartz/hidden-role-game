@@ -132,6 +132,8 @@ export interface RoleDefinition<
   category?: string;
   /** Alternative names or terms this role can be found by when searching. */
   aliases?: string[];
+  /** Roles that wake alone with unique individual mechanics — multiple copies would break narrator UX. */
+  unique?: true;
 }
 
 /**

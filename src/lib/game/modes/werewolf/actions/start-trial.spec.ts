@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { GameMode } from "@/lib/types";
-import { WerewolfPhase } from "../types";
+import { WerewolfPhase, TrialPhase, DaytimeVote } from "../types";
 import type { WerewolfTurnState, WerewolfDaytimePhase } from "../types";
 import { WerewolfRole } from "../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
@@ -44,7 +44,7 @@ describe("WerewolfAction.StartTrial — basic apply", () => {
         };
       }
     ).turnState.phase;
-    expect(phase.activeTrial.phase).toBe("defense");
+    expect(phase.activeTrial.phase).toBe(TrialPhase.Defense);
   });
 
   it("auto-casts guilty vote for Village Idiot player", () => {
@@ -67,7 +67,7 @@ describe("WerewolfAction.StartTrial — basic apply", () => {
     ).turnState.phase;
     expect(phase.activeTrial.votes).toContainEqual({
       playerId: "p2",
-      vote: "guilty",
+      vote: DaytimeVote.Guilty,
     });
   });
 
@@ -137,7 +137,7 @@ describe("WerewolfAction.StartTrial — basic apply", () => {
     ).turnState.phase;
     expect(phase.activeTrial.votes).toContainEqual({
       playerId: "p2",
-      vote: "innocent",
+      vote: DaytimeVote.Innocent,
     });
   });
 });
@@ -229,7 +229,7 @@ describe("WerewolfAction.StartTrial — silenced, hypnotized, and auto-resolve",
     ).turnState.phase;
     expect(phase.activeTrial.votes).toContainEqual({
       playerId: "p2",
-      vote: "guilty",
+      vote: DaytimeVote.Guilty,
     });
   });
 
@@ -260,7 +260,7 @@ describe("WerewolfAction.StartTrial — silenced, hypnotized, and auto-resolve",
         };
       }
     ).turnState.phase;
-    expect(phase.activeTrial.phase).toBe("defense");
+    expect(phase.activeTrial.phase).toBe(TrialPhase.Defense);
     expect(phase.activeTrial.verdict).toBeUndefined();
   });
 });

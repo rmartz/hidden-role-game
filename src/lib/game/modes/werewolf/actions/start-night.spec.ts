@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 import type { Game } from "@/lib/types";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "../timer-config";
-import { WerewolfPhase, TrialVerdict } from "../types";
+import { WerewolfPhase, TrialVerdict, TrialPhase } from "../types";
 import type {
   WerewolfTurnState,
   WerewolfNighttimePhase,
@@ -69,7 +69,7 @@ describe("WerewolfAction.StartNight", () => {
           activeTrial: {
             defendantId: "p2",
             startedAt: 2000,
-            phase: "voting",
+            phase: TrialPhase.Voting,
             votes: [],
           },
         },
@@ -89,7 +89,7 @@ describe("WerewolfAction.StartNight", () => {
           activeTrial: {
             defendantId: "p2",
             startedAt: 2000,
-            phase: "voting",
+            phase: TrialPhase.Voting,
             votes: [],
             verdict: TrialVerdict.Innocent,
           },

@@ -35,6 +35,20 @@ describe("extractPlayerNightState (Mentalist targeting)", () => {
     expect(result.mySecondNightTarget).toBeUndefined();
   });
 
+  it("myNightTarget is absent and mySecondNightTarget is set in intermediate deselect state", () => {
+    const nightActions = {
+      [WerewolfRole.Mentalist]: { secondTargetPlayerId: "p3" },
+    };
+    const game = makeMentalistGame(
+      WerewolfRole.Werewolf,
+      WerewolfRole.Villager,
+      nightActions,
+    );
+    const result = extractPlayerNightState(game, "p1", mentalistRole, []);
+    expect(result.myNightTarget).toBeUndefined();
+    expect(result.mySecondNightTarget).toBe("p3");
+  });
+
   it("investigationResult is absent before narrator reveals it", () => {
     const nightActions = {
       [WerewolfRole.Mentalist]: {

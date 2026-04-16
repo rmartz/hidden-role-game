@@ -62,6 +62,7 @@ export function RoleConfigEntry(props: RoleConfigEntryProps) {
             onChange={handleCountChange}
             disabled={props.disabled}
             minValue={0}
+            maxValue={role.unique ? 1 : undefined}
           />
         </div>
       ) : count > 0 ? (

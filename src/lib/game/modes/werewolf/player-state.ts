@@ -5,8 +5,8 @@ import type {
   BasePlayerGameState,
   NightStatusEntry,
 } from "@/server/types/game";
-import type { AnyNightAction, DaytimeVote } from "./types";
-import { TrialVerdict } from "./types";
+import type { AnyNightAction } from "./types";
+import { TrialVerdict, TrialPhase, DaytimeVote } from "./types";
 
 /**
  * Werewolf-specific extension of PlayerGameState. Includes all fields that
@@ -92,7 +92,7 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   activeTrial?: {
     defendantId: string;
     startedAt: number;
-    phase: "defense" | "voting";
+    phase: TrialPhase;
     voteStartedAt?: number;
     myVote?: DaytimeVote;
     voteCount: number;
