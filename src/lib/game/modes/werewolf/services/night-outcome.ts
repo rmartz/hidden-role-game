@@ -1,8 +1,14 @@
 import type { NightResolutionEvent, WerewolfDaytimePhase } from "../types";
 
+export enum NightOutcomeEffect {
+  Killed = "killed",
+  Silenced = "silenced",
+  Hypnotized = "hypnotized",
+}
+
 export interface AffectedPlayerOutcome {
   playerId: string;
-  effect: "killed" | "silenced" | "hypnotized";
+  effect: NightOutcomeEffect;
 }
 
 /**
@@ -19,11 +25,20 @@ export function getOrderedAffectedPlayers(
   for (const event of nightResolution) {
     let outcome: AffectedPlayerOutcome | undefined;
     if (event.type === "killed" && event.died) {
-      outcome = { playerId: event.targetPlayerId, effect: "killed" };
+      outcome = {
+        playerId: event.targetPlayerId,
+        effect: NightOutcomeEffect.Killed,
+      };
     } else if (event.type === "silenced") {
-      outcome = { playerId: event.targetPlayerId, effect: "silenced" };
+      outcome = {
+        playerId: event.targetPlayerId,
+        effect: NightOutcomeEffect.Silenced,
+      };
     } else if (event.type === "hypnotized") {
-      outcome = { playerId: event.targetPlayerId, effect: "hypnotized" };
+      outcome = {
+        playerId: event.targetPlayerId,
+        effect: NightOutcomeEffect.Hypnotized,
+      };
     }
     if (outcome && !seen.has(outcome.playerId)) {
       seen.add(outcome.playerId);

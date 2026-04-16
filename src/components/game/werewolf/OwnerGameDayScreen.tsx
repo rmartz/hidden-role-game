@@ -92,6 +92,10 @@ export function OwnerGameDayScreen({
     (p) => !revealedPlayerIds.has(p.playerId),
   );
   const isManualReveal = !gameState.autoRevealNightOutcome;
+  const nextToRevealName =
+    nextToReveal &&
+    (gameState.players.find((p) => p.id === nextToReveal.playerId)?.name ??
+      nextToReveal.playerId);
 
   return (
     <div className="p-5 max-w-4xl mx-auto">
@@ -131,19 +135,15 @@ export function OwnerGameDayScreen({
             />
           )}
         </OwnerAdvanceCard>
-        {isManualReveal && nextToReveal && (
+        {isManualReveal && nextToReveal && nextToRevealName && (
           <OwnerAdvanceCard
-            label={WEREWOLF_COPY.narrator.revealNextOutcome(
-              gameState.players.find((p) => p.id === nextToReveal.playerId)
-                ?.name ?? nextToReveal.playerId,
-            )}
+            label={WEREWOLF_COPY.narrator.revealNextOutcome(nextToRevealName)}
             onAdvance={handleRevealNightOutcomeStep}
             disabled={action.isPending}
           >
             <p className="text-sm text-muted-foreground mb-2">
               {WEREWOLF_COPY.narrator.nextOutcomeHint(
-                gameState.players.find((p) => p.id === nextToReveal.playerId)
-                  ?.name ?? nextToReveal.playerId,
+                nextToRevealName,
                 WEREWOLF_COPY.narrator.revealEffect[nextToReveal.effect],
               )}
             </p>

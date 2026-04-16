@@ -20,11 +20,7 @@ export interface WerewolfModeConfig {
    * A safety check prevents removing the last bad or neutral role.
    */
   hiddenRoleCount: number;
-  /** When true, night outcomes are revealed to all players immediately at day start. */
-  /**
-   * When true, elimination/status outcomes (killed/silenced/hypnotized) are
-   * revealed to all players immediately at day start.
-   */
+  /** When true, elimination/status outcomes are revealed to all players immediately at day start. */
   autoRevealNightOutcome: boolean;
 }
 

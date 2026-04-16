@@ -1,4 +1,5 @@
 import { WerewolfWinner } from "./utils/win-condition";
+import { NightOutcomeEffect } from "./services/night-outcome";
 
 /**
  * User-facing copy strings for the Werewolf game mode.
@@ -203,10 +204,10 @@ export const WEREWOLF_COPY = {
     nextOutcomeHint: (name: string, effect: string) =>
       `Next: ${name} (${effect})`,
     revealEffect: {
-      killed: "killed",
-      silenced: "silenced",
-      hypnotized: "hypnotized",
-    },
+      [NightOutcomeEffect.Killed]: "killed",
+      [NightOutcomeEffect.Silenced]: "silenced",
+      [NightOutcomeEffect.Hypnotized]: "hypnotized",
+    } as Record<NightOutcomeEffect, string>,
   },
   mirrorcaster: {
     protectMode: "Protect Mode — Choose a player to shield.",

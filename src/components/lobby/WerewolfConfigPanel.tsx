@@ -113,7 +113,7 @@ export function WerewolfConfigPanel({
         <Switch
           id="auto-reveal-night-outcome"
           checked={autoRevealNightOutcome}
-          disabled={disabled ?? !onAutoRevealNightOutcomeChange}
+          disabled={disabled === true || !onAutoRevealNightOutcomeChange}
           onCheckedChange={onAutoRevealNightOutcomeChange}
         />
         <Label htmlFor="auto-reveal-night-outcome">

@@ -132,3 +132,4 @@ export {
   getOrderedAffectedPlayerIds,
 } from "./night-outcome";
 export type { AffectedPlayerOutcome } from "./night-outcome";
+export { NightOutcomeEffect } from "./night-outcome";
