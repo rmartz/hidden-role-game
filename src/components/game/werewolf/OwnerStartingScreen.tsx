@@ -1,13 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
-import { GameStatus } from "@/lib/types";
+import { GameStatus, GameMode } from "@/lib/types";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { GameRolesList, PlayersRoleList } from "@/components/game";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RoleLabel } from "@/components/RoleLabel";
 import { GAME_MODES } from "@/lib/game/modes";
-import { GameMode } from "@/lib/types";
 import { OwnerHeader } from "./OwnerHeader";
 import { OWNER_STARTING_SCREEN_COPY } from "./OwnerStartingScreen.copy";
 
@@ -37,13 +36,10 @@ export function OwnerStartingScreen({
     onTimerTrigger: onStart,
   };
 
-  const hiddenRoles = useMemo(() => {
-    const roles = GAME_MODES[GameMode.Werewolf].roles;
-    return (gameState.hiddenRoleIds ?? []).flatMap((roleId) => {
-      const role = roles[roleId];
-      return role ? [role] : [];
-    });
-  }, [gameState.hiddenRoleIds]);
+  const hiddenRoles = (gameState.hiddenRoleIds ?? []).flatMap((roleId) => {
+    const role = GAME_MODES[GameMode.Werewolf].roles[roleId];
+    return role ? [role] : [];
+  });
 
   return (
     <div className="p-5 max-w-4xl mx-auto">
@@ -70,9 +66,9 @@ export function OwnerStartingScreen({
               {OWNER_STARTING_SCREEN_COPY.hiddenRolesDescription}
             </p>
             <div className="flex flex-wrap gap-2">
-              {hiddenRoles.map((role) => (
+              {hiddenRoles.map((role, i) => (
                 <RoleLabel
-                  key={role.id}
+                  key={`${role.id}-${String(i)}`}
                   role={role}
                   gameMode={GameMode.Werewolf}
                   showTeam
