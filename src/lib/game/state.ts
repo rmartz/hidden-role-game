@@ -216,21 +216,18 @@ export function buildGame(
 
   const hiddenCount = config.resolveHiddenRoleCount?.(resolvedModeConfig) ?? 0;
 
-  let roleAssignments;
-  let hiddenRoleIds: string[] | undefined;
-
-  if (hiddenCount > 0) {
-    const result = assignRolesFromBucketsWithHidden(
-      rolePlayers,
-      roleBuckets,
-      hiddenCount,
-      roles,
-    );
-    roleAssignments = result.assignments;
-    hiddenRoleIds = result.hiddenRoleIds;
-  } else {
-    roleAssignments = assignRolesFromBuckets(rolePlayers, roleBuckets);
-  }
+  const { assignments: roleAssignments, hiddenRoleIds } =
+    hiddenCount > 0
+      ? assignRolesFromBucketsWithHidden(
+          rolePlayers,
+          roleBuckets,
+          hiddenCount,
+          roles,
+        )
+      : {
+          assignments: assignRolesFromBuckets(rolePlayers, roleBuckets),
+          hiddenRoleIds: undefined,
+        };
 
   const ownerPlayer = ownerPlayerId ? getPlayer(players, ownerPlayerId) : null;
   const gamePlayers: GamePlayer[] = [
