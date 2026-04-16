@@ -133,10 +133,7 @@ export function RoleConfig(props: RoleConfigProps) {
       )
     : [];
 
-  // Props forwarded to RoleListEntry at every call site — computed once to avoid
-  // repeating the readOnly discriminant inline.
-  const entryReadOnly = props.readOnly;
-  const entryDisabled = !props.readOnly ? props.disabled : false;
+  const entryDisabled = readOnly ? false : props.disabled;
   const counts = readOnly ? readOnlyCounts : roleCounts;
 
   function toggleShowAll() {
@@ -213,7 +210,7 @@ export function RoleConfig(props: RoleConfigProps) {
                     gameMode={gameMode}
                     roleConfigMode={entryRoleConfigMode}
                     dimmed={false}
-                    readOnly={entryReadOnly}
+                    readOnly={readOnly}
                     count={counts[role.id] ?? 0}
                     disabled={entryDisabled}
                   />
@@ -256,7 +253,7 @@ export function RoleConfig(props: RoleConfigProps) {
                         disabledRoles={disabledRoles}
                         gameMode={gameMode}
                         roleConfigMode={entryRoleConfigMode}
-                        readOnly={entryReadOnly}
+                        readOnly={readOnly}
                         counts={counts}
                         formDisabled={entryDisabled}
                       />
