@@ -48,14 +48,27 @@ export function makeDaytimeGame(
     modeConfig: Partial<WerewolfModeConfig>;
   }> = {},
 ): Game {
+  const modeConfig: WerewolfModeConfig = {
+    gameMode: GameMode.Werewolf,
+    nominationsEnabled: false,
+    trialsPerDay: 1,
+    revealProtections: true,
+    showRolesOnDeath: true,
+    hiddenRoleCount: 0,
+    autoRevealNightOutcome: true,
+    ...(overrides.modeConfig ?? {}),
+  };
+  const nightOutcomeRevealStep =
+    overrides.nightOutcomeRevealStep ??
+    (modeConfig.autoRevealNightOutcome ? undefined : "hidden");
   const turnState: WerewolfTurnState = {
     turn: 2,
     phase: {
       type: WerewolfPhase.Daytime,
       startedAt: 1000,
       nightActions: overrides.nightActions ?? {},
-      ...(overrides.nightOutcomeRevealStep !== undefined
-        ? { nightOutcomeRevealStep: overrides.nightOutcomeRevealStep }
+      ...(nightOutcomeRevealStep !== undefined
+        ? { nightOutcomeRevealStep }
         : {}),
       ...(overrides.nightResolution !== undefined
         ? { nightResolution: overrides.nightResolution }
@@ -82,16 +95,7 @@ export function makeDaytimeGame(
     configuredRoleBuckets: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner",
-    modeConfig: {
-      gameMode: GameMode.Werewolf,
-      nominationsEnabled: false,
-      trialsPerDay: 1,
-      revealProtections: true,
-      hiddenRoleCount: 0,
-      showRolesOnDeath: true,
-      autoRevealNightOutcome: true,
-      ...(overrides.modeConfig ?? {}),
-    },
+    modeConfig,
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   };
 }

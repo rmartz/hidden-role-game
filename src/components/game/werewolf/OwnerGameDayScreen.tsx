@@ -18,13 +18,13 @@ import {
   GameTimer,
   RoleGlossaryDialog,
 } from "@/components/game";
+import { Button } from "@/components/ui/button";
 import { OwnerAdvanceCard } from "./OwnerAdvanceCard";
 import { NightOutcomeSummary } from "./NightOutcomeSummary";
 import { NominationPanel } from "./NominationPanel";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
 import { OwnerTrialPanel } from "./OwnerTrialPanel";
 import { HunterRevengePanel } from "./HunterRevengePanel";
-import { Button } from "@/components/ui/button";
 
 interface OwnerGameDayScreenProps {
   gameId: string;
