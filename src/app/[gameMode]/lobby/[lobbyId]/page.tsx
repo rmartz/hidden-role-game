@@ -11,6 +11,7 @@ import {
   useLobbyQuery,
   useLobbyWebSocket,
   useRemovePlayer,
+  useRenamePlayer,
   useReorderPlayers,
   useStartGame,
   useToggleReady,
@@ -112,6 +113,7 @@ export default function LobbyPage() {
       void queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
     }
   });
+  const renameMutation = useRenamePlayer(lobbyId, myPlayerId);
 
   const startGameMutation = useStartGame(lobbyId);
   const toggleReadyMutation = useToggleReady(lobbyId);
@@ -196,6 +198,12 @@ export default function LobbyPage() {
           {removeMutation.error.message}
         </p>
       )}
+      {renameMutation.error && (
+        <p className="text-destructive text-sm mb-3">
+          {LOBBY_PAGE_COPY.errorPrefix}
+          {renameMutation.error.message}
+        </p>
+      )}
 
       {configPanel}
 
@@ -228,6 +236,10 @@ export default function LobbyPage() {
               transferOwnerMutation.mutate(playerId);
             });
           }}
+          onRenamePlayer={(playerName) => {
+            renameMutation.mutate(playerName);
+          }}
+          isRenamePending={renameMutation.isPending}
           onToggleReady={() => {
             toggleReadyMutation.mutate();
           }}
