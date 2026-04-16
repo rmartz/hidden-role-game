@@ -90,7 +90,6 @@ function RoleListEntry({
 }
 
 interface ExpandedRoleListProps {
-  noResults: boolean;
   isSearching: boolean;
   hasCategoryGrouping: boolean;
   searchResultsByCategory: CategoryGroup[];
@@ -107,7 +106,6 @@ interface ExpandedRoleListProps {
 }
 
 function ExpandedRoleList({
-  noResults,
   isSearching,
   hasCategoryGrouping,
   searchResultsByCategory,
@@ -122,6 +120,7 @@ function ExpandedRoleList({
   getCount,
   disabled,
 }: ExpandedRoleListProps) {
+  const noResults = isSearching && searchResults.length === 0;
   if (noResults) {
     return (
       <p className="text-sm text-muted-foreground py-2">
@@ -252,8 +251,6 @@ export function RoleConfig(props: RoleConfigProps) {
   const searchResults = isSearching
     ? searchRoles(disabledRoles, searchQuery, { categoryLabels })
     : [];
-
-  const noResults = isSearching && searchResults.length === 0;
 
   // Disabled roles grouped by category — used in both expanded + no-search + categorized
   // and expanded + active search + categorized states.
@@ -422,7 +419,6 @@ export function RoleConfig(props: RoleConfigProps) {
                         className="mt-2"
                       />
                       <ExpandedRoleList
-                        noResults={noResults}
                         isSearching={isSearching}
                         hasCategoryGrouping={hasCategoryGrouping}
                         searchResultsByCategory={searchResultsByCategory}
