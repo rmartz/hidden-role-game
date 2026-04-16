@@ -2,9 +2,9 @@ import { describe, it, expect } from "vitest";
 import { parseWerewolfModeConfig } from "./lobby-config";
 
 describe("parseWerewolfModeConfig", () => {
-  it("parses showRolesOnDeath when provided", () => {
-    const parsed = parseWerewolfModeConfig({ showRolesOnDeath: false });
+  it("defaults showRolesOnDeath when the field is absent", () => {
+    const parsed = parseWerewolfModeConfig({});
 
-    expect(parsed.showRolesOnDeath).toBe(false);
+    expect(parsed.showRolesOnDeath).toBe(true);
   });
 });

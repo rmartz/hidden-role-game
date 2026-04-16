@@ -1,6 +1,5 @@
 import { describe, it, expect } from "vitest";
 import { GameMode } from "@/lib/types";
-import type { Game } from "@/lib/types";
 import { WerewolfPhase, TrialVerdict } from "../types";
 import type { WerewolfTurnState, WerewolfDaytimePhase } from "../types";
 import { WerewolfRole } from "../roles";
@@ -386,7 +385,7 @@ describe("WerewolfAction.NominatePlayer — trialsPerDay", () => {
         revealProtections: true,
         showRolesOnDeath: true,
       },
-    } as Partial<Game>);
+    });
     expect(action.isValid(game, "p2", { defendantId: "p4" })).toBe(false);
   });
 
@@ -399,8 +398,9 @@ describe("WerewolfAction.NominatePlayer — trialsPerDay", () => {
         nominationsEnabled: true,
         trialsPerDay: 2,
         revealProtections: true,
+        showRolesOnDeath: true,
       },
-    } as Partial<Game>);
+    });
     expect(action.isValid(game, "p2", { defendantId: "p4" })).toBe(true);
   });
 
@@ -413,8 +413,9 @@ describe("WerewolfAction.NominatePlayer — trialsPerDay", () => {
         nominationsEnabled: true,
         trialsPerDay: 2,
         revealProtections: true,
+        showRolesOnDeath: true,
       },
-    } as Partial<Game>);
+    });
     expect(action.isValid(game, "p2", { defendantId: "p4" })).toBe(false);
   });
 
@@ -429,7 +430,7 @@ describe("WerewolfAction.NominatePlayer — trialsPerDay", () => {
         revealProtections: true,
         showRolesOnDeath: true,
       },
-    } as Partial<Game>);
+    });
     expect(action.isValid(game, "p2", { defendantId: "p4" })).toBe(true);
   });
 });
