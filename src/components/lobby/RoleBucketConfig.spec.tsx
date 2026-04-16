@@ -10,7 +10,7 @@ afterEach(cleanup);
 const mockRoles: RoleDefinition<string, Team>[] = [
   { id: "villager", name: "Villager", team: Team.Good },
   { id: "werewolf", name: "Werewolf", team: Team.Bad },
-  { id: "seer", name: "Seer", team: Team.Good },
+  { id: "seer", name: "Seer", team: Team.Good, unique: true },
 ];
 
 const defaultProps = {
@@ -23,7 +23,7 @@ const defaultProps = {
   onSetBucketPlayerCount: vi.fn(),
   onAddRole: vi.fn(),
   onRemoveRole: vi.fn(),
-  onSetUnique: vi.fn(),
+  onSetBucketUnique: vi.fn(),
 };
 
 describe("RoleBucketConfigView", () => {
@@ -110,5 +110,39 @@ describe("RoleBucketConfigView", () => {
     for (const button of buttons) {
       expect(button.getAttribute("disabled")).not.toBeNull();
     }
+  });
+
+  it("shows the Unique badge on inherently unique roles", () => {
+    const buckets: AdvancedRoleBucket[] = [
+      { playerCount: 2, roles: [{ roleId: "seer", max: 1 }] },
+    ];
+    render(<RoleBucketConfigView {...defaultProps} buckets={buckets} />);
+    expect(screen.getByText(ROLE_BUCKET_CONFIG_COPY.uniqueBadge)).toBeDefined();
+  });
+
+  it("does not show the Unique badge on non-unique roles", () => {
+    const buckets: AdvancedRoleBucket[] = [
+      { playerCount: 2, roles: [{ roleId: "villager" }] },
+    ];
+    render(<RoleBucketConfigView {...defaultProps} buckets={buckets} />);
+    expect(screen.queryByText(ROLE_BUCKET_CONFIG_COPY.uniqueBadge)).toBeNull();
+  });
+
+  it("shows the bucket-level unique toggle when non-unique roles are present", () => {
+    const buckets: AdvancedRoleBucket[] = [
+      { playerCount: 2, roles: [{ roleId: "villager" }] },
+    ];
+    render(<RoleBucketConfigView {...defaultProps} buckets={buckets} />);
+    expect(
+      screen.getByText(ROLE_BUCKET_CONFIG_COPY.bucketUnique),
+    ).toBeDefined();
+  });
+
+  it("does not show the bucket-level unique toggle when only inherently unique roles are in the bucket", () => {
+    const buckets: AdvancedRoleBucket[] = [
+      { playerCount: 1, roles: [{ roleId: "seer", max: 1 }] },
+    ];
+    render(<RoleBucketConfigView {...defaultProps} buckets={buckets} />);
+    expect(screen.queryByText(ROLE_BUCKET_CONFIG_COPY.bucketUnique)).toBeNull();
   });
 });

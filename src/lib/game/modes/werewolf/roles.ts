@@ -138,6 +138,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "Each night, after the Werewolves have chosen their target, the Altruist learns which players are under attack. They may intercept one attack, saving the original target — but dying in their place. If the Altruist is themselves under attack, their intercept is ignored.",
     team: Team.Good,
+    unique: true,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Special,
     category: WerewolfRoleCategory.VillagerProtection,
@@ -149,6 +150,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "Each night the Bodyguard chooses one player to protect. If that player is attacked, they survive. The Bodyguard cannot protect the same player on consecutive nights.",
     team: Team.Good,
+    unique: true,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Protect,
     preventRepeatTarget: true,
@@ -161,6 +163,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "Each night the Chupacabra targets one player. The attack only succeeds if the target is a Werewolf — once all Werewolves have been eliminated, the Chupacabra can attack anyone. The Chupacabra is neutral and has its own win condition.",
     team: Team.Neutral,
+    unique: true,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Attack,
     category: WerewolfRoleCategory.NeutralKilling,
@@ -172,6 +175,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "Each night the Doctor chooses one player to protect from werewolf attacks. Unlike the Bodyguard, the Doctor can protect the same player on consecutive nights but cannot protect themselves.",
     team: Team.Good,
+    unique: true,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Protect,
     preventSelfTarget: true,
@@ -185,6 +189,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "On the first night only, the Elusive Seer wakes and is shown the identity of every plain Villager in the game. They have no night action on subsequent nights.",
     team: Team.Good,
+    unique: true,
     wakesAtNight: WakesAtNight.FirstNightOnly,
     targetCategory: TargetCategory.None,
     category: WerewolfRoleCategory.VillagerInvestigation,
@@ -207,6 +212,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "Once per game, the Exposer may target a player at night. When confirmed, that player's role is publicly revealed to all players at the start of the following day. This ability can only be used once.",
     team: Team.Good,
+    unique: true,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Special,
     oncePerGame: true,
@@ -269,6 +275,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "Each night the Mentalist selects two players and the Narrator privately reveals whether those two players are on the same team. The Mentalist does not learn either player's specific role — only whether their teams match.",
     team: Team.Good,
+    unique: true,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Investigate,
     dualTargetInvestigate: true,
@@ -281,6 +288,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "The Minion knows who the Werewolves are, but the Werewolves do not know the Minion's identity. The Minion wins with the Werewolves. The Seer's investigation reveals the Minion is not a Werewolf.",
     team: Team.Bad,
+    unique: true,
     awareOf: { werewolves: true },
     wakesAtNight: WakesAtNight.FirstNightOnly,
     targetCategory: TargetCategory.None,
@@ -295,6 +303,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "The Mirrorcaster starts in Protect mode, choosing a player to shield each night. When the protected player is attacked, the Mirrorcaster gains a charge and switches to Attack mode. Their next night action is an attack (blockable by protections). After attacking, the charge is consumed and they return to Protect mode.",
     team: Team.Good,
+    unique: true,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Special,
     preventSelfTarget: true,
@@ -307,6 +316,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "Each night, the Mortician targets one player to attack. If the target is protected, the attack fails and the Mortician receives a 'not a Werewolf' result regardless of the target's actual role. Once the Mortician successfully kills a Werewolf, their ability ends and they no longer wake at night.",
     team: Team.Good,
+    unique: true,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Attack,
     preventSelfTarget: true,
@@ -319,6 +329,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "Each night the Mummy selects a player to hypnotize. The following day, the hypnotized player's trial vote is automatically cast to match the Mummy's vote. The Mummy selects a new target each night.",
     team: Team.Good,
+    unique: true,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Special,
     category: WerewolfRoleCategory.VillagerSupport,
@@ -330,6 +341,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "Each night the Mystic Seer targets one player and the Narrator privately reveals that player's exact role — not merely whether they are a Werewolf. This is significantly more powerful than the Seer.",
     team: Team.Good,
+    unique: true,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Investigate,
     revealsExactRole: true,
@@ -353,6 +365,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "Each night the One-Eyed Seer targets one player and the Narrator privately reveals whether that player is a Werewolf (same check as the Seer). However, if the investigation reveals a Werewolf, the One-Eyed Seer is locked on — they cannot investigate any new players until that Werewolf is eliminated.",
     team: Team.Good,
+    unique: true,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Investigate,
     category: WerewolfRoleCategory.VillagerInvestigation,
@@ -376,6 +389,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "The Priest selects a player to place a ward on. The ward persists until the protected player is attacked, at which point the ward is consumed and the Priest selects a new target on the following night.",
     team: Team.Good,
+    unique: true,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Protect,
     category: WerewolfRoleCategory.VillagerProtection,
@@ -387,6 +401,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "Each night the Seer targets one player and the Narrator privately reveals whether that player is a Werewolf. Only Werewolves and Wolf Cubs are detected — other evil roles such as the Minion are not.",
     team: Team.Good,
+    unique: true,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Investigate,
     aliases: ["oracle", "prophet"],
@@ -399,6 +414,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "The Sentinel wakes on the first night and learns the identity of the Seer. They have no night action — their role is to use this knowledge to protect the Seer during daytime discussion without revealing them to the Werewolves.",
     team: Team.Good,
+    unique: true,
     awareOf: { roles: [WerewolfRole.Seer] },
     wakesAtNight: WakesAtNight.FirstNightOnly,
     targetCategory: TargetCategory.None,
@@ -411,6 +427,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "Each night the Spellcaster targets one player who is silenced the following day and cannot speak. The Spellcaster cannot target the same player on consecutive nights.",
     team: Team.Good,
+    unique: true,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Special,
     preventRepeatTarget: true,
@@ -457,6 +474,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "Starting on the second night, the Vigilante may choose one player to eliminate. If the target is protected, the kill is blocked. If the Vigilante successfully kills a Good-team player, the Vigilante also dies at the start of the following day.",
     team: Team.Good,
+    unique: true,
     wakesAtNight: WakesAtNight.AfterFirstNight,
     targetCategory: TargetCategory.Attack,
     preventSelfTarget: true,
@@ -507,6 +525,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "After all other night roles have acted, the Witch may use her special ability: either protect the player who was attacked that night, or attack any other player. This ability can only be used once per game.",
     team: Team.Good,
+    unique: true,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Special,
     aliases: ["potion"],
@@ -519,6 +538,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     description:
       "The Wizard wins with the Werewolves but operates alone — the wolves don't know the Wizard, and the Wizard doesn't know the wolves. Each night the Wizard targets one player and the Narrator privately reveals whether that player is the Seer. The Seer's own investigation returns 'not a Werewolf' for the Wizard.",
     team: Team.Bad,
+    unique: true,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Investigate,
     checksForSeer: true,

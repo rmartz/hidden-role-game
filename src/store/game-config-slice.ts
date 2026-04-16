@@ -258,12 +258,24 @@ const gameConfigSlice = createSlice({
 
     addRoleToBucket(
       state,
-      action: PayloadAction<{ bucketIndex: number; roleId: string }>,
+      action: PayloadAction<{
+        bucketIndex: number;
+        roleId: string;
+        /** True if the bucket is currently in all-unique mode — cap this slot too. */
+        bucketIsUnique?: boolean;
+      }>,
     ) {
       const bucket = state.roleBuckets[action.payload.bucketIndex];
       if (!bucket || isSimpleRoleBucket(bucket)) return;
       if (!bucket.roles.some((r) => r.roleId === action.payload.roleId)) {
-        bucket.roles.push({ roleId: action.payload.roleId });
+        const roleDef = GAME_MODES[state.gameMode].roles[action.payload.roleId];
+        const isInherentlyUnique = roleDef?.unique === true;
+        const shouldCap =
+          isInherentlyUnique || action.payload.bucketIsUnique === true;
+        bucket.roles.push({
+          roleId: action.payload.roleId,
+          ...(shouldCap ? { max: 1 } : {}),
+        });
         state.isValid = recomputeIsValid(state);
         state.syncVersion++;
       }
@@ -282,26 +294,30 @@ const gameConfigSlice = createSlice({
       state.syncVersion++;
     },
 
-    setBucketRoleUnique(
+    setBucketUnique(
       state,
       action: PayloadAction<{
         bucketIndex: number;
-        roleId: string;
         unique: boolean;
       }>,
     ) {
       const bucket = state.roleBuckets[action.payload.bucketIndex];
       if (!bucket || isSimpleRoleBucket(bucket)) return;
-      const slot = bucket.roles.find((r) => r.roleId === action.payload.roleId);
-      if (slot) {
+      const modeRoles = GAME_MODES[state.gameMode].roles;
+      for (const slot of bucket.roles) {
+        // Inherently unique roles are always capped at 1 — skip the toggle logic.
+        if (modeRoles[slot.roleId]?.unique === true) {
+          slot.max = 1;
+          continue;
+        }
         if (action.payload.unique) {
           slot.max = 1;
-        } else {
+        } else if (slot.max === 1) {
           delete slot.max;
         }
-        state.isValid = recomputeIsValid(state);
-        state.syncVersion++;
       }
+      state.isValid = recomputeIsValid(state);
+      state.syncVersion++;
     },
 
     setPlayerCount(state, action: PayloadAction<number>) {
@@ -388,7 +404,7 @@ export const {
   setBucketName,
   addRoleToBucket,
   removeRoleFromBucket,
-  setBucketRoleUnique,
+  setBucketUnique,
   setPlayerCount,
   setShowConfigToPlayers,
   setShowRolesInPlay,
