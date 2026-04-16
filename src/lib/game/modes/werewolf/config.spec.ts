@@ -42,24 +42,24 @@ describe("WEREWOLF_CONFIG.defaultRoleCount", () => {
   });
 
   it("6-8 role-players get 1 werewolf", () => {
-    for (const rolePlayers of [6, 7, 8]) {
-      const buckets = WEREWOLF_CONFIG.defaultRoleCount(rolePlayers);
+    for (const numRolePlayers of [6, 7, 8]) {
+      const buckets = WEREWOLF_CONFIG.defaultRoleCount(numRolePlayers);
       const counts = bucketCounts(buckets);
       expect(counts[WerewolfRole.Werewolf]).toBe(1);
     }
   });
 
   it("9-11 role-players get 2 werewolves", () => {
-    for (const rolePlayers of [9, 10, 11]) {
-      const buckets = WEREWOLF_CONFIG.defaultRoleCount(rolePlayers);
+    for (const numRolePlayers of [9, 10, 11]) {
+      const buckets = WEREWOLF_CONFIG.defaultRoleCount(numRolePlayers);
       const counts = bucketCounts(buckets);
       expect(counts[WerewolfRole.Werewolf]).toBe(2);
     }
   });
 
   it("12-14 role-players get 3 werewolves", () => {
-    for (const rolePlayers of [12, 13, 14]) {
-      const buckets = WEREWOLF_CONFIG.defaultRoleCount(rolePlayers);
+    for (const numRolePlayers of [12, 13, 14]) {
+      const buckets = WEREWOLF_CONFIG.defaultRoleCount(numRolePlayers);
       const counts = bucketCounts(buckets);
       expect(counts[WerewolfRole.Werewolf]).toBe(3);
     }

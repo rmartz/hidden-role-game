@@ -83,7 +83,7 @@ function isSafeToHide(
   roles: Record<string, RoleDefinition<string, Team>>,
 ): boolean {
   const candidateRoleId = roleIds[candidateIndex];
-  if (!candidateRoleId) return true; // Defensive: unknown index
+  if (!candidateRoleId) return true; // candidateIndex is out of bounds (should not happen given caller uses findIndex)
   const candidateRole = roles[candidateRoleId];
   if (!candidateRole) return true; // Unknown role — allow removal
   const isBadOrNeutral =
@@ -140,8 +140,7 @@ export function assignRolesFromBucketsWithHidden(
         "Cannot hide any more roles: removing any remaining role would leave no Bad or Neutral roles in the game.",
       );
     }
-    const spliced = remainingRoleIds.splice(candidateIndex, 1);
-    const hidden = spliced[0];
+    const [hidden] = remainingRoleIds.splice(candidateIndex, 1);
     if (!hidden) throw new Error("Unexpected empty splice result");
     hiddenRoleIds.push(hidden);
   }

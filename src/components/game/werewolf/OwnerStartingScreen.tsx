@@ -37,15 +37,13 @@ export function OwnerStartingScreen({
     onTimerTrigger: onStart,
   };
 
-  const werewolfRoles = GAME_MODES[GameMode.Werewolf].roles;
-  const hiddenRoleInfos = useMemo(
-    () =>
-      (gameState.hiddenRoleIds ?? []).flatMap((roleId) => {
-        const role = werewolfRoles[roleId];
-        return role ? [{ id: role.id, name: role.name, team: role.team }] : [];
-      }),
-    [gameState.hiddenRoleIds, werewolfRoles],
-  );
+  const hiddenRoleInfos = useMemo(() => {
+    const roles = GAME_MODES[GameMode.Werewolf].roles;
+    return (gameState.hiddenRoleIds ?? []).flatMap((roleId) => {
+      const role = roles[roleId];
+      return role ? [{ id: role.id, name: role.name, team: role.team }] : [];
+    });
+  }, [gameState.hiddenRoleIds]);
 
   return (
     <div className="p-5 max-w-4xl mx-auto">
