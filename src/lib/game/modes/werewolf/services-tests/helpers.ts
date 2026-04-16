@@ -1,6 +1,7 @@
 import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 import type { Game } from "@/lib/types";
 import {
+  NightOutcomeRevealStep,
   WerewolfPhase,
   WerewolfRole,
   DEFAULT_WEREWOLF_TIMER_CONFIG,
@@ -60,7 +61,9 @@ export function makeDaytimeGame(
   };
   const nightOutcomeRevealStep =
     overrides.nightOutcomeRevealStep ??
-    (modeConfig.autoRevealNightOutcome ? undefined : "hidden");
+    (modeConfig.autoRevealNightOutcome
+      ? undefined
+      : NightOutcomeRevealStep.Hidden);
   const turnState: WerewolfTurnState = {
     turn: 2,
     phase: {

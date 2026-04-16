@@ -3,11 +3,11 @@ import { GameMode, GameStatus } from "@/lib/types";
 import type { Game } from "@/lib/types";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
 import type { WerewolfDaytimePhase, WerewolfTurnState } from "../types";
-import { WerewolfPhase } from "../types";
+import { NightOutcomeRevealStep, WerewolfPhase } from "../types";
 import { makePlayingGame, dayTurnState } from "./test-helpers";
 
 function makeDaytimeTurnState(
-  revealStep: "hidden" | "killed" | "all",
+  revealStep: NightOutcomeRevealStep,
   nightResolution: NonNullable<
     Extract<
       WerewolfTurnState["phase"],
@@ -49,7 +49,7 @@ describe("WerewolfAction.RevealNightOutcomeStep", () => {
 
   it("advances from hidden to killed when there are killed outcomes", () => {
     const game = makePlayingGame(
-      makeDaytimeTurnState("hidden", [
+      makeDaytimeTurnState(NightOutcomeRevealStep.Hidden, [
         {
           type: "killed",
           targetPlayerId: "p2",
@@ -69,12 +69,14 @@ describe("WerewolfAction.RevealNightOutcomeStep", () => {
       },
     );
     action.apply(game, null, "owner-1");
-    expect(getDaytimePhase(game).nightOutcomeRevealStep).toBe("killed");
+    expect(getDaytimePhase(game).nightOutcomeRevealStep).toBe(
+      NightOutcomeRevealStep.Killed,
+    );
   });
 
   it("advances from killed to all", () => {
     const game = makePlayingGame(
-      makeDaytimeTurnState("killed", [
+      makeDaytimeTurnState(NightOutcomeRevealStep.Killed, [
         { type: "silenced", targetPlayerId: "p3" },
       ]),
       {
@@ -88,12 +90,14 @@ describe("WerewolfAction.RevealNightOutcomeStep", () => {
       },
     );
     action.apply(game, null, "owner-1");
-    expect(getDaytimePhase(game).nightOutcomeRevealStep).toBe("all");
+    expect(getDaytimePhase(game).nightOutcomeRevealStep).toBe(
+      NightOutcomeRevealStep.All,
+    );
   });
 
   it("jumps from hidden to all when only status outcomes exist", () => {
     const game = makePlayingGame(
-      makeDaytimeTurnState("hidden", [
+      makeDaytimeTurnState(NightOutcomeRevealStep.Hidden, [
         { type: "silenced", targetPlayerId: "p3" },
       ]),
       {
@@ -107,6 +111,8 @@ describe("WerewolfAction.RevealNightOutcomeStep", () => {
       },
     );
     action.apply(game, null, "owner-1");
-    expect(getDaytimePhase(game).nightOutcomeRevealStep).toBe("all");
+    expect(getDaytimePhase(game).nightOutcomeRevealStep).toBe(
+      NightOutcomeRevealStep.All,
+    );
   });
 });

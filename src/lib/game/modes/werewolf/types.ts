@@ -99,7 +99,11 @@ export enum TrialPhase {
   Defense = "defense",
   Voting = "voting",
 }
-export type NightOutcomeRevealStep = "hidden" | "killed" | "all";
+export enum NightOutcomeRevealStep {
+  Hidden = "hidden",
+  Killed = "killed",
+  All = "all",
+}
 
 export enum TrialVerdict {
   Eliminated = "eliminated",

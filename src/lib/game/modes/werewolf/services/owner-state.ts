@@ -6,9 +6,8 @@ import { getWerewolfModeConfig } from "../lobby-config";
 import type {
   AltruistInterceptedNightResolutionEvent,
   AnyNightAction,
-  NightOutcomeRevealStep,
 } from "../types";
-import { TrialVerdict, WerewolfPhase } from "../types";
+import { NightOutcomeRevealStep, TrialVerdict, WerewolfPhase } from "../types";
 import { SMITE_PHASE_KEY, OLD_MAN_TIMER_KEY } from "../utils";
 import { getSilencedPlayerIds, getHypnotizedPlayerId } from "../utils";
 import { currentTurnState } from "../utils/game-state";
@@ -21,17 +20,22 @@ import {
 
 function resolveNightOutcomeRevealStep(game: Game): NightOutcomeRevealStep {
   const ts = currentTurnState(game);
-  if (ts?.phase.type !== WerewolfPhase.Daytime) return "all";
-  if (getWerewolfModeConfig(game).autoRevealNightOutcome) return "all";
-  return ts.phase.nightOutcomeRevealStep ?? "hidden";
+  if (ts?.phase.type !== WerewolfPhase.Daytime)
+    return NightOutcomeRevealStep.All;
+  if (getWerewolfModeConfig(game).autoRevealNightOutcome)
+    return NightOutcomeRevealStep.All;
+  return ts.phase.nightOutcomeRevealStep ?? NightOutcomeRevealStep.Hidden;
 }
 
 function canPublicSeeKilledOutcomes(step: NightOutcomeRevealStep): boolean {
-  return step === "killed" || step === "all";
+  return (
+    step === NightOutcomeRevealStep.Killed ||
+    step === NightOutcomeRevealStep.All
+  );
 }
 
 function canPublicSeeStatusOutcomes(step: NightOutcomeRevealStep): boolean {
-  return step === "all";
+  return step === NightOutcomeRevealStep.All;
 }
 
 /** Extracts nightActions from the current turnState, if present. */

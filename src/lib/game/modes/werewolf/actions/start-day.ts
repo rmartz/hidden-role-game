@@ -1,6 +1,10 @@
 import { GameStatus, Team } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
-import { WerewolfPhase, isTeamNightAction } from "../types";
+import {
+  NightOutcomeRevealStep,
+  WerewolfPhase,
+  isTeamNightAction,
+} from "../types";
 import type {
   AttackNightResolutionEvent,
   NightAction,
@@ -285,8 +289,8 @@ export const startDayAction: GameAction = {
       ts.wolfCubDied === true || didWolfCubDie(newDeadIds, game);
     const nightOutcomeRevealStep = getWerewolfModeConfig(game)
       .autoRevealNightOutcome
-      ? "all"
-      : "hidden";
+      ? NightOutcomeRevealStep.All
+      : NightOutcomeRevealStep.Hidden;
     game.status = {
       type: GameStatus.Playing,
       turnState: {

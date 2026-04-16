@@ -5,7 +5,7 @@ import type {
   WerewolfDaytimePhase,
   WerewolfNighttimePhase,
 } from "../types";
-import { WerewolfPhase } from "../types";
+import { NightOutcomeRevealStep, WerewolfPhase } from "../types";
 import { WerewolfRole } from "../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
 import { WerewolfWinner } from "../utils/win-condition";
@@ -74,7 +74,7 @@ describe("WerewolfAction.StartDay — basic apply", () => {
     action.apply(game, null, "owner-1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
     const phase = ts.phase as WerewolfDaytimePhase;
-    expect(phase.nightOutcomeRevealStep).toBe("all");
+    expect(phase.nightOutcomeRevealStep).toBe(NightOutcomeRevealStep.All);
   });
 
   it("sets nightOutcomeRevealStep to hidden when auto reveal is disabled", () => {
@@ -90,7 +90,7 @@ describe("WerewolfAction.StartDay — basic apply", () => {
     action.apply(game, null, "owner-1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
     const phase = ts.phase as WerewolfDaytimePhase;
-    expect(phase.nightOutcomeRevealStep).toBe("hidden");
+    expect(phase.nightOutcomeRevealStep).toBe(NightOutcomeRevealStep.Hidden);
   });
 
   it("resolves night actions and adds killed players to deadPlayerIds", () => {

@@ -37,6 +37,18 @@ describe("WerewolfAction.SmitePlayer", () => {
       expect(action.isValid(game, "owner-1", { playerId: "p2" })).toBe(false);
     });
 
+    it("returns true during daytime trial when player is not already pending smited", () => {
+      const ds = makeDayState();
+      (ds.phase as WerewolfDaytimePhase).activeTrial = {
+        defendantId: "p3",
+        startedAt: 1000,
+        phase: "defense",
+        votes: [],
+      };
+      const game = makePlayingGame(ds);
+      expect(action.isValid(game, "owner-1", { playerId: "p2" })).toBe(true);
+    });
+
     it("returns false for non-owner caller", () => {
       const game = makePlayingGame(makeNightState());
       expect(action.isValid(game, "p1", { playerId: "p2" })).toBe(false);
@@ -59,6 +71,20 @@ describe("WerewolfAction.SmitePlayer", () => {
       expect(action.isValid(game, "owner-1", { playerId: "owner-1" })).toBe(
         false,
       );
+    });
+
+    it("returns false when phase type is not daytime or nighttime", () => {
+      const malformedState = {
+        turn: 1,
+        phase: {
+          type: "unknown-phase",
+          startedAt: 1000,
+          nightActions: {},
+        },
+        deadPlayerIds: [],
+      } as unknown as WerewolfTurnState;
+      const game = makePlayingGame(malformedState);
+      expect(action.isValid(game, "owner-1", { playerId: "p2" })).toBe(false);
     });
   });
 

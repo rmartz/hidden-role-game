@@ -3,7 +3,13 @@
 import { useCallback, useMemo } from "react";
 import { WeatherMoonRegular } from "@fluentui/react-icons";
 import { GAME_MODES } from "@/lib/game/modes";
-import { WerewolfPhase, WerewolfAction } from "@/lib/game/modes/werewolf";
+import {
+  NightOutcomeRevealStep,
+  WerewolfAction,
+  WerewolfPhase,
+  hasKilledOutcome,
+  hasStatusOutcome,
+} from "@/lib/game/modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import {
@@ -80,19 +86,16 @@ export function OwnerGameDayScreen({
         .map((r) => modeConfig.roles[r.id])
         .filter((r) => r !== undefined)
     : Object.values(modeConfig.roles);
-  const hasKilledOutcome = (daytimePhase.nightResolution ?? []).some(
-    (event) => event.type === "killed" && event.died,
-  );
-  const hasStatusOutcome = (daytimePhase.nightResolution ?? []).some(
-    (event) => event.type === "silenced" || event.type === "hypnotized",
-  );
-  const revealStep = daytimePhase.nightOutcomeRevealStep ?? "all";
+  const killedOutcomeExists = hasKilledOutcome(daytimePhase);
+  const statusOutcomeExists = hasStatusOutcome(daytimePhase);
+  const revealStep =
+    daytimePhase.nightOutcomeRevealStep ?? NightOutcomeRevealStep.All;
   const showRevealButton =
     !gameState.autoRevealNightOutcome &&
-    revealStep !== "all" &&
-    (hasKilledOutcome || hasStatusOutcome);
+    revealStep !== NightOutcomeRevealStep.All &&
+    (killedOutcomeExists || statusOutcomeExists);
   const revealLabel =
-    revealStep === "hidden" && hasKilledOutcome
+    revealStep === NightOutcomeRevealStep.Hidden && killedOutcomeExists
       ? WEREWOLF_COPY.narrator.revealNightEliminations
       : WEREWOLF_COPY.narrator.revealNightStatus;
 
