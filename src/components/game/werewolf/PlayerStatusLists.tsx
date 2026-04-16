@@ -9,6 +9,8 @@ interface PlayerStatusListsProps {
   gameOwnerId?: string;
   /** Known role assignments — if provided, role is shown next to eliminated players. */
   roleAssignments?: VisibleTeammate[];
+  /** The current user's player ID — if provided, "(You)" is shown next to their row. */
+  myPlayerId?: string;
 }
 
 export function PlayerStatusLists({
@@ -16,6 +18,7 @@ export function PlayerStatusLists({
   deadPlayerIds,
   gameOwnerId,
   roleAssignments,
+  myPlayerId,
 }: PlayerStatusListsProps) {
   const deadSet = new Set(deadPlayerIds);
   const filtered = players.filter((p) => p.id !== gameOwnerId);
@@ -47,7 +50,14 @@ export function PlayerStatusLists({
           ) : (
             <ul className="text-sm space-y-1">
               {activePlayers.map((p) => (
-                <li key={p.id}>{p.name}</li>
+                <li key={p.id}>
+                  {p.name}
+                  {p.id === myPlayerId && (
+                    <span className="text-xs text-muted-foreground ml-1">
+                      {WEREWOLF_COPY.playerLists.youSuffix}
+                    </span>
+                  )}
+                </li>
               ))}
             </ul>
           )}

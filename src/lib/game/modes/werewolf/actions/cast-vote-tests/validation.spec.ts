@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { WerewolfPhase, type WerewolfTurnState } from "../../types";
+import {
+  WerewolfPhase,
+  TrialVerdict,
+  type WerewolfTurnState,
+} from "../../types";
 import { WerewolfRole } from "../../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "../index";
 import { makePlayingGame, dayTurnState } from "../test-helpers";
@@ -9,7 +13,7 @@ function makeDayStateWithTrial(
     defendantId: string;
     votes: { playerId: string; vote: "guilty" | "innocent" }[];
     deadPlayerIds: string[];
-    verdict: "eliminated" | "innocent";
+    verdict: TrialVerdict;
   }> = {},
 ): WerewolfTurnState {
   return {
@@ -68,7 +72,7 @@ describe("WerewolfAction.CastVote — isValid", () => {
 
   it("returns false when verdict already set", () => {
     const game = makePlayingGame(
-      makeDayStateWithTrial({ verdict: "eliminated" }),
+      makeDayStateWithTrial({ verdict: TrialVerdict.Eliminated }),
     );
     expect(action.isValid(game, "p2", { vote: "guilty" })).toBe(false);
   });

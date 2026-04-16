@@ -1,6 +1,7 @@
 import { GameMode } from "@/lib/types";
 import type { Team } from "@/lib/types";
 import type { AnyNightAction, DaytimeVote } from "@/lib/game/modes/werewolf";
+import { TrialVerdict } from "@/lib/game/modes/werewolf";
 import type { NightStatusEntry } from "@/server/types";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import {
@@ -41,18 +42,20 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
     myVote?: DaytimeVote;
     voteCount: number;
     playerCount: number;
-    verdict?: "eliminated" | "innocent";
+    verdict?: TrialVerdict;
     mustVoteGuilty?: boolean;
     mustVoteInnocent?: boolean;
     voteResults?: { playerName: string; vote: DaytimeVote }[];
     eliminatedRole?: { id: string; name: string; team: string };
   };
   nominationsEnabled: boolean;
-  singleTrialPerDay: boolean;
+  trialsPerDay: number;
+  concludedTrialsCount?: number;
   revealProtections: boolean;
   executionerTargetId?: string;
   nominations?: { defendantId: string; nominatorIds: string[] }[];
   myNominatedDefendantId?: string;
+  pendingSmitePlayerIds?: string[];
   mirrorcasterCharged?: boolean;
   oneEyedSeerLockedTargetId?: string;
   elusiveSeerVillagerIds?: string[];
@@ -99,7 +102,10 @@ export function werewolfStateToFirebase(
     ...(state.isHypnotized ? { isHypnotized: true } : {}),
     ...(state.activeTrial ? { activeTrial: state.activeTrial } : {}),
     nominationsEnabled: state.nominationsEnabled,
-    singleTrialPerDay: state.singleTrialPerDay,
+    trialsPerDay: state.trialsPerDay,
+    ...(state.concludedTrialsCount
+      ? { concludedTrialsCount: state.concludedTrialsCount }
+      : {}),
     revealProtections: state.revealProtections,
     ...(state.executionerTargetId
       ? { executionerTargetId: state.executionerTargetId }
@@ -107,6 +113,9 @@ export function werewolfStateToFirebase(
     ...(state.nominations?.length ? { nominations: state.nominations } : {}),
     ...(state.myNominatedDefendantId
       ? { myNominatedDefendantId: state.myNominatedDefendantId }
+      : {}),
+    ...(state.pendingSmitePlayerIds?.length
+      ? { pendingSmitePlayerIds: state.pendingSmitePlayerIds }
       : {}),
     ...(state.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
     ...(state.oneEyedSeerLockedTargetId
@@ -133,7 +142,10 @@ export function werewolfStateFromFirebase(
     ...baseStateFromFirebase(raw),
     gameMode: GameMode.Werewolf,
     nominationsEnabled: raw.nominationsEnabled,
-    singleTrialPerDay: raw.singleTrialPerDay,
+    trialsPerDay: raw.trialsPerDay,
+    ...(raw.concludedTrialsCount
+      ? { concludedTrialsCount: raw.concludedTrialsCount }
+      : {}),
     revealProtections: raw.revealProtections,
     ...(raw.nightActions ? { nightActions: raw.nightActions } : {}),
     ...(raw.myNightTargetSkipped
@@ -173,6 +185,9 @@ export function werewolfStateFromFirebase(
     ...(raw.nominations?.length ? { nominations: raw.nominations } : {}),
     ...(raw.myNominatedDefendantId
       ? { myNominatedDefendantId: raw.myNominatedDefendantId }
+      : {}),
+    ...(raw.pendingSmitePlayerIds?.length
+      ? { pendingSmitePlayerIds: raw.pendingSmitePlayerIds }
       : {}),
     ...(raw.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
     ...(raw.oneEyedSeerLockedTargetId

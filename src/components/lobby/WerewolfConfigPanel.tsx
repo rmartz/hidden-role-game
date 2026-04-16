@@ -5,30 +5,39 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { WEREWOLF_CONFIG_PANEL_COPY } from "./WerewolfConfigPanel.copy";
 import { WerewolfTimerConfigPanel } from "./WerewolfTimerConfigPanel";
+import { Incrementer } from "./Incrementer";
+import type { IncrementDirection } from "./Incrementer";
 
 interface WerewolfConfigPanelProps {
   timerConfig: WerewolfTimerConfig;
   nominationEnabled: boolean;
-  singleTrialPerDay: boolean;
+  trialsPerDay: number;
   revealProtections: boolean;
   disabled?: boolean;
   onWerewolfTimerConfigChange?: (config: WerewolfTimerConfig) => void;
   onNominationEnabledChange?: (value: boolean) => void;
-  onSingleTrialPerDayChange?: (value: boolean) => void;
+  onTrialsPerDayChange?: (value: number) => void;
   onRevealProtectionsChange?: (value: boolean) => void;
 }
 
 export function WerewolfConfigPanel({
   timerConfig,
   nominationEnabled,
-  singleTrialPerDay,
+  trialsPerDay,
   revealProtections,
   disabled,
   onWerewolfTimerConfigChange,
   onNominationEnabledChange,
-  onSingleTrialPerDayChange,
+  onTrialsPerDayChange,
   onRevealProtectionsChange,
 }: WerewolfConfigPanelProps) {
+  function handleTrialsPerDayChange(direction: IncrementDirection) {
+    if (!onTrialsPerDayChange) return;
+    const next =
+      direction === "increment" ? trialsPerDay + 1 : trialsPerDay - 1;
+    onTrialsPerDayChange(Math.max(0, next));
+  }
+
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
@@ -43,15 +52,17 @@ export function WerewolfConfigPanel({
         </Label>
       </div>
       <div className="flex items-center gap-2">
-        <Switch
-          id="single-trial-per-day"
-          checked={singleTrialPerDay}
-          disabled={disabled ?? !onSingleTrialPerDayChange}
-          onCheckedChange={onSingleTrialPerDayChange}
+        <Incrementer
+          value={trialsPerDay}
+          minValue={0}
+          maxValue={10}
+          disabled={
+            disabled === true || !onTrialsPerDayChange ? true : undefined
+          }
+          onChange={handleTrialsPerDayChange}
+          zeroLabel={WEREWOLF_CONFIG_PANEL_COPY.trialsPerDayUnlimited}
         />
-        <Label htmlFor="single-trial-per-day">
-          {WEREWOLF_CONFIG_PANEL_COPY.singleTrialPerDay}
-        </Label>
+        <Label>{WEREWOLF_CONFIG_PANEL_COPY.trialsPerDay}</Label>
       </div>
       <div className="flex items-center gap-2">
         <Switch

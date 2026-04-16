@@ -50,7 +50,7 @@ export function makeMentalistGame(
     modeConfig: {
       gameMode: GameMode.Werewolf,
       nominationsEnabled: false,
-      singleTrialPerDay: true,
+      trialsPerDay: 1,
       revealProtections: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,

@@ -44,7 +44,7 @@ const baseLobby: PublicLobby = {
     modeConfig: {
       gameMode: GameMode.Werewolf,
       nominationsEnabled: true,
-      singleTrialPerDay: true,
+      trialsPerDay: 1,
       revealProtections: true,
     },
   },
