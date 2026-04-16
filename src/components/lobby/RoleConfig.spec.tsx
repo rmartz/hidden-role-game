@@ -65,6 +65,29 @@ function clickShowAll() {
   fireEvent.click(screen.getByText(ROLE_CONFIG_COPY.showAllRoles));
 }
 
+describe("RoleConfig collapsed view", () => {
+  it("shows only enabled roles (flat list) regardless of category grouping", () => {
+    const categoryedProps = {
+      ...defaultProps,
+      categoryOrder: ["cat-a", "cat-b"],
+      categoryLabels: { "cat-a": "Category A", "cat-b": "Category B" },
+      roleDefinitions: {
+        [roleA.id]: { ...roleA, category: "cat-a" },
+        [roleB.id]: { ...roleB, category: "cat-b" },
+        [roleC.id]: { ...roleC, category: "cat-a" },
+      },
+    };
+    renderWithStore(<RoleConfig {...categoryedProps} />);
+    // Enabled roles (A and C) are visible; disabled role (B) is hidden
+    expect(screen.getByText(roleA.name)).toBeDefined();
+    expect(screen.queryByText(roleB.name)).toBeNull();
+    expect(screen.getByText(roleC.name)).toBeDefined();
+    // No category headings are rendered in the collapsed view
+    expect(screen.queryByText("Category A")).toBeNull();
+    expect(screen.queryByText("Category B")).toBeNull();
+  });
+});
+
 describe("RoleConfig search", () => {
   it("does not render the search input before Show all roles is clicked", () => {
     renderWithStore(<RoleConfig {...defaultProps} />);
