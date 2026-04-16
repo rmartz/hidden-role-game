@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { GameStatus } from "@/lib/types";
-import { WerewolfPhase } from "../types";
+import { WerewolfPhase, TrialPhase } from "../types";
 import type { WerewolfTurnState } from "../types";
 import { WerewolfRole } from "../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
@@ -179,7 +179,7 @@ describe("WerewolfAction.KillPlayer", () => {
           activeTrial: {
             defendantId: "p2",
             startedAt: 2000,
-            phase: "voting",
+            phase: TrialPhase.Voting,
             votes: [],
           },
         },

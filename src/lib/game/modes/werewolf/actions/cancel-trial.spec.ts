@@ -1,11 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { WerewolfPhase, TrialVerdict } from "../types";
+import { WerewolfPhase, TrialVerdict, TrialPhase } from "../types";
 import type { WerewolfTurnState, WerewolfDaytimePhase } from "../types";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
 import { makePlayingGame } from "./test-helpers";
 
 function makeDayStateWithTrial(
-  phase: "defense" | "voting",
+  phase: TrialPhase,
   verdict?: TrialVerdict,
 ): WerewolfTurnState {
   return {
@@ -31,18 +31,18 @@ describe("WerewolfAction.CancelTrial", () => {
 
   describe("isValid", () => {
     it("returns true during defense phase", () => {
-      const game = makePlayingGame(makeDayStateWithTrial("defense"));
+      const game = makePlayingGame(makeDayStateWithTrial(TrialPhase.Defense));
       expect(action.isValid(game, "owner-1", null)).toBe(true);
     });
 
     it("returns true during voting phase", () => {
-      const game = makePlayingGame(makeDayStateWithTrial("voting"));
+      const game = makePlayingGame(makeDayStateWithTrial(TrialPhase.Voting));
       expect(action.isValid(game, "owner-1", null)).toBe(true);
     });
 
     it("returns false after verdict", () => {
       const game = makePlayingGame(
-        makeDayStateWithTrial("voting", TrialVerdict.Eliminated),
+        makeDayStateWithTrial(TrialPhase.Voting, TrialVerdict.Eliminated),
       );
       expect(action.isValid(game, "owner-1", null)).toBe(false);
     });
@@ -62,14 +62,14 @@ describe("WerewolfAction.CancelTrial", () => {
     });
 
     it("returns false for non-owner", () => {
-      const game = makePlayingGame(makeDayStateWithTrial("defense"));
+      const game = makePlayingGame(makeDayStateWithTrial(TrialPhase.Defense));
       expect(action.isValid(game, "p2", null)).toBe(false);
     });
   });
 
   describe("apply", () => {
     it("clears activeTrial entirely", () => {
-      const game = makePlayingGame(makeDayStateWithTrial("voting"));
+      const game = makePlayingGame(makeDayStateWithTrial(TrialPhase.Voting));
       action.apply(game, null, "owner-1");
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
       const phase = ts.phase as WerewolfDaytimePhase;
@@ -77,7 +77,7 @@ describe("WerewolfAction.CancelTrial", () => {
     });
 
     it("does not affect deadPlayerIds", () => {
-      const game = makePlayingGame(makeDayStateWithTrial("defense"));
+      const game = makePlayingGame(makeDayStateWithTrial(TrialPhase.Defense));
       action.apply(game, null, "owner-1");
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
       expect(ts.deadPlayerIds).toEqual([]);

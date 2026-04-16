@@ -1,11 +1,12 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import type { DaytimeVote } from "@/lib/game/modes/werewolf";
 import {
   WEREWOLF_COPY,
   WerewolfAction,
   TrialVerdict,
+  TrialPhase,
+  DaytimeVote,
 } from "@/lib/game/modes/werewolf";
 import type { PlayerGameState } from "@/server/types";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
@@ -113,7 +114,7 @@ export function TrialVotePanel({
           </p>
         )}
     </>
-  ) : activeTrial.phase === "defense" ? (
+  ) : activeTrial.phase === TrialPhase.Defense ? (
     <>
       <p className="font-semibold mb-1">
         {isDefendant
@@ -172,7 +173,7 @@ export function TrialVotePanel({
             size="sm"
             variant="default"
             onClick={() => {
-              castVote("guilty");
+              castVote(DaytimeVote.Guilty);
             }}
             className="w-32"
             disabled={action.isPending}
@@ -184,7 +185,7 @@ export function TrialVotePanel({
               size="sm"
               variant="default"
               onClick={() => {
-                castVote("innocent");
+                castVote(DaytimeVote.Innocent);
               }}
               className="w-32"
               disabled={action.isPending}

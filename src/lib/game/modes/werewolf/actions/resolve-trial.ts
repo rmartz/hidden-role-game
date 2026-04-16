@@ -1,7 +1,7 @@
 import { GameStatus } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
 import type { ActiveTrial, WerewolfTurnState } from "../types";
-import { TrialVerdict, WerewolfPhase } from "../types";
+import { TrialVerdict, WerewolfPhase, TrialPhase, DaytimeVote } from "../types";
 import {
   currentTurnState,
   isOwnerPlaying,
@@ -16,9 +16,11 @@ export function applyTrialVerdict(
   ts: WerewolfTurnState,
   game: Game,
 ) {
-  let guiltyCount = activeTrial.votes.filter((v) => v.vote === "guilty").length;
+  let guiltyCount = activeTrial.votes.filter(
+    (v) => v.vote === DaytimeVote.Guilty,
+  ).length;
   let innocentCount = activeTrial.votes.filter(
-    (v) => v.vote === "innocent",
+    (v) => v.vote === DaytimeVote.Innocent,
   ).length;
 
   // Mayor's vote counts double (secret — extra vote added to their side)
@@ -27,7 +29,7 @@ export function applyTrialVerdict(
       (a) => a.playerId === v.playerId,
     )?.roleDefinitionId;
     if (roleId === WerewolfRole.Mayor) {
-      if (v.vote === "guilty") guiltyCount++;
+      if (v.vote === DaytimeVote.Guilty) guiltyCount++;
       else innocentCount++;
     }
   }
@@ -65,7 +67,7 @@ export const resolveTrialAction: GameAction = {
     if (ts.phase.type !== WerewolfPhase.Daytime) return false;
     const { activeTrial } = ts.phase;
     if (!activeTrial) return false;
-    if (activeTrial.phase !== "voting") return false;
+    if (activeTrial.phase !== TrialPhase.Voting) return false;
     return !activeTrial.verdict;
   },
   apply(game: Game) {

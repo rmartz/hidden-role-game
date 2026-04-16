@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { GameStatus } from "@/lib/types";
-import { WerewolfPhase } from "../../types";
+import { WerewolfPhase, DaytimeVote, TrialPhase } from "../../types";
 import type { WerewolfTurnState } from "../../types";
 import { WerewolfRole } from "../../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "../index";
@@ -9,7 +9,7 @@ import { makePlayingGame } from "../test-helpers";
 function makeDayStateWithTrial(
   overrides: Partial<{
     defendantId: string;
-    votes: { playerId: string; vote: "guilty" | "innocent" }[];
+    votes: { playerId: string; vote: DaytimeVote }[];
     deadPlayerIds: string[];
   }> = {},
 ): WerewolfTurnState {
@@ -22,7 +22,7 @@ function makeDayStateWithTrial(
       activeTrial: {
         defendantId: overrides.defendantId ?? "p1",
         startedAt: 2000,
-        phase: "voting" as const,
+        phase: TrialPhase.Voting,
         votes: overrides.votes ?? [],
       },
     },
@@ -35,7 +35,7 @@ describe("WerewolfAction.CastVote — apply (basic)", () => {
 
   it("records the vote", () => {
     const game = makePlayingGame(makeDayStateWithTrial());
-    action.apply(game, { vote: "guilty" }, "p2");
+    action.apply(game, { vote: DaytimeVote.Guilty }, "p2");
     const phase = (
       game.status as {
         turnState: {
@@ -47,7 +47,7 @@ describe("WerewolfAction.CastVote — apply (basic)", () => {
     ).turnState.phase;
     expect(phase.activeTrial.votes).toContainEqual({
       playerId: "p2",
-      vote: "guilty",
+      vote: DaytimeVote.Guilty,
     });
   });
 
@@ -67,8 +67,8 @@ describe("WerewolfAction.CastVote — apply (basic)", () => {
         ],
       },
     );
-    action.apply(game, { vote: "guilty" }, "p2");
-    action.apply(game, { vote: "innocent" }, "p3");
+    action.apply(game, { vote: DaytimeVote.Guilty }, "p2");
+    action.apply(game, { vote: DaytimeVote.Innocent }, "p3");
     const ts = (
       game.status as {
         turnState: { phase: { activeTrial: { verdict?: string } } };
@@ -91,7 +91,7 @@ describe("WerewolfAction.CastVote — apply (basic)", () => {
         { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
       ],
     });
-    action.apply(game, { vote: "guilty" }, "p2");
+    action.apply(game, { vote: DaytimeVote.Guilty }, "p2");
     const phase = (
       game.status as {
         turnState: {
@@ -104,15 +104,17 @@ describe("WerewolfAction.CastVote — apply (basic)", () => {
     expect(phase.activeTrial.votes).toHaveLength(1);
     expect(phase.activeTrial.votes[0]).toEqual({
       playerId: "p2",
-      vote: "guilty",
+      vote: DaytimeVote.Guilty,
     });
   });
 
   it("replaces the existing vote when a player re-votes", () => {
     const game = makePlayingGame(
-      makeDayStateWithTrial({ votes: [{ playerId: "p2", vote: "guilty" }] }),
+      makeDayStateWithTrial({
+        votes: [{ playerId: "p2", vote: DaytimeVote.Guilty }],
+      }),
     );
-    action.apply(game, { vote: "innocent" }, "p2");
+    action.apply(game, { vote: DaytimeVote.Innocent }, "p2");
     const phase = (
       game.status as {
         turnState: {
@@ -126,14 +128,14 @@ describe("WerewolfAction.CastVote — apply (basic)", () => {
     expect(p2Votes).toHaveLength(1);
     const p2Vote = p2Votes[0];
     if (!p2Vote) throw new Error("p2 vote not found");
-    expect(p2Vote.vote).toBe("innocent");
+    expect(p2Vote.vote).toBe(DaytimeVote.Innocent);
   });
 
   it("triggers Werewolves win when auto-resolve eliminates last non-Bad player", () => {
     const game = makePlayingGame(
       makeDayStateWithTrial({
         defendantId: "p2",
-        votes: [{ playerId: "p1", vote: "guilty" }],
+        votes: [{ playerId: "p1", vote: DaytimeVote.Guilty }],
       }),
       {
         players: [
@@ -148,7 +150,7 @@ describe("WerewolfAction.CastVote — apply (basic)", () => {
         ],
       },
     );
-    action.apply(game, { vote: "guilty" }, "p3");
+    action.apply(game, { vote: DaytimeVote.Guilty }, "p3");
     expect(game.status.type).toBe(GameStatus.Finished);
   });
 });

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { GameStatus } from "@/lib/types";
-import { WerewolfPhase, TrialVerdict } from "../types";
+import { WerewolfPhase, TrialVerdict, DaytimeVote, TrialPhase } from "../types";
 import type { WerewolfTurnState } from "../types";
 import { WerewolfRole } from "../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
@@ -9,7 +9,7 @@ import { makePlayingGame } from "./test-helpers";
 function makeDayStateWithDefenseTrial(
   overrides: Partial<{
     defendantId: string;
-    votes: { playerId: string; vote: "guilty" | "innocent" }[];
+    votes: { playerId: string; vote: DaytimeVote }[];
     deadPlayerIds: string[];
   }> = {},
 ): WerewolfTurnState {
@@ -22,7 +22,7 @@ function makeDayStateWithDefenseTrial(
       activeTrial: {
         defendantId: overrides.defendantId ?? "p1",
         startedAt: 2000,
-        phase: "defense",
+        phase: TrialPhase.Defense,
         votes: overrides.votes ?? [],
       },
     },
@@ -54,7 +54,7 @@ describe("WerewolfAction.SkipDefense", () => {
           activeTrial: {
             defendantId: "p1",
             startedAt: 2000,
-            phase: "voting",
+            phase: TrialPhase.Voting,
             votes: [],
           },
         },
@@ -74,20 +74,20 @@ describe("WerewolfAction.SkipDefense", () => {
         WerewolfTurnState["phase"],
         { type: WerewolfPhase.Daytime }
       >;
-      expect(phase.activeTrial?.phase).toBe("voting");
+      expect(phase.activeTrial?.phase).toBe(TrialPhase.Voting);
       expect(phase.activeTrial?.voteStartedAt).toBeTypeOf("number");
     });
 
     it("auto-resolves when precast votes cover all eligible voters", () => {
-      // Use innocent votes so the verdict is "innocent" and no win condition fires
+      // Use innocent votes so the verdict is TrialVerdict.Innocent and no win condition fires
       const game = makePlayingGame(
         makeDayStateWithDefenseTrial({
           defendantId: "p1",
           votes: [
-            { playerId: "p2", vote: "innocent" },
-            { playerId: "p3", vote: "innocent" },
-            { playerId: "p4", vote: "innocent" },
-            { playerId: "p5", vote: "innocent" },
+            { playerId: "p2", vote: DaytimeVote.Innocent },
+            { playerId: "p3", vote: DaytimeVote.Innocent },
+            { playerId: "p4", vote: DaytimeVote.Innocent },
+            { playerId: "p5", vote: DaytimeVote.Innocent },
           ],
         }),
       );
@@ -105,8 +105,8 @@ describe("WerewolfAction.SkipDefense", () => {
         makeDayStateWithDefenseTrial({
           defendantId: "p2",
           votes: [
-            { playerId: "p1", vote: "guilty" },
-            { playerId: "p3", vote: "guilty" },
+            { playerId: "p1", vote: DaytimeVote.Guilty },
+            { playerId: "p3", vote: DaytimeVote.Guilty },
           ],
         }),
         {
