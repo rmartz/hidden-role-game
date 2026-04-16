@@ -3,9 +3,11 @@ import type {
   LobbyConfig,
   LobbyPlayer,
   ModeConfig,
-  RoleSlot,
+  RoleBucket,
+  RoleBucketSlot,
   TimerConfig,
 } from "@/lib/types";
+import { isSimpleRoleBucket } from "@/lib/types";
 import { DEFAULT_TIMER_CONFIG, GameMode } from "@/lib/types";
 import { GAME_MODES } from "@/lib/game/modes";
 import type { PublicLobby } from "@/server/types";
@@ -35,8 +37,8 @@ export interface FirebaseLobbyPlayer {
 export interface FirebaseLobbyConfig {
   gameMode: string;
   roleConfigMode: string;
-  /** Optional — Firebase omits empty arrays, so may be absent. */
-  roleSlots?: FirebaseRoleSlot[];
+  /** Optional — Firebase omits empty objects. */
+  roleBuckets?: Record<string, FirebaseRoleBucket>;
   showConfigToPlayers: boolean;
   showRolesInPlay: string;
   timerConfig: TimerConfig;
@@ -44,11 +46,28 @@ export interface FirebaseLobbyConfig {
   modeConfig?: Record<string, unknown>;
 }
 
-export interface FirebaseRoleSlot {
+export interface FirebaseRoleBucketSlot {
   roleId: string;
-  min: number;
-  max: number;
+  max?: number;
 }
+
+/** Simple form: always assigns playerCount copies of a single role. */
+export interface FirebaseSimpleRoleBucket {
+  playerCount: number;
+  roleId: string;
+}
+
+/** Advanced form: multi-role pool with min/max draw constraints. */
+export interface FirebaseAdvancedRoleBucket {
+  playerCount: number;
+  /** Firebase stores arrays as objects with numeric string keys. */
+  roles: Record<string, FirebaseRoleBucketSlot>;
+  name?: string;
+}
+
+export type FirebaseRoleBucket =
+  | FirebaseSimpleRoleBucket
+  | FirebaseAdvancedRoleBucket;
 
 export interface FirebaseLobbyPrivate {
   ownerSessionId: string;
@@ -99,17 +118,51 @@ export function modeConfigToFirebase(
   return rest;
 }
 
+export function roleBucketToFirebase(bucket: RoleBucket): FirebaseRoleBucket {
+  if (isSimpleRoleBucket(bucket)) {
+    return { playerCount: bucket.playerCount, roleId: bucket.roleId };
+  }
+  const roles: Record<string, FirebaseRoleBucketSlot> = {};
+  bucket.roles.forEach((slot, i) => {
+    roles[String(i)] = {
+      roleId: slot.roleId,
+      ...(slot.max !== undefined ? { max: slot.max } : {}),
+    };
+  });
+  return {
+    playerCount: bucket.playerCount,
+    roles,
+    ...(bucket.name !== undefined ? { name: bucket.name } : {}),
+  };
+}
+
+export function firebaseToRoleBucket(bucket: FirebaseRoleBucket): RoleBucket {
+  if ("roleId" in bucket) {
+    return { playerCount: bucket.playerCount, roleId: bucket.roleId };
+  }
+  const roles: RoleBucketSlot[] = Object.values(bucket.roles).map((s) => ({
+    roleId: s.roleId,
+    ...(s.max !== undefined ? { max: s.max } : {}),
+  }));
+  return {
+    playerCount: bucket.playerCount,
+    roles,
+    ...(bucket.name !== undefined ? { name: bucket.name } : {}),
+  };
+}
+
 function lobbyConfigToFirebase(config: LobbyConfig): FirebaseLobbyConfig {
   const firebaseModeConfig = modeConfigToFirebase(config.modeConfig);
   const hasModeConfig = Object.keys(firebaseModeConfig).length > 0;
+  const hasBuckets = config.roleBuckets.length > 0;
+  const firebaseBuckets: Record<string, FirebaseRoleBucket> = {};
+  config.roleBuckets.forEach((bucket, i) => {
+    firebaseBuckets[String(i)] = roleBucketToFirebase(bucket);
+  });
   return {
     gameMode: config.gameMode,
     roleConfigMode: config.roleConfigMode,
-    roleSlots: config.roleSlots.map((s) => ({
-      roleId: s.roleId,
-      min: s.min,
-      max: s.max,
-    })),
+    ...(hasBuckets ? { roleBuckets: firebaseBuckets } : {}),
     showConfigToPlayers: config.showConfigToPlayers,
     showRolesInPlay: config.showRolesInPlay,
     timerConfig: config.timerConfig,
@@ -153,10 +206,14 @@ function firebaseToLobbyConfig(config: FirebaseLobbyConfig): LobbyConfig {
   // Cast required: LobbyConfig is a discriminated union keyed on gameMode, but
   // we construct from runtime Firebase data where the discriminant is a string.
   // This is the single boundary-cast location for LobbyConfig deserialization.
+  const roleBuckets: RoleBucket[] = config.roleBuckets
+    ? Object.values(config.roleBuckets).map(firebaseToRoleBucket)
+    : [];
+
   return {
     gameMode,
     roleConfigMode: config.roleConfigMode as LobbyConfig["roleConfigMode"],
-    roleSlots: (config.roleSlots ?? []).map(firebaseToRoleSlot),
+    roleBuckets,
     showConfigToPlayers: config.showConfigToPlayers,
     showRolesInPlay: config.showRolesInPlay as LobbyConfig["showRolesInPlay"],
     timerConfig: parseTimerConfig(
@@ -164,10 +221,6 @@ function firebaseToLobbyConfig(config: FirebaseLobbyConfig): LobbyConfig {
     ),
     modeConfig,
   } as LobbyConfig;
-}
-
-export function firebaseToRoleSlot(s: FirebaseRoleSlot): RoleSlot {
-  return { roleId: s.roleId, min: s.min, max: s.max };
 }
 
 /**
@@ -203,8 +256,7 @@ export function parseTimerConfig(raw: Record<string, unknown>): TimerConfig {
 
 /**
  * Converts a FirebaseLobbyPublic node directly to a PublicLobby for client-side
- * consumption. Since the public node stores full config (including roleSlots),
- * all fields are present. Used by the Firebase client subscription hook.
+ * consumption. Used by the Firebase client subscription hook.
  */
 export function firebaseToPublicLobby(
   lobbyId: string,

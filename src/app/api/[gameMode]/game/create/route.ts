@@ -7,8 +7,8 @@ import {
   errorResponse,
   parseGameMode,
   toPublicLobby,
-  validateRoleSlotsForMode,
-  validateRoleSlotsCoverPlayerCount,
+  validateRoleBucketsCoverPlayerCount,
+  validateRoleBucketsForMode,
 } from "@/server/utils";
 import { isGameModeEnabled } from "@/lib/game/modes";
 
@@ -37,22 +37,23 @@ export async function POST(
     return errorResponse(prereqs.error, 409);
   }
 
-  const roleSlots = lobby.config.roleSlots;
+  const buckets = lobby.config.roleBuckets;
 
-  const coverError = validateRoleSlotsCoverPlayerCount(
-    roleSlots,
+  const bucketModeError = validateRoleBucketsForMode(buckets, gameMode);
+  if (bucketModeError) return errorResponse(bucketModeError, 400);
+
+  const bucketCoverError = validateRoleBucketsCoverPlayerCount(
+    buckets,
     gameMode,
     lobby.players.length,
+    lobby.config.modeConfig,
   );
-  if (coverError) return errorResponse(coverError, 400);
-
-  const modeError = validateRoleSlotsForMode(roleSlots, gameMode);
-  if (modeError) return errorResponse(modeError, 400);
+  if (bucketCoverError) return errorResponse(bucketCoverError, 400);
 
   const game = await createGame(
     lobbyId,
     lobby.players,
-    roleSlots,
+    buckets,
     gameMode,
     lobby.config.showRolesInPlay,
     prereqs.ownerPlayerId,

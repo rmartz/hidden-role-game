@@ -1,9 +1,13 @@
 import { describe, it, expect } from "vitest";
 import { isValidSession, toPublicLobby } from "./lobby-helpers";
 import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
-import type { Lobby } from "@/lib/types";
+import type { Lobby, RoleBucket } from "@/lib/types";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
 import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-villain/lobby-config";
+
+const DEFAULT_BUCKETS: RoleBucket[] = [
+  { playerCount: 2, roles: [{ roleId: "good" }] },
+];
 
 function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
   return {
@@ -17,7 +21,7 @@ function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
     config: {
       gameMode: GameMode.SecretVillain,
       roleConfigMode: RoleConfigMode.Default,
-      roleSlots: [{ roleId: "good", min: 2, max: 2 }],
+      roleBuckets: DEFAULT_BUCKETS,
       showConfigToPlayers: false,
       showRolesInPlay: ShowRolesInPlay.None,
       modeConfig: DEFAULT_SECRET_VILLAIN_MODE_CONFIG,
@@ -85,19 +89,19 @@ describe("toPublicLobby", () => {
     expect(result.gameId).toBe("game-abc");
   });
 
-  describe("roleSlots visibility", () => {
-    it("includes roleSlots for the owner", () => {
+  describe("roleBuckets visibility", () => {
+    it("includes roleBuckets for the owner", () => {
       const lobby = makeLobby();
       const result = toPublicLobby(lobby, "session-owner");
-      expect(result.config.roleSlots).toEqual(lobby.config.roleSlots);
+      expect(result.config.roleBuckets).toEqual(lobby.config.roleBuckets);
     });
 
-    it("includes roleSlots for non-owners when showConfigToPlayers is true", () => {
+    it("includes roleBuckets for non-owners when showConfigToPlayers is true", () => {
       const lobby = makeLobby({
         config: {
           gameMode: GameMode.SecretVillain,
           roleConfigMode: RoleConfigMode.Default,
-          roleSlots: [{ roleId: "good", min: 2, max: 2 }],
+          roleBuckets: DEFAULT_BUCKETS,
           showConfigToPlayers: true,
           showRolesInPlay: ShowRolesInPlay.None,
           modeConfig: DEFAULT_SECRET_VILLAIN_MODE_CONFIG,
@@ -105,19 +109,19 @@ describe("toPublicLobby", () => {
         },
       });
       const result = toPublicLobby(lobby, "session-bob");
-      expect(result.config.roleSlots).toEqual(lobby.config.roleSlots);
+      expect(result.config.roleBuckets).toEqual(lobby.config.roleBuckets);
     });
 
-    it("omits roleSlots for non-owners when showConfigToPlayers is false", () => {
+    it("returns empty roleBuckets for non-owners when showConfigToPlayers is false", () => {
       const lobby = makeLobby();
       const result = toPublicLobby(lobby, "session-bob");
-      expect(result.config).not.toHaveProperty("roleSlots");
+      expect(result.config.roleBuckets).toEqual([]);
     });
 
-    it("omits roleSlots for anonymous callers when showConfigToPlayers is false", () => {
+    it("returns empty roleBuckets for anonymous callers when showConfigToPlayers is false", () => {
       const lobby = makeLobby();
       const result = toPublicLobby(lobby);
-      expect(result.config).not.toHaveProperty("roleSlots");
+      expect(result.config.roleBuckets).toEqual([]);
     });
   });
 });
