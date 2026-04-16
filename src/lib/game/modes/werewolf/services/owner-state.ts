@@ -153,6 +153,11 @@ export function extractDaytimePlayerState(
     }
   }
 
+  // Narrator-only: pending daytime smites.
+  if (callerId === game.ownerPlayerId && phase.pendingSmitePlayerIds?.length) {
+    result.pendingSmitePlayerIds = phase.pendingSmitePlayerIds;
+  }
+
   // Executioner target.
   const callerExecutionerAssignment = game.roleAssignments.find(
     (a) =>
@@ -230,6 +235,11 @@ export function extractDaytimePlayerState(
         }
       }
     }
+  }
+
+  // Concluded trials count for this day.
+  if (phase.concludedTrialsCount) {
+    result.concludedTrialsCount = phase.concludedTrialsCount;
   }
 
   return result;

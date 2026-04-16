@@ -50,7 +50,7 @@ export function makeNighttimeGame(
     modeConfig: {
       gameMode: GameMode.Werewolf,
       nominationsEnabled: false,
-      singleTrialPerDay: true,
+      trialsPerDay: 1,
       revealProtections: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
@@ -99,7 +99,7 @@ export function makeNighttimeGameWithBonusPhase(
     modeConfig: {
       gameMode: GameMode.Werewolf,
       nominationsEnabled: false,
-      singleTrialPerDay: true,
+      trialsPerDay: 1,
       revealProtections: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,

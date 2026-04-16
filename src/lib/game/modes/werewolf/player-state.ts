@@ -18,8 +18,10 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   timerConfig: WerewolfTimerConfig;
   /** Whether player nominations for trial are enabled in this game. */
   nominationsEnabled: boolean;
-  /** When true, only one trial is allowed per day phase. */
-  singleTrialPerDay: boolean;
+  /** Maximum number of trials allowed per day phase. 0 means unlimited. */
+  trialsPerDay: number;
+  /** Number of trials that have concluded this day phase. */
+  concludedTrialsCount?: number;
   /** When true, the night summary reveals players who were attacked but saved by protection. */
   revealProtections: boolean;
   /** All night targets keyed by phase key. Only populated for the narrator/owner. */
@@ -74,6 +76,8 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   nominations?: { defendantId: string; nominatorIds: string[] }[];
   /** The defendant this player has nominated. */
   myNominatedDefendantId?: string;
+  /** Player IDs pending elimination at the end of the next night (narrator daytime smite). */
+  pendingSmitePlayerIds?: string[];
   /** True if the player is silenced this day. */
   isSilenced?: boolean;
   /** True if the player is hypnotized by the Mummy. */

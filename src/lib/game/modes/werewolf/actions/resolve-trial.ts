@@ -66,6 +66,9 @@ export const resolveTrialAction: GameAction = {
     if (!activeTrial) return;
     applyTrialVerdict(activeTrial, ts, game);
 
+    // Increment the count of concluded trials for this day.
+    ts.phase.concludedTrialsCount = (ts.phase.concludedTrialsCount ?? 0) + 1;
+
     if (activeTrial.verdict === "eliminated") {
       const { defendantId } = activeTrial;
 

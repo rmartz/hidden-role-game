@@ -12,9 +12,9 @@ describe("WerewolfAction.SmitePlayer", () => {
       expect(action.isValid(game, "owner-1", { playerId: "p2" })).toBe(true);
     });
 
-    it("returns false during daytime", () => {
+    it("returns true during daytime with valid playerId", () => {
       const game = makePlayingGame(dayTurnState);
-      expect(action.isValid(game, "owner-1", { playerId: "p2" })).toBe(false);
+      expect(action.isValid(game, "owner-1", { playerId: "p2" })).toBe(true);
     });
 
     it("returns false for non-owner caller", () => {

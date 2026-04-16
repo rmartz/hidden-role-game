@@ -45,7 +45,7 @@ describe("WerewolfAction.StartNight", () => {
         modeConfig: {
           gameMode: GameMode.Werewolf,
           nominationsEnabled: false,
-          singleTrialPerDay: true,
+          trialsPerDay: 1,
           revealProtections: true,
         },
         timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
@@ -189,7 +189,7 @@ describe("StartNight — Wolf Cub bonus phase lifecycle", () => {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: false,
-        singleTrialPerDay: true,
+        trialsPerDay: 1,
         revealProtections: true,
       },
       timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,

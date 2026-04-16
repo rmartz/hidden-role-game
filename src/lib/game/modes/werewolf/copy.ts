@@ -67,6 +67,7 @@ export const WEREWOLF_COPY = {
     eliminated: (count: number) => `Eliminated (${String(count)})`,
     none: "None",
     noneYet: "None yet",
+    youSuffix: "(You)",
   },
   trial: {
     verdictHeading: (name: string, label: string) =>
@@ -141,7 +142,7 @@ export const WEREWOLF_COPY = {
     subtitle:
       "Nominate a player to accuse them. A seconded nomination triggers a trial.",
     secondSectionHeading: "Second a nomination",
-    nominateSectionHeading: "Nominate another player",
+    nominateSectionHeading: "Nominate a player",
     nominateButton: (name: string) => `Nominate ${name}`,
     secondButton: (name: string) => `Second ${name}`,
     withdrawButton: "Withdraw Nomination",
@@ -243,6 +244,8 @@ export const WEREWOLF_COPY = {
     confirmTitle: "Smite player?",
     confirmDescription: (name: string) =>
       `${name} will be killed by mysterious forces at the start of day. This bypasses all protections.`,
+    confirmDayDescription: (name: string) =>
+      `${name} will be marked for elimination at the end of the next night. This bypasses all protections.`,
     confirmAction: "Smite",
     confirmCancel: "Cancel",
     undo: "Undo Smite",

@@ -50,9 +50,10 @@ export function PlayerGameDayScreen({
 
   const hasActiveTrial =
     !!gameState.activeTrial && !gameState.activeTrial.verdict;
-  const trialConcluded = !!gameState.activeTrial?.verdict;
   const nominationsBlocked =
-    hasActiveTrial || (gameState.singleTrialPerDay && trialConcluded);
+    hasActiveTrial ||
+    (gameState.trialsPerDay > 0 &&
+      (gameState.concludedTrialsCount ?? 0) >= gameState.trialsPerDay);
 
   return (
     <div className="p-5 max-w-lg mx-auto">
@@ -145,6 +146,7 @@ export function PlayerGameDayScreen({
         deadPlayerIds={turnState.deadPlayerIds}
         gameOwnerId={gameState.gameOwner?.id}
         roleAssignments={gameState.visibleRoleAssignments}
+        myPlayerId={gameState.myPlayerId}
       />
     </div>
   );

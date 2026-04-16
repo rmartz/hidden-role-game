@@ -1,6 +1,5 @@
 import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase } from "../types";
-import type { WerewolfNighttimePhase } from "../types";
 import { currentTurnState, isOwnerPlaying } from "../utils";
 
 export const unsmitePlayerAction: GameAction = {
@@ -8,19 +7,25 @@ export const unsmitePlayerAction: GameAction = {
     if (!isOwnerPlaying(game, callerId)) return false;
     const ts = currentTurnState(game);
     if (!ts) return false;
-    if (ts.phase.type !== WerewolfPhase.Nighttime) return false;
     const { playerId } = payload as { playerId?: unknown };
     if (typeof playerId !== "string") return false;
-    const smitedIds = ts.phase.smitedPlayerIds ?? [];
-    return smitedIds.includes(playerId);
+    if (ts.phase.type === WerewolfPhase.Nighttime) {
+      return (ts.phase.smitedPlayerIds ?? []).includes(playerId);
+    }
+    return (ts.phase.pendingSmitePlayerIds ?? []).includes(playerId);
   },
   apply(game: Game, payload: unknown) {
     const ts = currentTurnState(game);
     if (!ts) return;
-    const nightPhase = ts.phase as WerewolfNighttimePhase;
     const { playerId } = payload as { playerId: string };
-    nightPhase.smitedPlayerIds = (nightPhase.smitedPlayerIds ?? []).filter(
-      (id) => id !== playerId,
-    );
+    if (ts.phase.type === WerewolfPhase.Nighttime) {
+      ts.phase.smitedPlayerIds = (ts.phase.smitedPlayerIds ?? []).filter(
+        (id) => id !== playerId,
+      );
+    } else {
+      ts.phase.pendingSmitePlayerIds = (
+        ts.phase.pendingSmitePlayerIds ?? []
+      ).filter((id) => id !== playerId);
+    }
   },
 };
