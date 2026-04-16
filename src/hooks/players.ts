@@ -6,6 +6,7 @@ import {
   toggleReady,
   transferOwner,
   reorderPlayers,
+  renamePlayer,
 } from "@/lib/api";
 import { ServerResponseStatus } from "@/server/types";
 
@@ -53,6 +54,23 @@ export function useTransferOwner(lobbyId: string) {
     onSuccess: (response) => {
       if (response.status === ServerResponseStatus.Error) return;
       void queryClient.invalidateQueries({ queryKey: ["lobby", lobbyId] });
+    },
+  });
+}
+
+export function useRenamePlayer(lobbyId: string, playerId?: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (playerName: string) => {
+      if (!playerId) throw new Error("Unauthorized");
+      const response = await renamePlayer(lobbyId, playerId, playerName);
+      if (response.status === ServerResponseStatus.Error) {
+        throw new Error(response.error);
+      }
+      return response.data.lobby;
+    },
+    onSuccess: (lobby) => {
+      queryClient.setQueryData(["lobby", lobbyId], lobby);
     },
   });
 }
