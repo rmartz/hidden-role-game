@@ -1,5 +1,5 @@
 import type { Game, GameAction } from "@/lib/types";
-import { WerewolfPhase } from "../types";
+import { WerewolfPhase, TrialPhase, DaytimeVote } from "../types";
 import { getWerewolfModeConfig } from "../lobby-config";
 import {
   currentTurnState,
@@ -59,7 +59,7 @@ export const startTrialAction: GameAction = {
           WEREWOLF_ROLES[roleId].alwaysVotesGuilty === true
         );
       })
-      .map((p) => ({ playerId: p.id, vote: "guilty" as const }));
+      .map((p) => ({ playerId: p.id, vote: DaytimeVote.Guilty }));
 
     // Pre-populate innocent votes for roles that must always vote innocent
     const precastInnocentVotes = game.players
@@ -74,12 +74,12 @@ export const startTrialAction: GameAction = {
           WEREWOLF_ROLES[roleId].alwaysVotesInnocent === true
         );
       })
-      .map((p) => ({ playerId: p.id, vote: "innocent" as const }));
+      .map((p) => ({ playerId: p.id, vote: DaytimeVote.Innocent }));
 
     const activeTrial = {
       defendantId,
       startedAt: Date.now(),
-      phase: "defense" as const,
+      phase: TrialPhase.Defense,
       votes: [...precastGuiltyVotes, ...precastInnocentVotes],
     };
     ts.phase.activeTrial = activeTrial;

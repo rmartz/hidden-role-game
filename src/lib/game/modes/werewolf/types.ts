@@ -90,9 +90,15 @@ export type NightResolutionEvent =
   | ToughGuyAbsorbedNightResolutionEvent
   | AltruistInterceptedNightResolutionEvent;
 
-export type DaytimeVote = "guilty" | "innocent";
+export enum DaytimeVote {
+  Guilty = "guilty",
+  Innocent = "innocent",
+}
 
-export type TrialPhase = "defense" | "voting";
+export enum TrialPhase {
+  Defense = "defense",
+  Voting = "voting",
+}
 
 export enum TrialVerdict {
   Eliminated = "eliminated",

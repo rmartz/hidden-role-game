@@ -2,6 +2,8 @@ import { describe, it, expect } from "vitest";
 import {
   WerewolfPhase,
   TrialVerdict,
+  DaytimeVote,
+  TrialPhase,
   type WerewolfTurnState,
 } from "../../types";
 import { WerewolfRole } from "../../roles";
@@ -11,7 +13,7 @@ import { makePlayingGame, dayTurnState } from "../test-helpers";
 function makeDayStateWithTrial(
   overrides: Partial<{
     defendantId: string;
-    votes: { playerId: string; vote: "guilty" | "innocent" }[];
+    votes: { playerId: string; vote: DaytimeVote }[];
     deadPlayerIds: string[];
     verdict: TrialVerdict;
   }> = {},
@@ -25,7 +27,7 @@ function makeDayStateWithTrial(
       activeTrial: {
         defendantId: overrides.defendantId ?? "p1",
         startedAt: 2000,
-        phase: "voting" as const,
+        phase: TrialPhase.Voting,
         votes: overrides.votes ?? [],
         ...(overrides.verdict ? { verdict: overrides.verdict } : {}),
       },
@@ -39,22 +41,28 @@ describe("WerewolfAction.CastVote — isValid", () => {
 
   it("returns true for a valid guilty vote", () => {
     const game = makePlayingGame(makeDayStateWithTrial());
-    expect(action.isValid(game, "p2", { vote: "guilty" })).toBe(true);
+    expect(action.isValid(game, "p2", { vote: DaytimeVote.Guilty })).toBe(true);
   });
 
   it("returns true for a valid innocent vote", () => {
     const game = makePlayingGame(makeDayStateWithTrial());
-    expect(action.isValid(game, "p2", { vote: "innocent" })).toBe(true);
+    expect(action.isValid(game, "p2", { vote: DaytimeVote.Innocent })).toBe(
+      true,
+    );
   });
 
   it("returns false when called by owner", () => {
     const game = makePlayingGame(makeDayStateWithTrial());
-    expect(action.isValid(game, "owner-1", { vote: "guilty" })).toBe(false);
+    expect(action.isValid(game, "owner-1", { vote: DaytimeVote.Guilty })).toBe(
+      false,
+    );
   });
 
   it("returns false when not daytime", () => {
     const game = makePlayingGame(dayTurnState);
-    expect(action.isValid(game, "p2", { vote: "guilty" })).toBe(false);
+    expect(action.isValid(game, "p2", { vote: DaytimeVote.Guilty })).toBe(
+      false,
+    );
   });
 
   it("returns false when no active trial", () => {
@@ -67,33 +75,45 @@ describe("WerewolfAction.CastVote — isValid", () => {
       },
       deadPlayerIds: [],
     });
-    expect(action.isValid(game, "p2", { vote: "guilty" })).toBe(false);
+    expect(action.isValid(game, "p2", { vote: DaytimeVote.Guilty })).toBe(
+      false,
+    );
   });
 
   it("returns false when verdict already set", () => {
     const game = makePlayingGame(
       makeDayStateWithTrial({ verdict: TrialVerdict.Eliminated }),
     );
-    expect(action.isValid(game, "p2", { vote: "guilty" })).toBe(false);
+    expect(action.isValid(game, "p2", { vote: DaytimeVote.Guilty })).toBe(
+      false,
+    );
   });
 
   it("returns false when caller is the defendant", () => {
     const game = makePlayingGame(makeDayStateWithTrial({ defendantId: "p2" }));
-    expect(action.isValid(game, "p2", { vote: "guilty" })).toBe(false);
+    expect(action.isValid(game, "p2", { vote: DaytimeVote.Guilty })).toBe(
+      false,
+    );
   });
 
   it("returns true when caller already voted (re-vote is allowed)", () => {
     const game = makePlayingGame(
-      makeDayStateWithTrial({ votes: [{ playerId: "p2", vote: "guilty" }] }),
+      makeDayStateWithTrial({
+        votes: [{ playerId: "p2", vote: DaytimeVote.Guilty }],
+      }),
     );
-    expect(action.isValid(game, "p2", { vote: "innocent" })).toBe(true);
+    expect(action.isValid(game, "p2", { vote: DaytimeVote.Innocent })).toBe(
+      true,
+    );
   });
 
   it("returns false when caller is dead", () => {
     const game = makePlayingGame(
       makeDayStateWithTrial({ deadPlayerIds: ["p2"] }),
     );
-    expect(action.isValid(game, "p2", { vote: "guilty" })).toBe(false);
+    expect(action.isValid(game, "p2", { vote: DaytimeVote.Guilty })).toBe(
+      false,
+    );
   });
 
   it("returns false during defense phase", () => {
@@ -106,14 +126,16 @@ describe("WerewolfAction.CastVote — isValid", () => {
         activeTrial: {
           defendantId: "p1",
           startedAt: 2000,
-          phase: "defense",
+          phase: TrialPhase.Defense,
           votes: [],
         },
       },
       deadPlayerIds: [],
     };
     const game = makePlayingGame(ts);
-    expect(action.isValid(game, "p2", { vote: "guilty" })).toBe(false);
+    expect(action.isValid(game, "p2", { vote: DaytimeVote.Guilty })).toBe(
+      false,
+    );
   });
 
   it("returns false for an invalid vote value", () => {
@@ -127,7 +149,9 @@ describe("WerewolfAction.CastVote — isValid", () => {
       ts.phase as Extract<typeof ts.phase, { type: WerewolfPhase.Daytime }>
     ).nightResolution = [{ type: "silenced", targetPlayerId: "p2" }];
     const game = makePlayingGame(ts);
-    expect(action.isValid(game, "p2", { vote: "guilty" })).toBe(false);
+    expect(action.isValid(game, "p2", { vote: DaytimeVote.Guilty })).toBe(
+      false,
+    );
   });
 
   it("returns false when caller is hypnotized", () => {
@@ -138,7 +162,9 @@ describe("WerewolfAction.CastVote — isValid", () => {
       { type: "hypnotized", targetPlayerId: "p2", mummyPlayerId: "p3" },
     ];
     const game = makePlayingGame(ts);
-    expect(action.isValid(game, "p2", { vote: "guilty" })).toBe(false);
+    expect(action.isValid(game, "p2", { vote: DaytimeVote.Guilty })).toBe(
+      false,
+    );
   });
 
   it("returns true when caller is hypnotized but Mummy has died", () => {
@@ -149,7 +175,7 @@ describe("WerewolfAction.CastVote — isValid", () => {
       { type: "hypnotized", targetPlayerId: "p2", mummyPlayerId: "p3" },
     ];
     const game = makePlayingGame(ts);
-    expect(action.isValid(game, "p2", { vote: "guilty" })).toBe(true);
+    expect(action.isValid(game, "p2", { vote: DaytimeVote.Guilty })).toBe(true);
   });
 
   describe("Village Idiot", () => {
@@ -161,7 +187,9 @@ describe("WerewolfAction.CastVote — isValid", () => {
           { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
         ],
       });
-      expect(action.isValid(game, "p2", { vote: "guilty" })).toBe(true);
+      expect(action.isValid(game, "p2", { vote: DaytimeVote.Guilty })).toBe(
+        true,
+      );
     });
 
     it("rejects innocent vote", () => {
@@ -172,7 +200,9 @@ describe("WerewolfAction.CastVote — isValid", () => {
           { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
         ],
       });
-      expect(action.isValid(game, "p2", { vote: "innocent" })).toBe(false);
+      expect(action.isValid(game, "p2", { vote: DaytimeVote.Innocent })).toBe(
+        false,
+      );
     });
   });
 
@@ -185,7 +215,9 @@ describe("WerewolfAction.CastVote — isValid", () => {
           { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
         ],
       });
-      expect(action.isValid(game, "p2", { vote: "innocent" })).toBe(true);
+      expect(action.isValid(game, "p2", { vote: DaytimeVote.Innocent })).toBe(
+        true,
+      );
     });
 
     it("rejects guilty vote", () => {
@@ -196,7 +228,9 @@ describe("WerewolfAction.CastVote — isValid", () => {
           { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
         ],
       });
-      expect(action.isValid(game, "p2", { vote: "guilty" })).toBe(false);
+      expect(action.isValid(game, "p2", { vote: DaytimeVote.Guilty })).toBe(
+        false,
+      );
     });
   });
 });

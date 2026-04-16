@@ -1,5 +1,5 @@
 import type { Game, GameAction } from "@/lib/types";
-import type { DaytimeVote } from "../types";
+import { DaytimeVote, TrialPhase } from "../types";
 import { WerewolfPhase } from "../types";
 import {
   currentTurnState,
@@ -10,7 +10,7 @@ import {
 import { WEREWOLF_ROLES, WerewolfRole, isWerewolfRole } from "../roles";
 import { applyTrialVerdict } from "./resolve-trial";
 
-const VALID_VOTES: DaytimeVote[] = ["guilty", "innocent"];
+const VALID_VOTES: DaytimeVote[] = [DaytimeVote.Guilty, DaytimeVote.Innocent];
 
 export const castVoteAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {
@@ -21,7 +21,7 @@ export const castVoteAction: GameAction = {
     if (ts.phase.type !== WerewolfPhase.Daytime) return false;
     const { activeTrial } = ts.phase;
     if (!activeTrial) return false;
-    if (activeTrial.phase !== "voting") return false;
+    if (activeTrial.phase !== TrialPhase.Voting) return false;
     if (activeTrial.verdict) return false;
     if (ts.deadPlayerIds.includes(callerId)) return false;
     if (!game.players.some((p) => p.id === callerId)) return false;
@@ -34,6 +34,7 @@ export const castVoteAction: GameAction = {
     const { vote } = payload as { vote?: unknown };
     if (typeof vote !== "string" || !VALID_VOTES.includes(vote as DaytimeVote))
       return false;
+    const typedVote = vote as DaytimeVote;
     const callerRoleId = game.roleAssignments.find(
       (a) => a.playerId === callerId,
     )?.roleDefinitionId;
@@ -42,7 +43,7 @@ export const castVoteAction: GameAction = {
       callerRoleId !== undefined &&
       isWerewolfRole(callerRoleId) &&
       WEREWOLF_ROLES[callerRoleId].alwaysVotesGuilty &&
-      vote !== "guilty"
+      typedVote !== DaytimeVote.Guilty
     )
       return false;
     // Roles with alwaysVotesInnocent must always vote innocent
@@ -50,7 +51,7 @@ export const castVoteAction: GameAction = {
       callerRoleId !== undefined &&
       isWerewolfRole(callerRoleId) &&
       WEREWOLF_ROLES[callerRoleId].alwaysVotesInnocent &&
-      vote !== "innocent"
+      typedVote !== DaytimeVote.Innocent
     )
       return false;
     return true;
