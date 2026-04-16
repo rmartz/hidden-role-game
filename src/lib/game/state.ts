@@ -6,7 +6,7 @@ import type {
   LobbyPlayer,
   ModeConfig,
   PlayingGameStatus,
-  RoleSlot,
+  RoleBucket,
   TimerConfig,
 } from "@/lib/types";
 import type { PlayerGameState, VisibleTeammate } from "@/server/types";
@@ -14,7 +14,7 @@ import { GAME_MODES } from "@/lib/game/modes";
 import { DEFAULT_WEREWOLF_MODE_CONFIG } from "@/lib/game/modes/werewolf/lobby-config";
 import { getWerewolfModeConfig } from "@/lib/game/modes/werewolf/lobby-config";
 import { getPlayer } from "@/lib/player";
-import { assignRoles, adjustRoleSlots } from "@/server/utils";
+import { assignRolesFromBuckets } from "@/server/utils";
 import { buildRolesInPlay, buildGamePlayers } from "@/lib/game/initialization";
 import { GameMode } from "@/lib/types";
 
@@ -198,7 +198,7 @@ export function buildGame(
   gameId: string,
   lobbyId: string,
   players: LobbyPlayer[],
-  roleSlots: RoleSlot[],
+  roleBuckets: RoleBucket[],
   gameMode: GameMode,
   showRolesInPlay: ShowRolesInPlay,
   ownerPlayerId: string | undefined,
@@ -214,7 +214,7 @@ export function buildGame(
   const rolePlayers = ownerPlayerId
     ? players.filter((p) => p.id !== ownerPlayerId)
     : players;
-  const roleAssignments = assignRoles(rolePlayers, roleSlots);
+  const roleAssignments = assignRolesFromBuckets(rolePlayers, roleBuckets);
 
   const ownerPlayer = ownerPlayerId ? getPlayer(players, ownerPlayerId) : null;
   const gamePlayers: GamePlayer[] = [
@@ -233,7 +233,7 @@ export function buildGame(
     status: { type: GameStatus.Starting, startedAt: Date.now() },
     players: gamePlayers,
     roleAssignments,
-    configuredRoleSlots: roleSlots,
+    configuredRoleBuckets: roleBuckets,
     showRolesInPlay,
     ownerPlayerId,
     timerConfig,
@@ -256,18 +256,4 @@ export function buildPlayingStatus(game: Game): PlayingGameStatus {
       ...(game.playerOrder ? { playerOrder: game.playerOrder } : {}),
     }),
   };
-}
-
-export function adjustRoleSlotsForPlayer(
-  current: RoleSlot[],
-  gameMode: GameMode,
-  numPlayers: number,
-  operation: "add" | "remove",
-): RoleSlot[] {
-  const config = getModeDefinition(gameMode);
-  return adjustRoleSlots(
-    current,
-    config.defaultRoleCount(numPlayers),
-    operation,
-  );
 }

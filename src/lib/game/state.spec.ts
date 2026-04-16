@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { getPlayerGameState } from "./state";
 import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
-import type { Game, GamePlayer, RoleSlot } from "@/lib/types";
+import type { Game, GamePlayer, RoleBucket } from "@/lib/types";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
 import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-villain/lobby-config";
@@ -9,9 +9,9 @@ import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-c
 import { WerewolfPhase, WerewolfRole } from "@/lib/game/modes/werewolf";
 import { DEFAULT_WEREWOLF_MODE_CONFIG } from "@/lib/game/modes/werewolf/lobby-config";
 
-const DEFAULT_SLOTS: RoleSlot[] = [
-  { roleId: "good", min: 1, max: 1 },
-  { roleId: "bad", min: 1, max: 1 },
+const DEFAULT_BUCKETS: RoleBucket[] = [
+  { playerCount: 1, roles: [{ roleId: "good" }] },
+  { playerCount: 1, roles: [{ roleId: "bad" }] },
 ];
 
 function makePlayer(
@@ -30,7 +30,7 @@ function makeGameWithPlayers(
   players: GamePlayer[],
   roleAssignments: Game["roleAssignments"],
   showRolesInPlay: ShowRolesInPlay = ShowRolesInPlay.RoleAndCount,
-  configuredRoleSlots: RoleSlot[] = DEFAULT_SLOTS,
+  configuredRoleBuckets: RoleBucket[] = DEFAULT_BUCKETS,
 ): Game {
   return {
     id: "game-1",
@@ -39,7 +39,7 @@ function makeGameWithPlayers(
     status: { type: GameStatus.Playing },
     players,
     roleAssignments,
-    configuredRoleSlots,
+    configuredRoleBuckets,
     showRolesInPlay,
     ownerPlayerId: undefined,
     modeConfig: DEFAULT_SECRET_VILLAIN_MODE_CONFIG,
@@ -144,7 +144,7 @@ describe("GameStateService.getPlayerGameState — board player", () => {
         { playerId: "p1", roleDefinitionId: "good" },
         { playerId: "p2", roleDefinitionId: "bad" },
       ],
-      configuredRoleSlots: DEFAULT_SLOTS,
+      configuredRoleBuckets: DEFAULT_BUCKETS,
       showRolesInPlay: ShowRolesInPlay.RoleAndCount,
       ownerPlayerId: "board",
       modeConfig: { ...DEFAULT_SECRET_VILLAIN_MODE_CONFIG, includeBoard: true },
@@ -167,7 +167,7 @@ describe("GameStateService.getPlayerGameState — board player", () => {
         { playerId: "p1", roleDefinitionId: "good" },
         { playerId: "p2", roleDefinitionId: "bad" },
       ],
-      configuredRoleSlots: DEFAULT_SLOTS,
+      configuredRoleBuckets: DEFAULT_BUCKETS,
       showRolesInPlay: ShowRolesInPlay.RoleAndCount,
       ownerPlayerId: "narrator",
       modeConfig: DEFAULT_SECRET_VILLAIN_MODE_CONFIG,
@@ -195,9 +195,9 @@ function makeNarratorGame(nominationsEnabled = false): Game {
       { playerId: "p1", roleDefinitionId: "werewolf-villager" },
       { playerId: "p2", roleDefinitionId: "werewolf-werewolf" },
     ],
-    configuredRoleSlots: [
-      { roleId: "werewolf-villager", min: 1, max: 1 },
-      { roleId: "werewolf-werewolf", min: 1, max: 1 },
+    configuredRoleBuckets: [
+      { playerCount: 1, roles: [{ roleId: "werewolf-villager" }] },
+      { playerCount: 1, roles: [{ roleId: "werewolf-werewolf" }] },
     ],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "narrator",

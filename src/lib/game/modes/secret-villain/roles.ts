@@ -1,5 +1,5 @@
 import { Team } from "@/lib/types";
-import type { RoleSlot } from "@/lib/types";
+import type { RoleBucket } from "@/lib/types";
 
 export enum SecretVillainRole {
   Good = "good",
@@ -9,15 +9,15 @@ export enum SecretVillainRole {
 
 export const MIN_PLAYERS = 5;
 
-export function defaultRoleCount(numPlayers: number): RoleSlot[] {
+export function defaultRoleCount(numPlayers: number): RoleBucket[] {
   const n = Math.max(numPlayers, MIN_PLAYERS);
   const specialBad = 1;
   const bad = Math.floor((n - 1) / 2) - 1;
   const good = n - specialBad - bad;
   return [
-    { roleId: SecretVillainRole.SpecialBad, min: specialBad, max: specialBad },
-    { roleId: SecretVillainRole.Bad, min: bad, max: bad },
-    { roleId: SecretVillainRole.Good, min: good, max: good },
+    { playerCount: specialBad, roleId: SecretVillainRole.SpecialBad },
+    { playerCount: bad, roleId: SecretVillainRole.Bad },
+    { playerCount: good, roleId: SecretVillainRole.Good },
   ];
 }
 

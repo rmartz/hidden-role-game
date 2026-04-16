@@ -80,6 +80,7 @@ describe("useStartGame", () => {
           config: {
             gameMode: GameMode.SecretVillain,
             roleConfigMode: RoleConfigMode.Default,
+            roleBuckets: [],
             showConfigToPlayers: false,
             showRolesInPlay: ShowRolesInPlay.RoleAndCount,
             modeConfig: DEFAULT_SECRET_VILLAIN_MODE_CONFIG,

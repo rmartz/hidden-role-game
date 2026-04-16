@@ -199,7 +199,7 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
               {readOnly ? (
                 <RoleConfig
                   roleDefinitions={roleDefinitions}
-                  roleSlots={config.roleSlots}
+                  roleBuckets={config.roleBuckets}
                   roleConfigMode={config.roleConfigMode}
                   playerCount={playerCount}
                   gameMode={activeGameMode}

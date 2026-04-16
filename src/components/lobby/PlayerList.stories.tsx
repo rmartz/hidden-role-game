@@ -37,7 +37,7 @@ const baseLobby: PublicLobby = {
     roleConfigMode: RoleConfigMode.Default,
     showConfigToPlayers: true,
     showRolesInPlay: ShowRolesInPlay.AssignedRolesOnly,
-    roleSlots: [],
+    roleBuckets: [],
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     modeConfig: {
       gameMode: GameMode.Werewolf,

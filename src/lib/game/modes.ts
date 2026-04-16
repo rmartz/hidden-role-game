@@ -1,5 +1,5 @@
 import { GameMode } from "@/lib/types";
-import type { GameModeConfig, ModeConfig, RoleSlot } from "@/lib/types";
+import type { GameModeConfig, ModeConfig, RoleBucket } from "@/lib/types";
 import { SECRET_VILLAIN_CONFIG } from "@/lib/game/modes/secret-villain";
 import { AVALON_CONFIG } from "@/lib/game/modes/avalon";
 import { WEREWOLF_CONFIG } from "@/lib/game/modes/werewolf";
@@ -43,10 +43,10 @@ export const ALL_GAME_MODES: GameMode[] = Object.values(GameMode).sort((a, b) =>
 export const DEFAULT_GAME_MODE: GameMode =
   ENABLED_GAME_MODES.find((m) => GAME_MODES[m].released) ?? GameMode.Werewolf;
 
-export function getDefaultRoleSlots(
+export function getDefaultRoleBuckets(
   gameMode: GameMode,
   playerCount: number,
-): RoleSlot[] {
+): RoleBucket[] {
   const config = GAME_MODES[gameMode];
   return config.defaultRoleCount(Math.max(playerCount, config.minPlayers));
 }

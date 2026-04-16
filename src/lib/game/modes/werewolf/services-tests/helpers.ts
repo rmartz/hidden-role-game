@@ -68,7 +68,7 @@ export function makeDaytimeGame(
       { playerId: "p2", roleDefinitionId: WerewolfRole.Seer },
       { playerId: "p3", roleDefinitionId: WerewolfRole.Bodyguard },
     ],
-    configuredRoleSlots: [],
+    configuredRoleBuckets: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner",
     modeConfig: {
@@ -117,7 +117,7 @@ export function makeDaytimeGameWithTrial(callerRoleId: WerewolfRole): Game {
       { playerId: "p2", roleDefinitionId: callerRoleId },
       { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
     ],
-    configuredRoleSlots: [],
+    configuredRoleBuckets: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner",
     modeConfig: {
@@ -164,7 +164,7 @@ export function makeDaytimeGameWithNominations(
       { playerId: "p2", roleDefinitionId: WerewolfRole.Seer },
       { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
     ],
-    configuredRoleSlots: [],
+    configuredRoleBuckets: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner",
     modeConfig: {

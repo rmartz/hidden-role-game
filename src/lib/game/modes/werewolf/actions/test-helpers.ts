@@ -29,7 +29,7 @@ export function makePlayingGame(
       { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
       { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
     ],
-    configuredRoleSlots: [],
+    configuredRoleBuckets: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner-1",
     modeConfig: {
@@ -135,7 +135,7 @@ export function makeTeamGame(
       { playerId: "p3", roleDefinitionId: WerewolfRole.Seer },
       { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
     ],
-    configuredRoleSlots: [],
+    configuredRoleBuckets: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner-1",
     modeConfig: {

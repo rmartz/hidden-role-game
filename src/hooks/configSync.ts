@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { throttle } from "lodash";
 import { useAppSelector } from "@/store";
-import { selectRoleSlots } from "@/store/game-config-slice";
+import { selectRoleBuckets } from "@/store/game-config-slice";
 import { useUpdateLobbyConfig } from "./lobby";
 
 const SYNC_INTERVAL_MS = 1000;
@@ -53,7 +53,7 @@ export function useConfigSync(
             timerConfig,
             modeConfig,
           } = gameConfigRef.current;
-          const roleSlots = selectRoleSlots(gameConfigRef.current);
+          const roleBuckets = selectRoleBuckets(gameConfigRef.current);
           const drainResolvers = () => {
             const resolvers = pendingFlushResolversRef.current.splice(0);
             resolvers.forEach((r) => {
@@ -66,7 +66,7 @@ export function useConfigSync(
               roleConfigMode,
               showConfigToPlayers,
               showRolesInPlay,
-              roleSlots,
+              roleBuckets,
               timerConfig,
               modeConfig,
             },
