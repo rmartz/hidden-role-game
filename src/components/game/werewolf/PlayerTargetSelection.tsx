@@ -81,10 +81,10 @@ export function PlayerTargetSelectionView({
     confirmPhaseKey === WerewolfRole.Witch &&
     myPlayerId !== undefined &&
     !(attackedPlayerIds ?? []).includes(myPlayerId);
+  const hasSecondMentalistTarget = mySecondNightTarget !== undefined;
   const shouldShowMentalistSecondTargetHeading =
     requiresSecondTarget &&
-    hasFirstMentalistTarget &&
-    mySecondNightTarget === undefined;
+    hasFirstMentalistTarget !== hasSecondMentalistTarget;
 
   const handleTargetClick = (player: TargetablePlayer, isSelected: boolean) => {
     if (requiresSecondTarget) {
