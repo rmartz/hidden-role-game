@@ -23,7 +23,9 @@ export interface WerewolfLobbyConfig extends BaseLobbyConfig {
   modeConfig: WerewolfModeConfig;
 }
 
-export const DEFAULT_WEREWOLF_MODE_CONFIG: WerewolfModeConfig = {
+export const DEFAULT_WEREWOLF_MODE_CONFIG: WerewolfModeConfig & {
+  showRolesOnDeath: boolean;
+} = {
   gameMode: GameMode.Werewolf,
   nominationsEnabled: true,
   singleTrialPerDay: true,
