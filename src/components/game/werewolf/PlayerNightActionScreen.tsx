@@ -60,6 +60,9 @@ export function PlayerNightActionScreen({
   }));
   const suggestedTargetId = gameState.suggestedTargetId;
   const allAgreed = gameState.allAgreed ?? false;
+  const isMentalist =
+    !isGroupPhase &&
+    gameState.myRole?.id === (WerewolfRole.Mentalist as string);
 
   const allTargets = getTargetablePlayers(
     gameState.players,
@@ -71,7 +74,11 @@ export function PlayerNightActionScreen({
   ).map((player) => [player, gameState.myNightTarget === player.id] as const);
 
   const targets = isConfirmed
-    ? allTargets.filter(([, isSelected]) => isSelected)
+    ? allTargets.filter(
+        ([player, isSelected]) =>
+          isSelected ||
+          (isMentalist && player.id === gameState.mySecondNightTarget),
+      )
     : allTargets;
 
   // For group phases (Werewolf, Wolf Cub waking together), use the phase key;
@@ -81,10 +88,6 @@ export function PlayerNightActionScreen({
   const attackedPlayerIds = (gameState.nightStatus ?? [])
     .filter((e) => e.effect === "attacked")
     .map((e) => e.targetPlayerId);
-
-  const isMentalist =
-    !isGroupPhase &&
-    gameState.myRole?.id === (WerewolfRole.Mentalist as string);
 
   const isAltruist =
     !isGroupPhase && gameState.myRole?.id === (WerewolfRole.Altruist as string);

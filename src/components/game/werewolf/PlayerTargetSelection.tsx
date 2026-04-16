@@ -205,6 +205,9 @@ export function PlayerTargetSelection({
                     player.id === previousNightTargetId ||
                     (isWitchSelfDisabled && player.id === myPlayerId) ||
                     (requiresSecondTarget &&
+                      mySecondNightTarget !== undefined &&
+                      player.id === myNightTarget) ||
+                    (requiresSecondTarget &&
                       isMentalistSelectionComplete &&
                       player.id !== myNightTarget &&
                       player.id !== mySecondNightTarget)
