@@ -49,9 +49,6 @@ export function RoleBucketConfig({
     (b): b is AdvancedRoleBucket => !isSimpleRoleBucket(b),
   );
   const allRoles = Object.values(roleDefinitions);
-  const inherentlyUniqueRoleIds = allRoles
-    .filter((r) => r.unique)
-    .map((r) => r.id);
 
   return (
     <RoleBucketConfigView
@@ -71,22 +68,14 @@ export function RoleBucketConfig({
       onSetBucketPlayerCount={(i, count) => {
         dispatch(setBucketPlayerCount({ bucketIndex: i, playerCount: count }));
       }}
-      onAddRole={(i, roleId, isUnique, bucketIsUnique) => {
-        dispatch(
-          addRoleToBucket({ bucketIndex: i, roleId, isUnique, bucketIsUnique }),
-        );
+      onAddRole={(i, roleId, bucketIsUnique) => {
+        dispatch(addRoleToBucket({ bucketIndex: i, roleId, bucketIsUnique }));
       }}
       onRemoveRole={(i, roleId) => {
         dispatch(removeRoleFromBucket({ bucketIndex: i, roleId }));
       }}
       onSetBucketUnique={(i, unique) => {
-        dispatch(
-          setBucketUnique({
-            bucketIndex: i,
-            unique,
-            inherentlyUniqueRoleIds,
-          }),
-        );
+        dispatch(setBucketUnique({ bucketIndex: i, unique }));
       }}
     />
   );
@@ -104,7 +93,6 @@ export interface RoleBucketConfigViewProps {
   onAddRole: (
     bucketIndex: number,
     roleId: string,
-    isUnique: boolean,
     bucketIsUnique: boolean,
   ) => void;
   onRemoveRole: (bucketIndex: number, roleId: string) => void;
@@ -143,8 +131,8 @@ export function RoleBucketConfigView({
           onSetPlayerCount={(count) => {
             onSetBucketPlayerCount(bucketIndex, count);
           }}
-          onAddRole={(roleId, isUnique, bucketIsUnique) => {
-            onAddRole(bucketIndex, roleId, isUnique, bucketIsUnique);
+          onAddRole={(roleId, bucketIsUnique) => {
+            onAddRole(bucketIndex, roleId, bucketIsUnique);
           }}
           onRemoveRole={(roleId) => {
             onRemoveRole(bucketIndex, roleId);
@@ -175,11 +163,7 @@ interface BucketEditorProps {
   onRemove: () => void;
   onSetName: (name: string) => void;
   onSetPlayerCount: (count: number) => void;
-  onAddRole: (
-    roleId: string,
-    isUnique: boolean,
-    bucketIsUnique: boolean,
-  ) => void;
+  onAddRole: (roleId: string, bucketIsUnique: boolean) => void;
   onRemoveRole: (roleId: string) => void;
   onSetBucketUnique: (unique: boolean) => void;
 }
@@ -206,7 +190,7 @@ function BucketEditor({
   });
   const hasNonUniqueRoles = nonUniqueSlots.length > 0;
   const bucketIsUnique =
-    hasNonUniqueRoles && nonUniqueSlots.every((s) => s.max !== undefined);
+    hasNonUniqueRoles && nonUniqueSlots.every((s) => s.max === 1);
 
   return (
     <div className="border rounded-md p-3 space-y-3">
@@ -312,9 +296,7 @@ function BucketEditor({
           disabled={disabled}
           onValueChange={(roleId) => {
             if (!roleId) return;
-            const id = roleId as string;
-            const roleDef = allRoles.find((r) => r.id === id);
-            onAddRole(id, roleDef?.unique === true, bucketIsUnique);
+            onAddRole(roleId as string, bucketIsUnique);
           }}
         >
           <SelectTrigger className="w-48 h-8 text-sm">

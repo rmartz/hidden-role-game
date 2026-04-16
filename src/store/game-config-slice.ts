@@ -261,8 +261,6 @@ const gameConfigSlice = createSlice({
       action: PayloadAction<{
         bucketIndex: number;
         roleId: string;
-        /** True if this role is inherently unique (only one copy allowed). */
-        isUnique?: boolean;
         /** True if the bucket is currently in all-unique mode — cap this slot too. */
         bucketIsUnique?: boolean;
       }>,
@@ -270,9 +268,10 @@ const gameConfigSlice = createSlice({
       const bucket = state.roleBuckets[action.payload.bucketIndex];
       if (!bucket || isSimpleRoleBucket(bucket)) return;
       if (!bucket.roles.some((r) => r.roleId === action.payload.roleId)) {
+        const roleDef = GAME_MODES[state.gameMode].roles[action.payload.roleId];
+        const isInherentlyUnique = roleDef?.unique === true;
         const shouldCap =
-          action.payload.isUnique === true ||
-          action.payload.bucketIsUnique === true;
+          isInherentlyUnique || action.payload.bucketIsUnique === true;
         bucket.roles.push({
           roleId: action.payload.roleId,
           ...(shouldCap ? { max: 1 } : {}),
@@ -300,22 +299,16 @@ const gameConfigSlice = createSlice({
       action: PayloadAction<{
         bucketIndex: number;
         unique: boolean;
-        /**
-         * Role IDs that are inherently unique — their max is always 1 and
-         * should not be touched by this toggle.
-         */
-        inherentlyUniqueRoleIds: string[];
       }>,
     ) {
       const bucket = state.roleBuckets[action.payload.bucketIndex];
       if (!bucket || isSimpleRoleBucket(bucket)) return;
+      const modeRoles = GAME_MODES[state.gameMode].roles;
       for (const slot of bucket.roles) {
-        if (action.payload.inherentlyUniqueRoleIds.includes(slot.roleId)) {
-          continue;
-        }
+        if (modeRoles[slot.roleId]?.unique === true) continue;
         if (action.payload.unique) {
           slot.max = 1;
-        } else {
+        } else if (slot.max === 1) {
           delete slot.max;
         }
       }
