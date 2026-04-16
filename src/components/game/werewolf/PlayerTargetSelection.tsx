@@ -146,7 +146,6 @@ export function PlayerTargetSelection({
                   onClick={() => {
                     if (requiresSecondTarget) {
                       if (player.id === myNightTarget) {
-                        if (mySecondNightTarget !== undefined) return;
                         action.mutate({
                           actionId: WerewolfAction.SetNightTarget,
                           payload: {
@@ -204,9 +203,6 @@ export function PlayerTargetSelection({
                     isConfirmed ||
                     player.id === previousNightTargetId ||
                     (isWitchSelfDisabled && player.id === myPlayerId) ||
-                    (requiresSecondTarget &&
-                      mySecondNightTarget !== undefined &&
-                      player.id === myNightTarget) ||
                     (requiresSecondTarget &&
                       isMentalistSelectionComplete &&
                       player.id !== myNightTarget &&
