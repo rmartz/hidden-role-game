@@ -137,8 +137,7 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
       revealProtections={activeModeConfigData.revealProtections}
       showRolesOnDeath={
         activeModeConfigData.showRolesOnDeath ??
-        DEFAULT_WEREWOLF_MODE_CONFIG.showRolesOnDeath ??
-        true
+        Boolean(DEFAULT_WEREWOLF_MODE_CONFIG.showRolesOnDeath)
       }
       disabled={disabled}
       onWerewolfTimerConfigChange={
