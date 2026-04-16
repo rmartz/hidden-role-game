@@ -255,9 +255,9 @@ export const setNightTargetAction: GameAction = {
           existing.secondTargetPlayerId
         ) {
           // Preserve the second target when only clearing the primary target.
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { targetPlayerId: _, ...rest } = existing;
-          phase.nightActions[phaseKey] = rest;
+          phase.nightActions[phaseKey] = {
+            secondTargetPlayerId: existing.secondTargetPlayerId,
+          };
         } else {
           // Clear: remove the action entirely (back to undecided state).
           phase.nightActions = Object.fromEntries(
