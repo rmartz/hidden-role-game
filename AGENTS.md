@@ -28,7 +28,7 @@ pnpm build-storybook  # Build static Storybook
 
 - **Source files**: Keep under ~200 lines (split at ~240). Large files should be split by logical concern.
 - **Test files**: Keep under ~300 lines (split at ~360). Use `.spec.ts` / `.spec.tsx` extension (not `.test.ts`). When splitting, organize into a `{module}-tests/` directory with domain-specific files (e.g., `resolution-tests/altruist.spec.ts`).
-- **Components**: Each component file must contain exactly one component and its associated props interface. All component props must be defined as an explicitly named interface (e.g., `interface PlayerListProps`), never inline in the function signature. Delegate complex logic to utility functions or sub-components.
+- **Components**: A component file contains its primary component and props interface. Small sub-components with no standalone meaning — context wrappers, structural templates that purely abstract a fragment of the parent, or trivially thin presentational helpers — may be co-located in the same file. Sub-components that are substantial enough to have their own stories or tests (e.g., list components, row components, any component exercising independent state or props) must be in their own file. All component props must be defined as an explicitly named interface (e.g., `interface PlayerListProps`), never inline in the function signature. Delegate complex logic to utility functions or sub-components.
 - **Type files**: Convert large type files into barrel-exported directories with one file per logical domain (e.g., `lobby.ts`, `game.ts`, `player.ts`).
 - **Utility files**: Split by the type of operation or domain they serve.
 - **Service files**: Extract complex logic areas into focused utility functions or smaller services.
