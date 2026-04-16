@@ -24,6 +24,7 @@ export interface WerewolfLobbyConfig extends BaseLobbyConfig {
 export const DEFAULT_WEREWOLF_MODE_CONFIG: WerewolfModeConfig = {
   gameMode: GameMode.Werewolf,
   nominationsEnabled: true,
+  // 2 allows a re-trial if the first ends in acquittal, without unlimited churn.
   trialsPerDay: 2,
   revealProtections: true,
 };
