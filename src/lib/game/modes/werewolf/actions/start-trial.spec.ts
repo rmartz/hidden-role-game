@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { GameMode } from "@/lib/types";
+import type { Game } from "@/lib/types";
 import { WerewolfPhase } from "../types";
 import type { WerewolfTurnState, WerewolfDaytimePhase } from "../types";
 import { WerewolfRole } from "../roles";
@@ -285,7 +286,7 @@ describe("WerewolfAction.StartTrial — singleTrialPerDay", () => {
         revealProtections: true,
         showRolesOnDeath: true,
       },
-    });
+    } as Partial<Game>);
     expect(action.isValid(game, "owner-1", { defendantId: "p4" })).toBe(false);
   });
 
@@ -306,7 +307,7 @@ describe("WerewolfAction.StartTrial — singleTrialPerDay", () => {
         revealProtections: true,
         showRolesOnDeath: true,
       },
-    });
+    } as Partial<Game>);
     expect(action.isValid(game, "owner-1", { defendantId: "p4" })).toBe(true);
   });
 });
