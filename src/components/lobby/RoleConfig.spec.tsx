@@ -203,7 +203,7 @@ describe("RoleConfig expanded view", () => {
     expect(screen.getByText(roleB.name)).toBeDefined();
   });
 
-  it("shows a flat list of matches during active search, bypassing category headings", () => {
+  it("groups search results under their category headings during active search", () => {
     const categorizedProps = {
       ...defaultProps,
       categoryOrder: ["cat-a", "cat-b"],
@@ -221,9 +221,10 @@ describe("RoleConfig expanded view", () => {
       ROLE_CONFIG_COPY.searchPlaceholder,
     );
     fireEvent.change(input, { target: { value: "tricky" } });
-    // Only roleB matches — shown in flat list without category headings
+    // Only roleB matches — shown under its category heading
     expect(screen.getByText(roleB.name)).toBeDefined();
-    expect(screen.queryByText("Category B")).toBeNull();
+    expect(screen.getByText("Category B")).toBeDefined();
+    // Category A has no matches so its heading is not shown
     expect(screen.queryByText("Category A")).toBeNull();
   });
 });
