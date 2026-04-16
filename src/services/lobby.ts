@@ -170,6 +170,29 @@ export async function addPlayer(
   return firebaseToLobby(lobbyId, data.public, data.private);
 }
 
+export async function renamePlayer(
+  lobbyId: string,
+  playerId: string,
+  playerName: string,
+): Promise<Lobby | undefined> {
+  const snap = await lobbyRef(lobbyId).once("value");
+  if (!snap.exists()) return undefined;
+
+  const data = snap.val() as {
+    public: FirebaseLobbyPublic;
+    private: FirebaseLobbyPrivate;
+  };
+
+  if (!data.public.players?.[playerId]) return undefined;
+
+  await lobbyRef(lobbyId)
+    .child(`public/players/${playerId}/name`)
+    .set(playerName);
+
+  data.public.players[playerId].name = playerName;
+  return firebaseToLobby(lobbyId, data.public, data.private);
+}
+
 export async function toggleReady(
   lobbyId: string,
   playerId: string,

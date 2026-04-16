@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   validatePlayerJoin,
+  validatePlayerRename,
   authorizePlayerRemoval,
   MAX_LOBBY_PLAYERS,
 } from "./lobby";
@@ -90,5 +91,23 @@ describe("authorizePlayerRemoval", () => {
     expect(
       authorizePlayerRemoval(lobby, "player-1", "session-owner"),
     ).toBeDefined();
+  });
+});
+
+describe("validatePlayerRename", () => {
+  it("returns undefined when the renamed name is unique", () => {
+    expect(
+      validatePlayerRename(makeLobby(), "player-1", "Charlie"),
+    ).toBeUndefined();
+  });
+
+  it("returns undefined when the renamed name normalizes to the same current player name", () => {
+    expect(
+      validatePlayerRename(makeLobby(), "player-1", " alice "),
+    ).toBeUndefined();
+  });
+
+  it("returns an error when the renamed name matches another player", () => {
+    expect(validatePlayerRename(makeLobby(), "player-1", "bob")).toBeDefined();
   });
 });

@@ -72,6 +72,10 @@ export interface JoinLobbyRequest {
   playerName: string;
 }
 
+export interface UpdatePlayerNameRequest {
+  playerName: string;
+}
+
 export interface UpdateLobbyConfigRequest {
   showConfigToPlayers?: boolean;
   showRolesInPlay?: ShowRolesInPlay;

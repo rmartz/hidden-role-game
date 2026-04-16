@@ -19,9 +19,11 @@ interface PlayerListProps {
   isFetching: boolean;
   disabled: boolean;
   isReadyPending: boolean;
+  isRenamePending: boolean;
   onRefetch: () => void;
   onRemovePlayer: (playerId: string) => void;
   onTransferOwner: (playerId: string) => void;
+  onRenamePlayer: (playerName: string) => void;
   onToggleReady: () => void;
   onReorderPlayers?: (playerOrder: string[]) => void;
 }
@@ -51,9 +53,11 @@ export function PlayerList({
   isFetching,
   disabled,
   isReadyPending,
+  isRenamePending,
   onRefetch,
   onRemovePlayer,
   onTransferOwner,
+  onRenamePlayer,
   onToggleReady,
   onReorderPlayers,
 }: PlayerListProps) {
@@ -186,10 +190,12 @@ export function PlayerList({
                 showRemovePlayer={showRemovePlayer}
                 showMakeOwner={showMakeOwner}
                 disabled={disabled}
+                isRenamePending={isRenamePending}
                 canDrag={canDragRow(player.id)}
                 canReceiveDrop={canReorder}
                 onRemovePlayer={onRemovePlayer}
                 onTransferOwner={onTransferOwner}
+                onRenamePlayer={onRenamePlayer}
                 onDragStart={handleDragStart}
                 onDragOver={handleDragOver}
                 onDragEnd={handleDragEnd}
