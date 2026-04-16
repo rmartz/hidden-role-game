@@ -6,7 +6,7 @@ import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-vil
 import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-villain/lobby-config";
 
 const DEFAULT_BUCKETS: RoleBucket[] = [
-  { playerCount: 2, roles: [{ roleId: "good", min: 1 }] },
+  { playerCount: 2, roles: [{ roleId: "good" }] },
 ];
 
 function makeLobby(overrides: Partial<Lobby> = {}): Lobby {

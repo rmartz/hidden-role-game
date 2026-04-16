@@ -11,7 +11,7 @@ describe("validateRoleBucketsCoverPlayerCount", () => {
   // SecretVillain has no custom roleSlotsRequired, so required == playerCount
   it("returns undefined when buckets exactly cover the player count", () => {
     const buckets: RoleBucket[] = [
-      { playerCount: 5, roles: [{ roleId: "r", min: 1 }] },
+      { playerCount: 5, roles: [{ roleId: "r" }] },
     ];
     expect(
       validateRoleBucketsCoverPlayerCount(buckets, GameMode.SecretVillain, 5),
@@ -20,7 +20,7 @@ describe("validateRoleBucketsCoverPlayerCount", () => {
 
   it("returns an error when total playerCount is less than required", () => {
     const buckets: RoleBucket[] = [
-      { playerCount: 3, roles: [{ roleId: "r", min: 1 }] },
+      { playerCount: 3, roles: [{ roleId: "r" }] },
     ];
     expect(
       validateRoleBucketsCoverPlayerCount(buckets, GameMode.SecretVillain, 5),
@@ -29,7 +29,7 @@ describe("validateRoleBucketsCoverPlayerCount", () => {
 
   it("returns an error when total playerCount exceeds required", () => {
     const buckets: RoleBucket[] = [
-      { playerCount: 6, roles: [{ roleId: "r", min: 1 }] },
+      { playerCount: 6, roles: [{ roleId: "r" }] },
     ];
     expect(
       validateRoleBucketsCoverPlayerCount(buckets, GameMode.SecretVillain, 5),
@@ -38,8 +38,8 @@ describe("validateRoleBucketsCoverPlayerCount", () => {
 
   it("returns undefined when multiple buckets sum to exact player count", () => {
     const buckets: RoleBucket[] = [
-      { playerCount: 3, roles: [{ roleId: "good", min: 1 }] },
-      { playerCount: 2, roles: [{ roleId: "bad", min: 1 }] },
+      { playerCount: 3, roles: [{ roleId: "good" }] },
+      { playerCount: 2, roles: [{ roleId: "bad" }] },
     ];
     expect(
       validateRoleBucketsCoverPlayerCount(buckets, GameMode.SecretVillain, 5),
@@ -52,15 +52,15 @@ describe("validateRoleBucketsForMode", () => {
     const buckets: RoleBucket[] = [
       {
         playerCount: 3,
-        roles: [{ roleId: SecretVillainRole.Good, min: 1 }],
+        roles: [{ roleId: SecretVillainRole.Good }],
       },
       {
         playerCount: 1,
-        roles: [{ roleId: SecretVillainRole.Bad, min: 1 }],
+        roles: [{ roleId: SecretVillainRole.Bad }],
       },
       {
         playerCount: 1,
-        roles: [{ roleId: SecretVillainRole.SpecialBad, min: 1 }],
+        roles: [{ roleId: SecretVillainRole.SpecialBad }],
       },
     ];
     expect(
@@ -72,11 +72,11 @@ describe("validateRoleBucketsForMode", () => {
     const buckets: RoleBucket[] = [
       {
         playerCount: 3,
-        roles: [{ roleId: SecretVillainRole.Good, min: 1 }],
+        roles: [{ roleId: SecretVillainRole.Good }],
       },
       {
         playerCount: 1,
-        roles: [{ roleId: "not-a-real-role", min: 1 }],
+        roles: [{ roleId: "not-a-real-role" }],
       },
     ];
     const error = validateRoleBucketsForMode(buckets, GameMode.SecretVillain);

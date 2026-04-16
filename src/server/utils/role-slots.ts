@@ -9,24 +9,15 @@ import { getModeDefinition } from "@/lib/game/state";
 import { getRoleSlotsRequired } from "@/lib/game/modes";
 
 /**
- * Validates that an advanced bucket's role constraints can fill its playerCount.
- * Checks that sum(min) <= playerCount and total draw capacity >= playerCount.
+ * Validates that an advanced bucket's role pool can fill its playerCount.
+ * Checks that total draw capacity (sum of max, or playerCount for non-unique) >= playerCount.
  */
 function validateAdvancedBucketFeasibility(
   bucket: AdvancedRoleBucket,
 ): string | undefined {
-  let requiredCount = 0;
   let maxCapacity = 0;
   for (const slot of bucket.roles) {
-    if (slot.max !== undefined && slot.max < slot.min) {
-      return `Role "${slot.roleId}" has max (${String(slot.max)}) less than min (${String(slot.min)})`;
-    }
-    requiredCount += slot.min;
-    // Non-unique roles can fill the whole bucket; unique roles are capped at max.
     maxCapacity += slot.max ?? bucket.playerCount;
-  }
-  if (requiredCount > bucket.playerCount) {
-    return `Bucket requires ${String(requiredCount)} roles but only has ${String(bucket.playerCount)} player slots`;
   }
   if (maxCapacity < bucket.playerCount) {
     return `Bucket can fill at most ${String(maxCapacity)} of ${String(bucket.playerCount)} player slots`;

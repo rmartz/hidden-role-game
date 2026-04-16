@@ -46,11 +46,14 @@ function roleBucketToFirebase(bucket: RoleBucket): FirebaseRoleBucket {
   bucket.roles.forEach((slot, i) => {
     roles[String(i)] = {
       roleId: slot.roleId,
-      min: slot.min,
       ...(slot.max !== undefined ? { max: slot.max } : {}),
     };
   });
-  return { playerCount: bucket.playerCount, roles };
+  return {
+    playerCount: bucket.playerCount,
+    roles,
+    ...(bucket.name !== undefined ? { name: bucket.name } : {}),
+  };
 }
 
 function firebaseToRoleBucket(bucket: FirebaseRoleBucket): RoleBucket {
@@ -59,10 +62,13 @@ function firebaseToRoleBucket(bucket: FirebaseRoleBucket): RoleBucket {
   }
   const roles: RoleBucketSlot[] = Object.values(bucket.roles).map((s) => ({
     roleId: s.roleId,
-    min: s.min,
     ...(s.max !== undefined ? { max: s.max } : {}),
   }));
-  return { playerCount: bucket.playerCount, roles };
+  return {
+    playerCount: bucket.playerCount,
+    roles,
+    ...(bucket.name !== undefined ? { name: bucket.name } : {}),
+  };
 }
 
 export function gameToFirebase(game: Game): FirebaseGamePublic {

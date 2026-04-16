@@ -12,13 +12,14 @@ import {
   addBucket,
   removeBucket,
   setBucketPlayerCount,
+  setBucketName,
   addRoleToBucket,
   removeRoleFromBucket,
   setBucketRoleUnique,
-  setBucketRoleMin,
 } from "@/store/game-config-slice";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -58,6 +59,7 @@ export function RoleBucketConfig({
             gameMode={gameMode}
             disabled={disabled}
             onRemove={() => dispatch(removeBucket(bucketIndex))}
+            onSetName={(name) => dispatch(setBucketName({ bucketIndex, name }))}
             onSetPlayerCount={(count) =>
               dispatch(
                 setBucketPlayerCount({ bucketIndex, playerCount: count }),
@@ -71,9 +73,6 @@ export function RoleBucketConfig({
             }
             onSetUnique={(roleId, unique) =>
               dispatch(setBucketRoleUnique({ bucketIndex, roleId, unique }))
-            }
-            onSetMin={(roleId, min) =>
-              dispatch(setBucketRoleMin({ bucketIndex, roleId, min }))
             }
           />
         ))}
@@ -96,11 +95,11 @@ interface BucketEditorProps {
   gameMode: GameMode;
   disabled: boolean;
   onRemove: () => void;
+  onSetName: (name: string) => void;
   onSetPlayerCount: (count: number) => void;
   onAddRole: (roleId: string) => void;
   onRemoveRole: (roleId: string) => void;
   onSetUnique: (roleId: string, unique: boolean) => void;
-  onSetMin: (roleId: string, min: number) => void;
 }
 
 function BucketEditor({
@@ -110,11 +109,11 @@ function BucketEditor({
   gameMode,
   disabled,
   onRemove,
+  onSetName,
   onSetPlayerCount,
   onAddRole,
   onRemoveRole,
   onSetUnique,
-  onSetMin,
 }: BucketEditorProps) {
   const assignedRoleIds = new Set(bucket.roles.map((r) => r.roleId));
   const availableRoles = allRoles.filter((r) => !assignedRoleIds.has(r.id));
@@ -122,9 +121,17 @@ function BucketEditor({
   return (
     <div className="border rounded-md p-3 space-y-3">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-sm font-medium">
-          {ROLE_BUCKET_CONFIG_COPY.bucketLabel(bucketIndex)}
-        </span>
+        <Input
+          className="h-7 text-sm font-medium w-40 px-2"
+          value={bucket.name ?? ""}
+          onChange={(e) => {
+            onSetName(e.target.value);
+          }}
+          placeholder={ROLE_BUCKET_CONFIG_COPY.bucketNamePlaceholder(
+            bucketIndex,
+          )}
+          disabled={disabled}
+        />
         <div className="flex items-center gap-2">
           <span className="text-xs text-muted-foreground">
             {ROLE_BUCKET_CONFIG_COPY.playerCount}
@@ -175,20 +182,6 @@ function BucketEditor({
                   )}
                 </span>
                 <div className="flex items-center gap-3 shrink-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-xs text-muted-foreground">Min</span>
-                    <Incrementer
-                      value={slot.min}
-                      onChange={(dir) => {
-                        onSetMin(
-                          slot.roleId,
-                          dir === "increment" ? slot.min + 1 : slot.min - 1,
-                        );
-                      }}
-                      disabled={disabled}
-                      minValue={0}
-                    />
-                  </div>
                   <label className="flex items-center gap-1.5 cursor-pointer">
                     <Checkbox
                       checked={slot.max !== undefined}
@@ -222,7 +215,7 @@ function BucketEditor({
         <Select
           disabled={disabled}
           onValueChange={(roleId) => {
-            onAddRole(roleId as string);
+            if (roleId) onAddRole(roleId as string);
           }}
         >
           <SelectTrigger className="w-48 h-8 text-sm">

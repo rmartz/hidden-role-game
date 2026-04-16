@@ -7,8 +7,8 @@ import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-vill
 import { buildRolesInPlay } from "../initialization";
 
 const DEFAULT_BUCKETS: RoleBucket[] = [
-  { playerCount: 1, roles: [{ roleId: SecretVillainRole.Good, min: 1 }] },
-  { playerCount: 1, roles: [{ roleId: SecretVillainRole.Bad, min: 1 }] },
+  { playerCount: 1, roles: [{ roleId: SecretVillainRole.Good }] },
+  { playerCount: 1, roles: [{ roleId: SecretVillainRole.Bad }] },
 ];
 
 function makeSecretVillainGame(
@@ -56,8 +56,8 @@ describe("GameInitializationService.buildRolesInPlay", () => {
       ],
       ShowRolesInPlay.RoleAndCount,
       [
-        { playerCount: 2, roles: [{ roleId: SecretVillainRole.Good, min: 1 }] },
-        { playerCount: 1, roles: [{ roleId: SecretVillainRole.Bad, min: 1 }] },
+        { playerCount: 2, roles: [{ roleId: SecretVillainRole.Good }] },
+        { playerCount: 1, roles: [{ roleId: SecretVillainRole.Bad }] },
       ],
     );
 
@@ -80,7 +80,7 @@ describe("GameInitializationService.buildRolesInPlay", () => {
 
   it("returns unique roles without count for AssignedRolesOnly", () => {
     const buckets: RoleBucket[] = [
-      { playerCount: 2, roles: [{ roleId: SecretVillainRole.Good, min: 1 }] },
+      { playerCount: 2, roles: [{ roleId: SecretVillainRole.Good }] },
     ];
     const game = makeSecretVillainGame(
       [
@@ -98,16 +98,16 @@ describe("GameInitializationService.buildRolesInPlay", () => {
       id: SecretVillainRole.Good,
       name: "Good Role",
       team: Team.Good,
-      min: 1,
-      max: 1,
+      min: 0,
+      max: 2,
     });
     expect(result?.[0]).not.toHaveProperty("count");
   });
 
   it("returns configured roles for ConfiguredOnly", () => {
     const buckets: RoleBucket[] = [
-      { playerCount: 2, roles: [{ roleId: SecretVillainRole.Good, min: 1 }] },
-      { playerCount: 1, roles: [{ roleId: SecretVillainRole.Bad, min: 1 }] },
+      { playerCount: 2, roles: [{ roleId: SecretVillainRole.Good }] },
+      { playerCount: 1, roles: [{ roleId: SecretVillainRole.Bad }] },
     ];
     const game = makeSecretVillainGame(
       [{ playerId: "p1", roleDefinitionId: SecretVillainRole.Good }],
@@ -119,16 +119,16 @@ describe("GameInitializationService.buildRolesInPlay", () => {
 
     expect(result).toHaveLength(2);
     expect(result).toContainEqual(
-      expect.objectContaining({ id: SecretVillainRole.Good, min: 1 }),
+      expect.objectContaining({ id: SecretVillainRole.Good, min: 0 }),
     );
     expect(result).toContainEqual(
-      expect.objectContaining({ id: SecretVillainRole.Bad, min: 1 }),
+      expect.objectContaining({ id: SecretVillainRole.Bad, min: 0 }),
     );
   });
 
   it("ConfiguredOnly shows all roles present in configuredRoleBuckets", () => {
     const buckets: RoleBucket[] = [
-      { playerCount: 3, roles: [{ roleId: SecretVillainRole.Good, min: 1 }] },
+      { playerCount: 3, roles: [{ roleId: SecretVillainRole.Good }] },
     ];
     const game = makeSecretVillainGame(
       [{ playerId: "p1", roleDefinitionId: SecretVillainRole.Good }],

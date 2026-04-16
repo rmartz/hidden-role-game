@@ -8,8 +8,8 @@ import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-vill
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
 
 const DEFAULT_BUCKETS: RoleBucket[] = [
-  { playerCount: 1, roles: [{ roleId: "good", min: 1 }] },
-  { playerCount: 1, roles: [{ roleId: "bad", min: 1 }] },
+  { playerCount: 1, roles: [{ roleId: "good" }] },
+  { playerCount: 1, roles: [{ roleId: "bad" }] },
 ];
 
 function makePlayer(
@@ -194,8 +194,8 @@ function makeNarratorGame(nominationsEnabled = false): Game {
       { playerId: "p2", roleDefinitionId: "werewolf-werewolf" },
     ],
     configuredRoleBuckets: [
-      { playerCount: 1, roles: [{ roleId: "werewolf-villager", min: 1 }] },
-      { playerCount: 1, roles: [{ roleId: "werewolf-werewolf", min: 1 }] },
+      { playerCount: 1, roles: [{ roleId: "werewolf-villager" }] },
+      { playerCount: 1, roles: [{ roleId: "werewolf-werewolf" }] },
     ],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "narrator",

@@ -72,8 +72,8 @@ describe("POST /api/game/create", () => {
   it("should allow the owner to start the game with valid role buckets", async () => {
     const { lobbyId, aliceSession } = await setupLobbyWithPlayers();
     await configureRoleBuckets(lobbyId, aliceSession, [
-      { playerCount: 1, roles: [{ roleId: "good", min: 1 }] },
-      { playerCount: 1, roles: [{ roleId: "bad", min: 1 }] },
+      { playerCount: 1, roles: [{ roleId: "good" }] },
+      { playerCount: 1, roles: [{ roleId: "bad" }] },
     ]);
 
     const res = await startGame(
@@ -89,7 +89,7 @@ describe("POST /api/game/create", () => {
   it("should return 400 when role bucket count does not match player count", async () => {
     const { lobbyId, aliceSession } = await setupLobbyWithPlayers();
     await configureRoleBuckets(lobbyId, aliceSession, [
-      { playerCount: 1, roles: [{ roleId: "good", min: 1 }] },
+      { playerCount: 1, roles: [{ roleId: "good" }] },
     ]);
 
     const res = await startGame(
@@ -112,8 +112,8 @@ describe("POST /api/game/create", () => {
   it("should allow starting an Avalon game with Avalon role buckets", async () => {
     const { lobbyId, aliceSession } = await setupLobbyWithPlayers("avalon");
     await configureRoleBuckets(lobbyId, aliceSession, [
-      { playerCount: 1, roles: [{ roleId: "avalon-merlin", min: 1 }] },
-      { playerCount: 1, roles: [{ roleId: "avalon-minion", min: 1 }] },
+      { playerCount: 1, roles: [{ roleId: "avalon-merlin" }] },
+      { playerCount: 1, roles: [{ roleId: "avalon-minion" }] },
     ]);
 
     const res = await startGame(
@@ -129,8 +129,8 @@ describe("POST /api/game/create", () => {
   it("should return 400 when using a role from the wrong game mode", async () => {
     const { lobbyId, aliceSession } = await setupLobbyWithPlayers("avalon");
     await configureRoleBuckets(lobbyId, aliceSession, [
-      { playerCount: 1, roles: [{ roleId: "good", min: 1 }] },
-      { playerCount: 1, roles: [{ roleId: "bad", min: 1 }] },
+      { playerCount: 1, roles: [{ roleId: "good" }] },
+      { playerCount: 1, roles: [{ roleId: "bad" }] },
     ]);
 
     const res = await startGame(
@@ -165,8 +165,8 @@ describe("POST /api/game/create", () => {
   it("should return 409 when the game has already started", async () => {
     const { lobbyId, aliceSession } = await setupLobbyWithPlayers();
     await configureRoleBuckets(lobbyId, aliceSession, [
-      { playerCount: 1, roles: [{ roleId: "good", min: 1 }] },
-      { playerCount: 1, roles: [{ roleId: "bad", min: 1 }] },
+      { playerCount: 1, roles: [{ roleId: "good" }] },
+      { playerCount: 1, roles: [{ roleId: "bad" }] },
     ]);
 
     await startGame(
@@ -185,7 +185,7 @@ describe("POST /api/game/create", () => {
     const { lobbyId, aliceSession } = await setupLobbyWithPlayers("werewolf");
     // Alice (owner) is the Narrator; Bob gets the only role bucket.
     await configureRoleBuckets(lobbyId, aliceSession, [
-      { playerCount: 1, roles: [{ roleId: "werewolf-villager", min: 1 }] },
+      { playerCount: 1, roles: [{ roleId: "werewolf-villager" }] },
     ]);
 
     const res = await startGame(

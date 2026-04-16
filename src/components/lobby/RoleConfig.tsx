@@ -1,6 +1,12 @@
 import { sum } from "lodash";
 import { useState } from "react";
-import type { GameMode, RoleBucket, RoleDefinition, Team } from "@/lib/types";
+import type {
+  AdvancedRoleBucket,
+  GameMode,
+  RoleBucket,
+  RoleDefinition,
+  Team,
+} from "@/lib/types";
 import { RoleConfigMode, isSimpleRoleBucket } from "@/lib/types";
 import { useAppSelector } from "@/store";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,9 +53,7 @@ export function RoleConfig(props: RoleConfigProps) {
   const readOnlyBuckets = readOnly ? (props.roleBuckets ?? []) : [];
   const readOnlyMin = Object.fromEntries(
     readOnlyBuckets.flatMap((b) =>
-      isSimpleRoleBucket(b)
-        ? [[b.roleId, b.playerCount]]
-        : b.roles.map((s) => [s.roleId, s.min]),
+      isSimpleRoleBucket(b) ? [[b.roleId, b.playerCount]] : [],
     ),
   );
   const readOnlyMax = Object.fromEntries(
@@ -135,7 +139,46 @@ export function RoleConfig(props: RoleConfigProps) {
               disabled={props.disabled}
             />
           )}
-          {(!isAdvanced || readOnly) && (
+          {readOnly && isAdvanced && (
+            <ul className="space-y-3 list-none p-0">
+              {readOnlyBuckets
+                .filter((b): b is AdvancedRoleBucket => !isSimpleRoleBucket(b))
+                .map((bucket, i) => (
+                  <li key={i} className="border rounded-md p-3 space-y-1">
+                    <p className="text-sm font-medium">
+                      {bucket.name ?? ROLE_CONFIG_COPY.bucketLabel(i)}
+                    </p>
+                    <ul className="space-y-0.5 list-none p-0">
+                      {bucket.roles.map((slot) => {
+                        const roleDef = roleDefinitions[slot.roleId];
+                        return (
+                          <li
+                            key={slot.roleId}
+                            className="flex items-center gap-2"
+                          >
+                            {roleDef ? (
+                              <RoleConfigEntry
+                                role={roleDef}
+                                gameMode={gameMode}
+                                roleConfigMode={roleConfigMode}
+                                min={0}
+                                max={slot.max ?? bucket.playerCount}
+                                readOnly={true}
+                              />
+                            ) : (
+                              <span className="text-sm text-muted-foreground">
+                                {slot.roleId}
+                              </span>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </li>
+                ))}
+            </ul>
+          )}
+          {!isAdvanced && (
             <>
               <ul className="space-y-1 list-none p-0">
                 {topListRoles.map((role) =>

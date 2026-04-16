@@ -42,8 +42,8 @@ async function setupFinishedGame() {
       },
       body: JSON.stringify({
         roleBuckets: [
-          { playerCount: 1, roles: [{ roleId: "good", min: 1 }] },
-          { playerCount: 1, roles: [{ roleId: "bad", min: 1 }] },
+          { playerCount: 1, roles: [{ roleId: "good" }] },
+          { playerCount: 1, roles: [{ roleId: "bad" }] },
         ],
       }),
     }),
@@ -134,8 +134,8 @@ describe("POST /api/lobby/[lobbyId]/return", () => {
         },
         body: JSON.stringify({
           roleBuckets: [
-            { playerCount: 1, roles: [{ roleId: "good", min: 1 }] },
-            { playerCount: 1, roles: [{ roleId: "bad", min: 1 }] },
+            { playerCount: 1, roles: [{ roleId: "good" }] },
+            { playerCount: 1, roles: [{ roleId: "bad" }] },
           ],
         }),
       }),

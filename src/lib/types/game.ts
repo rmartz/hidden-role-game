@@ -245,14 +245,13 @@ export interface PlayerRoleAssignment {
 }
 
 /**
- * A single role entry within a role bucket.
- * `min` is the guaranteed minimum count from this bucket.
- * `max` is undefined for non-unique roles (unlimited copies); set to a number
- * for unique roles (e.g. max: 1 means at most one copy drawn from this bucket).
+ * A single role entry within an advanced role bucket.
+ * `max` is undefined for non-unique roles (can fill the whole bucket);
+ * set to a number to cap how many copies can be drawn
+ * (e.g. max: 1 means at most one copy drawn from this bucket).
  */
 export interface RoleBucketSlot {
   roleId: string;
-  min: number;
   max?: number;
 }
 
@@ -269,6 +268,8 @@ export interface SimpleRoleBucket {
 export interface AdvancedRoleBucket {
   playerCount: number;
   roles: RoleBucketSlot[];
+  /** Optional display name shown in the config UI and post-game lobby. */
+  name?: string;
 }
 
 export type RoleBucket = SimpleRoleBucket | AdvancedRoleBucket;

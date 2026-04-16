@@ -125,8 +125,8 @@ export function buildRolesInPlay(game: Game): RoleInPlay[] | undefined {
   const { roles } = GAME_MODES[game.gameMode];
 
   // Build a role display map from buckets: aggregate counts across all buckets.
-  // Simple buckets always contribute exactly playerCount of a single role.
-  // Advanced buckets contribute per-slot min/max (undefined max = non-unique).
+  // Simple buckets always contribute exactly playerCount of a single role (min = max).
+  // Advanced buckets contribute per-slot max (undefined max = non-unique, min is always 0).
   const roleDisplayMap = new Map<string, { min: number; max?: number }>();
   for (const bucket of game.configuredRoleBuckets) {
     if (isSimpleRoleBucket(bucket)) {
@@ -138,12 +138,10 @@ export function buildRolesInPlay(game: Game): RoleInPlay[] | undefined {
     } else {
       for (const slot of bucket.roles) {
         const existing = roleDisplayMap.get(slot.roleId);
+        const slotMax = slot.max ?? bucket.playerCount;
         roleDisplayMap.set(slot.roleId, {
-          min: (existing?.min ?? 0) + slot.min,
-          max:
-            slot.max !== undefined && existing?.max !== undefined
-              ? existing.max + slot.max
-              : undefined,
+          min: existing?.min ?? 0,
+          max: existing?.max !== undefined ? existing.max + slotMax : slotMax,
         });
       }
     }
