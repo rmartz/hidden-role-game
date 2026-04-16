@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { GameMode } from "@/lib/types";
-import { WerewolfPhase } from "../types";
+import { WerewolfPhase, TrialPhase } from "../types";
 import type { WerewolfTurnState } from "../types";
 import { WerewolfRole } from "../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
@@ -81,7 +81,7 @@ describe("WerewolfAction.WithdrawNomination", () => {
           activeTrial: {
             defendantId: "p3",
             startedAt: 2000,
-            phase: "defense",
+            phase: TrialPhase.Defense,
             votes: [],
           },
         },
