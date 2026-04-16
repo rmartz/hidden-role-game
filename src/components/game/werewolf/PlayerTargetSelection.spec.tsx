@@ -51,13 +51,10 @@ describe("PlayerTargetSelection", () => {
           { id: "p3", name: "Charlie" },
           { id: "p4", name: "Dave" },
         ]}
-        targets={targetPlayers.map<TargetSelectionTuple>(
-          (player) =>
-            [
-              player,
-              player.id === "p2",
-            ] as const satisfies TargetSelectionTuple,
-        )}
+        targets={targetPlayers.map<TargetSelectionTuple>((player) => [
+          player,
+          player.id === "p2",
+        ])}
         isConfirmed={false}
         isGroupPhase={false}
         confirmPhaseKey={WerewolfRole.Mentalist}
