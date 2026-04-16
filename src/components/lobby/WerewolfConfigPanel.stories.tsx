@@ -13,13 +13,11 @@ type Story = StoryObj<typeof meta>;
 const DEFAULT_ARGS = {
   timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   nominationEnabled: true,
-  singleTrialPerDay: true,
   trialsPerDay: 1,
   revealProtections: true,
   showRolesOnDeath: true,
   onWerewolfTimerConfigChange: fn(),
   onNominationEnabledChange: fn(),
-  onSingleTrialPerDayChange: fn(),
   onTrialsPerDayChange: fn(),
   onRevealProtectionsChange: fn(),
   onShowRolesOnDeathChange: fn(),
