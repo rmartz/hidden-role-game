@@ -141,15 +141,18 @@ export function assignRolesFromBucketsWithHidden(
   const remainingRoleIds = [...allRoleIds];
 
   for (let i = 0; i < hiddenCount; i++) {
-    // Find the first candidate (in shuffled order) that is safe to hide.
-    const candidateIndex = remainingRoleIds.findIndex((_, idx) =>
-      isSafeToHide(idx, remainingRoleIds, roles),
-    );
-    if (candidateIndex === -1) {
+    const safeIndices = remainingRoleIds
+      .map((_, idx) => idx)
+      .filter((idx) => isSafeToHide(idx, remainingRoleIds, roles));
+    if (safeIndices.length === 0) {
       throw new Error(
         "Cannot hide any more roles: removing any remaining role would leave no Bad or Neutral roles in the game.",
       );
     }
+    const candidateIndex =
+      safeIndices[Math.floor(Math.random() * safeIndices.length)];
+    if (candidateIndex === undefined)
+      throw new Error("Safe index unexpectedly undefined");
     const [hidden] = remainingRoleIds.splice(candidateIndex, 1);
     if (!hidden) throw new Error("Unexpected empty splice result");
     hiddenRoleIds.push(hidden);

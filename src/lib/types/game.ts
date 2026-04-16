@@ -190,6 +190,11 @@ export interface GameModeConfig {
    */
   resolveOwnerSeesRoleAssignments?(modeConfig: ModeConfig): boolean;
   /**
+   * Resolve which dead player IDs should have their roles revealed mid-game.
+   * When not implemented, all provided dead player IDs are revealed.
+   */
+  resolveRevealDeadPlayerIds?(game: Game, deadPlayerIds: string[]): string[];
+  /**
    * Returns the number of role slots required for a specific game configuration.
    * Use when slot count depends on modeConfig (e.g. optional Board player).
    * Falls back to `roleSlotsRequired` when not implemented.

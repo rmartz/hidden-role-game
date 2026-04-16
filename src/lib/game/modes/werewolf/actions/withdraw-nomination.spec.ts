@@ -35,6 +35,7 @@ describe("WerewolfAction.WithdrawNomination", () => {
             trialsPerDay: 1,
             revealProtections: true,
             hiddenRoleCount: 0,
+            showRolesOnDeath: true,
           },
         },
       );
@@ -49,6 +50,7 @@ describe("WerewolfAction.WithdrawNomination", () => {
           trialsPerDay: 1,
           revealProtections: true,
           hiddenRoleCount: 0,
+          showRolesOnDeath: true,
         },
       });
       expect(action.isValid(game, "p2", null)).toBe(false);
@@ -64,6 +66,7 @@ describe("WerewolfAction.WithdrawNomination", () => {
             trialsPerDay: 1,
             revealProtections: true,
             hiddenRoleCount: 0,
+            showRolesOnDeath: true,
           },
         },
       );
@@ -94,6 +97,7 @@ describe("WerewolfAction.WithdrawNomination", () => {
           trialsPerDay: 1,
           revealProtections: true,
           hiddenRoleCount: 0,
+          showRolesOnDeath: true,
         },
       });
       expect(action.isValid(game, "p2", null)).toBe(false);
@@ -118,6 +122,7 @@ describe("WerewolfAction.WithdrawNomination", () => {
           trialsPerDay: 1,
           revealProtections: true,
           hiddenRoleCount: 0,
+          showRolesOnDeath: true,
         },
       });
       expect(action.isValid(game, "p2", null)).toBe(false);
@@ -138,6 +143,7 @@ describe("WerewolfAction.WithdrawNomination", () => {
             trialsPerDay: 1,
             revealProtections: true,
             hiddenRoleCount: 0,
+            showRolesOnDeath: true,
           },
         },
       );
@@ -169,6 +175,7 @@ describe("WerewolfAction.WithdrawNomination", () => {
             trialsPerDay: 1,
             revealProtections: true,
             hiddenRoleCount: 0,
+            showRolesOnDeath: true,
           },
         },
       );

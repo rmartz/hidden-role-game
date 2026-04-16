@@ -76,6 +76,7 @@ describe("extractDaytimePlayerState — playerCount excludes silenced", () => {
         trialsPerDay: 1,
         revealProtections: true,
         hiddenRoleCount: 0,
+        showRolesOnDeath: true,
       },
       timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     };
@@ -125,6 +126,7 @@ describe("extractDaytimePlayerState — playerCount excludes silenced", () => {
         trialsPerDay: 1,
         revealProtections: true,
         hiddenRoleCount: 0,
+        showRolesOnDeath: true,
       },
       timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     };

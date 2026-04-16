@@ -8,6 +8,7 @@ import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "./timer-config";
 import {
   DEFAULT_WEREWOLF_MODE_CONFIG,
   buildDefaultWerewolfLobbyConfig,
+  getWerewolfModeConfig,
   parseWerewolfModeConfig,
 } from "./lobby-config";
 import { werewolfServices } from "./services";
@@ -32,6 +33,9 @@ export const WEREWOLF_CONFIG = {
   defaultModeConfig: DEFAULT_WEREWOLF_MODE_CONFIG,
   parseModeConfig: parseWerewolfModeConfig,
   buildDefaultLobbyConfig: buildDefaultWerewolfLobbyConfig,
+  resolveRevealDeadPlayerIds(game, deadPlayerIds) {
+    return getWerewolfModeConfig(game).showRolesOnDeath ? deadPlayerIds : [];
+  },
   actions: WEREWOLF_ACTIONS,
   services: werewolfServices,
   // The Narrator is a player but doesn't receive a role.

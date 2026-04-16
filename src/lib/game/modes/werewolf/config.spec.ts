@@ -11,6 +11,7 @@ const defaultModeConfig: WerewolfModeConfig = {
   nominationsEnabled: true,
   trialsPerDay: 2,
   revealProtections: true,
+  showRolesOnDeath: true,
   hiddenRoleCount: 0,
 };
 

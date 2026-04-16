@@ -12,6 +12,8 @@ export interface WerewolfModeConfig {
   trialsPerDay: number;
   /** When true, the night summary reveals players who were attacked but saved by protection. */
   revealProtections: boolean;
+  /** When true, a killed player's role is revealed during the game. */
+  showRolesOnDeath: boolean;
   /**
    * Number of roles to draw but not assign at game start. These are randomly
    * selected from the full role pool and revealed only to the Narrator.
@@ -33,6 +35,7 @@ export const DEFAULT_WEREWOLF_MODE_CONFIG: WerewolfModeConfig = {
   // 2 allows a re-trial if the first ends in acquittal, without unlimited churn.
   trialsPerDay: 2,
   revealProtections: true,
+  showRolesOnDeath: true,
   hiddenRoleCount: 0,
 };
 
@@ -83,6 +86,10 @@ export function parseWerewolfModeConfig(
       typeof raw["revealProtections"] === "boolean"
         ? raw["revealProtections"]
         : DEFAULT_WEREWOLF_MODE_CONFIG.revealProtections,
+    showRolesOnDeath:
+      typeof raw["showRolesOnDeath"] === "boolean"
+        ? raw["showRolesOnDeath"]
+        : DEFAULT_WEREWOLF_MODE_CONFIG.showRolesOnDeath,
     hiddenRoleCount:
       typeof raw["hiddenRoleCount"] === "number" &&
       Number.isInteger(raw["hiddenRoleCount"]) &&

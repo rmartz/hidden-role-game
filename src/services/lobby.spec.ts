@@ -24,6 +24,7 @@ function makeBaseLobby(overrides: Partial<Lobby["config"]> = {}): Lobby {
         trialsPerDay: 1,
         revealProtections: true,
         hiddenRoleCount: 0,
+        showRolesOnDeath: true,
       },
       timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
       ...overrides,
@@ -42,6 +43,7 @@ describe("updateConfig — nominationsEnabled", () => {
         trialsPerDay: 1,
         revealProtections: true,
         hiddenRoleCount: 0,
+        showRolesOnDeath: true,
       },
     });
 
@@ -59,6 +61,7 @@ describe("updateConfig — nominationsEnabled", () => {
           trialsPerDay: 1,
           revealProtections: true,
           hiddenRoleCount: 0,
+          showRolesOnDeath: true,
         },
       }),
     );
@@ -70,6 +73,7 @@ describe("updateConfig — nominationsEnabled", () => {
         trialsPerDay: 1,
         revealProtections: true,
         hiddenRoleCount: 0,
+        showRolesOnDeath: true,
       },
     });
 
@@ -87,6 +91,7 @@ describe("updateConfig — nominationsEnabled", () => {
           trialsPerDay: 1,
           revealProtections: true,
           hiddenRoleCount: 0,
+          showRolesOnDeath: true,
         },
       }),
     );
@@ -97,6 +102,7 @@ describe("updateConfig — nominationsEnabled", () => {
         trialsPerDay: 1,
         revealProtections: true,
         hiddenRoleCount: 0,
+        showRolesOnDeath: true,
       },
     });
 
@@ -116,6 +122,7 @@ describe("updateConfig — nominationsEnabled", () => {
           trialsPerDay: 1,
           revealProtections: true,
           hiddenRoleCount: 0,
+          showRolesOnDeath: true,
         },
       }),
     );
@@ -137,6 +144,7 @@ describe("updateConfig — nominationsEnabled", () => {
         trialsPerDay: 1,
         revealProtections: true,
         hiddenRoleCount: 0,
+        showRolesOnDeath: true,
       },
     });
 
