@@ -134,6 +134,7 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
       nominationEnabled={activeModeConfigData.nominationsEnabled}
       singleTrialPerDay={activeModeConfigData.singleTrialPerDay}
       revealProtections={activeModeConfigData.revealProtections}
+      hiddenRole={activeModeConfigData.hiddenRoleCount > 0}
       disabled={disabled}
       onWerewolfTimerConfigChange={
         onTimerConfigChange as
@@ -153,6 +154,12 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
       onRevealProtectionsChange={
         onModeConfigFieldChange
           ? (v: boolean) => onModeConfigFieldChange("revealProtections", v)
+          : undefined
+      }
+      onHiddenRoleChange={
+        onModeConfigFieldChange
+          ? (v: boolean) =>
+              onModeConfigFieldChange("hiddenRoleCount", v ? 1 : 0)
           : undefined
       }
     />

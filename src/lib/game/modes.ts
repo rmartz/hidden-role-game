@@ -48,7 +48,10 @@ export function getDefaultRoleBuckets(
   playerCount: number,
 ): RoleBucket[] {
   const config = GAME_MODES[gameMode];
-  return config.defaultRoleCount(Math.max(playerCount, config.minPlayers));
+  const effectivePlayerCount = Math.max(playerCount, config.minPlayers);
+  const roleSlotsCount =
+    config.roleSlotsRequired?.(effectivePlayerCount) ?? effectivePlayerCount;
+  return config.defaultRoleCount(roleSlotsCount);
 }
 
 export function getRoleSlotsRequired(

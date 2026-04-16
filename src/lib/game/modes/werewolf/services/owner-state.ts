@@ -247,6 +247,14 @@ export function extractOwnerState(
   const callerId = game.ownerPlayerId ?? "";
   const daytimeNightState = extractDaytimeNightSummary(game, callerId);
 
+  // hiddenRoleIds is only present on WerewolfGame when hiddenRoleCount > 0.
+  const hiddenRoleIds =
+    "hiddenRoleIds" in game &&
+    Array.isArray(game.hiddenRoleIds) &&
+    game.hiddenRoleIds.length > 0
+      ? game.hiddenRoleIds
+      : undefined;
+
   return {
     ...(nightActions ? { nightActions } : {}),
     ...daytimeNightState,
@@ -255,6 +263,7 @@ export function extractOwnerState(
     ...(game.executionerTargetId
       ? { executionerTargetId: game.executionerTargetId }
       : {}),
+    ...(hiddenRoleIds ? { hiddenRoleIds } : {}),
   };
 }
 

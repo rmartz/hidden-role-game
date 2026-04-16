@@ -60,6 +60,8 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
   mySecondNightTarget?: string;
   exposerAbilityUsed?: boolean;
   hunterRevengePlayerId?: string;
+  /** Narrator-only hidden role IDs. Present only when hiddenRoleCount > 0. */
+  hiddenRoleIds?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -122,6 +124,9 @@ export function werewolfStateToFirebase(
     ...(state.exposerAbilityUsed ? { exposerAbilityUsed: true } : {}),
     ...(state.hunterRevengePlayerId
       ? { hunterRevengePlayerId: state.hunterRevengePlayerId }
+      : {}),
+    ...(state.hiddenRoleIds?.length
+      ? { hiddenRoleIds: state.hiddenRoleIds }
       : {}),
   };
 }
@@ -196,5 +201,6 @@ export function werewolfStateFromFirebase(
     ...(raw.hunterRevengePlayerId
       ? { hunterRevengePlayerId: raw.hunterRevengePlayerId }
       : {}),
+    ...(raw.hiddenRoleIds?.length ? { hiddenRoleIds: raw.hiddenRoleIds } : {}),
   } as WerewolfPlayerGameState;
 }

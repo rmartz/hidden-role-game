@@ -1,6 +1,7 @@
 import { sum } from "lodash";
 import { Team } from "@/lib/types";
-import type { GameModeConfig } from "@/lib/types";
+import type { GameModeConfig, ModeConfig } from "@/lib/types";
+import { isWerewolfModeConfig } from "@/lib/types";
 import { MIN_PLAYERS, defaultRoleCount, WEREWOLF_ROLES } from "./roles";
 import { WEREWOLF_ACTIONS } from "./actions";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "./timer-config";
@@ -10,6 +11,10 @@ import {
   parseWerewolfModeConfig,
 } from "./lobby-config";
 import { werewolfServices } from "./services";
+
+function hiddenRoleCountFromConfig(modeConfig: ModeConfig): number {
+  return isWerewolfModeConfig(modeConfig) ? modeConfig.hiddenRoleCount : 0;
+}
 
 export const WEREWOLF_CONFIG = {
   name: "Werewolf",
@@ -35,5 +40,23 @@ export const WEREWOLF_CONFIG = {
   },
   isValidRoleCount(numPlayers: number, roleCounts: Record<string, number>) {
     return sum(Object.values(roleCounts)) === numPlayers - 1;
+  },
+  /**
+   * Returns the number of role slots required, accounting for hidden roles.
+   * = (numPlayers - 1) + hiddenRoleCount (narrator excluded, hidden slots included).
+   */
+  resolveRoleSlotsRequired(numPlayers: number, modeConfig: ModeConfig): number {
+    return numPlayers - 1 + hiddenRoleCountFromConfig(modeConfig);
+  },
+  /**
+   * Validates the total configured role count, accounting for hidden roles.
+   */
+  resolveIsValidRoleCount(
+    numPlayers: number,
+    roleCounts: Record<string, number>,
+    modeConfig: ModeConfig,
+  ): boolean {
+    const required = numPlayers - 1 + hiddenRoleCountFromConfig(modeConfig);
+    return sum(Object.values(roleCounts)) === required;
   },
 } satisfies GameModeConfig;

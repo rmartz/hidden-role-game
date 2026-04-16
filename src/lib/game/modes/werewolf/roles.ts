@@ -117,10 +117,14 @@ export interface WerewolfRoleDefinition extends RoleDefinition<
 
 export const MIN_PLAYERS = 7;
 
-export function defaultRoleCount(numPlayers: number): RoleBucket[] {
-  // Subtract 1 for the Narrator, who is a player but receives no role.
+/** Minimum number of players who receive roles (= MIN_PLAYERS - 1, excluding the Narrator). */
+export const MIN_ROLE_PLAYERS = MIN_PLAYERS - 1;
+
+export function defaultRoleCount(numRolePlayers: number): RoleBucket[] {
+  // numRolePlayers is already the number of role-receiving players (Narrator excluded by caller).
+  // Includes any hidden unassigned role slots (hiddenRoleCount).
   // Werewolf count: 6-8 role-players → 1, 9-11 → 2, 12-14 → 3, etc.
-  const n = Math.max(numPlayers, MIN_PLAYERS) - 1;
+  const n = Math.max(numRolePlayers, MIN_ROLE_PLAYERS);
   const werewolves = Math.max(1, Math.floor((n - 3) / 3));
   const villagers = n - werewolves - 1;
   return [

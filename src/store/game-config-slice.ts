@@ -60,6 +60,24 @@ function computeIsValid(
   return sum(Object.values(roleCounts)) === playerCount;
 }
 
+/**
+ * Returns the number of role slots to pass to `defaultRoleCount` for a given
+ * player count and mode config. Accounts for modes that reserve players as
+ * non-role owners (e.g. Werewolf Narrator) and for hidden unassigned roles.
+ */
+function defaultRoleSlotCount(
+  gameMode: GameMode,
+  playerCount: number,
+  modeConfig: ModeConfig,
+): number {
+  const modeDefinition = GAME_MODES[gameMode];
+  return (
+    modeDefinition.resolveRoleSlotsRequired?.(playerCount, modeConfig) ??
+    modeDefinition.roleSlotsRequired?.(playerCount) ??
+    playerCount
+  );
+}
+
 function roleCountsFromBuckets(buckets: RoleBucket[]): Record<string, number> {
   const counts: Record<string, number> = {};
   for (const bucket of buckets) {
@@ -140,7 +158,13 @@ const gameConfigSlice = createSlice({
       const buckets =
         config.roleBuckets.length > 0
           ? config.roleBuckets
-          : GAME_MODES[config.gameMode].defaultRoleCount(playerCount);
+          : GAME_MODES[config.gameMode].defaultRoleCount(
+              defaultRoleSlotCount(
+                config.gameMode,
+                playerCount,
+                config.modeConfig,
+              ),
+            );
       state.roleCounts = roleCountsFromBuckets(buckets);
       state.roleBuckets = buckets;
       state.showConfigToPlayers = config.showConfigToPlayers;
@@ -152,12 +176,15 @@ const gameConfigSlice = createSlice({
 
     setGameMode(state, action: PayloadAction<GameMode>) {
       state.gameMode = action.payload;
-      const modeConfig = GAME_MODES[action.payload];
-      const buckets = modeConfig.defaultRoleCount(state.playerCount);
+      const modeDefinition = GAME_MODES[action.payload];
+      const newModeConfig = modeDefinition.defaultModeConfig;
+      const buckets = modeDefinition.defaultRoleCount(
+        defaultRoleSlotCount(action.payload, state.playerCount, newModeConfig),
+      );
       state.roleCounts = roleCountsFromBuckets(buckets);
       state.roleBuckets = buckets;
-      state.timerConfig = modeConfig.defaultTimerConfig;
-      state.modeConfig = modeConfig.defaultModeConfig;
+      state.timerConfig = modeDefinition.defaultTimerConfig;
+      state.modeConfig = newModeConfig;
       state.isValid = recomputeIsValid(state);
       state.syncVersion++;
     },
@@ -168,7 +195,11 @@ const gameConfigSlice = createSlice({
       if (action.payload === RoleConfigMode.Default) {
         // Reset to game mode defaults
         const buckets = GAME_MODES[state.gameMode].defaultRoleCount(
-          state.playerCount,
+          defaultRoleSlotCount(
+            state.gameMode,
+            state.playerCount,
+            state.modeConfig,
+          ),
         );
         state.roleCounts = roleCountsFromBuckets(buckets);
         state.roleBuckets = buckets;

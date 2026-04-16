@@ -11,11 +11,13 @@ interface WerewolfConfigPanelProps {
   nominationEnabled: boolean;
   singleTrialPerDay: boolean;
   revealProtections: boolean;
+  hiddenRole: boolean;
   disabled?: boolean;
   onWerewolfTimerConfigChange?: (config: WerewolfTimerConfig) => void;
   onNominationEnabledChange?: (value: boolean) => void;
   onSingleTrialPerDayChange?: (value: boolean) => void;
   onRevealProtectionsChange?: (value: boolean) => void;
+  onHiddenRoleChange?: (value: boolean) => void;
 }
 
 export function WerewolfConfigPanel({
@@ -23,11 +25,13 @@ export function WerewolfConfigPanel({
   nominationEnabled,
   singleTrialPerDay,
   revealProtections,
+  hiddenRole,
   disabled,
   onWerewolfTimerConfigChange,
   onNominationEnabledChange,
   onSingleTrialPerDayChange,
   onRevealProtectionsChange,
+  onHiddenRoleChange,
 }: WerewolfConfigPanelProps) {
   return (
     <div className="space-y-3">
@@ -62,6 +66,17 @@ export function WerewolfConfigPanel({
         />
         <Label htmlFor="reveal-protections">
           {WEREWOLF_CONFIG_PANEL_COPY.revealProtections}
+        </Label>
+      </div>
+      <div className="flex items-center gap-2">
+        <Switch
+          id="hidden-role"
+          checked={hiddenRole}
+          disabled={disabled ?? !onHiddenRoleChange}
+          onCheckedChange={onHiddenRoleChange}
+        />
+        <Label htmlFor="hidden-role">
+          {WEREWOLF_CONFIG_PANEL_COPY.hiddenRole}
         </Label>
       </div>
       <WerewolfTimerConfigPanel

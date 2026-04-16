@@ -4,4 +4,5 @@ export const WEREWOLF_CONFIG_PANEL_COPY = {
   singleTrialPerDay: "Limit to one trial per day",
   revealProtections:
     "Reveal when a player was attacked but saved by a protector",
+  hiddenRole: "Include one hidden unassigned role (Narrator-only secret)",
 } as const;

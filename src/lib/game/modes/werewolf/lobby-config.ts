@@ -12,6 +12,12 @@ export interface WerewolfModeConfig {
   singleTrialPerDay: boolean;
   /** When true, the night summary reveals players who were attacked but saved by protection. */
   revealProtections: boolean;
+  /**
+   * Number of roles to draw but not assign at game start. These are randomly
+   * selected from the full role pool and revealed only to the Narrator.
+   * A safety check prevents removing the last bad or neutral role.
+   */
+  hiddenRoleCount: number;
 }
 
 /** Werewolf-specific lobby configuration. */
@@ -26,6 +32,7 @@ export const DEFAULT_WEREWOLF_MODE_CONFIG: WerewolfModeConfig = {
   nominationsEnabled: true,
   singleTrialPerDay: true,
   revealProtections: true,
+  hiddenRoleCount: 0,
 };
 
 /**
@@ -64,5 +71,11 @@ export function parseWerewolfModeConfig(
       typeof raw["revealProtections"] === "boolean"
         ? raw["revealProtections"]
         : DEFAULT_WEREWOLF_MODE_CONFIG.revealProtections,
+    hiddenRoleCount:
+      typeof raw["hiddenRoleCount"] === "number" &&
+      Number.isInteger(raw["hiddenRoleCount"]) &&
+      raw["hiddenRoleCount"] >= 0
+        ? raw["hiddenRoleCount"]
+        : DEFAULT_WEREWOLF_MODE_CONFIG.hiddenRoleCount,
   };
 }

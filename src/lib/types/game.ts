@@ -313,6 +313,8 @@ export interface WerewolfGame extends BaseGame {
   gameMode: GameMode.Werewolf;
   timerConfig: WerewolfTimerConfig;
   modeConfig: WerewolfModeConfig;
+  /** Role IDs that were drawn but not assigned to players (hidden from everyone except the Narrator). */
+  hiddenRoleIds?: string[];
 }
 
 export interface SecretVillainGame extends BaseGame {
