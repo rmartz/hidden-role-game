@@ -93,7 +93,8 @@ export function parseWerewolfModeConfig(
     hiddenRoleCount:
       typeof raw["hiddenRoleCount"] === "number" &&
       Number.isInteger(raw["hiddenRoleCount"]) &&
-      raw["hiddenRoleCount"] >= 0
+      raw["hiddenRoleCount"] >= 0 &&
+      raw["hiddenRoleCount"] <= 1
         ? raw["hiddenRoleCount"]
         : DEFAULT_WEREWOLF_MODE_CONFIG.hiddenRoleCount,
   };

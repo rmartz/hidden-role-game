@@ -73,10 +73,6 @@ export function assignRolesFromBuckets(
   });
 }
 
-/**
- * Returns true if removing the role at `candidateIndex` from `roleIds` is safe,
- * i.e. there remains at least one Bad or Neutral role in the pool.
- */
 function isSafeToHide(
   candidateIndex: number,
   roleIds: string[],
@@ -94,11 +90,10 @@ function isSafeToHide(
     );
   const isBadOrNeutral =
     candidateRole.team === Team.Bad || candidateRole.team === Team.Neutral;
-  if (!isBadOrNeutral) return true; // Good roles can always be removed
+  if (!isBadOrNeutral) return true;
 
-  // Count how many Bad/Neutral roles remain after removing this specific occurrence.
   const badOrNeutralRemaining = roleIds.filter((id, i) => {
-    if (i === candidateIndex) return false; // skip this occurrence
+    if (i === candidateIndex) return false;
     const r = roles[id];
     if (!r)
       throw new Error(
@@ -109,16 +104,6 @@ function isSafeToHide(
   return badOrNeutralRemaining.length >= 1;
 }
 
-/**
- * Assigns roles to players, randomly selecting `hiddenCount` roles to exclude.
- *
- * The role buckets must contain `players.length + hiddenCount` roles total.
- * Hidden roles are selected randomly with a safety constraint: removing a
- * Bad or Neutral role is only allowed if at least one Bad/Neutral role
- * remains in the assigned pool.
- *
- * Returns the player role assignments and the hidden role IDs.
- */
 export function assignRolesFromBucketsWithHidden(
   players: LobbyPlayer[],
   buckets: RoleBucket[],

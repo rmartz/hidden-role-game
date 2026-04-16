@@ -39,13 +39,15 @@ The Narrator's session is stored separately and receives a different (fuller) `P
 | `trialsPerDay`         | ✓        | ✓       | Max number of trials allowed per day (0 = unlimited) |
 | `concludedTrialsCount` | ✓        | ✓       | Number of trials concluded so far this day phase     |
 | `revealProtections`    | ✓        | ✓       | Whether night summary reveals protection saves       |
+| `hiddenRoleCount`      | ✓        | ✓       | Number of roles drawn but not assigned at game start |
 
 ### Narrator-Only (Nighttime)
 
-| Field                   | Description                                                               |
-| ----------------------- | ------------------------------------------------------------------------- |
-| `nightActions`          | Full record of all night actions keyed by phase key                       |
-| `hunterRevengePlayerId` | Player ID of the Hunter awaiting revenge resolution; set when Hunter dies |
+| Field                   | Description                                                                                                                                        |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nightActions`          | Full record of all night actions keyed by phase key                                                                                                |
+| `hunterRevengePlayerId` | Player ID of the Hunter awaiting revenge resolution; set when Hunter dies                                                                          |
+| `hiddenRoleIds`         | Role IDs drawn from the pool but not assigned to any player; stored in `FirebaseWerewolfPlayerState` (session-scoped, not in `FirebaseGamePublic`) |
 
 ### Player Fields — Nighttime (own turn only)
 
@@ -102,6 +104,8 @@ stateDiagram-v2
 
 1. Narrator calls the lobby API to start the game.
 2. `createGame` (`src/server/game.ts`) orchestrates game creation: `buildGame` assembles the `Game` object (role assignment, player visibility), `saveGame` persists it to Firebase.
+   - If `hiddenRoleCount > 0`, `assignRolesFromBucketsWithHidden` draws `players + hiddenRoleCount` roles, randomly sets aside the hidden ones (ensuring at least one Bad/Neutral role remains in play), and stores them in `game.hiddenRoleIds`.
+   - `hiddenRoleIds` is written only to the Narrator's session-scoped `FirebaseWerewolfPlayerState`; it is never included in `FirebaseGamePublic`.
 3. `buildAllPlayerStates` computes per-player `PlayerGameState` for each session; `writeAllPlayerStates` writes them to Firebase.
 4. Clients receive real-time updates via Firebase `onValue`.
 

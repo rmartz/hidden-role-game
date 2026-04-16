@@ -34,8 +34,6 @@ export interface FirebaseGamePublic {
   executionerTargetId?: string;
   /** Lobby seating order used to set president rotation. Firebase omits absent. */
   playerOrder?: string[];
-  /** Role IDs hidden from players (Narrator-only, Werewolf). Firebase omits absent. */
-  hiddenRoleIds?: string[];
   /** Unix ms timestamp set server-side at game creation. Used for TTL cleanup. */
   createdAt?: number;
 }
@@ -82,9 +80,6 @@ export function gameToFirebase(game: Game): FirebaseGamePublic {
       : {}),
     ...(game.playerOrder && game.playerOrder.length > 0
       ? { playerOrder: game.playerOrder }
-      : {}),
-    ...(game.gameMode === GameMode.Werewolf && game.hiddenRoleIds?.length
-      ? { hiddenRoleIds: game.hiddenRoleIds }
       : {}),
   };
 }
@@ -134,9 +129,6 @@ export function firebaseToGame(
       : {}),
     ...(pub.playerOrder && pub.playerOrder.length > 0
       ? { playerOrder: pub.playerOrder }
-      : {}),
-    ...(pub.hiddenRoleIds && pub.hiddenRoleIds.length > 0
-      ? { hiddenRoleIds: pub.hiddenRoleIds }
       : {}),
   } as Game;
 }

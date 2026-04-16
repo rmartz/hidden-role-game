@@ -214,7 +214,6 @@ export function buildGame(
     ? players.filter((p) => p.id !== ownerPlayerId)
     : players;
 
-  // Handle hidden unassigned roles (delegated to the mode config).
   const hiddenCount = config.resolveHiddenRoleCount?.(resolvedModeConfig) ?? 0;
 
   let roleAssignments;
