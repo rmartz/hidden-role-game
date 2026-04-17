@@ -95,7 +95,7 @@ export function GameOverScreenView({
           {gameState.victoryCondition.label}
         </p>
       )}
-      {!subheading && !gameState.victoryCondition && <div className="mb-6" />}
+      {!gameState.victoryCondition && <div className="mb-6" />}
       <Card className="mb-4">
         <CardHeader className="pb-2 pt-4">
           <CardTitle className="text-sm">

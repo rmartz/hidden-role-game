@@ -79,6 +79,19 @@ describe("werewolfServices extractPlayerState victoryCondition", () => {
     });
   });
 
+  it("sets victoryCondition label and Neutral team for LoneWolf win", () => {
+    const game = makeFinishedGame(WerewolfWinner.LoneWolf);
+    const state = werewolfServices.extractPlayerState(game, "p1", {
+      id: WerewolfRole.Seer,
+      name: "Seer",
+      team: Team.Good,
+    });
+    expect(state["victoryCondition"]).toEqual({
+      label: WEREWOLF_COPY.gameOver.victoryConditions[WerewolfWinner.LoneWolf],
+      winner: Team.Neutral,
+    });
+  });
+
   it("does not set victoryCondition when game is not finished", () => {
     const game: Game = {
       id: "game-1",

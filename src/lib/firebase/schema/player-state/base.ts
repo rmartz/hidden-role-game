@@ -24,7 +24,7 @@ export interface FirebaseBasePlayerState {
   amDead?: boolean;
   deadPlayerIds?: string[];
   timerConfig: TimerConfig;
-  victoryCondition?: { label: string; winner: string } | null;
+  victoryCondition?: { label: string; winner: string };
 }
 
 export function baseStateToFirebase(

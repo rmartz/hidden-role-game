@@ -26,16 +26,16 @@ import { WerewolfWinner } from "../utils/win-condition";
 import { WEREWOLF_COPY } from "../copy";
 import type { VictoryCondition } from "@/server/types/game";
 
-const WEREWOLF_WINNER_TEAMS: Record<WerewolfWinner, Team> = {
+const WEREWOLF_WINNER_TEAMS = {
   [WerewolfWinner.Village]: Team.Good,
   [WerewolfWinner.Werewolves]: Team.Bad,
   [WerewolfWinner.Tanner]: Team.Neutral,
   [WerewolfWinner.Draw]: Team.Neutral,
   [WerewolfWinner.Chupacabra]: Team.Neutral,
-  [WerewolfWinner.LoneWolf]: Team.Bad,
+  [WerewolfWinner.LoneWolf]: Team.Neutral,
   [WerewolfWinner.Spoiler]: Team.Neutral,
   [WerewolfWinner.Executioner]: Team.Neutral,
-};
+} satisfies Record<WerewolfWinner, Team>;
 
 function extractVictoryCondition(game: Game): VictoryCondition | undefined {
   if (game.status.type !== GameStatus.Finished) return undefined;
