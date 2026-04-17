@@ -108,3 +108,18 @@ export const AllCappedBucket: Story = {
     ],
   },
 };
+
+export const InsufficientCapacity: Story = {
+  args: {
+    buckets: [
+      {
+        playerCount: 3,
+        name: "Underfilled",
+        roles: [
+          { roleId: "villager", max: 1 },
+          { roleId: "werewolf", max: 1 },
+        ],
+      },
+    ],
+  },
+};

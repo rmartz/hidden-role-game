@@ -192,6 +192,15 @@ function BucketEditor({
   const bucketIsUnique =
     hasNonUniqueRoles && nonUniqueSlots.every((s) => s.max === 1);
 
+  const feasibilityError =
+    bucket.roles.length > 0 &&
+    bucket.roles.reduce(
+      (sum, slot) => sum + (slot.max ?? bucket.playerCount),
+      0,
+    ) < bucket.playerCount
+      ? ROLE_BUCKET_CONFIG_COPY.errorInsufficientCapacity
+      : undefined;
+
   return (
     <div className="border rounded-md p-3 space-y-3">
       <div className="flex items-center justify-between gap-2">
@@ -289,6 +298,10 @@ function BucketEditor({
             {ROLE_BUCKET_CONFIG_COPY.bucketUnique}
           </span>
         </label>
+      )}
+
+      {feasibilityError && (
+        <p className="text-xs text-destructive">{feasibilityError}</p>
       )}
 
       {availableRoles.length > 0 && (
