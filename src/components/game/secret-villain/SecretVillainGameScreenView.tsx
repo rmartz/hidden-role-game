@@ -8,6 +8,7 @@ import type { PlayerGameState } from "@/server/types";
 import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
 import { getSvThemeLabels } from "@/lib/game/modes/secret-villain/themes";
 import { BoardDisplay } from "./BoardDisplay";
+import { ElectionNominationView } from "./ElectionNominationView";
 import { ElectionVoteView } from "./ElectionVoteView";
 import { ElectionResultView } from "./ElectionResultView";
 import { PolicyPresidentView } from "./PolicyPresidentView";

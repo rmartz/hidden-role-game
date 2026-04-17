@@ -50,4 +50,14 @@ describe("ElectionResultView", () => {
       screen.getByText(SECRET_VILLAIN_COPY.election.noCount(1)),
     ).toBeDefined();
   });
+
+  it("renders custom voteYesLabel in vote list when provided", () => {
+    render(<ElectionResultView {...defaultProps} voteYesLabel="Ja!" />);
+    expect(screen.getAllByText("Ja!").length).toBe(2);
+  });
+
+  it("renders custom voteNoLabel in vote list when provided", () => {
+    render(<ElectionResultView {...defaultProps} voteNoLabel="Nein!" />);
+    expect(screen.getByText("Nein!")).toBeDefined();
+  });
 });

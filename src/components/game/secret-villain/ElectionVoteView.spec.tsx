@@ -190,4 +190,14 @@ describe("ElectionVoteView", () => {
       screen.getByText(SECRET_VILLAIN_COPY.election.waitingForPlayers(["Bob"])),
     ).toBeDefined();
   });
+
+  it("renders custom voteYesLabel when provided", () => {
+    render(<ElectionVoteView {...defaultProps} voteYesLabel="Ja!" />);
+    expect(screen.getByRole("button", { name: "Ja!" })).toBeDefined();
+  });
+
+  it("renders custom voteNoLabel when provided", () => {
+    render(<ElectionVoteView {...defaultProps} voteNoLabel="Nein!" />);
+    expect(screen.getByRole("button", { name: "Nein!" })).toBeDefined();
+  });
 });

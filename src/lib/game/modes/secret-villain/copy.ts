@@ -50,6 +50,9 @@ export const SECRET_VILLAIN_COPY = {
     voteInstructions: (presidentName: string, chancellorName: string) =>
       `President: ${presidentName} \u00b7 Chancellor: ${chancellorName}`,
     castVote: "Cast your vote",
+    // These are the fallback labels when no theme provides vote labels.
+    // The Default theme intentionally mirrors these values; the two are
+    // independent so each can evolve without affecting the other.
     yes: "Yes",
     no: "No",
     waitingForVotes: "Waiting for all players to vote\u2026",
