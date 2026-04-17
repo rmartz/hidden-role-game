@@ -338,7 +338,7 @@ describe("extractPlayerState", () => {
         startedAt: 1000,
         presidentId: "p1",
         chancellorNomineeId: "p2",
-        votes: [{ playerId: "p3", vote: "aye" }],
+        votes: [{ playerId: "p3", vote: "yes" }],
       },
     };
     const result = secretVillainServices.extractPlayerState(
@@ -346,7 +346,7 @@ describe("extractPlayerState", () => {
       "p3",
       goodRole,
     );
-    expect(result["myElectionVote"]).toBe("aye");
+    expect(result["myElectionVote"]).toBe("yes");
   });
 
   it("president sees eligible chancellor IDs during ElectionNomination phase", () => {

@@ -16,7 +16,7 @@ describe("ElectionVoteView", () => {
   it("shows vote buttons when no vote has been cast", () => {
     render(<ElectionVoteView {...defaultProps} />);
     expect(
-      screen.getByRole("button", { name: SECRET_VILLAIN_COPY.election.aye }),
+      screen.getByRole("button", { name: SECRET_VILLAIN_COPY.election.yes }),
     ).toBeDefined();
     expect(
       screen.getByRole("button", { name: SECRET_VILLAIN_COPY.election.no }),
@@ -24,9 +24,9 @@ describe("ElectionVoteView", () => {
   });
 
   it("keeps vote buttons visible after voting with current vote highlighted", () => {
-    render(<ElectionVoteView {...defaultProps} myVote="aye" />);
+    render(<ElectionVoteView {...defaultProps} myVote="yes" />);
     expect(
-      screen.getByRole("button", { name: SECRET_VILLAIN_COPY.election.aye }),
+      screen.getByRole("button", { name: SECRET_VILLAIN_COPY.election.yes }),
     ).toBeDefined();
     expect(
       screen.getByRole("button", { name: SECRET_VILLAIN_COPY.election.no }),
@@ -43,7 +43,7 @@ describe("ElectionVoteView", () => {
   it("hides vote buttons when eliminated", () => {
     render(<ElectionVoteView {...defaultProps} isEliminated={true} />);
     expect(
-      screen.queryByRole("button", { name: SECRET_VILLAIN_COPY.election.aye }),
+      screen.queryByRole("button", { name: SECRET_VILLAIN_COPY.election.yes }),
     ).toBeNull();
     expect(
       screen.queryByRole("button", { name: SECRET_VILLAIN_COPY.election.no }),
@@ -56,7 +56,7 @@ describe("ElectionVoteView", () => {
   });
 
   it("shows Reveal Results button when all players have voted", () => {
-    render(<ElectionVoteView {...defaultProps} allVoted={true} myVote="aye" />);
+    render(<ElectionVoteView {...defaultProps} allVoted={true} myVote="yes" />);
     expect(
       screen.getByRole("button", {
         name: SECRET_VILLAIN_COPY.election.resolveVote,
@@ -66,7 +66,7 @@ describe("ElectionVoteView", () => {
 
   it("does not show Reveal Results button when not all players have voted", () => {
     render(
-      <ElectionVoteView {...defaultProps} allVoted={false} myVote="aye" />,
+      <ElectionVoteView {...defaultProps} allVoted={false} myVote="yes" />,
     );
     expect(
       screen.queryByRole("button", {
@@ -81,7 +81,7 @@ describe("ElectionVoteView", () => {
         {...defaultProps}
         onResolve={undefined}
         allVoted={true}
-        myVote="aye"
+        myVote="yes"
       />,
     );
     expect(
@@ -100,7 +100,7 @@ describe("ElectionVoteView", () => {
     render(
       <ElectionVoteView
         {...defaultProps}
-        myVote="aye"
+        myVote="yes"
         players={players}
         votedPlayerIds={["p1"]}
       />,
@@ -120,7 +120,7 @@ describe("ElectionVoteView", () => {
     render(
       <ElectionVoteView
         {...defaultProps}
-        myVote="aye"
+        myVote="yes"
         players={players}
         votedPlayerIds={["p1", "p2"]}
       />,
@@ -139,7 +139,7 @@ describe("ElectionVoteView", () => {
     render(
       <ElectionVoteView
         {...defaultProps}
-        myVote="aye"
+        myVote="yes"
         players={players}
         votedPlayerIds={["p1", "p2"]}
         nonVotingPlayerIds={["board"]}
@@ -161,7 +161,7 @@ describe("ElectionVoteView", () => {
     render(
       <ElectionVoteView
         {...defaultProps}
-        myVote="aye"
+        myVote="yes"
         players={players}
         votedPlayerIds={["p1"]}
       />,
@@ -180,7 +180,7 @@ describe("ElectionVoteView", () => {
     render(
       <ElectionVoteView
         {...defaultProps}
-        myVote="aye"
+        myVote="yes"
         players={players}
         votedPlayerIds={["p1"]}
         eliminatedPlayerIds={["p3"]}

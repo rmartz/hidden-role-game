@@ -6,8 +6,8 @@ import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
 afterEach(cleanup);
 
 const defaultVotes = [
-  { playerName: "Alice", vote: "aye" as const },
-  { playerName: "Bob", vote: "aye" as const },
+  { playerName: "Alice", vote: "yes" as const },
+  { playerName: "Bob", vote: "yes" as const },
   { playerName: "Charlie", vote: "no" as const },
 ];
 
@@ -44,7 +44,7 @@ describe("ElectionResultView", () => {
   it("displays correct vote counts", () => {
     render(<ElectionResultView {...defaultProps} />);
     expect(
-      screen.getByText(SECRET_VILLAIN_COPY.election.ayeCount(2)),
+      screen.getByText(SECRET_VILLAIN_COPY.election.yesCount(2)),
     ).toBeDefined();
     expect(
       screen.getByText(SECRET_VILLAIN_COPY.election.noCount(1)),

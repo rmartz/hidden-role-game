@@ -52,6 +52,10 @@ export interface SvThemeLabels {
   specialBadMessage: string;
   /** Starting screen: description shown to the special bad when they can see their bad ally. */
   specialBadAllyDescription: string;
+  /** Vote yes button label (e.g. "Ja!", "Sure", "Yes"). */
+  voteYes: string;
+  /** Vote no button label (e.g. "Nein!", "Wait", "No"). */
+  voteNo: string;
 }
 
 export const SV_THEMES: Record<SvTheme, SvThemeLabels> = {
@@ -81,6 +85,8 @@ export const SV_THEMES: Record<SvTheme, SvThemeLabels> = {
     specialBadMessage:
       "Close your eyes and raise your thumb. The other Bad players will see you.",
     specialBadAllyDescription: "This player is on the Bad team.",
+    voteYes: "Yes",
+    voteNo: "No",
   },
   [SvTheme.Original]: {
     name: "Original",
@@ -108,6 +114,8 @@ export const SV_THEMES: Record<SvTheme, SvThemeLabels> = {
     specialBadMessage:
       "Close your eyes and raise your thumb. The other Fascists will see you.",
     specialBadAllyDescription: "This player is a Fascist.",
+    voteYes: "Ja!",
+    voteNo: "Nein!",
   },
   [SvTheme.StarWars]: {
     name: "Star Wars",
@@ -135,6 +143,8 @@ export const SV_THEMES: Record<SvTheme, SvThemeLabels> = {
     specialBadMessage:
       "Close your eyes and raise your thumb. The other Sith will see you.",
     specialBadAllyDescription: "This player is a Sith Lord.",
+    voteYes: "Yes",
+    voteNo: "No",
   },
   [SvTheme.Business]: {
     name: "Business",
@@ -162,6 +172,8 @@ export const SV_THEMES: Record<SvTheme, SvThemeLabels> = {
     specialBadMessage:
       "Close your eyes and raise your thumb. The other Management players will see you.",
     specialBadAllyDescription: "This player is on the Management team.",
+    voteYes: "Sure",
+    voteNo: "Wait",
   },
 };
 

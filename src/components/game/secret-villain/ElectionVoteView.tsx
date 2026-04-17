@@ -9,8 +9,8 @@ import { GameTimer } from "@/components/game/GameTimer";
 interface ElectionVoteViewProps {
   presidentName: string;
   chancellorNomineeName: string;
-  myVote?: "aye" | "no";
-  onVote: (vote: "aye" | "no") => void;
+  myVote?: "yes" | "no";
+  onVote: (vote: "yes" | "no") => void;
   /** Resolve the election (tally votes). */
   onResolve?: () => void;
   /** Whether all alive players have voted. */
@@ -29,6 +29,10 @@ interface ElectionVoteViewProps {
   nonVotingPlayerIds?: string[];
   isPending?: boolean;
   isEliminated?: boolean;
+  /** Theme-specific label for the yes vote button. Defaults to copy constant. */
+  voteYesLabel?: string;
+  /** Theme-specific label for the no vote button. Defaults to copy constant. */
+  voteNoLabel?: string;
 }
 
 /** Max number of pending players to show by name. */
@@ -49,6 +53,8 @@ export function ElectionVoteView({
   nonVotingPlayerIds,
   isPending,
   isEliminated,
+  voteYesLabel,
+  voteNoLabel,
 }: ElectionVoteViewProps) {
   const hasVoted = myVote !== undefined;
   const [timerExpired, setTimerExpired] = useState(false);
@@ -111,13 +117,13 @@ export function ElectionVoteView({
             </p>
             <div className="flex gap-2">
               <Button
-                variant={myVote === "aye" ? "default" : "outline"}
+                variant={myVote === "yes" ? "default" : "outline"}
                 onClick={() => {
-                  onVote("aye");
+                  onVote("yes");
                 }}
                 disabled={!!isPending}
               >
-                {SECRET_VILLAIN_COPY.election.aye}
+                {voteYesLabel ?? SECRET_VILLAIN_COPY.election.yes}
               </Button>
               <Button
                 variant={myVote === "no" ? "default" : "outline"}
@@ -126,7 +132,7 @@ export function ElectionVoteView({
                 }}
                 disabled={!!isPending}
               >
-                {SECRET_VILLAIN_COPY.election.no}
+                {voteNoLabel ?? SECRET_VILLAIN_COPY.election.no}
               </Button>
             </div>
             {hasVoted && (
