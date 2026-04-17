@@ -1,5 +1,4 @@
-import { isSecretVillainModeConfig } from "@/lib/types";
-import { GameStatus, Team } from "@/lib/types";
+import { isSecretVillainModeConfig, GameStatus, Team } from "@/lib/types";
 import type { Game, GameModeServices, PlayerRoleAssignment } from "@/lib/types";
 import { resolvePlayerOrder } from "@/lib/player-order";
 import { SecretVillainRole } from "./roles";
@@ -200,10 +199,7 @@ export const secretVillainServices: GameModeServices = {
 
     // Populate victory condition when the game is finished.
     const svTheme = result["svTheme"] as SvTheme | undefined;
-    const victoryCondition = extractSvVictoryCondition(game, svTheme);
-    if (victoryCondition) {
-      result["victoryCondition"] = victoryCondition;
-    }
+    result["victoryCondition"] = extractSvVictoryCondition(game, svTheme);
 
     if (!ts) return result;
 

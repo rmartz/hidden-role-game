@@ -1,10 +1,10 @@
+import { GameStatus, Team } from "@/lib/types";
 import type {
   Game,
   GameModeServices,
   PlayerRoleAssignment,
   RoleDefinition,
 } from "@/lib/types";
-import { GameStatus, Team } from "@/lib/types";
 import type { WerewolfPlayerGameState } from "../player-state";
 import { getWerewolfModeConfig } from "../lobby-config";
 import { WerewolfRole, getWerewolfRole } from "../roles";
@@ -126,14 +126,13 @@ export const werewolfServices: GameModeServices = {
 
     // Include Werewolf-specific game settings in the player state.
     const wwConfig = getWerewolfModeConfig(game);
-    const victoryCondition = extractVictoryCondition(game);
     return {
       ...modeState,
       nominationsEnabled: wwConfig.nominationsEnabled as unknown,
       trialsPerDay: wwConfig.trialsPerDay as unknown,
       revealProtections: wwConfig.revealProtections as unknown,
       autoRevealNightOutcome: wwConfig.autoRevealNightOutcome as unknown,
-      ...(victoryCondition ? { victoryCondition } : {}),
+      victoryCondition: extractVictoryCondition(game) as unknown,
     };
   },
 };
