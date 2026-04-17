@@ -126,8 +126,6 @@ export {
   buildInitialTurnState,
 } from "./initialization";
 export {
-  hasKilledOutcome,
-  hasStatusOutcome,
   getOrderedAffectedPlayers,
   getOrderedAffectedPlayerIds,
 } from "./night-outcome";
