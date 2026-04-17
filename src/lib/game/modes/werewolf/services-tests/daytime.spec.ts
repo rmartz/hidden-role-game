@@ -7,7 +7,6 @@ import {
   DEFAULT_WEREWOLF_TIMER_CONFIG,
 } from "@/lib/game/modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
-import type { WerewolfModeConfig } from "@/lib/game/modes/werewolf/lobby-config";
 import { extractDaytimeState, makeDaytimeGame } from "./helpers";
 import { extractVisibleDeadPlayerIds } from "../services/owner-state";
 
@@ -113,12 +112,6 @@ describe("extractDaytimeNightSummary", () => {
         },
       ],
     });
-    game.modeConfig = {
-      ...(game.modeConfig as WerewolfModeConfig),
-      revealProtections: false,
-      hiddenRoleCount: 0,
-      showRolesOnDeath: true,
-    };
 
     const result = extractDaytimeState(game, "player-1");
     expect(result.nightStatus).toBeUndefined();

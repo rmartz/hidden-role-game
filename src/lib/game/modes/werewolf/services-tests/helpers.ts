@@ -14,6 +14,7 @@ import {
   extractDaytimeNightSummary,
   extractDaytimePlayerState,
 } from "../services/owner-state";
+import { getOrderedAffectedPlayerIds } from "../services/night-outcome";
 
 // ---------------------------------------------------------------------------
 // extractDaytimeState — combines the two new functions for test convenience
@@ -55,15 +56,18 @@ export function makeDaytimeGame(
     autoRevealNightOutcome: true,
     ...(overrides.modeConfig ?? {}),
   };
+  const revealedPlayerIds =
+    overrides.revealedPlayerIds ??
+    (modeConfig.autoRevealNightOutcome
+      ? getOrderedAffectedPlayerIds(overrides.nightResolution ?? [])
+      : undefined);
   const turnState: WerewolfTurnState = {
     turn: 2,
     phase: {
       type: WerewolfPhase.Daytime,
       startedAt: 1000,
       nightActions: overrides.nightActions ?? {},
-      ...(overrides.revealedPlayerIds !== undefined
-        ? { revealedPlayerIds: overrides.revealedPlayerIds }
-        : {}),
+      ...(revealedPlayerIds !== undefined ? { revealedPlayerIds } : {}),
       ...(overrides.nightResolution !== undefined
         ? { nightResolution: overrides.nightResolution }
         : {}),

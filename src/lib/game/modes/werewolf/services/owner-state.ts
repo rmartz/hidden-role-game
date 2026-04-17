@@ -17,15 +17,11 @@ import {
   isWerewolfRole,
   getWerewolfRole,
 } from "../roles";
-import { getOrderedAffectedPlayerIds } from "./night-outcome";
 
 /** Returns the set of player IDs whose night outcomes are publicly visible. */
 function resolveRevealedPlayerIds(game: Game): Set<string> {
   const ts = currentTurnState(game);
   if (ts?.phase.type !== WerewolfPhase.Daytime) return new Set();
-  if (getWerewolfModeConfig(game).autoRevealNightOutcome) {
-    return new Set(getOrderedAffectedPlayerIds(ts.phase.nightResolution ?? []));
-  }
   return new Set(ts.phase.revealedPlayerIds ?? []);
 }
 
