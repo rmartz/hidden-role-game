@@ -13,6 +13,7 @@ import {
   checkBoardWinCondition,
   checkChancellorElectionWinCondition,
 } from "../utils";
+import { SvVictoryConditionKey } from "../utils/win-condition";
 
 /**
  * Tally the election votes and set `passed` on the phase.
@@ -50,6 +51,7 @@ export function advanceFromElection(game: Game): void {
       game.status = {
         type: GameStatus.Finished,
         winner: chancellorWin.winner,
+        victoryConditionKey: SvVictoryConditionKey.SpecialBadElected,
       };
       return;
     }
@@ -97,6 +99,7 @@ export function advanceFromElection(game: Game): void {
         game.status = {
           type: GameStatus.Finished,
           winner: boardWin.winner,
+          victoryConditionKey: SvVictoryConditionKey.Chaos,
         };
         return;
       }

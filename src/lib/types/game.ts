@@ -61,6 +61,8 @@ export interface FinishedGameStatus {
   type: GameStatus.Finished;
   /** The winning team or role identifier. */
   winner?: GameWinner;
+  /** Mode-specific key identifying which win condition triggered the game end. */
+  victoryConditionKey?: string;
 }
 
 export type GameStatusState =

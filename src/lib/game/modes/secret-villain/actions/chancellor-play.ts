@@ -7,6 +7,10 @@ import {
   getSpecialAction,
   checkBoardWinCondition,
 } from "../utils";
+import {
+  SecretVillainWinner,
+  SvVictoryConditionKey,
+} from "../utils/win-condition";
 
 export const chancellorPlayAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {
@@ -48,7 +52,14 @@ export const chancellorPlayAction: GameAction = {
     // Check win condition.
     const boardWin = checkBoardWinCondition(ts);
     if (boardWin) {
-      game.status = { type: GameStatus.Finished, winner: boardWin.winner };
+      game.status = {
+        type: GameStatus.Finished,
+        winner: boardWin.winner,
+        victoryConditionKey:
+          boardWin.winner === SecretVillainWinner.Good
+            ? SvVictoryConditionKey.GoodPolicy
+            : SvVictoryConditionKey.BadPolicy,
+      };
       return;
     }
 

@@ -3,6 +3,7 @@ import type { Game, GameAction } from "@/lib/types";
 import { SecretVillainPhase, SpecialActionType } from "../types";
 import { currentTurnState, checkShootWinCondition } from "../utils";
 import { advanceToNextElection } from "./advance-to-election";
+import { SvVictoryConditionKey } from "../utils/win-condition";
 
 /**
  * President shoots (eliminates) a player. If the target is the Special
@@ -37,7 +38,11 @@ export const shootPlayerAction: GameAction = {
       game.roleAssignments,
     );
     if (shootWin) {
-      game.status = { type: GameStatus.Finished, winner: shootWin.winner };
+      game.status = {
+        type: GameStatus.Finished,
+        winner: shootWin.winner,
+        victoryConditionKey: SvVictoryConditionKey.GoodShoot,
+      };
       return;
     }
 

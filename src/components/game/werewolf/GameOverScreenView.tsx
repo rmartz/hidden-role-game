@@ -88,9 +88,14 @@ export function GameOverScreenView({
     <div className="p-5 max-w-lg mx-auto">
       <h1 className="text-3xl font-bold mb-1">{heading}</h1>
       {subheading && (
-        <p className="text-lg text-muted-foreground mb-6">{subheading}</p>
+        <p className="text-lg text-muted-foreground mb-1">{subheading}</p>
       )}
-      {!subheading && <div className="mb-6" />}
+      {gameState.victoryCondition && (
+        <p className="text-sm text-muted-foreground mb-6">
+          {gameState.victoryCondition.label}
+        </p>
+      )}
+      {!subheading && !gameState.victoryCondition && <div className="mb-6" />}
       <Card className="mb-4">
         <CardHeader className="pb-2 pt-4">
           <CardTitle className="text-sm">

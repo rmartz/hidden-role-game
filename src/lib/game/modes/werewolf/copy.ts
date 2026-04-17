@@ -137,6 +137,16 @@ export const WEREWOLF_COPY = {
     rolesRevealHeading: "Final Roles",
     returnToLobby: "Return to Lobby",
     returnToLobbyError: "Failed to return to lobby. Please try again.",
+    victoryConditions: {
+      [WerewolfWinner.Village]: "All werewolves eliminated",
+      [WerewolfWinner.Werewolves]: "Werewolves outnumber villagers",
+      [WerewolfWinner.Tanner]: "Tanner lynched",
+      [WerewolfWinner.Draw]: "All players eliminated simultaneously",
+      [WerewolfWinner.Chupacabra]: "Chupacabra eliminated all opposition",
+      [WerewolfWinner.LoneWolf]: "Lone Wolf outlasted the village",
+      [WerewolfWinner.Spoiler]: "Spoiler claimed the victory",
+      [WerewolfWinner.Executioner]: "Executioner's target eliminated",
+    } satisfies Record<WerewolfWinner, string>,
   },
   nomination: {
     heading: "Nominate for Trial",

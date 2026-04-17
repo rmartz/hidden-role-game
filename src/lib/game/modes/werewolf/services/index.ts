@@ -4,6 +4,7 @@ import type {
   PlayerRoleAssignment,
   RoleDefinition,
 } from "@/lib/types";
+import { GameStatus, Team } from "@/lib/types";
 import type { WerewolfPlayerGameState } from "../player-state";
 import { getWerewolfModeConfig } from "../lobby-config";
 import { WerewolfRole, getWerewolfRole } from "../roles";
@@ -21,6 +22,29 @@ import {
   extractDaytimePlayerState,
 } from "./owner-state";
 import { extractPlayerNightState } from "./player-night-state";
+import { WerewolfWinner } from "../utils/win-condition";
+import { WEREWOLF_COPY } from "../copy";
+import type { VictoryCondition } from "@/server/types/game";
+
+const WEREWOLF_WINNER_TEAMS: Record<WerewolfWinner, Team> = {
+  [WerewolfWinner.Village]: Team.Good,
+  [WerewolfWinner.Werewolves]: Team.Bad,
+  [WerewolfWinner.Tanner]: Team.Neutral,
+  [WerewolfWinner.Draw]: Team.Neutral,
+  [WerewolfWinner.Chupacabra]: Team.Neutral,
+  [WerewolfWinner.LoneWolf]: Team.Bad,
+  [WerewolfWinner.Spoiler]: Team.Neutral,
+  [WerewolfWinner.Executioner]: Team.Neutral,
+};
+
+function extractVictoryCondition(game: Game): VictoryCondition | undefined {
+  if (game.status.type !== GameStatus.Finished) return undefined;
+  const winner = game.status.winner as WerewolfWinner | undefined;
+  if (!winner) return undefined;
+  const label = WEREWOLF_COPY.gameOver.victoryConditions[winner];
+  if (!label) return undefined;
+  return { label, winner: WEREWOLF_WINNER_TEAMS[winner] };
+}
 
 function extractNonOwnerState(
   game: Game,
@@ -102,12 +126,14 @@ export const werewolfServices: GameModeServices = {
 
     // Include Werewolf-specific game settings in the player state.
     const wwConfig = getWerewolfModeConfig(game);
+    const victoryCondition = extractVictoryCondition(game);
     return {
       ...modeState,
       nominationsEnabled: wwConfig.nominationsEnabled as unknown,
       trialsPerDay: wwConfig.trialsPerDay as unknown,
       revealProtections: wwConfig.revealProtections as unknown,
       autoRevealNightOutcome: wwConfig.autoRevealNightOutcome as unknown,
+      ...(victoryCondition ? { victoryCondition } : {}),
     };
   },
 };

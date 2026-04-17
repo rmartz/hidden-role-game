@@ -128,6 +128,15 @@ export const SECRET_VILLAIN_COPY = {
     rolesRevealHeading: "Role Reveals",
     returnToLobby: "Return to Lobby",
     returnToLobbyError: "Failed to return to lobby. Please try again.",
+    victoryConditions: {
+      goodPolicy: (goodTeam: string) => `${goodTeam} policy victory`,
+      badPolicy: (badTeam: string) => `${badTeam} policy victory`,
+      specialBadElected: (specialBadRole: string) =>
+        `${specialBadRole} elected Chancellor`,
+      goodShoot: (specialBadRole: string) => `${specialBadRole} eliminated`,
+      chaos: (winningTeam: string) =>
+        `Government in chaos \u2014 ${winningTeam} wins`,
+    },
   },
   starting: {
     heading: "Game Starting",

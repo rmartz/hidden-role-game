@@ -170,6 +170,26 @@ describe("Werewolf player state round-trip", () => {
     expect(result.amDead).toBe(true);
     expect(result.deadPlayerIds).toEqual(["p2", "p3"]);
   });
+
+  it("round-trips victoryCondition when present", () => {
+    const state = makeWerewolfState({
+      victoryCondition: {
+        label: "All werewolves eliminated",
+        winner: Team.Good,
+      },
+    });
+    const result = firebaseToPlayerState(playerStateToFirebase(state));
+    expect(result.victoryCondition).toEqual({
+      label: "All werewolves eliminated",
+      winner: Team.Good,
+    });
+  });
+
+  it("omits victoryCondition when absent", () => {
+    const state = makeWerewolfState();
+    const result = firebaseToPlayerState(playerStateToFirebase(state));
+    expect(result.victoryCondition).toBeUndefined();
+  });
 });
 
 describe("Secret Villain player state round-trip", () => {
