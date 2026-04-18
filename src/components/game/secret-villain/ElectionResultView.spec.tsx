@@ -44,15 +44,16 @@ describe("ElectionResultView", () => {
   it("displays correct vote counts", () => {
     render(<ElectionResultView {...defaultProps} />);
     expect(
-      screen.getByText(SECRET_VILLAIN_COPY.election.yesCount(2)),
+      screen.getByText(`${SECRET_VILLAIN_COPY.election.yes}: 2`),
     ).toBeDefined();
     expect(
-      screen.getByText(SECRET_VILLAIN_COPY.election.noCount(1)),
+      screen.getByText(`${SECRET_VILLAIN_COPY.election.no}: 1`),
     ).toBeDefined();
   });
 
   it("renders custom voteYesLabel in vote list when provided", () => {
     render(<ElectionResultView {...defaultProps} voteYesLabel="Ja!" />);
+    // "Ja!" appears once per yes-voting player (Alice + Bob) in the vote list
     expect(screen.getAllByText("Ja!").length).toBe(2);
   });
 

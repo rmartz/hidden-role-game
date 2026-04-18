@@ -23,10 +23,7 @@ export function tallyElection(game: Game): void {
   if (ts?.phase.type !== SecretVillainPhase.ElectionVote) return;
   if (ts.phase.passed !== undefined) return;
 
-  // Also accept legacy "aye" votes stored in Firebase before the rename.
-  const ayes = ts.phase.votes.filter(
-    (v) => v.vote === "yes" || (v.vote as string) === "aye",
-  ).length;
+  const ayes = ts.phase.votes.filter((v) => v.vote === "yes").length;
   const nos = ts.phase.votes.filter((v) => v.vote === "no").length;
   ts.phase.passed = ayes > nos;
 }

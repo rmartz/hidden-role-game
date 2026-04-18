@@ -50,8 +50,12 @@ export function ElectionResultView({
         </p>
 
         <div className="flex gap-4 text-sm font-medium">
-          <span>{SECRET_VILLAIN_COPY.election.yesCount(yesCount)}</span>
-          <span>{SECRET_VILLAIN_COPY.election.noCount(noCount)}</span>
+          <span>
+            {yesLabel}: {yesCount}
+          </span>
+          <span>
+            {noLabel}: {noCount}
+          </span>
         </div>
 
         <ul className="space-y-1">
