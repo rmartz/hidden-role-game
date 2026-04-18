@@ -6,8 +6,9 @@ import {
   getNextPresidentId,
   getSpecialAction,
   checkBoardWinCondition,
+  SecretVillainWinner,
+  SvVictoryConditionKey,
 } from "../utils";
-import { SecretVillainWinner, SvVictoryConditionKey } from "../utils";
 
 export const chancellorPlayAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {

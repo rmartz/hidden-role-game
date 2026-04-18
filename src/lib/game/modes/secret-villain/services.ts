@@ -179,7 +179,7 @@ export const secretVillainServices: GameModeServices = {
   extractPlayerState(
     game: Game,
     callerId: string,
-    _myRole: RoleDefinition | undefined,
+    _: RoleDefinition | undefined,
   ): Record<string, unknown> {
     const result: Record<string, unknown> = {};
 
