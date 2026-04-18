@@ -1,7 +1,7 @@
-import { GameStatus } from "@/lib/types";
+import { GameStatus, Team } from "@/lib/types";
 import type { Game, GameModeServices, PlayerRoleAssignment } from "@/lib/types";
 import { resolvePlayerOrder } from "@/lib/player-order";
-import { AvalonRole } from "./roles";
+import { AvalonRole, AVALON_ROLES } from "./roles";
 import { AvalonPhase } from "./types";
 import type { AvalonTurnState } from "./types";
 import type { AvalonPublicPhase } from "./player-state";
@@ -201,10 +201,16 @@ export const avalonServices: GameModeServices = {
         result["assassinationTarget"] = phase.targetPlayerId;
       }
 
-      // Assassin sees all players as valid targets.
+      // Assassin sees Good-team players as valid targets.
       const myRoleId = myRole?.id as AvalonRole | undefined;
       if (myRoleId === AvalonRole.Assassin) {
-        result["assassinationTargetIds"] = game.players.map((p) => p.id);
+        const goodPlayerIds = game.roleAssignments
+          .filter(
+            (a) =>
+              AVALON_ROLES[a.roleDefinitionId as AvalonRole].team === Team.Good,
+          )
+          .map((a) => a.playerId);
+        result["assassinationTargetIds"] = goodPlayerIds;
       }
     }
 

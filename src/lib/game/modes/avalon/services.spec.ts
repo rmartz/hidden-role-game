@@ -416,7 +416,7 @@ describe("extractPlayerState", () => {
       "p5",
       assassinRole,
     );
-    expect(result["assassinationTargetIds"]).toEqual(playerIds);
+    expect(result["assassinationTargetIds"]).toEqual(["p1", "p2", "p3"]);
   });
 
   it("non-Assassin does not see assassinationTargetIds during Assassination phase", () => {
