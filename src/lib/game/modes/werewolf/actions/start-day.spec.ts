@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { GameMode, GameStatus } from "@/lib/types";
+import type { WerewolfGame } from "@/lib/types";
 import type {
   WerewolfTurnState,
   WerewolfDaytimePhase,
@@ -41,6 +42,28 @@ describe("WerewolfAction.StartDay — isValid", () => {
 
 describe("WerewolfAction.StartDay — basic apply", () => {
   const action = WEREWOLF_ACTIONS[WerewolfAction.StartDay];
+  const autoRevealOnConfig: Partial<WerewolfGame> = {
+    modeConfig: {
+      gameMode: GameMode.Werewolf,
+      nominationsEnabled: false,
+      trialsPerDay: 2,
+      revealProtections: true,
+      showRolesOnDeath: true,
+      hiddenRoleCount: 0,
+      autoRevealNightOutcome: true,
+    },
+  };
+  const autoRevealOffConfig: Partial<WerewolfGame> = {
+    modeConfig: {
+      gameMode: GameMode.Werewolf,
+      nominationsEnabled: false,
+      trialsPerDay: 2,
+      revealProtections: true,
+      showRolesOnDeath: true,
+      hiddenRoleCount: 0,
+      autoRevealNightOutcome: false,
+    },
+  };
 
   it("transitions to daytime on the same turn", () => {
     const game = makePlayingGame(nightTurnState);
@@ -71,16 +94,7 @@ describe("WerewolfAction.StartDay — basic apply", () => {
           },
         },
       }),
-      {
-        modeConfig: {
-          gameMode: GameMode.Werewolf,
-          nominationsEnabled: false,
-          trialsPerDay: 2,
-          revealProtections: true,
-          showRolesOnDeath: true,
-          autoRevealNightOutcome: true,
-        },
-      },
+      autoRevealOnConfig,
     );
     action.apply(game, null, "owner-1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
@@ -90,16 +104,7 @@ describe("WerewolfAction.StartDay — basic apply", () => {
   });
 
   it("initializes revealedPlayerIds as empty when auto reveal is disabled", () => {
-    const game = makePlayingGame(nightTurnState, {
-      modeConfig: {
-        gameMode: GameMode.Werewolf,
-        nominationsEnabled: false,
-        trialsPerDay: 2,
-        revealProtections: true,
-        showRolesOnDeath: true,
-        autoRevealNightOutcome: false,
-      },
-    });
+    const game = makePlayingGame(nightTurnState, autoRevealOffConfig);
     action.apply(game, null, "owner-1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
     const phase = ts.phase as WerewolfDaytimePhase;

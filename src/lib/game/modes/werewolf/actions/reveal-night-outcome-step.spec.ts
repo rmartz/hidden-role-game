@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { GameMode, GameStatus } from "@/lib/types";
-import type { Game } from "@/lib/types";
+import type { Game, WerewolfGame } from "@/lib/types";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
 import type { WerewolfDaytimePhase, WerewolfTurnState } from "../types";
 import { WerewolfPhase } from "../types";
@@ -34,16 +34,17 @@ function getDaytimePhase(game: Game): WerewolfDaytimePhase {
   return turnState.phase;
 }
 
-const manualRevealConfig = {
+const manualRevealConfig: Partial<WerewolfGame> = {
   modeConfig: {
     gameMode: GameMode.Werewolf,
     nominationsEnabled: false,
     trialsPerDay: 2,
     revealProtections: true,
     showRolesOnDeath: true,
+    hiddenRoleCount: 0,
     autoRevealNightOutcome: false,
   },
-} as const;
+};
 
 describe("WerewolfAction.RevealNightOutcomeStep", () => {
   const action = WEREWOLF_ACTIONS[WerewolfAction.RevealNightOutcomeStep];

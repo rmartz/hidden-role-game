@@ -4,7 +4,7 @@ import type {
   WerewolfNighttimePhase,
   WerewolfDaytimePhase,
 } from "../types";
-import { WerewolfPhase } from "../types";
+import { TrialPhase, WerewolfPhase } from "../types";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
 import { makePlayingGame, makeNightState } from "./test-helpers";
 
@@ -42,7 +42,7 @@ describe("WerewolfAction.SmitePlayer", () => {
       (ds.phase as WerewolfDaytimePhase).activeTrial = {
         defendantId: "p3",
         startedAt: 1000,
-        phase: "defense",
+        phase: TrialPhase.Defense,
         votes: [],
       };
       const game = makePlayingGame(ds);
