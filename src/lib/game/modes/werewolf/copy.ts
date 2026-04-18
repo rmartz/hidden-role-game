@@ -252,14 +252,6 @@ export const WEREWOLF_COPY = {
     yourTarget: (name: string) =>
       `Your target: ${name}. Convince the village to put them on trial.`,
   },
-  mason: {
-    playerWarning:
-      "Do not let anyone else know you are a Mason — mysterious threats lurk everywhere.",
-    nonMasonWarning:
-      "Rumors exist there are members of a secretive group called the Masons among you, but do not even mention their name — mysterious threats lurk everywhere.",
-    narratorWarning:
-      "There are Mason characters in this game. If any player mentions Masons or implies they are one, smite them during the night.",
-  },
   tavernKeeper: {
     blocked:
       "You had too much to drink at the tavern. You cannot stay awake tonight.",
