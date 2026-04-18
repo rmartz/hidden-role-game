@@ -93,6 +93,12 @@ pnpm build-storybook  # Build static Storybook
 - **Keep tests simple.** A failing test should make it immediately obvious whether the failure is a bug or an intentional change in behavior. If understanding a failure requires reading more than one layer of test setup or multiple assertions, split the test.
 - **Granularity scales with level of abstraction.** Low-level functions (pure utilities, serializers, resolvers) warrant thorough edge-case coverage. High-level functions (actions, service orchestration) should have smoke tests that verify they correctly apply the lower-level logic — not re-test every edge case that belongs in the lower-level tests.
 
+## GitHub Issues
+
+- Epic issues use a checkbox task list in their Sub-issues section: `- [ ] #xxx — description`. Use this format — not a table — so GitHub tracks progress natively and agents can parse the next task automatically.
+- Every sub-issue under a game-mode Epic must carry the same game-mode label as the Epic (e.g. `Werewolf`, `Avalon`, `Clocktower`, `Codenames`).
+- When a sub-issue is closed, update the parent Epic's checkbox to `- [x]`.
+
 ## Git Conventions
 
 - Branch names: lowercase with hyphens, prefixed by type: `feature/`, `chore/`, `refactor/`, `docs/`, with issue number suffix (e.g., `feature/secret-villain-deck-290`).
