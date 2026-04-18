@@ -91,6 +91,7 @@ export function buildNightPhaseOrder(
   const emittedGroupPhases = new Set<string>();
 
   let altruistPhaseKey: string | undefined;
+  let tavernKeeperPhaseKey: string | undefined;
   let witchPhaseKey: string | undefined;
 
   const sortedRoles = Object.values(WEREWOLF_ROLES).sort((a, b) => {
@@ -124,6 +125,10 @@ export function buildNightPhaseOrder(
         if (!hasAliveGroupParticipants(key, roleAssignments, dead)) continue;
         phaseKeys.push(key);
       }
+    } else if (role.id === WerewolfRole.TavernKeeper) {
+      // Tavern Keeper acts first — before all other roles.
+      if (!hasAlivePlayers(role.id as string, roleAssignments, dead)) continue;
+      tavernKeeperPhaseKey = role.id;
     } else if (role.id === WerewolfRole.Witch) {
       if (!hasAlivePlayers(role.id as string, roleAssignments, dead)) continue;
       witchPhaseKey = role.id;
@@ -142,6 +147,9 @@ export function buildNightPhaseOrder(
   if (witchPhaseKey !== undefined) phaseKeys.push(witchPhaseKey);
   // Altruist acts last — after the Witch — so they only see players still unprotected.
   if (altruistPhaseKey !== undefined) phaseKeys.push(altruistPhaseKey);
+  // Tavern Keeper acts first — unshift to the front after all others are collected.
+  if (tavernKeeperPhaseKey !== undefined)
+    phaseKeys.unshift(tavernKeeperPhaseKey);
 
   return phaseKeys;
 }

@@ -56,12 +56,14 @@ function collectBaseAttacksAndProtections(
   for (const [phaseKey, action] of Object.entries(nightActions)) {
     // Witch and Spellcaster are handled separately below.
     // Priest protection is handled via priestWards, not the generic Protect pipeline.
+    // Tavern Keeper target is a role-block, not an attack or protection.
     if (
       isRoleActive(phaseKey, [
         WerewolfRole.Witch,
         WerewolfRole.Spellcaster,
         WerewolfRole.Priest,
         WerewolfRole.Altruist,
+        WerewolfRole.TavernKeeper,
       ])
     )
       continue;

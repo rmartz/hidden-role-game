@@ -74,6 +74,8 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   priestWardActive?: boolean;
   /** Whether the Mirrorcaster is charged (Attack mode). */
   mirrorcasterCharged?: boolean;
+  /** True when this player has been blocked by the Tavern Keeper tonight. */
+  tavernKeeperBlocked?: boolean;
   /** Executioner: target player ID. */
   executionerTargetId?: string;
   /** Hunter revenge pending: the Hunter's player ID. Narrator-only. */

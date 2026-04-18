@@ -5,7 +5,7 @@ import {
   validateActiveNightPlayer,
   getGroupPhasePlayerIds,
 } from "../utils";
-import { getWerewolfRole } from "../roles";
+import { WerewolfRole, getWerewolfRole } from "../roles";
 
 export const confirmNightTargetAction: GameAction = {
   isValid(game: Game, callerId: string) {
@@ -20,11 +20,12 @@ export const confirmNightTargetAction: GameAction = {
       // Group phase: all alive participants must agree (same target or all skip).
       if (!isTeamNightAction(action)) return false;
       const ts = currentTurnState(game);
+      const blockedPlayerId = ts?.tavernKeeperBlockedPlayerId;
       const aliveParticipantIds = getGroupPhasePlayerIds(
         game.roleAssignments,
         result.activePhaseKey,
         ts?.deadPlayerIds ?? [],
-      );
+      ).filter((id) => id !== blockedPlayerId);
       if (aliveParticipantIds.length === 0) return false;
       const aliveVotes = action.votes.filter((v) =>
         aliveParticipantIds.includes(v.playerId),
@@ -64,6 +65,53 @@ export const confirmNightTargetAction: GameAction = {
     const action = phase.nightActions[activePhaseKey];
     if (action) {
       phase.nightActions[activePhaseKey] = { ...action, confirmed: true };
+    }
+
+    // Tavern Keeper: on confirm, store the blocked player ID and remove their
+    // phase from nightPhaseOrder if they have no other alive teammates.
+    if (activePhaseKey === (WerewolfRole.TavernKeeper as string)) {
+      const tkAction = phase.nightActions[activePhaseKey];
+      if (tkAction && !isTeamNightAction(tkAction) && tkAction.targetPlayerId) {
+        const blockedId = tkAction.targetPlayerId;
+        ts.tavernKeeperBlockedPlayerId = blockedId;
+
+        const blockedAssignment = game.roleAssignments.find(
+          (a) => a.playerId === blockedId,
+        );
+        if (blockedAssignment) {
+          const blockedRole = getWerewolfRole(
+            blockedAssignment.roleDefinitionId,
+          );
+          if (blockedRole) {
+            // Determine the phase key the blocked player would act in.
+            const blockedPhaseKey = blockedRole.wakesWith ?? blockedRole.id;
+            // For a group phase: check if there are other alive participants.
+            // If yes, the phase proceeds but blocked player is excluded from
+            // consensus. If no (lone team member), remove the phase entirely.
+            const isGroupPhase =
+              blockedRole.teamTargeting === true ||
+              blockedRole.wakesWith !== undefined;
+            if (isGroupPhase) {
+              const aliveParticipants = getGroupPhasePlayerIds(
+                game.roleAssignments,
+                blockedPhaseKey as string,
+                ts.deadPlayerIds,
+              ).filter((id) => id !== blockedId);
+              if (aliveParticipants.length === 0) {
+                const blockedKey = blockedPhaseKey as string;
+                phase.nightPhaseOrder = phase.nightPhaseOrder.filter(
+                  (k) => k !== blockedKey,
+                );
+              }
+            } else {
+              // Solo role: remove their phase entirely.
+              phase.nightPhaseOrder = phase.nightPhaseOrder.filter(
+                (k) => k !== (blockedRole.id as string),
+              );
+            }
+          }
+        }
+      }
     }
 
     // witchAbilityUsed and exposerAbilityUsed are set in start-day

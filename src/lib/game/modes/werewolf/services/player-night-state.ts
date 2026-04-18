@@ -35,6 +35,11 @@ export function extractPlayerNightState(
   const ts = currentTurnState(game);
   const nightActions = ts?.phase.nightActions ?? {};
 
+  // Tavern Keeper block: show blocked message, skip all other night state.
+  if (ts?.tavernKeeperBlockedPlayerId === callerId) {
+    return { tavernKeeperBlocked: true };
+  }
+
   // Group phase handling.
   const groupPhaseKey = myRole.teamTargeting ? myRole.id : myRole.wakesWith;
 

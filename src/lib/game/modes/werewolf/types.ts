@@ -192,6 +192,12 @@ export interface WerewolfTurnState {
   draculaWives?: string[];
   /** Player IDs that the Zombie has infected. Accumulated across nights. */
   zombieInfected?: string[];
+  /**
+   * The player ID blocked by the Tavern Keeper this night.
+   * That player cannot submit a night action; their phase is removed from
+   * nightPhaseOrder if they are a solo role or the last alive member of a team.
+   */
+  tavernKeeperBlockedPlayerId?: string;
 }
 
 export interface TargetablePlayer {
