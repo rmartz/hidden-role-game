@@ -1,17 +1,29 @@
 import { GameMode } from "@/lib/types";
 import type { BasePlayerGameState } from "@/server/types/game";
-import type {
-  AvalonTurnPhase,
-  QuestResult,
-  TeamVote,
-  QuestCard,
-} from "./types";
+import type { AvalonPhase, QuestResult, TeamVote, QuestCard } from "./types";
 
 /** Current quest info visible to all players. */
 export interface AvalonCurrentQuest {
   questNumber: number;
   teamSize: number;
   requiresTwoFails: boolean;
+}
+
+/**
+ * Public phase info sent to clients — contains only the fields that are safe
+ * for all players to see. This is a stripped version of `AvalonTurnPhase`
+ * (similar to `SvPhaseInfo` in Secret Villain).
+ */
+export interface AvalonPublicPhase {
+  type: AvalonPhase;
+  /** Present during TeamProposal, TeamVote, and Quest phases. */
+  leaderId?: string;
+  /** Size of the team being proposed (TeamProposal only). */
+  teamSize?: number;
+  /** Player IDs on the active quest team (Quest phase only). */
+  teamPlayerIds?: string[];
+  /** Player ID of the Assassin (Assassination phase only). */
+  assassinPlayerId?: string;
 }
 
 /**
@@ -25,7 +37,7 @@ export interface AvalonPlayerGameState extends BasePlayerGameState {
   /** Current quest number, team size, and double-fail rule. */
   currentQuest?: AvalonCurrentQuest;
   /** Current phase info (type, leaderId, team, etc.). */
-  avalonPhase?: AvalonTurnPhase;
+  avalonPhase?: AvalonPublicPhase;
   /** Proposed team player IDs (during proposal/vote phases). */
   proposedTeam?: string[];
   /** This player's approve/reject team vote. */

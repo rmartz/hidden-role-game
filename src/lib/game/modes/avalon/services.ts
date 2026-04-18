@@ -4,6 +4,7 @@ import { resolvePlayerOrder } from "@/lib/player-order";
 import { AvalonRole } from "./roles";
 import { AvalonPhase } from "./types";
 import type { AvalonTurnState } from "./types";
+import type { AvalonPublicPhase } from "./player-state";
 
 // ---------------------------------------------------------------------------
 // Quest configuration tables (standard Avalon rules)
@@ -37,7 +38,7 @@ function requiresTwoFailsQuests(playerCount: number): number[] {
 function getQuestTeamSizes(
   playerCount: number,
 ): [number, number, number, number, number] {
-  const sizes = QUEST_TEAM_SIZES[Math.min(Math.max(playerCount, 5), 10)];
+  const sizes = QUEST_TEAM_SIZES[playerCount];
   if (!sizes) {
     throw new Error(
       "No quest configuration for " + String(playerCount) + " players",
@@ -157,12 +158,8 @@ export const avalonServices: GameModeServices = {
       phase.type === AvalonPhase.TeamVote ||
       phase.type === AvalonPhase.TeamProposal
     ) {
-      const team =
-        phase.type === AvalonPhase.TeamProposal
-          ? phase.proposedTeam
-          : phase.proposedTeam;
-      if (team) {
-        result["proposedTeam"] = team;
+      if (phase.proposedTeam) {
+        result["proposedTeam"] = phase.proposedTeam;
       }
     }
 
@@ -219,25 +216,27 @@ export const avalonServices: GameModeServices = {
 // Public phase builder — strips server-only fields (e.g. full card lists)
 // ---------------------------------------------------------------------------
 
-function buildPublicPhase(
-  phase: AvalonTurnState["phase"],
-): Record<string, unknown> {
-  const base: Record<string, unknown> = { type: phase.type };
+function buildPublicPhase(phase: AvalonTurnState["phase"]): AvalonPublicPhase {
+  const base: AvalonPublicPhase = { type: phase.type };
 
   if (
     phase.type === AvalonPhase.TeamProposal ||
     phase.type === AvalonPhase.TeamVote ||
     phase.type === AvalonPhase.Quest
   ) {
-    base["leaderId"] = phase.leaderId;
+    base.leaderId = phase.leaderId;
   }
 
   if (phase.type === AvalonPhase.TeamProposal) {
-    base["teamSize"] = phase.teamSize;
+    base.teamSize = phase.teamSize;
+  }
+
+  if (phase.type === AvalonPhase.Quest) {
+    base.teamPlayerIds = phase.teamPlayerIds;
   }
 
   if (phase.type === AvalonPhase.Assassination) {
-    base["assassinPlayerId"] = phase.assassinPlayerId;
+    base.assassinPlayerId = phase.assassinPlayerId;
   }
 
   return base;
