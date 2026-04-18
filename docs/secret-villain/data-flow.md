@@ -32,7 +32,7 @@ Game state lives in Firebase Realtime Database. `getPlayerGameState` (`src/lib/g
 | `bad-policy`          | `Bad`        | "Bad policy victory"                  |
 | `special-bad-elected` | `Bad`        | "Special Bad Role elected Chancellor" |
 | `good-shoot`          | `Good`       | "Special Bad Role eliminated"         |
-| `chaos`               | `Bad`/`Good` | "Government in chaos — Bad team wins" |
+| `chaos`               | `Bad`/`Good` | "Government in chaos — Bad wins"      |
 
 ### Secret Villain–Specific Fields
 
