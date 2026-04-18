@@ -16,7 +16,11 @@ import type {
   TimerConfig,
 } from "@/lib/types";
 import type { GameConfig } from "@/server/types";
-import { DEFAULT_GAME_MODE, GAME_MODES } from "@/lib/game/modes";
+import {
+  DEFAULT_GAME_MODE,
+  GAME_MODES,
+  getAdvancedBucketMaxCapacity,
+} from "@/lib/game/modes";
 
 function computeIsValid(
   gameMode: GameMode,
@@ -41,11 +45,8 @@ function computeIsValid(
     // Each advanced bucket must have enough draw capacity to fill its playerCount.
     for (const bucket of roleBuckets) {
       if (isSimpleRoleBucket(bucket)) continue;
-      let maxCapacity = 0;
-      for (const slot of bucket.roles) {
-        maxCapacity += slot.max ?? bucket.playerCount;
-      }
-      if (maxCapacity < bucket.playerCount) return false;
+      if (getAdvancedBucketMaxCapacity(bucket) < bucket.playerCount)
+        return false;
     }
     return true;
   }

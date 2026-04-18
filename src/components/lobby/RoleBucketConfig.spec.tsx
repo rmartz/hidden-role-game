@@ -157,9 +157,11 @@ describe("RoleBucketConfigView", () => {
       },
     ];
     render(<RoleBucketConfigView {...defaultProps} buckets={buckets} />);
-    expect(
-      screen.getByText(ROLE_BUCKET_CONFIG_COPY.errorInsufficientCapacity),
-    ).toBeDefined();
+    const alert = screen.getByRole("alert");
+    expect(alert).toBeDefined();
+    expect(alert.textContent).toBe(
+      ROLE_BUCKET_CONFIG_COPY.errorInsufficientCapacity(2, 3),
+    );
   });
 
   it("does not show an insufficient capacity error when max capacity meets playerCount", () => {
@@ -173,9 +175,7 @@ describe("RoleBucketConfigView", () => {
       },
     ];
     render(<RoleBucketConfigView {...defaultProps} buckets={buckets} />);
-    expect(
-      screen.queryByText(ROLE_BUCKET_CONFIG_COPY.errorInsufficientCapacity),
-    ).toBeNull();
+    expect(screen.queryByRole("alert")).toBeNull();
   });
 
   it("does not show an insufficient capacity error when a non-unique role provides unlimited capacity", () => {
@@ -186,16 +186,12 @@ describe("RoleBucketConfigView", () => {
       },
     ];
     render(<RoleBucketConfigView {...defaultProps} buckets={buckets} />);
-    expect(
-      screen.queryByText(ROLE_BUCKET_CONFIG_COPY.errorInsufficientCapacity),
-    ).toBeNull();
+    expect(screen.queryByRole("alert")).toBeNull();
   });
 
   it("does not show an insufficient capacity error for an empty bucket", () => {
     const buckets: AdvancedRoleBucket[] = [{ playerCount: 2, roles: [] }];
     render(<RoleBucketConfigView {...defaultProps} buckets={buckets} />);
-    expect(
-      screen.queryByText(ROLE_BUCKET_CONFIG_COPY.errorInsufficientCapacity),
-    ).toBeNull();
+    expect(screen.queryByRole("alert")).toBeNull();
   });
 });
