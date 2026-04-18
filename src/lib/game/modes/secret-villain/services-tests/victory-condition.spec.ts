@@ -81,7 +81,11 @@ describe("secretVillainServices extractPlayerState victoryCondition", () => {
       SecretVillainWinner.Good,
       SvVictoryConditionKey.GoodPolicy,
     );
-    const result = secretVillainServices.extractPlayerState(game, "p1");
+    const result = secretVillainServices.extractPlayerState(
+      game,
+      "p1",
+      undefined,
+    );
     const themeLabels = getSvThemeLabels(undefined);
     expect(result["victoryCondition"]).toEqual({
       label: SECRET_VILLAIN_COPY.gameOver.victoryConditions.goodPolicy(
@@ -96,7 +100,11 @@ describe("secretVillainServices extractPlayerState victoryCondition", () => {
       SecretVillainWinner.Bad,
       SvVictoryConditionKey.BadPolicy,
     );
-    const result = secretVillainServices.extractPlayerState(game, "p1");
+    const result = secretVillainServices.extractPlayerState(
+      game,
+      "p1",
+      undefined,
+    );
     const themeLabels = getSvThemeLabels(undefined);
     expect(result["victoryCondition"]).toEqual({
       label: SECRET_VILLAIN_COPY.gameOver.victoryConditions.badPolicy(
@@ -111,7 +119,11 @@ describe("secretVillainServices extractPlayerState victoryCondition", () => {
       SecretVillainWinner.Bad,
       SvVictoryConditionKey.SpecialBadElected,
     );
-    const result = secretVillainServices.extractPlayerState(game, "p1");
+    const result = secretVillainServices.extractPlayerState(
+      game,
+      "p1",
+      undefined,
+    );
     const themeLabels = getSvThemeLabels(undefined);
     expect(result["victoryCondition"]).toEqual({
       label: SECRET_VILLAIN_COPY.gameOver.victoryConditions.specialBadElected(
@@ -126,7 +138,11 @@ describe("secretVillainServices extractPlayerState victoryCondition", () => {
       SecretVillainWinner.Good,
       SvVictoryConditionKey.GoodShoot,
     );
-    const result = secretVillainServices.extractPlayerState(game, "p1");
+    const result = secretVillainServices.extractPlayerState(
+      game,
+      "p1",
+      undefined,
+    );
     const themeLabels = getSvThemeLabels(undefined);
     expect(result["victoryCondition"]).toEqual({
       label: SECRET_VILLAIN_COPY.gameOver.victoryConditions.goodShoot(
@@ -141,7 +157,11 @@ describe("secretVillainServices extractPlayerState victoryCondition", () => {
       SecretVillainWinner.Bad,
       SvVictoryConditionKey.Chaos,
     );
-    const result = secretVillainServices.extractPlayerState(game, "p1");
+    const result = secretVillainServices.extractPlayerState(
+      game,
+      "p1",
+      undefined,
+    );
     const themeLabels = getSvThemeLabels(undefined);
     expect(result["victoryCondition"]).toEqual({
       label: SECRET_VILLAIN_COPY.gameOver.victoryConditions.chaos(
@@ -158,7 +178,11 @@ describe("secretVillainServices extractPlayerState victoryCondition", () => {
       SvVictoryConditionKey.GoodPolicy,
       theme,
     );
-    const result = secretVillainServices.extractPlayerState(game, "p1");
+    const result = secretVillainServices.extractPlayerState(
+      game,
+      "p1",
+      undefined,
+    );
     const themeLabels = getSvThemeLabels(theme);
     expect(result["victoryCondition"]).toEqual({
       label: SECRET_VILLAIN_COPY.gameOver.victoryConditions.goodPolicy(
@@ -186,7 +210,11 @@ describe("secretVillainServices extractPlayerState victoryCondition", () => {
       timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
       modeConfig: { gameMode: GameMode.SecretVillain },
     } satisfies Game;
-    const result = secretVillainServices.extractPlayerState(game, "p1");
+    const result = secretVillainServices.extractPlayerState(
+      game,
+      "p1",
+      undefined,
+    );
     expect(result["victoryCondition"]).toBeUndefined();
   });
 
@@ -208,7 +236,11 @@ describe("secretVillainServices extractPlayerState victoryCondition", () => {
       timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
       modeConfig: { gameMode: GameMode.SecretVillain },
     } satisfies Game;
-    const result = secretVillainServices.extractPlayerState(game, "p1");
+    const result = secretVillainServices.extractPlayerState(
+      game,
+      "p1",
+      undefined,
+    );
     expect(result["victoryCondition"]).toBeUndefined();
   });
 });

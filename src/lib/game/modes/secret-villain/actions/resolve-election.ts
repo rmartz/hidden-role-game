@@ -12,8 +12,8 @@ import {
   reshuffleIfNeeded,
   checkBoardWinCondition,
   checkChancellorElectionWinCondition,
+  SvVictoryConditionKey,
 } from "../utils";
-import { SvVictoryConditionKey } from "../utils/win-condition";
 
 /**
  * Tally the election votes and set `passed` on the phase.

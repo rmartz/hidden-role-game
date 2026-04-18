@@ -10,7 +10,7 @@ import {
   SvBoardPreset,
 } from "../types";
 import type { SecretVillainTurnState, ElectionVotePhase } from "../types";
-import { BOARD_PRESETS } from "../utils";
+import { BOARD_PRESETS, SvVictoryConditionKey } from "../utils";
 import { SecretVillainRole } from "../roles";
 import { nominateChancellorAction } from "./nominate-chancellor";
 import { castElectionVoteAction } from "./cast-election-vote";
@@ -338,6 +338,9 @@ describe("resolveElectionAction", () => {
       expect(game.status.type).toBe(GameStatus.Finished);
       if (game.status.type === GameStatus.Finished) {
         expect(game.status.winner).toBe("Bad");
+        expect(game.status.victoryConditionKey).toBe(
+          SvVictoryConditionKey.SpecialBadElected,
+        );
       }
     });
 
@@ -353,6 +356,9 @@ describe("resolveElectionAction", () => {
       expect(game.status.type).toBe(GameStatus.Finished);
       if (game.status.type === GameStatus.Finished) {
         expect(game.status.winner).toBe("Good");
+        expect(game.status.victoryConditionKey).toBe(
+          SvVictoryConditionKey.Chaos,
+        );
       }
     });
   });

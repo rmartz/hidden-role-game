@@ -1,5 +1,10 @@
 import { isSecretVillainModeConfig, GameStatus, Team } from "@/lib/types";
-import type { Game, GameModeServices, PlayerRoleAssignment } from "@/lib/types";
+import type {
+  Game,
+  GameModeServices,
+  PlayerRoleAssignment,
+  RoleDefinition,
+} from "@/lib/types";
 import { resolvePlayerOrder } from "@/lib/player-order";
 import { SecretVillainRole } from "./roles";
 import {
@@ -15,11 +20,9 @@ import {
   getDefaultBoardPreset,
   getEligibleChancellorIds,
   resolvePowerTable,
-} from "./utils";
-import {
   SecretVillainWinner,
   SvVictoryConditionKey,
-} from "./utils/win-condition";
+} from "./utils";
 import { getSvThemeLabels } from "./themes";
 import type { SvTheme } from "./themes";
 import { SECRET_VILLAIN_COPY } from "./copy";
@@ -77,28 +80,40 @@ function extractSvVictoryCondition(
     | undefined;
   if (!conditionKey) return undefined;
   const themeLabels = getSvThemeLabels(svTheme);
-  const winner = game.status.winner;
-  const winnerTeam = winner === SecretVillainWinner.Good ? Team.Good : Team.Bad;
   const vc = SECRET_VILLAIN_COPY.gameOver.victoryConditions;
   let label: string;
+  let winnerTeam: Team;
   switch (conditionKey) {
     case SvVictoryConditionKey.GoodPolicy:
+      winnerTeam = Team.Good;
       label = vc.goodPolicy(themeLabels.goodTeam);
       break;
     case SvVictoryConditionKey.BadPolicy:
+      winnerTeam = Team.Bad;
       label = vc.badPolicy(themeLabels.badTeam);
       break;
     case SvVictoryConditionKey.SpecialBadElected:
+      winnerTeam = Team.Bad;
       label = vc.specialBadElected(themeLabels.specialBadRole);
       break;
     case SvVictoryConditionKey.GoodShoot:
+      winnerTeam = Team.Good;
       label = vc.goodShoot(themeLabels.specialBadRole);
       break;
-    case SvVictoryConditionKey.Chaos:
+    case SvVictoryConditionKey.Chaos: {
+      const winner = game.status.winner;
+      if (winner === SecretVillainWinner.Good) {
+        winnerTeam = Team.Good;
+      } else if (winner === SecretVillainWinner.Bad) {
+        winnerTeam = Team.Bad;
+      } else {
+        return undefined;
+      }
       label = vc.chaos(
         winnerTeam === Team.Good ? themeLabels.goodTeam : themeLabels.badTeam,
       );
       break;
+    }
     default:
       return undefined;
   }
@@ -161,7 +176,11 @@ export const secretVillainServices: GameModeServices = {
     return {};
   },
 
-  extractPlayerState(game: Game, callerId: string): Record<string, unknown> {
+  extractPlayerState(
+    game: Game,
+    callerId: string,
+    _myRole: RoleDefinition | undefined,
+  ): Record<string, unknown> {
     const result: Record<string, unknown> = {};
 
     // Pass the theme to the client for cosmetic label resolution.

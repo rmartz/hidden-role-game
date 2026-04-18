@@ -11,7 +11,7 @@ import {
   SvBoardPreset,
 } from "../types";
 import type { SecretVillainTurnState, PolicyChancellorPhase } from "../types";
-import { BOARD_PRESETS } from "../utils";
+import { BOARD_PRESETS, SvVictoryConditionKey } from "../utils";
 import { SecretVillainRole } from "../roles";
 import { presidentDiscardAction } from "./president-discard";
 import { chancellorPlayAction } from "./chancellor-play";
@@ -256,6 +256,9 @@ describe("chancellorPlayAction", () => {
       expect(game.status.type).toBe(GameStatus.Finished);
       if (game.status.type === GameStatus.Finished) {
         expect(game.status.winner).toBe("Good");
+        expect(game.status.victoryConditionKey).toBe(
+          SvVictoryConditionKey.GoodPolicy,
+        );
       }
     });
 
@@ -275,6 +278,9 @@ describe("chancellorPlayAction", () => {
       expect(game.status.type).toBe(GameStatus.Finished);
       if (game.status.type === GameStatus.Finished) {
         expect(game.status.winner).toBe("Bad");
+        expect(game.status.victoryConditionKey).toBe(
+          SvVictoryConditionKey.BadPolicy,
+        );
       }
     });
 

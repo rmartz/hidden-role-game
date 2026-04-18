@@ -16,6 +16,7 @@ export {
 } from "./special-actions";
 export {
   SecretVillainWinner,
+  SvVictoryConditionKey,
   checkBoardWinCondition,
   checkShootWinCondition,
   checkChancellorElectionWinCondition,
