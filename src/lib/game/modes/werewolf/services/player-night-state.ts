@@ -105,11 +105,12 @@ function extractGroupPhaseState(
 
   const myVote = action.votes.find((v) => v.playerId === callerId);
   const playerById = new Map(game.players.map((p) => [p.id, p]));
+  const blockedPlayerId = ts?.tavernKeeperBlockedPlayerId;
   const aliveParticipantIds = getGroupPhasePlayerIds(
     game.roleAssignments,
     groupPhaseKey,
     deadPlayerIds,
-  );
+  ).filter((id) => id !== blockedPlayerId);
 
   const teamVotes = action.votes
     .filter((v) => aliveParticipantIds.includes(v.playerId))

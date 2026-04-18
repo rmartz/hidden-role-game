@@ -102,11 +102,22 @@ export const confirmNightTargetAction: GameAction = {
                 phase.nightPhaseOrder = phase.nightPhaseOrder.filter(
                   (k) => k !== blockedKey,
                 );
+                phase.nightActions = Object.fromEntries(
+                  Object.entries(phase.nightActions).filter(
+                    ([k]) => k !== blockedKey,
+                  ),
+                );
               }
             } else {
               // Solo role: remove their phase entirely.
+              const soloKey = blockedRole.id as string;
               phase.nightPhaseOrder = phase.nightPhaseOrder.filter(
-                (k) => k !== (blockedRole.id as string),
+                (k) => k !== soloKey,
+              );
+              phase.nightActions = Object.fromEntries(
+                Object.entries(phase.nightActions).filter(
+                  ([k]) => k !== soloKey,
+                ),
               );
             }
           }
