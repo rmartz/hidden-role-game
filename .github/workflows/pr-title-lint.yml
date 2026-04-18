@@ -20,7 +20,7 @@ jobs:
             echo "PR title is valid: $PR_TITLE"
           else
             echo "PR title does not follow Conventional Commits format."
-            echo "Expected: <type>: description  or  <type>(<scope>): description"
+            echo "Expected: <type>[!]: description  or  <type>(<scope>)[!]: description"
             echo "Valid types: feat, fix, docs, chore, refactor, test, style, perf, ci, build, revert"
             echo "Got: $PR_TITLE"
             exit 1
