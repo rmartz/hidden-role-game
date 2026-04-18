@@ -10,4 +10,7 @@ export const ROLE_BUCKET_CONFIG_COPY = {
   bucketUnique: "Limit to one copy per role",
   removeRole: "Remove",
   noRoles: "No roles added yet.",
+  /** Error shown when the total max draw capacity is less than the bucket's playerCount. */
+  errorInsufficientCapacity: (maxCapacity: number, playerCount: number) =>
+    `Not enough role capacity to fill this bucket (can fill at most ${String(maxCapacity)} of ${String(playerCount)})`,
 } as const;
