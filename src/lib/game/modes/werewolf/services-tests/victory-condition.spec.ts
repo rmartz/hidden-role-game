@@ -33,6 +33,7 @@ function makeFinishedGame(winner: WerewolfWinner): Game {
       revealProtections: true,
       hiddenRoleCount: 0,
       showRolesOnDeath: true,
+      autoRevealNightOutcome: false,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   };
@@ -114,6 +115,7 @@ describe("werewolfServices extractPlayerState victoryCondition", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: false,
       },
       timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     };
