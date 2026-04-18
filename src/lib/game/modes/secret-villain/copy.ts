@@ -136,7 +136,7 @@ export const SECRET_VILLAIN_COPY = {
       specialBadRoleName: string,
       badPolicyLabel: string,
     ) =>
-      `You have been elected Chancellor while ${String(BAD_CARDS_FOR_SPECIAL_BAD_WIN)}+ ${badPolicyLabel} policies are in play. Are you the ${specialBadRoleName}?`,
+      `You have been elected Chancellor while ${String(BAD_CARDS_FOR_SPECIAL_BAD_WIN)}+ ${badPolicyLabel} are in play. Are you the ${specialBadRoleName}?`,
     confirmButton: (specialBadRoleName: string) =>
       `Confirm \u2014 I am not the ${specialBadRoleName}`,
     revealButton: (specialBadRoleName: string) =>

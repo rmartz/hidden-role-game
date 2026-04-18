@@ -322,7 +322,7 @@ export function SecretVillainGameScreenView({
             chancellorName={getPlayerName(players, phase.chancellorId ?? "")}
             specialBadRoleName={themeLabels.specialBadRole}
             badTeamLabel={themeLabels.badTeam}
-            badPolicyLabel={themeLabels.badPolicy}
+            badPolicyLabel={themeLabels.badTrack}
             isChancellor={phase.chancellorId === myPlayerId}
             revealed={gameState.svSpecialBadReveal?.revealed}
             onConfirm={onConfirmSpecialBad}

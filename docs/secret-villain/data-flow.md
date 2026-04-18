@@ -71,7 +71,7 @@ Election Vote
   If passed and Special Bad is chancellor with 3+ Bad cards played:
     SpecialBadReveal (identity checkpoint)
       → confirm-special-bad (chancellor: "I am not the Special Bad") → revealed = false
-      → deny-special-bad   (chancellor: "I am the Special Bad")     → revealed = true
+      → reveal-special-bad (chancellor: "I am the Special Bad")     → revealed = true
       → advance-from-special-bad-reveal (any player, after chancellor acts)
         If revealed = true  → Bad team wins (game over)
         If revealed = false → Policy President (continues normally)
