@@ -35,9 +35,11 @@ pnpm build-storybook  # Build static Storybook
 
 ## Code Conventions
 
+- **Favor type inference.** Explicit type parameterization is a code smell — let TypeScript infer where it can.
 - **No spurious variables.** Do not assign a value to a variable only to immediately return it on the next line — return the expression directly instead.
 - **No IIFEs.** Do not use immediately-invoked function expressions. Extract the logic into a named helper function or compute the value with a plain expression instead.
 - **No function-style imports.** Do not use inline `import("…").Type` syntax in type annotations. Use module-level `import type { … } from "…"` statements at the top of the file. Dynamic `await import("…")` for services that require conditional loading (e.g., Sentry instrumentation) is acceptable.
+- **No unnecessary helpers.** Do not extract logic into a helper function unless it separates significant logic or belongs in a different module. Three similar lines is better than a premature abstraction.
 - **Role enums and definitions** in game mode files (e.g., `WerewolfRole` enum and `WEREWOLF_ROLES` object) must be kept in alphabetical order to minimize merge conflicts.
 - **Prefer enums over string literal unions** for any domain concept with two or more named states (e.g., use `enum TrialPhase { Defense = "defense", Voting = "voting" }` rather than `"defense" | "voting"`). String enum values must match the existing serialized literals so Firebase data round-trips without migration. Export new enums from the module barrel.
 
