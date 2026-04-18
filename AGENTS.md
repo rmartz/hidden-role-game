@@ -95,9 +95,9 @@ pnpm build-storybook  # Build static Storybook
 
 ## GitHub Issues
 
-- Epic issues use a checkbox task list in their Sub-issues section: `- [ ] #xxx — description`. Use this format — not a table — so GitHub tracks progress natively and agents can parse the next task automatically.
-- Every sub-issue under a game-mode Epic must carry the same game-mode label as the Epic (e.g. `Werewolf`, `Avalon`, `Clocktower`, `Codenames`).
-- When a sub-issue is closed, update the parent Epic's checkbox to `- [x]`.
+- Each Epic has a corresponding GitHub Milestone with the same title. All sub-issues must be assigned to that milestone; progress is tracked natively via the milestone.
+- Every sub-issue under a game-mode Epic must carry the same game-mode label as the Epic (e.g. `Werewolf`, `Avalon`, `Clocktower`, `Codenames`). Labels persist across epics for the same mode; milestones are per-epic deliverable.
+- When picking the next task from an Epic, use `gh issue list --milestone "<milestone title>" --state open`.
 
 ## Git Conventions
 
