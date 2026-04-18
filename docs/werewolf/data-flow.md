@@ -32,7 +32,7 @@ The Narrator's session is stored separately and receives a different (fuller) `P
 | `timerConfig`            | ✓ (if set)      | ✓ (if set)                      |
 | `victoryCondition`       | ✓ (if finished) | ✓ (if finished)                 |
 
-`victoryCondition` is only present when `status.type === "Finished"`. It contains a human-readable `label` (e.g. `"All werewolves eliminated"`) and a `winner: Team` used for colour/icon selection. The label is derived from the `winner` field and is sourced from `WEREWOLF_COPY.gameOver.victoryConditions`.
+`victoryCondition` is only present when `status.type === "Finished"`. It contains a human-readable `label` (e.g. `"By elimination"`) and a `winner: Team` used for colour/icon selection. The label is derived from the `winner` field and is sourced from `WEREWOLF_COPY.gameOver.victoryConditions`.
 
 ### Werewolf Game Settings (WerewolfPlayerGameState)
 
