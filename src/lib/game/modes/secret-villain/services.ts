@@ -1,10 +1,5 @@
 import { isSecretVillainModeConfig, GameStatus, Team } from "@/lib/types";
-import type {
-  Game,
-  GameModeServices,
-  PlayerRoleAssignment,
-  RoleDefinition,
-} from "@/lib/types";
+import type { Game, GameModeServices, PlayerRoleAssignment } from "@/lib/types";
 import { resolvePlayerOrder } from "@/lib/player-order";
 import { SecretVillainRole } from "./roles";
 import {
@@ -176,11 +171,7 @@ export const secretVillainServices: GameModeServices = {
     return {};
   },
 
-  extractPlayerState(
-    game: Game,
-    callerId: string,
-    _: RoleDefinition | undefined,
-  ): Record<string, unknown> {
+  extractPlayerState(game: Game, callerId: string): Record<string, unknown> {
     const result: Record<string, unknown> = {};
 
     // Pass the theme to the client for cosmetic label resolution.
