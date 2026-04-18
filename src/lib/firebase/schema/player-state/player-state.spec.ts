@@ -244,7 +244,7 @@ describe("Secret Villain player state round-trip", () => {
 
   it("round-trips election votes", () => {
     const votes = [
-      { playerId: "p1", vote: "aye" as const },
+      { playerId: "p1", vote: "yes" as const },
       { playerId: "p2", vote: "no" as const },
     ];
     const state = makeSecretVillainState({ electionVotes: votes });
@@ -253,7 +253,7 @@ describe("Secret Villain player state round-trip", () => {
     ) as SecretVillainPlayerGameState;
     expect(result.electionVotes).toHaveLength(2);
     expect(result.electionVotes?.at(0)?.playerId).toBe("p1");
-    expect(result.electionVotes?.at(0)?.vote).toBe("aye");
+    expect(result.electionVotes?.at(0)?.vote).toBe("yes");
   });
 });
 

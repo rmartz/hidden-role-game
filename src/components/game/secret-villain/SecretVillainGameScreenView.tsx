@@ -6,6 +6,7 @@ import { FAILED_ELECTION_THRESHOLD } from "@/lib/game/modes/secret-villain/types
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
 import type { PlayerGameState } from "@/server/types";
 import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
+import { getSvThemeLabels } from "@/lib/game/modes/secret-villain/themes";
 import { BoardDisplay } from "./BoardDisplay";
 import { ElectionNominationView } from "./ElectionNominationView";
 import { ElectionVoteView } from "./ElectionVoteView";
@@ -30,7 +31,7 @@ export interface SecretVillainGameScreenViewProps {
   selectedChancellorId?: string;
   onSelectChancellor: (playerId: string) => void;
   onConfirmNomination: () => void;
-  onVote: (vote: "aye" | "no") => void;
+  onVote: (vote: "yes" | "no") => void;
   /** Tally votes and show results. */
   onResolveElection: () => void;
   // Policy actions
@@ -118,6 +119,7 @@ export function SecretVillainGameScreenView({
   const isEliminated = gameState.amDead === true;
   const board = gameState.svBoard;
   const players = gameState.players;
+  const themeLabels = getSvThemeLabels(gameState.svTheme);
 
   const boardSection = board?.powerTable ? (
     <BoardDisplay
@@ -182,6 +184,8 @@ export function SecretVillainGameScreenView({
               }))}
               onContinue={onAdvanceFromElection}
               isPending={isPending}
+              voteYesLabel={themeLabels.voteYes}
+              voteNoLabel={themeLabels.voteNo}
             />
           );
         }
@@ -214,6 +218,8 @@ export function SecretVillainGameScreenView({
             nonVotingPlayerIds={nonVotingPlayerIds}
             isPending={isPending}
             isEliminated={isEliminated}
+            voteYesLabel={themeLabels.voteYes}
+            voteNoLabel={themeLabels.voteNo}
           />
         );
       }

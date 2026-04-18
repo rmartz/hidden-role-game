@@ -24,7 +24,7 @@ export function tallyElection(game: Game): void {
   if (ts?.phase.type !== SecretVillainPhase.ElectionVote) return;
   if (ts.phase.passed !== undefined) return;
 
-  const ayes = ts.phase.votes.filter((v) => v.vote === "aye").length;
+  const ayes = ts.phase.votes.filter((v) => v.vote === "yes").length;
   const nos = ts.phase.votes.filter((v) => v.vote === "no").length;
   ts.phase.passed = ayes > nos;
 }

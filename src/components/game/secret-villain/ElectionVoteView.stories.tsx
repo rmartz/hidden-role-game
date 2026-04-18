@@ -19,11 +19,11 @@ export const NotVoted: Story = {
   },
 };
 
-export const VotedAye: Story = {
+export const VotedYes: Story = {
   args: {
     presidentName: "Alice",
     chancellorNomineeName: "Bob",
-    myVote: "aye",
+    myVote: "yes",
   },
 };
 

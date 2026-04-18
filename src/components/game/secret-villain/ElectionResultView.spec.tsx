@@ -6,8 +6,8 @@ import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
 afterEach(cleanup);
 
 const defaultVotes = [
-  { playerName: "Alice", vote: "aye" as const },
-  { playerName: "Bob", vote: "aye" as const },
+  { playerName: "Alice", vote: "yes" as const },
+  { playerName: "Bob", vote: "yes" as const },
   { playerName: "Charlie", vote: "no" as const },
 ];
 
@@ -44,10 +44,21 @@ describe("ElectionResultView", () => {
   it("displays correct vote counts", () => {
     render(<ElectionResultView {...defaultProps} />);
     expect(
-      screen.getByText(SECRET_VILLAIN_COPY.election.ayeCount(2)),
+      screen.getByText(`${SECRET_VILLAIN_COPY.election.yes}: 2`),
     ).toBeDefined();
     expect(
-      screen.getByText(SECRET_VILLAIN_COPY.election.noCount(1)),
+      screen.getByText(`${SECRET_VILLAIN_COPY.election.no}: 1`),
     ).toBeDefined();
+  });
+
+  it("renders custom voteYesLabel in vote list when provided", () => {
+    render(<ElectionResultView {...defaultProps} voteYesLabel="Ja!" />);
+    // "Ja!" appears once per yes-voting player (Alice + Bob) in the vote list
+    expect(screen.getAllByText("Ja!").length).toBe(2);
+  });
+
+  it("renders custom voteNoLabel in vote list when provided", () => {
+    render(<ElectionResultView {...defaultProps} voteNoLabel="Nein!" />);
+    expect(screen.getByText("Nein!")).toBeDefined();
   });
 });
