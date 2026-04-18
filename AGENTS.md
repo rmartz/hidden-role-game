@@ -34,8 +34,8 @@ pnpm build-storybook  # Build static Storybook
 - **Test files**: Keep under ~300 lines (split at ~360). Use `.spec.ts` / `.spec.tsx` extension (not `.test.ts`). When splitting, organize into a `{module}-tests/` directory with domain-specific files (e.g., `resolution-tests/altruist.spec.ts`).
 - **Components**: A component file contains its primary component and props interface. A sub-component may be co-located in the same file if it owns no hooks, state, effects, or context, and is used only by the parent component in that file — e.g., a context wrapper, structural template, or props alias. A sub-component must be in its own file when any of these are true: it owns hooks, state, effects, or context; it is referenced from multiple parents; or it is substantial enough to warrant its own stories or tests (e.g., list items, row components, panels, form sections). All component props must be defined as an explicitly named interface (e.g., `interface PlayerListProps`), never inline in the function signature.
 - **Type files**: Convert large type files into barrel-exported directories with one file per logical domain (e.g., `lobby.ts`, `game.ts`, `player.ts`).
-- Barrel `index.ts` exports for all component/module directories.
-- Use named exports, not default exports (except for Next.js pages and Redux slices).
+- Add a barrel `index.ts` when a component or module directory exposes a public API or already follows a barrel pattern; do not require one for every directory (e.g. ShadCN-generated `src/components/ui/` has no barrel by convention).
+- Use named exports, not default exports (except for Next.js pages, Redux slices, and Storybook story files, which require `export default meta`).
 
 ## Code Conventions
 
@@ -49,7 +49,9 @@ pnpm build-storybook  # Build static Storybook
 
 ## User-Facing Text
 
-- All user-facing strings must be stored in a co-located copy file (e.g., `ComponentName.copy.ts` or `copy.ts`) for internationalization (i18n) readiness.
+- For any new or modified UI component, store user-facing strings in a co-located copy file (e.g., `ComponentName.copy.ts` or `copy.ts`) for internationalization (i18n) readiness. Do not introduce new hardcoded display strings inline in components you are actively changing.
+
+  Existing hardcoded strings elsewhere in the codebase are technical debt to be migrated over time; this rule does not require unrelated cleanup.
 - Copy files export a single `as const` object named `{SCOPE}_COPY` (e.g., `WEREWOLF_COPY`, `HOME_PAGE_COPY`, `GAME_TIMER_COPY`).
 
 ## Documentation
@@ -71,7 +73,7 @@ pnpm build-storybook  # Build static Storybook
 
 ### JSX
 
-- **No imperative logic inside JSX.** Imperative logic means anything that requires a statement rather than an expression: `const`/`let` declarations, `if`/`switch` blocks, loops, or any sequence of statements that produces a result through side effects. All such logic must live in the component body before the `return` statement, or be extracted into a child component. Expressions of any complexity are permitted directly in JSX — ternaries, logical operators (`&&`, `||`, `??`), method chains (`.map()`, `.filter()`, `.find()`), nested function calls, and template literals are all fine as long as they form a single expression with no intermediate bindings.
+- **No imperative logic inside JSX.** Imperative logic means anything that requires a statement rather than an expression: `const`/`let` declarations, `if`/`switch` blocks, loops, or any sequence of statements that produces a result through side effects. All such logic must live in the component body before the `return` statement, or be extracted into a child component. Expressions of any complexity are permitted directly in JSX — ternaries, logical operators (`&&`, `||`, `??`), method chains (`.map()`, `.filter()`, `.find()`), nested function calls, and template literals are all fine as long as they form a single expression with no intermediate bindings. Statement blocks inside callback functions passed as JSX props are allowed (e.g. multi-statement event handlers like `onChange={(e) => { setValue(e.target.value); setError(undefined); }}`).
 
 ### Component Structure
 
