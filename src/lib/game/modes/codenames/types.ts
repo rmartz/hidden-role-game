@@ -63,9 +63,43 @@ export interface GuessPhase {
   type: CodenamesPhase.Guess;
   /** The clue that prompted this guessing phase. */
   clue: Clue;
+  /** How many guesses the active team has remaining this turn. */
+  guessesRemaining: number;
 }
 
 export type CodenamesTurnPhase = GiveCluePhase | GuessPhase;
+
+// ---------------------------------------------------------------------------
+// Board type alias
+// ---------------------------------------------------------------------------
+
+export type CodenamesBoard = [
+  BoardCard,
+  BoardCard,
+  BoardCard,
+  BoardCard,
+  BoardCard,
+  BoardCard,
+  BoardCard,
+  BoardCard,
+  BoardCard,
+  BoardCard,
+  BoardCard,
+  BoardCard,
+  BoardCard,
+  BoardCard,
+  BoardCard,
+  BoardCard,
+  BoardCard,
+  BoardCard,
+  BoardCard,
+  BoardCard,
+  BoardCard,
+  BoardCard,
+  BoardCard,
+  BoardCard,
+  BoardCard,
+];
 
 // ---------------------------------------------------------------------------
 // Turn state
@@ -79,37 +113,9 @@ export interface CodenamesTurnState {
   /** The team whose turn it currently is. */
   activeTeam: CodenamesTeam;
   /** The 25-card game board. */
-  board: [
-    BoardCard,
-    BoardCard,
-    BoardCard,
-    BoardCard,
-    BoardCard,
-    BoardCard,
-    BoardCard,
-    BoardCard,
-    BoardCard,
-    BoardCard,
-    BoardCard,
-    BoardCard,
-    BoardCard,
-    BoardCard,
-    BoardCard,
-    BoardCard,
-    BoardCard,
-    BoardCard,
-    BoardCard,
-    BoardCard,
-    BoardCard,
-    BoardCard,
-    BoardCard,
-    BoardCard,
-    BoardCard,
-  ];
+  board: CodenamesBoard;
   /** History of all clues given, in order. */
   clueHistory: Clue[];
-  /** How many guesses the active team has remaining this turn. */
-  guessesRemaining: number;
   /** The team that goes first and has 9 words assigned (the other has 8). */
   startingTeam: CodenamesTeam;
 }
