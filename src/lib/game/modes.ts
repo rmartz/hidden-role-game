@@ -76,7 +76,6 @@ export function getRoleSlotsRequired(
 /**
  * Computes the total draw capacity of an advanced bucket: the sum of each
  * slot's `max`, treating `undefined` (uncapped) as `bucket.playerCount`.
- * Used by the store, UI, and server to check bucket feasibility.
  */
 export function getAdvancedBucketMaxCapacity(
   bucket: AdvancedRoleBucket,
