@@ -2,16 +2,19 @@ import { GameStatus } from "@/lib/types";
 import type { Game, GameModeServices, PlayerRoleAssignment } from "@/lib/types";
 import { ClocktowerPhase } from "./types";
 import type { ClocktowerTurnState } from "./types";
+import { ClocktowerRole } from "./roles";
 
 function buildInitialTurnState(
   roleAssignments: PlayerRoleAssignment[],
 ): ClocktowerTurnState {
   const playerIds = roleAssignments.map((a) => a.playerId);
 
-  // The Demon player is identified at initialization time.
-  // For now we use the first player as a placeholder — full Demon assignment
-  // is implemented in the game initialization sub-issue (#354).
-  const demonPlayerId = playerIds[0] ?? "";
+  const demonAssignment = roleAssignments.find(
+    (a) => a.roleDefinitionId === (ClocktowerRole.Imp as string),
+  );
+  if (!demonAssignment)
+    throw new Error("Clocktower turn state requires an Imp assignment");
+  const demonPlayerId = demonAssignment.playerId;
 
   return {
     turn: 1,
@@ -46,7 +49,6 @@ export const clocktowerServices: GameModeServices = {
     return {
       clocktowerTurn: ts.turn,
       clocktowerPhase: ts.phase.type,
-      deadPlayerIds: ts.deadPlayerIds,
       ghostVotesUsed: ts.ghostVotesUsed,
     };
   },

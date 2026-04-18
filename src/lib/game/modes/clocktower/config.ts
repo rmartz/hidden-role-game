@@ -12,7 +12,7 @@ export const CLOCKTOWER_CONFIG = {
   name: "Clocktower",
   released: false,
   minPlayers: MIN_PLAYERS,
-  ownerTitle: "Storyteller",
+  ownerTitle: null,
   teamLabels: {
     [Team.Good]: "Good",
     [Team.Bad]: "Evil",
@@ -24,5 +24,8 @@ export const CLOCKTOWER_CONFIG = {
   parseModeConfig: parseClocktowerModeConfig,
   buildDefaultLobbyConfig: buildDefaultClocktowerLobbyConfig,
   actions: {},
+  // Clocktower's Storyteller controls information delivery manually;
+  // roles are not automatically revealed when a player dies.
+  resolveRevealDeadPlayerIds: () => [],
   services: clocktowerServices,
 } satisfies GameModeConfig;
