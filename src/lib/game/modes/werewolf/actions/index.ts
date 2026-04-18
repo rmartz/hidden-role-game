@@ -7,6 +7,7 @@ import { setNightPhaseAction } from "./set-night-phase";
 import { setNightTargetAction } from "./set-night-target";
 import { confirmNightTargetAction } from "./confirm-night-target";
 import { revealInvestigationResultAction } from "./reveal-investigation-result";
+import { revealNightOutcomeStepAction } from "./reveal-night-outcome-step";
 import { markPlayerDeadAction, markPlayerAliveAction } from "./mark-player";
 import { startTrialAction } from "./start-trial";
 import { castVoteAction } from "./cast-vote";
@@ -29,6 +30,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.SetNightTarget]: setNightTargetAction,
   [WerewolfAction.ConfirmNightTarget]: confirmNightTargetAction,
   [WerewolfAction.RevealInvestigationResult]: revealInvestigationResultAction,
+  [WerewolfAction.RevealNightOutcomeStep]: revealNightOutcomeStepAction,
   [WerewolfAction.MarkPlayerDead]: markPlayerDeadAction,
   [WerewolfAction.MarkPlayerAlive]: markPlayerAliveAction,
   [WerewolfAction.StartTrial]: startTrialAction,

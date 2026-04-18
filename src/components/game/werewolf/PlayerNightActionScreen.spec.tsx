@@ -63,6 +63,7 @@ describe("PlayerNightActionScreen", () => {
       nominationsEnabled: true,
       trialsPerDay: 1,
       revealProtections: true,
+      autoRevealNightOutcome: true,
       myPlayerId: "p1",
       myRole: {
         id: WerewolfRole.Mentalist,
@@ -116,6 +117,7 @@ describe("PlayerNightActionScreen", () => {
       nominationsEnabled: true,
       trialsPerDay: 1,
       revealProtections: true,
+      autoRevealNightOutcome: true,
       myPlayerId: "p1",
       myRole: {
         id: WerewolfRole.Seer,

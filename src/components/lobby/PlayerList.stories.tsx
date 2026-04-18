@@ -48,6 +48,7 @@ const baseLobby: PublicLobby = {
       revealProtections: true,
       hiddenRoleCount: 0,
       showRolesOnDeath: true,
+      autoRevealNightOutcome: true,
     },
   },
   readyPlayerIds: ["p2", "p4"],

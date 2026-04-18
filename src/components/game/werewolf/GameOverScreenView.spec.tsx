@@ -36,6 +36,7 @@ function makeGameState(
     nominationsEnabled: false,
     trialsPerDay: 0,
     revealProtections: false,
+    autoRevealNightOutcome: true,
     ...overrides,
   };
 }

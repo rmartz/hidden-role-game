@@ -54,6 +54,7 @@ export function makeNighttimeGame(
       revealProtections: true,
       hiddenRoleCount: 0,
       showRolesOnDeath: true,
+      autoRevealNightOutcome: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   };
@@ -105,6 +106,7 @@ export function makeNighttimeGameWithBonusPhase(
       revealProtections: true,
       hiddenRoleCount: 0,
       showRolesOnDeath: true,
+      autoRevealNightOutcome: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   };

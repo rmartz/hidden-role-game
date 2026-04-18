@@ -8,11 +8,13 @@ import {
   DaytimeVote,
 } from "@/lib/game/modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
+import type { WerewolfModeConfig } from "@/lib/game/modes/werewolf";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import {
   extractDaytimeNightSummary,
   extractDaytimePlayerState,
 } from "../services/owner-state";
+import { getOrderedAffectedPlayerIds } from "../services/night-outcome";
 
 // ---------------------------------------------------------------------------
 // extractDaytimeState — combines the two new functions for test convenience
@@ -39,15 +41,33 @@ export function makeDaytimeGame(
       WerewolfTurnState["phase"],
       { type: WerewolfPhase.Daytime }
     >["nightResolution"];
+    revealedPlayerIds: string[];
     deadPlayerIds: string[];
+    modeConfig: Partial<WerewolfModeConfig>;
   }> = {},
 ): Game {
+  const modeConfig: WerewolfModeConfig = {
+    gameMode: GameMode.Werewolf,
+    nominationsEnabled: false,
+    trialsPerDay: 1,
+    revealProtections: true,
+    showRolesOnDeath: true,
+    hiddenRoleCount: 0,
+    autoRevealNightOutcome: true,
+    ...(overrides.modeConfig ?? {}),
+  };
+  const revealedPlayerIds =
+    overrides.revealedPlayerIds ??
+    (modeConfig.autoRevealNightOutcome
+      ? getOrderedAffectedPlayerIds(overrides.nightResolution ?? [])
+      : undefined);
   const turnState: WerewolfTurnState = {
     turn: 2,
     phase: {
       type: WerewolfPhase.Daytime,
       startedAt: 1000,
       nightActions: overrides.nightActions ?? {},
+      ...(revealedPlayerIds !== undefined ? { revealedPlayerIds } : {}),
       ...(overrides.nightResolution !== undefined
         ? { nightResolution: overrides.nightResolution }
         : {}),
@@ -73,14 +93,7 @@ export function makeDaytimeGame(
     configuredRoleBuckets: [],
     showRolesInPlay: ShowRolesInPlay.None,
     ownerPlayerId: "owner",
-    modeConfig: {
-      gameMode: GameMode.Werewolf,
-      nominationsEnabled: false,
-      trialsPerDay: 1,
-      revealProtections: true,
-      hiddenRoleCount: 0,
-      showRolesOnDeath: true,
-    },
+    modeConfig,
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   };
 }
@@ -131,6 +144,7 @@ export function makeDaytimeGameWithTrial(callerRoleId: WerewolfRole): Game {
       revealProtections: true,
       hiddenRoleCount: 0,
       showRolesOnDeath: true,
+      autoRevealNightOutcome: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   };
@@ -180,6 +194,7 @@ export function makeDaytimeGameWithNominations(
       revealProtections: true,
       hiddenRoleCount: 0,
       showRolesOnDeath: true,
+      autoRevealNightOutcome: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   };

@@ -13,6 +13,7 @@ const defaultModeConfig: WerewolfModeConfig = {
   revealProtections: true,
   showRolesOnDeath: true,
   hiddenRoleCount: 0,
+  autoRevealNightOutcome: true,
 };
 
 const hiddenModeConfig: WerewolfModeConfig = {

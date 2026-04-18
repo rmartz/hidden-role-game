@@ -209,6 +209,7 @@ function makeNarratorGame(nominationsEnabled = false): Game {
       revealProtections: true,
       hiddenRoleCount: 0,
       showRolesOnDeath: true,
+      autoRevealNightOutcome: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
   };
@@ -325,6 +326,7 @@ describe("buildGame — Werewolf hidden roles", () => {
       revealProtections: true,
       showRolesOnDeath: true,
       hiddenRoleCount: 1,
+      autoRevealNightOutcome: true,
     };
 
     const game = buildGame(
@@ -378,6 +380,7 @@ describe("buildGame — Werewolf hidden roles", () => {
       revealProtections: true,
       showRolesOnDeath: true,
       hiddenRoleCount: 0,
+      autoRevealNightOutcome: true,
     };
 
     const game = buildGame(

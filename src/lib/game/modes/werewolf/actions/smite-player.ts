@@ -11,10 +11,15 @@ export const smitePlayerAction: GameAction = {
     if (typeof playerId !== "string") return false;
     if (playerId === game.ownerPlayerId) return false;
     if (ts.deadPlayerIds.includes(playerId)) return false;
-    if (ts.phase.type === WerewolfPhase.Nighttime) {
-      if ((ts.phase.smitedPlayerIds ?? []).includes(playerId)) return false;
-    } else {
-      if ((ts.phase.pendingSmitePlayerIds ?? []).includes(playerId))
+    switch (ts.phase.type) {
+      case WerewolfPhase.Nighttime:
+        if ((ts.phase.smitedPlayerIds ?? []).includes(playerId)) return false;
+        break;
+      case WerewolfPhase.Daytime:
+        if ((ts.phase.pendingSmitePlayerIds ?? []).includes(playerId))
+          return false;
+        break;
+      default:
         return false;
     }
     return game.players.some((p) => p.id === playerId);
@@ -23,16 +28,19 @@ export const smitePlayerAction: GameAction = {
     const ts = currentTurnState(game);
     if (!ts) return;
     const { playerId } = payload as { playerId: string };
-    if (ts.phase.type === WerewolfPhase.Nighttime) {
-      ts.phase.smitedPlayerIds = [
-        ...(ts.phase.smitedPlayerIds ?? []),
-        playerId,
-      ];
-    } else {
-      ts.phase.pendingSmitePlayerIds = [
-        ...(ts.phase.pendingSmitePlayerIds ?? []),
-        playerId,
-      ];
+    switch (ts.phase.type) {
+      case WerewolfPhase.Nighttime:
+        ts.phase.smitedPlayerIds = [
+          ...(ts.phase.smitedPlayerIds ?? []),
+          playerId,
+        ];
+        break;
+      case WerewolfPhase.Daytime:
+        ts.phase.pendingSmitePlayerIds = [
+          ...(ts.phase.pendingSmitePlayerIds ?? []),
+          playerId,
+        ];
+        break;
     }
   },
 };

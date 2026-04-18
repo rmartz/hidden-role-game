@@ -9,23 +9,30 @@ export const unsmitePlayerAction: GameAction = {
     if (!ts) return false;
     const { playerId } = payload as { playerId?: unknown };
     if (typeof playerId !== "string") return false;
-    if (ts.phase.type === WerewolfPhase.Nighttime) {
-      return (ts.phase.smitedPlayerIds ?? []).includes(playerId);
+    switch (ts.phase.type) {
+      case WerewolfPhase.Nighttime:
+        return (ts.phase.smitedPlayerIds ?? []).includes(playerId);
+      case WerewolfPhase.Daytime:
+        return (ts.phase.pendingSmitePlayerIds ?? []).includes(playerId);
+      default:
+        return false;
     }
-    return (ts.phase.pendingSmitePlayerIds ?? []).includes(playerId);
   },
   apply(game: Game, payload: unknown) {
     const ts = currentTurnState(game);
     if (!ts) return;
     const { playerId } = payload as { playerId: string };
-    if (ts.phase.type === WerewolfPhase.Nighttime) {
-      ts.phase.smitedPlayerIds = (ts.phase.smitedPlayerIds ?? []).filter(
-        (id) => id !== playerId,
-      );
-    } else {
-      ts.phase.pendingSmitePlayerIds = (
-        ts.phase.pendingSmitePlayerIds ?? []
-      ).filter((id) => id !== playerId);
+    switch (ts.phase.type) {
+      case WerewolfPhase.Nighttime:
+        ts.phase.smitedPlayerIds = (ts.phase.smitedPlayerIds ?? []).filter(
+          (id) => id !== playerId,
+        );
+        break;
+      case WerewolfPhase.Daytime:
+        ts.phase.pendingSmitePlayerIds = (
+          ts.phase.pendingSmitePlayerIds ?? []
+        ).filter((id) => id !== playerId);
+        break;
     }
   },
 };

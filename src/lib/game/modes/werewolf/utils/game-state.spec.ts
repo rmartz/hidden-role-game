@@ -28,6 +28,7 @@ function makePlayingGame(
       revealProtections: true,
       hiddenRoleCount: 0,
       showRolesOnDeath: true,
+      autoRevealNightOutcome: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     ...overrides,
@@ -81,6 +82,7 @@ describe("isOwnerPlaying", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
       timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     };
@@ -117,6 +119,7 @@ describe("currentTurnState", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
       timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     };
@@ -141,6 +144,7 @@ describe("currentTurnState", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
       timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     };

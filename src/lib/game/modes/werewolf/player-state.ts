@@ -25,6 +25,11 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   concludedTrialsCount?: number;
   /** When true, the night summary reveals players who were attacked but saved by protection. */
   revealProtections: boolean;
+  /**
+   * When true, elimination/status outcomes (killed/silenced/hypnotized) are
+   * revealed to all players immediately at day start.
+   */
+  autoRevealNightOutcome: boolean;
   /** All night targets keyed by phase key. Only populated for the narrator/owner. */
   nightActions?: Record<string, AnyNightAction>;
   /** The current player's night target. null = intentional skip; undefined = no decision. */
