@@ -1,5 +1,9 @@
 {
   "mcpServers": {
+    "github": {
+      "command": "gh",
+      "args": ["mcp", "serve"]
+    },
     "shadcn": {
       "command": "npx",
       "args": ["shadcn@latest", "mcp"]
