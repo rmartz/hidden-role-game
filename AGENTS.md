@@ -17,6 +17,10 @@ pnpm storybook        # Start Storybook dev server (port 6006)
 pnpm build-storybook  # Build static Storybook
 ```
 
+## Firebase Compatibility
+
+- **No backward-compatibility guards for Firebase data.** This project is not public-facing; breaking in-progress games on deploy is acceptable. Do not add migration guards, legacy-value fallbacks, or `"aye" | "yes"` dual-handling for renamed serialized values. Write code against the current schema only.
+
 ## TypeScript
 
 - Strict mode throughout. No `any` types. No `@ts-ignore`.
