@@ -57,6 +57,12 @@ function buildPhaseInfo(
   if (phase.type === SecretVillainPhase.SpecialAction) {
     base["actionType"] = phase.actionType;
   }
+  if (phase.type === SecretVillainPhase.SpecialBadReveal) {
+    base["chancellorId"] = phase.chancellorId;
+    if (phase.revealed !== undefined) {
+      base["revealed"] = phase.revealed;
+    }
+  }
   return base;
 }
 
@@ -325,6 +331,14 @@ export const secretVillainServices: GameModeServices = {
         result["electionVotes"] = phase.votes;
         result["electionPassed"] = phase.passed;
       }
+    }
+
+    // Special Bad reveal checkpoint — visible to all players.
+    if (phase.type === SecretVillainPhase.SpecialBadReveal) {
+      result["svSpecialBadReveal"] = {
+        chancellorId: phase.chancellorId,
+        ...(phase.revealed !== undefined ? { revealed: phase.revealed } : {}),
+      };
     }
 
     // Eligible chancellors for nomination phase (president only).

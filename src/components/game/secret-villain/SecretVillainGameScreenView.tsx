@@ -17,6 +17,7 @@ import { VetoPromptView } from "./VetoPromptView";
 import { SpecialActionView } from "./SpecialActionView";
 import { SecretVillainGameOverView } from "./SecretVillainGameOverView";
 import { SecretVillainStartingView } from "./SecretVillainStartingView";
+import { SpecialBadRevealView } from "./SpecialBadRevealView";
 
 function getPlayerName(
   players: PlayerGameState["players"],
@@ -54,6 +55,10 @@ export interface SecretVillainGameScreenViewProps {
   onPeek: () => void;
   /** Advance from election results to the next phase. */
   onAdvanceFromElection: () => void;
+  // Special Bad reveal
+  onConfirmSpecialBad: () => void;
+  onDenySpecialBad: () => void;
+  onAdvanceFromSpecialBadReveal: () => void;
   // Game over
   onReturnToLobby: () => void;
   // Starting
@@ -86,6 +91,9 @@ export function SecretVillainGameScreenView({
   onConsent,
   onPeek,
   onAdvanceFromElection,
+  onConfirmSpecialBad,
+  onDenySpecialBad,
+  onAdvanceFromSpecialBadReveal,
   onReturnToLobby,
   startingSecondsRemaining,
   isPending,
@@ -304,6 +312,22 @@ export function SecretVillainGameScreenView({
             onPeek={onPeek}
             peekedCards={gameState.policyCards?.peekedCards}
             svTheme={gameState.svTheme}
+          />
+        );
+      }
+      case SecretVillainPhase.SpecialBadReveal: {
+        const themeLabels = getSvThemeLabels(gameState.svTheme);
+        return (
+          <SpecialBadRevealView
+            chancellorName={getPlayerName(players, phase.chancellorId ?? "")}
+            specialBadRoleName={themeLabels.specialBadRole}
+            badTeamLabel={themeLabels.badTeam}
+            isChancellor={phase.chancellorId === myPlayerId}
+            revealed={gameState.svSpecialBadReveal?.revealed}
+            onConfirm={onConfirmSpecialBad}
+            onReveal={onDenySpecialBad}
+            onContinue={onAdvanceFromSpecialBadReveal}
+            isPending={isPending}
           />
         );
       }

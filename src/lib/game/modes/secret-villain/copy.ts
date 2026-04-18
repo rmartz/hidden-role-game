@@ -1,4 +1,9 @@
-import { SvBoardPreset, SpecialActionType, SecretVillainPhase } from "./types";
+import {
+  SvBoardPreset,
+  SpecialActionType,
+  SecretVillainPhase,
+  BAD_CARDS_FOR_SPECIAL_BAD_WIN,
+} from "./types";
 
 export const SECRET_VILLAIN_COPY = {
   boardPresets: {
@@ -36,6 +41,7 @@ export const SECRET_VILLAIN_COPY = {
       [SecretVillainPhase.PolicyPresident]: "Policy: President",
       [SecretVillainPhase.PolicyChancellor]: "Policy: Chancellor",
       [SecretVillainPhase.SpecialAction]: "Presidential Power",
+      [SecretVillainPhase.SpecialBadReveal]: "Identity Checkpoint",
     } satisfies Record<SecretVillainPhase, string>,
     eliminated: "Eliminated Players",
     noEliminated: "None",
@@ -120,6 +126,27 @@ export const SECRET_VILLAIN_COPY = {
     policyPeekReveal: "Peek",
     policyPeekCardsRevealed: "These are the top 3 cards of the policy deck.",
     policyPeekConfirm: "Done",
+  },
+  specialBadReveal: {
+    waitingHeading: "Identity Checkpoint",
+    waitingMessage: (chancellorName: string) =>
+      `Waiting for ${chancellorName} to confirm their identity\u2026`,
+    chancellorHeading: "Confirm Your Identity",
+    chancellorInstructions: (specialBadRoleName: string) =>
+      `You have been elected Chancellor while ${String(BAD_CARDS_FOR_SPECIAL_BAD_WIN)}+ Bad policies are in play. Are you the ${specialBadRoleName}?`,
+    confirmButton: (specialBadRoleName: string) =>
+      `Confirm \u2014 I am not the ${specialBadRoleName}`,
+    revealButton: (specialBadRoleName: string) =>
+      `Reveal \u2014 I am the ${specialBadRoleName}`,
+    outcomeConfirmed: (chancellorName: string, specialBadRoleName: string) =>
+      `${chancellorName} confirmed they are not the ${specialBadRoleName}.`,
+    outcomeRevealed: (
+      chancellorName: string,
+      specialBadRoleName: string,
+      badTeamLabel: string,
+    ) =>
+      `${chancellorName} revealed as the ${specialBadRoleName} \u2014 ${badTeamLabel} wins!`,
+    continueButton: "Continue",
   },
   gameOver: {
     victory: "Victory!",
