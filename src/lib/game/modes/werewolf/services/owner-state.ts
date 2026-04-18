@@ -18,6 +18,13 @@ import {
   getWerewolfRole,
 } from "../roles";
 
+/** Returns the set of player IDs whose night outcomes are publicly visible. */
+function resolveRevealedPlayerIds(game: Game): Set<string> {
+  const ts = currentTurnState(game);
+  if (ts?.phase.type !== WerewolfPhase.Daytime) return new Set();
+  return new Set(ts.phase.revealedPlayerIds ?? []);
+}
+
 /** Extracts nightActions from the current turnState, if present. */
 function extractNightActions(
   game: Game,
@@ -52,16 +59,22 @@ export function extractDaytimeNightSummary(
   const ts = currentTurnState(game);
   if (ts?.phase.type !== WerewolfPhase.Daytime) return {};
   const phase = ts.phase;
+  const revealedPlayerIds = resolveRevealedPlayerIds(game);
+  const callerIsOwner = callerId === game.ownerPlayerId;
 
   const altruistIntercept = (phase.nightResolution ?? []).find(
     (e): e is AltruistInterceptedNightResolutionEvent =>
       e.type === "altruist-intercepted",
   );
 
+  const canSeeOutcomeFor = (playerId: string) =>
+    callerIsOwner || revealedPlayerIds.has(playerId) || playerId === callerId;
+
   const nightStatus: DaytimeNightStatusEntry[] = (
     phase.nightResolution ?? []
   ).flatMap((e): DaytimeNightStatusEntry[] => {
     if (e.type === "killed" && e.died) {
+      if (!canSeeOutcomeFor(e.targetPlayerId)) return [];
       // Altruist death: emit altruist-sacrifice with savedPlayerId.
       if (e.targetPlayerId === altruistIntercept?.altruistPlayerId) {
         return [
@@ -92,9 +105,9 @@ export function extractDaytimeNightSummary(
     }
     if (e.type === "tough-guy-absorbed" && e.targetPlayerId === callerId)
       return [{ targetPlayerId: e.targetPlayerId, effect: "survived" }];
-    if (e.type === "silenced")
+    if (e.type === "silenced" && canSeeOutcomeFor(e.targetPlayerId))
       return [{ targetPlayerId: e.targetPlayerId, effect: "silenced" }];
-    if (e.type === "hypnotized")
+    if (e.type === "hypnotized" && canSeeOutcomeFor(e.targetPlayerId))
       return [{ targetPlayerId: e.targetPlayerId, effect: "hypnotized" }];
     return [];
   });
@@ -277,3 +290,38 @@ export function extractOwnerState(
 }
 
 export { extractNightActions, extractDeadPlayerIds };
+
+/**
+ * Returns dead players visible to a specific caller.
+ * During manual night-outcome reveal, newly killed players remain hidden from
+ * other players until the narrator reveals eliminations, while the affected
+ * player and narrator still see their own elimination immediately.
+ */
+export function extractVisibleDeadPlayerIds(
+  game: Game,
+  callerId: string,
+): string[] {
+  const ts = currentTurnState(game);
+  if (ts?.phase.type !== WerewolfPhase.Daytime) {
+    return ts?.deadPlayerIds ?? [];
+  }
+  if (callerId === game.ownerPlayerId) return ts.deadPlayerIds;
+
+  const revealedPlayerIds = resolveRevealedPlayerIds(game);
+  const deadThisNight = new Set<string>();
+  for (const event of ts.phase.nightResolution ?? []) {
+    if (event.type === "killed" && event.died) {
+      deadThisNight.add(event.targetPlayerId);
+    }
+  }
+
+  // Deaths from previous nights are always visible; this night's kills are
+  // visible only once the narrator reveals that player (or they see themselves).
+  const visible = ts.deadPlayerIds.filter(
+    (id) => !deadThisNight.has(id) || revealedPlayerIds.has(id),
+  );
+  if (deadThisNight.has(callerId) && !revealedPlayerIds.has(callerId)) {
+    return [...visible, callerId];
+  }
+  return visible;
+}

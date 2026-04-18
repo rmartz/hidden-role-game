@@ -136,6 +136,7 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
       revealProtections={activeModeConfigData.revealProtections}
       showRolesOnDeath={activeModeConfigData.showRolesOnDeath}
       hiddenRole={activeModeConfigData.hiddenRoleCount > 0}
+      autoRevealNightOutcome={activeModeConfigData.autoRevealNightOutcome}
       disabled={disabled}
       onWerewolfTimerConfigChange={
         onTimerConfigChange as
@@ -166,6 +167,11 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
         onModeConfigFieldChange
           ? (v: boolean) =>
               onModeConfigFieldChange("hiddenRoleCount", v ? 1 : 0)
+          : undefined
+      }
+      onAutoRevealNightOutcomeChange={
+        onModeConfigFieldChange
+          ? (v: boolean) => onModeConfigFieldChange("autoRevealNightOutcome", v)
           : undefined
       }
     />

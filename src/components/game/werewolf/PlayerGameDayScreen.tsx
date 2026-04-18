@@ -139,7 +139,7 @@ export function PlayerGameDayScreen({
 
       <PlayerStatusLists
         players={gameState.players}
-        deadPlayerIds={turnState.deadPlayerIds}
+        deadPlayerIds={gameState.deadPlayerIds ?? []}
         gameOwnerId={gameState.gameOwner?.id}
         roleAssignments={gameState.visibleRoleAssignments}
         myPlayerId={gameState.myPlayerId}

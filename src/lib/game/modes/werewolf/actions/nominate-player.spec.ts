@@ -47,6 +47,7 @@ describe("WerewolfAction.NominatePlayer — apply", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
     });
     action.apply(game, { defendantId: "p3" }, "p2");
@@ -72,6 +73,7 @@ describe("WerewolfAction.NominatePlayer — apply", () => {
           revealProtections: true,
           hiddenRoleCount: 0,
           showRolesOnDeath: true,
+          autoRevealNightOutcome: true,
         },
       },
     );
@@ -105,6 +107,7 @@ describe("WerewolfAction.NominatePlayer — apply", () => {
           revealProtections: true,
           hiddenRoleCount: 0,
           showRolesOnDeath: true,
+          autoRevealNightOutcome: true,
         },
       },
     );
@@ -129,6 +132,7 @@ describe("WerewolfAction.NominatePlayer — apply", () => {
           revealProtections: true,
           hiddenRoleCount: 0,
           showRolesOnDeath: true,
+          autoRevealNightOutcome: true,
         },
       },
     );
@@ -150,6 +154,7 @@ describe("WerewolfAction.NominatePlayer — apply", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
     });
     action.apply(game, { defendantId: "p3" }, "p2");
@@ -179,6 +184,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(true);
@@ -193,6 +199,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
     });
     expect(action.isValid(game, "owner-1", { defendantId: "p3" })).toBe(false);
@@ -207,6 +214,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(false);
@@ -236,6 +244,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(false);
@@ -266,6 +275,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(true);
@@ -284,6 +294,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(false);
@@ -302,6 +313,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(false);
@@ -316,6 +328,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p2" })).toBe(false);
@@ -330,6 +343,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "owner-1" })).toBe(false);
@@ -346,6 +360,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
           revealProtections: true,
           hiddenRoleCount: 0,
           showRolesOnDeath: true,
+          autoRevealNightOutcome: true,
         },
       },
     );
@@ -365,6 +380,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(false);
@@ -381,6 +397,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
           revealProtections: true,
           hiddenRoleCount: 0,
           showRolesOnDeath: true,
+          autoRevealNightOutcome: true,
         },
       },
     );
@@ -402,6 +419,7 @@ describe("WerewolfAction.NominatePlayer — trialsPerDay", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p4" })).toBe(false);
@@ -418,6 +436,7 @@ describe("WerewolfAction.NominatePlayer — trialsPerDay", () => {
         revealProtections: true,
         showRolesOnDeath: true,
         hiddenRoleCount: 0,
+        autoRevealNightOutcome: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p4" })).toBe(true);
@@ -434,6 +453,7 @@ describe("WerewolfAction.NominatePlayer — trialsPerDay", () => {
         revealProtections: true,
         showRolesOnDeath: true,
         hiddenRoleCount: 0,
+        autoRevealNightOutcome: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p4" })).toBe(false);
@@ -450,6 +470,7 @@ describe("WerewolfAction.NominatePlayer — trialsPerDay", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
     });
     expect(action.isValid(game, "p2", { defendantId: "p4" })).toBe(true);

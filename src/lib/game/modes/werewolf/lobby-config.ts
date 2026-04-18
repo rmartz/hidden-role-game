@@ -20,6 +20,8 @@ export interface WerewolfModeConfig {
    * A safety check prevents removing the last bad or neutral role.
    */
   hiddenRoleCount: number;
+  /** When true, elimination/status outcomes are revealed to all players immediately at day start. */
+  autoRevealNightOutcome: boolean;
 }
 
 /** Werewolf-specific lobby configuration. */
@@ -37,6 +39,7 @@ export const DEFAULT_WEREWOLF_MODE_CONFIG: WerewolfModeConfig = {
   revealProtections: true,
   showRolesOnDeath: true,
   hiddenRoleCount: 0,
+  autoRevealNightOutcome: true,
 };
 
 /**
@@ -97,5 +100,9 @@ export function parseWerewolfModeConfig(
       raw["hiddenRoleCount"] <= 1
         ? raw["hiddenRoleCount"]
         : DEFAULT_WEREWOLF_MODE_CONFIG.hiddenRoleCount,
+    autoRevealNightOutcome:
+      typeof raw["autoRevealNightOutcome"] === "boolean"
+        ? raw["autoRevealNightOutcome"]
+        : DEFAULT_WEREWOLF_MODE_CONFIG.autoRevealNightOutcome,
   };
 }

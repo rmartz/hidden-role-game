@@ -5,6 +5,7 @@ export enum WerewolfAction {
   SetNightTarget = "set-night-target",
   ConfirmNightTarget = "confirm-night-target",
   RevealInvestigationResult = "reveal-investigation-result",
+  RevealNightOutcomeStep = "reveal-night-outcome-step",
   MarkPlayerDead = "mark-player-dead",
   MarkPlayerAlive = "mark-player-alive",
   StartTrial = "start-trial",

@@ -53,6 +53,7 @@ describe("WerewolfAction.StartNight", () => {
           revealProtections: true,
           hiddenRoleCount: 0,
           showRolesOnDeath: true,
+          autoRevealNightOutcome: true,
         },
         timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
       };
@@ -295,6 +296,7 @@ describe("StartNight — Wolf Cub bonus phase lifecycle", () => {
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
       },
       timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     };
