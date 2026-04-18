@@ -63,8 +63,6 @@ export const SECRET_VILLAIN_COPY = {
     resolveVote: "Reveal Results",
     resultPassed: "Election Passed",
     resultFailed: "Election Failed",
-    yesCount: (count: number) => `${String(count)} Yes`,
-    noCount: (count: number) => `${String(count)} No`,
     failedElectionWarning: (count: number, threshold: number) =>
       `${String(count)} of ${String(threshold)} failed elections. If the next election fails, a policy will be enacted automatically.`,
     chaosWarning:
