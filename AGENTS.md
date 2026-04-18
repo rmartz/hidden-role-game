@@ -95,6 +95,7 @@ pnpm build-storybook  # Build static Storybook
 
 - Branch names: lowercase with hyphens, prefixed by type: `feature/`, `chore/`, `refactor/`, `docs/`, with issue number suffix (e.g., `feature/secret-villain-deck-290`).
 - Commit messages: imperative verbs (Add, Implement, Fix, Update, Extract, Remove). No `feat:`/`fix:` prefixes.
+- PR titles must follow Conventional Commits format: `<type>: description` or `<type>(<scope>): description`. Valid types: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `style`, `perf`, `ci`, `build`, `revert`. A `!` suffix is allowed before the colon to denote breaking changes (e.g., `feat!: remove legacy auth`). This is enforced by CI.
 - PR descriptions must use `Closes #123`, `Fixes #123`, or `Resolves #123` to trigger GitHub's automatic issue close on merge. Phrases like "Addresses #123" or "Related to #123" do NOT trigger auto-close.
 
 ## Storybook
