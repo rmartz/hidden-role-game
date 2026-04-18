@@ -17,6 +17,10 @@ pnpm storybook        # Start Storybook dev server (port 6006)
 pnpm build-storybook  # Build static Storybook
 ```
 
+## Firebase Compatibility
+
+- **No backward-compatibility guards for Firebase data.** This project is not public-facing; breaking in-progress games on deploy is acceptable. Do not add migration guards, legacy-value fallbacks, or `"aye" | "yes"` dual-handling for renamed serialized values. Write code against the current schema only.
+
 ## TypeScript
 
 - Strict mode throughout. No `any` types. No `@ts-ignore`.
@@ -41,7 +45,7 @@ pnpm build-storybook  # Build static Storybook
 - **No function-style imports.** Do not use inline `import("…").Type` syntax in type annotations. Use module-level `import type { … } from "…"` statements at the top of the file. Dynamic `await import("…")` for services that require conditional loading (e.g., Sentry instrumentation) is acceptable.
 - **No unnecessary helpers.** Do not extract logic into a helper function unless it separates significant logic or belongs in a different module. Three similar lines is better than a premature abstraction.
 - **Role enums and definitions** in game mode files (e.g., `WerewolfRole` enum and `WEREWOLF_ROLES` object) must be kept in alphabetical order to minimize merge conflicts.
-- **Prefer enums over string literal unions** for any domain concept with two or more named states (e.g., use `enum TrialPhase { Defense = "defense", Voting = "voting" }` rather than `"defense" | "voting"`). String enum values must match the existing serialized literals so Firebase data round-trips without migration. Export new enums from the module barrel.
+- **Prefer enums over string literal unions** for any domain concept with two or more named states (e.g., use `enum TrialPhase { Defense = "defense", Voting = "voting" }` rather than `"defense" | "voting"`). String enum values must match the current serialized schema (keep code and literals in sync); do not add compatibility shims for old serialized values. Export new enums from the module barrel.
 
 ## User-Facing Text
 
@@ -92,6 +96,12 @@ pnpm build-storybook  # Build static Storybook
 - **One reason to fail per test.** Each test should assert a single logical outcome. Helper functions are fine, but if a test invokes two functions from the codebase it should be explicitly testing how those two interact (e.g. validating a serialization round-trip). Incidental coverage of a second function is not a reason to combine assertions.
 - **Keep tests simple.** A failing test should make it immediately obvious whether the failure is a bug or an intentional change in behavior. If understanding a failure requires reading more than one layer of test setup or multiple assertions, split the test.
 - **Granularity scales with level of abstraction.** Low-level functions (pure utilities, serializers, resolvers) warrant thorough edge-case coverage. High-level functions (actions, service orchestration) should have smoke tests that verify they correctly apply the lower-level logic — not re-test every edge case that belongs in the lower-level tests.
+
+## GitHub Issues
+
+- Each Epic has a corresponding GitHub Milestone with the same title. All sub-issues must be assigned to that milestone; progress is tracked natively via the milestone.
+- Every sub-issue under a game-mode Epic must carry the same game-mode label as the Epic (e.g. `Werewolf`, `Avalon`, `Clocktower`, `Codenames`). Labels persist across epics for the same mode; milestones are per-epic deliverable.
+- When picking the next task from an Epic, use `gh issue list --milestone "<milestone title>" --state open`.
 
 ## Git Conventions
 

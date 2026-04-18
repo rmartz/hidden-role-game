@@ -6,7 +6,10 @@ import type {
 } from "@/lib/types";
 import { isSimpleRoleBucket } from "@/lib/types";
 import { getModeDefinition } from "@/lib/game/state";
-import { getRoleSlotsRequired } from "@/lib/game/modes";
+import {
+  getAdvancedBucketMaxCapacity,
+  getRoleSlotsRequired,
+} from "@/lib/game/modes";
 
 /**
  * Validates that an advanced bucket's role pool can fill its playerCount.
@@ -15,10 +18,7 @@ import { getRoleSlotsRequired } from "@/lib/game/modes";
 function validateAdvancedBucketFeasibility(
   bucket: AdvancedRoleBucket,
 ): string | undefined {
-  let maxCapacity = 0;
-  for (const slot of bucket.roles) {
-    maxCapacity += slot.max ?? bucket.playerCount;
-  }
+  const maxCapacity = getAdvancedBucketMaxCapacity(bucket);
   if (maxCapacity < bucket.playerCount) {
     return `Bucket can fill at most ${String(maxCapacity)} of ${String(bucket.playerCount)} player slots`;
   }

@@ -145,4 +145,53 @@ describe("RoleBucketConfigView", () => {
     render(<RoleBucketConfigView {...defaultProps} buckets={buckets} />);
     expect(screen.queryByText(ROLE_BUCKET_CONFIG_COPY.bucketUnique)).toBeNull();
   });
+
+  it("shows an insufficient capacity error when capped roles cannot fill playerCount", () => {
+    const buckets: AdvancedRoleBucket[] = [
+      {
+        playerCount: 3,
+        roles: [
+          { roleId: "villager", max: 1 },
+          { roleId: "werewolf", max: 1 },
+        ],
+      },
+    ];
+    render(<RoleBucketConfigView {...defaultProps} buckets={buckets} />);
+    const alert = screen.getByRole("alert");
+    expect(alert).toBeDefined();
+    expect(alert.textContent).toBe(
+      ROLE_BUCKET_CONFIG_COPY.errorInsufficientCapacity(2, 3),
+    );
+  });
+
+  it("does not show an insufficient capacity error when max capacity meets playerCount", () => {
+    const buckets: AdvancedRoleBucket[] = [
+      {
+        playerCount: 2,
+        roles: [
+          { roleId: "villager", max: 1 },
+          { roleId: "werewolf", max: 1 },
+        ],
+      },
+    ];
+    render(<RoleBucketConfigView {...defaultProps} buckets={buckets} />);
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  it("does not show an insufficient capacity error when a non-unique role provides unlimited capacity", () => {
+    const buckets: AdvancedRoleBucket[] = [
+      {
+        playerCount: 5,
+        roles: [{ roleId: "villager" }],
+      },
+    ];
+    render(<RoleBucketConfigView {...defaultProps} buckets={buckets} />);
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
+
+  it("does not show an insufficient capacity error for an empty bucket", () => {
+    const buckets: AdvancedRoleBucket[] = [{ playerCount: 2, roles: [] }];
+    render(<RoleBucketConfigView {...defaultProps} buckets={buckets} />);
+    expect(screen.queryByRole("alert")).toBeNull();
+  });
 });
