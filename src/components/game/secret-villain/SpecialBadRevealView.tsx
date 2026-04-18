@@ -8,6 +8,7 @@ interface SpecialBadRevealViewProps {
   chancellorName: string;
   specialBadRoleName: string;
   badTeamLabel: string;
+  badPolicyLabel: string;
   isChancellor: boolean;
   /** Set once the chancellor has acted. */
   revealed?: boolean;
@@ -21,6 +22,7 @@ export function SpecialBadRevealView({
   chancellorName,
   specialBadRoleName,
   badTeamLabel,
+  badPolicyLabel,
   isChancellor,
   revealed,
   onConfirm,
@@ -30,54 +32,50 @@ export function SpecialBadRevealView({
 }: SpecialBadRevealViewProps) {
   const copy = SECRET_VILLAIN_COPY.specialBadReveal;
 
-  if (revealed !== undefined) {
-    const outcomeText = revealed
-      ? copy.outcomeRevealed(chancellorName, specialBadRoleName, badTeamLabel)
-      : copy.outcomeConfirmed(chancellorName, specialBadRoleName);
-
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>{copy.waitingHeading}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm">{outcomeText}</p>
-          <Button onClick={onContinue} disabled={!!isPending}>
-            {copy.continueButton}
+  return revealed !== undefined ? (
+    <Card>
+      <CardHeader>
+        <CardTitle>{copy.waitingHeading}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-sm">
+          {revealed
+            ? copy.outcomeRevealed(
+                chancellorName,
+                specialBadRoleName,
+                badTeamLabel,
+              )
+            : copy.outcomeConfirmed(chancellorName, specialBadRoleName)}
+        </p>
+        <Button onClick={onContinue} disabled={!!isPending}>
+          {copy.continueButton}
+        </Button>
+      </CardContent>
+    </Card>
+  ) : isChancellor ? (
+    <Card>
+      <CardHeader>
+        <CardTitle>{copy.chancellorHeading}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-sm">
+          {copy.chancellorInstructions(specialBadRoleName, badPolicyLabel)}
+        </p>
+        <div className="flex flex-col gap-2">
+          <Button onClick={onConfirm} disabled={!!isPending}>
+            {copy.confirmButton(specialBadRoleName)}
           </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (isChancellor) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>{copy.chancellorHeading}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm">
-            {copy.chancellorInstructions(specialBadRoleName)}
-          </p>
-          <div className="flex flex-col gap-2">
-            <Button onClick={onConfirm} disabled={!!isPending}>
-              {copy.confirmButton(specialBadRoleName)}
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={onReveal}
-              disabled={!!isPending}
-            >
-              {copy.revealButton(specialBadRoleName)}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
+          <Button
+            variant="destructive"
+            onClick={onReveal}
+            disabled={!!isPending}
+          >
+            {copy.revealButton(specialBadRoleName)}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  ) : (
     <Card>
       <CardHeader>
         <CardTitle>{copy.waitingHeading}</CardTitle>

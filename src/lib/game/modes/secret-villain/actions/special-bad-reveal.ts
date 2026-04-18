@@ -24,7 +24,7 @@ export const confirmSpecialBadAction: GameAction = {
 };
 
 /** Chancellor reveals themselves as the Special Bad — sets revealed = true. */
-export const denySpecialBadAction: GameAction = {
+export const revealSpecialBadAction: GameAction = {
   isValid(game: Game, callerId: string) {
     const ts = currentTurnState(game);
     if (!ts) return false;

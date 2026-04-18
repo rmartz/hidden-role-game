@@ -57,7 +57,7 @@ export interface SecretVillainGameScreenViewProps {
   onAdvanceFromElection: () => void;
   // Special Bad reveal
   onConfirmSpecialBad: () => void;
-  onDenySpecialBad: () => void;
+  onRevealSpecialBad: () => void;
   onAdvanceFromSpecialBadReveal: () => void;
   // Game over
   onReturnToLobby: () => void;
@@ -92,7 +92,7 @@ export function SecretVillainGameScreenView({
   onPeek,
   onAdvanceFromElection,
   onConfirmSpecialBad,
-  onDenySpecialBad,
+  onRevealSpecialBad,
   onAdvanceFromSpecialBadReveal,
   onReturnToLobby,
   startingSecondsRemaining,
@@ -322,10 +322,11 @@ export function SecretVillainGameScreenView({
             chancellorName={getPlayerName(players, phase.chancellorId ?? "")}
             specialBadRoleName={themeLabels.specialBadRole}
             badTeamLabel={themeLabels.badTeam}
+            badPolicyLabel={themeLabels.badPolicy}
             isChancellor={phase.chancellorId === myPlayerId}
             revealed={gameState.svSpecialBadReveal?.revealed}
             onConfirm={onConfirmSpecialBad}
-            onReveal={onDenySpecialBad}
+            onReveal={onRevealSpecialBad}
             onContinue={onAdvanceFromSpecialBadReveal}
             isPending={isPending}
           />

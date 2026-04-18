@@ -18,7 +18,7 @@ Entered when an election passes and the elected chancellor is the Special Bad wi
 | Action                            | Who        | When                           | Effect                                                 |
 | --------------------------------- | ---------- | ------------------------------ | ------------------------------------------------------ |
 | `confirm-special-bad`             | Chancellor | SpecialBadReveal, before acted | Sets `revealed = false` (denies being Special Bad)     |
-| `deny-special-bad`                | Chancellor | SpecialBadReveal, before acted | Sets `revealed = true` (reveals as Special Bad)        |
+| `reveal-special-bad`              | Chancellor | SpecialBadReveal, before acted | Sets `revealed = true` (reveals as Special Bad)        |
 | `advance-from-special-bad-reveal` | Any player | SpecialBadReveal, after acted  | If revealed: Bad team wins. Otherwise: PolicyPresident |
 
 ## Policy Phase

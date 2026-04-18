@@ -13,7 +13,7 @@ import { BOARD_PRESETS } from "../utils";
 import { SecretVillainRole } from "../roles";
 import {
   confirmSpecialBadAction,
-  denySpecialBadAction,
+  revealSpecialBadAction,
   advanceFromSpecialBadRevealAction,
 } from "./special-bad-reveal";
 import { SecretVillainWinner } from "../utils/win-condition";
@@ -109,30 +109,30 @@ describe("confirmSpecialBadAction", () => {
   });
 });
 
-// ─── denySpecialBadAction ────────────────────────────────────────────────────
+// ─── revealSpecialBadAction ────────────────────────────────────────────────────
 
-describe("denySpecialBadAction", () => {
+describe("revealSpecialBadAction", () => {
   describe("isValid", () => {
     it("returns true for the chancellor in SpecialBadReveal phase", () => {
       const game = makeRevealGame();
-      expect(denySpecialBadAction.isValid(game, "p5", {})).toBe(true);
+      expect(revealSpecialBadAction.isValid(game, "p5", {})).toBe(true);
     });
 
     it("returns false for a non-chancellor player", () => {
       const game = makeRevealGame();
-      expect(denySpecialBadAction.isValid(game, "p2", {})).toBe(false);
+      expect(revealSpecialBadAction.isValid(game, "p2", {})).toBe(false);
     });
 
     it("returns false after revealed is already set", () => {
       const game = makeRevealGame({ revealed: true });
-      expect(denySpecialBadAction.isValid(game, "p5", {})).toBe(false);
+      expect(revealSpecialBadAction.isValid(game, "p5", {})).toBe(false);
     });
   });
 
   describe("apply", () => {
     it("sets revealed to true", () => {
       const game = makeRevealGame();
-      denySpecialBadAction.apply(game, {}, "p5");
+      revealSpecialBadAction.apply(game, {}, "p5");
       const phase = getTurnState(game).phase as SpecialBadRevealPhase;
       expect(phase.revealed).toBe(true);
     });

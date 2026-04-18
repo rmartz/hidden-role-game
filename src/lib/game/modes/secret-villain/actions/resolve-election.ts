@@ -4,7 +4,6 @@ import {
   SecretVillainPhase,
   FAILED_ELECTION_THRESHOLD,
   PolicyCard,
-  BAD_CARDS_FOR_SPECIAL_BAD_WIN,
 } from "../types";
 import {
   currentTurnState,
@@ -44,14 +43,11 @@ export function advanceFromElection(game: Game): void {
   if (votePhase.passed) {
     // If Special Bad is elected chancellor in the danger zone, enter the
     // reveal checkpoint — chancellor must act before the game resolves.
-    const isInDangerZone = ts.badCardsPlayed >= BAD_CARDS_FOR_SPECIAL_BAD_WIN;
-    const chancellorWouldWin = isInDangerZone
-      ? checkChancellorElectionWinCondition(
-          votePhase.chancellorNomineeId,
-          game.roleAssignments,
-          ts.badCardsPlayed,
-        )
-      : undefined;
+    const chancellorWouldWin = checkChancellorElectionWinCondition(
+      votePhase.chancellorNomineeId,
+      game.roleAssignments,
+      ts.badCardsPlayed,
+    );
 
     if (chancellorWouldWin) {
       ts.failedElectionCount = 0;

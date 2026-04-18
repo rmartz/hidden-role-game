@@ -189,8 +189,8 @@ export function SecretVillainGameScreen({
       onConfirmSpecialBad={() => {
         action.mutate({ actionId: SecretVillainAction.ConfirmSpecialBad });
       }}
-      onDenySpecialBad={() => {
-        action.mutate({ actionId: SecretVillainAction.DenySpecialBad });
+      onRevealSpecialBad={() => {
+        action.mutate({ actionId: SecretVillainAction.RevealSpecialBad });
       }}
       onAdvanceFromSpecialBadReveal={() => {
         action.mutate({

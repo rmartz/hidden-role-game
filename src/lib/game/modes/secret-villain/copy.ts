@@ -132,8 +132,11 @@ export const SECRET_VILLAIN_COPY = {
     waitingMessage: (chancellorName: string) =>
       `Waiting for ${chancellorName} to confirm their identity\u2026`,
     chancellorHeading: "Confirm Your Identity",
-    chancellorInstructions: (specialBadRoleName: string) =>
-      `You have been elected Chancellor while ${String(BAD_CARDS_FOR_SPECIAL_BAD_WIN)}+ Bad policies are in play. Are you the ${specialBadRoleName}?`,
+    chancellorInstructions: (
+      specialBadRoleName: string,
+      badPolicyLabel: string,
+    ) =>
+      `You have been elected Chancellor while ${String(BAD_CARDS_FOR_SPECIAL_BAD_WIN)}+ ${badPolicyLabel} policies are in play. Are you the ${specialBadRoleName}?`,
     confirmButton: (specialBadRoleName: string) =>
       `Confirm \u2014 I am not the ${specialBadRoleName}`,
     revealButton: (specialBadRoleName: string) =>
