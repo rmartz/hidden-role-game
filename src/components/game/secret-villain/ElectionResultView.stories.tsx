@@ -18,9 +18,9 @@ export const Passed: Story = {
     chancellorNomineeName: "Bob",
     passed: true,
     votes: [
-      { playerName: "Alice", vote: "aye" },
-      { playerName: "Bob", vote: "aye" },
-      { playerName: "Charlie", vote: "aye" },
+      { playerName: "Alice", vote: "yes" },
+      { playerName: "Bob", vote: "yes" },
+      { playerName: "Charlie", vote: "yes" },
       { playerName: "Diana", vote: "no" },
       { playerName: "Eve", vote: "no" },
     ],
@@ -33,7 +33,7 @@ export const Failed: Story = {
     chancellorNomineeName: "Bob",
     passed: false,
     votes: [
-      { playerName: "Alice", vote: "aye" },
+      { playerName: "Alice", vote: "yes" },
       { playerName: "Bob", vote: "no" },
       { playerName: "Charlie", vote: "no" },
       { playerName: "Diana", vote: "no" },

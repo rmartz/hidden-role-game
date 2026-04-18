@@ -50,7 +50,10 @@ export const SECRET_VILLAIN_COPY = {
     voteInstructions: (presidentName: string, chancellorName: string) =>
       `President: ${presidentName} \u00b7 Chancellor: ${chancellorName}`,
     castVote: "Cast your vote",
-    aye: "Aye",
+    // These are the fallback labels when no theme provides vote labels.
+    // The Default theme intentionally mirrors these values; the two are
+    // independent so each can evolve without affecting the other.
+    yes: "Yes",
     no: "No",
     waitingForVotes: "Waiting for all players to vote\u2026",
     alreadyVoted: "Vote cast. Waiting for others\u2026",
@@ -60,8 +63,6 @@ export const SECRET_VILLAIN_COPY = {
     resolveVote: "Reveal Results",
     resultPassed: "Election Passed",
     resultFailed: "Election Failed",
-    ayeCount: (count: number) => `${String(count)} Aye`,
-    noCount: (count: number) => `${String(count)} No`,
     failedElectionWarning: (count: number, threshold: number) =>
       `${String(count)} of ${String(threshold)} failed elections. If the next election fails, a policy will be enacted automatically.`,
     chaosWarning:

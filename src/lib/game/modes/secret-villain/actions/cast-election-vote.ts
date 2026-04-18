@@ -3,7 +3,7 @@ import type { ElectionVote } from "../types";
 import { SecretVillainPhase } from "../types";
 import { currentTurnState } from "../utils";
 
-const VALID_VOTES: ElectionVote[] = ["aye", "no"];
+const VALID_VOTES: ElectionVote[] = ["yes", "no"];
 
 export const castElectionVoteAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {

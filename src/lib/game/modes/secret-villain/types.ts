@@ -81,7 +81,7 @@ export const VETO_UNLOCK_THRESHOLD = 4;
 // Election types
 // ---------------------------------------------------------------------------
 
-export type ElectionVote = "aye" | "no";
+export type ElectionVote = "yes" | "no";
 
 // ---------------------------------------------------------------------------
 // Phase types (discriminated union members)

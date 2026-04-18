@@ -146,7 +146,7 @@ describe("nominateChancellorAction", () => {
 
 describe("castElectionVoteAction", () => {
   function makeVoteGame(
-    votes: { playerId: string; vote: "aye" | "no" }[] = [],
+    votes: { playerId: string; vote: "yes" | "no" }[] = [],
   ) {
     return makeElectionGame({
       turnState: {
@@ -162,9 +162,9 @@ describe("castElectionVoteAction", () => {
   }
 
   describe("isValid", () => {
-    it("alive player can vote aye or no", () => {
+    it("alive player can vote yes or no", () => {
       const game = makeVoteGame();
-      expect(castElectionVoteAction.isValid(game, "p2", { vote: "aye" })).toBe(
+      expect(castElectionVoteAction.isValid(game, "p2", { vote: "yes" })).toBe(
         true,
       );
       expect(castElectionVoteAction.isValid(game, "p2", { vote: "no" })).toBe(
@@ -176,13 +176,13 @@ describe("castElectionVoteAction", () => {
       const game = makeVoteGame();
       const ts = getTurnState(game);
       ts.eliminatedPlayerIds = ["p2"];
-      expect(castElectionVoteAction.isValid(game, "p2", { vote: "aye" })).toBe(
+      expect(castElectionVoteAction.isValid(game, "p2", { vote: "yes" })).toBe(
         false,
       );
     });
 
     it("player can change their vote", () => {
-      const game = makeVoteGame([{ playerId: "p2", vote: "aye" }]);
+      const game = makeVoteGame([{ playerId: "p2", vote: "yes" }]);
       expect(castElectionVoteAction.isValid(game, "p2", { vote: "no" })).toBe(
         true,
       );
@@ -202,15 +202,15 @@ describe("castElectionVoteAction", () => {
   describe("apply", () => {
     it("adds vote to the phase", () => {
       const game = makeVoteGame();
-      castElectionVoteAction.apply(game, { vote: "aye" }, "p2");
+      castElectionVoteAction.apply(game, { vote: "yes" }, "p2");
 
       const ts = getTurnState(game);
       const phase = ts.phase as ElectionVotePhase;
-      expect(phase.votes).toEqual([{ playerId: "p2", vote: "aye" }]);
+      expect(phase.votes).toEqual([{ playerId: "p2", vote: "yes" }]);
     });
 
     it("replaces existing vote when player re-votes", () => {
-      const game = makeVoteGame([{ playerId: "p2", vote: "aye" }]);
+      const game = makeVoteGame([{ playerId: "p2", vote: "yes" }]);
       castElectionVoteAction.apply(game, { vote: "no" }, "p2");
 
       const ts = getTurnState(game);
@@ -220,7 +220,7 @@ describe("castElectionVoteAction", () => {
 
     it("does not duplicate vote count on re-vote", () => {
       const game = makeVoteGame([
-        { playerId: "p2", vote: "aye" },
+        { playerId: "p2", vote: "yes" },
         { playerId: "p3", vote: "no" },
       ]);
       castElectionVoteAction.apply(game, { vote: "no" }, "p2");
@@ -237,12 +237,12 @@ describe("castElectionVoteAction", () => {
 // ─── resolveElectionAction ──────────────────────────────────────────────────
 
 describe("resolveElectionAction", () => {
-  function allVotes(vote: "aye" | "no") {
+  function allVotes(vote: "yes" | "no") {
     return ["p1", "p2", "p3", "p4", "p5"].map((id) => ({ playerId: id, vote }));
   }
 
   function makeResolveGame(
-    votes: { playerId: string; vote: "aye" | "no" }[],
+    votes: { playerId: string; vote: "yes" | "no" }[],
     extraTurnState: Partial<SecretVillainTurnState> = {},
   ) {
     return makeElectionGame({
@@ -261,19 +261,19 @@ describe("resolveElectionAction", () => {
 
   describe("isValid", () => {
     it("can resolve when all alive players have voted", () => {
-      const game = makeResolveGame(allVotes("aye"));
+      const game = makeResolveGame(allVotes("yes"));
       expect(resolveElectionAction.isValid(game, "p1", {})).toBe(true);
     });
 
     it("can resolve before all votes are in (timer expiry case)", () => {
-      const game = makeResolveGame([{ playerId: "p1", vote: "aye" }]);
+      const game = makeResolveGame([{ playerId: "p1", vote: "yes" }]);
       expect(resolveElectionAction.isValid(game, "p1", {})).toBe(true);
     });
   });
 
   describe("apply", () => {
     it("passed: transitions to PolicyPresident phase and resets failedElectionCount", () => {
-      const game = makeResolveGame(allVotes("aye"), { failedElectionCount: 1 });
+      const game = makeResolveGame(allVotes("yes"), { failedElectionCount: 1 });
       resolveElectionAction.apply(game, {}, "p1");
       advanceFromElectionAction.apply(game, {}, "p1");
 
@@ -325,7 +325,7 @@ describe("resolveElectionAction", () => {
     });
 
     it("passed: Special Bad as chancellor after 3+ bad cards triggers Bad team win", () => {
-      const game = makeResolveGame(allVotes("aye"), {
+      const game = makeResolveGame(allVotes("yes"), {
         badCardsPlayed: BAD_CARDS_FOR_SPECIAL_BAD_WIN,
       });
       // Override nominee to be the SpecialBad player (p5)
