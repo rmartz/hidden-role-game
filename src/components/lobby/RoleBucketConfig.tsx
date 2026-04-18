@@ -31,6 +31,7 @@ import {
 import { RoleLabel } from "@/components/RoleLabel";
 import { Incrementer } from "./Incrementer";
 import { ROLE_BUCKET_CONFIG_COPY } from "./RoleBucketConfig.copy";
+import { getAdvancedBucketMaxCapacity } from "@/lib/game/modes";
 
 interface RoleBucketConfigProps {
   roleDefinitions: Record<string, RoleDefinition<string, Team>>;
@@ -192,6 +193,16 @@ function BucketEditor({
   const bucketIsUnique =
     hasNonUniqueRoles && nonUniqueSlots.every((s) => s.max === 1);
 
+  const maxCapacity =
+    bucket.roles.length > 0 ? getAdvancedBucketMaxCapacity(bucket) : undefined;
+  const feasibilityError =
+    maxCapacity !== undefined && maxCapacity < bucket.playerCount
+      ? ROLE_BUCKET_CONFIG_COPY.errorInsufficientCapacity(
+          maxCapacity,
+          bucket.playerCount,
+        )
+      : undefined;
+
   return (
     <div className="border rounded-md p-3 space-y-3">
       <div className="flex items-center justify-between gap-2">
@@ -289,6 +300,12 @@ function BucketEditor({
             {ROLE_BUCKET_CONFIG_COPY.bucketUnique}
           </span>
         </label>
+      )}
+
+      {feasibilityError && (
+        <p className="text-xs text-destructive" role="alert" aria-live="polite">
+          {feasibilityError}
+        </p>
       )}
 
       {availableRoles.length > 0 && (

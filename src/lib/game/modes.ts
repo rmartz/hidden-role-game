@@ -1,5 +1,10 @@
 import { GameMode } from "@/lib/types";
-import type { GameModeConfig, ModeConfig, RoleBucket } from "@/lib/types";
+import type {
+  AdvancedRoleBucket,
+  GameModeConfig,
+  ModeConfig,
+  RoleBucket,
+} from "@/lib/types";
 import { SECRET_VILLAIN_CONFIG } from "@/lib/game/modes/secret-villain";
 import { AVALON_CONFIG } from "@/lib/game/modes/avalon";
 import { WEREWOLF_CONFIG } from "@/lib/game/modes/werewolf";
@@ -66,4 +71,17 @@ export function getRoleSlotsRequired(
     return config.resolveRoleSlotsRequired(numPlayers, modeConfig);
   }
   return config.roleSlotsRequired?.(numPlayers) ?? numPlayers;
+}
+
+/**
+ * Computes the total draw capacity of an advanced bucket: the sum of each
+ * slot's `max`, treating `undefined` (uncapped) as `bucket.playerCount`.
+ */
+export function getAdvancedBucketMaxCapacity(
+  bucket: AdvancedRoleBucket,
+): number {
+  return bucket.roles.reduce(
+    (total, slot) => total + (slot.max ?? bucket.playerCount),
+    0,
+  );
 }
