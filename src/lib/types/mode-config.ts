@@ -1,6 +1,7 @@
 import type { WerewolfModeConfig } from "@/lib/game/modes/werewolf/lobby-config";
 import type { SecretVillainModeConfig } from "@/lib/game/modes/secret-villain/lobby-config";
 import type { AvalonModeConfig } from "@/lib/game/modes/avalon/lobby-config";
+import type { ClocktowerModeConfig } from "@/lib/game/modes/clocktower/lobby-config";
 import { GameMode } from "./game";
 
 /**
@@ -10,7 +11,8 @@ import { GameMode } from "./game";
 export type ModeConfig =
   | WerewolfModeConfig
   | SecretVillainModeConfig
-  | AvalonModeConfig;
+  | AvalonModeConfig
+  | ClocktowerModeConfig;
 
 /**
  * Any mutable field key across all ModeConfig variants (excludes the
