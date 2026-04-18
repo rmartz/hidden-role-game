@@ -324,7 +324,7 @@ describe("resolveElectionAction", () => {
       expect(ts.previousChancellorId).toBeUndefined();
     });
 
-    it("passed: Special Bad as chancellor after 3+ bad cards triggers Bad team win", () => {
+    it("passed: Special Bad as chancellor after 3+ bad cards enters SpecialBadReveal phase", () => {
       const game = makeResolveGame(allVotes("yes"), {
         badCardsPlayed: BAD_CARDS_FOR_SPECIAL_BAD_WIN,
       });
@@ -335,12 +335,12 @@ describe("resolveElectionAction", () => {
       resolveElectionAction.apply(game, {}, "p1");
       advanceFromElectionAction.apply(game, {}, "p1");
 
-      expect(game.status.type).toBe(GameStatus.Finished);
-      if (game.status.type === GameStatus.Finished) {
-        expect(game.status.winner).toBe("Bad");
-        expect(game.status.victoryConditionKey).toBe(
-          SvVictoryConditionKey.SpecialBadElected,
-        );
+      expect(game.status.type).toBe(GameStatus.Playing);
+      const newPhase = getTurnState(game).phase;
+      expect(newPhase.type).toBe(SecretVillainPhase.SpecialBadReveal);
+      if (newPhase.type === SecretVillainPhase.SpecialBadReveal) {
+        expect(newPhase.chancellorId).toBe("p5");
+        expect(newPhase.revealed).toBeUndefined();
       }
     });
 
