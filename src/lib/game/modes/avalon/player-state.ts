@@ -22,8 +22,6 @@ export interface AvalonPublicPhase {
   teamSize?: number;
   /** Player IDs on the active quest team (Quest phase only). */
   teamPlayerIds?: string[];
-  /** Player ID of the Assassin (Assassination phase only). */
-  assassinPlayerId?: string;
 }
 
 /**
