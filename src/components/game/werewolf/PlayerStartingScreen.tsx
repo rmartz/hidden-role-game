@@ -41,9 +41,10 @@ export function PlayerStartingScreen({ gameState }: PlayerStartingScreenProps) {
       </div>
     ) : null;
 
-  const masonRoleId: string = WerewolfRole.Mason;
-  const masonInPlay = gameState.rolesInPlay?.some((r) => r.id === masonRoleId);
-  const isMason = gameState.myRole?.id === masonRoleId;
+  const isMason = gameState.myRole?.id === WerewolfRole.Mason;
+  const masonInPlay =
+    isMason ||
+    gameState.rolesInPlay?.some((r) => r.id === (WerewolfRole.Mason as string));
   const masonWarning = masonInPlay
     ? isMason
       ? WEREWOLF_COPY.mason.playerWarning

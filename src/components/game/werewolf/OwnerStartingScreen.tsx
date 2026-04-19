@@ -43,8 +43,9 @@ export function OwnerStartingScreen({
     return role ? [role] : [];
   });
 
-  const masonRoleId: string = WerewolfRole.Mason;
-  const masonInPlay = gameState.rolesInPlay?.some((r) => r.id === masonRoleId);
+  const masonInPlay = gameState.visibleRoleAssignments.some(
+    (a) => a.role?.id === WerewolfRole.Mason,
+  );
 
   return (
     <div className="p-5 max-w-4xl mx-auto">
