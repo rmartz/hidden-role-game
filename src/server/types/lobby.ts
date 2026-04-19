@@ -11,6 +11,7 @@ import type { WerewolfTimerConfig } from "@/lib/game/modes/werewolf/timer-config
 import type { SecretVillainModeConfig } from "@/lib/game/modes/secret-villain/lobby-config";
 import type { SecretVillainTimerConfig } from "@/lib/game/modes/secret-villain/timer-config";
 import type { AvalonModeConfig } from "@/lib/game/modes/avalon/lobby-config";
+import type { ClocktowerModeConfig } from "@/lib/game/modes/clocktower/lobby-config";
 
 export interface PublicLobbyPlayer {
   id: string;
@@ -43,6 +44,12 @@ export interface AvalonGameConfig extends BaseGameConfig {
   modeConfig: AvalonModeConfig;
 }
 
+export interface ClocktowerGameConfig extends BaseGameConfig {
+  gameMode: GameMode.Clocktower;
+  timerConfig: TimerConfig;
+  modeConfig: ClocktowerModeConfig;
+}
+
 /**
  * Client-visible lobby configuration. roleSlots is optional — hidden from non-owner players.
  * Discriminated union on `gameMode`.
@@ -50,7 +57,8 @@ export interface AvalonGameConfig extends BaseGameConfig {
 export type GameConfig =
   | WerewolfGameConfig
   | SecretVillainGameConfig
-  | AvalonGameConfig;
+  | AvalonGameConfig
+  | ClocktowerGameConfig;
 
 export interface PublicLobby {
   id: string;

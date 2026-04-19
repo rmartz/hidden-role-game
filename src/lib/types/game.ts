@@ -13,6 +13,10 @@ import type {
   AvalonLobbyConfig,
   AvalonModeConfig,
 } from "@/lib/game/modes/avalon/lobby-config";
+import type {
+  ClocktowerLobbyConfig,
+  ClocktowerModeConfig,
+} from "@/lib/game/modes/clocktower/lobby-config";
 
 export interface LobbyPlayer {
   id: string;
@@ -71,8 +75,9 @@ export type GameStatusState =
 // --- Game Modes ---
 
 export enum GameMode {
-  SecretVillain = "secret-villain",
   Avalon = "avalon",
+  Clocktower = "clocktower",
+  SecretVillain = "secret-villain",
   Werewolf = "werewolf",
 }
 
@@ -344,11 +349,21 @@ export interface AvalonGame extends BaseGame {
   modeConfig: AvalonModeConfig;
 }
 
+export interface ClocktowerGame extends BaseGame {
+  gameMode: GameMode.Clocktower;
+  timerConfig: TimerConfig;
+  modeConfig: ClocktowerModeConfig;
+}
+
 /**
  * Discriminated union of all game-mode-specific game objects.
  * Narrow on `gameMode` to access typed `timerConfig` and `modeConfig`.
  */
-export type Game = WerewolfGame | SecretVillainGame | AvalonGame;
+export type Game =
+  | WerewolfGame
+  | SecretVillainGame
+  | AvalonGame
+  | ClocktowerGame;
 
 /**
  * A game-mode-defined action that can be applied to a game. Actions are
@@ -393,7 +408,8 @@ export interface BaseLobbyConfig {
 export type LobbyConfig =
   | WerewolfLobbyConfig
   | SecretVillainLobbyConfig
-  | AvalonLobbyConfig;
+  | AvalonLobbyConfig
+  | ClocktowerLobbyConfig;
 
 export interface Lobby {
   id: string;
