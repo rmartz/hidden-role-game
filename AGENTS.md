@@ -52,6 +52,7 @@ pnpm build-storybook  # Build static Storybook
 - For any new UI component, store user-facing strings in a co-located copy file (e.g., `ComponentName.copy.ts` or `copy.ts`) for internationalization (i18n) readiness. When modifying an existing UI component, move any new or changed user-facing strings into a co-located copy file; do not introduce new hardcoded display strings inline.
 
   Existing hardcoded strings that are not being added or changed as part of the current work are technical debt to be migrated over time; this rule does not require unrelated cleanup.
+
 - Copy files export a single `as const` object named `{SCOPE}_COPY` (e.g., `WEREWOLF_COPY`, `HOME_PAGE_COPY`, `GAME_TIMER_COPY`).
 
 ## Documentation
