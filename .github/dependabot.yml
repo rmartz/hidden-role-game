@@ -4,6 +4,10 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    commit-message:
+      prefix: "chore"
+      prefix-development: "chore"
+      include: "scope"
     groups:
       dev-dependencies:
         dependency-type: development
@@ -18,3 +22,6 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    commit-message:
+      prefix: "chore"
+      include: "scope"
