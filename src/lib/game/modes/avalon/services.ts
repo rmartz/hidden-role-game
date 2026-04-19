@@ -192,7 +192,7 @@ export const avalonServices: GameModeServices = {
       phase.type === AvalonPhase.TeamProposal &&
       phase.leaderId === callerId
     ) {
-      result["eligibleTeamMemberIds"] = game.players.map((p) => p.id);
+      result["eligibleTeamMemberIds"] = ts.leaderOrder;
     }
 
     // Assassination phase: all players see the assassin's target (if selected).
