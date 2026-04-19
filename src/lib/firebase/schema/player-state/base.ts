@@ -24,6 +24,7 @@ export interface FirebaseBasePlayerState {
   amDead?: boolean;
   deadPlayerIds?: string[];
   timerConfig: TimerConfig;
+  victoryCondition?: { label: string; winner: string };
 }
 
 export function baseStateToFirebase(
@@ -44,6 +45,9 @@ export function baseStateToFirebase(
       ? { deadPlayerIds: state.deadPlayerIds }
       : {}),
     timerConfig: state.timerConfig,
+    ...(state.victoryCondition
+      ? { victoryCondition: state.victoryCondition }
+      : {}),
   };
 }
 
@@ -80,6 +84,12 @@ export function baseStateFromFirebase(raw: FirebaseBasePlayerState) {
     rolesInPlay: raw.rolesInPlay ?? undefined,
     amDead: raw.amDead ? true : undefined,
     deadPlayerIds: raw.deadPlayerIds?.length ? raw.deadPlayerIds : undefined,
+    victoryCondition: raw.victoryCondition
+      ? {
+          label: raw.victoryCondition.label,
+          winner: raw.victoryCondition.winner as Team,
+        }
+      : undefined,
     // The TypeScript type says TimerConfig, but old Firebase documents may
     // have partial data (e.g. missing autoAdvance). Cast to raw Record so
     // parseTimerConfig validates each field and fills defaults, rather than

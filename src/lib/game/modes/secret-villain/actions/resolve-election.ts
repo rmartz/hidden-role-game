@@ -12,6 +12,7 @@ import {
   reshuffleIfNeeded,
   checkBoardWinCondition,
   checkChancellorElectionWinCondition,
+  SvVictoryConditionKey,
 } from "../utils";
 
 /**
@@ -50,6 +51,7 @@ export function advanceFromElection(game: Game): void {
       game.status = {
         type: GameStatus.Finished,
         winner: chancellorWin.winner,
+        victoryConditionKey: SvVictoryConditionKey.SpecialBadElected,
       };
       return;
     }
@@ -97,6 +99,7 @@ export function advanceFromElection(game: Game): void {
         game.status = {
           type: GameStatus.Finished,
           winner: boardWin.winner,
+          victoryConditionKey: SvVictoryConditionKey.Chaos,
         };
         return;
       }

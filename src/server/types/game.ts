@@ -61,6 +61,14 @@ export type NightStatusEntry =
   | DaytimeNightStatusEntry
   | NighttimeNightStatusEntry;
 
+/** Explains the specific win condition that ended the game. */
+export interface VictoryCondition {
+  /** Short label shown on the game-over screen. */
+  label: string;
+  /** Which team this condition favours (for colour/icon selection). */
+  winner: Team;
+}
+
 /** Shared player game state fields. Game-mode-specific variants extend this. */
 export interface BasePlayerGameState {
   status: GameStatusState;
@@ -79,6 +87,8 @@ export interface BasePlayerGameState {
   deadPlayerIds?: string[];
   /** Phase timer configuration. */
   timerConfig: TimerConfig;
+  /** Explains which specific condition caused the game to end. Only present when the game is finished. */
+  victoryCondition?: VictoryCondition;
 }
 
 /**

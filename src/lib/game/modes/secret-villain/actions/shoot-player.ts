@@ -1,7 +1,11 @@
 import { GameStatus } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
 import { SecretVillainPhase, SpecialActionType } from "../types";
-import { currentTurnState, checkShootWinCondition } from "../utils";
+import {
+  currentTurnState,
+  checkShootWinCondition,
+  SvVictoryConditionKey,
+} from "../utils";
 import { advanceToNextElection } from "./advance-to-election";
 
 /**
@@ -37,7 +41,11 @@ export const shootPlayerAction: GameAction = {
       game.roleAssignments,
     );
     if (shootWin) {
-      game.status = { type: GameStatus.Finished, winner: shootWin.winner };
+      game.status = {
+        type: GameStatus.Finished,
+        winner: shootWin.winner,
+        victoryConditionKey: SvVictoryConditionKey.GoodShoot,
+      };
       return;
     }
 
