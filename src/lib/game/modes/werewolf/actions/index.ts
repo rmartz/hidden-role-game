@@ -13,6 +13,8 @@ import { startTrialAction } from "./start-trial";
 import { castVoteAction } from "./cast-vote";
 import { resolveTrialAction } from "./resolve-trial";
 import { endGameAction } from "./end-game";
+import { pauseTimerAction } from "./pause-timer";
+import { resumeTimerAction } from "./resume-timer";
 import { smitePlayerAction } from "./smite-player";
 import { unsmitePlayerAction } from "./unsmite-player";
 import { nominatePlayerAction } from "./nominate-player";
@@ -37,6 +39,8 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.CastVote]: castVoteAction,
   [WerewolfAction.ResolveTrial]: resolveTrialAction,
   [WerewolfAction.EndGame]: endGameAction,
+  [WerewolfAction.PauseTimer]: pauseTimerAction,
+  [WerewolfAction.ResumeTimer]: resumeTimerAction,
   [WerewolfAction.SmitePlayer]: smitePlayerAction,
   [WerewolfAction.UnsmitePlayer]: unsmitePlayerAction,
   [WerewolfAction.NominatePlayer]: nominatePlayerAction,

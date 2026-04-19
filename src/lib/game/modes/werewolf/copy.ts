@@ -210,6 +210,8 @@ export const WEREWOLF_COPY = {
       `One-Eyed Seer is locked onto ${playerName}.`,
     mentalistSameTeam: "on the same team",
     mentalistDifferentTeams: "on different teams",
+    pauseTimer: "Pause",
+    resumeTimer: "Resume",
     restoreAbility: "Restore Ability",
     bypassAbility: "Override",
     revealNextOutcome: (name: string) => `Reveal — ${name}`,
