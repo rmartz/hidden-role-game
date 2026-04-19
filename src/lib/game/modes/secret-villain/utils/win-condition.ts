@@ -12,6 +12,15 @@ export enum SecretVillainWinner {
   Bad = "Bad",
 }
 
+/** Keys identifying which specific win condition triggered the end of a Secret Villain game. */
+export enum SvVictoryConditionKey {
+  GoodPolicy = "good-policy",
+  BadPolicy = "bad-policy",
+  SpecialBadElected = "special-bad-elected",
+  GoodShoot = "good-shoot",
+  Chaos = "chaos",
+}
+
 export interface WinConditionResult {
   winner: SecretVillainWinner;
 }

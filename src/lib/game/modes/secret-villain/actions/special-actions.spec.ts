@@ -9,7 +9,7 @@ import {
   SvBoardPreset,
 } from "../types";
 import type { SecretVillainTurnState, SpecialActionPhase } from "../types";
-import { BOARD_PRESETS } from "../utils";
+import { BOARD_PRESETS, SvVictoryConditionKey } from "../utils";
 import { SecretVillainRole } from "../roles";
 import {
   selectInvestigationTargetAction,
@@ -306,6 +306,9 @@ describe("shootPlayerAction", () => {
       expect(game.status.type).toBe(GameStatus.Finished);
       if (game.status.type === GameStatus.Finished) {
         expect(game.status.winner).toBe("Good");
+        expect(game.status.victoryConditionKey).toBe(
+          SvVictoryConditionKey.GoodShoot,
+        );
       }
     });
   });
