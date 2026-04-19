@@ -7,10 +7,12 @@ import type {
 } from "@/lib/types";
 import { SECRET_VILLAIN_CONFIG } from "@/lib/game/modes/secret-villain";
 import { AVALON_CONFIG } from "@/lib/game/modes/avalon";
+import { CLOCKTOWER_CONFIG } from "@/lib/game/modes/clocktower";
 import { WEREWOLF_CONFIG } from "@/lib/game/modes/werewolf";
 
 export { SecretVillainRole } from "@/lib/game/modes/secret-villain";
 export { AvalonRole } from "@/lib/game/modes/avalon";
+export { ClocktowerRole } from "@/lib/game/modes/clocktower";
 export { WerewolfRole } from "@/lib/game/modes/werewolf";
 
 export function parseGameMode(value: string): GameMode | undefined {
@@ -20,8 +22,9 @@ export function parseGameMode(value: string): GameMode | undefined {
 }
 
 export const GAME_MODES: Record<GameMode, GameModeConfig> = {
-  [GameMode.SecretVillain]: SECRET_VILLAIN_CONFIG,
   [GameMode.Avalon]: AVALON_CONFIG,
+  [GameMode.Clocktower]: CLOCKTOWER_CONFIG,
+  [GameMode.SecretVillain]: SECRET_VILLAIN_CONFIG,
   [GameMode.Werewolf]: WEREWOLF_CONFIG,
 };
 
