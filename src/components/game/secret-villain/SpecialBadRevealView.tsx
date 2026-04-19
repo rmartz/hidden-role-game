@@ -35,7 +35,7 @@ export function SpecialBadRevealView({
   return revealed !== undefined ? (
     <Card>
       <CardHeader>
-        <CardTitle>{copy.waitingHeading}</CardTitle>
+        <CardTitle>{copy.outcomeHeading}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm">
