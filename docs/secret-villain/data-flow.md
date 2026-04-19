@@ -22,6 +22,17 @@ Game state lives in Firebase Realtime Database. `getPlayerGameState` (`src/lib/g
 | `timerConfig`            | ✓                                                  |
 | `amDead`                 | ✓ (if eliminated)                                  |
 | `deadPlayerIds`          | ✓ (if any eliminated)                              |
+| `victoryCondition`       | ✓ (when game is finished)                          |
+
+`victoryCondition` is only present when `status.type === "Finished"` and a `victoryConditionKey` was set on the finished status. It contains a human-readable `label` resolved from the theme and a `winner: Team` used for colour/icon selection. Possible conditions:
+
+| `victoryConditionKey` | Winner       | Example label (Default theme)         |
+| --------------------- | ------------ | ------------------------------------- |
+| `good-policy`         | `Good`       | "Good policy victory"                 |
+| `bad-policy`          | `Bad`        | "Bad policy victory"                  |
+| `special-bad-elected` | `Bad`        | "Special Bad Role elected Chancellor" |
+| `good-shoot`          | `Good`       | "Special Bad Role eliminated"         |
+| `chaos`               | `Bad`/`Good` | "Government in chaos — Bad wins"      |
 
 ### Secret Villain–Specific Fields
 

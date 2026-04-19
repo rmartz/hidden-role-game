@@ -1,3 +1,4 @@
+import { GameStatus, Team } from "@/lib/types";
 import type {
   Game,
   GameModeServices,
@@ -21,6 +22,29 @@ import {
   extractDaytimePlayerState,
 } from "./owner-state";
 import { extractPlayerNightState } from "./player-night-state";
+import { WerewolfWinner } from "../utils/win-condition";
+import { WEREWOLF_COPY } from "../copy";
+import type { VictoryCondition } from "@/server/types/game";
+
+const WEREWOLF_WINNER_TEAMS = {
+  [WerewolfWinner.Village]: Team.Good,
+  [WerewolfWinner.Werewolves]: Team.Bad,
+  [WerewolfWinner.Tanner]: Team.Neutral,
+  [WerewolfWinner.Draw]: Team.Neutral,
+  [WerewolfWinner.Chupacabra]: Team.Neutral,
+  [WerewolfWinner.LoneWolf]: Team.Neutral,
+  [WerewolfWinner.Spoiler]: Team.Neutral,
+  [WerewolfWinner.Executioner]: Team.Neutral,
+} satisfies Record<WerewolfWinner, Team>;
+
+function extractVictoryCondition(game: Game): VictoryCondition | undefined {
+  if (game.status.type !== GameStatus.Finished) return undefined;
+  const winner = game.status.winner as WerewolfWinner | undefined;
+  if (!winner) return undefined;
+  const label = WEREWOLF_COPY.gameOver.victoryConditions[winner];
+  if (!label) return undefined;
+  return { label, winner: WEREWOLF_WINNER_TEAMS[winner] };
+}
 
 function extractNonOwnerState(
   game: Game,
@@ -108,6 +132,7 @@ export const werewolfServices: GameModeServices = {
       trialsPerDay: wwConfig.trialsPerDay as unknown,
       revealProtections: wwConfig.revealProtections as unknown,
       autoRevealNightOutcome: wwConfig.autoRevealNightOutcome as unknown,
+      victoryCondition: extractVictoryCondition(game) as unknown,
     };
   },
 };

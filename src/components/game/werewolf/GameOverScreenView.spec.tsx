@@ -102,6 +102,29 @@ describe("GameOverScreenView", () => {
     ).toBeDefined();
   });
 
+  it("renders victory condition label when victoryCondition is set", () => {
+    const label =
+      WEREWOLF_COPY.gameOver.victoryConditions[WerewolfWinner.Village];
+    const gameState = makeGameState({
+      myRole: { id: "villager", name: "Villager", team: Team.Good },
+      myPlayerId: "p1",
+      victoryCondition: { label, winner: Team.Good },
+    });
+    render(<GameOverScreenView {...defaultProps} gameState={gameState} />);
+    expect(screen.getByText(label)).toBeDefined();
+  });
+
+  it("does not render victory condition section when victoryCondition is absent", () => {
+    const label =
+      WEREWOLF_COPY.gameOver.victoryConditions[WerewolfWinner.Village];
+    const gameState = makeGameState({
+      myRole: { id: "villager", name: "Villager", team: Team.Good },
+      myPlayerId: "p1",
+    });
+    render(<GameOverScreenView {...defaultProps} gameState={gameState} />);
+    expect(screen.queryByText(label)).toBeNull();
+  });
+
   it("renders role assignment list with player names", () => {
     const gameState = makeGameState();
     render(<GameOverScreenView {...defaultProps} gameState={gameState} />);

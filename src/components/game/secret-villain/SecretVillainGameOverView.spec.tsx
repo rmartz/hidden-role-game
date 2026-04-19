@@ -94,6 +94,26 @@ describe("SecretVillainGameOverView", () => {
     expect(screen.getByText("Bob")).toBeDefined();
   });
 
+  it("renders victory condition label when victoryCondition is set", () => {
+    const label = "Good policy victory";
+    const gameState = makeGameState({
+      victoryCondition: { label, winner: Team.Good },
+    });
+    render(
+      <SecretVillainGameOverView {...defaultProps} gameState={gameState} />,
+    );
+    expect(screen.getByText(label)).toBeDefined();
+  });
+
+  it("does not render victory condition label when victoryCondition is absent", () => {
+    const label = "Good policy victory";
+    const gameState = makeGameState();
+    render(
+      <SecretVillainGameOverView {...defaultProps} gameState={gameState} />,
+    );
+    expect(screen.queryByText(label)).toBeNull();
+  });
+
   it("renders themed role names for the Original theme", () => {
     const theme = SvTheme.Original;
     const themeLabels = SV_THEMES[theme];

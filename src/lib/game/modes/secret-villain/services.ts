@@ -1,4 +1,4 @@
-import { isSecretVillainModeConfig } from "@/lib/types";
+import { isSecretVillainModeConfig, GameStatus, Team } from "@/lib/types";
 import type { Game, GameModeServices, PlayerRoleAssignment } from "@/lib/types";
 import { resolvePlayerOrder } from "@/lib/player-order";
 import { SecretVillainRole } from "./roles";
@@ -15,7 +15,13 @@ import {
   getDefaultBoardPreset,
   getEligibleChancellorIds,
   resolvePowerTable,
+  SecretVillainWinner,
+  SvVictoryConditionKey,
 } from "./utils";
+import { getSvThemeLabels } from "./themes";
+import type { SvTheme } from "./themes";
+import { SECRET_VILLAIN_COPY } from "./copy";
+import type { VictoryCondition } from "@/server/types/game";
 
 function shuffle<T>(array: T[]): T[] {
   const result = [...array];
@@ -57,6 +63,56 @@ function buildPhaseInfo(
 interface BuildTurnStateOptions {
   playerOrder?: string[];
   executionerTargetId?: string;
+}
+
+function extractSvVictoryCondition(
+  game: Game,
+  svTheme: SvTheme | undefined,
+): VictoryCondition | undefined {
+  if (game.status.type !== GameStatus.Finished) return undefined;
+  const conditionKey = game.status.victoryConditionKey as
+    | SvVictoryConditionKey
+    | undefined;
+  if (!conditionKey) return undefined;
+  const themeLabels = getSvThemeLabels(svTheme);
+  const vc = SECRET_VILLAIN_COPY.gameOver.victoryConditions;
+  let label: string;
+  let winnerTeam: Team;
+  switch (conditionKey) {
+    case SvVictoryConditionKey.GoodPolicy:
+      winnerTeam = Team.Good;
+      label = vc.goodPolicy(themeLabels.goodTeam);
+      break;
+    case SvVictoryConditionKey.BadPolicy:
+      winnerTeam = Team.Bad;
+      label = vc.badPolicy(themeLabels.badTeam);
+      break;
+    case SvVictoryConditionKey.SpecialBadElected:
+      winnerTeam = Team.Bad;
+      label = vc.specialBadElected(themeLabels.specialBadRole);
+      break;
+    case SvVictoryConditionKey.GoodShoot:
+      winnerTeam = Team.Good;
+      label = vc.goodShoot(themeLabels.specialBadRole);
+      break;
+    case SvVictoryConditionKey.Chaos: {
+      const winner = game.status.winner;
+      if (winner === SecretVillainWinner.Good) {
+        winnerTeam = Team.Good;
+      } else if (winner === SecretVillainWinner.Bad) {
+        winnerTeam = Team.Bad;
+      } else {
+        return undefined;
+      }
+      label = vc.chaos(
+        winnerTeam === Team.Good ? themeLabels.goodTeam : themeLabels.badTeam,
+      );
+      break;
+    }
+    default:
+      return undefined;
+  }
+  return { label, winner: winnerTeam };
 }
 
 export const secretVillainServices: GameModeServices = {
@@ -150,6 +206,11 @@ export const secretVillainServices: GameModeServices = {
     }
 
     const ts = currentTurnState(game);
+
+    // Populate victory condition when the game is finished.
+    const svTheme = result["svTheme"] as SvTheme | undefined;
+    result["victoryCondition"] = extractSvVictoryCondition(game, svTheme);
+
     if (!ts) return result;
 
     const { phase } = ts;
