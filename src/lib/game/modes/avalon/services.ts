@@ -10,9 +10,8 @@ import type { AvalonPublicPhase } from "./player-state";
 // ---------------------------------------------------------------------------
 
 /**
- * Quest team sizes for player counts 5–10.
- * Index 0 is for 5 players; index 5 is for 10 players.
- * Each inner tuple is [Q1, Q2, Q3, Q4, Q5].
+ * Quest team sizes keyed by player count (5–10).
+ * Each tuple is [Q1, Q2, Q3, Q4, Q5] team sizes for that player count.
  */
 const QUEST_TEAM_SIZES: Record<
   number,
