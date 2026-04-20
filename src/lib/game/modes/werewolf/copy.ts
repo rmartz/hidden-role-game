@@ -254,7 +254,7 @@ export const WEREWOLF_COPY = {
     playerWarning:
       "Do not let anyone else know you are a Mason — mysterious threats lurk everywhere.",
     nonMasonWarning:
-      "Rumors exist there are members of a secretive group called the Masons among you, but do not even mention their name — mysterious threats lurk everywhere.",
+      "Rumors exist that there are members of a secretive group called the Masons among you, but do not even mention its name — mysterious threats lurk everywhere.",
     narratorWarning:
       "There are Mason characters in this game. If any player mentions Masons or implies they are one, smite them during the night.",
   },

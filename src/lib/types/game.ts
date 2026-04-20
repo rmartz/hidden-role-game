@@ -231,7 +231,6 @@ export interface GameModeConfig {
    * Validates mode-specific role count constraints beyond basic role ID validity
    * and slot count. Returns an error message, or undefined if valid.
    * Called for Custom (roleCounts) and Advanced (simple-bucket counts) modes.
-   * The `roleCounts` map reflects total assigned counts per role ID.
    */
   validateRoleConfig?(roleCounts: Record<string, number>): string | undefined;
   readonly roles: Record<string, RoleDefinition<string, Team>>;
