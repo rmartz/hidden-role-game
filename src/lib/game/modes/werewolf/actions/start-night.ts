@@ -7,6 +7,7 @@ import {
   currentTurnState,
   isOwnerPlaying,
   GROUP_PHASE_KEY_SEPARATOR,
+  checkWinCondition,
 } from "../utils";
 import { WerewolfRole } from "../roles";
 
@@ -42,6 +43,19 @@ export const startNightAction: GameAction = {
     const pendingSmites = dayPhase.pendingSmitePlayerIds?.filter(
       (id) => !ts.deadPlayerIds.includes(id),
     );
+
+    // Dracula: carry forward wives (filtering out the dead) and check win condition.
+    // Dracula wins if alive and ≥3 wives are alive at the start of any night
+    // (after the first full day-and-night cycle, i.e. turn > 1).
+    const aliveWives = (ts.draculaWives ?? []).filter(
+      (id) => !ts.deadPlayerIds.includes(id),
+    );
+
+    // Zombie: carry forward infected list (filtering out the dead).
+    const aliveInfected = (ts.zombieInfected ?? []).filter(
+      (id) => !ts.deadPlayerIds.includes(id),
+    );
+
     game.status = {
       type: GameStatus.Playing,
       turnState: {
@@ -73,7 +87,18 @@ export const startNightAction: GameAction = {
           ? { executionerTargetId: ts.executionerTargetId }
           : {}),
         ...(ts.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
+        ...(aliveWives.length > 0 ? { draculaWives: aliveWives } : {}),
+        ...(aliveInfected.length > 0 ? { zombieInfected: aliveInfected } : {}),
       },
     };
+
+    // Dracula wins at the start of night if they are alive and have ≥3 wives alive.
+    // This is only checked from turn 2 onward (after at least one full day cycle).
+    if (nextTurn > 1) {
+      const winResult = checkWinCondition(game, ts.deadPlayerIds);
+      if (winResult) {
+        game.status = winResult;
+      }
+    }
   },
 };

@@ -282,6 +282,34 @@ export const startDayAction: GameAction = {
 
     const updatedDeadIds = [...ts.deadPlayerIds, ...newDeadIds];
 
+    // Dracula: add the night's wife target to the accumulated list.
+    const draculaAction = nightPhase.nightActions[
+      WerewolfRole.Dracula as string
+    ] as NightAction | undefined;
+    const draculaWives = draculaAction?.targetPlayerId
+      ? [
+          ...(ts.draculaWives ?? []).filter(
+            (id) => !updatedDeadIds.includes(id),
+          ),
+          ...(ts.draculaWives?.includes(draculaAction.targetPlayerId)
+            ? []
+            : [draculaAction.targetPlayerId]),
+        ]
+      : (ts.draculaWives ?? []).filter((id) => !updatedDeadIds.includes(id));
+
+    // Zombie: add the night's infection target to the accumulated list (if not already infected).
+    const zombieAction = nightPhase.nightActions[
+      WerewolfRole.Zombie as string
+    ] as NightAction | undefined;
+    const existingInfected = (ts.zombieInfected ?? []).filter(
+      (id) => !updatedDeadIds.includes(id),
+    );
+    const zombieInfected =
+      zombieAction?.targetPlayerId &&
+      !existingInfected.includes(zombieAction.targetPlayerId)
+        ? [...existingInfected, zombieAction.targetPlayerId]
+        : existingInfected;
+
     const wolfCubDied =
       ts.wolfCubDied === true || didWolfCubDie(newDeadIds, game);
     const revealedPlayerIds = getWerewolfModeConfig(game).autoRevealNightOutcome
@@ -318,6 +346,8 @@ export const startDayAction: GameAction = {
           ? { executionerTargetId: ts.executionerTargetId }
           : {}),
         ...(mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
+        ...(draculaWives.length > 0 ? { draculaWives } : {}),
+        ...(zombieInfected.length > 0 ? { zombieInfected } : {}),
       },
     };
 
