@@ -15,11 +15,17 @@ import {
   avalonStateToFirebase,
   avalonStateFromFirebase,
 } from "./avalon";
+import {
+  type FirebaseCodenamesPlayerState,
+  codenamesStateToFirebase,
+  codenamesStateFromFirebase,
+} from "./codenames";
 
 export type { FirebaseBasePlayerState } from "./base";
 export type { FirebaseWerewolfPlayerState } from "./werewolf";
 export type { FirebaseSecretVillainPlayerState } from "./secret-villain";
 export type { FirebaseAvalonPlayerState } from "./avalon";
+export type { FirebaseCodenamesPlayerState } from "./codenames";
 
 // ---------------------------------------------------------------------------
 // Discriminated union
@@ -28,7 +34,8 @@ export type { FirebaseAvalonPlayerState } from "./avalon";
 export type FirebasePlayerState =
   | FirebaseWerewolfPlayerState
   | FirebaseSecretVillainPlayerState
-  | FirebaseAvalonPlayerState;
+  | FirebaseAvalonPlayerState
+  | FirebaseCodenamesPlayerState;
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -44,6 +51,8 @@ export function playerStateToFirebase(
       return secretVillainStateToFirebase(state);
     case GameMode.Avalon:
       return avalonStateToFirebase(state);
+    case GameMode.Codenames:
+      return codenamesStateToFirebase(state);
   }
 }
 
@@ -62,6 +71,8 @@ export function firebaseToPlayerState(
       );
     case GameMode.Avalon:
       return avalonStateFromFirebase(raw);
+    case GameMode.Codenames:
+      return codenamesStateFromFirebase(raw as FirebaseCodenamesPlayerState);
     default:
       throw new Error(`Unknown game mode: ${raw.gameMode}`);
   }
