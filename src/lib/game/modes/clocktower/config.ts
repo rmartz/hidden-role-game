@@ -7,6 +7,7 @@ import {
   parseClocktowerModeConfig,
 } from "./lobby-config";
 import { clocktowerServices } from "./services";
+import { CLOCKTOWER_ACTIONS } from "./actions";
 
 export const CLOCKTOWER_CONFIG = {
   name: "Clocktower",
@@ -23,7 +24,7 @@ export const CLOCKTOWER_CONFIG = {
   defaultModeConfig: DEFAULT_CLOCKTOWER_MODE_CONFIG,
   parseModeConfig: parseClocktowerModeConfig,
   buildDefaultLobbyConfig: buildDefaultClocktowerLobbyConfig,
-  actions: {},
+  actions: CLOCKTOWER_ACTIONS,
   // Clocktower's Storyteller controls information delivery manually;
   // roles are not automatically revealed when a player dies.
   resolveRevealDeadPlayerIds: () => [],

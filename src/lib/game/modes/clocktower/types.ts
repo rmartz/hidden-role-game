@@ -12,12 +12,25 @@ export enum ClocktowerPhase {
 // ---------------------------------------------------------------------------
 
 /**
+ * Storyteller-provided information for a night action.
+ *
+ * Shape varies by role:
+ * - Empath, Chef: `number` (0–2 for Empath; ≥0 count for Chef)
+ * - Fortune Teller: `boolean` (yes = Demon present)
+ * - Washerwoman, Librarian, Investigator: two player IDs + a role name
+ * - Undertaker, Ravenkeeper: a role name
+ */
+export type ClocktowerNightInformation =
+  | { type: "number"; value: number }
+  | { type: "boolean"; value: boolean }
+  | { type: "two-players-role"; playerIds: [string, string]; roleId: string }
+  | { type: "role"; roleId: string };
+
+/**
  * Records the action taken by a role during the night.
  *
  * Most Clocktower night actions involve choosing a single target; the
  * Storyteller then mediates information delivery manually.
- * Role-specific extensions (e.g. Fortune Teller's second target) should
- * extend this interface per role as needed.
  *
  * Keyed by role ID in `ClocktowerNightPhase.nightActions` — assumes one active
  * instance per role ID per night.
@@ -25,6 +38,15 @@ export enum ClocktowerPhase {
 export interface ClocktowerNightAction {
   /** The primary player ID targeted by this role's night action. */
   targetPlayerId?: string;
+  /** Fortune Teller only: second player targeted. */
+  secondTargetPlayerId?: string;
+  /** Whether the player has confirmed their target selection. */
+  confirmed?: true;
+  /**
+   * Storyteller-entered information for this role.
+   * Set via the `provide-information` action after the player wakes.
+   */
+  information?: ClocktowerNightInformation;
 }
 
 // ---------------------------------------------------------------------------
