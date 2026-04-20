@@ -8,7 +8,7 @@ interface SpecialBadRevealViewProps {
   chancellorName: string;
   specialBadRoleName: string;
   badTeamLabel: string;
-  badPolicyLabel: string;
+  badTrackLabel: string;
   isChancellor: boolean;
   /** Set once the chancellor has acted. */
   revealed?: boolean;
@@ -22,7 +22,7 @@ export function SpecialBadRevealView({
   chancellorName,
   specialBadRoleName,
   badTeamLabel,
-  badPolicyLabel,
+  badTrackLabel,
   isChancellor,
   revealed,
   onConfirm,
@@ -59,7 +59,7 @@ export function SpecialBadRevealView({
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm">
-          {copy.chancellorInstructions(specialBadRoleName, badPolicyLabel)}
+          {copy.chancellorInstructions(specialBadRoleName, badTrackLabel)}
         </p>
         <div className="flex flex-col gap-2">
           <Button onClick={onConfirm} disabled={!!isPending}>

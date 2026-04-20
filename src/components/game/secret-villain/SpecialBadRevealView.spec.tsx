@@ -11,7 +11,7 @@ const defaultProps = {
   chancellorName: "Alice",
   specialBadRoleName: "Hitler",
   badTeamLabel: "Fascist",
-  badPolicyLabel: "Fascist Policy",
+  badTrackLabel: "Fascist Policy",
   isChancellor: false,
   onConfirm: vi.fn(),
   onReveal: vi.fn(),

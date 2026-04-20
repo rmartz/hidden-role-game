@@ -8,7 +8,7 @@ const meta = {
     chancellorName: "Alice",
     specialBadRoleName: "Hitler",
     badTeamLabel: "Fascist",
-    badPolicyLabel: "Fascist Policy",
+    badTrackLabel: "Fascist Policy",
     onConfirm: fn(),
     onReveal: fn(),
     onContinue: fn(),
