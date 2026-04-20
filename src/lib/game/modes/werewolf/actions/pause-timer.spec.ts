@@ -130,6 +130,15 @@ describe("WerewolfAction.ResumeTimer", () => {
       expect(phase.pausedAt).toBeUndefined();
     });
 
+    it("clears pausedAt after resuming during daytime", () => {
+      const game = makePlayingGame(makeDayTurnState({ pausedAt: 5000 }));
+      resumeTimer.apply(game, null, "owner-1");
+      const phase = (
+        game.status as { turnState: { phase: WerewolfDaytimePhase } }
+      ).turnState.phase;
+      expect(phase.pausedAt).toBeUndefined();
+    });
+
     it("accumulates elapsed time into pauseOffset and resets startedAt", () => {
       // Phase started at 1000ms, paused at 3000ms — 2000ms elapsed.
       const game = makePlayingGame(

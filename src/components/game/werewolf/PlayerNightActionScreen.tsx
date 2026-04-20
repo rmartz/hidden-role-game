@@ -127,6 +127,10 @@ export function PlayerNightActionScreen({
           autoAdvance={gameState.timerConfig.autoAdvance}
           startedAt={phaseStartedAt}
           resetKey={phase.currentPhaseIndex}
+          pausedAt={
+            phase.pausedAt !== undefined ? new Date(phase.pausedAt) : undefined
+          }
+          pauseOffset={phase.pauseOffset}
         />
         <p className="text-muted-foreground mb-4">
           {priestWardActive

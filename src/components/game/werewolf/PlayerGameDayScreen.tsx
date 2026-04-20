@@ -66,6 +66,12 @@ export function PlayerGameDayScreen({
         durationSeconds={timerConfig.dayPhaseSeconds}
         autoAdvance={timerConfig.autoAdvance}
         startedAt={phaseStartedAt}
+        pausedAt={
+          isDaytime && phase.pausedAt !== undefined
+            ? new Date(phase.pausedAt)
+            : undefined
+        }
+        pauseOffset={isDaytime ? phase.pauseOffset : undefined}
       />
       <p className="mb-4 text-muted-foreground">
         {WEREWOLF_COPY.day.gameUnderway}
