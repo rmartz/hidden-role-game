@@ -34,17 +34,22 @@ export function GameTimer({
   const rawStartedAtMs = startedAt.getTime();
   const startedAtMs = isNaN(rawStartedAtMs) ? Date.now() : rawStartedAtMs;
 
+  const rawPausedAtMs = pausedAt?.getTime();
   const isPaused = pausedAt !== undefined;
 
   const computeElapsed = useCallback(
     (nowMs: number) => {
-      const effectiveNow = isPaused ? pausedAt.getTime() : nowMs;
+      const pausedAtMs =
+        rawPausedAtMs !== undefined && !isNaN(rawPausedAtMs)
+          ? rawPausedAtMs
+          : nowMs;
+      const effectiveNow = isPaused ? pausedAtMs : nowMs;
       return Math.max(
         0,
         Math.floor((pauseOffset + (effectiveNow - startedAtMs)) / 1000),
       );
     },
-    [isPaused, pausedAt, pauseOffset, startedAtMs],
+    [isPaused, rawPausedAtMs, pauseOffset, startedAtMs],
   );
 
   const [elapsedSeconds, setElapsedSeconds] = useState(() =>
