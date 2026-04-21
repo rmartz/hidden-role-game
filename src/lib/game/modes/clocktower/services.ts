@@ -2,7 +2,11 @@ import { GameStatus } from "@/lib/types";
 import type { Game, GameModeServices, PlayerRoleAssignment } from "@/lib/types";
 import { ClocktowerPhase } from "./types";
 import type { ClocktowerTurnState } from "./types";
-import { ClocktowerRole, CLOCKTOWER_ROLES } from "./roles";
+import {
+  ClocktowerCharacterType,
+  ClocktowerRole,
+  getClocktowerRole,
+} from "./roles";
 import type { ClocktowerRoleDefinition } from "./roles";
 import type { ClocktowerGame } from "@/lib/types/game";
 
@@ -23,12 +27,12 @@ function pickDrunkFakeRole(
   roleAssignments: PlayerRoleAssignment[],
 ): string | undefined {
   const townsfolkRoles = roleAssignments
-    .map((a) => CLOCKTOWER_ROLES[a.roleDefinitionId as ClocktowerRole])
+    .map((a) => getClocktowerRole(a.roleDefinitionId))
     .filter(
       (r): r is ClocktowerRoleDefinition =>
         r !== undefined && !r.showsFakeTownsfolkToken,
     )
-    .filter((r) => r.characterType === "townsfolk");
+    .filter((r) => r.characterType === ClocktowerCharacterType.Townsfolk);
 
   if (townsfolkRoles.length === 0) return undefined;
   const idx = Math.floor(Math.random() * townsfolkRoles.length);
@@ -118,9 +122,8 @@ export const clocktowerServices: GameModeServices = {
     // modeState only — the Drunk's fake role is shown as their role.
     const ctGame = game as ClocktowerGame;
     if (ts.drunkPlayerId === callerId && ctGame.drunkFakeRoleId !== undefined) {
-      const fakeRole =
-        CLOCKTOWER_ROLES[ctGame.drunkFakeRoleId as ClocktowerRole];
-      if (fakeRole) {
+      const fakeRole = getClocktowerRole(ctGame.drunkFakeRoleId);
+      if (fakeRole !== undefined) {
         result["myRole"] = {
           id: fakeRole.id,
           name: fakeRole.name,
