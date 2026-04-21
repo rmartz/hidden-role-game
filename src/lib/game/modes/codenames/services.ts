@@ -45,8 +45,8 @@ export const codenamesServices: GameModeServices = {
     return {
       board: visibleBoard,
       clueHistory,
-      turn,
-      phase,
+      codenamesTurn: turn,
+      codenamesPhase: phase,
       activeTeam,
       startingTeam,
     };

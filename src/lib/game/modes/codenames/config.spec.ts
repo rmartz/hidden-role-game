@@ -151,7 +151,7 @@ describe("CODENAMES_CONFIG", () => {
   });
 
   it("parseModeConfig returns a Codenames mode config", () => {
-    const result = CODENAMES_CONFIG.parseModeConfig({});
+    const result = CODENAMES_CONFIG.parseModeConfig();
     expect(result.gameMode).toBe("codenames");
   });
 });
