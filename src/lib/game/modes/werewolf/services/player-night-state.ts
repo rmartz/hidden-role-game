@@ -133,6 +133,9 @@ function extractGroupPhaseState(
     suggestedTargetId: action.suggestedTargetId,
     allAgreed,
     ...(previousNightTargetId ? { previousNightTargetId } : {}),
+    ...(ts?.evilEmpathRevealedResult !== undefined
+      ? { evilEmpathRevealedResult: ts.evilEmpathRevealedResult }
+      : {}),
   };
 }
 
@@ -230,6 +233,21 @@ function extractRoleSpecificState(
         elusiveSeerVillagerIds,
       };
     }
+  }
+
+  if (myRole.id === WerewolfRole.EvilEmpath) {
+    const empathAction = nightActions[myRole.id];
+    const soloAction =
+      empathAction && !isTeamNightAction(empathAction)
+        ? empathAction
+        : undefined;
+    return {
+      myNightTarget: undefined,
+      myNightTargetConfirmed: soloAction?.confirmed ?? false,
+      ...(ts?.evilEmpathLastResult !== undefined
+        ? { evilEmpathRevealedResult: ts.evilEmpathLastResult }
+        : {}),
+    };
   }
 
   return undefined;
@@ -351,7 +369,7 @@ function extractGenericSoloState(
     myAction.resultRevealed &&
     myAction.targetPlayerId
   ) {
-    appendInvestigationResult(result, game, myRole, myAction);
+    appendInvestigationResult(result, game, myRole, myAction, ts);
   }
 
   return result;
@@ -362,6 +380,7 @@ function appendInvestigationResult(
   game: Game,
   myRoleDef: WerewolfRoleDefinition,
   myAction: { targetPlayerId: string; secondTargetPlayerId?: string },
+  ts: WerewolfTurnState | undefined,
 ): void {
   const targetAssignment = game.roleAssignments.find(
     (a) => a.playerId === myAction.targetPlayerId,
@@ -409,9 +428,12 @@ function appendInvestigationResult(
       secondTargetName: secondName,
     };
   } else {
+    // Illusion Artist: invert the result when the target matches illusionTargetId.
+    const isWerewolf = targetRoleDef?.isWerewolf === true;
+    const illusionApplies = ts?.illusionTargetId === myAction.targetPlayerId;
     result.investigationResult = {
       targetPlayerId: myAction.targetPlayerId,
-      isWerewolfTeam: targetRoleDef?.isWerewolf === true,
+      isWerewolfTeam: illusionApplies ? !isWerewolf : isWerewolf,
     };
   }
 }

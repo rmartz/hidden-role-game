@@ -89,6 +89,13 @@ export const startNightAction: GameAction = {
         ...(ts.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
         ...(aliveWives.length > 0 ? { draculaWives: aliveWives } : {}),
         ...(aliveInfected.length > 0 ? { zombieInfected: aliveInfected } : {}),
+        // illusionTargetId is night-specific — not carried forward.
+        ...(ts.evilEmpathLastResult !== undefined
+          ? { evilEmpathLastResult: ts.evilEmpathLastResult }
+          : {}),
+        ...(ts.evilEmpathRevealedResult !== undefined
+          ? { evilEmpathRevealedResult: ts.evilEmpathRevealedResult }
+          : {}),
       },
     };
 

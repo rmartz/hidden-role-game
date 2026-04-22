@@ -24,7 +24,7 @@ export const resolveHunterRevengeAction: GameAction = {
     if (didWolfCubDie([targetPlayerId], game)) {
       ts.wolfCubDied = true;
     }
-    cleanupAfterDaytimeKill(targetPlayerId, ts);
+    cleanupAfterDaytimeKill(targetPlayerId, ts, game);
 
     ts.hunterRevengePlayerId = undefined;
 
