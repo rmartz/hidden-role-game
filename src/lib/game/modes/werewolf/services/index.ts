@@ -5,6 +5,7 @@ import type {
   PlayerRoleAssignment,
   RoleDefinition,
 } from "@/lib/types";
+import { currentTurnState } from "../utils/game-state";
 import type { WerewolfPlayerGameState } from "../player-state";
 import { getWerewolfModeConfig } from "../lobby-config";
 import { WerewolfRole, getWerewolfRole } from "../roles";
@@ -77,6 +78,22 @@ function extractNonOwnerState(
       }
     : {};
 
+  // Alpha Wolf: surface bite status and role conversions to werewolf-team players.
+  const isWerewolfTeam = myRole.isWerewolf === true || myRole.team === Team.Bad;
+  const ts = currentTurnState(game);
+  const wolfTeamState: Partial<WerewolfPlayerGameState> = {};
+  if (isWerewolfTeam && ts) {
+    if (ts.alphaWolfBiteUsed) wolfTeamState.alphaWolfBiteUsed = true;
+    if (ts.roleOverrides && Object.keys(ts.roleOverrides).length > 0) {
+      wolfTeamState.roleConversions = Object.entries(ts.roleOverrides).map(
+        ([playerId, newRoleDefinitionId]) => ({
+          playerId,
+          newRoleDefinitionId,
+        }),
+      );
+    }
+  }
+
   return {
     ...nightTargetState,
     ...daytimeNightState,
@@ -86,6 +103,7 @@ function extractNonOwnerState(
       ? { deadPlayerIds: visibleDeadPlayerIds }
       : {}),
     ...executionerState,
+    ...wolfTeamState,
   };
 }
 

@@ -22,6 +22,11 @@ export interface WerewolfModeConfig {
   hiddenRoleCount: number;
   /** When true, elimination/status outcomes are revealed to all players immediately at day start. */
   autoRevealNightOutcome: boolean;
+  /**
+   * The role the Village Drunk assumes on night 3 when they sober up.
+   * Undefined when Village Drunk is not in the game or no sober role is configured.
+   */
+  villageDrunkSoberRoleId?: string;
 }
 
 /** Werewolf-specific lobby configuration. */
@@ -104,5 +109,8 @@ export function parseWerewolfModeConfig(
       typeof raw["autoRevealNightOutcome"] === "boolean"
         ? raw["autoRevealNightOutcome"]
         : DEFAULT_WEREWOLF_MODE_CONFIG.autoRevealNightOutcome,
+    ...(typeof raw["villageDrunkSoberRoleId"] === "string"
+      ? { villageDrunkSoberRoleId: raw["villageDrunkSoberRoleId"] }
+      : {}),
   };
 }

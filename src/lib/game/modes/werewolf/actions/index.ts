@@ -1,6 +1,7 @@
 export { WerewolfAction } from "./types";
 import type { GameAction } from "@/lib/types";
 import { WerewolfAction } from "./types";
+import { alphaWolfBiteAction } from "./alpha-wolf-bite";
 import { startNightAction } from "./start-night";
 import { startDayAction } from "./start-day";
 import { setNightPhaseAction } from "./set-night-phase";
@@ -24,6 +25,7 @@ import { cancelTrialAction } from "./cancel-trial";
 import { resetAbilityAction } from "./reset-ability";
 
 export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
+  [WerewolfAction.AlphaWolfBite]: alphaWolfBiteAction,
   [WerewolfAction.StartNight]: startNightAction,
   [WerewolfAction.StartDay]: startDayAction,
   [WerewolfAction.SetNightPhase]: setNightPhaseAction,

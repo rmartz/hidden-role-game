@@ -42,6 +42,7 @@ export const WEREWOLF_ROLE_CATEGORY_LABELS: Record<
 };
 
 export enum WerewolfRole {
+  AlphaWolf = "werewolf-alpha-wolf",
   Altruist = "werewolf-altruist",
   Bodyguard = "werewolf-bodyguard",
   Chupacabra = "werewolf-chupacabra",
@@ -70,6 +71,7 @@ export enum WerewolfRole {
   Tanner = "werewolf-tanner",
   ToughGuy = "werewolf-tough-guy",
   Vigilante = "werewolf-vigilante",
+  VillageDrunk = "werewolf-village-drunk",
   VillageIdiot = "werewolf-village-idiot",
   Villager = "werewolf-villager",
   Werewolf = "werewolf-werewolf",
@@ -135,6 +137,23 @@ export function defaultRoleCount(numRolePlayers: number): RoleBucket[] {
 }
 
 export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
+  [WerewolfRole.AlphaWolf]: {
+    id: WerewolfRole.AlphaWolf,
+    name: "Alpha Wolf",
+    summary:
+      "Once per game, converts a villager to the Werewolf team instead of killing",
+    description:
+      "The Alpha Wolf wakes with the Werewolves each night. Once per game, instead of a standard kill, the Alpha Wolf may bite a villager — secretly converting them to the Werewolf team. Alternatively, the Alpha Wolf may use their ability to eliminate an additional villager that same night.",
+    team: Team.Bad,
+    isWerewolf: true,
+    wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Special,
+    wakesWith: WerewolfRole.Werewolf,
+    awareOf: { werewolves: true },
+    oncePerGame: true,
+    unique: true,
+    category: WerewolfRoleCategory.EvilKilling,
+  },
   [WerewolfRole.Altruist]: {
     id: WerewolfRole.Altruist,
     name: "Altruist",
@@ -483,6 +502,19 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     targetCategory: TargetCategory.Attack,
     preventSelfTarget: true,
     category: WerewolfRoleCategory.VillagerKilling,
+  },
+  [WerewolfRole.VillageDrunk]: {
+    id: WerewolfRole.VillageDrunk,
+    name: "Village Drunk",
+    summary:
+      "Cannot speak normally; gets sober on night 3 and gains an alternate role",
+    description:
+      "The Village Drunk is mute until they sober up. At the start of night 3, the Village Drunk sobers up and takes on an alternate role (configured by the narrator before the game starts). From that point they play as that new role.",
+    team: Team.Good,
+    unique: true,
+    wakesAtNight: WakesAtNight.Never,
+    targetCategory: TargetCategory.None,
+    category: WerewolfRoleCategory.VillagerHandicap,
   },
   [WerewolfRole.VillageIdiot]: {
     id: WerewolfRole.VillageIdiot,

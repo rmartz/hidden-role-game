@@ -9,6 +9,10 @@ import {
   GROUP_PHASE_KEY_SEPARATOR,
 } from "../utils";
 import { WerewolfRole } from "../roles";
+import { getWerewolfModeConfig } from "../lobby-config";
+
+/** Night at which the Village Drunk sobers up and gains their alternate role. */
+const VILLAGE_DRUNK_SOBER_TURN = 3;
 
 export const startNightAction: GameAction = {
   isValid(game: Game, callerId: string) {
@@ -31,12 +35,45 @@ export const startNightAction: GameAction = {
     const wolfCubBonusPhaseKey =
       WerewolfRole.Werewolf + GROUP_PHASE_KEY_SEPARATOR + "2";
     const extraGroupPhaseKeys = ts.wolfCubDied ? [wolfCubBonusPhaseKey] : [];
+
+    // Village Drunk: sober up on VILLAGE_DRUNK_SOBER_TURN.
+    // Apply the sober role override before building the night phase order so
+    // the sober role's night phase is included in the order if it wakes at night.
+    let roleOverrides = ts.roleOverrides ? { ...ts.roleOverrides } : undefined;
+    if (nextTurn === VILLAGE_DRUNK_SOBER_TURN) {
+      const modeConfig = getWerewolfModeConfig(game);
+      const soberRoleId = modeConfig.villageDrunkSoberRoleId;
+      if (soberRoleId) {
+        const drunkAssignment = game.roleAssignments.find(
+          (a) =>
+            a.roleDefinitionId === (WerewolfRole.VillageDrunk as string) &&
+            !ts.deadPlayerIds.includes(a.playerId),
+        );
+        if (drunkAssignment) {
+          roleOverrides = {
+            ...(roleOverrides ?? {}),
+            [drunkAssignment.playerId]: soberRoleId,
+          };
+        }
+      }
+    }
+
+    // Build effective role assignments for night-phase-order calculation,
+    // applying any role overrides (including the just-applied Village Drunk sober).
+    const effectiveAssignments = roleOverrides
+      ? game.roleAssignments.map((a) => {
+          const override = roleOverrides[a.playerId];
+          return override ? { ...a, roleDefinitionId: override } : a;
+        })
+      : game.roleAssignments;
+
     const nightPhaseOrder = buildNightPhaseOrder(
       nextTurn,
-      game.roleAssignments,
+      effectiveAssignments,
       ts.deadPlayerIds,
       extraGroupPhaseKeys,
     );
+
     // Carry over any pending daytime smites into the night phase so they are
     // resolved at the end of this night (in start-day).
     const pendingSmites = dayPhase.pendingSmitePlayerIds?.filter(
@@ -73,6 +110,8 @@ export const startNightAction: GameAction = {
           ? { executionerTargetId: ts.executionerTargetId }
           : {}),
         ...(ts.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
+        ...(roleOverrides ? { roleOverrides } : {}),
+        ...(ts.alphaWolfBiteUsed ? { alphaWolfBiteUsed: true } : {}),
       },
     };
   },

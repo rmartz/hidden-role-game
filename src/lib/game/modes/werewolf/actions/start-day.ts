@@ -29,6 +29,17 @@ export const startDayAction: GameAction = {
     if (!ts) return;
     const nightPhase = ts.phase as WerewolfNighttimePhase;
 
+    // Build effective role assignments — apply any mid-game roleOverrides
+    // (Alpha Wolf bite, Village Drunk sober) so all resolution logic uses
+    // the current effective role, not the original assignment.
+    const roleOverrides = ts.roleOverrides;
+    const effectiveAssignments = roleOverrides
+      ? game.roleAssignments.map((a) => {
+          const override = roleOverrides[a.playerId];
+          return override ? { ...a, roleDefinitionId: override } : a;
+        })
+      : game.roleAssignments;
+
     // Build priest wards: carry forward existing wards and add any new ward
     // from this night's Priest action BEFORE resolution so the ward protects
     // the target on the same night it is placed.
@@ -39,7 +50,7 @@ export const startDayAction: GameAction = {
       WerewolfRole.Priest as string
     ] as NightAction | undefined;
     if (priestAction?.targetPlayerId) {
-      const priestPlayerId = game.roleAssignments.find(
+      const priestPlayerId = effectiveAssignments.find(
         (a) => a.roleDefinitionId === (WerewolfRole.Priest as string),
       )?.playerId;
       if (priestPlayerId) {
@@ -48,11 +59,11 @@ export const startDayAction: GameAction = {
     }
 
     // Old Man timer: fires after (#werewolves + 2) nights.
-    const werewolfCount = game.roleAssignments.filter((a) => {
+    const werewolfCount = effectiveAssignments.filter((a) => {
       const roleDef = getWerewolfRole(a.roleDefinitionId);
       return roleDef?.isWerewolf === true;
     }).length;
-    const oldManAssignment = game.roleAssignments.find(
+    const oldManAssignment = effectiveAssignments.find(
       (a) => a.roleDefinitionId === (WerewolfRole.OldMan as string),
     );
     const oldManTimerPlayerId =
@@ -64,7 +75,7 @@ export const startDayAction: GameAction = {
 
     const nightResolution = resolveNightActions(
       nightPhase.nightActions,
-      game.roleAssignments,
+      effectiveAssignments,
       ts.deadPlayerIds,
       nightPhase.smitedPlayerIds,
       {
@@ -116,7 +127,7 @@ export const startDayAction: GameAction = {
       oesAction.confirmed &&
       oesAction.targetPlayerId
     ) {
-      const oesTargetAssignment = game.roleAssignments.find(
+      const oesTargetAssignment = effectiveAssignments.find(
         (a) => a.playerId === oesAction.targetPlayerId,
       );
       const oesTargetRoleDef = oesTargetAssignment
@@ -146,7 +157,7 @@ export const startDayAction: GameAction = {
       exposerAction.targetPlayerId &&
       !exposerReveal
     ) {
-      const exposerTargetAssignment = game.roleAssignments.find(
+      const exposerTargetAssignment = effectiveAssignments.find(
         (a) => a.playerId === exposerAction.targetPlayerId,
       );
       if (exposerTargetAssignment) {
@@ -169,7 +180,7 @@ export const startDayAction: GameAction = {
 
     // Vigilante self-death: if the Vigilante killed a Good-team player, they die too.
     // Skip if the Vigilante was already killed this night (e.g. by wolves).
-    const vigilanteAssignment = game.roleAssignments.find(
+    const vigilanteAssignment = effectiveAssignments.find(
       (a) =>
         a.roleDefinitionId === (WerewolfRole.Vigilante as string) &&
         !ts.deadPlayerIds.includes(a.playerId) &&
@@ -182,7 +193,7 @@ export const startDayAction: GameAction = {
       if (vigilanteAction?.targetPlayerId) {
         const targetDied = newDeadIds.includes(vigilanteAction.targetPlayerId);
         if (targetDied) {
-          const targetAssignment = game.roleAssignments.find(
+          const targetAssignment = effectiveAssignments.find(
             (a) => a.playerId === vigilanteAction.targetPlayerId,
           );
           const targetRole = targetAssignment
@@ -206,7 +217,7 @@ export const startDayAction: GameAction = {
           morticianAction.targetPlayerId,
         );
         if (morticianKilled) {
-          const targetAssignment = game.roleAssignments.find(
+          const targetAssignment = effectiveAssignments.find(
             (a) => a.playerId === morticianAction.targetPlayerId,
           );
           const targetRole = targetAssignment
@@ -221,7 +232,7 @@ export const startDayAction: GameAction = {
 
     // Hunter revenge: if the Hunter died this night, defer win-condition check
     // until the narrator resolves the Hunter's revenge target.
-    const hunterAssignment = game.roleAssignments.find(
+    const hunterAssignment = effectiveAssignments.find(
       (a) => a.roleDefinitionId === (WerewolfRole.Hunter as string),
     );
     const hunterDiedThisNight =
@@ -318,12 +329,14 @@ export const startDayAction: GameAction = {
           ? { executionerTargetId: ts.executionerTargetId }
           : {}),
         ...(mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
+        ...(ts.roleOverrides ? { roleOverrides: ts.roleOverrides } : {}),
+        ...(ts.alphaWolfBiteUsed ? { alphaWolfBiteUsed: true } : {}),
       },
     };
 
     // Tanner wins immediately if killed at night — checked after turn state
     // is built so all deaths and night resolution are recorded.
-    const tannerAssignment = game.roleAssignments.find(
+    const tannerAssignment = effectiveAssignments.find(
       (a) => a.roleDefinitionId === (WerewolfRole.Tanner as string),
     );
     if (tannerAssignment && newDeadIds.includes(tannerAssignment.playerId)) {

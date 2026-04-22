@@ -4,11 +4,21 @@ Actions are the mechanism by which the Narrator and players mutate game state. E
 
 ## Action Reference
 
+### `alpha-wolf-bite`
+
+**Who:** Narrator only
+**When:** During Nighttime (any turn), while the Alpha Wolf is alive and `alphaWolfBiteUsed` is not set
+**Effect:** Converts a living non-werewolf-team player to the Werewolf team by writing an entry to `roleOverrides` in turn state (maps target `playerId → WerewolfRole.Werewolf`). Sets `alphaWolfBiteUsed: true` to prevent reuse. The conversion is reflected immediately in win-condition checks (via `resolveRoleId`) and is visible to all werewolf-team players in their game state (`roleConversions`). Cannot target the narrator/owner, dead players, or players already on Team Bad / flagged `isWerewolf`.
+
+**Payload:** `{ targetPlayerId: string }`
+
+---
+
 ### `start-night`
 
 **Who:** Narrator only
 **When:** During Daytime
-**Effect:** Advances to the next turn and transitions to Nighttime. Builds the `nightPhaseOrder` for the new turn. If the Wolf Cub was killed during the previous night or day, an extra Werewolf phase is appended to `nightPhaseOrder`.
+**Effect:** Advances to the next turn and transitions to Nighttime. Builds the `nightPhaseOrder` for the new turn. If the Wolf Cub was killed during the previous night or day, an extra Werewolf phase is appended to `nightPhaseOrder`. If the new turn is turn 3 and `villageDrunkSoberRoleId` is configured, the Village Drunk's role is overridden via `roleOverrides` before `nightPhaseOrder` is built, so their new role's night phase (if any) is included.
 
 ---
 
