@@ -45,12 +45,14 @@ export enum WerewolfRole {
   Altruist = "werewolf-altruist",
   Bodyguard = "werewolf-bodyguard",
   Chupacabra = "werewolf-chupacabra",
+  Count = "werewolf-count",
   Doctor = "werewolf-doctor",
   Dracula = "werewolf-dracula",
   ElusiveSeer = "werewolf-elusive-seer",
   Executioner = "werewolf-executioner",
   Exposer = "werewolf-exposer",
   Hunter = "werewolf-hunter",
+  Insomniac = "werewolf-insomniac",
   LoneWolf = "werewolf-lone-wolf",
   Mason = "werewolf-mason",
   Mayor = "werewolf-mayor",
@@ -69,6 +71,7 @@ export enum WerewolfRole {
   Spellcaster = "werewolf-spellcaster",
   Spoiler = "werewolf-spoiler",
   Tanner = "werewolf-tanner",
+  TheThing = "werewolf-the-thing",
   ToughGuy = "werewolf-tough-guy",
   Vigilante = "werewolf-vigilante",
   VillageIdiot = "werewolf-village-idiot",
@@ -113,6 +116,12 @@ export interface WerewolfRoleDefinition extends RoleDefinition<
   dualTargetInvestigate?: boolean;
   /** Exposer only: ability can only be used once per game. */
   oncePerGame?: boolean;
+  /**
+   * True for roles whose night action targets are restricted to adjacent seats.
+   * The Thing may only tap immediate neighbors; the player list from
+   * `game.playerOrder` is used to determine adjacency.
+   */
+  adjacentTargetOnly?: boolean;
   /** Used for grouping in the role config UI. */
   category: WerewolfRoleCategory;
 }
@@ -161,6 +170,18 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     targetCategory: TargetCategory.Protect,
     preventRepeatTarget: true,
     category: WerewolfRoleCategory.VillagerProtection,
+  },
+  [WerewolfRole.Count]: {
+    id: WerewolfRole.Count,
+    name: "The Count",
+    summary: "On night 1, learns the werewolf count in each half of the table",
+    description:
+      "On the first night only, The Count wakes and learns how many werewolf-aligned players are seated in the left half versus the right half of the table. They have no night action on subsequent nights.",
+    team: Team.Good,
+    unique: true,
+    wakesAtNight: WakesAtNight.FirstNightOnly,
+    targetCategory: TargetCategory.None,
+    category: WerewolfRoleCategory.VillagerInvestigation,
   },
   [WerewolfRole.Chupacabra]: {
     id: WerewolfRole.Chupacabra,
@@ -249,6 +270,18 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     targetCategory: TargetCategory.None,
     aliases: ["gunslinger"],
     category: WerewolfRoleCategory.VillagerKilling,
+  },
+  [WerewolfRole.Insomniac]: {
+    id: WerewolfRole.Insomniac,
+    name: "Insomniac",
+    summary: "Each night, learns if either neighbor woke and acted",
+    description:
+      "Each night, after all other roles have acted, the Insomniac learns whether their left neighbor and right neighbor (by seating order) woke and performed a night action. A neighbor with no night role always returns no.",
+    team: Team.Good,
+    unique: true,
+    wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.None,
+    category: WerewolfRoleCategory.VillagerInvestigation,
   },
   [WerewolfRole.LoneWolf]: {
     id: WerewolfRole.LoneWolf,
@@ -474,6 +507,19 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.Never,
     targetCategory: TargetCategory.None,
     category: WerewolfRoleCategory.NeutralManipulation,
+  },
+  [WerewolfRole.TheThing]: {
+    id: WerewolfRole.TheThing,
+    name: "The Thing",
+    summary: "Each night, taps an adjacent player — they know they were tapped",
+    description:
+      "Each night The Thing selects one of their immediate neighbors (by seating order) to tap. The tapped player learns they were touched in the night, but not by whom. The Thing wins with the village.",
+    team: Team.Good,
+    unique: true,
+    wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Special,
+    adjacentTargetOnly: true,
+    category: WerewolfRoleCategory.VillagerSupport,
   },
   [WerewolfRole.ToughGuy]: {
     id: WerewolfRole.ToughGuy,

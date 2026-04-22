@@ -92,6 +92,7 @@ export function buildNightPhaseOrder(
 
   let altruistPhaseKey: string | undefined;
   let witchPhaseKey: string | undefined;
+  let insomniacPhaseKey: string | undefined;
 
   const sortedRoles = Object.values(WEREWOLF_ROLES).sort((a, b) => {
     const aIdx =
@@ -132,6 +133,11 @@ export function buildNightPhaseOrder(
       // didn't already protect.
       if (!hasAlivePlayers(role.id as string, roleAssignments, dead)) continue;
       altruistPhaseKey = role.id;
+    } else if (role.id === WerewolfRole.Insomniac) {
+      // Insomniac acts very last — after all other roles (including Altruist)
+      // so they can query which neighbors woke and acted.
+      if (!hasAlivePlayers(role.id as string, roleAssignments, dead)) continue;
+      insomniacPhaseKey = role.id;
     } else {
       if (!hasAlivePlayers(role.id as string, roleAssignments, dead)) continue;
       phaseKeys.push(role.id);
@@ -140,8 +146,11 @@ export function buildNightPhaseOrder(
 
   // Witch acts second-to-last — they need to see all prior attacks before choosing.
   if (witchPhaseKey !== undefined) phaseKeys.push(witchPhaseKey);
-  // Altruist acts last — after the Witch — so they only see players still unprotected.
+  // Altruist acts after the Witch — so they only see players still unprotected.
   if (altruistPhaseKey !== undefined) phaseKeys.push(altruistPhaseKey);
+  // Insomniac acts absolutely last — after all other roles have acted — so they
+  // can determine which neighbors woke and performed a non-skip action.
+  if (insomniacPhaseKey !== undefined) phaseKeys.push(insomniacPhaseKey);
 
   return phaseKeys;
 }

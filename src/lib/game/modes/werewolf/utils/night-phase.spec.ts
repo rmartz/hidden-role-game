@@ -237,4 +237,53 @@ describe("buildNightPhaseOrder", () => {
     const seerIdx = order.indexOf(WerewolfRole.Seer);
     expect(vigilanteIdx).toBeLessThan(seerIdx);
   });
+
+  it("places Insomniac absolutely last — after Seer, Witch, and Altruist", () => {
+    const withInsomniac = [
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "s1", roleDefinitionId: WerewolfRole.Seer },
+      { playerId: "wt1", roleDefinitionId: WerewolfRole.Witch },
+      { playerId: "a1", roleDefinitionId: WerewolfRole.Altruist },
+      { playerId: "i1", roleDefinitionId: WerewolfRole.Insomniac },
+    ];
+    const order = buildNightPhaseOrder(2, withInsomniac);
+    const seerIdx = order.indexOf(WerewolfRole.Seer);
+    const witchIdx = order.indexOf(WerewolfRole.Witch);
+    const altruistIdx = order.indexOf(WerewolfRole.Altruist);
+    const insomniacIdx = order.indexOf(WerewolfRole.Insomniac);
+    expect(insomniacIdx).toBeGreaterThan(seerIdx);
+    expect(insomniacIdx).toBeGreaterThan(witchIdx);
+    expect(insomniacIdx).toBeGreaterThan(altruistIdx);
+    expect(insomniacIdx).toBe(order.length - 1);
+  });
+
+  it("omits Insomniac when Insomniac player is dead", () => {
+    const withInsomniac = [
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "s1", roleDefinitionId: WerewolfRole.Seer },
+      { playerId: "i1", roleDefinitionId: WerewolfRole.Insomniac },
+    ];
+    const order = buildNightPhaseOrder(2, withInsomniac, ["i1"]);
+    expect(order).not.toContain(WerewolfRole.Insomniac);
+  });
+
+  it("includes The Count on turn 1 and omits it on turn 2", () => {
+    const withCount = [
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "c1", roleDefinitionId: WerewolfRole.Count },
+    ];
+    const turn1Order = buildNightPhaseOrder(1, withCount);
+    const turn2Order = buildNightPhaseOrder(2, withCount);
+    expect(turn1Order).toContain(WerewolfRole.Count);
+    expect(turn2Order).not.toContain(WerewolfRole.Count);
+  });
+
+  it("includes The Thing on every night", () => {
+    const withThing = [
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "t1", roleDefinitionId: WerewolfRole.TheThing },
+    ];
+    expect(buildNightPhaseOrder(1, withThing)).toContain(WerewolfRole.TheThing);
+    expect(buildNightPhaseOrder(2, withThing)).toContain(WerewolfRole.TheThing);
+  });
 });
