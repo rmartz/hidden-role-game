@@ -54,12 +54,14 @@ export type GameWinner =
   | "Werewolves"
   | "Chupacabra"
   | "Draw"
+  | "Dracula"
   | "LoneWolf"
   | "Tanner"
   | "Spoiler"
   | "Executioner"
   | "Good"
-  | "Bad";
+  | "Bad"
+  | "Zombie";
 
 export interface FinishedGameStatus {
   type: GameStatus.Finished;

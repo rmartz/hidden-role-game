@@ -92,7 +92,7 @@ describe("Dracula night action", () => {
       },
     });
     // p2 was already a wife from the previous turn
-    (ts as WerewolfTurnState).draculaWives = ["p2"];
+    ts.draculaWives = ["p2"];
     const game = makeGameWithDracula(ts);
     startDay.apply(game, undefined, "owner-1");
     const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
@@ -107,7 +107,7 @@ describe("Dracula night action", () => {
         [WerewolfRole.Dracula]: { targetPlayerId: "p2", confirmed: true },
       },
     });
-    (ts as WerewolfTurnState).draculaWives = ["p2"];
+    ts.draculaWives = ["p2"];
     const game = makeGameWithDracula(ts);
     startDay.apply(game, undefined, "owner-1");
     const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
@@ -127,7 +127,7 @@ describe("Dracula night action", () => {
       },
     });
     // p2 was a wife from before
-    (ts as WerewolfTurnState).draculaWives = ["p2"];
+    ts.draculaWives = ["p2"];
     const game = makeGameWithDracula(ts);
     startDay.apply(game, undefined, "owner-1");
     const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
@@ -249,7 +249,7 @@ describe("Zombie night action", () => {
         [WerewolfRole.Zombie]: { targetPlayerId: "p3", confirmed: true },
       },
     });
-    (ts as WerewolfTurnState).zombieInfected = ["p2"];
+    ts.zombieInfected = ["p2"];
     const game = makeGameWithZombie(ts);
     startDay.apply(game, undefined, "owner-1");
     const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
@@ -269,7 +269,7 @@ describe("Zombie night action", () => {
         },
       },
     });
-    (ts as WerewolfTurnState).zombieInfected = ["p2"];
+    ts.zombieInfected = ["p2"];
     const game = makeGameWithZombie(ts);
     startDay.apply(game, undefined, "owner-1");
     const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
@@ -291,7 +291,7 @@ describe("Zombie setNightTarget validation", () => {
       nightPhaseOrder: [WerewolfRole.Zombie],
       currentPhaseIndex: 0,
     });
-    (ts as WerewolfTurnState).zombieInfected = ["p2"];
+    ts.zombieInfected = ["p2"];
     const game = makeGameWithZombie(ts);
     expect(
       setTarget.isValid(game, "owner-1", {
@@ -307,7 +307,7 @@ describe("Zombie setNightTarget validation", () => {
       nightPhaseOrder: [WerewolfRole.Zombie],
       currentPhaseIndex: 0,
     });
-    (ts as WerewolfTurnState).zombieInfected = ["p2"];
+    ts.zombieInfected = ["p2"];
     const game = makeGameWithZombie(ts);
     expect(
       setTarget.isValid(game, "owner-1", {
@@ -349,19 +349,7 @@ describe("Zombie win condition after deaths", () => {
 
   it("Zombie does not win when infected equal healthy", () => {
     // zombie, p1 (infected), p2 (healthy): infected (1) vs healthy (1) → no win
-    const ts: WerewolfTurnState = {
-      turn: 2,
-      phase: {
-        type: WerewolfPhase.Daytime,
-        startedAt: 1000,
-        nightActions: {},
-      },
-      deadPlayerIds: [],
-      zombieInfected: ["p1"],
-    };
-    const game = makeGameWithZombie(ts, []);
-    // Kill p3 and p4 to set up: zombie + p1 (infected) + p2 (healthy) → 1 infected, 1 healthy
-    // We need to set this up differently — let's just check directly
+    // Set up via smallTs so we can directly assert without a kill action
     const smallTs: WerewolfTurnState = {
       turn: 2,
       phase: {
