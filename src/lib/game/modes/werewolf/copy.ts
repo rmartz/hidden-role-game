@@ -144,6 +144,7 @@ export const WEREWOLF_COPY = {
       [WerewolfWinner.Draw]: "All players eliminated simultaneously",
       [WerewolfWinner.Chupacabra]: "By elimination",
       [WerewolfWinner.Dracula]: "3 wives survived a full cycle",
+      [WerewolfWinner.Illuminati]: "Survived to the final 3",
       [WerewolfWinner.LoneWolf]: "By elimination",
       [WerewolfWinner.Spoiler]: "Spoiler stole the victory",
       [WerewolfWinner.Executioner]: "Executioner's target eliminated",
@@ -175,6 +176,11 @@ export const WEREWOLF_COPY = {
   elusiveSeer: {
     villagerListHeading: "You see the following Villagers:",
     noVillagers: "There are no plain Villagers in this game.",
+  },
+  illuminati: {
+    rolesListHeading: "All player roles:",
+    waitingForNarrator: "Waiting for the Narrator to reveal roles…",
+    narratorRevealHeading: "Reveal all roles to the Illuminati:",
   },
   mentalist: {
     sameTeam: "on the same team",

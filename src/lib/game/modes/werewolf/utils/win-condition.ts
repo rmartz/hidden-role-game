@@ -64,6 +64,7 @@ export function checkWinCondition(
   let neutralAlive = 0;
   let chupacabraAlive = false;
   let spoilerAlive = false;
+  let illuminatiAlive = false;
 
   for (const assignment of aliveAssignments) {
     const role = getWerewolfRole(assignment.roleDefinitionId);
@@ -72,6 +73,9 @@ export function checkWinCondition(
       chupacabraAlive = true;
     } else if (role.id === WerewolfRole.Spoiler) {
       spoilerAlive = true;
+    } else if (role.id === WerewolfRole.Illuminati) {
+      illuminatiAlive = true;
+      neutralAlive++;
     } else if (role.id === WerewolfRole.LoneWolf) {
       // Lone Wolf is Team.Neutral but wolf-aligned for win condition purposes
       badAlive++;
@@ -136,6 +140,12 @@ export function checkWinCondition(
     }
   }
 
+  // Illuminati override: if any win condition fires, the Illuminati is alive,
+  // and ≤ 3 total players remain, the Illuminati wins instead.
+  if (winResult && illuminatiAlive && aliveAssignments.length <= 3) {
+    return { type: GameStatus.Finished, winner: WerewolfWinner.Illuminati };
+  }
+
   // Spoiler override: if a standard win condition is met and the Spoiler is alive,
   // the Spoiler wins instead.
   if (winResult && spoilerAlive) {
@@ -152,6 +162,7 @@ export const WerewolfWinner = {
   Chupacabra: "Chupacabra",
   Dracula: "Dracula",
   Draw: "Draw",
+  Illuminati: "Illuminati",
   LoneWolf: "LoneWolf",
   Tanner: "Tanner",
   Spoiler: "Spoiler",

@@ -1,17 +1,20 @@
 "use client";
 
+import type { Team } from "@/lib/types";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 
 interface PlayerFirstTurnScreenProps {
   roleName?: string;
   teammateNames: string[];
   villagerNames?: string[];
+  illuminatiRoles?: { playerName: string; roleName: string; team: Team }[];
 }
 
 export function PlayerFirstTurnScreen({
   roleName,
   teammateNames,
   villagerNames,
+  illuminatiRoles,
 }: PlayerFirstTurnScreenProps) {
   const hasTeammates = teammateNames.length > 0;
   const teammateLabel = teammateNames.length === 1 ? "teammate" : "teammates";
@@ -42,6 +45,28 @@ export function PlayerFirstTurnScreen({
                 </li>
               ))}
             </ul>
+          )}
+        </div>
+      )}
+      {illuminatiRoles !== undefined && (
+        <div className="rounded-md border p-3 text-sm">
+          {illuminatiRoles.length === 0 ? (
+            <p className="text-muted-foreground italic">
+              {WEREWOLF_COPY.illuminati.waitingForNarrator}
+            </p>
+          ) : (
+            <>
+              <p className="font-medium mb-1">
+                {WEREWOLF_COPY.illuminati.rolesListHeading}
+              </p>
+              <ul className="space-y-0.5">
+                {illuminatiRoles.map(({ playerName, roleName: rName }) => (
+                  <li key={playerName} className="text-foreground">
+                    <strong>{playerName}</strong>: {rName}
+                  </li>
+                ))}
+              </ul>
+            </>
           )}
         </div>
       )}
