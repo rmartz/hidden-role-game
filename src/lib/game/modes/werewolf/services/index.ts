@@ -9,6 +9,7 @@ import type { WerewolfPlayerGameState } from "../player-state";
 import { getWerewolfModeConfig } from "../lobby-config";
 import { WerewolfRole, getWerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
+import { WerewolfPhase } from "../types";
 import {
   selectExecutionerTarget,
   buildInitialTurnState,
@@ -22,6 +23,7 @@ import {
   extractDaytimePlayerState,
 } from "./owner-state";
 import { extractPlayerNightState } from "./player-night-state";
+import { currentTurnState } from "../utils/game-state";
 import { WerewolfWinner } from "../utils/win-condition";
 import { WEREWOLF_COPY } from "../copy";
 import type { VictoryCondition } from "@/server/types/game";
@@ -56,14 +58,25 @@ function extractNonOwnerState(
   const deadPlayerIds = extractDeadPlayerIds(game);
   const nightActions = extractNightActions(game);
 
-  const nightTargetState = nightActions
-    ? extractPlayerNightState(game, callerId, myRole, deadPlayerIds)
-    : {};
+  const amDead = deadPlayerIds.includes(callerId);
+
+  // Ghost: when dead and it's nighttime, grant narrator-level visibility.
+  const isGhost = myRole.id === WerewolfRole.Ghost;
+  const isNighttime =
+    currentTurnState(game)?.phase.type === WerewolfPhase.Nighttime;
+  const ghostNightState =
+    isGhost && amDead && isNighttime && nightActions
+      ? { ghostVisible: true, nightActions }
+      : {};
+
+  const nightTargetState =
+    nightActions && !ghostNightState.ghostVisible
+      ? extractPlayerNightState(game, callerId, myRole, deadPlayerIds)
+      : {};
 
   const daytimeNightState = extractDaytimeNightSummary(game, callerId);
   const daytimePlayerState = extractDaytimePlayerState(game, callerId);
 
-  const amDead = deadPlayerIds.includes(callerId);
   const visibleDeadPlayerIds = extractVisibleDeadPlayerIds(game, callerId);
 
   // Executioner: surface the target so the player knows who to get eliminated,
@@ -81,6 +94,7 @@ function extractNonOwnerState(
 
   return {
     ...nightTargetState,
+    ...ghostNightState,
     ...daytimeNightState,
     ...daytimePlayerState,
     ...(amDead ? { amDead: true } : {}),
