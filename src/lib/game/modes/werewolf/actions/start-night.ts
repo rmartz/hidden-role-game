@@ -20,6 +20,8 @@ export const startNightAction: GameAction = {
     if (ts.hunterRevengePlayerId) return false;
     // Cannot advance to night while a trial is actively ongoing
     if (ts.phase.activeTrial && !ts.phase.activeTrial.verdict) return false;
+    // Cannot advance to night while a guilty verdict is awaiting resolution
+    if (ts.phase.pendingGuiltId) return false;
     return true;
   },
   apply(game: Game) {
@@ -89,6 +91,7 @@ export const startNightAction: GameAction = {
         ...(ts.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
         ...(aliveWives.length > 0 ? { draculaWives: aliveWives } : {}),
         ...(aliveInfected.length > 0 ? { zombieInfected: aliveInfected } : {}),
+        ...(ts.martyrUsed ? { martyrUsed: true } : {}),
       },
     };
 

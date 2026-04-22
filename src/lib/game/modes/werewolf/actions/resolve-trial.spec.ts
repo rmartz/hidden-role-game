@@ -4,7 +4,6 @@ import { WerewolfPhase, TrialVerdict, DaytimeVote, TrialPhase } from "../types";
 import type { WerewolfTurnState } from "../types";
 import { WerewolfRole } from "../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
-import { WerewolfWinner } from "../utils/win-condition";
 import { makePlayingGame } from "./test-helpers";
 
 // ---------------------------------------------------------------------------
@@ -59,9 +58,8 @@ describe("WerewolfAction.ResolveTrial", () => {
   });
 
   describe("win condition after elimination", () => {
-    it("Werewolves win when last non-Bad player is eliminated by trial", () => {
-      // 1 bad (p1) + 2 good (p2=defendant, p3=voter)
-      // p2 gets guilty verdict → 1 bad vs 1 good → Werewolves win
+    it("sets pendingGuiltId when last non-Bad player receives guilty verdict", () => {
+      // Guilty verdict defers death to AdvanceMartyrWindow; game stays Playing.
       const game = makePlayingGame(
         makeDayStateWithPendingTrial("p2", [
           { playerId: "p3", vote: DaytimeVote.Guilty },
@@ -80,15 +78,14 @@ describe("WerewolfAction.ResolveTrial", () => {
         },
       );
       action.apply(game, {}, "owner-1");
-      expect(game.status.type).toBe(GameStatus.Finished);
-      expect((game.status as { winner?: string }).winner).toBe(
-        WerewolfWinner.Werewolves,
-      );
+      expect(game.status.type).toBe(GameStatus.Playing);
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      const phase = ts.phase as { pendingGuiltId?: string };
+      expect(phase.pendingGuiltId).toBe("p2");
     });
 
-    it("Village wins when last Bad player is eliminated by trial", () => {
-      // 2 good (p2, p3) + 1 bad (p1=defendant)
-      // p1 gets guilty verdict → 2 good remain → Village wins
+    it("sets pendingGuiltId when last Bad player receives guilty verdict", () => {
+      // Guilty verdict defers death to AdvanceMartyrWindow; game stays Playing.
       const game = makePlayingGame(
         makeDayStateWithPendingTrial("p1", [
           { playerId: "p2", vote: DaytimeVote.Guilty },
@@ -108,13 +105,13 @@ describe("WerewolfAction.ResolveTrial", () => {
         },
       );
       action.apply(game, {}, "owner-1");
-      expect(game.status.type).toBe(GameStatus.Finished);
-      expect((game.status as { winner?: string }).winner).toBe(
-        WerewolfWinner.Village,
-      );
+      expect(game.status.type).toBe(GameStatus.Playing);
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      const phase = ts.phase as { pendingGuiltId?: string };
+      expect(phase.pendingGuiltId).toBe("p1");
     });
 
-    it("does not end game when elimination does not trigger a win condition", () => {
+    it("sets pendingGuiltId when elimination does not trigger a win condition", () => {
       // 1 bad (p1) + 3 good (p2=defendant, p3, p4) — eliminating p2 leaves 1v2, no win
       const game = makePlayingGame(
         makeDayStateWithPendingTrial("p2", [
@@ -124,6 +121,9 @@ describe("WerewolfAction.ResolveTrial", () => {
       );
       action.apply(game, {}, "owner-1");
       expect(game.status.type).toBe(GameStatus.Playing);
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      const phase = ts.phase as { pendingGuiltId?: string };
+      expect(phase.pendingGuiltId).toBe("p2");
     });
 
     it("Mayor vote counts double — tips a tie to guilty", () => {
@@ -206,7 +206,8 @@ describe("WerewolfAction.ResolveTrial", () => {
       expect(game.status.type).toBe(GameStatus.Playing);
     });
 
-    it("clears One-Eyed Seer lock when locked target is eliminated by trial", () => {
+    it("sets pendingGuiltId (does not yet clear One-Eyed Seer lock) when convicted player receives guilty verdict", () => {
+      // The lock will be cleared in AdvanceMartyrWindow after death is applied.
       const ts = makeDayStateWithPendingTrial("p3", [
         { playerId: "p4", vote: DaytimeVote.Guilty },
         { playerId: "p5", vote: DaytimeVote.Guilty },
@@ -216,10 +217,14 @@ describe("WerewolfAction.ResolveTrial", () => {
       action.apply(game, {}, "owner-1");
       const result = (game.status as { turnState: WerewolfTurnState })
         .turnState;
-      expect(result.oneEyedSeerLockedTargetId).toBeUndefined();
+      const phase = result.phase as { pendingGuiltId?: string };
+      expect(phase.pendingGuiltId).toBe("p3");
+      // Lock is not cleared yet — cleared by AdvanceMartyrWindow
+      expect(result.oneEyedSeerLockedTargetId).toBe("p3");
     });
 
-    it("consumes priest ward when warded player is eliminated by trial", () => {
+    it("sets pendingGuiltId (does not yet consume priest ward) when convicted player receives guilty verdict", () => {
+      // The ward will be consumed in AdvanceMartyrWindow after death is applied.
       const ts = makeDayStateWithPendingTrial("p3", [
         { playerId: "p4", vote: DaytimeVote.Guilty },
         { playerId: "p5", vote: DaytimeVote.Guilty },
@@ -229,10 +234,14 @@ describe("WerewolfAction.ResolveTrial", () => {
       action.apply(game, {}, "owner-1");
       const result = (game.status as { turnState: WerewolfTurnState })
         .turnState;
-      expect(result.priestWards).toEqual({ p4: "p2" });
+      const phase = result.phase as { pendingGuiltId?: string };
+      expect(phase.pendingGuiltId).toBe("p3");
+      // Ward not consumed yet — consumed by AdvanceMartyrWindow
+      expect(result.priestWards).toEqual({ p3: "p2", p4: "p2" });
     });
 
-    it("sets hunterRevengePlayerId when Hunter is eliminated by trial", () => {
+    it("sets pendingGuiltId when Hunter receives guilty verdict", () => {
+      // Hunter revenge and death are deferred to AdvanceMartyrWindow.
       const game = makePlayingGame(
         makeDayStateWithPendingTrial("p2", [
           { playerId: "p3", vote: DaytimeVote.Guilty },
@@ -251,13 +260,15 @@ describe("WerewolfAction.ResolveTrial", () => {
       action.apply(game, {}, "owner-1");
       expect(game.status.type).toBe(GameStatus.Playing);
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-      expect(ts.hunterRevengePlayerId).toBe("p2");
-      expect(ts.deadPlayerIds).toContain("p2");
+      const phase = ts.phase as { pendingGuiltId?: string };
+      expect(phase.pendingGuiltId).toBe("p2");
+      // Death not applied yet — happens in AdvanceMartyrWindow
+      expect(ts.deadPlayerIds).not.toContain("p2");
+      expect(ts.hunterRevengePlayerId).toBeUndefined();
     });
 
-    it("defers win condition when Hunter is eliminated at trial (would otherwise trigger win)", () => {
-      // 1 wolf vs hunter + 1 villager → eliminating hunter = 1 wolf vs 1 villager = wolves win
-      // But hunter revenge should defer the check
+    it("sets pendingGuiltId when Hunter receives guilty verdict (would otherwise trigger win)", () => {
+      // 1 wolf vs hunter + 1 villager → eliminating hunter = wolves win — but deferred.
       const game = makePlayingGame(
         makeDayStateWithPendingTrial("p2", [
           { playerId: "p3", vote: DaytimeVote.Guilty },
@@ -276,13 +287,14 @@ describe("WerewolfAction.ResolveTrial", () => {
         },
       );
       action.apply(game, {}, "owner-1");
-      // Game should still be playing — not finished
       expect(game.status.type).toBe(GameStatus.Playing);
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-      expect(ts.hunterRevengePlayerId).toBe("p2");
+      const phase = ts.phase as { pendingGuiltId?: string };
+      expect(phase.pendingGuiltId).toBe("p2");
     });
 
-    it("Tanner voted out at trial ends game with Tanner winner", () => {
+    it("sets pendingGuiltId when Tanner receives guilty verdict", () => {
+      // Tanner win is deferred to AdvanceMartyrWindow.
       const game = makePlayingGame(
         makeDayStateWithPendingTrial("p3", [
           { playerId: "p2", vote: DaytimeVote.Guilty },
@@ -299,13 +311,14 @@ describe("WerewolfAction.ResolveTrial", () => {
         },
       );
       action.apply(game, {}, "owner-1");
-      expect(game.status.type).toBe(GameStatus.Finished);
-      expect((game.status as { winner?: string }).winner).toBe(
-        WerewolfWinner.Tanner,
-      );
+      expect(game.status.type).toBe(GameStatus.Playing);
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      const phase = ts.phase as { pendingGuiltId?: string };
+      expect(phase.pendingGuiltId).toBe("p3");
     });
 
-    it("Executioner wins when their target is voted out", () => {
+    it("sets pendingGuiltId when Executioner's target is voted out", () => {
+      // Executioner win is deferred to AdvanceMartyrWindow.
       const ts = makeDayStateWithPendingTrial("p2", [
         { playerId: "p3", vote: DaytimeVote.Guilty },
         { playerId: "p4", vote: DaytimeVote.Guilty },
@@ -321,10 +334,10 @@ describe("WerewolfAction.ResolveTrial", () => {
         ],
       });
       action.apply(game, {}, "owner-1");
-      expect(game.status.type).toBe(GameStatus.Finished);
-      expect((game.status as { winner?: string }).winner).toBe(
-        WerewolfWinner.Executioner,
-      );
+      expect(game.status.type).toBe(GameStatus.Playing);
+      const phase = (game.status as { turnState: WerewolfTurnState }).turnState
+        .phase as { pendingGuiltId?: string };
+      expect(phase.pendingGuiltId).toBe("p2");
     });
 
     it("non-target player voted out does not trigger Executioner win", () => {

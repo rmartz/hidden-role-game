@@ -1,5 +1,5 @@
 import type { Game, GameAction } from "@/lib/types";
-import { DaytimeVote, TrialPhase } from "../types";
+import { DaytimeVote, TrialPhase, TrialVerdict } from "../types";
 import { WerewolfPhase } from "../types";
 import {
   currentTurnState,
@@ -96,9 +96,14 @@ export const castVoteAction: GameAction = {
     ).length;
     if (activeTrial.votes.length >= eligibleCount) {
       applyTrialVerdict(activeTrial, ts, game);
-      const winResult = checkWinCondition(game, ts.deadPlayerIds);
-      if (winResult) {
-        game.status = winResult;
+      // Guilty verdict: pendingGuiltId is now set; narrator must advance the
+      // Martyr window before the death is applied.
+      // Innocent verdict: no pending death — check win condition directly.
+      if (activeTrial.verdict !== TrialVerdict.Eliminated) {
+        const winResult = checkWinCondition(game, ts.deadPlayerIds);
+        if (winResult) {
+          game.status = winResult;
+        }
       }
     }
   },
