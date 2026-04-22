@@ -1,11 +1,7 @@
 "use client";
 
 import { GAME_MODES } from "@/lib/game/modes";
-import {
-  getPhaseLabel,
-  isGroupPhaseKey,
-  baseGroupPhaseKey,
-} from "@/lib/game/modes/werewolf";
+import { getPhaseLabel } from "@/lib/game/modes/werewolf";
 import type { WerewolfNighttimePhase } from "@/lib/game/modes/werewolf";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
@@ -71,12 +67,8 @@ export function GhostNightObserverScreen({
                     if (action.skipped) {
                       targetText = "skipped";
                     } else if (action.targetPlayerId) {
-                      const basePhaseKey = isGroupPhaseKey(phaseKey)
-                        ? baseGroupPhaseKey(phaseKey)
-                        : phaseKey;
                       const name = playerById.get(action.targetPlayerId)?.name;
                       targetText = name ?? action.targetPlayerId;
-                      void basePhaseKey;
                     }
                   }
                 }

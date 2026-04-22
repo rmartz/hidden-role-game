@@ -55,7 +55,7 @@ export function GhostCluePanel({
           <div className="flex gap-2">
             <Input
               value={clue}
-              onChange={(e) => { setClue(e.target.value); }}
+              onChange={(e) => setClue(e.target.value)}
               maxLength={GHOST_CLUE_MAX_LENGTH}
               placeholder={WEREWOLF_COPY.ghost.clueInputPlaceholder}
               aria-label={WEREWOLF_COPY.ghost.clueInputLabel}
