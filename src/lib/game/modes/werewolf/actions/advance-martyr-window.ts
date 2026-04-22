@@ -32,20 +32,19 @@ export const advanceMartyrWindowAction: GameAction = {
     const { pendingGuiltId } = ts.phase;
     if (!pendingGuiltId) return;
 
-    const defendantId = pendingGuiltId;
     ts.phase.pendingGuiltId = undefined;
 
-    if (!ts.deadPlayerIds.includes(defendantId)) {
-      ts.deadPlayerIds = [...ts.deadPlayerIds, defendantId];
-      if (didWolfCubDie([defendantId], game)) {
+    if (!ts.deadPlayerIds.includes(pendingGuiltId)) {
+      ts.deadPlayerIds = [...ts.deadPlayerIds, pendingGuiltId];
+      if (didWolfCubDie([pendingGuiltId], game)) {
         ts.wolfCubDied = true;
       }
-      cleanupAfterDaytimeKill(defendantId, ts);
+      cleanupAfterDaytimeKill(pendingGuiltId, ts);
     }
 
     // Executioner wins if their target was eliminated and the Executioner is alive.
     // Check Executioner before Tanner (if target is also the Tanner, Executioner wins).
-    if (ts.executionerTargetId === defendantId) {
+    if (ts.executionerTargetId === pendingGuiltId) {
       const executionerAssignment = game.roleAssignments.find(
         (a) => a.roleDefinitionId === (WerewolfRole.Executioner as string),
       );
@@ -65,7 +64,7 @@ export const advanceMartyrWindowAction: GameAction = {
     const tannerAssignment = game.roleAssignments.find(
       (a) => a.roleDefinitionId === (WerewolfRole.Tanner as string),
     );
-    if (tannerAssignment?.playerId === defendantId) {
+    if (tannerAssignment?.playerId === pendingGuiltId) {
       game.status = {
         type: GameStatus.Finished,
         winner: WerewolfWinner.Tanner,
@@ -75,10 +74,10 @@ export const advanceMartyrWindowAction: GameAction = {
 
     // Hunter revenge: if the eliminated player is the Hunter, defer win check.
     const eliminatedRole = game.roleAssignments.find(
-      (a) => a.playerId === defendantId,
+      (a) => a.playerId === pendingGuiltId,
     )?.roleDefinitionId;
     if (eliminatedRole === (WerewolfRole.Hunter as string)) {
-      ts.hunterRevengePlayerId = defendantId;
+      ts.hunterRevengePlayerId = pendingGuiltId;
       return;
     }
 

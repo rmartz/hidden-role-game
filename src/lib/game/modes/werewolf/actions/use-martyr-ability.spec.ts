@@ -32,7 +32,7 @@ function makeDayStateWithMartyrWindow(
       pendingGuiltId,
     },
     deadPlayerIds,
-    ...(martyrUsed ? { martyrUsed: true } : {}),
+    ...(martyrUsed && { martyrUsed: true }),
   };
 }
 

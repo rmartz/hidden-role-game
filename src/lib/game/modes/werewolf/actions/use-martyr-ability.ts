@@ -43,13 +43,12 @@ export const useMartyrAbilityAction: GameAction = {
     ts.phase.pendingGuiltId = undefined;
     ts.martyrUsed = true;
 
-    const martyrId = callerId;
-    if (!ts.deadPlayerIds.includes(martyrId)) {
-      ts.deadPlayerIds = [...ts.deadPlayerIds, martyrId];
-      if (didWolfCubDie([martyrId], game)) {
+    if (!ts.deadPlayerIds.includes(callerId)) {
+      ts.deadPlayerIds = [...ts.deadPlayerIds, callerId];
+      if (didWolfCubDie([callerId], game)) {
         ts.wolfCubDied = true;
       }
-      cleanupAfterDaytimeKill(martyrId, ts);
+      cleanupAfterDaytimeKill(callerId, ts);
     }
 
     const winResult = checkWinCondition(game, ts.deadPlayerIds);
