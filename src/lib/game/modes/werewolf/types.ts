@@ -83,12 +83,23 @@ export interface AltruistInterceptedNightResolutionEvent {
   savedPlayerId: string;
 }
 
+export interface VeteranCounterkilledNightResolutionEvent {
+  type: "veteran-counterkilled";
+  /** The player killed by the Veteran's counter-kill. */
+  counterkilledPlayerId: string;
+  /** The Veteran player who counter-killed. */
+  veteranPlayerId: string;
+  /** Whether the counter-kill was from repelling a wolf attack or killing a visiting protector. */
+  source: "wolf-repel" | "protector-visit";
+}
+
 export type NightResolutionEvent =
   | AttackNightResolutionEvent
   | SilencedNightResolutionEvent
   | HypnotizedNightResolutionEvent
   | ToughGuyAbsorbedNightResolutionEvent
-  | AltruistInterceptedNightResolutionEvent;
+  | AltruistInterceptedNightResolutionEvent
+  | VeteranCounterkilledNightResolutionEvent;
 
 export enum DaytimeVote {
   Guilty = "guilty",

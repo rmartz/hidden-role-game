@@ -22,9 +22,14 @@ export const setNightTargetAction: GameAction = {
     if (ts.turn <= 1) return false;
 
     const phase = ts.phase;
-    const { roleId: explicitPhaseKey, targetPlayerId } = payload as {
+    const {
+      roleId: explicitPhaseKey,
+      targetPlayerId,
+      alerted,
+    } = payload as {
       roleId?: unknown;
       targetPlayerId?: unknown;
+      alerted?: unknown;
     };
 
     // Determine the phase key.
@@ -59,6 +64,8 @@ export const setNightTargetAction: GameAction = {
     }
 
     // targetPlayerId undefined = clear; null = intentional skip; string = set target.
+    // alerted = true signals the Veteran's alert (no target selection needed).
+    if (alerted === true) return isRoleActive(phaseKey, WerewolfRole.Veteran);
     if (targetPlayerId === undefined) return true;
     if (targetPlayerId === null) return true;
     if (typeof targetPlayerId !== "string") return false;
@@ -163,15 +170,23 @@ export const setNightTargetAction: GameAction = {
       roleId: explicitPhaseKey,
       targetPlayerId,
       isSecondTarget,
+      alerted,
     } = payload as {
       roleId?: string;
       targetPlayerId?: string | null;
       isSecondTarget?: boolean;
+      alerted?: boolean;
     };
 
     const phaseKey =
       explicitPhaseKey ?? phase.nightPhaseOrder[phase.currentPhaseIndex];
     if (!phaseKey) return;
+
+    // Veteran Alert: store an empty (non-skipped) action to indicate alerting.
+    if (alerted === true) {
+      phase.nightActions[phaseKey] = {};
+      return;
+    }
 
     if (isGroupPhaseKey(phaseKey)) {
       // Group phase: upsert a player's vote.

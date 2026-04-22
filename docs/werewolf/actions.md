@@ -41,10 +41,10 @@ Additional resolution steps:
 **When:** During Nighttime, turn 2+
 **Effect:** Sets or clears a night target.
 
-- **Solo roles** (Seer, Bodyguard, Witch, etc.): stores `{ targetPlayerId }` under the role's phase key. Passing `targetPlayerId: null` records an intentional skip (`{ skipped: true }`); passing `undefined` clears the selection.
+- **Solo roles** (Seer, Bodyguard, Witch, etc.): stores `{ targetPlayerId }` under the role's phase key. Passing `targetPlayerId: null` records an intentional skip (`{ skipped: true }`); passing `undefined` clears the selection. Passing `alerted: true` (Veteran only) stores an empty action `{}` indicating the Veteran has gone on Alert with no target.
 - **Group phases** (Werewolves): upserts the caller's vote in `votes[]`. Passing `null` records a skip vote; passing `undefined` removes the vote. The Narrator override sets all alive participants' votes at once and also sets `suggestedTargetId`.
 
-**Payload:** `{ roleId?: string; targetPlayerId?: string | null }`
+**Payload:** `{ roleId?: string; targetPlayerId?: string | null; alerted?: boolean }`
 
 **Validation:**
 
@@ -256,18 +256,22 @@ interface TeamNightAction {
 2. Applies Priest ward protection: any player with an active ward has the ward consume the attack (ward is removed, player survives).
 3. Applies Witch action: if target is already under attack → protect; otherwise → attack.
 4. Applies Altruist action (last): if the Altruist's target is under attack, the attack is redirected onto the Altruist (the Altruist dies instead).
-5. Applies Tough Guy absorption: if a Tough Guy is attacked for the first time, the attack is absorbed (survives this night, dies on the next attack).
-6. Applies Smite: any smited player is killed regardless of protections.
-7. Applies Spellcaster action: emits a `silenced` event.
-8. Applies Mummy action: emits a `hypnotized` event for the target.
-9. Checks Old Man timer (`oldManTimerPlayerId` option): if the timer has fired **and** the Old Man was not attacked this night, emits a killed event with `attackedBy: [OLD_MAN_TIMER_KEY]`, `died: true`. This bypasses protections (applied after `buildKilledEvents`, like smite). If the Old Man was attacked, the attack takes precedence.
-10. Returns `NightResolutionEvent[]`:
+5. Applies Veteran counter-kill (after Altruist, so the Altruist cannot intercept the counter-kill): if the Veteran alerted this night (action exists and is not `{ skipped: true }`):
+   - **Wolf repel:** if any wolf group targeted the Veteran, the wolf attack on the Veteran is removed and one alive wolf-group participant is counter-killed instead. Emits `veteran-counterkilled (source: "wolf-repel")`.
+   - **Protector kill:** any Protect-category role (Bodyguard, Doctor, etc., excluding Priest wards) that visited the Veteran is killed, and their protection of the Veteran is discarded. Emits `veteran-counterkilled (source: "protector-visit")` per killed protector.
+6. Applies Tough Guy absorption: if a Tough Guy is attacked for the first time, the attack is absorbed (survives this night, dies on the next attack).
+7. Applies Smite: any smited player is killed regardless of protections.
+8. Applies Spellcaster action: emits a `silenced` event.
+9. Applies Mummy action: emits a `hypnotized` event for the target.
+10. Checks Old Man timer (`oldManTimerPlayerId` option): if the timer has fired **and** the Old Man was not attacked this night, emits a killed event with `attackedBy: [OLD_MAN_TIMER_KEY]`, `died: true`. This bypasses protections (applied after `buildKilledEvents`, like smite). If the Old Man was attacked, the attack takes precedence.
+11. Returns `NightResolutionEvent[]`:
 
 - `{ type: "killed", targetPlayerId, attackedBy, protectedBy, died }`
 - `{ type: "silenced", targetPlayerId }`
 - `{ type: "hypnotized", targetPlayerId }`
 - `{ type: "tough-guy-absorbed", targetPlayerId }`
 - `{ type: "altruist-intercepted", targetPlayerId }`
+- `{ type: "veteran-counterkilled", counterkilledPlayerId, veteranPlayerId, source }`
 
 After resolution, `start-day` performs additional checks:
 

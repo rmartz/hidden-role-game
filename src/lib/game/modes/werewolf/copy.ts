@@ -228,6 +228,17 @@ export const WEREWOLF_COPY = {
     narratorProtectMode: "Mirrorcaster is in Protect mode.",
     narratorAttackMode: "Mirrorcaster is charged — Attack mode.",
   },
+  veteran: {
+    alertButton: "Go on Alert",
+    skipButton: "Stay Home",
+    dayAnnouncementWolfRepel: (veteranName: string, wolfName: string) =>
+      `${veteranName} was on alert — ${wolfName} was killed repelling the attack.`,
+    dayAnnouncementProtectorKilled: (
+      veteranName: string,
+      protectorName: string,
+    ) =>
+      `${veteranName} was on alert and killed ${protectorName}, who tried to protect them.`,
+  },
   altruist: {
     attackedIntro:
       "The following players are under attack. You may sacrifice yourself to save one of them.",
