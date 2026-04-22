@@ -2,7 +2,10 @@ import { GameStatus } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
 import { SecretVillainPhase, PolicyCard } from "../types";
 import { currentTurnState, drawCards, reshuffleIfNeeded } from "../utils";
-import { SecretVillainWinner } from "../utils/win-condition";
+import {
+  SecretVillainWinner,
+  SvVictoryConditionKey,
+} from "../utils/win-condition";
 
 /** Chancellor denies being the Special Bad — sets revealed = false. */
 export const confirmSpecialBadAction: GameAction = {
@@ -64,6 +67,7 @@ export const advanceFromSpecialBadRevealAction: GameAction = {
       game.status = {
         type: GameStatus.Finished,
         winner: SecretVillainWinner.Bad,
+        victoryConditionKey: SvVictoryConditionKey.SpecialBadElected,
       };
       return;
     }
