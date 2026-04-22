@@ -60,9 +60,9 @@ export function PlayerFirstTurnScreen({
                 {WEREWOLF_COPY.illuminati.rolesListHeading}
               </p>
               <ul className="space-y-0.5">
-                {illuminatiRoles.map(({ playerName, roleName: rName }) => (
+                {illuminatiRoles.map(({ playerName, roleName }) => (
                   <li key={playerName} className="text-foreground">
-                    <strong>{playerName}</strong>: {rName}
+                    <strong>{playerName}</strong>: {roleName}
                   </li>
                 ))}
               </ul>

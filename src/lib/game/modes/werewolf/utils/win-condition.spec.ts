@@ -437,7 +437,7 @@ describe("checkWinCondition", () => {
       expect(result?.winner).toBe(WerewolfWinner.Village);
     });
 
-    it("alive Illuminati alive counts as neutral and prevents premature wolf win", () => {
+    it("Illuminati counts as neutral and prevents premature wolf win", () => {
       const game = makeGame([
         { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
         { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },

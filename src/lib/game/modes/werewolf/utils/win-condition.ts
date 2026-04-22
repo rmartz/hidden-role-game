@@ -141,13 +141,13 @@ export function checkWinCondition(
   }
 
   // Illuminati override: if any win condition fires, the Illuminati is alive,
-  // and ≤ 3 total players remain, the Illuminati wins instead.
+  // and ≤ 3 total players remain, the Illuminati wins instead (takes priority over Spoiler).
   if (winResult && illuminatiAlive && aliveAssignments.length <= 3) {
     return { type: GameStatus.Finished, winner: WerewolfWinner.Illuminati };
   }
 
   // Spoiler override: if a standard win condition is met and the Spoiler is alive,
-  // the Spoiler wins instead.
+  // the Spoiler wins instead (lower priority than Illuminati).
   if (winResult && spoilerAlive) {
     return { type: GameStatus.Finished, winner: WerewolfWinner.Spoiler };
   }
