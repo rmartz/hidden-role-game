@@ -54,7 +54,7 @@ export function applyTrialVerdict(
       if (didWolfCubDie([defendantId], game)) {
         ts.wolfCubDied = true;
       }
-      cleanupAfterDaytimeKill(defendantId, ts);
+      cleanupAfterDaytimeKill(defendantId, ts, game);
     }
   }
 }

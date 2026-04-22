@@ -22,6 +22,9 @@ Additional resolution steps:
 
 - **Vigilante self-death:** If the Vigilante's target is a Good-team player and was killed, the Vigilante also dies.
 - **Hunter revenge detection:** If a killed player is the Hunter, sets `hunterRevengePlayerId` on the Narrator's state and defers the win-condition check until revenge is resolved.
+- **Illusion Artist:** If the Illusion Artist confirmed a target this night, stores `illusionTargetId` on the new daytime turn state. This is night-specific and not carried forward to the next night.
+- **Evil Empath death trigger:** If the Evil Empath was killed this night and `evilEmpathLastResult` is set, populates `evilEmpathRevealedResult` on the turn state so Werewolves see the result.
+- **Evil Empath carry-forward:** `evilEmpathLastResult` and `evilEmpathRevealedResult` are preserved across the day/night boundary.
 
 ---
 
@@ -191,9 +194,36 @@ Additional resolution steps:
 
 **Who:** Narrator only
 **When:** During Daytime
-**Effect:** Immediately kills a player (for in-person trials). Checks win condition. Clears One-Eyed Seer lock and Priest wards for the killed player.
+**Effect:** Immediately kills a player (for in-person trials). Checks win condition. Clears One-Eyed Seer lock and Priest wards for the killed player. If the killed player is the Evil Empath and a `evilEmpathLastResult` is recorded, sets `evilEmpathRevealedResult` so Werewolves see the result.
 
 **Payload:** `{ playerId: string }`
+
+---
+
+### `set-illusion-target`
+
+**Who:** Illusion Artist player only
+**When:** During Nighttime, during the Illusion Artist's phase, turn 2+
+**Effect:** Stores the target in `nightActions[IllusionArtist].targetPlayerId`. When the Seer investigates that target during the same night, the investigation result is inverted. The `illusionTargetId` is carried into the daytime turn state so the Seer's result display sees the correct (inverted) value. Not carried into the next night.
+
+**Payload:** `{ targetPlayerId: string }`
+
+**Validation:**
+
+- Caller must be the Illusion Artist.
+- Active night phase must be `IllusionArtist`.
+- Target must be alive and not the caller.
+- Target cannot be the same player targeted the previous night (`preventRepeatTarget` via `lastTargets`).
+
+---
+
+### `confirm-evil-empath-result`
+
+**Who:** Narrator only
+**When:** During Nighttime, during the Evil Empath's phase
+**Effect:** Auto-computes whether the Seer is seated adjacent (circular seating order in `game.playerOrder`) to any living Werewolf-team player. Stores the boolean result in `evilEmpathLastResult` on the turn state, marks the Evil Empath's night action as `confirmed` and `resultRevealed`. The result is surfaced to the Evil Empath player as `evilEmpathRevealedResult` in their player state. When the Evil Empath dies (night via `start-day`, or day via `kill-player`, `resolve-trial`, `resolve-hunter-revenge`), `evilEmpathRevealedResult` is set on the turn state so Werewolves see it in their group phase state.
+
+**Payload:** none
 
 ---
 

@@ -271,4 +271,16 @@ export const WEREWOLF_COPY = {
     confirmCancel: "Cancel",
     undo: "Undo Smite",
   },
+  evilEmpath: {
+    adjacentResult: "Yes — the Seer is adjacent to a Werewolf.",
+    notAdjacentResult: "No — the Seer is not adjacent to a Werewolf.",
+    revealedToWerewolves: (result: boolean) =>
+      result
+        ? "The Evil Empath revealed: Seer was adjacent to a Werewolf."
+        : "The Evil Empath revealed: Seer was not adjacent to a Werewolf.",
+  },
+  illusionArtist: {
+    targetLabel: "Illusion target",
+    narratorTargetLabel: (name: string) => `Illusion Artist targeted: ${name}`,
+  },
 } as const;

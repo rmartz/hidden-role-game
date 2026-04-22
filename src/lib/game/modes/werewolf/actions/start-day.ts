@@ -157,6 +157,34 @@ export const startDayAction: GameAction = {
       }
     }
 
+    // Illusion Artist: extract the target from this night's action to carry into
+    // daytime turn state. Seer result resolution reads illusionTargetId to invert
+    // the result when the Seer's target matches this player.
+    const illusionAction = nightPhase.nightActions[
+      WerewolfRole.IllusionArtist as string
+    ] as NightAction | undefined;
+    const illusionTargetId =
+      illusionAction?.confirmed && illusionAction.targetPlayerId
+        ? illusionAction.targetPlayerId
+        : undefined;
+
+    // Evil Empath: carry the last known adjacency result forward so it can be
+    // revealed to Werewolves when the Evil Empath dies.
+    const evilEmpathLastResult = ts.evilEmpathLastResult;
+
+    // Evil Empath death trigger: if the Evil Empath died this night and there is
+    // a last result, set evilEmpathRevealedResult so Werewolves see it.
+    const evilEmpathAssignment = game.roleAssignments.find(
+      (a) => a.roleDefinitionId === (WerewolfRole.EvilEmpath as string),
+    );
+    const evilEmpathRevealedResult =
+      ts.evilEmpathRevealedResult ??
+      (evilEmpathAssignment !== undefined &&
+      newDeadIds.includes(evilEmpathAssignment.playerId) &&
+      evilEmpathLastResult !== undefined
+        ? evilEmpathLastResult
+        : undefined);
+
     // Build lastTargets for roles that prevent consecutive same-player targeting.
     const lastTargets: Record<string, string> = {};
     for (const [phaseKey, action] of Object.entries(nightPhase.nightActions)) {
@@ -353,6 +381,12 @@ export const startDayAction: GameAction = {
         ...(mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
         ...(draculaWives.length > 0 ? { draculaWives } : {}),
         ...(zombieInfected.length > 0 ? { zombieInfected } : {}),
+        // illusionTargetId is night-specific — not carried forward to next night.
+        ...(illusionTargetId ? { illusionTargetId } : {}),
+        ...(evilEmpathLastResult !== undefined ? { evilEmpathLastResult } : {}),
+        ...(evilEmpathRevealedResult !== undefined
+          ? { evilEmpathRevealedResult }
+          : {}),
       },
     };
 
