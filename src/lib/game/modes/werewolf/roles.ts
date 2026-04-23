@@ -67,6 +67,7 @@ export enum WerewolfRole {
   Sentinel = "werewolf-sentinel",
   Spellcaster = "werewolf-spellcaster",
   Spoiler = "werewolf-spoiler",
+  Swapper = "werewolf-swapper",
   Tanner = "werewolf-tanner",
   ToughGuy = "werewolf-tough-guy",
   Vigilante = "werewolf-vigilante",
@@ -109,6 +110,8 @@ export interface WerewolfRoleDefinition extends RoleDefinition<
   revealsExactRole?: boolean;
   /** Mentalist only: investigation checks if two selected targets share the same team. */
   dualTargetInvestigate?: boolean;
+  /** Swapper only: requires two swap targets; resolves by swapping final night effects. */
+  dualTargetSwap?: boolean;
   /** Exposer only: ability can only be used once per game. */
   oncePerGame?: boolean;
   /** Used for grouping in the role config UI. */
@@ -447,6 +450,19 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.Never,
     targetCategory: TargetCategory.None,
     category: WerewolfRoleCategory.NeutralManipulation,
+  },
+  [WerewolfRole.Swapper]: {
+    id: WerewolfRole.Swapper,
+    name: "Swapper",
+    summary: "Reverses the night effects of two players",
+    description:
+      "Each night, the Swapper selects two living players (including themselves). At the end of the night, the final night effects of those two players are reversed — if one would be eliminated, silenced, or hypnotized, the other player suffers that effect instead. Investigations are unaffected. Protections also switch, so an attack-and-protection on one player moves fully to the other.",
+    team: Team.Good,
+    unique: true,
+    wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Special,
+    dualTargetSwap: true,
+    category: WerewolfRoleCategory.VillagerSupport,
   },
   [WerewolfRole.Tanner]: {
     id: WerewolfRole.Tanner,

@@ -42,8 +42,9 @@ export const confirmNightTargetAction: GameAction = {
     }
 
     // Mentalist requires both targets to be set (unless skipping entirely).
+    // Swapper also requires both targets to be set (unless skipping entirely).
     const roleDef = getWerewolfRole(result.activePhaseKey);
-    if (roleDef?.dualTargetInvestigate) {
+    if (roleDef?.dualTargetInvestigate || roleDef?.dualTargetSwap) {
       if (!isTeamNightAction(action) && !action.skipped) {
         if (!action.targetPlayerId || !action.secondTargetPlayerId)
           return false;

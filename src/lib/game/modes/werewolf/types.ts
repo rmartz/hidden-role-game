@@ -83,12 +83,21 @@ export interface AltruistInterceptedNightResolutionEvent {
   savedPlayerId: string;
 }
 
+export interface SwapperSwappedNightResolutionEvent {
+  type: "swapper-swapped";
+  /** The first player selected by the Swapper. */
+  firstPlayerId: string;
+  /** The second player selected by the Swapper. */
+  secondPlayerId: string;
+}
+
 export type NightResolutionEvent =
   | AttackNightResolutionEvent
   | SilencedNightResolutionEvent
   | HypnotizedNightResolutionEvent
   | ToughGuyAbsorbedNightResolutionEvent
-  | AltruistInterceptedNightResolutionEvent;
+  | AltruistInterceptedNightResolutionEvent
+  | SwapperSwappedNightResolutionEvent;
 
 export enum DaytimeVote {
   Guilty = "guilty",
