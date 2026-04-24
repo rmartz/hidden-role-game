@@ -129,7 +129,7 @@ export const SECRET_VILLAIN_COPY = {
   },
   specialBadReveal: {
     waitingHeading: "Identity Checkpoint",
-    outcomeHeading: "Identity Revealed",
+    outcomeHeading: "Identity Check Result",
     waitingMessage: (chancellorName: string) =>
       `Waiting for ${chancellorName} to confirm their identity\u2026`,
     chancellorHeading: "Confirm Your Identity",

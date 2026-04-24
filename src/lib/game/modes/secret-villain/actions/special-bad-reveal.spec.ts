@@ -16,7 +16,10 @@ import {
   revealSpecialBadAction,
   advanceFromSpecialBadRevealAction,
 } from "./special-bad-reveal";
-import { SecretVillainWinner } from "../utils/win-condition";
+import {
+  SecretVillainWinner,
+  SvVictoryConditionKey,
+} from "../utils/win-condition";
 
 function makeRevealGame(
   revealPhaseOverrides: Partial<SpecialBadRevealPhase> = {},
@@ -165,6 +168,9 @@ describe("advanceFromSpecialBadRevealAction", () => {
       expect(game.status.type).toBe(GameStatus.Finished);
       if (game.status.type === GameStatus.Finished) {
         expect(game.status.winner).toBe(SecretVillainWinner.Bad);
+        expect(game.status.victoryConditionKey).toBe(
+          SvVictoryConditionKey.SpecialBadElected,
+        );
       }
     });
   });
