@@ -84,7 +84,7 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   /** The Thing: the player ID the Thing chose to tap this night. */
   thingTappedPlayerId?: string;
   /** Insomniac: whether each neighbor woke and acted this night. */
-  insomniactResult?: { leftActed: boolean; rightActed: boolean };
+  insomniacResult?: { leftActed: boolean; rightActed: boolean };
   /** The Count: werewolf counts in each half of the table (night 1 only). */
   countResult?: { leftCount: number; rightCount: number };
   /**

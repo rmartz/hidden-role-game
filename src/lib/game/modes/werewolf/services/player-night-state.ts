@@ -417,7 +417,7 @@ function extractInsomniacState(
   return {
     myNightTarget: undefined,
     myNightTargetConfirmed: false,
-    insomniactResult: {
+    insomniacResult: {
       leftActed: neighborActed(left),
       rightActed: neighborActed(right),
     },

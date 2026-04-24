@@ -166,7 +166,7 @@ describe("Insomniac night state", () => {
       WEREWOLF_ROLES[WerewolfRole.Insomniac],
       [],
     );
-    expect(state.insomniactResult).toEqual({
+    expect(state.insomniacResult).toEqual({
       leftActed: false,
       rightActed: false,
     });
@@ -196,8 +196,8 @@ describe("Insomniac night state", () => {
       WEREWOLF_ROLES[WerewolfRole.Insomniac],
       [],
     );
-    expect(state.insomniactResult?.leftActed).toBe(true);
-    expect(state.insomniactResult?.rightActed).toBe(false);
+    expect(state.insomniacResult?.leftActed).toBe(true);
+    expect(state.insomniacResult?.rightActed).toBe(false);
   });
 
   it("returns false when neighbor's role is not in nightPhaseOrder", () => {
@@ -218,7 +218,7 @@ describe("Insomniac night state", () => {
       WEREWOLF_ROLES[WerewolfRole.Insomniac],
       [],
     );
-    expect(state.insomniactResult?.leftActed).toBe(false);
+    expect(state.insomniacResult?.leftActed).toBe(false);
   });
 
   it("returns true for a Werewolf neighbor who cast a team vote", () => {
@@ -248,7 +248,7 @@ describe("Insomniac night state", () => {
       WEREWOLF_ROLES[WerewolfRole.Insomniac],
       [],
     );
-    expect(state.insomniactResult?.leftActed).toBe(true);
+    expect(state.insomniacResult?.leftActed).toBe(true);
   });
 });
 

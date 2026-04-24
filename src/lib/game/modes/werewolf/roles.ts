@@ -171,18 +171,6 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     preventRepeatTarget: true,
     category: WerewolfRoleCategory.VillagerProtection,
   },
-  [WerewolfRole.Count]: {
-    id: WerewolfRole.Count,
-    name: "The Count",
-    summary: "On night 1, learns the werewolf count in each half of the table",
-    description:
-      "On the first night only, The Count wakes and learns how many werewolf-aligned players are seated in the left half versus the right half of the table. They have no night action on subsequent nights.",
-    team: Team.Good,
-    unique: true,
-    wakesAtNight: WakesAtNight.FirstNightOnly,
-    targetCategory: TargetCategory.None,
-    category: WerewolfRoleCategory.VillagerInvestigation,
-  },
   [WerewolfRole.Chupacabra]: {
     id: WerewolfRole.Chupacabra,
     name: "Chupacabra",
@@ -194,6 +182,18 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Attack,
     category: WerewolfRoleCategory.NeutralKilling,
+  },
+  [WerewolfRole.Count]: {
+    id: WerewolfRole.Count,
+    name: "The Count",
+    summary: "On night 1, learns the werewolf count in each half of the table",
+    description:
+      "On the first night only, The Count wakes and learns how many werewolf-aligned players are seated in the left half versus the right half of the table. They have no night action on subsequent nights.",
+    team: Team.Good,
+    unique: true,
+    wakesAtNight: WakesAtNight.FirstNightOnly,
+    targetCategory: TargetCategory.None,
+    category: WerewolfRoleCategory.VillagerInvestigation,
   },
   [WerewolfRole.Doctor]: {
     id: WerewolfRole.Doctor,
