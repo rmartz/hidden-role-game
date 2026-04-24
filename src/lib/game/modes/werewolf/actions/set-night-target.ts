@@ -22,7 +22,11 @@ export const setNightTargetAction: GameAction = {
     if (ts.turn <= 1) return false;
 
     const phase = ts.phase;
-    const { roleId: explicitPhaseKey, targetPlayerId, isSecondTarget } = payload as {
+    const {
+      roleId: explicitPhaseKey,
+      targetPlayerId,
+      isSecondTarget,
+    } = payload as {
       roleId?: unknown;
       targetPlayerId?: unknown;
       isSecondTarget?: unknown;
@@ -89,7 +93,11 @@ export const setNightTargetAction: GameAction = {
       return false;
 
     // Dual-target swap roles (e.g. Swapper) cannot select the same player for both targets.
-    if (typeof targetPlayerId === "string" && isSecondTarget === true && phaseRoleDef?.dualTargetSwap) {
+    if (
+      typeof targetPlayerId === "string" &&
+      isSecondTarget === true &&
+      phaseRoleDef?.dualTargetSwap
+    ) {
       const existing = phase.nightActions[phaseKey];
       if (
         existing &&

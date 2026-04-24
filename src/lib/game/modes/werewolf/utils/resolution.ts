@@ -263,7 +263,11 @@ export function resolveNightActions(
   // Runs after all other attack/protect modifiers so it operates on the final
   // attack and protection state. Silenced and hypnotized events are swapped later.
   const swapperAction = nightActions[WerewolfRole.Swapper] as
-    | { targetPlayerId?: string; secondTargetPlayerId?: string; skipped?: boolean }
+    | {
+        targetPlayerId?: string;
+        secondTargetPlayerId?: string;
+        skipped?: boolean;
+      }
     | undefined;
   const swapperAId = swapperAction?.targetPlayerId;
   const swapperBId = swapperAction?.secondTargetPlayerId;
@@ -398,13 +402,17 @@ export function resolveNightActions(
   let finalHypnotizedEvents = hypnotizedEvents;
   if (swapperActive) {
     finalSilencedEvents = silencedEvents.map((e) => {
-      if (e.targetPlayerId === swapperAId) return { ...e, targetPlayerId: swapperBId };
-      if (e.targetPlayerId === swapperBId) return { ...e, targetPlayerId: swapperAId };
+      if (e.targetPlayerId === swapperAId)
+        return { ...e, targetPlayerId: swapperBId };
+      if (e.targetPlayerId === swapperBId)
+        return { ...e, targetPlayerId: swapperAId };
       return e;
     });
     finalHypnotizedEvents = hypnotizedEvents.map((e) => {
-      if (e.targetPlayerId === swapperAId) return { ...e, targetPlayerId: swapperBId };
-      if (e.targetPlayerId === swapperBId) return { ...e, targetPlayerId: swapperAId };
+      if (e.targetPlayerId === swapperAId)
+        return { ...e, targetPlayerId: swapperBId };
+      if (e.targetPlayerId === swapperBId)
+        return { ...e, targetPlayerId: swapperAId };
       return e;
     });
     swapperEvents.push({

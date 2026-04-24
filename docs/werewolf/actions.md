@@ -262,8 +262,8 @@ interface TeamNightAction {
 8. Applies Spellcaster action: emits a `silenced` event.
 9. Applies Mummy action: emits a `hypnotized` event for the target.
 10. Applies Swapper to silenced and hypnotized events: swaps the `targetPlayerId` of any silenced or hypnotized event between the two Swapper targets, then emits a `swapper-swapped` event.
-9. Checks Old Man timer (`oldManTimerPlayerId` option): if the timer has fired **and** the Old Man was not attacked this night, emits a killed event with `attackedBy: [OLD_MAN_TIMER_KEY]`, `died: true`. This bypasses protections (applied after `buildKilledEvents`, like smite). If the Old Man was attacked, the attack takes precedence.
-11. Returns `NightResolutionEvent[]`:
+11. Checks Old Man timer (`oldManTimerPlayerId` option): if the timer has fired **and** the Old Man was not attacked this night, emits a killed event with `attackedBy: [OLD_MAN_TIMER_KEY]`, `died: true`. This bypasses protections (applied after `buildKilledEvents`, like smite). If the Old Man was attacked, the attack takes precedence.
+12. Returns `NightResolutionEvent[]`:
 
 - `{ type: "killed", targetPlayerId, attackedBy, protectedBy, died }`
 - `{ type: "silenced", targetPlayerId }`

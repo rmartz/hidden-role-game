@@ -18,7 +18,10 @@ describe("resolveNightActions", () => {
       const events = resolveNightActions(
         {
           [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
-          [WerewolfRole.Swapper]: { targetPlayerId: "p1", secondTargetPlayerId: "p2" },
+          [WerewolfRole.Swapper]: {
+            targetPlayerId: "p1",
+            secondTargetPlayerId: "p2",
+          },
         },
         swapperAssignments,
         [],
@@ -44,7 +47,10 @@ describe("resolveNightActions", () => {
       const events = resolveNightActions(
         {
           [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p2" },
-          [WerewolfRole.Swapper]: { targetPlayerId: "p1", secondTargetPlayerId: "p2" },
+          [WerewolfRole.Swapper]: {
+            targetPlayerId: "p1",
+            secondTargetPlayerId: "p2",
+          },
         },
         swapperAssignments,
         [],
@@ -67,7 +73,10 @@ describe("resolveNightActions", () => {
         {
           [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
           [WerewolfRole.Bodyguard]: { targetPlayerId: "p2" },
-          [WerewolfRole.Swapper]: { targetPlayerId: "p1", secondTargetPlayerId: "p2" },
+          [WerewolfRole.Swapper]: {
+            targetPlayerId: "p1",
+            secondTargetPlayerId: "p2",
+          },
         },
         [
           ...swapperAssignments,
@@ -92,7 +101,10 @@ describe("resolveNightActions", () => {
       const events = resolveNightActions(
         {
           [WerewolfRole.Spellcaster]: { targetPlayerId: "p1" },
-          [WerewolfRole.Swapper]: { targetPlayerId: "p1", secondTargetPlayerId: "p2" },
+          [WerewolfRole.Swapper]: {
+            targetPlayerId: "p1",
+            secondTargetPlayerId: "p2",
+          },
         },
         swapperAssignments,
         [],
@@ -112,7 +124,10 @@ describe("resolveNightActions", () => {
       const events = resolveNightActions(
         {
           [WerewolfRole.Mummy]: { targetPlayerId: "p1" },
-          [WerewolfRole.Swapper]: { targetPlayerId: "p1", secondTargetPlayerId: "p2" },
+          [WerewolfRole.Swapper]: {
+            targetPlayerId: "p1",
+            secondTargetPlayerId: "p2",
+          },
         },
         swapperAssignments,
         [],
@@ -163,7 +178,10 @@ describe("resolveNightActions", () => {
       const events = resolveNightActions(
         {
           [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p3" },
-          [WerewolfRole.Swapper]: { targetPlayerId: "p1", secondTargetPlayerId: "p2" },
+          [WerewolfRole.Swapper]: {
+            targetPlayerId: "p1",
+            secondTargetPlayerId: "p2",
+          },
         },
         swapperAssignments,
         [],
@@ -186,7 +204,10 @@ describe("resolveNightActions", () => {
         {
           [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
           [WerewolfRole.Bodyguard]: { targetPlayerId: "p1" },
-          [WerewolfRole.Swapper]: { targetPlayerId: "p1", secondTargetPlayerId: "p2" },
+          [WerewolfRole.Swapper]: {
+            targetPlayerId: "p1",
+            secondTargetPlayerId: "p2",
+          },
         },
         [
           ...swapperAssignments,
