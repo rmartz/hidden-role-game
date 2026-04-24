@@ -110,16 +110,15 @@ export function PlayerGameDayScreen({
         </p>
       )}
 
-      {gameState.amDead &&
-        gameState.myRole?.id === WerewolfRole.Ghost && (
-          <GhostCluePanel
-            gameId={gameId}
-            ghostClues={gameState.ghostClues ?? []}
-            alreadySubmittedThisTurn={
-              gameState.ghostClueSubmittedThisTurn ?? false
-            }
-          />
-        )}
+      {gameState.amDead && gameState.myRole?.id === WerewolfRole.Ghost && (
+        <GhostCluePanel
+          gameId={gameId}
+          ghostClues={gameState.ghostClues ?? []}
+          alreadySubmittedThisTurn={
+            gameState.ghostClueSubmittedThisTurn ?? false
+          }
+        />
+      )}
 
       {!gameState.amDead && (gameState.ghostClues?.length ?? 0) > 0 && (
         <div className="mb-4">
@@ -128,7 +127,9 @@ export function PlayerGameDayScreen({
           </p>
           <ul className="space-y-1 text-sm text-muted-foreground">
             {(gameState.ghostClues ?? []).map((c) => (
-              <li key={c.turn}>{WEREWOLF_COPY.ghost.clueTurn(c.turn, c.clue)}</li>
+              <li key={c.turn}>
+                {WEREWOLF_COPY.ghost.clueTurn(c.turn, c.clue)}
+              </li>
             ))}
           </ul>
         </div>

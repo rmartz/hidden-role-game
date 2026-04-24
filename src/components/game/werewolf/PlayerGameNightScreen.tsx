@@ -26,9 +26,7 @@ export function PlayerGameNightScreen({
   const isMyTurn = isPlayersTurn(gameState.myRole, activePhaseKey);
 
   if (gameState.ghostVisible) {
-    return (
-      <GhostNightObserverScreen gameState={gameState} phase={phase} />
-    );
+    return <GhostNightObserverScreen gameState={gameState} phase={phase} />;
   }
 
   const isSnoozing = (gameState.amDead ?? false) || !isMyTurn;
@@ -45,4 +43,3 @@ export function PlayerGameNightScreen({
     />
   );
 }
-

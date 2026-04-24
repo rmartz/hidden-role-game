@@ -206,6 +206,7 @@ Additional resolution steps:
 **Payload:** `{ clue: string }`
 
 **Validation:**
+
 - Caller must be dead.
 - Caller must have the Ghost role.
 - Game must be in Daytime phase.

@@ -43,7 +43,9 @@ export function GhostCluePanel({
         {ghostClues.length > 0 && (
           <ul className="mb-3 space-y-1 text-sm text-muted-foreground">
             {ghostClues.map((c) => (
-              <li key={c.turn}>{WEREWOLF_COPY.ghost.clueTurn(c.turn, c.clue)}</li>
+              <li key={c.turn}>
+                {WEREWOLF_COPY.ghost.clueTurn(c.turn, c.clue)}
+              </li>
             ))}
           </ul>
         )}
@@ -55,7 +57,9 @@ export function GhostCluePanel({
           <div className="flex gap-2">
             <Input
               value={clue}
-              onChange={(e) => setClue(e.target.value)}
+              onChange={(e) => {
+                setClue(e.target.value);
+              }}
               maxLength={GHOST_CLUE_MAX_LENGTH}
               placeholder={WEREWOLF_COPY.ghost.clueInputPlaceholder}
               aria-label={WEREWOLF_COPY.ghost.clueInputLabel}
