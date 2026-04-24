@@ -272,7 +272,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
       "Each night the Illusion Artist targets one player. If the Seer investigates that player the same night, the Seer receives an inverted result — a Werewolf appears innocent and a non-Werewolf appears guilty. The illusion lasts only for that night.",
     team: Team.Bad,
     unique: true,
-    wakesAtNight: WakesAtNight.EveryNight,
+    wakesAtNight: WakesAtNight.AfterFirstNight,
     targetCategory: TargetCategory.Special,
     preventRepeatTarget: true,
     category: WerewolfRoleCategory.EvilSupport,
