@@ -26,8 +26,7 @@ export const useMartyrAbilityAction: GameAction = {
     const martyrAssignment = game.roleAssignments.find(
       (a) => a.roleDefinitionId === (WerewolfRole.Martyr as string),
     );
-    if (!martyrAssignment || martyrAssignment.playerId !== callerId)
-      return false;
+    if (martyrAssignment?.playerId !== callerId) return false;
     // Martyr must be alive
     if (ts.deadPlayerIds.includes(callerId)) return false;
     // Martyr cannot save themselves
