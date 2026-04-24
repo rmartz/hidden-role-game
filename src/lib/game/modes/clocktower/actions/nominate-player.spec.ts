@@ -92,6 +92,19 @@ describe("nominatePlayerAction.isValid", () => {
     );
   });
 
+  it("rejects nominating a player who has already been nominated today", () => {
+    const ts = makeDayTurnState(
+      {},
+      {
+        nominations: [{ nominatorId: "p4", nomineeId: "p3", votes: [] }],
+      },
+    );
+    const game = makePlayingGame(ts);
+    expect(nominatePlayerAction.isValid(game, "p2", { nomineeId: "p3" })).toBe(
+      false,
+    );
+  });
+
   it("rejects Butler nominating their master", () => {
     const ts = makeDayTurnState({ butlerMasterId: "p3" });
     const game = makePlayingGame(ts, {

@@ -43,10 +43,14 @@ function resolveExecution(
 }
 
 export const closeNominationsAction: GameAction = {
-  isValid(game: Game) {
+  isValid(game: Game, callerId: string) {
+    if (callerId !== game.ownerPlayerId) return false;
     const ts = currentTurnState(game);
     if (!ts) return false;
-    return ts.phase.type === ClocktowerPhase.Day;
+    if (ts.phase.type !== ClocktowerPhase.Day) return false;
+    // Prevent calling close again after an execution has already been recorded
+    if (ts.phase.executedToday !== undefined) return false;
+    return true;
   },
 
   apply(game: Game) {

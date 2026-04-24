@@ -61,6 +61,10 @@ export const nominatePlayerAction: GameAction = {
     // Must be a valid player
     if (!game.players.some((p) => p.id === nomineeId)) return false;
 
+    // Each player may only be nominated once per day
+    if (ts.phase.nominations.some((n) => n.nomineeId === nomineeId))
+      return false;
+
     // Butler cannot nominate their master
     const callerRole = getPlayerRole(game, callerId);
     if (

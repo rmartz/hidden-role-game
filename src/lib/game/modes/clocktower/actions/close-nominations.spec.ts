@@ -18,7 +18,7 @@ describe("closeNominationsAction.isValid", () => {
   it("allows closing nominations during the day phase", () => {
     const ts = makeDayTurnState();
     const game = makePlayingGame(ts);
-    expect(closeNominationsAction.isValid(game, "owner", {})).toBe(true);
+    expect(closeNominationsAction.isValid(game, "owner-1", {})).toBe(true);
   });
 
   it("rejects when game is not in playing state", () => {
@@ -26,7 +26,7 @@ describe("closeNominationsAction.isValid", () => {
     const game = makePlayingGame(ts);
     // @ts-expect-error — override status for test
     game.status = { type: GameStatus.Lobby };
-    expect(closeNominationsAction.isValid(game, "owner", {})).toBe(false);
+    expect(closeNominationsAction.isValid(game, "owner-1", {})).toBe(false);
   });
 
   it("rejects during the night phase", () => {
@@ -34,7 +34,19 @@ describe("closeNominationsAction.isValid", () => {
     // @ts-expect-error — override phase for test
     ts.phase = { type: "night", currentActionIndex: 0, nightActions: {} };
     const game = makePlayingGame(ts);
-    expect(closeNominationsAction.isValid(game, "owner", {})).toBe(false);
+    expect(closeNominationsAction.isValid(game, "owner-1", {})).toBe(false);
+  });
+
+  it("rejects when caller is not the owner", () => {
+    const ts = makeDayTurnState();
+    const game = makePlayingGame(ts);
+    expect(closeNominationsAction.isValid(game, "p2", {})).toBe(false);
+  });
+
+  it("rejects when an execution has already been recorded today", () => {
+    const ts = makeDayTurnState({}, { executedToday: "p3" });
+    const game = makePlayingGame(ts);
+    expect(closeNominationsAction.isValid(game, "owner-1", {})).toBe(false);
   });
 });
 
