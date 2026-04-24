@@ -138,6 +138,48 @@ describe("ClocktowerAction.SetNightTarget", () => {
         action.isValid(game, OWNER_ID, { targetPlayerId: EMPATH_PLAYER_ID }),
       ).toBe(false);
     });
+
+    it("returns true when secondTargetPlayerId is a valid alive player", () => {
+      const game = makePlayingGame(makeNightState());
+      expect(
+        action.isValid(game, FORTUNE_TELLER_PLAYER_ID, {
+          targetPlayerId: IMP_PLAYER_ID,
+          secondTargetPlayerId: EMPATH_PLAYER_ID,
+        }),
+      ).toBe(true);
+    });
+
+    it("returns false when secondTargetPlayerId is a dead player", () => {
+      const game = makePlayingGame(
+        makeNightState({ deadPlayerIds: [EMPATH_PLAYER_ID] }),
+      );
+      expect(
+        action.isValid(game, FORTUNE_TELLER_PLAYER_ID, {
+          targetPlayerId: IMP_PLAYER_ID,
+          secondTargetPlayerId: EMPATH_PLAYER_ID,
+        }),
+      ).toBe(false);
+    });
+
+    it("returns false when secondTargetPlayerId is not in the game", () => {
+      const game = makePlayingGame(makeNightState());
+      expect(
+        action.isValid(game, FORTUNE_TELLER_PLAYER_ID, {
+          targetPlayerId: IMP_PLAYER_ID,
+          secondTargetPlayerId: "unknown-id",
+        }),
+      ).toBe(false);
+    });
+
+    it("returns false when secondTargetPlayerId is the Storyteller", () => {
+      const game = makePlayingGame(makeNightState());
+      expect(
+        action.isValid(game, FORTUNE_TELLER_PLAYER_ID, {
+          targetPlayerId: IMP_PLAYER_ID,
+          secondTargetPlayerId: OWNER_ID,
+        }),
+      ).toBe(false);
+    });
   });
 
   describe("apply", () => {

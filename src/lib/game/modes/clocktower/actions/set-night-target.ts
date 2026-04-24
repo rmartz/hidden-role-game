@@ -41,9 +41,10 @@ export const setNightTargetAction: GameAction = {
     if (!ts) return false;
     if (ts.phase.type !== ClocktowerPhase.Night) return false;
 
-    const { roleId, targetPlayerId } = payload as {
+    const { roleId, targetPlayerId, secondTargetPlayerId } = payload as {
       roleId?: unknown;
       targetPlayerId?: unknown;
+      secondTargetPlayerId?: unknown;
     };
 
     const activeRoleId = resolveActingRoleId(
@@ -64,6 +65,15 @@ export const setNightTargetAction: GameAction = {
     if (ts.deadPlayerIds.includes(targetPlayerId)) return false;
     // Cannot target the Storyteller
     if (targetPlayerId === game.ownerPlayerId) return false;
+
+    // Validate secondTargetPlayerId with the same constraints as targetPlayerId.
+    if (secondTargetPlayerId !== undefined) {
+      if (typeof secondTargetPlayerId !== "string") return false;
+      if (!game.players.some((p) => p.id === secondTargetPlayerId))
+        return false;
+      if (ts.deadPlayerIds.includes(secondTargetPlayerId)) return false;
+      if (secondTargetPlayerId === game.ownerPlayerId) return false;
+    }
 
     return true;
   },
