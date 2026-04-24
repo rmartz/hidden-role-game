@@ -79,13 +79,21 @@ function extractNonOwnerState(
     : {};
 
   // Alpha Wolf: surface bite status and role conversions to werewolf-team players.
+  // Only include entries where the override is WerewolfRole.Werewolf (Alpha Wolf bites);
+  // Village Drunk sober transitions must not be visible to other players.
   const isWerewolfTeam = myRole.isWerewolf === true || myRole.team === Team.Bad;
   const ts = currentTurnState(game);
   const wolfTeamState: Partial<WerewolfPlayerGameState> = {};
   if (isWerewolfTeam && ts) {
     if (ts.alphaWolfBiteUsed) wolfTeamState.alphaWolfBiteUsed = true;
-    if (ts.roleOverrides && Object.keys(ts.roleOverrides).length > 0) {
-      wolfTeamState.roleConversions = Object.entries(ts.roleOverrides).map(
+    const biteConversions = ts.roleOverrides
+      ? Object.entries(ts.roleOverrides).filter(
+          ([, newRoleDefinitionId]) =>
+            newRoleDefinitionId === (WerewolfRole.Werewolf as string),
+        )
+      : [];
+    if (biteConversions.length > 0) {
+      wolfTeamState.roleConversions = biteConversions.map(
         ([playerId, newRoleDefinitionId]) => ({
           playerId,
           newRoleDefinitionId,
