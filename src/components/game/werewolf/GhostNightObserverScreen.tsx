@@ -27,12 +27,7 @@ export function GhostNightObserverScreen({
 
   const completedPhases = nightPhaseOrder
     .slice(0, currentPhaseIndex)
-    .filter((phaseKey) => {
-      const action = nightActions[phaseKey];
-      if (!action) return false;
-      if (isTeamNightAction(action)) return action.confirmed === true;
-      return action.confirmed === true;
-    });
+    .filter((phaseKey) => nightActions[phaseKey]?.confirmed === true);
 
   return (
     <div className="p-5 max-w-lg mx-auto">
@@ -56,16 +51,16 @@ export function GhostNightObserverScreen({
               {completedPhases.map((phaseKey) => {
                 const action = nightActions[phaseKey];
                 const label = getPhaseLabel(phaseKey, modeConfig.roles);
-                let targetText = "—";
+                let targetText: string = WEREWOLF_COPY.ghost.targetNone;
                 if (action) {
                   if (isTeamNightAction(action)) {
                     const target = action.suggestedTargetId;
                     targetText = target
                       ? (getPlayerName(gameState.players, target) ?? target)
-                      : "—";
+                      : WEREWOLF_COPY.ghost.targetNone;
                   } else {
                     if (action.skipped) {
-                      targetText = "skipped";
+                      targetText = WEREWOLF_COPY.ghost.targetSkipped;
                     } else if (action.targetPlayerId) {
                       const name = playerById.get(action.targetPlayerId)?.name;
                       targetText = name ?? action.targetPlayerId;

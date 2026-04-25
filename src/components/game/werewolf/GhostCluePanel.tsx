@@ -9,29 +9,23 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-interface GhostCluePanelProps {
-  gameId: string;
+export interface GhostCluePanelViewProps {
   ghostClues: { turn: number; clue: string }[];
   alreadySubmittedThisTurn: boolean;
+  clue: string;
+  onClueChange: (value: string) => void;
+  onSubmit: () => void;
+  isPending: boolean;
 }
 
-export function GhostCluePanel({
-  gameId,
+export function GhostCluePanelView({
   ghostClues,
   alreadySubmittedThisTurn,
-}: GhostCluePanelProps) {
-  const action = useGameAction(gameId);
-  const [clue, setClue] = useState("");
-
-  const handleSubmit = () => {
-    if (!clue.trim() || alreadySubmittedThisTurn) return;
-    action.mutate({
-      actionId: WerewolfAction.SubmitGhostClue,
-      payload: { clue: clue.trim() },
-    });
-    setClue("");
-  };
-
+  clue,
+  onClueChange,
+  onSubmit,
+  isPending,
+}: GhostCluePanelViewProps) {
   return (
     <Card className="mb-4">
       <CardHeader className="pb-2 pt-4">
@@ -57,9 +51,7 @@ export function GhostCluePanel({
           <div className="flex gap-2">
             <Input
               value={clue}
-              onChange={(e) => {
-                setClue(e.target.value);
-              }}
+              onChange={(e) => onClueChange(e.target.value)}
               maxLength={GHOST_CLUE_MAX_LENGTH}
               placeholder={WEREWOLF_COPY.ghost.clueInputPlaceholder}
               aria-label={WEREWOLF_COPY.ghost.clueInputLabel}
@@ -67,8 +59,8 @@ export function GhostCluePanel({
             />
             <Button
               size="sm"
-              onClick={handleSubmit}
-              disabled={!clue.trim() || action.isPending}
+              onClick={onSubmit}
+              disabled={!clue.trim() || isPending}
             >
               {WEREWOLF_COPY.ghost.clueSubmitButton}
             </Button>
@@ -76,5 +68,40 @@ export function GhostCluePanel({
         )}
       </CardContent>
     </Card>
+  );
+}
+
+interface GhostCluePanelProps {
+  gameId: string;
+  ghostClues: { turn: number; clue: string }[];
+  alreadySubmittedThisTurn: boolean;
+}
+
+export function GhostCluePanel({
+  gameId,
+  ghostClues,
+  alreadySubmittedThisTurn,
+}: GhostCluePanelProps) {
+  const action = useGameAction(gameId);
+  const [clue, setClue] = useState("");
+
+  const handleSubmit = () => {
+    if (!clue.trim() || alreadySubmittedThisTurn) return;
+    action.mutate({
+      actionId: WerewolfAction.SubmitGhostClue,
+      payload: { clue: clue.trim() },
+    });
+    setClue("");
+  };
+
+  return (
+    <GhostCluePanelView
+      ghostClues={ghostClues}
+      alreadySubmittedThisTurn={alreadySubmittedThisTurn}
+      clue={clue}
+      onClueChange={setClue}
+      onSubmit={handleSubmit}
+      isPending={action.isPending}
+    />
   );
 }

@@ -282,5 +282,7 @@ export const WEREWOLF_COPY = {
     nightObserverHeading: "Observing the night…",
     nightObserverSubtext:
       "As a Ghost you can watch all activity, but cannot act.",
+    targetSkipped: "skipped",
+    targetNone: "—",
   },
 } as const;

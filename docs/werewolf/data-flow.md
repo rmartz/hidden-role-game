@@ -73,19 +73,22 @@ These fields are only populated when the active phase matches the player's role.
 | `elusiveSeerVillagerIds`    | Elusive Seer                                        | List of player IDs who have the Villager role (shown on first night only)                                                                                                                 |
 | `oneEyedSeerLockedTargetId` | One-Eyed Seer                                       | Player ID the One-Eyed Seer is locked onto after detecting a werewolf                                                                                                                     |
 | `executionerTargetId`       | Executioner                                         | The player ID of the Executioner's assigned Good-team target; visible only to the Executioner                                                                                             |
+| `ghostVisible`              | Ghost (dead only)                                   | `true` when the Ghost is dead during nighttime; enables narrator-level night observer view. When set, `nightActions` is also fully populated for this player.                             |
 
 ### Player Fields — Daytime (day start)
 
-| Field                    | Description                                                                                                                                                                                                             |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nightStatus`            | `{ targetPlayerId, effect }[]` — outcome of the previous night. Effects: `"killed"`, `"silenced"`, `"hypnotized"`, `"smited"`, `"survived"`, `"peaceful"` (`"peaceful"` indicates the Old Man died from timer expiring) |
-| `nominations`            | Current nominations for trial defendants                                                                                                                                                                                |
-| `myNominatedDefendantId` | The defendant this player has nominated (if any)                                                                                                                                                                        |
-| `activeTrial`            | Active trial state (defendant, phase, votes) if a trial is in progress                                                                                                                                                  |
-| `isSilenced`             | Whether this player is silenced (cannot vote or nominate)                                                                                                                                                               |
-| `isHypnotized`           | Whether this player is hypnotized (vote mirrors the Mummy)                                                                                                                                                              |
-| `exposerReveal`          | Publicly revealed role from the Exposer's ability (if any)                                                                                                                                                              |
-| `altruistSave`           | Information about an Altruist intercept that saved a player                                                                                                                                                             |
+| Field                        | Description                                                                                                                                                                                                             |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nightStatus`                | `{ targetPlayerId, effect }[]` — outcome of the previous night. Effects: `"killed"`, `"silenced"`, `"hypnotized"`, `"smited"`, `"survived"`, `"peaceful"` (`"peaceful"` indicates the Old Man died from timer expiring) |
+| `nominations`                | Current nominations for trial defendants                                                                                                                                                                                |
+| `myNominatedDefendantId`     | The defendant this player has nominated (if any)                                                                                                                                                                        |
+| `activeTrial`                | Active trial state (defendant, phase, votes) if a trial is in progress                                                                                                                                                  |
+| `isSilenced`                 | Whether this player is silenced (cannot vote or nominate)                                                                                                                                                               |
+| `isHypnotized`               | Whether this player is hypnotized (vote mirrors the Mummy)                                                                                                                                                              |
+| `exposerReveal`              | Publicly revealed role from the Exposer's ability (if any)                                                                                                                                                              |
+| `altruistSave`               | Information about an Altruist intercept that saved a player                                                                                                                                                             |
+| `ghostClues`                 | `{ turn: number; clue: string }[]` — all clues submitted by the Ghost player; visible to all players                                                                                                                    |
+| `ghostClueSubmittedThisTurn` | Ghost player only. `true` when the Ghost has already submitted a clue this turn; disables the clue submission UI                                                                                                        |
 
 ## Game Phase State Machine
 
@@ -258,3 +261,12 @@ The `WerewolfWinner` enum determines the outcome of the game. In addition to the
 | `Tanner`      | The Tanner is killed (by wolves at night or voted out at trial); triggers immediate game end    |
 | `Spoiler`     | The Spoiler is alive when the game ends; wins instead of the team that would otherwise have won |
 | `Executioner` | The Executioner's assigned Good-team target is voted out at trial                               |
+
+## Ghost Special Case
+
+The Ghost is a Good-team role that becomes meaningful after death. When the Ghost dies, they gain narrator-level visibility into all nighttime actions. During each day phase, they may submit a single short clue (up to 20 characters) visible to all living players.
+
+**`WerewolfTurnState.ghostClues`**: `{ turn: number; clue: string }[]`
+Persists all submitted clues across turns. The Ghost may submit at most one clue per `turn` value (enforced by the `submit-ghost-clue` action). During daytime, all players receive the full `ghostClues` array in their `PlayerGameState`. The Ghost's own state additionally includes `ghostClueSubmittedThisTurn: true` once they have submitted for the current turn.
+
+**Nighttime observer view**: When the Ghost is dead and the game is in the nighttime phase, `extractNonOwnerState` sets `ghostVisible: true` and fully populates `nightActions` for the Ghost's session (identical to the narrator's view). The Ghost client renders a read-only observer screen instead of the normal "snoozing" screen.
