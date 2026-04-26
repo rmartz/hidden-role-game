@@ -1,0 +1,31 @@
+# Schema for public environment config files (deployment/production.yml).
+#
+# All keys in those files must match at least one allowed_pattern OR appear in allowed_keys.
+# Keys matching any denied_pattern are rejected even if they match an allowed_pattern.
+#
+# To add a new public variable (e.g. NEXT_PUBLIC_FIREBASE_DATABASE_URL):
+# add it to the config file — no schema change needed, because NEXT_PUBLIC_* is
+# already an allowed pattern.
+#
+# To add a server-side non-sensitive variable (e.g. FIREBASE_PROJECT_ID):
+# add it to allowed_keys below with a comment explaining why it is safe to commit.
+
+# Keys matching these glob patterns are allowed without explicit listing.
+# NEXT_PUBLIC_* variables are intentionally bundled into client JavaScript by Next.js.
+allowed_patterns:
+  - "NEXT_PUBLIC_*"
+
+# Server-side variables that are non-sensitive and safe to commit.
+# These are identifiers / slugs, not credentials.
+allowed_keys:
+  - FIREBASE_PROJECT_ID # Non-sensitive; also exposed via NEXT_PUBLIC_FIREBASE_PROJECT_ID
+  - FIREBASE_DATABASE_URL # Non-sensitive RTDB URL; also exposed as NEXT_PUBLIC_FIREBASE_DATABASE_URL
+
+# Keys matching these patterns are always rejected, even if they match allowed_patterns.
+# Belt-and-suspenders: catches common secret naming conventions.
+denied_patterns:
+  - "*PRIVATE_KEY*"
+  - "*SECRET*"
+  - "*_TOKEN*"
+  - "*AUTH_TOKEN*"
+  - "FIREBASE_CLIENT_EMAIL"
