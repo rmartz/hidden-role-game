@@ -96,7 +96,6 @@ export const clocktowerServices: GameModeServices = {
     const ts = currentTurnState(game);
     if (!ts) return {};
 
-    const isStoryteller = callerId === game.ownerPlayerId;
     const result: Record<string, unknown> = {};
 
     result["seatedOrder"] = ts.playerOrder;
@@ -106,16 +105,6 @@ export const clocktowerServices: GameModeServices = {
 
     if (ts.phase.type === ClocktowerPhase.Day) {
       result["nominations"] = ts.phase.nominations;
-    }
-
-    if (isStoryteller) {
-      if (ts.poisonedPlayerId) {
-        result["poisonedIndicator"] = ts.poisonedPlayerId;
-      }
-      if (ts.drunkPlayerId) {
-        result["drunkIndicator"] = ts.drunkPlayerId;
-      }
-      return result;
     }
 
     // Per-player state

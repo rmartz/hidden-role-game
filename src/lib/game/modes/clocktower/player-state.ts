@@ -6,8 +6,10 @@ import type { ClocktowerNomination } from "./types";
  * Clocktower-specific extension of PlayerGameState. Includes all fields that
  * only exist in Clocktower games.
  *
- * Storyteller-only fields (`poisonedIndicator`, `drunkIndicator`) are only
- * populated when the caller is the Storyteller (owner with no myPlayerId).
+ * Storyteller-only fields (`poisonedIndicator`, `drunkIndicator`) are reserved
+ * for a future Storyteller role. They will be populated once the Clocktower
+ * config introduces an owner/Storyteller player (i.e. `ownerTitle` is set).
+ * Currently, no caller receives Storyteller-only state.
  */
 export interface ClocktowerPlayerGameState extends BasePlayerGameState {
   gameMode: GameMode.Clocktower;
