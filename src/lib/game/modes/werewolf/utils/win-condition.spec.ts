@@ -3,16 +3,21 @@ import { GameStatus, GameMode, ShowRolesInPlay } from "@/lib/types";
 import type { Game } from "@/lib/types";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "../timer-config";
 import { WerewolfRole } from "../roles";
+import { WerewolfPhase } from "../types";
+import type { WerewolfTurnState } from "../types";
 import { checkWinCondition, WerewolfWinner } from "./win-condition";
 
 function makeGame(
   roleAssignments: { playerId: string; roleDefinitionId: string }[],
+  turnState?: WerewolfTurnState,
 ): Game {
   return {
     id: "g1",
     lobbyId: "l1",
     gameMode: GameMode.Werewolf,
-    status: { type: GameStatus.Playing },
+    status: turnState
+      ? { type: GameStatus.Playing, turnState }
+      : { type: GameStatus.Playing },
     players: roleAssignments.map((a, i) => ({
       id: a.playerId,
       name: a.playerId,
@@ -33,6 +38,17 @@ function makeGame(
       autoRevealNightOutcome: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
+  };
+}
+
+function makeDayTurnState(
+  overrides: Partial<WerewolfTurnState> = {},
+): WerewolfTurnState {
+  return {
+    turn: 2,
+    phase: { type: WerewolfPhase.Daytime, startedAt: 1000, nightActions: {} },
+    deadPlayerIds: [],
+    ...overrides,
   };
 }
 
@@ -288,6 +304,90 @@ describe("checkWinCondition", () => {
       ]);
       const result = checkWinCondition(game, []);
       expect(result).toBeUndefined();
+    });
+
+    it("Dracula alive prevents wolves from winning by being uncounted", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Dracula },
+      ]);
+      const result = checkWinCondition(game, []);
+      expect(result).toBeUndefined();
+    });
+
+    it("Zombie alive prevents wolves from winning by being uncounted", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Zombie },
+      ]);
+      const result = checkWinCondition(game, []);
+      expect(result).toBeUndefined();
+    });
+  });
+
+  describe("Zombie", () => {
+    it("Zombie wins when infected alive outnumber healthy alive", () => {
+      // zombie + p1 (infected) + p2 (infected) + p3 (healthy): 2 infected > 1 healthy
+      const ts = makeDayTurnState({ zombieInfected: ["p1", "p2"] });
+      const game = makeGame(
+        [
+          { playerId: "zombie", roleDefinitionId: WerewolfRole.Zombie },
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        ],
+        ts,
+      );
+      const result = checkWinCondition(game, []);
+      expect(result?.winner).toBe(WerewolfWinner.Zombie);
+    });
+
+    it("game continues when infected equals healthy", () => {
+      const ts = makeDayTurnState({ zombieInfected: ["p1"] });
+      const game = makeGame(
+        [
+          { playerId: "zombie", roleDefinitionId: WerewolfRole.Zombie },
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        ],
+        ts,
+      );
+      const result = checkWinCondition(game, []);
+      expect(result?.winner).not.toBe(WerewolfWinner.Zombie);
+    });
+
+    it("Zombie does not win when dead", () => {
+      const ts = makeDayTurnState({ zombieInfected: ["p1", "p2"] });
+      const game = makeGame(
+        [
+          { playerId: "zombie", roleDefinitionId: WerewolfRole.Zombie },
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        ],
+        ts,
+      );
+      const result = checkWinCondition(game, ["zombie"]);
+      expect(result?.winner).not.toBe(WerewolfWinner.Zombie);
+    });
+
+    it("dead infected players are not counted for Zombie win", () => {
+      // zombie + p1 (infected, dead) + p2 (infected) + p3 (healthy)
+      // alive: 1 infected vs 1 healthy → no win
+      const ts = makeDayTurnState({ zombieInfected: ["p1", "p2"] });
+      const game = makeGame(
+        [
+          { playerId: "zombie", roleDefinitionId: WerewolfRole.Zombie },
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        ],
+        ts,
+      );
+      const result = checkWinCondition(game, ["p1"]);
+      expect(result?.winner).not.toBe(WerewolfWinner.Zombie);
     });
   });
 });
