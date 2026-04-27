@@ -16,7 +16,7 @@ pnpm tsc              # Type check
 pnpm storybook        # Start Storybook dev server (port 6006)
 pnpm build-storybook  # Build static Storybook
 pnpm run env:pull     # Pull .env.local from Vercel (requires vercel login)
-pnpm run secrets-check # Gitleaks secret scan (also runs pre-commit)
+pnpm run secrets-check # Gitleaks secret scan (runs in pre-commit)
 ```
 
 ## Secret Management
