@@ -120,9 +120,7 @@ export function firebaseToGame(
     // have partial data (e.g. missing autoAdvance). Cast to raw Record so
     // parseTimerConfig validates each field and fills defaults, rather than
     // blindly trusting the cast value.
-    timerConfig: parseTimerConfig(
-      pub.timerConfig as unknown as Record<string, unknown>,
-    ),
+    timerConfig: parseTimerConfig(pub.timerConfig),
     modeConfig,
     ...(pub.executionerTargetId
       ? { executionerTargetId: pub.executionerTargetId }

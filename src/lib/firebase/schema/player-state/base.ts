@@ -94,8 +94,6 @@ export function baseStateFromFirebase(raw: FirebaseBasePlayerState) {
     // have partial data (e.g. missing autoAdvance). Cast to raw Record so
     // parseTimerConfig validates each field and fills defaults, rather than
     // blindly trusting the cast value.
-    timerConfig: parseTimerConfig(
-      raw.timerConfig as unknown as Record<string, unknown>,
-    ),
+    timerConfig: parseTimerConfig(raw.timerConfig),
   };
 }

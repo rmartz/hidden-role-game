@@ -66,13 +66,11 @@ export function firebaseToPlayerState(
     case GameMode.Werewolf:
       return werewolfStateFromFirebase(raw as FirebaseWerewolfPlayerState);
     case GameMode.SecretVillain:
-      return secretVillainStateFromFirebase(
-        raw as FirebaseSecretVillainPlayerState,
-      );
+      return secretVillainStateFromFirebase(raw);
     case GameMode.Avalon:
       return avalonStateFromFirebase(raw);
     case GameMode.Codenames:
-      return codenamesStateFromFirebase(raw as FirebaseCodenamesPlayerState);
+      return codenamesStateFromFirebase(raw);
     default:
       throw new Error(`Unknown game mode: ${raw.gameMode}`);
   }
