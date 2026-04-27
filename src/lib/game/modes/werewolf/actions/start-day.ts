@@ -282,6 +282,39 @@ export const startDayAction: GameAction = {
 
     const updatedDeadIds = [...ts.deadPlayerIds, ...newDeadIds];
 
+    // Dracula: add the night's wife target to the accumulated list.
+    // Exclude the target if they died the same night they were claimed.
+    const draculaAction = nightPhase.nightActions[WerewolfRole.Dracula];
+    const draculaWives =
+      draculaAction &&
+      !isTeamNightAction(draculaAction) &&
+      draculaAction.targetPlayerId &&
+      !updatedDeadIds.includes(draculaAction.targetPlayerId)
+        ? [
+            ...(ts.draculaWives ?? []).filter(
+              (id) => !updatedDeadIds.includes(id),
+            ),
+            ...(ts.draculaWives?.includes(draculaAction.targetPlayerId)
+              ? []
+              : [draculaAction.targetPlayerId]),
+          ]
+        : (ts.draculaWives ?? []).filter((id) => !updatedDeadIds.includes(id));
+
+    // Zombie: add the night's infection target to the accumulated list (if not already infected).
+    // Exclude the target if they died the same night they were infected.
+    const zombieAction = nightPhase.nightActions[WerewolfRole.Zombie];
+    const existingInfected = (ts.zombieInfected ?? []).filter(
+      (id) => !updatedDeadIds.includes(id),
+    );
+    const zombieInfected =
+      zombieAction &&
+      !isTeamNightAction(zombieAction) &&
+      zombieAction.targetPlayerId &&
+      !existingInfected.includes(zombieAction.targetPlayerId) &&
+      !updatedDeadIds.includes(zombieAction.targetPlayerId)
+        ? [...existingInfected, zombieAction.targetPlayerId]
+        : existingInfected;
+
     const wolfCubDied =
       ts.wolfCubDied === true || didWolfCubDie(newDeadIds, game);
     const revealedPlayerIds = getWerewolfModeConfig(game).autoRevealNightOutcome
@@ -318,6 +351,8 @@ export const startDayAction: GameAction = {
           ? { executionerTargetId: ts.executionerTargetId }
           : {}),
         ...(mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
+        ...(draculaWives.length > 0 ? { draculaWives } : {}),
+        ...(zombieInfected.length > 0 ? { zombieInfected } : {}),
       },
     };
 
