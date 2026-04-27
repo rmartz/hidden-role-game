@@ -106,6 +106,7 @@ Roles wake in a consistent order determined by their `category`, following the r
    - Mummy
    - Sentinel
    - Spellcaster
+   - Tavern Keeper
 9. `VillagerHandicap` (Good — no night action).
 
 Within a category, the order is arbitrary. After all category-ordered roles, the Witch and Altruist always act last in that order.

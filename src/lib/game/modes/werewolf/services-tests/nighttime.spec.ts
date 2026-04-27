@@ -10,6 +10,18 @@ import {
 } from "./nighttime-helpers";
 
 // ---------------------------------------------------------------------------
+// extractPlayerNightState — Tavern Keeper block
+// ---------------------------------------------------------------------------
+
+describe("extractPlayerNightState (Tavern Keeper block)", () => {
+  it("returns { tavernKeeperBlocked: true } when the caller is the blocked player", () => {
+    const game = makeNighttimeGame({}, false, "p1");
+    const result = extractPlayerNightState(game, "p1", werewolfRole, []);
+    expect(result).toEqual({ tavernKeeperBlocked: true });
+  });
+});
+
+// ---------------------------------------------------------------------------
 // extractPlayerNightState — Witch
 // ---------------------------------------------------------------------------
 

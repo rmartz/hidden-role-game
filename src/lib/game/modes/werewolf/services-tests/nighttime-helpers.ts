@@ -16,6 +16,7 @@ import { WEREWOLF_ROLES } from "@/lib/game/modes/werewolf/roles";
 export function makeNighttimeGame(
   nightActions: Record<string, unknown> = {},
   witchAbilityUsed = false,
+  tavernKeeperBlockedPlayerId?: string,
 ): Game {
   const turnState: WerewolfTurnState = {
     turn: 1,
@@ -28,6 +29,7 @@ export function makeNighttimeGame(
     },
     deadPlayerIds: [],
     ...(witchAbilityUsed ? { witchAbilityUsed: true } : {}),
+    ...(tavernKeeperBlockedPlayerId ? { tavernKeeperBlockedPlayerId } : {}),
   };
   return {
     id: "game-1",
