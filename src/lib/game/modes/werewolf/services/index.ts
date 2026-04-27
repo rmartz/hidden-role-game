@@ -32,9 +32,11 @@ const WEREWOLF_WINNER_TEAMS = {
   [WerewolfWinner.Tanner]: Team.Neutral,
   [WerewolfWinner.Draw]: Team.Neutral,
   [WerewolfWinner.Chupacabra]: Team.Neutral,
+  [WerewolfWinner.Dracula]: Team.Neutral,
   [WerewolfWinner.LoneWolf]: Team.Neutral,
   [WerewolfWinner.Spoiler]: Team.Neutral,
   [WerewolfWinner.Executioner]: Team.Neutral,
+  [WerewolfWinner.Zombie]: Team.Neutral,
 } satisfies Record<WerewolfWinner, Team>;
 
 function extractVictoryCondition(game: Game): VictoryCondition | undefined {
