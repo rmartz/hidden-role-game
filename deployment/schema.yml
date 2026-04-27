@@ -1,7 +1,7 @@
 # Schema for public environment config files (deployment/production.yml).
 #
-# All keys in those files must match at least one allowed_pattern OR appear in allowed_keys.
-# Keys matching any denied_pattern are rejected even if they match an allowed_pattern.
+# All keys in those files must match at least one allowed_patterns entry OR appear in allowed_keys.
+# Keys matching any denied_patterns entry are rejected even if they match an allowed_patterns entry.
 #
 # To add a new public variable (e.g. NEXT_PUBLIC_FIREBASE_DATABASE_URL):
 # add it to the config file — no schema change needed, because NEXT_PUBLIC_* is
