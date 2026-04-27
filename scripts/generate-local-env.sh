@@ -30,7 +30,10 @@ fi
 OUTPUT="$PROJECT_ROOT/.env.local"
 
 echo "Pulling staging environment variables from Vercel..."
-vercel env pull "$OUTPUT" --environment=preview --yes
+(
+  cd "$PROJECT_ROOT"
+  vercel env pull "$OUTPUT" --environment=preview --yes
+)
 
 echo ""
 echo "Written to .env.local (gitignored — do not commit)."

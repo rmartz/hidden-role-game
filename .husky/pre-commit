@@ -1,3 +1,2 @@
 #!/usr/bin/env sh
-pnpm exec lint-staged
-pnpm run secrets-check
+pnpm exec lint-staged && pnpm run secrets-check
