@@ -23,7 +23,9 @@ describe("GhostCluePanelView", () => {
     });
     expect(input).toBeDefined();
     expect(
-      screen.getByRole("button", { name: WEREWOLF_COPY.ghost.clueSubmitButton }),
+      screen.getByRole("button", {
+        name: WEREWOLF_COPY.ghost.clueSubmitButton,
+      }),
     ).toBeDefined();
   });
 
@@ -94,7 +96,9 @@ describe("GhostCluePanelView", () => {
     );
 
     fireEvent.click(
-      screen.getByRole("button", { name: WEREWOLF_COPY.ghost.clueSubmitButton }),
+      screen.getByRole("button", {
+        name: WEREWOLF_COPY.ghost.clueSubmitButton,
+      }),
     );
 
     expect(onSubmit).toHaveBeenCalledTimes(1);

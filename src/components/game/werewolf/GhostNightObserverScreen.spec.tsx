@@ -42,7 +42,9 @@ describe("GhostNightObserverScreen", () => {
       nightActions: {},
     };
 
-    render(<GhostNightObserverScreen gameState={baseGameState} phase={phase} />);
+    render(
+      <GhostNightObserverScreen gameState={baseGameState} phase={phase} />,
+    );
 
     expect(
       screen.getByText(WEREWOLF_COPY.ghost.nightObserverHeading),
@@ -58,7 +60,9 @@ describe("GhostNightObserverScreen", () => {
       nightActions: {},
     };
 
-    render(<GhostNightObserverScreen gameState={baseGameState} phase={phase} />);
+    render(
+      <GhostNightObserverScreen gameState={baseGameState} phase={phase} />,
+    );
 
     const heading = screen.getByText(WEREWOLF_COPY.narrator.currentlyAwake, {
       exact: false,
@@ -97,7 +101,9 @@ describe("GhostNightObserverScreen", () => {
       },
     };
 
-    render(<GhostNightObserverScreen gameState={baseGameState} phase={phase} />);
+    render(
+      <GhostNightObserverScreen gameState={baseGameState} phase={phase} />,
+    );
 
     expect(screen.getByText(/Charlie/)).toBeDefined();
   });
@@ -116,7 +122,9 @@ describe("GhostNightObserverScreen", () => {
       },
     };
 
-    render(<GhostNightObserverScreen gameState={baseGameState} phase={phase} />);
+    render(
+      <GhostNightObserverScreen gameState={baseGameState} phase={phase} />,
+    );
 
     expect(screen.getByText(/skipped/)).toBeDefined();
   });
