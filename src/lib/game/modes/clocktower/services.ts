@@ -1,5 +1,6 @@
 import { GameStatus } from "@/lib/types";
 import type { Game, GameModeServices, PlayerRoleAssignment } from "@/lib/types";
+import { resolvePlayerOrder } from "@/lib/player-order";
 import { ClocktowerPhase } from "./types";
 import type { ClocktowerTurnState } from "./types";
 import {
@@ -46,8 +47,16 @@ function pickDrunkFakeRole(
 export const clocktowerServices: GameModeServices = {
   buildInitialTurnState(
     roleAssignments: PlayerRoleAssignment[],
+    options?: Record<string, unknown>,
   ): ClocktowerTurnState {
-    const playerIds = roleAssignments.map((a) => a.playerId);
+    const allPlayerIds = roleAssignments.map((a) => a.playerId);
+    const { playerOrder } = (options ?? {}) as { playerOrder?: string[] };
+
+    // Preserve lobby seating order when available; otherwise use role-assignment order.
+    const orderedPlayerIds =
+      playerOrder && playerOrder.length > 0
+        ? resolvePlayerOrder(playerOrder, allPlayerIds)
+        : allPlayerIds;
 
     const demonAssignment = roleAssignments.find(
       (a) => a.roleDefinitionId === (ClocktowerRole.Imp as string),
@@ -62,7 +71,7 @@ export const clocktowerServices: GameModeServices = {
         currentActionIndex: 0,
         nightActions: {},
       },
-      playerOrder: playerIds,
+      playerOrder: orderedPlayerIds,
       deadPlayerIds: [],
       ghostVotesUsed: [],
       demonPlayerId: demonAssignment.playerId,

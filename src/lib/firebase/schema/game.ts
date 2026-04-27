@@ -32,6 +32,8 @@ export interface FirebaseGamePublic {
   /** Game-mode-specific config stored as a flat record. Firebase omits empty objects. */
   modeConfig?: Record<string, unknown>;
   executionerTargetId?: string;
+  /** Clocktower: Townsfolk role ID shown to the Drunk as their fake token. Firebase omits absent. */
+  drunkFakeRoleId?: string;
   /** Lobby seating order used to set president rotation. Firebase omits absent. */
   playerOrder?: string[];
   /** Unix ms timestamp set server-side at game creation. Used for TTL cleanup. */
@@ -77,6 +79,9 @@ export function gameToFirebase(game: Game): FirebaseGamePublic {
     ...(hasModeConfig ? { modeConfig: firebaseModeConfig } : {}),
     ...(game.executionerTargetId
       ? { executionerTargetId: game.executionerTargetId }
+      : {}),
+    ...(game.gameMode === GameMode.Clocktower && game.drunkFakeRoleId
+      ? { drunkFakeRoleId: game.drunkFakeRoleId }
       : {}),
     ...(game.playerOrder && game.playerOrder.length > 0
       ? { playerOrder: game.playerOrder }
@@ -127,6 +132,7 @@ export function firebaseToGame(
     ...(pub.executionerTargetId
       ? { executionerTargetId: pub.executionerTargetId }
       : {}),
+    ...(pub.drunkFakeRoleId ? { drunkFakeRoleId: pub.drunkFakeRoleId } : {}),
     ...(pub.playerOrder && pub.playerOrder.length > 0
       ? { playerOrder: pub.playerOrder }
       : {}),
