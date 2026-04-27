@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Generates .env.local in the project root by pulling from Vercel's stored
-# environment variables for the staging (preview) environment.
+# environment variables for the preview environment.
 #
 # Usage: scripts/generate-local-env.sh
 #
@@ -29,7 +29,7 @@ fi
 
 OUTPUT="$PROJECT_ROOT/.env.local"
 
-echo "Pulling staging environment variables from Vercel..."
+echo "Pulling preview environment variables from Vercel..."
 (
   cd "$PROJECT_ROOT"
   vercel env pull "$OUTPUT" --environment=preview --yes
