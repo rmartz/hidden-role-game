@@ -199,6 +199,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     unique: true,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Special,
+    preventSelfTarget: true,
     category: WerewolfRoleCategory.NeutralManipulation,
   },
   [WerewolfRole.ElusiveSeer]: {
@@ -586,6 +587,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     unique: true,
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Special,
+    preventSelfTarget: true,
     category: WerewolfRoleCategory.NeutralKilling,
   },
 } satisfies Record<WerewolfRole, WerewolfRoleDefinition>;

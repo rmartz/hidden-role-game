@@ -193,7 +193,23 @@ describe("Dracula win condition at start of night", () => {
     expect(game.status.type).not.toBe(GameStatus.Finished);
   });
 
-  it("game does not check Dracula win on first night (turn 1)", () => {
+  it("game continues if Dracula is dead even with 3 wives alive", () => {
+    const ts: WerewolfTurnState = {
+      turn: 2,
+      phase: {
+        type: WerewolfPhase.Daytime,
+        startedAt: 1000,
+        nightActions: {},
+      },
+      deadPlayerIds: ["dracula"],
+      draculaWives: ["p2", "p3", "p4"],
+    };
+    const game = makeGameWithDracula(ts);
+    startNight.apply(game, undefined, "owner-1");
+    expect(game.status.type).not.toBe(GameStatus.Finished);
+  });
+
+  it("Dracula wins on first transition to night 2 (turn 2) when 3 wives are alive", () => {
     const ts: WerewolfTurnState = {
       turn: 1,
       phase: {
@@ -202,14 +218,10 @@ describe("Dracula win condition at start of night", () => {
         nightActions: {},
       },
       deadPlayerIds: [],
-      // Even with 3 wives: should not trigger win on night 1→2 transition
       draculaWives: ["p2", "p3", "p4"],
     };
     const game = makeGameWithDracula(ts);
     startNight.apply(game, undefined, "owner-1");
-    // Turn 1 → 2 counts as nextTurn === 2 which is > 1, so Dracula CAN win here
-    // This test documents the boundary: the first "start night" from turn 1 day
-    // advances to night 2 (nextTurn=2 > 1), so Dracula can win.
     expect(game.status.type).toBe(GameStatus.Finished);
     expect((game.status as { winner?: string }).winner).toBe(
       WerewolfWinner.Dracula,

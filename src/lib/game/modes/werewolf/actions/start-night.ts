@@ -7,7 +7,7 @@ import {
   currentTurnState,
   isOwnerPlaying,
   GROUP_PHASE_KEY_SEPARATOR,
-  checkWinCondition,
+  WerewolfWinner,
 } from "../utils";
 import { WerewolfRole } from "../roles";
 
@@ -92,12 +92,21 @@ export const startNightAction: GameAction = {
       },
     };
 
-    // Dracula wins at the start of night if they are alive and have ≥3 wives alive.
-    // This is only checked from turn 2 onward (after at least one full day cycle).
-    if (nextTurn > 1) {
-      const winResult = checkWinCondition(game, ts.deadPlayerIds);
-      if (winResult) {
-        game.status = winResult;
+    // Dracula wins at the start of night if alive and ≥3 wives are alive.
+    // Only checked from turn 2 onward — wives can't accumulate on turn 1.
+    if (nextTurn > 1 && aliveWives.length >= 3) {
+      const draculaAssignment = game.roleAssignments.find(
+        (a) => a.roleDefinitionId === (WerewolfRole.Dracula as string),
+      );
+      if (
+        draculaAssignment &&
+        !ts.deadPlayerIds.includes(draculaAssignment.playerId)
+      ) {
+        game.status = {
+          type: GameStatus.Finished,
+          winner: WerewolfWinner.Dracula,
+        };
+        return;
       }
     }
   },

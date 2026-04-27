@@ -283,30 +283,35 @@ export const startDayAction: GameAction = {
     const updatedDeadIds = [...ts.deadPlayerIds, ...newDeadIds];
 
     // Dracula: add the night's wife target to the accumulated list.
-    const draculaAction = nightPhase.nightActions[
-      WerewolfRole.Dracula as string
-    ] as NightAction | undefined;
-    const draculaWives = draculaAction?.targetPlayerId
-      ? [
-          ...(ts.draculaWives ?? []).filter(
-            (id) => !updatedDeadIds.includes(id),
-          ),
-          ...(ts.draculaWives?.includes(draculaAction.targetPlayerId)
-            ? []
-            : [draculaAction.targetPlayerId]),
-        ]
-      : (ts.draculaWives ?? []).filter((id) => !updatedDeadIds.includes(id));
+    // Exclude the target if they died the same night they were claimed.
+    const draculaAction = nightPhase.nightActions[WerewolfRole.Dracula];
+    const draculaWives =
+      draculaAction &&
+      !isTeamNightAction(draculaAction) &&
+      draculaAction.targetPlayerId &&
+      !updatedDeadIds.includes(draculaAction.targetPlayerId)
+        ? [
+            ...(ts.draculaWives ?? []).filter(
+              (id) => !updatedDeadIds.includes(id),
+            ),
+            ...(ts.draculaWives?.includes(draculaAction.targetPlayerId)
+              ? []
+              : [draculaAction.targetPlayerId]),
+          ]
+        : (ts.draculaWives ?? []).filter((id) => !updatedDeadIds.includes(id));
 
     // Zombie: add the night's infection target to the accumulated list (if not already infected).
-    const zombieAction = nightPhase.nightActions[
-      WerewolfRole.Zombie as string
-    ] as NightAction | undefined;
+    // Exclude the target if they died the same night they were infected.
+    const zombieAction = nightPhase.nightActions[WerewolfRole.Zombie];
     const existingInfected = (ts.zombieInfected ?? []).filter(
       (id) => !updatedDeadIds.includes(id),
     );
     const zombieInfected =
-      zombieAction?.targetPlayerId &&
-      !existingInfected.includes(zombieAction.targetPlayerId)
+      zombieAction &&
+      !isTeamNightAction(zombieAction) &&
+      zombieAction.targetPlayerId &&
+      !existingInfected.includes(zombieAction.targetPlayerId) &&
+      !updatedDeadIds.includes(zombieAction.targetPlayerId)
         ? [...existingInfected, zombieAction.targetPlayerId]
         : existingInfected;
 

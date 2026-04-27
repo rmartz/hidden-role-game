@@ -19,9 +19,9 @@ import { currentTurnState } from "./game-state";
  *    their win conditions conflict and will resolve through night kills
  * 5. Werewolves win: Bad team count ≥ non-Bad count (Good + Neutral + Chupacabra)
  *
- * Dracula and Zombie wins are checked before standard conditions:
- * - Dracula wins: Dracula alive and ≥3 wives still alive (checked at night start)
+ * Zombie wins are checked before standard conditions:
  * - Zombie wins: infected alive > healthy alive (checked after every death)
+ * Note: Dracula win is checked separately in startNightAction, not here.
  */
 export function checkWinCondition(
   game: Game,
@@ -33,23 +33,6 @@ export function checkWinCondition(
   );
 
   const ts = currentTurnState(game);
-
-  // Dracula wins if alive and ≥3 wives are still alive.
-  const draculaAssignment = game.roleAssignments.find(
-    (a) => a.roleDefinitionId === (WerewolfRole.Dracula as string),
-  );
-  if (
-    draculaAssignment &&
-    !deadSet.has(draculaAssignment.playerId) &&
-    ts?.draculaWives
-  ) {
-    const aliveWivesCount = ts.draculaWives.filter(
-      (id) => !deadSet.has(id),
-    ).length;
-    if (aliveWivesCount >= 3) {
-      return { type: GameStatus.Finished, winner: WerewolfWinner.Dracula };
-    }
-  }
 
   // Zombie wins if infected alive > healthy alive (Zombie itself is excluded).
   const zombieAssignment = game.roleAssignments.find(
