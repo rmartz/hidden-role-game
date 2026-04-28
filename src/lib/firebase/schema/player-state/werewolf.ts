@@ -66,6 +66,9 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
   hunterRevengePlayerId?: string;
   /** Narrator-only hidden role IDs. Present only when hiddenRoleCount > 0. */
   hiddenRoleIds?: string[];
+  ghostClues?: { turn: number; clue: string }[];
+  ghostClueSubmittedThisTurn?: boolean;
+  ghostVisible?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -139,6 +142,11 @@ export function werewolfStateToFirebase(
     ...(state.hiddenRoleIds?.length
       ? { hiddenRoleIds: state.hiddenRoleIds }
       : {}),
+    ...(state.ghostClues?.length ? { ghostClues: state.ghostClues } : {}),
+    ...(state.ghostClueSubmittedThisTurn
+      ? { ghostClueSubmittedThisTurn: true }
+      : {}),
+    ...(state.ghostVisible ? { ghostVisible: true } : {}),
   };
 }
 
@@ -220,5 +228,10 @@ export function werewolfStateFromFirebase(
       ? { hunterRevengePlayerId: raw.hunterRevengePlayerId }
       : {}),
     ...(raw.hiddenRoleIds?.length ? { hiddenRoleIds: raw.hiddenRoleIds } : {}),
+    ...(raw.ghostClues?.length ? { ghostClues: raw.ghostClues } : {}),
+    ...(raw.ghostClueSubmittedThisTurn
+      ? { ghostClueSubmittedThisTurn: true }
+      : {}),
+    ...(raw.ghostVisible ? { ghostVisible: true } : {}),
   } as WerewolfPlayerGameState;
 }

@@ -64,13 +64,12 @@ function extractNonOwnerState(
   const isGhost = myRole.id === WerewolfRole.Ghost;
   const isNighttime =
     currentTurnState(game)?.phase.type === WerewolfPhase.Nighttime;
+  const ghostVisible = isGhost && amDead && isNighttime;
   const ghostNightState =
-    isGhost && amDead && isNighttime && nightActions
-      ? { ghostVisible: true, nightActions }
-      : {};
+    ghostVisible && nightActions ? { ghostVisible: true, nightActions } : {};
 
   const nightTargetState =
-    nightActions && !ghostNightState.ghostVisible
+    nightActions && !ghostVisible
       ? extractPlayerNightState(game, callerId, myRole, deadPlayerIds)
       : {};
 
