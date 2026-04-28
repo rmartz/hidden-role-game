@@ -3,6 +3,7 @@ import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase, isTeamNightAction } from "../types";
 import type {
   AttackNightResolutionEvent,
+  NightAction,
   ToughGuyAbsorbedNightResolutionEvent,
   WerewolfNighttimePhase,
 } from "../types";

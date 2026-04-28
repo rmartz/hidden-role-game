@@ -33,11 +33,11 @@ function getAdjacentPlayerIds(
 }
 
 /**
- * Returns the ID of the left neighbour (seat before) and right neighbour
+ * Returns the ID of the left neighbor (seat before) and right neighbor
  * (seat after) for `playerId` in `playerOrder`. Returns undefined for either
  * if the player list is too short.
  */
-function getNeighbourIds(
+function getNeighborIds(
   playerOrder: string[],
   playerId: string,
 ): { left: string | undefined; right: string | undefined } {
@@ -248,7 +248,7 @@ function extractRoleSpecificState(
   }
 
   if (myRole.id === WerewolfRole.Insomniac) {
-    return extractInsomniacState(game, callerId, nightActions, ts);
+    return extractInsomniacState(game, callerId, nightActions);
   }
 
   if (myRole.id === WerewolfRole.Count) {
@@ -385,30 +385,28 @@ function extractInsomniacState(
   game: Game,
   callerId: string,
   nightActions: Record<string, AnyNightAction>,
-  ts: WerewolfTurnState | undefined,
 ): Partial<WerewolfPlayerGameState> {
   const playerOrder = game.playerOrder ?? game.players.map((p) => p.id);
-  const { left, right } = getNeighbourIds(playerOrder, callerId);
+  const { left, right } = getNeighborIds(playerOrder, callerId);
 
-  const nightPhaseOrder =
-    ts?.phase.type === WerewolfPhase.Nighttime ? ts.phase.nightPhaseOrder : [];
-
-  const neighborActed = (neighbourId: string | undefined): boolean => {
-    if (!neighbourId) return false;
+  // Derive "woke and acted" purely from nightActions — nightPhaseOrder is empty
+  // during Daytime, so we cannot use it here. Any non-skip entry in nightActions
+  // for the neighbor's phase key means they woke and acted this night.
+  const neighborActed = (neighborId: string | undefined): boolean => {
+    if (!neighborId) return false;
     const assignment = game.roleAssignments.find(
-      (a) => a.playerId === neighbourId,
+      (a) => a.playerId === neighborId,
     );
     if (!assignment) return false;
     const roleDef = getWerewolfRole(assignment.roleDefinitionId);
     if (!roleDef) return false;
     // Roles that wake with another role use that role's phase key.
     const phaseKey = (roleDef.wakesWith ?? roleDef.id) as string;
-    if (!nightPhaseOrder.includes(phaseKey)) return false;
     const action = nightActions[phaseKey];
     if (!action) return false;
     if (isTeamNightAction(action)) {
-      // Group phase: check if the neighbour cast a non-skip vote.
-      const vote = action.votes.find((v) => v.playerId === neighbourId);
+      // Group phase: check if the neighbor cast a non-skip vote.
+      const vote = action.votes.find((v) => v.playerId === neighborId);
       return vote !== undefined && !vote.skipped;
     }
     return !action.skipped && action.targetPlayerId !== undefined;

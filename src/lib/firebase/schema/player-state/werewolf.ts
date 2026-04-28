@@ -66,6 +66,11 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
   hunterRevengePlayerId?: string;
   /** Narrator-only hidden role IDs. Present only when hiddenRoleCount > 0. */
   hiddenRoleIds?: string[];
+  thingTappedMe?: boolean;
+  thingTappedPlayerId?: string;
+  insomniacResult?: { leftActed: boolean; rightActed: boolean };
+  countResult?: { leftCount: number; rightCount: number };
+  adjacentPlayerIds?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -138,6 +143,17 @@ export function werewolfStateToFirebase(
       : {}),
     ...(state.hiddenRoleIds?.length
       ? { hiddenRoleIds: state.hiddenRoleIds }
+      : {}),
+    ...(state.thingTappedMe ? { thingTappedMe: true } : {}),
+    ...(state.thingTappedPlayerId
+      ? { thingTappedPlayerId: state.thingTappedPlayerId }
+      : {}),
+    ...(state.insomniacResult
+      ? { insomniacResult: state.insomniacResult }
+      : {}),
+    ...(state.countResult ? { countResult: state.countResult } : {}),
+    ...(state.adjacentPlayerIds?.length
+      ? { adjacentPlayerIds: state.adjacentPlayerIds }
       : {}),
   };
 }
@@ -220,5 +236,14 @@ export function werewolfStateFromFirebase(
       ? { hunterRevengePlayerId: raw.hunterRevengePlayerId }
       : {}),
     ...(raw.hiddenRoleIds?.length ? { hiddenRoleIds: raw.hiddenRoleIds } : {}),
+    ...(raw.thingTappedMe ? { thingTappedMe: true } : {}),
+    ...(raw.thingTappedPlayerId
+      ? { thingTappedPlayerId: raw.thingTappedPlayerId }
+      : {}),
+    ...(raw.insomniacResult ? { insomniacResult: raw.insomniacResult } : {}),
+    ...(raw.countResult ? { countResult: raw.countResult } : {}),
+    ...(raw.adjacentPlayerIds?.length
+      ? { adjacentPlayerIds: raw.adjacentPlayerIds }
+      : {}),
   } as WerewolfPlayerGameState;
 }
