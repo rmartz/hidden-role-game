@@ -25,7 +25,9 @@
     "format:check": "prettier --check .",
     "prepare": "husky",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "env:pull": "scripts/generate-local-env.sh",
+    "secrets-check": "node scripts/secrets-check.mjs"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

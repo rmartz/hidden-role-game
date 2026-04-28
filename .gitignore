@@ -4,6 +4,7 @@ dist/
 package-lock.json
 tsconfig.tsbuildinfo
 .partykit/
+.vercel/
 .env
 .env.local
 .env*.local
