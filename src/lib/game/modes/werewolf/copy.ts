@@ -181,6 +181,8 @@ export const WEREWOLF_COPY = {
     rolesListHeading: "All player roles:",
     waitingForNarrator: "Waiting for the Narrator to reveal roles…",
     narratorRevealHeading: "Reveal all roles to the Illuminati:",
+    revealUnconfirmed:
+      "Role list has not been revealed to the Illuminati player",
   },
   mentalist: {
     sameTeam: "on the same team",

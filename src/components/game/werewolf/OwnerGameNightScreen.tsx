@@ -198,10 +198,11 @@ export function OwnerGameNightScreen({
   const unconfirmedWarning =
     !isFirstTurn && !isWitchAbilitySkipped && !isActionConfirmed
       ? WEREWOLF_COPY.narrator.playerUnconfirmed
-      : (investigationResult && !isResultRevealed) ||
-          (isIlluminatiPhase && !isIlluminatiRevealed)
+      : investigationResult && !isResultRevealed
         ? WEREWOLF_COPY.narrator.investigationUnrevealed
-        : undefined;
+        : isIlluminatiPhase && !isIlluminatiRevealed
+          ? WEREWOLF_COPY.illuminati.revealUnconfirmed
+          : undefined;
 
   const advanceIcon = unconfirmedWarning ? (
     <ClockWarningRegular />

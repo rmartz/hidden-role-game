@@ -25,6 +25,7 @@ export function OwnerIlluminatiRevealPanel({
   const roleRows = roleAssignments
     .filter((a) => a.role)
     .map((a) => ({
+      playerId: a.player.id,
       playerName: getPlayerName(players, a.player.id) ?? a.player.id,
       roleName: a.role?.name ?? a.role?.id ?? "Unknown",
     }));
@@ -35,8 +36,8 @@ export function OwnerIlluminatiRevealPanel({
         {WEREWOLF_COPY.illuminati.narratorRevealHeading}
       </p>
       <ul className="mb-3 space-y-0.5">
-        {roleRows.map(({ playerName, roleName }) => (
-          <li key={playerName} className="text-foreground">
+        {roleRows.map(({ playerId, playerName, roleName }) => (
+          <li key={playerId} className="text-foreground">
             <strong>{playerName}</strong>: {roleName}
           </li>
         ))}

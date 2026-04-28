@@ -7,7 +7,12 @@ interface PlayerFirstTurnScreenProps {
   roleName?: string;
   teammateNames: string[];
   villagerNames?: string[];
-  illuminatiRoles?: { playerName: string; roleName: string; team: Team }[];
+  illuminatiRoles?: {
+    playerId: string;
+    playerName: string;
+    roleName: string;
+    team: Team;
+  }[];
 }
 
 export function PlayerFirstTurnScreen({
@@ -60,8 +65,8 @@ export function PlayerFirstTurnScreen({
                 {WEREWOLF_COPY.illuminati.rolesListHeading}
               </p>
               <ul className="space-y-0.5">
-                {illuminatiRoles.map(({ playerName, roleName }) => (
-                  <li key={playerName} className="text-foreground">
+                {illuminatiRoles.map(({ playerId, playerName, roleName }) => (
+                  <li key={playerId} className="text-foreground">
                     <strong>{playerName}</strong>: {roleName}
                   </li>
                 ))}
