@@ -3,11 +3,7 @@ import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 import type { Game } from "@/lib/types";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "../timer-config";
 import { WerewolfPhase, TrialVerdict, TrialPhase } from "../types";
-import type {
-  WerewolfTurnState,
-  WerewolfNighttimePhase,
-  WerewolfDaytimePhase,
-} from "../types";
+import type { WerewolfTurnState, WerewolfNighttimePhase } from "../types";
 import { WerewolfRole } from "../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
 import { makePlayingGame, nightTurnState, dayTurnState } from "./test-helpers";
@@ -154,7 +150,7 @@ describe("StartNight — pendingSmitePlayerIds carry-over", () => {
         startedAt: 1000,
         nightActions: {},
         pendingSmitePlayerIds: ["p2"],
-      } as WerewolfDaytimePhase,
+      },
       deadPlayerIds: [],
     };
     const game = makePlayingGame(dayWithPendingSmite);
@@ -173,7 +169,7 @@ describe("StartNight — pendingSmitePlayerIds carry-over", () => {
         startedAt: 1000,
         nightActions: {},
         pendingSmitePlayerIds: ["p2", "p3"],
-      } as WerewolfDaytimePhase,
+      },
       deadPlayerIds: ["p3"],
     };
     const game = makePlayingGame(dayWithPendingSmite);
