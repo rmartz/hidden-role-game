@@ -119,6 +119,11 @@ export const setNightTargetAction: GameAction = {
         return false;
     }
 
+    // Zombie cannot infect an already-infected player.
+    if (isRoleActive(phaseKey, WerewolfRole.Zombie)) {
+      if (ts.zombieInfected?.includes(targetPlayerId)) return false;
+    }
+
     // Witch cannot self-target unless under attack (self-protect is OK,
     // self-attack is not).
     if (

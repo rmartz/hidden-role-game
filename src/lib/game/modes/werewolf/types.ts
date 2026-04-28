@@ -206,6 +206,10 @@ export interface WerewolfTurnState {
   roleOverrides?: Record<string, string>;
   /** True once the Alpha Wolf has used their once-per-game bite ability. */
   alphaWolfBiteUsed?: boolean;
+  /** Player IDs that Dracula has claimed as wives. Accumulated across nights. */
+  draculaWives?: string[];
+  /** Player IDs that the Zombie has infected. Accumulated across nights. */
+  zombieInfected?: string[];
 }
 
 export interface TargetablePlayer {

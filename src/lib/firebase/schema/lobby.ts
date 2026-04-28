@@ -216,9 +216,7 @@ function firebaseToLobbyConfig(config: FirebaseLobbyConfig): LobbyConfig {
     roleBuckets,
     showConfigToPlayers: config.showConfigToPlayers,
     showRolesInPlay: config.showRolesInPlay as LobbyConfig["showRolesInPlay"],
-    timerConfig: parseTimerConfig(
-      config.timerConfig as unknown as Record<string, unknown>,
-    ),
+    timerConfig: parseTimerConfig(config.timerConfig),
     modeConfig,
   } as LobbyConfig;
 }

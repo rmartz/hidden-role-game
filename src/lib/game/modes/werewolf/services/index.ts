@@ -33,9 +33,11 @@ const WEREWOLF_WINNER_TEAMS = {
   [WerewolfWinner.Tanner]: Team.Neutral,
   [WerewolfWinner.Draw]: Team.Neutral,
   [WerewolfWinner.Chupacabra]: Team.Neutral,
+  [WerewolfWinner.Dracula]: Team.Neutral,
   [WerewolfWinner.LoneWolf]: Team.Neutral,
   [WerewolfWinner.Spoiler]: Team.Neutral,
   [WerewolfWinner.Executioner]: Team.Neutral,
+  [WerewolfWinner.Zombie]: Team.Neutral,
 } satisfies Record<WerewolfWinner, Team>;
 
 function extractVictoryCondition(game: Game): VictoryCondition | undefined {
@@ -138,27 +140,24 @@ export const werewolfServices: GameModeServices = {
   ): Record<string, unknown> {
     let modeState: Record<string, unknown>;
     if (!myRole) {
-      modeState = extractOwnerState(game) as Record<string, unknown>;
+      modeState = extractOwnerState(game);
     } else {
       const werewolfRole = getWerewolfRole(myRole.id);
       if (!werewolfRole) {
         throw new Error(`Unknown Werewolf role ID: ${myRole.id}`);
       }
-      modeState = extractNonOwnerState(game, callerId, werewolfRole) as Record<
-        string,
-        unknown
-      >;
+      modeState = extractNonOwnerState(game, callerId, werewolfRole);
     }
 
     // Include Werewolf-specific game settings in the player state.
     const wwConfig = getWerewolfModeConfig(game);
     return {
       ...modeState,
-      nominationsEnabled: wwConfig.nominationsEnabled as unknown,
-      trialsPerDay: wwConfig.trialsPerDay as unknown,
-      revealProtections: wwConfig.revealProtections as unknown,
-      autoRevealNightOutcome: wwConfig.autoRevealNightOutcome as unknown,
-      victoryCondition: extractVictoryCondition(game) as unknown,
+      nominationsEnabled: wwConfig.nominationsEnabled,
+      trialsPerDay: wwConfig.trialsPerDay,
+      revealProtections: wwConfig.revealProtections,
+      autoRevealNightOutcome: wwConfig.autoRevealNightOutcome,
+      victoryCondition: extractVictoryCondition(game),
     };
   },
 };
