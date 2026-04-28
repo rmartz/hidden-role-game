@@ -90,12 +90,8 @@ export function baseStateFromFirebase(raw: FirebaseBasePlayerState) {
           winner: raw.victoryCondition.winner as Team,
         }
       : undefined,
-    // The TypeScript type says TimerConfig, but old Firebase documents may
-    // have partial data (e.g. missing autoAdvance). Cast to raw Record so
-    // parseTimerConfig validates each field and fills defaults, rather than
-    // blindly trusting the cast value.
-    timerConfig: parseTimerConfig(
-      raw.timerConfig as unknown as Record<string, unknown>,
-    ),
+    // Old Firebase documents may have partial data (e.g. missing autoAdvance);
+    // parseTimerConfig validates each field and fills defaults.
+    timerConfig: parseTimerConfig(raw.timerConfig),
   };
 }

@@ -70,7 +70,7 @@ export function SecretVillainConfigPanel({
   const previousConcretePreset: SvConcretePreset =
     currentPreset !== SvBoardPreset.Custom &&
     currentPreset !== SvBoardPreset.Default
-      ? (currentPreset as SvConcretePreset)
+      ? currentPreset
       : getDefaultBoardPreset(playerCount);
 
   const customPowerTable: SvCustomPowerConfig =
@@ -108,7 +108,7 @@ export function SecretVillainConfigPanel({
           value={currentTheme}
           disabled={disabled ?? !onModeConfigFieldChange}
           onValueChange={(value: string | null) => {
-            if (value) onModeConfigFieldChange?.("theme", value as SvTheme);
+            if (value) onModeConfigFieldChange?.("theme", value);
           }}
         >
           <SelectTrigger id="sv-theme" className="w-[180px]">

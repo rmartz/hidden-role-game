@@ -408,7 +408,7 @@ const gameConfigSlice = createSlice({
       state.modeConfig = {
         ...state.modeConfig,
         [action.payload.key]: action.payload.value,
-      } as ModeConfig;
+      };
       if (state.roleConfigMode === RoleConfigMode.Default) {
         const modeDefinition = GAME_MODES[state.gameMode];
         const effectiveCount =
