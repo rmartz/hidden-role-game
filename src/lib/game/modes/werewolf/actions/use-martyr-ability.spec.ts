@@ -217,7 +217,7 @@ describe("WerewolfAction.UseMartyrAbility", () => {
       );
     });
 
-    it("martyrUsed is carried forward to next turn", () => {
+    it("martyrUsed is carried forward day to night", () => {
       // Verify that start-night carries martyrUsed forward.
       const ts = makeDayStateWithMartyrWindow("p3");
       const game = makeGameWithMartyr(ts, "p2");
@@ -228,6 +228,21 @@ describe("WerewolfAction.UseMartyrAbility", () => {
       const nightTs = (game.status as { turnState: WerewolfTurnState })
         .turnState;
       expect(nightTs.martyrUsed).toBe(true);
+    });
+
+    it("martyrUsed is carried forward night to day", () => {
+      // Verify that start-day also carries martyrUsed forward (once-per-game
+      // flag must survive a full day/night cycle).
+      const ts = makeDayStateWithMartyrWindow("p3");
+      const game = makeGameWithMartyr(ts, "p2");
+      action.apply(game, {}, "p2");
+      // Advance day -> night, then night -> day.
+      const startNight = WEREWOLF_ACTIONS[WerewolfAction.StartNight];
+      startNight.apply(game, {}, "owner-1");
+      const startDay = WEREWOLF_ACTIONS[WerewolfAction.StartDay];
+      startDay.apply(game, {}, "owner-1");
+      const dayTs = (game.status as { turnState: WerewolfTurnState }).turnState;
+      expect(dayTs.martyrUsed).toBe(true);
     });
   });
 });

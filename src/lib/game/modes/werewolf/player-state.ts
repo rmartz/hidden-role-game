@@ -89,6 +89,14 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   myNominatedDefendantId?: string;
   /** Player IDs pending elimination at the end of the next night (narrator daytime smite). */
   pendingSmitePlayerIds?: string[];
+  /**
+   * Convicted player ID awaiting final elimination during the post-verdict
+   * Martyr window. Populated for all players so the UI can present the window.
+   * Cleared when the Martyr intercepts or the narrator advances past it.
+   */
+  pendingGuiltId?: string;
+  /** True once the Martyr has used their once-per-game substitution ability. */
+  martyrUsed?: boolean;
   /** True if the player is silenced this day. */
   isSilenced?: boolean;
   /** True if the player is hypnotized by the Mummy. */

@@ -357,6 +357,7 @@ export const startDayAction: GameAction = {
         ...(mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
         ...(draculaWives.length > 0 ? { draculaWives } : {}),
         ...(zombieInfected.length > 0 ? { zombieInfected } : {}),
+        ...(ts.martyrUsed ? { martyrUsed: true } : {}),
       },
     };
 
