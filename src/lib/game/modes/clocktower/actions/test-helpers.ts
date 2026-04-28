@@ -1,7 +1,11 @@
 import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 import type { Game } from "@/lib/types";
 import { ClocktowerPhase } from "../types";
-import type { ClocktowerTurnState, ClocktowerNightAction } from "../types";
+import type {
+  ClocktowerNightPhase,
+  ClocktowerTurnState,
+  ClocktowerNightAction,
+} from "../types";
 import { ClocktowerRole } from "../roles";
 import { DEFAULT_CLOCKTOWER_MODE_CONFIG } from "../lobby-config";
 import { DEFAULT_TIMER_CONFIG } from "@/lib/types";
@@ -12,6 +16,11 @@ export const EMPATH_PLAYER_ID = "p2";
 export const FORTUNE_TELLER_PLAYER_ID = "p3";
 export const WASHERWOMAN_PLAYER_ID = "p4";
 export const MAYOR_PLAYER_ID = "p5";
+
+export interface NightFixture {
+  ts: ClocktowerTurnState;
+  phase: ClocktowerNightPhase;
+}
 
 export function makeNightState(
   overrides: Partial<{
@@ -41,15 +50,43 @@ export function makeNightState(
   };
 }
 
+export function makeNightTurnState(
+  overrides: Partial<{
+    turn: number;
+    currentActionIndex: number;
+    nightActions: Record<string, ClocktowerNightAction>;
+    deadPlayerIds: string[];
+    demonPlayerId: string;
+    poisonedPlayerId: string;
+  }> = {},
+): NightFixture {
+  const phase: ClocktowerNightPhase = {
+    type: ClocktowerPhase.Night,
+    currentActionIndex: overrides.currentActionIndex ?? 0,
+    nightActions: overrides.nightActions ?? {},
+  };
+  const ts: ClocktowerTurnState = {
+    turn: overrides.turn ?? 1,
+    phase,
+    playerOrder: ["p1", "p2", "p3", "p4", "p5"],
+    deadPlayerIds: overrides.deadPlayerIds ?? [],
+    ghostVotesUsed: [],
+    demonPlayerId: overrides.demonPlayerId ?? "p1",
+    poisonedPlayerId: overrides.poisonedPlayerId,
+  };
+  return { ts, phase };
+}
+
 export function makePlayingGame(
-  turnState: ClocktowerTurnState,
+  turnState: ClocktowerTurnState | NightFixture,
   overrides: Partial<Game> = {},
 ): Game {
+  const resolvedTurnState = "ts" in turnState ? turnState.ts : turnState;
   return {
     id: "game-1",
     lobbyId: "lobby-1",
     gameMode: GameMode.Clocktower,
-    status: { type: GameStatus.Playing, turnState },
+    status: { type: GameStatus.Playing, turnState: resolvedTurnState },
     players: [
       { id: IMP_PLAYER_ID, name: "Alice", sessionId: "s1", visiblePlayers: [] },
       {

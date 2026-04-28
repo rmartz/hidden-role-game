@@ -100,6 +100,35 @@ describe("ClocktowerAction.SetNightTarget", () => {
       ).toBe(false);
     });
 
+    it("returns true when Storyteller overrides a confirmed action", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          nightActions: {
+            [ClocktowerRole.Imp]: {
+              targetPlayerId: EMPATH_PLAYER_ID,
+              confirmed: true,
+            },
+          },
+        }),
+      );
+      expect(
+        action.isValid(game, OWNER_ID, {
+          roleId: ClocktowerRole.Imp,
+          targetPlayerId: MAYOR_PLAYER_ID,
+        }),
+      ).toBe(true);
+    });
+
+    it("returns false when secondTargetPlayerId is provided for a non-Fortune Teller role", () => {
+      const game = makePlayingGame(makeNightState());
+      expect(
+        action.isValid(game, IMP_PLAYER_ID, {
+          targetPlayerId: EMPATH_PLAYER_ID,
+          secondTargetPlayerId: MAYOR_PLAYER_ID,
+        }),
+      ).toBe(false);
+    });
+
     it("returns false when the game is not in Playing status", () => {
       const game = makePlayingGame(makeNightState(), {
         status: { type: GameStatus.Finished },
@@ -238,6 +267,25 @@ describe("ClocktowerAction.SetNightTarget", () => {
       expect(
         phase.nightActions[ClocktowerRole.Imp]?.targetPlayerId,
       ).toBeUndefined();
+    });
+
+    it("also clears secondTargetPlayerId when clearing the primary target", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          nightActions: {
+            [ClocktowerRole.FortuneTeller]: {
+              targetPlayerId: IMP_PLAYER_ID,
+              secondTargetPlayerId: EMPATH_PLAYER_ID,
+            },
+          },
+        }),
+      );
+      action.apply(game, {}, FORTUNE_TELLER_PLAYER_ID);
+      const ts = (game.status as { turnState: ClocktowerTurnState }).turnState;
+      const phase = ts.phase as ClocktowerNightPhase;
+      const ftAction = phase.nightActions[ClocktowerRole.FortuneTeller];
+      expect(ftAction?.targetPlayerId).toBeUndefined();
+      expect(ftAction?.secondTargetPlayerId).toBeUndefined();
     });
 
     it("preserves existing action fields when updating target", () => {

@@ -25,7 +25,7 @@ function isValidInformation(
 
   switch (candidate.type) {
     case "number":
-      return typeof candidate.value === "number";
+      return Number.isFinite(candidate.value);
 
     case "boolean":
       return typeof candidate.value === "boolean";
@@ -88,6 +88,12 @@ export const provideInformationAction: GameAction = {
 
     if (typeof roleId !== "string") return false;
     if (!isClocktowerRole(roleId)) return false;
+    if (
+      !game.roleAssignments.some(
+        (a) => a.roleDefinitionId === (roleId as string),
+      )
+    )
+      return false;
     if (!isValidInformation(game, information)) return false;
 
     return true;

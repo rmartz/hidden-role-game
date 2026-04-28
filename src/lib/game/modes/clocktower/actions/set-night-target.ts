@@ -2,6 +2,7 @@ import type { Game, GameAction } from "@/lib/types";
 import { GameStatus } from "@/lib/types";
 import { ClocktowerPhase } from "../types";
 import type { ClocktowerTurnState } from "../types";
+import { ClocktowerRole, isClocktowerRole } from "../roles";
 
 function currentTurnState(game: Game): ClocktowerTurnState | undefined {
   if (game.status.type !== GameStatus.Playing) return undefined;
@@ -18,7 +19,15 @@ function resolveActingRoleId(
   roleId: string | undefined,
 ): string | undefined {
   if (callerId === game.ownerPlayerId) {
-    return typeof roleId === "string" ? roleId : undefined;
+    if (typeof roleId !== "string") return undefined;
+    if (!isClocktowerRole(roleId)) return undefined;
+    if (
+      !game.roleAssignments.some(
+        (a) => a.roleDefinitionId === (roleId as string),
+      )
+    )
+      return undefined;
+    return roleId;
   }
   return game.roleAssignments.find((a) => a.playerId === callerId)
     ?.roleDefinitionId;
@@ -54,9 +63,9 @@ export const setNightTargetAction: GameAction = {
     );
     if (!activeRoleId) return false;
 
-    // Prevent changing a confirmed target
+    // Prevent players from changing a confirmed target; the Storyteller can always override
     const existing = ts.phase.nightActions[activeRoleId];
-    if (existing?.confirmed) return false;
+    if (existing?.confirmed && callerId !== game.ownerPlayerId) return false;
 
     // targetPlayerId undefined = clear; string = set target
     if (targetPlayerId === undefined) return true;
@@ -66,8 +75,15 @@ export const setNightTargetAction: GameAction = {
     // Cannot target the Storyteller
     if (targetPlayerId === game.ownerPlayerId) return false;
 
-    // Validate secondTargetPlayerId with the same constraints as targetPlayerId.
+    // secondTargetPlayerId is Fortune Teller-only; reject it for any other role
     if (secondTargetPlayerId !== undefined) {
+      if (
+        !(
+          isClocktowerRole(activeRoleId) &&
+          activeRoleId === ClocktowerRole.FortuneTeller
+        )
+      )
+        return false;
       if (typeof secondTargetPlayerId !== "string") return false;
       if (!game.players.some((p) => p.id === secondTargetPlayerId))
         return false;
@@ -98,13 +114,24 @@ export const setNightTargetAction: GameAction = {
     if (targetPlayerId === undefined) {
       const updated = { ...existing };
       delete updated.targetPlayerId;
+      delete updated.secondTargetPlayerId;
       phase.nightActions[activeRoleId] = updated;
     } else {
-      phase.nightActions[activeRoleId] = {
+      const updated: typeof existing = {
         ...existing,
         targetPlayerId,
-        ...(secondTargetPlayerId !== undefined ? { secondTargetPlayerId } : {}),
       };
+      if (secondTargetPlayerId !== undefined) {
+        updated.secondTargetPlayerId = secondTargetPlayerId;
+      } else if (
+        !(
+          isClocktowerRole(activeRoleId) &&
+          activeRoleId === ClocktowerRole.FortuneTeller
+        )
+      ) {
+        delete updated.secondTargetPlayerId;
+      }
+      phase.nightActions[activeRoleId] = updated;
     }
   },
 };

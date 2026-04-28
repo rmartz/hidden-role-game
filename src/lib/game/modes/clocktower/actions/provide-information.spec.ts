@@ -38,7 +38,19 @@ describe("ClocktowerAction.ProvideInformation", () => {
     });
 
     it("returns true for a role information payload (Undertaker)", () => {
-      const game = makePlayingGame(makeNightState());
+      const game = makePlayingGame(makeNightState(), {
+        roleAssignments: [
+          { playerId: IMP_PLAYER_ID, roleDefinitionId: ClocktowerRole.Imp },
+          {
+            playerId: EMPATH_PLAYER_ID,
+            roleDefinitionId: ClocktowerRole.Empath,
+          },
+          {
+            playerId: WASHERWOMAN_PLAYER_ID,
+            roleDefinitionId: ClocktowerRole.Undertaker,
+          },
+        ],
+      });
       expect(
         action.isValid(game, OWNER_ID, {
           roleId: ClocktowerRole.Undertaker,

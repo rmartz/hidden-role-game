@@ -18,36 +18,35 @@ In Clocktower, night actions are **Storyteller-mediated**: players select target
 
 **Who:** Player (inferred from role) or Storyteller (explicit `roleId`)
 **When:** During Night phase
-**Effect:** Sets, clears, or skips a player's night action target.
+**Effect:** Sets or clears a player's night action target.
 
-**Payload:** `{ roleId?: string; targetPlayerId?: string | null }`
+**Payload:** `{ roleId?: string; targetPlayerId?: string; secondTargetPlayerId?: string }`
 
 - `targetPlayerId: string` — set target
-- `targetPlayerId: null` — intentional skip (no target this night)
-- `targetPlayerId: undefined` — clear selection
+- `targetPlayerId: undefined` — clear selection (also clears `secondTargetPlayerId`)
 
 **Validation:**
 
 - Target must exist, not be dead, not be the Storyteller.
 - Players cannot change a confirmed action; the Storyteller can always override.
 - Storyteller must supply a `roleId` matching a role in the current game.
-- For the Fortune Teller, `secondTargetPlayerId` may be included in the same payload as `targetPlayerId`. It is subject to the same constraints: must be a valid, alive, in-game player who is not the Storyteller.
+- `secondTargetPlayerId` is Fortune Teller-only; it is rejected for any other role. It is subject to the same constraints as `targetPlayerId`: must be a valid, alive, in-game player who is not the Storyteller.
 
 ---
 
 ### `confirm-night-target`
 
-**Who:** Player only (Storyteller overrides directly via `set-night-target`)
+**Who:** Player (inferred from role) or Storyteller (explicit `roleId`)
 **When:** During Night phase
-**Effect:** Locks in the player's target selection. Prevents further changes by the player.
+**Effect:** Locks in the target selection for a role. Prevents further changes by the player.
 
-**Payload:** none
+**Payload:** `{ roleId?: string }` — Storyteller only: which role's action to confirm
 
 **Validation:**
 
-- Caller must not be the Storyteller.
-- An action (target or skip) must already be set.
-- Fortune Teller requires both `targetPlayerId` and `secondTargetPlayerId` to be set (unless skipping).
+- A night action entry must already exist for the role.
+- `targetPlayerId` must be set on the entry.
+- Fortune Teller requires both `targetPlayerId` and `secondTargetPlayerId` to be set.
 - Cannot re-confirm an already-confirmed action.
 
 ---
@@ -58,19 +57,20 @@ In Clocktower, night actions are **Storyteller-mediated**: players select target
 **When:** During Night phase, after an information role wakes
 **Effect:** Records the information the Storyteller shows to an information role. Does not expose this to other players.
 
-**Payload:** `{ roleId: string; information: ClocktowerInformation }`
+**Payload:** `{ roleId: string; information: ClocktowerNightInformation }`
 
 Information shapes by role type:
 
 - **Numeric** (`Empath`, `Chef`): `{ type: "number"; value: number }`
 - **Yes/No** (`Fortune Teller`): `{ type: "boolean"; value: boolean }`
-- **Two-player + role** (`Washerwoman`, `Librarian`, `Investigator`, `Undertaker`, `Ravenkeeper`): `{ type: "player-role"; playerIds: [string, string]; roleId: string }`
+- **Role only** (`Undertaker`, `Ravenkeeper`): `{ type: "role"; roleId: string }`
+- **Two-player + role** (`Washerwoman`, `Librarian`, `Investigator`): `{ type: "two-players-role"; playerIds: [string, string]; roleId: string }`
 
 **Validation:**
 
 - Caller must be the Storyteller.
-- `roleId` must be assigned in the current game.
-- `information` must match one of the three valid shapes; `player-role.roleId` must be a known `ClocktowerRole`.
+- `roleId` must be a known `ClocktowerRole`.
+- `information` must match one of the four valid shapes; `role`/`two-players-role` `roleId` must be a known `ClocktowerRole`.
 
 ---
 
@@ -78,14 +78,21 @@ Information shapes by role type:
 
 **Who:** Storyteller only
 **When:** During Night phase, after all kill-action roles have acted
-**Effect:**
+**Effect:** Resolves all kill mechanics for the night and advances to the information phase.
+
+**Payload:** `{}` (no fields required)
+
+**Validation:**
+
+- Caller must be the Storyteller.
+- Game must be in Night phase.
+
+**Apply:**
 
 1. Resolves the Imp's kill, accounting for Monk protection and Soldier immunity.
-2. If the Imp targeted themselves: adds Imp to `deadPlayerIds` and transfers the Demon role (Scarlet Woman priority when 5+ players alive, otherwise first living Minion).
-3. Updates `poisonedPlayerId` from the Poisoner's action (clears it if Poisoner had no action).
+2. If the Imp targeted themselves: adds Imp to `deadPlayerIds` and transfers the Demon role (Scarlet Woman priority when 5+ players alive, otherwise first living Minion in assignment order).
+3. Updates `poisonedPlayerId` from the Poisoner's action (clears it if Poisoner had no action entry).
 4. Advances `currentActionIndex` by 1 so information roles can wake next.
-
-**Payload:** none
 
 ---
 
@@ -93,6 +100,11 @@ Information shapes by role type:
 
 **Who:** Storyteller only
 **When:** During Night phase
-**Effect:** Advances `currentActionIndex` by 1. Used to step through the night action order (e.g., after an information role has been shown their information).
+**Effect:** Advances `currentActionIndex` by 1. Used to step through the night action order after an information role has been shown their information.
 
-**Payload:** none
+**Payload:** `{}` (no fields required)
+
+**Validation:**
+
+- Caller must be the Storyteller.
+- Game must be in Night phase.

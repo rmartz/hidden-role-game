@@ -4,9 +4,13 @@ import { ClocktowerAction } from "./types";
 import { setNightTargetAction } from "./set-night-target";
 import { confirmNightTargetAction } from "./confirm-night-target";
 import { provideInformationAction } from "./provide-information";
+import { resolveNightAction } from "./resolve-night";
+import { advanceNightStepAction } from "./advance-night-step";
 
 export const CLOCKTOWER_ACTIONS: Record<ClocktowerAction, GameAction> = {
-  [ClocktowerAction.SetNightTarget]: setNightTargetAction,
+  [ClocktowerAction.AdvanceNightStep]: advanceNightStepAction,
   [ClocktowerAction.ConfirmNightTarget]: confirmNightTargetAction,
   [ClocktowerAction.ProvideInformation]: provideInformationAction,
+  [ClocktowerAction.ResolveNight]: resolveNightAction,
+  [ClocktowerAction.SetNightTarget]: setNightTargetAction,
 };

@@ -13,7 +13,7 @@ export const CLOCKTOWER_CONFIG = {
   name: "Clocktower",
   released: false,
   minPlayers: MIN_PLAYERS,
-  ownerTitle: null,
+  ownerTitle: "Storyteller",
   teamLabels: {
     [Team.Good]: "Good",
     [Team.Bad]: "Evil",

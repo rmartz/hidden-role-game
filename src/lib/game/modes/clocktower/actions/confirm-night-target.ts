@@ -2,7 +2,7 @@ import type { Game, GameAction } from "@/lib/types";
 import { GameStatus } from "@/lib/types";
 import { ClocktowerPhase } from "../types";
 import type { ClocktowerTurnState } from "../types";
-import { ClocktowerRole } from "../roles";
+import { ClocktowerRole, isClocktowerRole } from "../roles";
 
 function currentTurnState(game: Game): ClocktowerTurnState | undefined {
   if (game.status.type !== GameStatus.Playing) return undefined;
@@ -19,7 +19,15 @@ function resolveActingRoleId(
   roleId: string | undefined,
 ): string | undefined {
   if (callerId === game.ownerPlayerId) {
-    return typeof roleId === "string" ? roleId : undefined;
+    if (typeof roleId !== "string") return undefined;
+    if (!isClocktowerRole(roleId)) return undefined;
+    if (
+      !game.roleAssignments.some(
+        (a) => a.roleDefinitionId === (roleId as string),
+      )
+    )
+      return undefined;
+    return roleId;
   }
   return game.roleAssignments.find((a) => a.playerId === callerId)
     ?.roleDefinitionId;
@@ -50,7 +58,7 @@ export const confirmNightTargetAction: GameAction = {
     if (!activeRoleId) return false;
 
     const action = ts.phase.nightActions[activeRoleId];
-    // Must have a target set (or be an explicit no-target role handled by Storyteller)
+    // Must have a night action entry for this role
     if (!action) return false;
     // Cannot confirm twice
     if (action.confirmed) return false;
@@ -58,7 +66,10 @@ export const confirmNightTargetAction: GameAction = {
     if (!action.targetPlayerId) return false;
 
     // Fortune Teller requires both targets
-    if (activeRoleId === (ClocktowerRole.FortuneTeller as string)) {
+    if (
+      isClocktowerRole(activeRoleId) &&
+      activeRoleId === ClocktowerRole.FortuneTeller
+    ) {
       if (!action.secondTargetPlayerId) return false;
     }
 
