@@ -1,0 +1,10 @@
+# Declares which environments are active for this project.
+#
+# This project uses a single production environment — all stored data is
+# ephemeral (7-day TTL, UUID-addressed) with no persistent user accounts,
+# so a separate staging environment provides no meaningful isolation benefit.
+
+environments:
+  - production
+
+single_environment: true
