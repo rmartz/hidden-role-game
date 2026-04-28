@@ -3,7 +3,6 @@ import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase, isTeamNightAction } from "../types";
 import type {
   AttackNightResolutionEvent,
-  NightAction,
   ToughGuyAbsorbedNightResolutionEvent,
   WerewolfNighttimePhase,
 } from "../types";
@@ -35,10 +34,12 @@ export const startDayAction: GameAction = {
     const priestWardsForResolution: Record<string, string> = {
       ...(ts.priestWards ?? {}),
     };
-    const priestAction = nightPhase.nightActions[
-      WerewolfRole.Priest as string
-    ] as NightAction | undefined;
-    if (priestAction?.targetPlayerId) {
+    const priestAction = nightPhase.nightActions[WerewolfRole.Priest];
+    if (
+      priestAction &&
+      !isTeamNightAction(priestAction) &&
+      priestAction.targetPlayerId
+    ) {
       const priestPlayerId = game.roleAssignments.find(
         (a) => a.roleDefinitionId === (WerewolfRole.Priest as string),
       )?.playerId;
@@ -136,9 +137,8 @@ export const startDayAction: GameAction = {
 
     // Exposer reveal: if the Exposer confirmed a target this night, store the reveal.
     let exposerReveal = ts.exposerReveal;
-    const exposerAction = nightPhase.nightActions[
-      WerewolfRole.Exposer as string
-    ] as NightAction | undefined;
+    const exposerAction =
+      nightPhase.nightActions[WerewolfRole.Exposer as string];
     if (
       exposerAction &&
       !isTeamNightAction(exposerAction) &&
@@ -176,10 +176,12 @@ export const startDayAction: GameAction = {
         !newDeadIds.includes(a.playerId),
     );
     if (vigilanteAssignment) {
-      const vigilanteAction = nightPhase.nightActions[
-        WerewolfRole.Vigilante as string
-      ] as NightAction | undefined;
-      if (vigilanteAction?.targetPlayerId) {
+      const vigilanteAction = nightPhase.nightActions[WerewolfRole.Vigilante];
+      if (
+        vigilanteAction &&
+        !isTeamNightAction(vigilanteAction) &&
+        vigilanteAction.targetPlayerId
+      ) {
         const targetDied = newDeadIds.includes(vigilanteAction.targetPlayerId);
         if (targetDied) {
           const targetAssignment = game.roleAssignments.find(
@@ -198,10 +200,12 @@ export const startDayAction: GameAction = {
     // Mortician ability: check if the Mortician killed a Werewolf this night.
     let morticianAbilityEnded = ts.morticianAbilityEnded === true;
     if (!morticianAbilityEnded) {
-      const morticianAction = nightPhase.nightActions[
-        WerewolfRole.Mortician as string
-      ] as NightAction | undefined;
-      if (morticianAction?.targetPlayerId) {
+      const morticianAction = nightPhase.nightActions[WerewolfRole.Mortician];
+      if (
+        morticianAction &&
+        !isTeamNightAction(morticianAction) &&
+        morticianAction.targetPlayerId
+      ) {
         const morticianKilled = newDeadIds.includes(
           morticianAction.targetPlayerId,
         );
@@ -274,7 +278,7 @@ export const startDayAction: GameAction = {
           (e) =>
             e.type === "killed" &&
             e.targetPlayerId === protectedId &&
-            e.protectedBy.includes(WerewolfRole.Mirrorcaster as string),
+            e.protectedBy.includes(WerewolfRole.Mirrorcaster),
         );
         mirrorcasterCharged = protectionTriggered;
       }

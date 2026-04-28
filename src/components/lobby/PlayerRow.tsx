@@ -155,7 +155,7 @@ export function PlayerRow({
               ? (e) => {
                   e.dataTransfer.effectAllowed = "move";
                   e.dataTransfer.setData("text/plain", player.id);
-                  const rowEl = (e.currentTarget as HTMLElement).closest("li");
+                  const rowEl = e.currentTarget.closest("li");
                   if (rowEl) {
                     const clone = rowEl.cloneNode(true) as HTMLElement;
                     clone.style.position = "fixed";
