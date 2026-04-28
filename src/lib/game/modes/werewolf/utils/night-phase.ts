@@ -125,15 +125,15 @@ export function buildNightPhaseOrder(
         phaseKeys.push(key);
       }
     } else if (role.id === WerewolfRole.Witch) {
-      if (!hasAlivePlayers(role.id as string, roleAssignments, dead)) continue;
+      if (!hasAlivePlayers(role.id, roleAssignments, dead)) continue;
       witchPhaseKey = role.id;
     } else if (role.id === WerewolfRole.Altruist) {
       // Altruist acts last — after the Witch — so they only see players the Witch
       // didn't already protect.
-      if (!hasAlivePlayers(role.id as string, roleAssignments, dead)) continue;
+      if (!hasAlivePlayers(role.id, roleAssignments, dead)) continue;
       altruistPhaseKey = role.id;
     } else {
-      if (!hasAlivePlayers(role.id as string, roleAssignments, dead)) continue;
+      if (!hasAlivePlayers(role.id, roleAssignments, dead)) continue;
       phaseKeys.push(role.id);
     }
   }

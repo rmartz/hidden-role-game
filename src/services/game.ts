@@ -128,10 +128,10 @@ export async function applyStatusTransaction(
   const committedStatusJson = result.snapshot.val() as string | null;
   const committedGame =
     committedStatusJson !== null
-      ? ({
+      ? {
           ...baseGame,
           status: JSON.parse(committedStatusJson) as GameStatusState,
-        } as Game)
+        }
       : finalGame;
   return { game: committedGame };
 }
