@@ -261,8 +261,14 @@ export function resolveNightActions(
   const veteranAlerted =
     veteranAction !== undefined &&
     !isTeamNightAction(veteranAction) &&
-    !veteranAction.skipped;
-  const veteranCounterkilledEvents: NightResolutionEvent[] = [];
+    veteranAction.alerted === true;
+  // Pending counter-kill entries; events are emitted after Tough Guy so the
+  // `died` field reflects the actual outcome rather than the initial attack.
+  const pendingVeteranKills: {
+    counterkilledPlayerId: string;
+    veteranPlayerId: string;
+    source: "wolf-repel" | "protector-visit";
+  }[] = [];
 
   if (veteranAlerted) {
     const veteranPlayerId = roleAssignments.find(
@@ -272,6 +278,9 @@ export function resolveNightActions(
     if (veteranPlayerId) {
       // Werewolf attack repel: if a wolf group targeted the Veteran, remove
       // that attack and counterkill one alive wolf participant instead.
+      // Track already-selected victims so multiple wolf-group phases don't
+      // select the same wolf when there are bonus attack keys (e.g. Wolf Cub).
+      const selectedWolfVictimIds = new Set<string>();
       for (const [phaseKey, action] of Object.entries(nightActions)) {
         if (!isGroupPhaseKey(phaseKey)) continue;
         const groupAction = action as TeamNightAction;
@@ -286,22 +295,24 @@ export function resolveNightActions(
           attacks.set(veteranPlayerId, filteredAttackers);
         }
 
-        // Find the first alive participant in this wolf group to counterkill.
+        // Find the first alive participant in this wolf group not already
+        // selected as a victim this resolution pass.
         const baseKey = baseGroupPhaseKey(phaseKey);
         const wolfVictimId = roleAssignments.find((a) => {
           if (deadPlayerIds.includes(a.playerId)) return false;
+          if (selectedWolfVictimIds.has(a.playerId)) return false;
           if (a.roleDefinitionId === baseKey) return true;
           const role = getWerewolfRole(a.roleDefinitionId);
           return (role?.wakesWith as string | undefined) === baseKey;
         })?.playerId;
 
         if (wolfVictimId) {
+          selectedWolfVictimIds.add(wolfVictimId);
           attacks.set(wolfVictimId, [
             ...(attacks.get(wolfVictimId) ?? []),
             WerewolfRole.Veteran,
           ]);
-          veteranCounterkilledEvents.push({
-            type: "veteran-counterkilled",
+          pendingVeteranKills.push({
             counterkilledPlayerId: wolfVictimId,
             veteranPlayerId,
             source: "wolf-repel",
@@ -337,13 +348,12 @@ export function resolveNightActions(
           protections.set(veteranPlayerId, filteredProtectors);
         }
 
-        // Counterkill the protector.
+        // Queue the counter-kill attack.
         attacks.set(protectorPlayerId, [
           ...(attacks.get(protectorPlayerId) ?? []),
           WerewolfRole.Veteran,
         ]);
-        veteranCounterkilledEvents.push({
-          type: "veteran-counterkilled",
+        pendingVeteranKills.push({
           counterkilledPlayerId: protectorPlayerId,
           veteranPlayerId,
           source: "protector-visit",
@@ -415,6 +425,24 @@ export function resolveNightActions(
       });
     }
   }
+
+  // Veteran counter-kill events: emitted here so `died` reflects the actual
+  // outcome after Tough Guy absorption.
+  const veteranCounterkilledEvents: NightResolutionEvent[] =
+    pendingVeteranKills.map((kill) => {
+      const combatEvent = combatEvents.find(
+        (e) =>
+          e.type === "killed" &&
+          e.targetPlayerId === kill.counterkilledPlayerId,
+      );
+      return {
+        type: "veteran-counterkilled" as const,
+        counterkilledPlayerId: kill.counterkilledPlayerId,
+        veteranPlayerId: kill.veteranPlayerId,
+        source: kill.source,
+        died: combatEvent?.type === "killed" ? combatEvent.died : true,
+      };
+    });
 
   // Spellcaster: emit a silenced event for their target.
   const spellcasterAction = nightActions[WerewolfRole.Spellcaster] as

@@ -63,9 +63,17 @@ export const setNightTargetAction: GameAction = {
         return false;
     }
 
+    // Veteran: only alert (alerted: true) or skip/clear (null/undefined) are valid.
+    // A targetPlayerId string is rejected to prevent inadvertent alert triggering.
+    if (isRoleActive(phaseKey, WerewolfRole.Veteran)) {
+      if (alerted === true) return true;
+      if (targetPlayerId === undefined) return true;
+      if (targetPlayerId === null) return true;
+      return false;
+    }
+    if (alerted === true) return false;
+
     // targetPlayerId undefined = clear; null = intentional skip; string = set target.
-    // alerted = true signals the Veteran's alert (no target selection needed).
-    if (alerted === true) return isRoleActive(phaseKey, WerewolfRole.Veteran);
     if (targetPlayerId === undefined) return true;
     if (targetPlayerId === null) return true;
     if (typeof targetPlayerId !== "string") return false;
@@ -182,9 +190,10 @@ export const setNightTargetAction: GameAction = {
       explicitPhaseKey ?? phase.nightPhaseOrder[phase.currentPhaseIndex];
     if (!phaseKey) return;
 
-    // Veteran Alert: store an empty (non-skipped) action to indicate alerting.
+    // Veteran Alert: store an explicit alerted flag so resolution can distinguish
+    // alerting from other empty solo actions.
     if (alerted === true) {
-      phase.nightActions[phaseKey] = {};
+      phase.nightActions[phaseKey] = { alerted: true };
       return;
     }
 

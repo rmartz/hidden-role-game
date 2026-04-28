@@ -20,7 +20,7 @@ describe("resolveNightActions", () => {
             votes: [{ playerId: "w1", targetPlayerId: "vet1" }],
             suggestedTargetId: "vet1",
           },
-          [WerewolfRole.Veteran]: {},
+          [WerewolfRole.Veteran]: { alerted: true },
         },
         veteranAssignments,
         [],
@@ -50,7 +50,7 @@ describe("resolveNightActions", () => {
       const events = resolveNightActions(
         {
           [WerewolfRole.Bodyguard]: { targetPlayerId: "vet1" },
-          [WerewolfRole.Veteran]: {},
+          [WerewolfRole.Veteran]: { alerted: true },
         },
         veteranAssignments,
         [],
@@ -84,7 +84,7 @@ describe("resolveNightActions", () => {
             suggestedTargetId: "vet1",
           },
           [WerewolfRole.Bodyguard]: { targetPlayerId: "vet1" },
-          [WerewolfRole.Veteran]: {},
+          [WerewolfRole.Veteran]: { alerted: true },
         },
         veteranAssignments,
         [],
@@ -153,7 +153,7 @@ describe("resolveNightActions", () => {
     it("alerts but no one visits: no deaths", () => {
       const events = resolveNightActions(
         {
-          [WerewolfRole.Veteran]: {},
+          [WerewolfRole.Veteran]: { alerted: true },
         },
         veteranAssignments,
         [],
@@ -171,7 +171,7 @@ describe("resolveNightActions", () => {
       const events = resolveNightActions(
         {
           [WerewolfRole.Doctor]: { targetPlayerId: "vet1" },
-          [WerewolfRole.Veteran]: {},
+          [WerewolfRole.Veteran]: { alerted: true },
         },
         veteranAssignments,
         [],
@@ -196,7 +196,7 @@ describe("resolveNightActions", () => {
             votes: [{ playerId: "w1", targetPlayerId: "vet1" }],
             suggestedTargetId: "vet1",
           },
-          [WerewolfRole.Veteran]: { confirmed: true },
+          [WerewolfRole.Veteran]: { alerted: true, confirmed: true },
         },
         veteranAssignments,
         [],
