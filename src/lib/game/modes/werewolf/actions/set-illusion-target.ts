@@ -22,10 +22,14 @@ export const setIllusionTargetAction: GameAction = {
     if (typeof targetPlayerId !== "string") return false;
     if (targetPlayerId === callerId) return false;
     const ts = currentTurnState(game);
-    if (ts?.deadPlayerIds.includes(targetPlayerId)) return false;
+    if (ts?.phase.type !== WerewolfPhase.Nighttime) return false;
+    const existing =
+      result.phase.nightActions[WerewolfRole.IllusionArtist as string];
+    if (existing && !("votes" in existing) && existing.confirmed) return false;
+    if (ts.deadPlayerIds.includes(targetPlayerId)) return false;
 
     // Prevent targeting the same player on consecutive nights.
-    const lastTarget = ts?.lastTargets?.[WerewolfRole.IllusionArtist as string];
+    const lastTarget = ts.lastTargets?.[WerewolfRole.IllusionArtist as string];
     if (lastTarget === targetPlayerId) return false;
 
     return game.players.some((p) => p.id === targetPlayerId);
@@ -37,6 +41,14 @@ export const setIllusionTargetAction: GameAction = {
     const activePhaseKey = phase.nightPhaseOrder[phase.currentPhaseIndex];
     if (!activePhaseKey) return;
     const { targetPlayerId } = payload as { targetPlayerId: string };
-    phase.nightActions[activePhaseKey] = { targetPlayerId };
+    const existing = phase.nightActions[activePhaseKey];
+    const resultRevealed =
+      existing && !("votes" in existing) && !existing.skipped
+        ? existing.resultRevealed
+        : undefined;
+    phase.nightActions[activePhaseKey] = {
+      targetPlayerId,
+      ...(resultRevealed !== undefined ? { resultRevealed } : {}),
+    };
   },
 };

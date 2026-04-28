@@ -71,7 +71,7 @@ function makeEmpathGame(
       autoRevealNightOutcome: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
-  } as Game;
+  };
 }
 
 describe("WerewolfAction.ConfirmEvilEmpathResult — isValid", () => {

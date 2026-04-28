@@ -18,7 +18,6 @@ function makeGame(
     playerOrder?: string[];
     turnState?: WerewolfTurnState;
     deadPlayerIds?: string[];
-    illusionTargetId?: string;
     evilEmpathLastResult?: boolean;
     evilEmpathRevealedResult?: boolean;
   } = {},
@@ -40,9 +39,6 @@ function makeGame(
       },
     },
     deadPlayerIds,
-    ...(overrides.illusionTargetId !== undefined
-      ? { illusionTargetId: overrides.illusionTargetId }
-      : {}),
     ...(overrides.evilEmpathLastResult !== undefined
       ? { evilEmpathLastResult: overrides.evilEmpathLastResult }
       : {}),
@@ -95,7 +91,7 @@ function makeGame(
       autoRevealNightOutcome: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
-  } as Game;
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -111,23 +107,48 @@ describe("Seer investigation — Illusion Artist inversion", () => {
     expect(result.investigationResult?.isWerewolfTeam).toBe(true);
   });
 
-  it("inverts the result to false when illusionTargetId matches the Seer's target (wolf appears innocent)", () => {
-    const game = makeGame({ illusionTargetId: "wolf1" });
-    const result = extractPlayerNightState(game, "seer1", seerRole, []);
-    expect(result.investigationResult?.isWerewolfTeam).toBe(false);
-  });
-
-  it("inverts the result to true when illusionTargetId matches a Villager target (villager appears guilty)", () => {
+  it("inverts the result to false when IllusionArtist confirmed target matches the Seer's target (wolf appears innocent)", () => {
     const game = makeGame({
-      illusionTargetId: "v1",
       turnState: {
         turn: 2,
         phase: {
           type: WerewolfPhase.Nighttime,
           startedAt: 1000,
-          nightPhaseOrder: [WerewolfRole.Seer],
-          currentPhaseIndex: 0,
+          nightPhaseOrder: [WerewolfRole.IllusionArtist, WerewolfRole.Seer],
+          currentPhaseIndex: 1,
           nightActions: {
+            [WerewolfRole.IllusionArtist]: {
+              targetPlayerId: "wolf1",
+              confirmed: true,
+            },
+            [WerewolfRole.Seer]: {
+              targetPlayerId: "wolf1",
+              confirmed: true,
+              resultRevealed: true,
+            },
+          },
+        },
+        deadPlayerIds: [],
+      },
+    });
+    const result = extractPlayerNightState(game, "seer1", seerRole, []);
+    expect(result.investigationResult?.isWerewolfTeam).toBe(false);
+  });
+
+  it("inverts the result to true when IllusionArtist confirmed target matches a Villager target (villager appears guilty)", () => {
+    const game = makeGame({
+      turnState: {
+        turn: 2,
+        phase: {
+          type: WerewolfPhase.Nighttime,
+          startedAt: 1000,
+          nightPhaseOrder: [WerewolfRole.IllusionArtist, WerewolfRole.Seer],
+          currentPhaseIndex: 1,
+          nightActions: {
+            [WerewolfRole.IllusionArtist]: {
+              targetPlayerId: "v1",
+              confirmed: true,
+            },
             [WerewolfRole.Seer]: {
               targetPlayerId: "v1",
               confirmed: true,
@@ -136,16 +157,66 @@ describe("Seer investigation — Illusion Artist inversion", () => {
           },
         },
         deadPlayerIds: [],
-        illusionTargetId: "v1",
       },
     });
     const result = extractPlayerNightState(game, "seer1", seerRole, []);
     expect(result.investigationResult?.isWerewolfTeam).toBe(true);
   });
 
-  it("does not invert when illusionTargetId is a different player than the Seer's target", () => {
+  it("does not invert when IllusionArtist targets a different player than the Seer's target", () => {
     // Illusion is on v1, but Seer is investigating wolf1
-    const game = makeGame({ illusionTargetId: "v1" });
+    const game = makeGame({
+      turnState: {
+        turn: 2,
+        phase: {
+          type: WerewolfPhase.Nighttime,
+          startedAt: 1000,
+          nightPhaseOrder: [WerewolfRole.IllusionArtist, WerewolfRole.Seer],
+          currentPhaseIndex: 1,
+          nightActions: {
+            [WerewolfRole.IllusionArtist]: {
+              targetPlayerId: "v1",
+              confirmed: true,
+            },
+            [WerewolfRole.Seer]: {
+              targetPlayerId: "wolf1",
+              confirmed: true,
+              resultRevealed: true,
+            },
+          },
+        },
+        deadPlayerIds: [],
+      },
+    });
+    const result = extractPlayerNightState(game, "seer1", seerRole, []);
+    expect(result.investigationResult?.isWerewolfTeam).toBe(true);
+  });
+
+  it("does not invert when IllusionArtist has not confirmed their target yet", () => {
+    // Illusion Artist has set target but not confirmed
+    const game = makeGame({
+      turnState: {
+        turn: 2,
+        phase: {
+          type: WerewolfPhase.Nighttime,
+          startedAt: 1000,
+          nightPhaseOrder: [WerewolfRole.IllusionArtist, WerewolfRole.Seer],
+          currentPhaseIndex: 1,
+          nightActions: {
+            [WerewolfRole.IllusionArtist]: {
+              targetPlayerId: "wolf1",
+              // confirmed omitted — not yet confirmed
+            },
+            [WerewolfRole.Seer]: {
+              targetPlayerId: "wolf1",
+              confirmed: true,
+              resultRevealed: true,
+            },
+          },
+        },
+        deadPlayerIds: [],
+      },
+    });
     const result = extractPlayerNightState(game, "seer1", seerRole, []);
     expect(result.investigationResult?.isWerewolfTeam).toBe(true);
   });
