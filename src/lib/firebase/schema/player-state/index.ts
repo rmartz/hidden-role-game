@@ -15,11 +15,17 @@ import {
   avalonStateToFirebase,
   avalonStateFromFirebase,
 } from "./avalon";
+import {
+  type FirebaseCodenamesPlayerState,
+  codenamesStateToFirebase,
+  codenamesStateFromFirebase,
+} from "./codenames";
 
 export type { FirebaseBasePlayerState } from "./base";
 export type { FirebaseWerewolfPlayerState } from "./werewolf";
 export type { FirebaseSecretVillainPlayerState } from "./secret-villain";
 export type { FirebaseAvalonPlayerState } from "./avalon";
+export type { FirebaseCodenamesPlayerState } from "./codenames";
 
 // ---------------------------------------------------------------------------
 // Discriminated union
@@ -28,7 +34,8 @@ export type { FirebaseAvalonPlayerState } from "./avalon";
 export type FirebasePlayerState =
   | FirebaseWerewolfPlayerState
   | FirebaseSecretVillainPlayerState
-  | FirebaseAvalonPlayerState;
+  | FirebaseAvalonPlayerState
+  | FirebaseCodenamesPlayerState;
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -44,6 +51,8 @@ export function playerStateToFirebase(
       return secretVillainStateToFirebase(state);
     case GameMode.Avalon:
       return avalonStateToFirebase(state);
+    case GameMode.Codenames:
+      return codenamesStateToFirebase(state);
   }
 }
 
@@ -52,16 +61,19 @@ export function firebaseToPlayerState(
 ): PlayerGameState {
   // gameMode is typed as string on FirebaseBasePlayerState (Firebase boundary),
   // so the discriminated union cannot be narrowed at compile time. Cast to
-  // GameMode for the switch and narrow each branch individually.
+  // GameMode for the switch. Only the Werewolf branch needs a further per-branch
+  // cast because FirebaseWerewolfPlayerState has required fields absent from the
+  // base type; the other modes add only optional fields and TypeScript accepts
+  // raw directly.
   switch (raw.gameMode as GameMode) {
     case GameMode.Werewolf:
       return werewolfStateFromFirebase(raw as FirebaseWerewolfPlayerState);
     case GameMode.SecretVillain:
-      return secretVillainStateFromFirebase(
-        raw as FirebaseSecretVillainPlayerState,
-      );
+      return secretVillainStateFromFirebase(raw);
     case GameMode.Avalon:
       return avalonStateFromFirebase(raw);
+    case GameMode.Codenames:
+      return codenamesStateFromFirebase(raw);
     default:
       throw new Error(`Unknown game mode: ${raw.gameMode}`);
   }

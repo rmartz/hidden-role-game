@@ -1,6 +1,7 @@
 import { GameStatus, Team } from "@/lib/types";
 import type { Game } from "@/lib/types";
 import { WerewolfRole, getWerewolfRole } from "../roles";
+import { currentTurnState } from "./game-state";
 
 /**
  * Checks the current win condition for a Werewolf game.
@@ -17,6 +18,10 @@ import { WerewolfRole, getWerewolfRole } from "../roles";
  * 4. Game continues if Chupacabra is the only remaining opposition (goodAlive === 0):
  *    their win conditions conflict and will resolve through night kills
  * 5. Werewolves win: Bad team count ≥ non-Bad count (Good + Neutral + Chupacabra)
+ *
+ * Zombie wins are checked before standard conditions:
+ * - Zombie wins: infected alive > healthy alive (checked after every death)
+ * Note: Dracula win is checked separately in startNightAction, not here.
  */
 export function checkWinCondition(
   game: Game,
@@ -26,6 +31,31 @@ export function checkWinCondition(
   const aliveAssignments = game.roleAssignments.filter(
     (a) => !deadSet.has(a.playerId),
   );
+
+  const ts = currentTurnState(game);
+
+  // Zombie wins if infected alive > healthy alive (Zombie itself is excluded).
+  const zombieAssignment = game.roleAssignments.find(
+    (a) => a.roleDefinitionId === (WerewolfRole.Zombie as string),
+  );
+  if (
+    zombieAssignment &&
+    !deadSet.has(zombieAssignment.playerId) &&
+    ts?.zombieInfected?.length
+  ) {
+    const infectedSet = new Set(ts.zombieInfected);
+    const infectedAlive = aliveAssignments.filter((a) =>
+      infectedSet.has(a.playerId),
+    ).length;
+    const healthyAlive = aliveAssignments.filter(
+      (a) =>
+        !infectedSet.has(a.playerId) &&
+        a.playerId !== zombieAssignment.playerId,
+    ).length;
+    if (infectedAlive > healthyAlive) {
+      return { type: GameStatus.Finished, winner: WerewolfWinner.Zombie };
+    }
+  }
 
   let badAlive = 0;
   let regularBadAlive = 0;
@@ -52,7 +82,7 @@ export function checkWinCondition(
     } else if (role.team === Team.Good) {
       goodAlive++;
     } else {
-      // Remaining neutral roles (Tanner, Executioner) oppose wolves
+      // Remaining neutral roles (Tanner, Executioner, Dracula, Zombie) oppose wolves
       neutralAlive++;
     }
   }
@@ -120,11 +150,13 @@ export const WerewolfWinner = {
   Werewolves: "Werewolves",
   Village: "Village",
   Chupacabra: "Chupacabra",
+  Dracula: "Dracula",
   Draw: "Draw",
   LoneWolf: "LoneWolf",
   Tanner: "Tanner",
   Spoiler: "Spoiler",
   Executioner: "Executioner",
+  Zombie: "Zombie",
 } as const;
 export type WerewolfWinner =
   (typeof WerewolfWinner)[keyof typeof WerewolfWinner];

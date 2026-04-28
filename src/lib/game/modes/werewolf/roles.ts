@@ -46,6 +46,7 @@ export enum WerewolfRole {
   Bodyguard = "werewolf-bodyguard",
   Chupacabra = "werewolf-chupacabra",
   Doctor = "werewolf-doctor",
+  Dracula = "werewolf-dracula",
   ElusiveSeer = "werewolf-elusive-seer",
   Executioner = "werewolf-executioner",
   Exposer = "werewolf-exposer",
@@ -77,6 +78,7 @@ export enum WerewolfRole {
   Witch = "werewolf-witch",
   Wizard = "werewolf-wizard",
   WolfCub = "werewolf-wolf-cub",
+  Zombie = "werewolf-zombie",
 }
 
 export interface WerewolfRoleDefinition extends RoleDefinition<
@@ -188,6 +190,20 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     preventSelfTarget: true,
     aliases: ["healer", "medic"],
     category: WerewolfRoleCategory.VillagerProtection,
+  },
+  [WerewolfRole.Dracula]: {
+    id: WerewolfRole.Dracula,
+    name: "Dracula",
+    summary:
+      "Claims wives each night; wins with 3 wives alive after a full cycle",
+    description:
+      "Each night Dracula selects one player to become a wife. Wives retain their original roles and are unaware of their status. If Dracula is alive and at least 3 wives are simultaneously alive at the start of any night, Dracula wins. Dracula may skip their night action.",
+    team: Team.Neutral,
+    unique: true,
+    wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Special,
+    preventSelfTarget: true,
+    category: WerewolfRoleCategory.NeutralManipulation,
   },
   [WerewolfRole.ElusiveSeer]: {
     id: WerewolfRole.ElusiveSeer,
@@ -576,6 +592,19 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     targetCategory: TargetCategory.Attack,
     wakesWith: WerewolfRole.Werewolf,
     category: WerewolfRoleCategory.EvilKilling,
+  },
+  [WerewolfRole.Zombie]: {
+    id: WerewolfRole.Zombie,
+    name: "Zombie",
+    summary: "Infects players; wins when infected outnumber healthy",
+    description:
+      "Each night the Zombie infects one player. Infected players continue normally under their original roles and are unaware of their status. After every death, if the number of living infected players exceeds the number of living non-infected players (excluding the Zombie), the Zombie wins. The Zombie cannot infect a player who is already infected.",
+    team: Team.Neutral,
+    unique: true,
+    wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Special,
+    preventSelfTarget: true,
+    category: WerewolfRoleCategory.NeutralKilling,
   },
 } satisfies Record<WerewolfRole, WerewolfRoleDefinition>;
 

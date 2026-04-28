@@ -197,6 +197,10 @@ export interface WerewolfTurnState {
   executionerTargetId?: string;
   /** True when the Mirrorcaster has gained a charge from a successful protection. */
   mirrorcasterCharged?: boolean;
+  /** Player IDs that Dracula has claimed as wives. Accumulated across nights. */
+  draculaWives?: string[];
+  /** Player IDs that the Zombie has infected. Accumulated across nights. */
+  zombieInfected?: string[];
 }
 
 export interface TargetablePlayer {

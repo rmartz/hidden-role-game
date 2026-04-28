@@ -143,9 +143,11 @@ export const WEREWOLF_COPY = {
       [WerewolfWinner.Tanner]: "Tanner eliminated",
       [WerewolfWinner.Draw]: "All players eliminated simultaneously",
       [WerewolfWinner.Chupacabra]: "By elimination",
+      [WerewolfWinner.Dracula]: "3 wives survived a full cycle",
       [WerewolfWinner.LoneWolf]: "By elimination",
       [WerewolfWinner.Spoiler]: "Spoiler stole the victory",
       [WerewolfWinner.Executioner]: "Executioner's target eliminated",
+      [WerewolfWinner.Zombie]: "Infected outnumber the healthy",
     } satisfies Record<WerewolfWinner, string>,
   },
   nomination: {
@@ -217,7 +219,7 @@ export const WEREWOLF_COPY = {
       [NightOutcomeEffect.Killed]: "killed",
       [NightOutcomeEffect.Silenced]: "silenced",
       [NightOutcomeEffect.Hypnotized]: "hypnotized",
-    } as Record<NightOutcomeEffect, string>,
+    },
   },
   mirrorcaster: {
     protectMode: "Protect Mode — Choose a player to shield.",

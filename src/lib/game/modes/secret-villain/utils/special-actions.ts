@@ -66,7 +66,7 @@ export function resolvePowerTable(
   const concrete =
     preset === SvBoardPreset.Default
       ? getDefaultBoardPreset(playerCount ?? 5)
-      : (preset as SvConcretePreset);
+      : preset;
   return BOARD_PRESETS[concrete];
 }
 

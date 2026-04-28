@@ -12,6 +12,7 @@ Each player is secretly assigned one role. The Narrator has no role and runs the
 | Bodyguard     | `werewolf-bodyguard`     | Good    | Every Night               | Protect               | Chosen target survives any attack that night; cannot protect the same player on consecutive nights (`preventRepeatTarget`)                                                              |
 | Chupacabra    | `werewolf-chupacabra`    | Neutral | Every Night               | Attack (conditional)  | Attack lands only if target is on Team Bad, **or** if all Team Bad players are already dead                                                                                             |
 | Doctor        | `werewolf-doctor`        | Good    | Every Night               | Protect               | Chosen target survives any attack that night; cannot protect self (`preventSelfTarget`)                                                                                                 |
+| Dracula       | `werewolf-dracula`       | Neutral | Every Night               | Special (claim wife)  | Claims one player as a wife each night (skip allowed). Wives retain original roles and are unaware. Wins if alive and ≥3 wives are simultaneously alive at night start (turn ≥ 2).      |
 | Elusive Seer  | `werewolf-elusive-seer`  | Good    | First Night Only          | —                     | Sees all Villager-role players on the first night                                                                                                                                       |
 | Executioner   | `werewolf-executioner`   | Neutral | Never                     | —                     | Assigned a random Good-team target. Wins if that target is voted out at trial                                                                                                           |
 | Exposer       | `werewolf-exposer`       | Good    | Every Night               | Special (reveal)      | Reveals target's role publicly; one-time ability (`oncePerGame`)                                                                                                                        |
@@ -43,6 +44,7 @@ Each player is secretly assigned one role. The Narrator has no role and runs the
 | Witch         | `werewolf-witch`         | Good    | Every Night (2nd-to-last) | Special (once)        | After all other roles act (except Altruist), may protect the attacked player **or** attack any other player; one-time ability                                                           |
 | Wizard        | `werewolf-wizard`        | Bad     | Every Night               | Investigate           | Checks whether the target is the Seer (`checksForSeer`)                                                                                                                                 |
 | Wolf Cub      | `werewolf-wolf-cub`      | Bad     | Every Night               | Attack (group vote)   | Wakes with Werewolves (`wakesWith`); when killed, Werewolves receive two attack phases the following night; `isWerewolf`                                                                |
+| Zombie        | `werewolf-zombie`        | Neutral | Every Night               | Special (infect)      | Infects one player per night; infected players continue normally under their original roles. Wins when living infected outnumber living healthy players (Zombie excluded from count).   |
 
 ## Role Properties
 
@@ -74,14 +76,37 @@ interface WerewolfRoleDefinition {
 
 Roles wake in a consistent order determined by their `category`, following the rule **Bad team → Neutral team → Good team**, and within each team **Attack → Investigate → Protect → Special**. The full category order used for night phases is:
 
-1. `EvilKilling` (Bad — Attack): Werewolf group phase always goes first.
-2. `EvilSupport` (Bad — Support/Investigate): Minion (night 1 only), Wizard.
-3. `NeutralKilling` (Neutral — Attack): Chupacabra.
-4. `NeutralManipulation` (Neutral — no night action).
-5. `VillagerKilling` (Good — Attack): Mortician, Vigilante.
-6. `VillagerInvestigation` (Good — Investigate): Seer, Mystic Seer, One-Eyed Seer, Mentalist, Elusive Seer, etc.
-7. `VillagerProtection` (Good — Protect): Bodyguard, Doctor, Priest, Mirrorcaster.
-8. `VillagerSupport` (Good — Special): Mummy, Spellcaster, Mason, Sentinel.
+1. `EvilKilling` (Bad — Attack):
+   - Werewolf (group phase, always first; includes Wolf Cub)
+2. `EvilSupport` (Bad — Support/Investigate):
+   - Minion (night 1 only)
+   - Wizard
+3. `NeutralKilling` (Neutral — Attack):
+   - Chupacabra
+   - Lone Wolf
+   - Zombie
+4. `NeutralManipulation` (Neutral — Special):
+   - Dracula
+5. `VillagerKilling` (Good — Attack):
+   - Mortician
+   - Vigilante
+6. `VillagerInvestigation` (Good — Investigate):
+   - Elusive Seer
+   - Exposer
+   - Mentalist
+   - Mystic Seer
+   - One-Eyed Seer
+   - Seer
+7. `VillagerProtection` (Good — Protect):
+   - Bodyguard
+   - Doctor
+   - Mirrorcaster
+   - Priest
+8. `VillagerSupport` (Good — Special):
+   - Mason
+   - Mummy
+   - Sentinel
+   - Spellcaster
 9. `VillagerHandicap` (Good — no night action).
 
 Within a category, the order is arbitrary. After all category-ordered roles, the Witch and Altruist always act last in that order.
