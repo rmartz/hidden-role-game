@@ -80,7 +80,7 @@ export function firebaseToPlayerState(
     case GameMode.SecretVillain:
       return secretVillainStateFromFirebase(raw);
     case GameMode.Avalon:
-      return avalonStateFromFirebase(raw as FirebaseAvalonPlayerState);
+      return avalonStateFromFirebase(raw);
     case GameMode.Clocktower:
       return clocktowerStateFromFirebase(raw as FirebaseClocktowerPlayerState);
     case GameMode.Codenames:

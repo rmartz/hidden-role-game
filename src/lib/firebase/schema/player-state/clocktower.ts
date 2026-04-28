@@ -76,5 +76,5 @@ export function clocktowerStateFromFirebase(
     ...(raw.drunkIndicator !== undefined
       ? { drunkIndicator: raw.drunkIndicator }
       : {}),
-  } as ClocktowerPlayerGameState;
+  };
 }
