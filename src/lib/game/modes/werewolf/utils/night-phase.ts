@@ -136,7 +136,7 @@ export function buildNightPhaseOrder(
     } else if (role.id === WerewolfRole.Insomniac) {
       // Insomniac acts very last — after all other roles (including Altruist)
       // so they can query which neighbors woke and acted.
-      if (!hasAlivePlayers(role.id as string, roleAssignments, dead)) continue;
+      if (!hasAlivePlayers(role.id, roleAssignments, dead)) continue;
       insomniacPhaseKey = role.id;
     } else {
       if (!hasAlivePlayers(role.id, roleAssignments, dead)) continue;

@@ -3,7 +3,6 @@ import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase, isTeamNightAction } from "../types";
 import type {
   AttackNightResolutionEvent,
-  NightAction,
   ToughGuyAbsorbedNightResolutionEvent,
   WerewolfNighttimePhase,
 } from "../types";
@@ -322,10 +321,11 @@ export const startDayAction: GameAction = {
 
     // The Thing tap: record the tapped player ID so they see the notification
     // during the following daytime.
-    const thingAction = nightPhase.nightActions[
-      WerewolfRole.TheThing as string
-    ] as NightAction | undefined;
-    const thingTapped = thingAction?.targetPlayerId;
+    const thingAction = nightPhase.nightActions[WerewolfRole.TheThing];
+    const thingTapped =
+      thingAction !== undefined && !isTeamNightAction(thingAction)
+        ? thingAction.targetPlayerId
+        : undefined;
 
     const wolfCubDied =
       ts.wolfCubDied === true || didWolfCubDie(newDeadIds, game);
