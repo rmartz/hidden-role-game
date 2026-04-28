@@ -35,7 +35,10 @@ async function writePlayerStates(game: Game): Promise<void> {
   try {
     await writeAllPlayerStates(game.id, states);
   } catch (err) {
-    console.error(`[writePlayerStates] writeAllPlayerStates failed for game ${game.id}:`, err);
+    console.error(
+      `[writePlayerStates] writeAllPlayerStates failed for game ${game.id}:`,
+      err,
+    );
     throw err;
   }
 }
