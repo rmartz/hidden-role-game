@@ -64,6 +64,10 @@ export const clocktowerServices: GameModeServices = {
     if (!demonAssignment)
       throw new Error("Clocktower turn state requires an Imp assignment");
 
+    const drunkAssignment = roleAssignments.find(
+      (a) => a.roleDefinitionId === (ClocktowerRole.Drunk as string),
+    );
+
     return {
       turn: 1,
       phase: {
@@ -75,6 +79,7 @@ export const clocktowerServices: GameModeServices = {
       deadPlayerIds: [],
       ghostVotesUsed: [],
       demonPlayerId: demonAssignment.playerId,
+      ...(drunkAssignment && { drunkPlayerId: drunkAssignment.playerId }),
     };
   },
 
