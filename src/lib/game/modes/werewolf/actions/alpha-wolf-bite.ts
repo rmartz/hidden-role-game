@@ -56,7 +56,7 @@ export const alphaWolfBiteAction: GameAction = {
     ts.alphaWolfBiteUsed = true;
     ts.roleOverrides = {
       ...(ts.roleOverrides ?? {}),
-      [targetPlayerId]: WerewolfRole.Werewolf as string,
+      [targetPlayerId]: WerewolfRole.Werewolf,
     };
   },
 };

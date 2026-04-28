@@ -60,7 +60,7 @@ function makeGame(
       ...(villageDrunkSoberRoleId ? { villageDrunkSoberRoleId } : {}),
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
-  } as Game;
+  };
 }
 
 function getTurnState(game: Game): WerewolfTurnState {
