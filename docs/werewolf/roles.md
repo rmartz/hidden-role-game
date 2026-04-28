@@ -75,13 +75,16 @@ interface WerewolfRoleDefinition {
 Roles wake in a consistent order determined by their `category`, following the rule **Bad team → Neutral team → Good team**, and within each team **Attack → Investigate → Protect → Special**. The full category order used for night phases is:
 
 1. `EvilKilling` (Bad — Attack):
-   - Werewolf (group phase, always first)
+   - Werewolf (group phase, always first; includes Wolf Cub)
 2. `EvilSupport` (Bad — Support/Investigate):
    - Minion (night 1 only)
    - Wizard
 3. `NeutralKilling` (Neutral — Attack):
    - Chupacabra
-4. `NeutralManipulation` (Neutral — no night action).
+   - Lone Wolf
+   - Zombie
+4. `NeutralManipulation` (Neutral — Special):
+   - Dracula
 5. `VillagerKilling` (Good — Attack):
    - Mortician
    - Vigilante
