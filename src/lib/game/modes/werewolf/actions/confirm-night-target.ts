@@ -100,11 +100,11 @@ export const confirmNightTargetAction: GameAction = {
               if (aliveParticipants.length === 0) {
                 const blockedKey = blockedPhaseKey as string;
                 phase.nightPhaseOrder = phase.nightPhaseOrder.filter(
-                  (k) => k !== blockedKey,
+                  (k) => k !== blockedKey && k.split(":")[0] !== blockedKey,
                 );
                 phase.nightActions = Object.fromEntries(
                   Object.entries(phase.nightActions).filter(
-                    ([k]) => k !== blockedKey,
+                    ([k]) => k !== blockedKey && k.split(":")[0] !== blockedKey,
                   ),
                 );
               }
