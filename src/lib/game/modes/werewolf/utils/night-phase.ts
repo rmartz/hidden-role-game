@@ -174,6 +174,11 @@ export function validateActiveNightPlayer(
   );
   if (!callerAssignment) return undefined;
 
+  // Apply roleOverrides so a mid-game role change (e.g. Village Drunk sobering
+  // up) is reflected when checking whether the caller can act this phase.
+  const effectiveRoleId =
+    ts.roleOverrides?.[callerId] ?? callerAssignment.roleDefinitionId;
+
   const activePhaseKey = phase.nightPhaseOrder[phase.currentPhaseIndex];
   if (!activePhaseKey) return undefined;
 
@@ -181,7 +186,7 @@ export function validateActiveNightPlayer(
     // Group phase — check caller is the primary role or a wakesWith participant.
     // Use the base key so suffixed repeat phases (e.g. ":2") match correctly.
     const baseKey = baseGroupPhaseKey(activePhaseKey);
-    const callerRole = getWerewolfRole(callerAssignment.roleDefinitionId);
+    const callerRole = getWerewolfRole(effectiveRoleId);
     const isParticipant =
       (callerRole?.id as string | undefined) === baseKey ||
       (callerRole?.wakesWith as string | undefined) === baseKey;
@@ -189,7 +194,7 @@ export function validateActiveNightPlayer(
     return { phase, activePhaseKey, isGroupPhase: true };
   }
 
-  // Solo phase — exact role match.
-  if (callerAssignment.roleDefinitionId !== activePhaseKey) return undefined;
+  // Solo phase — exact role match against effective role.
+  if (effectiveRoleId !== activePhaseKey) return undefined;
   return { phase, activePhaseKey, isGroupPhase: false };
 }
