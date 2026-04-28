@@ -428,12 +428,30 @@ function appendInvestigationResult(
       secondTargetName: secondName,
     };
   } else {
-    // Illusion Artist: invert the result when the target matches illusionTargetId.
+    // Illusion Artist: invert the result when the target matches the illusion target.
+    // During nighttime, illusionTargetId is not yet set on turn state (it is lifted
+    // at start-day), so derive it directly from the confirmed IllusionArtist night
+    // action instead. During daytime, fall back to ts.illusionTargetId which was set
+    // at start-day.
     const isWerewolf = targetRoleDef?.isWerewolf === true;
-    const illusionApplies = ts?.illusionTargetId === myAction.targetPlayerId;
+    let illusionTargetId: string | undefined;
+    if (ts?.phase.type === WerewolfPhase.Nighttime) {
+      const illusionAction =
+        ts.phase.nightActions[WerewolfRole.IllusionArtist as string];
+      if (
+        illusionAction &&
+        !isTeamNightAction(illusionAction) &&
+        illusionAction.confirmed
+      ) {
+        illusionTargetId = illusionAction.targetPlayerId;
+      }
+    } else {
+      illusionTargetId = ts?.illusionTargetId;
+    }
     result.investigationResult = {
       targetPlayerId: myAction.targetPlayerId,
-      isWerewolfTeam: illusionApplies ? !isWerewolf : isWerewolf,
+      isWerewolfTeam:
+        illusionTargetId === myAction.targetPlayerId ? !isWerewolf : isWerewolf,
     };
   }
 }

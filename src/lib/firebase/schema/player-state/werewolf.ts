@@ -66,6 +66,11 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
   hunterRevengePlayerId?: string;
   /** Narrator-only hidden role IDs. Present only when hiddenRoleCount > 0. */
   hiddenRoleIds?: string[];
+  /**
+   * Set when the Evil Empath dies, revealing their last adjacency result to the Werewolves.
+   * True = Seer was adjacent to a Werewolf.
+   */
+  evilEmpathRevealedResult?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -138,6 +143,9 @@ export function werewolfStateToFirebase(
       : {}),
     ...(state.hiddenRoleIds?.length
       ? { hiddenRoleIds: state.hiddenRoleIds }
+      : {}),
+    ...(state.evilEmpathRevealedResult !== undefined
+      ? { evilEmpathRevealedResult: state.evilEmpathRevealedResult }
       : {}),
   };
 }
@@ -220,5 +228,8 @@ export function werewolfStateFromFirebase(
       ? { hunterRevengePlayerId: raw.hunterRevengePlayerId }
       : {}),
     ...(raw.hiddenRoleIds?.length ? { hiddenRoleIds: raw.hiddenRoleIds } : {}),
+    ...(raw.evilEmpathRevealedResult !== undefined
+      ? { evilEmpathRevealedResult: raw.evilEmpathRevealedResult }
+      : {}),
   } as WerewolfPlayerGameState;
 }

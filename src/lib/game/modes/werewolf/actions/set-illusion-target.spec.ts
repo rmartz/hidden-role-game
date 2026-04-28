@@ -24,8 +24,7 @@ function makeIllusionGame(
       startedAt: 1000,
       nightPhaseOrder: [WerewolfRole.IllusionArtist, WerewolfRole.Seer],
       currentPhaseIndex: overrides.currentPhaseIndex ?? 0,
-      nightActions: (overrides.nightActions ??
-        {}) as WerewolfTurnState["phase"]["nightActions"],
+      nightActions: overrides.nightActions ?? {},
     },
     deadPlayerIds: overrides.deadPlayerIds ?? [],
     ...(overrides.lastTargets ? { lastTargets: overrides.lastTargets } : {}),
@@ -63,7 +62,7 @@ function makeIllusionGame(
       autoRevealNightOutcome: true,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
-  } as Game;
+  };
 }
 
 describe("WerewolfAction.SetIllusionTarget — isValid", () => {

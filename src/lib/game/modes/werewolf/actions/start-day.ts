@@ -160,9 +160,12 @@ export const startDayAction: GameAction = {
     // Illusion Artist: extract the target from this night's action to carry into
     // daytime turn state. Seer result resolution reads illusionTargetId to invert
     // the result when the Seer's target matches this player.
-    const illusionAction = nightPhase.nightActions[
-      WerewolfRole.IllusionArtist as string
-    ] as NightAction | undefined;
+    const illusionRawAction =
+      nightPhase.nightActions[WerewolfRole.IllusionArtist as string];
+    const illusionAction =
+      illusionRawAction && !isTeamNightAction(illusionRawAction)
+        ? illusionRawAction
+        : undefined;
     const illusionTargetId =
       illusionAction?.confirmed && illusionAction.targetPlayerId
         ? illusionAction.targetPlayerId
