@@ -76,14 +76,37 @@ interface WerewolfRoleDefinition {
 
 Roles wake in a consistent order determined by their `category`, following the rule **Bad team → Neutral team → Good team**, and within each team **Attack → Investigate → Protect → Special**. The full category order used for night phases is:
 
-1. `EvilKilling` (Bad — Attack): Werewolf group phase always goes first.
-2. `EvilSupport` (Bad — Support/Investigate): Minion (night 1 only), Wizard.
-3. `NeutralKilling` (Neutral — Attack): Chupacabra.
-4. `NeutralManipulation` (Neutral — no night action).
-5. `VillagerKilling` (Good — Attack): Mortician, Vigilante.
-6. `VillagerInvestigation` (Good — Investigate): Seer, Mystic Seer, One-Eyed Seer, Mentalist, Elusive Seer, etc.
-7. `VillagerProtection` (Good — Protect): Bodyguard, Doctor, Priest, Mirrorcaster.
-8. `VillagerSupport` (Good — Special): Mummy, Spellcaster, Mason, Sentinel.
+1. `EvilKilling` (Bad — Attack):
+   - Werewolf (group phase, always first; includes Wolf Cub)
+2. `EvilSupport` (Bad — Support/Investigate):
+   - Minion (night 1 only)
+   - Wizard
+3. `NeutralKilling` (Neutral — Attack):
+   - Chupacabra
+   - Lone Wolf
+   - Zombie
+4. `NeutralManipulation` (Neutral — Special):
+   - Dracula
+5. `VillagerKilling` (Good — Attack):
+   - Mortician
+   - Vigilante
+6. `VillagerInvestigation` (Good — Investigate):
+   - Elusive Seer
+   - Exposer
+   - Mentalist
+   - Mystic Seer
+   - One-Eyed Seer
+   - Seer
+7. `VillagerProtection` (Good — Protect):
+   - Bodyguard
+   - Doctor
+   - Mirrorcaster
+   - Priest
+8. `VillagerSupport` (Good — Special):
+   - Mason
+   - Mummy
+   - Sentinel
+   - Spellcaster
 9. `VillagerHandicap` (Good — no night action).
 
 Within a category, the order is arbitrary. After all category-ordered roles, the Witch and Altruist always act last in that order.

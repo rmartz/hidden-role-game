@@ -142,5 +142,5 @@ export function avalonStateFromFirebase(
     ...(raw.assassinationTargetIds?.length
       ? { assassinationTargetIds: raw.assassinationTargetIds }
       : {}),
-  } as AvalonPlayerGameState;
+  };
 }

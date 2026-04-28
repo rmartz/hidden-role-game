@@ -225,7 +225,7 @@ export const WEREWOLF_COPY = {
       [NightOutcomeEffect.Killed]: "killed",
       [NightOutcomeEffect.Silenced]: "silenced",
       [NightOutcomeEffect.Hypnotized]: "hypnotized",
-    } as Record<NightOutcomeEffect, string>,
+    },
   },
   mirrorcaster: {
     protectMode: "Protect Mode — Choose a player to shield.",
