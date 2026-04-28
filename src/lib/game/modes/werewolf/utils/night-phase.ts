@@ -127,7 +127,7 @@ export function buildNightPhaseOrder(
       }
     } else if (role.id === WerewolfRole.TavernKeeper) {
       // Tavern Keeper acts first — before all other roles.
-      if (!hasAlivePlayers(role.id as string, roleAssignments, dead)) continue;
+      if (!hasAlivePlayers(role.id, roleAssignments, dead)) continue;
       tavernKeeperPhaseKey = role.id;
     } else if (role.id === WerewolfRole.Witch) {
       if (!hasAlivePlayers(role.id, roleAssignments, dead)) continue;
