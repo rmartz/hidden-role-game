@@ -1,0 +1,19 @@
+# Public environment variables for the production environment.
+#
+# Only non-sensitive variables belong here. Keep keys aligned with deployment/schema.yml.
+# Automated validation scripts (pre-commit hook, CI enforcement) will be added in a follow-up.
+#
+# Sensitive variables are managed directly in Vercel and must never be committed.
+
+environment: production
+
+variables:
+  # Firebase Client SDK — safe to expose; access control is enforced by Firebase security rules
+  NEXT_PUBLIC_FIREBASE_API_KEY: "AIzaSyDHRbEXEn0SkdY7gIDrvJzVM-_ufy9iMnA"
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: "hidden-role-game-e530f.firebaseapp.com"
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID: "hidden-role-game-e530f"
+  NEXT_PUBLIC_FIREBASE_DATABASE_URL: "https://hidden-role-game-e530f-default-rtdb.firebaseio.com"
+
+  # Firebase Admin SDK — project identifier only, not a credential
+  FIREBASE_PROJECT_ID: "hidden-role-game-e530f"
+  FIREBASE_DATABASE_URL: "https://hidden-role-game-e530f-default-rtdb.firebaseio.com"
