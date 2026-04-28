@@ -26,8 +26,8 @@
     "prepare": "husky",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "env:pull": "scripts/generate-local-env.sh",
-    "secrets-check": "node scripts/secrets-check.mjs"
+    "env:pull": "generate-local-env",
+    "secrets-check": "secrets-check --config .gitleaks.toml"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -95,6 +95,7 @@
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.1",
     "vite": "^8.0.10",
+    "vercel-deploy-scripts": "github:rmartz/vercel-deploy-scripts#v1.1.0",
     "vitest": "^4.1.5"
   }
 }

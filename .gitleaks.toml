@@ -1,18 +1,18 @@
 # gitleaks configuration
 # https://github.com/gitleaks/gitleaks
 #
-# Extends the default ruleset with project-specific patterns and allowlists
-# known false positives (e.g. example/placeholder values in documentation).
+# Extends the shared base ruleset from vercel-deploy-scripts.
+# Only project-specific rules and allowlists are defined below.
 
 title = "hidden-role-game"
 
 [extend]
-useDefault = true
+path = "node_modules/vercel-deploy-scripts/.gitleaks.toml"
 
 [allowlist]
 description = "Known safe patterns — placeholder values in documentation and config examples"
 regexes = [
-  # Placeholder values used in .env.example and documentation
+  # Lowercase placeholder values used in .env.example and documentation
   '''your-project-id''',
   '''your-project''',
   '''firebase-adminsdk-xxx''',
@@ -20,23 +20,3 @@ regexes = [
 paths = [
   ".env.example",
 ]
-
-# Project-specific rules for secrets not covered by the default ruleset
-
-[[rules]]
-id = "firebase-private-key"
-description = "Firebase service account private key"
-regex = '''-----BEGIN (RSA )?PRIVATE KEY-----'''
-tags = ["firebase", "key"]
-
-[[rules]]
-id = "firebase-admin-json"
-description = "Firebase service account JSON blob"
-regex = '''"private_key_id"\s*:\s*"[a-f0-9]{40}"'''
-tags = ["firebase", "key"]
-
-[[rules]]
-id = "vercel-token"
-description = "Vercel API token"
-regex = '''(?i)vercel[_-]?token['":\s=]+[A-Za-z0-9]{24,}'''
-tags = ["vercel"]
