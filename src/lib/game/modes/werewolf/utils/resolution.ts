@@ -271,34 +271,37 @@ export function resolveNightActions(
     | undefined;
   const swapperAId = swapperAction?.targetPlayerId;
   const swapperBId = swapperAction?.secondTargetPlayerId;
-  const swapperActive =
-    swapperAId !== undefined &&
-    swapperBId !== undefined &&
-    swapperAId !== swapperBId;
-  if (swapperActive) {
-    const aAttacks = attacks.get(swapperAId);
-    const bAttacks = attacks.get(swapperBId);
-    const aProtections = protections.get(swapperAId);
-    const bProtections = protections.get(swapperBId);
+  if (
+    typeof swapperAId === "string" &&
+    typeof swapperBId === "string" &&
+    swapperAId !== swapperBId &&
+    !swapperAction?.skipped
+  ) {
+    const aId = swapperAId;
+    const bId = swapperBId;
+    const aAttacks = attacks.get(aId);
+    const bAttacks = attacks.get(bId);
+    const aProtections = protections.get(aId);
+    const bProtections = protections.get(bId);
     if (bAttacks !== undefined) {
-      attacks.set(swapperAId, bAttacks);
+      attacks.set(aId, bAttacks);
     } else {
-      attacks.delete(swapperAId);
+      attacks.delete(aId);
     }
     if (aAttacks !== undefined) {
-      attacks.set(swapperBId, aAttacks);
+      attacks.set(bId, aAttacks);
     } else {
-      attacks.delete(swapperBId);
+      attacks.delete(bId);
     }
     if (bProtections !== undefined) {
-      protections.set(swapperAId, bProtections);
+      protections.set(aId, bProtections);
     } else {
-      protections.delete(swapperAId);
+      protections.delete(aId);
     }
     if (aProtections !== undefined) {
-      protections.set(swapperBId, aProtections);
+      protections.set(bId, aProtections);
     } else {
-      protections.delete(swapperBId);
+      protections.delete(bId);
     }
   }
 
@@ -400,25 +403,28 @@ export function resolveNightActions(
   const swapperEvents: NightResolutionEvent[] = [];
   let finalSilencedEvents = silencedEvents;
   let finalHypnotizedEvents = hypnotizedEvents;
-  if (swapperActive) {
+  if (
+    typeof swapperAId === "string" &&
+    typeof swapperBId === "string" &&
+    swapperAId !== swapperBId &&
+    !swapperAction?.skipped
+  ) {
+    const aId = swapperAId;
+    const bId = swapperBId;
     finalSilencedEvents = silencedEvents.map((e) => {
-      if (e.targetPlayerId === swapperAId)
-        return { ...e, targetPlayerId: swapperBId };
-      if (e.targetPlayerId === swapperBId)
-        return { ...e, targetPlayerId: swapperAId };
+      if (e.targetPlayerId === aId) return { ...e, targetPlayerId: bId };
+      if (e.targetPlayerId === bId) return { ...e, targetPlayerId: aId };
       return e;
     });
     finalHypnotizedEvents = hypnotizedEvents.map((e) => {
-      if (e.targetPlayerId === swapperAId)
-        return { ...e, targetPlayerId: swapperBId };
-      if (e.targetPlayerId === swapperBId)
-        return { ...e, targetPlayerId: swapperAId };
+      if (e.targetPlayerId === aId) return { ...e, targetPlayerId: bId };
+      if (e.targetPlayerId === bId) return { ...e, targetPlayerId: aId };
       return e;
     });
     swapperEvents.push({
       type: "swapper-swapped",
-      firstPlayerId: swapperAId,
-      secondPlayerId: swapperBId,
+      firstPlayerId: aId,
+      secondPlayerId: bId,
     });
   }
 

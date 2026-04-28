@@ -252,7 +252,7 @@ interface TeamNightAction {
 
 `resolveNightActions()` runs when `start-day` is called:
 
-1. Collects base attacks and protections from all roles except Witch, Altruist, Spellcaster, Mummy, and Swapper.
+1. Collects base attacks and protections from all roles except Witch, Altruist, Spellcaster, Mummy, Swapper, and Priest.
 2. Applies Priest ward protection: any player with an active ward has the ward consume the attack (ward is removed, player survives).
 3. Applies Witch action: if target is already under attack → protect; otherwise → attack.
 4. Applies Altruist action (last): if the Altruist's target is under attack, the attack is redirected onto the Altruist (the Altruist dies instead).
@@ -269,7 +269,7 @@ interface TeamNightAction {
 - `{ type: "silenced", targetPlayerId }`
 - `{ type: "hypnotized", targetPlayerId }`
 - `{ type: "tough-guy-absorbed", targetPlayerId }`
-- `{ type: "altruist-intercepted", targetPlayerId }`
+- `{ type: "altruist-intercepted", altruistPlayerId, savedPlayerId }`
 - `{ type: "swapper-swapped", firstPlayerId, secondPlayerId }`
 
 After resolution, `start-day` performs additional checks:
