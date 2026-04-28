@@ -138,11 +138,7 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
       hiddenRole={activeModeConfigData.hiddenRoleCount > 0}
       autoRevealNightOutcome={activeModeConfigData.autoRevealNightOutcome}
       disabled={disabled}
-      onWerewolfTimerConfigChange={
-        onTimerConfigChange as
-          | ((config: WerewolfTimerConfig) => void)
-          | undefined
-      }
+      onWerewolfTimerConfigChange={onTimerConfigChange}
       onNominationEnabledChange={
         onModeConfigFieldChange
           ? (v: boolean) => onModeConfigFieldChange("nominationsEnabled", v)
@@ -181,11 +177,7 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
       modeConfig={activeModeConfigData}
       playerCount={playerCount}
       disabled={disabled}
-      onTimerConfigChange={
-        onTimerConfigChange as
-          | ((config: SecretVillainTimerConfig) => void)
-          | undefined
-      }
+      onTimerConfigChange={onTimerConfigChange}
       onModeConfigFieldChange={onModeConfigFieldChange}
       onModeConfigChange={
         readOnly ? undefined : (config) => dispatch(setModeConfig(config))

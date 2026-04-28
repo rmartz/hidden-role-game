@@ -30,7 +30,9 @@ export interface ExtendedRoleProperties {
  * group night phases (e.g. Werewolf) pass role definitions that include
  * teamTargeting, wakesWith, and isWerewolf.
  */
-export function buildGamePlayers<R extends RoleDefinition<string, Team>>(
+export function buildGamePlayers<
+  R extends RoleDefinition<string, Team> & ExtendedRoleProperties,
+>(
   players: LobbyPlayer[],
   roleAssignments: PlayerRoleAssignment[],
   roles: Record<string, R>,
@@ -40,9 +42,7 @@ export function buildGamePlayers<R extends RoleDefinition<string, Team>>(
   return roleAssignments.map((assignment) => {
     const player = playerById.get(assignment.playerId);
     if (!player) throw new Error(`Player not found: ${assignment.playerId}`);
-    const myRole = roles[assignment.roleDefinitionId] as
-      | (R & ExtendedRoleProperties)
-      | undefined;
+    const myRole = roles[assignment.roleDefinitionId];
 
     const visiblePlayers: VisiblePlayer[] = [];
     const seenPlayerIds = new Set<string>();
@@ -55,9 +55,7 @@ export function buildGamePlayers<R extends RoleDefinition<string, Team>>(
       if (groupKey) {
         for (const other of roleAssignments) {
           if (other.playerId === assignment.playerId) continue;
-          const otherRole = roles[other.roleDefinitionId] as
-            | (R & ExtendedRoleProperties)
-            | undefined;
+          const otherRole = roles[other.roleDefinitionId];
           if (!otherRole) continue;
           const otherGroupKey =
             otherRole.wakesWith ??
@@ -84,9 +82,7 @@ export function buildGamePlayers<R extends RoleDefinition<string, Team>>(
       for (const other of roleAssignments) {
         if (other.playerId === assignment.playerId) continue;
         if (seenPlayerIds.has(other.playerId)) continue;
-        const otherRole = roles[other.roleDefinitionId] as
-          | (R & ExtendedRoleProperties)
-          | undefined;
+        const otherRole = roles[other.roleDefinitionId];
         if (!otherRole) continue;
         const matchedByTeam =
           awareOfTeams.has(otherRole.team) && !excludeRoles.has(otherRole.id);
