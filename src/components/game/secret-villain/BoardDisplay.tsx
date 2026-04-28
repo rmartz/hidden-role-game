@@ -5,10 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
 import { getSvThemeLabels } from "@/lib/game/modes/secret-villain/themes";
 import type { SvTheme } from "@/lib/game/modes/secret-villain/themes";
-import type {
-  SvPowerTable,
-  SpecialActionType,
-} from "@/lib/game/modes/secret-villain/types";
+import type { SvPowerTable } from "@/lib/game/modes/secret-villain/types";
 import {
   GOOD_CARDS_TO_WIN,
   BAD_CARDS_TO_WIN,
@@ -98,10 +95,7 @@ function TrackSlots({ filled, size, variant, labels }: TrackSlotsProps) {
 }
 
 function resolvePowerLabels(powerTable: SvPowerTable): (string | undefined)[] {
-  const labels = SECRET_VILLAIN_COPY.board.powerLabels as Record<
-    SpecialActionType,
-    string
-  >;
+  const labels = SECRET_VILLAIN_COPY.board.powerLabels;
   return powerTable.map((action) =>
     action !== undefined ? labels[action] : undefined,
   );
