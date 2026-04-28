@@ -89,5 +89,5 @@ export function codenamesStateFromFirebase(
             raw.startingTeam as CodenamesPlayerGameState["startingTeam"],
         }
       : {}),
-  } as CodenamesPlayerGameState;
+  };
 }
