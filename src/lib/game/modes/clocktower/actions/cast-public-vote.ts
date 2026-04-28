@@ -49,13 +49,14 @@ export const castPublicVoteAction: GameAction = {
       if (ts.ghostVotesUsed.includes(callerId)) return false;
     }
 
-    // Butler may only vote yes if their master has already voted yes on this nomination
+    // Butler must mirror their master's recorded vote on this nomination
     const callerRole = getPlayerRole(game, callerId);
-    if (callerRole === ClocktowerRole.Butler && voted && ts.butlerMasterId) {
-      const masterHasVotedYes = nomination.votes.some(
-        (v) => v.playerId === ts.butlerMasterId && v.voted,
+    if (callerRole === ClocktowerRole.Butler && ts.butlerMasterId) {
+      const masterVote = nomination.votes.find(
+        (v) => v.playerId === ts.butlerMasterId,
       );
-      if (!masterHasVotedYes) return false;
+      if (!masterVote) return false;
+      if (masterVote.voted !== voted) return false;
     }
 
     // Must be a valid player

@@ -133,7 +133,37 @@ describe("castPublicVoteAction.isValid", () => {
     ).toBe(false);
   });
 
-  it("rejects Butler voting yes before their master has voted yes", () => {
+  it("rejects Butler voting before their master has voted at all", () => {
+    const ts = makeDayTurnState(
+      { butlerMasterId: "p4" },
+      {
+        nominations: [{ nominatorId: "p1", nomineeId: "p3", votes: [] }],
+      },
+    );
+    const game = makePlayingGame(ts, {
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: ClocktowerRole.Imp },
+        { playerId: "p2", roleDefinitionId: ClocktowerRole.Butler },
+        { playerId: "p3", roleDefinitionId: ClocktowerRole.Chef },
+        { playerId: "p4", roleDefinitionId: ClocktowerRole.Empath },
+        { playerId: "p5", roleDefinitionId: ClocktowerRole.Soldier },
+      ],
+    });
+    expect(
+      castPublicVoteAction.isValid(game, "p2", {
+        nomineeId: "p3",
+        voted: true,
+      }),
+    ).toBe(false);
+    expect(
+      castPublicVoteAction.isValid(game, "p2", {
+        nomineeId: "p3",
+        voted: false,
+      }),
+    ).toBe(false);
+  });
+
+  it("rejects Butler voting yes when master voted no", () => {
     const ts = makeDayTurnState(
       { butlerMasterId: "p4" },
       {
@@ -159,6 +189,36 @@ describe("castPublicVoteAction.isValid", () => {
       castPublicVoteAction.isValid(game, "p2", {
         nomineeId: "p3",
         voted: true,
+      }),
+    ).toBe(false);
+  });
+
+  it("rejects Butler voting no when master voted yes", () => {
+    const ts = makeDayTurnState(
+      { butlerMasterId: "p4" },
+      {
+        nominations: [
+          {
+            nominatorId: "p1",
+            nomineeId: "p3",
+            votes: [{ playerId: "p4", voted: true }],
+          },
+        ],
+      },
+    );
+    const game = makePlayingGame(ts, {
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: ClocktowerRole.Imp },
+        { playerId: "p2", roleDefinitionId: ClocktowerRole.Butler },
+        { playerId: "p3", roleDefinitionId: ClocktowerRole.Chef },
+        { playerId: "p4", roleDefinitionId: ClocktowerRole.Empath },
+        { playerId: "p5", roleDefinitionId: ClocktowerRole.Soldier },
+      ],
+    });
+    expect(
+      castPublicVoteAction.isValid(game, "p2", {
+        nomineeId: "p3",
+        voted: false,
       }),
     ).toBe(false);
   });
@@ -189,6 +249,36 @@ describe("castPublicVoteAction.isValid", () => {
       castPublicVoteAction.isValid(game, "p2", {
         nomineeId: "p3",
         voted: true,
+      }),
+    ).toBe(true);
+  });
+
+  it("allows Butler to vote no after their master has voted no", () => {
+    const ts = makeDayTurnState(
+      { butlerMasterId: "p4" },
+      {
+        nominations: [
+          {
+            nominatorId: "p1",
+            nomineeId: "p3",
+            votes: [{ playerId: "p4", voted: false }],
+          },
+        ],
+      },
+    );
+    const game = makePlayingGame(ts, {
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: ClocktowerRole.Imp },
+        { playerId: "p2", roleDefinitionId: ClocktowerRole.Butler },
+        { playerId: "p3", roleDefinitionId: ClocktowerRole.Chef },
+        { playerId: "p4", roleDefinitionId: ClocktowerRole.Empath },
+        { playerId: "p5", roleDefinitionId: ClocktowerRole.Soldier },
+      ],
+    });
+    expect(
+      castPublicVoteAction.isValid(game, "p2", {
+        nomineeId: "p3",
+        voted: false,
       }),
     ).toBe(true);
   });

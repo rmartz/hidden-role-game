@@ -92,7 +92,7 @@ describe("nominatePlayerAction.isValid", () => {
     );
   });
 
-  it("rejects nominating a player who has already been nominated today", () => {
+  it("allows nominating a player who has already been nominated today by a different nominator", () => {
     const ts = makeDayTurnState(
       {},
       {
@@ -101,7 +101,7 @@ describe("nominatePlayerAction.isValid", () => {
     );
     const game = makePlayingGame(ts);
     expect(nominatePlayerAction.isValid(game, "p2", { nomineeId: "p3" })).toBe(
-      false,
+      true,
     );
   });
 

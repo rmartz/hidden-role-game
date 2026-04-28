@@ -8,7 +8,7 @@ Actions are the mechanism by which the Storyteller and players mutate game state
 
 **Who:** Living player
 **When:** During the Day phase, before an execution has occurred this day
-**Effect:** Nominates another player for execution. Each player may nominate at most once per day. Each player may be nominated at most once per day. If the nominee is the Virgin and a Townsfolk nominator triggers the Virgin's one-time ability, the nominator is immediately executed and the nomination ends without adding an open nomination.
+**Effect:** Nominates another player for execution. Each player may nominate at most once per day. A player may be nominated by multiple different nominators on the same day. If the nominee is the Virgin and a Townsfolk nominator triggers the Virgin's one-time ability, the nominator is immediately executed and the nomination ends without adding an open nomination.
 
 **Payload:** `{ nomineeId: string }`
 
@@ -19,7 +19,7 @@ Actions are the mechanism by which the Storyteller and players mutate game state
 - Caller must be alive.
 - Caller may not have already nominated today (`nominatedByPlayerIds`).
 - `nomineeId` must be a string, must differ from the caller, and must be an existing player.
-- The same player may not be nominated twice in one day (checked against `nominations`).
+- A player may be nominated multiple times per day by different nominators.
 - A Butler may not nominate their master (`butlerMasterId`).
 
 ---
@@ -27,18 +27,17 @@ Actions are the mechanism by which the Storyteller and players mutate game state
 ### `cast-public-vote`
 
 **Who:** Living player (or dead player spending their ghost vote)
-**When:** During the Day phase, while an open nomination exists
-**Effect:** Casts a yes/no vote on the most recent open nomination. A Butler may only vote yes if their master has already voted yes on the same nomination.
+**When:** During the Day phase, while an open nomination exists for the target nominee
+**Effect:** Casts or updates a yes/no vote on the nomination identified by `nomineeId`. If the caller has already voted on that nomination, the existing vote is replaced. A Butler must mirror their master's recorded vote — the master must have already voted before the Butler can vote, and Butler's vote must match the master's.
 
-**Payload:** `{ voted: boolean }`
+**Payload:** `{ nomineeId: string, voted: boolean }`
 
 **Validation:**
 
 - Game must be in Playing state, Day phase.
-- There must be at least one open nomination.
-- Caller must not have already voted on the active nomination.
-- Dead players may vote only if they have not yet spent their ghost vote (`ghostVotesUsed`).
-- A Butler voting yes must have their master (`butlerMasterId`) already recorded as a yes vote on the same nomination.
+- `nomineeId` must identify an existing open nomination.
+- Dead players may vote only if they have not yet spent their ghost vote (`ghostVotesUsed`), and may only vote yes.
+- A Butler must have their master (`butlerMasterId`) already recorded as a vote on the same nomination, and the Butler's `voted` must match the master's recorded vote.
 
 ---
 
@@ -60,11 +59,11 @@ Actions are the mechanism by which the Storyteller and players mutate game state
 
 ## Action Payload Summary
 
-| Action              | Caller      | Payload                 |
-| ------------------- | ----------- | ----------------------- |
-| `nominate-player`   | Player      | `{ nomineeId: string }` |
-| `cast-public-vote`  | Player      | `{ voted: boolean }`    |
-| `close-nominations` | Storyteller | none                    |
+| Action              | Caller      | Payload                                 |
+| ------------------- | ----------- | --------------------------------------- |
+| `nominate-player`   | Player      | `{ nomineeId: string }`                 |
+| `cast-public-vote`  | Player      | `{ nomineeId: string, voted: boolean }` |
+| `close-nominations` | Storyteller | none                                    |
 
 ## Special-Case Abilities
 
@@ -74,4 +73,4 @@ When a Townsfolk nominates the Virgin for the first time (and the Townsfolk is n
 
 ### Butler
 
-The Butler's master is recorded in `butlerMasterId` on the turn state (set during the Butler's night action). The Butler may not nominate their master and may only vote yes on a nomination if their master has already cast a yes vote on the same nomination.
+The Butler's master is recorded in `butlerMasterId` on the turn state (set during the Butler's night action). The Butler may not nominate their master. When voting, the Butler must mirror their master's recorded vote exactly: the master must have already voted on the nomination before the Butler can vote, and the Butler's `voted` value must match the master's.
