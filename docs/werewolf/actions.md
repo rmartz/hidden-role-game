@@ -197,6 +197,34 @@ Additional resolution steps:
 
 ---
 
+### `pause-timer`
+
+**Who:** Narrator only
+**When:** During Nighttime or Daytime, while a timer is running (not already paused)
+**Effect:** Freezes the active phase timer by recording the current time in `pausedAt`. The elapsed-time formula switches to `pauseOffset + (pausedAt - startedAt)` until the timer is resumed.
+
+**Payload:** `{}` (no payload)
+
+**Validation:** Phase must exist; `pausedAt` must not already be set.
+
+**Fields mutated:** `phase.pausedAt`
+
+---
+
+### `resume-timer`
+
+**Who:** Narrator only
+**When:** During Nighttime or Daytime, while the timer is paused (`pausedAt` is set)
+**Effect:** Resumes the active phase timer by accumulating the paused interval into `pauseOffset`, resetting `startedAt` to now, and clearing `pausedAt`.
+
+**Payload:** `{}` (no payload)
+
+**Validation:** Phase must exist; `pausedAt` must be set.
+
+**Fields mutated:** `phase.pauseOffset`, `phase.startedAt`, `phase.pausedAt` (cleared)
+
+---
+
 ## Action Payload Summary
 
 | Action                        | Caller                    | Payload                                                |
