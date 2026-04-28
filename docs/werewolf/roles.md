@@ -90,6 +90,7 @@ Roles wake in a consistent order determined by their `category`, following the r
    - Vigilante
 6. `VillagerInvestigation` (Good — Investigate):
    - Elusive Seer
+   - Exposer
    - Mentalist
    - Mystic Seer
    - One-Eyed Seer
