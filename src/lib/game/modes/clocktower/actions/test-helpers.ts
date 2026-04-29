@@ -1,14 +1,15 @@
 import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 import type { Game } from "@/lib/types";
+import { DEFAULT_TIMER_CONFIG } from "@/lib/types";
 import { ClocktowerPhase } from "../types";
 import type {
+  ClocktowerDayPhase,
   ClocktowerNightPhase,
   ClocktowerTurnState,
   ClocktowerNightAction,
 } from "../types";
 import { ClocktowerRole } from "../roles";
 import { DEFAULT_CLOCKTOWER_MODE_CONFIG } from "../lobby-config";
-import { DEFAULT_TIMER_CONFIG } from "@/lib/types";
 
 export const OWNER_ID = "owner-1";
 export const IMP_PLAYER_ID = "p1";
@@ -20,6 +21,32 @@ export const MAYOR_PLAYER_ID = "p5";
 export interface NightFixture {
   ts: ClocktowerTurnState;
   phase: ClocktowerNightPhase;
+}
+
+export function makeDayPhase(
+  overrides: Partial<ClocktowerDayPhase> = {},
+): ClocktowerDayPhase {
+  return {
+    type: ClocktowerPhase.Day,
+    nominations: [],
+    nominatedByPlayerIds: [],
+    ...overrides,
+  };
+}
+
+export function makeDayTurnState(
+  overrides: Partial<ClocktowerTurnState> = {},
+  phaseOverrides: Partial<ClocktowerDayPhase> = {},
+): ClocktowerTurnState {
+  return {
+    turn: 1,
+    phase: makeDayPhase(phaseOverrides),
+    playerOrder: ["p1", "p2", "p3", "p4", "p5"],
+    deadPlayerIds: [],
+    ghostVotesUsed: [],
+    demonPlayerId: "p1",
+    ...overrides,
+  };
 }
 
 export function makeNightState(
