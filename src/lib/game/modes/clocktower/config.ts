@@ -7,6 +7,10 @@ import {
   parseClocktowerModeConfig,
 } from "./lobby-config";
 import { clocktowerServices } from "./services";
+import { ClocktowerAction } from "./actions/types";
+import { nominatePlayerAction } from "./actions/nominate-player";
+import { castPublicVoteAction } from "./actions/cast-public-vote";
+import { closeNominationsAction } from "./actions/close-nominations";
 
 export const CLOCKTOWER_CONFIG = {
   name: "Clocktower",
@@ -23,7 +27,11 @@ export const CLOCKTOWER_CONFIG = {
   defaultModeConfig: DEFAULT_CLOCKTOWER_MODE_CONFIG,
   parseModeConfig: parseClocktowerModeConfig,
   buildDefaultLobbyConfig: buildDefaultClocktowerLobbyConfig,
-  actions: {},
+  actions: {
+    [ClocktowerAction.NominatePlayer]: nominatePlayerAction,
+    [ClocktowerAction.CastPublicVote]: castPublicVoteAction,
+    [ClocktowerAction.CloseNominations]: closeNominationsAction,
+  },
   // Clocktower's Storyteller controls information delivery manually;
   // roles are not automatically revealed when a player dies.
   resolveRevealDeadPlayerIds: () => [],

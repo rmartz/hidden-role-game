@@ -133,4 +133,16 @@ export interface ClocktowerTurnState {
    * trigger (when the Demon dies with 5+ players alive).
    */
   demonPlayerId: string;
+  /**
+   * The player ID chosen as the Butler's master for the current day.
+   * Set during the Butler's night action; cleared at end of day.
+   * The Butler may only vote if their master also votes for the same nomination.
+   */
+  butlerMasterId?: string;
+  /**
+   * When true, the Virgin's one-time ability has already fired.
+   * The Virgin ability triggers the first time a Townsfolk nominates them;
+   * subsequent nominations are resolved normally.
+   */
+  virginAbilityUsed?: true;
 }
