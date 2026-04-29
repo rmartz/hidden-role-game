@@ -152,7 +152,7 @@ describe("ClocktowerAction.ResolveNight", () => {
         ownerPlayerId: "owner-1",
         modeConfig: { gameMode: GameMode.Clocktower },
         timerConfig: DEFAULT_TIMER_CONFIG,
-      } as Game;
+      };
       action.apply(game, {}, "owner-1");
       expect(fixture.ts.deadPlayerIds).toContain("p1");
       expect(fixture.ts.demonPlayerId).toBe("p3");
