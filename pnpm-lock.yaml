@@ -145,8 +145,8 @@ importers:
         specifier: ^8.59.1
         version: 8.59.1(eslint@10.2.1(jiti@2.6.1))(typescript@6.0.3)
       vercel-deploy-scripts:
-        specifier: github:rmartz/vercel-deploy-scripts#v1.1.0
-        version: git+https://git@github.com:rmartz/vercel-deploy-scripts.git#cb36f10273b6ccea3966d48937da6d6875819860
+        specifier: https://github.com/rmartz/vercel-deploy-scripts.git#v1.1.0
+        version: https://codeload.github.com/rmartz/vercel-deploy-scripts/tar.gz/cb36f10273b6ccea3966d48937da6d6875819860
       vite:
         specifier: ^8.0.10
         version: 8.0.10(@types/node@25.6.0)(esbuild@0.27.7)(jiti@2.6.1)(terser@5.46.2)(tsx@4.21.0)(yaml@2.8.3)
@@ -4866,8 +4866,8 @@ packages:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
 
-  vercel-deploy-scripts@git+https://git@github.com:rmartz/vercel-deploy-scripts.git#cb36f10273b6ccea3966d48937da6d6875819860:
-    resolution: {commit: cb36f10273b6ccea3966d48937da6d6875819860, repo: git@github.com:rmartz/vercel-deploy-scripts.git, type: git}
+  vercel-deploy-scripts@https://codeload.github.com/rmartz/vercel-deploy-scripts/tar.gz/cb36f10273b6ccea3966d48937da6d6875819860:
+    resolution: {tarball: https://codeload.github.com/rmartz/vercel-deploy-scripts/tar.gz/cb36f10273b6ccea3966d48937da6d6875819860}
     version: 0.0.0
     engines: {node: '>=18'}
     hasBin: true
@@ -10052,7 +10052,7 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vercel-deploy-scripts@git+https://git@github.com:rmartz/vercel-deploy-scripts.git#cb36f10273b6ccea3966d48937da6d6875819860: {}
+  vercel-deploy-scripts@https://codeload.github.com/rmartz/vercel-deploy-scripts/tar.gz/cb36f10273b6ccea3966d48937da6d6875819860: {}
 
   vite-plugin-storybook-nextjs@3.2.4(next@16.2.4(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(storybook@10.3.5(@testing-library/dom@10.4.1)(prettier@3.8.3)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(typescript@6.0.3)(vite@8.0.10(@types/node@25.6.0)(esbuild@0.27.7)(jiti@2.6.1)(terser@5.46.2)(tsx@4.21.0)(yaml@2.8.3)):
     dependencies:
