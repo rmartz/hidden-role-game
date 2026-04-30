@@ -30,7 +30,13 @@ export { getModeDefinition };
 
 /** Compute and write all player states to Firebase. */
 async function writePlayerStates(game: Game): Promise<void> {
+  console.log(
+    `[writePlayerStates] Computing player states for game ${game.id}`,
+  );
   const states = buildAllPlayerStates(game);
+  console.log(
+    `[writePlayerStates] Writing ${String(Object.keys(states).length)} player states for game ${game.id}`,
+  );
   try {
     await writeAllPlayerStates(game.id, states);
   } catch (err) {
@@ -67,6 +73,7 @@ export async function createGame(
     playerOrder,
   );
 
+  console.log(`[createGame] Saving game ${game.id} to Firebase`);
   const saveTimeout = new Promise<never>((_, reject) =>
     setTimeout(() => {
       reject(new Error(`[createGame] saveGame timed out for game ${game.id}`));
