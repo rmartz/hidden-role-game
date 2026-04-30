@@ -123,6 +123,7 @@ export async function removePlayer(
     [`public/players/${playerId}`]: null,
     [`private/playerSessions/${playerId}`]: null,
     "public/playerOrder": updatedOrder.length > 0 ? updatedOrder : null,
+    "public/countdownStartedAt": null,
   });
 
   data.public.players = Object.fromEntries(
@@ -211,16 +212,26 @@ export async function toggleReady(
     ? current.filter((id) => id !== playerId)
     : [...current, playerId];
 
-  await lobbyRef(lobbyId)
-    .child("public/readyPlayerIds")
-    .set(updated.length > 0 ? updated : null);
+  const allPlayerIds = Object.keys(data.public.players ?? {});
+  const allReady =
+    allPlayerIds.length >= 2 &&
+    allPlayerIds.every((id) => updated.includes(id));
+
+  await lobbyRef(lobbyId).update({
+    "public/readyPlayerIds": updated.length > 0 ? updated : null,
+    "public/countdownStartedAt": allReady ? ServerValue.TIMESTAMP : null,
+  });
 
   data.public.readyPlayerIds = updated.length > 0 ? updated : undefined;
+  data.public.countdownStartedAt = allReady ? Date.now() : undefined;
   return firebaseToLobby(lobbyId, data.public, data.private);
 }
 
 export async function clearReadyPlayerIds(lobbyId: string): Promise<void> {
-  await lobbyRef(lobbyId).child("public/readyPlayerIds").remove();
+  await lobbyRef(lobbyId).update({
+    "public/readyPlayerIds": null,
+    "public/countdownStartedAt": null,
+  });
 }
 
 export async function updateConfig(
