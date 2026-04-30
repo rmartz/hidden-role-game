@@ -78,16 +78,23 @@ export async function POST(request: Request): Promise<Response> {
 
   const ownerPlayer = ownerTitle ? players[0] : undefined;
 
-  const game = await createGame(
-    `debug-${randomUUID()}`,
-    players,
-    roleBuckets,
-    gameMode,
-    showRolesInPlay,
-    ownerPlayer?.id ?? undefined,
-    { ...GAME_MODES[gameMode].defaultTimerConfig, ...timerConfig },
-    resolvedModeConfig,
-  );
+  let game;
+  try {
+    game = await createGame(
+      `debug-${randomUUID()}`,
+      players,
+      roleBuckets,
+      gameMode,
+      showRolesInPlay,
+      ownerPlayer?.id ?? undefined,
+      { ...GAME_MODES[gameMode].defaultTimerConfig, ...timerConfig },
+      resolvedModeConfig,
+    );
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[debug/game] createGame failed:", err);
+    return Response.json({ error: message }, { status: 500 });
+  }
 
   const debugPlayers: DebugPlayer[] = players.map((p) => ({
     id: p.id,
