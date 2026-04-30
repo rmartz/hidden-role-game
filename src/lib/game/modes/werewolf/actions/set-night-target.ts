@@ -65,8 +65,12 @@ export const setNightTargetAction: GameAction = {
 
     // Veteran: only alert (alerted: true) or skip/clear (null/undefined) are valid.
     // A targetPlayerId string is rejected to prevent inadvertent alert triggering.
+    // Alerting is blocked once the Veteran has used all 3 of their alerts.
     if (isRoleActive(phaseKey, WerewolfRole.Veteran)) {
-      if (alerted === true) return true;
+      if (alerted === true) {
+        if ((ts.veteranAlertsUsed ?? 0) >= 3) return false;
+        return true;
+      }
       if (targetPlayerId === undefined) return true;
       if (targetPlayerId === null) return true;
       return false;

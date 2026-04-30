@@ -319,6 +319,15 @@ export const startDayAction: GameAction = {
         ? [...existingInfected, zombieAction.targetPlayerId]
         : existingInfected;
 
+    // Veteran alert usage tracking: increment once per night the Veteran alerts.
+    const veteranNightAction = nightPhase.nightActions[WerewolfRole.Veteran];
+    const veteranAlertedThisNight =
+      veteranNightAction !== undefined &&
+      !isTeamNightAction(veteranNightAction) &&
+      veteranNightAction.alerted === true;
+    const veteranAlertsUsed =
+      (ts.veteranAlertsUsed ?? 0) + (veteranAlertedThisNight ? 1 : 0);
+
     const wolfCubDied =
       ts.wolfCubDied === true || didWolfCubDie(newDeadIds, game);
     const revealedPlayerIds = getWerewolfModeConfig(game).autoRevealNightOutcome
@@ -357,6 +366,7 @@ export const startDayAction: GameAction = {
         ...(mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
         ...(draculaWives.length > 0 ? { draculaWives } : {}),
         ...(zombieInfected.length > 0 ? { zombieInfected } : {}),
+        ...(veteranAlertsUsed > 0 ? { veteranAlertsUsed } : {}),
       },
     };
 

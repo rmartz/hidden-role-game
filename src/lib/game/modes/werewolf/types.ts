@@ -207,6 +207,8 @@ export interface WerewolfTurnState {
   draculaWives?: string[];
   /** Player IDs that the Zombie has infected. Accumulated across nights. */
   zombieInfected?: string[];
+  /** Number of nights the Veteran has chosen to go on Alert. Maximum 3. */
+  veteranAlertsUsed?: number;
 }
 
 export interface TargetablePlayer {

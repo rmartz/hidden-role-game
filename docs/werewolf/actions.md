@@ -41,7 +41,7 @@ Additional resolution steps:
 **When:** During Nighttime, turn 2+
 **Effect:** Sets or clears a night target.
 
-- **Solo roles** (Seer, Bodyguard, Witch, etc.): stores `{ targetPlayerId }` under the role's phase key. Passing `targetPlayerId: null` records an intentional skip (`{ skipped: true }`); passing `undefined` clears the selection. Passing `alerted: true` (Veteran only) stores an empty action `{}` indicating the Veteran has gone on Alert with no target.
+- **Solo roles** (Seer, Bodyguard, Witch, etc.): stores `{ targetPlayerId }` under the role's phase key. Passing `targetPlayerId: null` records an intentional skip (`{ skipped: true }`); passing `undefined` clears the selection. Passing `alerted: true` (Veteran only) stores `{ alerted: true }` indicating the Veteran has gone on Alert with no target. The Veteran may only alert up to 3 times per game; further alert attempts are rejected.
 - **Group phases** (Werewolves): upserts the caller's vote in `votes[]`. Passing `null` records a skip vote; passing `undefined` removes the vote. The Narrator override sets all alive participants' votes at once and also sets `suggestedTargetId`.
 
 **Payload:** `{ roleId?: string; targetPlayerId?: string | null; alerted?: boolean }`
@@ -256,7 +256,7 @@ interface TeamNightAction {
 2. Applies Priest ward protection: any player with an active ward has the ward consume the attack (ward is removed, player survives).
 3. Applies Witch action: if target is already under attack → protect; otherwise → attack.
 4. Applies Altruist action (last): if the Altruist's target is under attack, the attack is redirected onto the Altruist (the Altruist dies instead).
-5. Applies Veteran counter-kill (after Altruist, so the Altruist cannot intercept the counter-kill): if the Veteran alerted this night (action exists and is not `{ skipped: true }`):
+5. Applies Veteran counter-kill (after Altruist, so the Altruist cannot intercept the counter-kill): if the Veteran alerted this night (action has `alerted: true`):
    - **Wolf repel:** if any wolf group targeted the Veteran, the wolf attack on the Veteran is removed and one alive wolf-group participant is counter-killed instead. Emits `veteran-counterkilled (source: "wolf-repel")`.
    - **Protector kill:** any Protect-category role (Bodyguard, Doctor, etc., excluding Priest wards) that visited the Veteran is killed, and their protection of the Veteran is discarded. Emits `veteran-counterkilled (source: "protector-visit")` per killed protector.
 6. Applies Tough Guy absorption: if a Tough Guy is attacked for the first time, the attack is absorbed (survives this night, dies on the next attack).

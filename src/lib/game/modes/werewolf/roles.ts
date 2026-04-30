@@ -493,7 +493,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     summary:
       "Goes on alert each night; repels werewolves and kills visiting protectors",
     description:
-      "Each night the Veteran may choose to go on Alert. While Alerted, the Veteran repels any werewolf attack — one participating wolf dies instead — and kills any protector who visits them. If the Veteran does not Alert, they are treated as a normal Villager for that night.",
+      "Each night the Veteran may choose to go on Alert (up to 3 times). While Alerted, the Veteran repels any werewolf attack — one participating wolf dies instead — and kills any protector who visits them. If the Veteran does not Alert, they are treated as a normal Villager for that night.",
     team: Team.Good,
     unique: true,
     wakesAtNight: WakesAtNight.EveryNight,
