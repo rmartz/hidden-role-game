@@ -1,8 +1,9 @@
 # gitleaks configuration
 # https://github.com/gitleaks/gitleaks
 #
-# Extends the default ruleset with project-specific patterns and allowlists
-# known false positives (e.g. example/placeholder values in documentation).
+# Extends the default gitleaks ruleset and adds project-specific rules.
+# Note: we inline the rules from vercel-deploy-scripts here because the reusable
+# secret-scan workflow does not run pnpm install, so node_modules is unavailable.
 
 title = "hidden-role-game"
 
@@ -12,7 +13,13 @@ useDefault = true
 [allowlist]
 description = "Known safe patterns — placeholder values in documentation and config examples"
 regexes = [
-  # Placeholder values used in .env.example and documentation
+  # Shared allowlist from vercel-deploy-scripts
+  '''YOUR_[A-Z0-9_]*''',
+  '''PLACEHOLDER_[A-Z0-9_]*''',
+  '''<[^>]+>''',
+  '''(?i)^example$''',
+  '''(?i)^changeme$''',
+  # Lowercase placeholder values used in .env.example and documentation
   '''your-project-id''',
   '''your-project''',
   '''firebase-adminsdk-xxx''',
@@ -21,22 +28,29 @@ paths = [
   ".env.example",
 ]
 
-# Project-specific rules for secrets not covered by the default ruleset
-
 [[rules]]
 id = "firebase-private-key"
 description = "Firebase service account private key"
-regex = '''-----BEGIN (RSA )?PRIVATE KEY-----'''
+regex = '''-----BEGIN PRIVATE KEY-----'''
 tags = ["firebase", "key"]
 
+[rules.allowlist]
+regexes = ['''YOUR_PRIVATE_KEY''', '''<private_key>''']
+
 [[rules]]
-id = "firebase-admin-json"
+id = "firebase-service-account-json"
 description = "Firebase service account JSON blob"
-regex = '''"private_key_id"\s*:\s*"[a-f0-9]{40}"'''
-tags = ["firebase", "key"]
+regex = '''"type"\s*:\s*"service_account"'''
+tags = ["firebase", "credentials"]
+
+[rules.allowlist]
+regexes = ['''YOUR_SERVICE_ACCOUNT''', '''<service_account>''']
 
 [[rules]]
-id = "vercel-token"
+id = "vercel-api-token"
 description = "Vercel API token"
-regex = '''(?i)vercel[_-]?token['":\s=]+[A-Za-z0-9]{24,}'''
-tags = ["vercel"]
+regex = '''(?:vercel_[a-zA-Z0-9]{24,}|(?:VERCEL_TOKEN|VERCEL_API_TOKEN)\s*=\s*[a-zA-Z0-9_\-]{20,})'''
+tags = ["vercel", "token"]
+
+[rules.allowlist]
+regexes = ['''vercel_YOUR_.*''', '''vercel_PLACEHOLDER_.*''', '''<vercel[_-]token>''']
