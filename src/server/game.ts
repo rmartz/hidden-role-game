@@ -30,8 +30,22 @@ export { getModeDefinition };
 
 /** Compute and write all player states to Firebase. */
 async function writePlayerStates(game: Game): Promise<void> {
+  console.log(
+    `[writePlayerStates] Computing player states for game ${game.id}`,
+  );
   const states = buildAllPlayerStates(game);
-  await writeAllPlayerStates(game.id, states);
+  console.log(
+    `[writePlayerStates] Writing ${String(Object.keys(states).length)} player states for game ${game.id}`,
+  );
+  try {
+    await writeAllPlayerStates(game.id, states);
+  } catch (err) {
+    console.error(
+      `[writePlayerStates] writeAllPlayerStates failed for game ${game.id}:`,
+      err,
+    );
+    throw err;
+  }
 }
 
 /** Create a game from lobby data, persist to Firebase, compute player states. */
@@ -59,7 +73,18 @@ export async function createGame(
     playerOrder,
   );
 
-  await saveGame(game);
+  console.log(`[createGame] Saving game ${game.id} to Firebase`);
+  const saveTimeout = new Promise<never>((_, reject) =>
+    setTimeout(() => {
+      reject(new Error(`[createGame] saveGame timed out for game ${game.id}`));
+    }, 8000),
+  );
+  try {
+    await Promise.race([saveGame(game), saveTimeout]);
+  } catch (err) {
+    console.error(`[createGame] saveGame failed for game ${game.id}:`, err);
+    throw err;
+  }
   await writePlayerStates(game);
 
   return game;
