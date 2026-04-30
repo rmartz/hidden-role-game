@@ -55,7 +55,20 @@ export function OwnerTrialPanel({
     action.mutate({ actionId: WerewolfAction.CancelTrial });
   }, [action]);
 
-  const { trial } = WEREWOLF_COPY;
+  const handlePauseTimer = useCallback(() => {
+    action.mutate({ actionId: WerewolfAction.PauseTimer });
+  }, [action]);
+
+  const handleResumeTimer = useCallback(() => {
+    action.mutate({ actionId: WerewolfAction.ResumeTimer });
+  }, [action]);
+
+  const { trial, narrator } = WEREWOLF_COPY;
+  const trialPausedAt =
+    activeTrial.pausedAt !== undefined
+      ? new Date(activeTrial.pausedAt)
+      : undefined;
+  const trialPauseOffset = activeTrial.pauseOffset ?? 0;
   const verdictLabel = activeTrial.verdict
     ? activeTrial.verdict === TrialVerdict.Eliminated
       ? trial.verdictLabelEliminated
@@ -82,13 +95,36 @@ export function OwnerTrialPanel({
           <p className="font-semibold mb-2">
             {trial.defenseHeading(defendantName)}
           </p>
-          <GameTimer
-            durationSeconds={defensePhaseSeconds}
-            autoAdvance={autoAdvance}
-            startedAt={trialStartedAt}
-            onTimerTrigger={handleSkipDefense}
-            resetKey={activeTrial.startedAt}
-          />
+          <div className="flex items-center gap-3 mb-2">
+            <GameTimer
+              durationSeconds={defensePhaseSeconds}
+              autoAdvance={autoAdvance}
+              startedAt={trialStartedAt}
+              onTimerTrigger={handleSkipDefense}
+              resetKey={activeTrial.startedAt}
+              pausedAt={trialPausedAt}
+              pauseOffset={trialPauseOffset}
+            />
+            {trialPausedAt !== undefined ? (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleResumeTimer}
+                disabled={action.isPending}
+              >
+                {narrator.resumeTimer}
+              </Button>
+            ) : (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handlePauseTimer}
+                disabled={action.isPending}
+              >
+                {narrator.pauseTimer}
+              </Button>
+            )}
+          </div>
           <p className="text-sm text-muted-foreground mb-3">
             {trial.defenseSubtext}
           </p>
@@ -116,13 +152,36 @@ export function OwnerTrialPanel({
           <p className="font-semibold mb-2">
             {trial.narratorTrialHeading(defendantName)}
           </p>
-          <GameTimer
-            durationSeconds={votePhaseSeconds}
-            autoAdvance={autoAdvance}
-            startedAt={voteTimerStartedAt}
-            onTimerTrigger={handleResolve}
-            resetKey={activeTrial.voteStartedAt ?? activeTrial.startedAt}
-          />
+          <div className="flex items-center gap-3 mb-2">
+            <GameTimer
+              durationSeconds={votePhaseSeconds}
+              autoAdvance={autoAdvance}
+              startedAt={voteTimerStartedAt}
+              onTimerTrigger={handleResolve}
+              resetKey={activeTrial.voteStartedAt ?? activeTrial.startedAt}
+              pausedAt={trialPausedAt}
+              pauseOffset={trialPauseOffset}
+            />
+            {trialPausedAt !== undefined ? (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleResumeTimer}
+                disabled={action.isPending}
+              >
+                {narrator.resumeTimer}
+              </Button>
+            ) : (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handlePauseTimer}
+                disabled={action.isPending}
+              >
+                {narrator.pauseTimer}
+              </Button>
+            )}
+          </div>
           <p className="text-sm text-muted-foreground mb-3">
             {trial.guiltyInnocentTotal(
               guiltyCount,

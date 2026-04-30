@@ -18,7 +18,7 @@ interface GameTimerProps {
   resetKey?: string | number;
   /** When set, freezes the timer display at the moment the timer was paused. */
   pausedAt?: Date;
-  /** Accumulated paused milliseconds from prior pause/resume cycles. */
+  /** Accumulated elapsed milliseconds from prior running segments, carried into this one on resume. */
   pauseOffset?: number;
 }
 
