@@ -62,14 +62,7 @@ export function VisibilityGroupCard({
   renderActions,
 }: VisibilityGroupCardProps) {
   const baseConfig = REASON_CONFIG[reason];
-  const overrides = myRoleId
-    ? (
-        ROLE_VISIBILITY_OVERRIDES as Record<
-          string,
-          (typeof ROLE_VISIBILITY_OVERRIDES)[keyof typeof ROLE_VISIBILITY_OVERRIDES]
-        >
-      )[myRoleId]
-    : undefined;
+  const overrides = myRoleId ? ROLE_VISIBILITY_OVERRIDES[myRoleId] : undefined;
   const heading =
     reason === "wake-partner"
       ? (overrides?.wakePartnerHeading ?? baseConfig.heading)

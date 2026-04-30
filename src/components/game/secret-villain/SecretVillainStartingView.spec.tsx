@@ -22,7 +22,7 @@ function makeGameState(
     visibleRoleAssignments: [],
     timerConfig: DEFAULT_SECRET_VILLAIN_TIMER_CONFIG,
     ...overrides,
-  } as SecretVillainPlayerGameState;
+  };
 }
 
 describe("SecretVillainStartingView", () => {

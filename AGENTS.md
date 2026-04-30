@@ -15,7 +15,15 @@ pnpm test             # Run tests with Vitest
 pnpm tsc              # Type check
 pnpm storybook        # Start Storybook dev server (port 6006)
 pnpm build-storybook  # Build static Storybook
+pnpm run env:pull     # Pull .env.local from Vercel (requires vercel login)
+pnpm run secrets-check # Gitleaks secret scan (runs in pre-commit)
 ```
+
+## Secret Management
+
+- Pull `.env.local` for local development: `pnpm run env:pull` (requires `vercel login`)
+- Secret scanning runs automatically on every commit via `.husky/pre-commit` and is enforced in CI via `.github/workflows/secret-scan.yml`
+- Never commit `.env.local`, `.vercel/`, service account keys, or Firebase private keys. The `.env.example` file contains only placeholder values. `.vercel/` is listed in `.gitignore` — it is local project metadata created by `vercel env pull` / `vercel link` and must not be committed.
 
 ## Firebase Compatibility
 
@@ -35,7 +43,7 @@ pnpm build-storybook  # Build static Storybook
 - **Components**: A component file contains its primary component and props interface. A sub-component may be co-located in the same file if it owns no hooks, state, effects, or context, and is used only by the parent component in that file — e.g., a context wrapper, structural template, or props alias. A sub-component must be in its own file when any of these are true: it owns hooks, state, effects, or context; it is referenced from multiple parents; or it is substantial enough to warrant its own stories or tests (e.g., list items, row components, panels, form sections). All component props must be defined as an explicitly named interface (e.g., `interface PlayerListProps`), never inline in the function signature.
 - **Type files**: Convert large type files into barrel-exported directories with one file per logical domain (e.g., `lobby.ts`, `game.ts`, `player.ts`).
 - Add a barrel `index.ts` when a directory is imported from outside its own subtree; omit it for self-contained or framework-generated directories (e.g. `src/components/ui/`).
-- Use named exports, not default exports (except for Next.js pages, Redux slices, and Storybook story files, which require a default export; in this repo, we typically name the Storybook metadata binding `meta`).
+- Use named exports, not default exports (except for Next.js pages, Redux slices, and Storybook story files, where the only allowed default export is the required `export default meta`; stories and components must remain named exports).
 
 ## Code Conventions
 
@@ -44,7 +52,7 @@ pnpm build-storybook  # Build static Storybook
 - **No IIFEs.** Do not use immediately-invoked function expressions. Extract the logic into a named helper function or compute the value with a plain expression instead.
 - **No function-style imports.** Do not use inline `import("…").Type` syntax in type annotations. Use module-level `import type { … } from "…"` statements at the top of the file. Dynamic `await import("…")` for services that require conditional loading (e.g., Sentry instrumentation) is acceptable.
 - **No unnecessary helpers.** Do not extract logic into a helper function unless it separates significant logic or belongs in a different module. Three similar lines is better than a premature abstraction.
-- **Role enums and definitions** in game mode files (e.g., `WerewolfRole` enum and `WEREWOLF_ROLES` object) must be kept in alphabetical order to minimize merge conflicts.
+- **Enums and constant objects** should be kept in alphabetical order to minimize merge conflicts.
 - **Prefer enums over string literal unions** for any domain concept with two or more named states (e.g., use `enum TrialPhase { Defense = "defense", Voting = "voting" }` rather than `"defense" | "voting"`). String enum values must match the current serialized schema (keep code and literals in sync); do not add compatibility shims for old serialized values. Export new enums from the module barrel.
 
 ## User-Facing Text
@@ -74,7 +82,7 @@ pnpm build-storybook  # Build static Storybook
 
 ### JSX
 
-- **No imperative logic inside JSX.** Imperative logic means anything that requires a statement rather than an expression: `const`/`let` declarations, `if`/`switch` blocks, loops, or any sequence of statements that produces a result through side effects. All such logic must live in the component body before the `return` statement, or be extracted into a child component. Expressions of any complexity are permitted directly in JSX — ternaries, logical operators (`&&`, `||`, `??`), method chains (`.map()`, `.filter()`, `.find()`), nested function calls, and template literals are all fine as long as they form a single expression with no intermediate bindings. Statement blocks inside callback functions passed as JSX props are allowed as long as they only contain a single statement (e.g. event handlers like `onChange={(e) => { setValue(e.target.value); }}`).
+- **No imperative logic inside JSX.** Imperative logic means anything that requires a statement rather than an expression: `const`/`let` declarations, `if`/`switch` blocks, loops, or any sequence of statements that produces a result through side effects. All such logic must live in the component body before the `return` statement, or be extracted into a child component. Expressions of any complexity are permitted directly in JSX — ternaries, logical operators (`&&`, `||`, `??`), method chains (`.map()`, `.filter()`, `.find()`), nested function calls, and template literals are all fine as long as they form a single expression with no intermediate bindings. Multi-statement callback functions passed as JSX props (e.g. `onChange={(e) => { setValue(e.target.value); setError(undefined); }}`) are permitted — the prohibition targets imperative logic in JSX structure, not callback bodies.
 
 ### Component Structure
 
