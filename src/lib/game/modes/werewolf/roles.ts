@@ -470,9 +470,9 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
   [WerewolfRole.Swapper]: {
     id: WerewolfRole.Swapper,
     name: "Swapper",
-    summary: "Reverses the night effects of two players",
+    summary: "Swaps the night effects of two players",
     description:
-      "Each night, the Swapper selects two living players (including themselves). At the end of the night, the final night effects of those two players are reversed — if one would be eliminated, silenced, or hypnotized, the other player suffers that effect instead. Investigations are unaffected. Protections also switch, so an attack-and-protection on one player moves fully to the other.",
+      "Each night, the Swapper selects two living players (including themselves). At the end of the night, the final night effects of those two players are swapped — if one would be eliminated, silenced, or hypnotized, the other player suffers that effect instead. Investigations are unaffected. Protections also switch, so an attack-and-protection on one player moves fully to the other.",
     team: Team.Good,
     unique: true,
     wakesAtNight: WakesAtNight.EveryNight,

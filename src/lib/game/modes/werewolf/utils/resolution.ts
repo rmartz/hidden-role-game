@@ -61,6 +61,8 @@ function collectBaseAttacksAndProtections(
   for (const [phaseKey, action] of Object.entries(nightActions)) {
     // Witch and Spellcaster are handled separately below.
     // Priest protection is handled via priestWards, not the generic Protect pipeline.
+    // Altruist intercept is applied after this loop.
+    // Swapper swap is applied after Altruist intercept.
     if (
       isRoleActive(phaseKey, [
         WerewolfRole.Witch,
@@ -302,6 +304,15 @@ export function resolveNightActions(
       protections.set(bId, aProtections);
     } else {
       protections.delete(bId);
+    }
+
+    // If the Altruist intercept redirected an attack onto the Altruist, but the
+    // Swapper subsequently moved that attack away, the intercept event is stale.
+    if (
+      altruistInterceptEvent?.type === "altruist-intercepted" &&
+      !attacks.has(altruistInterceptEvent.altruistPlayerId)
+    ) {
+      altruistInterceptEvent = undefined;
     }
   }
 

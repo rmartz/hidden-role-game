@@ -197,6 +197,39 @@ describe("resolveNightActions", () => {
       expect(p3Event).toMatchObject({ died: true });
     });
 
+    it("clears altruist-intercepted event when Swapper moves the redirected attack off the Altruist", () => {
+      // Werewolves attack p1; Altruist intercepts (attack moves to Altruist).
+      // Swapper selects Altruist and p2 — attack is swapped from Altruist to p2.
+      // The altruist-intercepted event must NOT be emitted (it would be stale).
+      const assignmentsWithAltruist = [
+        ...swapperAssignments,
+        { playerId: "alt1", roleDefinitionId: WerewolfRole.Altruist },
+      ];
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
+          [WerewolfRole.Altruist]: { targetPlayerId: "p1" },
+          [WerewolfRole.Swapper]: {
+            targetPlayerId: "alt1",
+            secondTargetPlayerId: "p2",
+          },
+        },
+        assignmentsWithAltruist,
+        [],
+      );
+
+      // The stale intercept event must not appear
+      expect(
+        events.find((e) => e.type === "altruist-intercepted"),
+      ).toBeUndefined();
+
+      // p2 receives the attack (swapped from Altruist) and dies
+      const p2Event = events.find(
+        (e) => e.type === "killed" && e.targetPlayerId === "p2",
+      );
+      expect(p2Event).toMatchObject({ died: true });
+    });
+
     it("attack-and-protection on one player is fully moved to the other when swapped", () => {
       // p1 is both attacked and protected; p2 is neither attacked nor protected.
       // After swap: p2 is attacked and protected (dies: false), p1 has nothing.
