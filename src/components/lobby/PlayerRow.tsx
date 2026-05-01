@@ -135,7 +135,7 @@ export function PlayerRow({
   const showOwnerRenameNoDevice =
     !isCurrentUser &&
     isOwner &&
-    !!player.noDevice &&
+    player.noDevice &&
     onRenameNoDevicePlayer !== undefined;
 
   return (

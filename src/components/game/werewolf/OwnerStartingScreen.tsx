@@ -75,7 +75,7 @@ export function OwnerStartingScreen({
     onTimerTrigger: handleStart,
   };
 
-  const roleAssignmentMap = new Map(
+  const noDeviceRoleMap = new Map(
     (gameState.visibleRoleAssignments ?? []).map((a) => [a.player.id, a.role]),
   );
 
@@ -106,7 +106,7 @@ export function OwnerStartingScreen({
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
               {noDevicePlayers.map((player) => {
                 const alreadyViewed = viewedPlayerIds.has(player.id);
-                const role = roleAssignmentMap.get(player.id);
+                const role = noDeviceRoleMap.get(player.id);
                 return (
                   <button
                     key={player.id}
