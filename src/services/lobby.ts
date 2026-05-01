@@ -118,11 +118,16 @@ export async function removePlayer(
     data.public.playerOrder,
     remainingPlayerIds,
   );
+  const updatedReadyIds = (data.public.readyPlayerIds ?? []).filter(
+    (id) => id !== playerId,
+  );
 
   await lobbyRef(lobbyId).update({
     [`public/players/${playerId}`]: null,
     [`private/playerSessions/${playerId}`]: null,
     "public/playerOrder": updatedOrder.length > 0 ? updatedOrder : null,
+    "public/readyPlayerIds":
+      updatedReadyIds.length > 0 ? updatedReadyIds : null,
     "public/countdownStartedAt": null,
   });
 
@@ -135,6 +140,8 @@ export async function removePlayer(
     ),
   );
   data.public.playerOrder = updatedOrder.length > 0 ? updatedOrder : undefined;
+  data.public.readyPlayerIds =
+    updatedReadyIds.length > 0 ? updatedReadyIds : undefined;
   return firebaseToLobby(lobbyId, data.public, data.private);
 }
 
