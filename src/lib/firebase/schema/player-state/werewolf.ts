@@ -64,6 +64,10 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
   mySecondNightTarget?: string;
   exposerAbilityUsed?: boolean;
   hunterRevengePlayerId?: string;
+  /** Whether the Alpha Wolf has used their once-per-game bite ability. */
+  alphaWolfBiteUsed?: boolean;
+  /** Players whose roles have been changed mid-game (Alpha Wolf bite). */
+  roleConversions?: { playerId: string; newRoleDefinitionId: string }[];
   /** Narrator-only hidden role IDs. Present only when hiddenRoleCount > 0. */
   hiddenRoleIds?: string[];
 }
@@ -135,6 +139,10 @@ export function werewolfStateToFirebase(
     ...(state.exposerAbilityUsed ? { exposerAbilityUsed: true } : {}),
     ...(state.hunterRevengePlayerId
       ? { hunterRevengePlayerId: state.hunterRevengePlayerId }
+      : {}),
+    ...(state.alphaWolfBiteUsed ? { alphaWolfBiteUsed: true } : {}),
+    ...(state.roleConversions?.length
+      ? { roleConversions: state.roleConversions }
       : {}),
     ...(state.hiddenRoleIds?.length
       ? { hiddenRoleIds: state.hiddenRoleIds }
@@ -218,6 +226,10 @@ export function werewolfStateFromFirebase(
     ...(raw.exposerAbilityUsed ? { exposerAbilityUsed: true } : {}),
     ...(raw.hunterRevengePlayerId
       ? { hunterRevengePlayerId: raw.hunterRevengePlayerId }
+      : {}),
+    ...(raw.alphaWolfBiteUsed ? { alphaWolfBiteUsed: true } : {}),
+    ...(raw.roleConversions?.length
+      ? { roleConversions: raw.roleConversions }
       : {}),
     ...(raw.hiddenRoleIds?.length ? { hiddenRoleIds: raw.hiddenRoleIds } : {}),
   } as WerewolfPlayerGameState;

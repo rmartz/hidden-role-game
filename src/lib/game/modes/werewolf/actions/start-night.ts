@@ -51,10 +51,15 @@ export const startNightAction: GameAction = {
             !ts.deadPlayerIds.includes(a.playerId),
         );
         if (drunkAssignment) {
-          roleOverrides = {
-            ...(roleOverrides ?? {}),
-            [drunkAssignment.playerId]: soberRoleId,
-          };
+          const effectiveDrunkRole =
+            roleOverrides?.[drunkAssignment.playerId] ??
+            drunkAssignment.roleDefinitionId;
+          if (effectiveDrunkRole === (WerewolfRole.VillageDrunk as string)) {
+            roleOverrides = {
+              ...(roleOverrides ?? {}),
+              [drunkAssignment.playerId]: soberRoleId,
+            };
+          }
         }
       }
     }

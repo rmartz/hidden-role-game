@@ -115,6 +115,32 @@ describe("Werewolf player state round-trip", () => {
     expect(result.hunterRevengePlayerId).toBe("p1");
   });
 
+  it("round-trips alphaWolfBiteUsed", () => {
+    const state = makeWerewolfState({ alphaWolfBiteUsed: true });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.alphaWolfBiteUsed).toBe(true);
+  });
+
+  it("round-trips roleConversions", () => {
+    const conversions = [{ playerId: "p3", newRoleDefinitionId: "werewolf" }];
+    const state = makeWerewolfState({ roleConversions: conversions });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.roleConversions).toEqual(conversions);
+  });
+
+  it("omits alphaWolfBiteUsed and roleConversions when absent", () => {
+    const state = makeWerewolfState();
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.alphaWolfBiteUsed).toBeUndefined();
+    expect(result.roleConversions).toBeUndefined();
+  });
+
   it("omits optional fields when absent", () => {
     const state = makeWerewolfState();
     const result = firebaseToPlayerState(

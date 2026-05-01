@@ -144,4 +144,18 @@ describe("startNightAction — Village Drunk sober transition", () => {
     expect(ts.roleOverrides?.["p3"]).toBe(WerewolfRole.Werewolf);
     expect(ts.turn).toBe(4);
   });
+
+  it("does not apply sober override to a Village Drunk already bitten by Alpha Wolf", () => {
+    // p2 (Village Drunk) was bitten before night 3 — their effective role is already Werewolf
+    const bitenOverrides = { p2: WerewolfRole.Werewolf };
+    const game = makeGame(
+      makeDayTurnState(2, { roleOverrides: bitenOverrides }),
+      WerewolfRole.Seer,
+    );
+    startNightAction.apply(game, undefined, "owner-1");
+    const ts = getTurnState(game);
+    expect(ts.turn).toBe(3);
+    // The bite override must not be overwritten by the sober transition
+    expect(ts.roleOverrides?.["p2"]).toBe(WerewolfRole.Werewolf);
+  });
 });
