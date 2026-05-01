@@ -38,7 +38,11 @@ export function getPlayerGameState(
   if (!caller) return null;
 
   const playerById = new Map(game.players.map((p) => [p.id, p]));
-  const publicPlayers = game.players.map((p) => ({ id: p.id, name: p.name }));
+  const publicPlayers = game.players.map((p) => ({
+    id: p.id,
+    name: p.name,
+    ...(p.noDevice ? { noDevice: true } : {}),
+  }));
 
   if (callerId === game.ownerPlayerId) {
     const seesRoles =
@@ -50,7 +54,11 @@ export function getPlayerGameState(
           if (!player || !role) return [];
           return [
             {
-              player: { id: player.id, name: player.name },
+              player: {
+                id: player.id,
+                name: player.name,
+                ...(player.noDevice ? { noDevice: true } : {}),
+              },
               reason: "revealed" as const,
               role: { id: role.id, name: role.name, team: role.team },
             },

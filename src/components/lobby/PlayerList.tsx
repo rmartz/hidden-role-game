@@ -4,6 +4,18 @@ import { useState, useEffect, useRef, Fragment } from "react";
 import type { PublicLobby } from "@/server/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { PlayerRow } from "./PlayerRow";
 import { PLAYER_LIST_COPY } from "./PlayerList.copy";
@@ -20,10 +32,14 @@ interface PlayerListProps {
   disabled: boolean;
   isReadyPending: boolean;
   isRenamePending: boolean;
+  isOwnerRenamePending: boolean;
+  isAddNoDevicePending: boolean;
   onRefetch: () => void;
   onRemovePlayer: (playerId: string) => void;
   onTransferOwner: (playerId: string) => void;
   onRenamePlayer: (playerName: string) => void;
+  onRenameNoDevicePlayer: (playerId: string, playerName: string) => void;
+  onAddNoDevicePlayer: (playerName: string) => void;
   onToggleReady: () => void;
   onReorderPlayers?: (playerOrder: string[]) => void;
 }
@@ -42,6 +58,65 @@ function computeDropOrder(
     : [...without.slice(0, insertAt), sourceId, ...without.slice(insertAt)];
 }
 
+interface AddNoDevicePlayerDialogProps {
+  disabled: boolean;
+  onAdd: (playerName: string) => void;
+}
+
+function AddNoDevicePlayerDialog({
+  disabled,
+  onAdd,
+}: AddNoDevicePlayerDialogProps) {
+  const [nameValue, setNameValue] = useState("");
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger
+        render={
+          <Button variant="outline" size="sm" className="mt-3" disabled={disabled} />
+        }
+      >
+        {PLAYER_LIST_COPY.addNoDeviceButton}
+      </AlertDialogTrigger>
+      <AlertDialogContent size="sm">
+        <AlertDialogHeader>
+          <AlertDialogTitle>
+            {PLAYER_LIST_COPY.addNoDeviceTitle}
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            {PLAYER_LIST_COPY.addNoDeviceDescription}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <Input
+          value={nameValue}
+          onChange={(event) => {
+            setNameValue(event.target.value);
+          }}
+          placeholder={PLAYER_LIST_COPY.addNoDevicePlaceholder}
+        />
+        <AlertDialogFooter>
+          <AlertDialogCancel
+            onClick={() => {
+              setNameValue("");
+            }}
+          >
+            {PLAYER_LIST_COPY.addNoDeviceCancel}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            disabled={nameValue.trim() === ""}
+            onClick={() => {
+              onAdd(nameValue);
+              setNameValue("");
+            }}
+          >
+            {PLAYER_LIST_COPY.addNoDeviceConfirm}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
 export function PlayerList({
   lobby,
   userPlayerId,
@@ -54,10 +129,14 @@ export function PlayerList({
   disabled,
   isReadyPending,
   isRenamePending,
+  isOwnerRenamePending,
+  isAddNoDevicePending,
   onRefetch,
   onRemovePlayer,
   onTransferOwner,
   onRenamePlayer,
+  onRenameNoDevicePlayer,
+  onAddNoDevicePlayer,
   onToggleReady,
   onReorderPlayers,
 }: PlayerListProps) {
@@ -66,12 +145,12 @@ export function PlayerList({
 
   const playerMap = new Map(lobby.players.map((p) => [p.id, p]));
 
-  const nonOwnerPlayers = lobby.players.filter(
-    (p) => p.id !== lobby.ownerPlayerId,
+  const nonOwnerDevicePlayers = lobby.players.filter(
+    (p) => p.id !== lobby.ownerPlayerId && !p.noDevice,
   );
   const allPlayersReady =
-    nonOwnerPlayers.length > 0 &&
-    nonOwnerPlayers.every((p) => readySet.has(p.id));
+    nonOwnerDevicePlayers.length > 0 &&
+    nonOwnerDevicePlayers.every((p) => readySet.has(p.id));
 
   const [committedOrder, setCommittedOrder] = useState<string[]>(
     () => lobby.playerOrder,
@@ -185,17 +264,25 @@ export function PlayerList({
                 player={player}
                 ownerPlayerId={lobby.ownerPlayerId}
                 isCurrentUser={player.id === userPlayerId}
+                isOwner={isOwner}
                 isReady={readySet.has(player.id)}
                 showLeave={showLeave}
                 showRemovePlayer={showRemovePlayer}
                 showMakeOwner={showMakeOwner}
                 disabled={disabled}
                 isRenamePending={isRenamePending}
+                isOwnerRenamePending={isOwnerRenamePending}
                 canDrag={canDragRow(player.id)}
                 canReceiveDrop={canReorder}
                 onRemovePlayer={onRemovePlayer}
                 onTransferOwner={onTransferOwner}
                 onRenamePlayer={onRenamePlayer}
+                onRenameNoDevicePlayer={
+                  isOwner && player.noDevice
+                    ? (playerName) =>
+                        onRenameNoDevicePlayer(player.id, playerName)
+                    : undefined
+                }
                 onDragStart={handleDragStart}
                 onDragOver={handleDragOver}
                 onDragEnd={handleDragEnd}
@@ -228,6 +315,12 @@ export function PlayerList({
               ? PLAYER_LIST_COPY.notReadyButton
               : PLAYER_LIST_COPY.readyButton}
           </Button>
+        )}
+        {isOwner && (
+          <AddNoDevicePlayerDialog
+            disabled={disabled || isAddNoDevicePending}
+            onAdd={onAddNoDevicePlayer}
+          />
         )}
         {allPlayersReady && (
           <p className="text-sm text-green-600 font-medium mt-2">

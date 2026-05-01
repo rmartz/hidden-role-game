@@ -48,6 +48,17 @@ describe("isValidSession", () => {
     const lobby = makeLobby({ players: [] });
     expect(isValidSession(lobby, "session-owner")).toBe(false);
   });
+
+  it("returns false when a no-device player exists but sessionId is provided", () => {
+    const lobby = makeLobby({
+      players: [
+        { id: "player-1", name: "Alice", sessionId: "session-owner" },
+        { id: "player-nd", name: "NoDevice", noDevice: true },
+      ],
+    });
+    // A no-device player has no sessionId, so an empty-ish lookup should not match
+    expect(isValidSession(lobby, "session-unknown")).toBe(false);
+  });
 });
 
 describe("toPublicLobby", () => {
@@ -87,6 +98,20 @@ describe("toPublicLobby", () => {
     const lobby = makeLobby({ gameId: "game-abc" });
     const result = toPublicLobby(lobby);
     expect(result.gameId).toBe("game-abc");
+  });
+
+  it("includes noDevice flag for no-device players", () => {
+    const lobby = makeLobby({
+      players: [
+        { id: "player-1", name: "Alice", sessionId: "session-owner" },
+        { id: "player-nd", name: "NoDevice", noDevice: true },
+      ],
+    });
+    const result = toPublicLobby(lobby);
+    const noDevicePlayer = result.players.find((p) => p.id === "player-nd");
+    expect(noDevicePlayer?.noDevice).toBe(true);
+    const devicePlayer = result.players.find((p) => p.id === "player-1");
+    expect(devicePlayer?.noDevice).toBeUndefined();
   });
 
   describe("roleBuckets visibility", () => {

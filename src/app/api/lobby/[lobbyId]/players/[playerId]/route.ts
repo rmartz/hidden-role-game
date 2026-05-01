@@ -56,7 +56,11 @@ export async function PUT(
   const caller = lobby.players.find(
     (player) => player.sessionId === auth.sessionId,
   );
-  if (caller?.id !== playerId) {
+  const targetPlayer = lobby.players.find((p) => p.id === playerId);
+  const callerIsTarget = caller?.id === playerId;
+  const callerIsOwnerRenamingNoDevice =
+    auth.sessionId === lobby.ownerSessionId && targetPlayer?.noDevice === true;
+  if (!callerIsTarget && !callerIsOwnerRenamingNoDevice) {
     return errorResponse("Unauthorized", 403);
   }
 

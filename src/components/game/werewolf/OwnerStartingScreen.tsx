@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { GameStatus, GameMode } from "@/lib/types";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { GameRolesList, PlayersRoleList } from "@/components/game";
@@ -11,11 +11,13 @@ import { OwnerHeader } from "./OwnerHeader";
 import { OWNER_STARTING_SCREEN_COPY } from "./OwnerStartingScreen.copy";
 
 interface OwnerStartingScreenProps {
+  gameId: string;
   gameState: WerewolfPlayerGameState;
   onStart: () => void;
 }
 
 export function OwnerStartingScreen({
+  gameId,
   gameState,
   onStart,
 }: OwnerStartingScreenProps) {
@@ -41,6 +43,40 @@ export function OwnerStartingScreen({
     return role ? [role] : [];
   });
 
+  const noDevicePlayers = gameState.players.filter((p) => p.noDevice);
+
+  const sessionStorageKey = `no-device-roles-viewed-${gameId}`;
+
+  const [viewedPlayerIds, setViewedPlayerIds] = useState<Set<string>>(() => {
+    if (typeof window === "undefined") return new Set<string>();
+    const stored = sessionStorage.getItem(sessionStorageKey);
+    if (!stored) return new Set<string>();
+    try {
+      return new Set<string>(JSON.parse(stored) as string[]);
+    } catch {
+      return new Set<string>();
+    }
+  });
+
+  useEffect(() => {
+    return () => {
+      sessionStorage.removeItem(sessionStorageKey);
+    };
+  }, [sessionStorageKey]);
+
+  function handleRevealNoDeviceRole(playerId: string) {
+    setViewedPlayerIds((prev) => {
+      const next = new Set(prev);
+      next.add(playerId);
+      sessionStorage.setItem(sessionStorageKey, JSON.stringify([...next]));
+      return next;
+    });
+  }
+
+  const roleAssignmentMap = new Map(
+    (gameState.visibleRoleAssignments ?? []).map((a) => [a.player.id, a.role]),
+  );
+
   return (
     <div className="p-5 max-w-4xl mx-auto">
       <OwnerHeader
@@ -54,6 +90,56 @@ export function OwnerStartingScreen({
         gameMode={gameState.gameMode}
         executionerTargetId={gameState.executionerTargetId}
       />
+      {noDevicePlayers.length > 0 && (
+        <Card className="mb-5 border-blue-500 dark:border-blue-600">
+          <CardHeader>
+            <CardTitle className="text-blue-700 dark:text-blue-400">
+              {OWNER_STARTING_SCREEN_COPY.noDeviceRolesTitle}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-3">
+              {OWNER_STARTING_SCREEN_COPY.noDeviceRolesDescription}
+            </p>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+              {noDevicePlayers.map((player) => {
+                const alreadyViewed = viewedPlayerIds.has(player.id);
+                const role = roleAssignmentMap.get(player.id);
+                return (
+                  <button
+                    key={player.id}
+                    type="button"
+                    disabled={alreadyViewed}
+                    onClick={() => {
+                      if (!alreadyViewed) {
+                        handleRevealNoDeviceRole(player.id);
+                      }
+                    }}
+                    className={`relative rounded-lg border p-3 text-left transition-colors ${
+                      alreadyViewed
+                        ? "cursor-not-allowed opacity-50 bg-muted"
+                        : "cursor-pointer hover:bg-accent border-border"
+                    }`}
+                  >
+                    <p className="font-medium text-sm truncate">{player.name}</p>
+                    {alreadyViewed && role ? (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {role.name}
+                      </p>
+                    ) : (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {alreadyViewed
+                          ? OWNER_STARTING_SCREEN_COPY.noDeviceAlreadyViewed
+                          : OWNER_STARTING_SCREEN_COPY.noDeviceRevealPrompt}
+                      </p>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      )}
       {hiddenRoles.length > 0 && (
         <Card className="mb-5 border-amber-500 dark:border-amber-600">
           <CardHeader>

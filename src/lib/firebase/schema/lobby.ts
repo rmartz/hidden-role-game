@@ -30,6 +30,8 @@ export interface FirebaseLobbyPublic {
 export interface FirebaseLobbyPlayer {
   id: string;
   name: string;
+  /** When true, this player has no device and is managed entirely by the lobby owner. */
+  noDevice?: boolean;
   /** Visible players for this player. Absent for the game owner. */
   visiblePlayers?: { playerId: string; reason: string; roleId?: string }[];
 }
@@ -85,8 +87,14 @@ export function lobbyToFirebase(lobby: Lobby): {
   const players: Record<string, FirebaseLobbyPlayer> = {};
   const playerSessions: Record<string, string> = {};
   for (const p of lobby.players) {
-    players[p.id] = { id: p.id, name: p.name };
-    playerSessions[p.id] = p.sessionId;
+    players[p.id] = {
+      id: p.id,
+      name: p.name,
+      ...(p.noDevice ? { noDevice: true } : {}),
+    };
+    if (p.sessionId) {
+      playerSessions[p.id] = p.sessionId;
+    }
   }
 
   return {
@@ -179,7 +187,7 @@ export function firebaseToLobby(
   const players: LobbyPlayer[] = Object.values(pub.players ?? {}).map((p) => ({
     id: p.id,
     name: p.name,
-    sessionId: sessions[p.id] ?? "",
+    ...(p.noDevice ? { noDevice: true } : { sessionId: sessions[p.id] }),
   }));
 
   return {
@@ -263,6 +271,7 @@ export function firebaseToPublicLobby(
   const players = Object.values(pub.players ?? {}).map((p) => ({
     id: p.id,
     name: p.name,
+    ...(p.noDevice ? { noDevice: true } : {}),
   }));
 
   return {

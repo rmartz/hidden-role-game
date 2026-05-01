@@ -139,7 +139,7 @@ export async function removePlayer(
 
 export async function addPlayer(
   lobbyId: string,
-  player: { id: string; name: string; sessionId: string },
+  player: { id: string; name: string; sessionId?: string; noDevice?: boolean },
 ): Promise<Lobby | undefined> {
   const snap = await lobbyRef(lobbyId).once("value");
   if (!snap.exists()) return undefined;
@@ -156,16 +156,25 @@ export async function addPlayer(
   ];
 
   await lobbyRef(lobbyId).update({
-    [`public/players/${player.id}`]: { id: player.id, name: player.name },
-    [`private/playerSessions/${player.id}`]: player.sessionId,
+    [`public/players/${player.id}`]: {
+      id: player.id,
+      name: player.name,
+      ...(player.noDevice ? { noDevice: true } : {}),
+    },
+    ...(player.sessionId
+      ? { [`private/playerSessions/${player.id}`]: player.sessionId }
+      : {}),
     "public/playerOrder": updatedOrder,
   });
 
   (data.public.players ??= {})[player.id] = {
     id: player.id,
     name: player.name,
+    ...(player.noDevice ? { noDevice: true } : {}),
   };
-  (data.private.playerSessions ??= {})[player.id] = player.sessionId;
+  if (player.sessionId) {
+    (data.private.playerSessions ??= {})[player.id] = player.sessionId;
+  }
   data.public.playerOrder = updatedOrder;
   return firebaseToLobby(lobbyId, data.public, data.private);
 }

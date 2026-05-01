@@ -25,7 +25,10 @@ import type {
 export interface LobbyPlayer {
   id: string;
   name: string;
-  sessionId: string;
+  /** Absent for no-device players who were created by the lobby owner. */
+  sessionId?: string;
+  /** When true, this player has no device and is managed entirely by the lobby owner. */
+  noDevice?: boolean;
 }
 
 // --- Game Status (no Lobby — Lobby is a separate concept) ---

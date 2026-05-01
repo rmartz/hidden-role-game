@@ -136,3 +136,7 @@ pnpm run secrets-check # Gitleaks secret scan (runs in pre-commit)
 - Do not use `.toBeInTheDocument()` — use `.toBeDefined()` or check `.textContent` instead.
 - Assert against copy constants (e.g., `WEREWOLF_COPY`) rather than hardcoded strings.
 - Test presentational view components directly; avoid mocking hooks in tests where possible.
+
+## Narrator-First / No-Device Player Principle
+
+**No-device player participation is the baseline for narrator-accessible mechanics.** Any role that grants a player secret information during or after the starting phase must have a narrator-facing path to communicate it privately (e.g., narrator-only instructions, a separate UI panel). The existing owner night UI must remain sufficient for the narrator to act on behalf of no-device players without exposing information to other players. Validate this whenever adding a new role or night-phase mechanic.
