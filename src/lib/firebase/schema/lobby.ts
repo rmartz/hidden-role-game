@@ -184,11 +184,17 @@ export function firebaseToLobby(
   priv: FirebaseLobbyPrivate,
 ): Lobby {
   const sessions = priv.playerSessions ?? {};
-  const players: LobbyPlayer[] = Object.values(pub.players ?? {}).map((p) => ({
-    id: p.id,
-    name: p.name,
-    ...(p.noDevice ? { noDevice: true } : { sessionId: sessions[p.id] }),
-  }));
+  const players: LobbyPlayer[] = Object.values(pub.players ?? {}).map((p) =>
+    p.noDevice
+      ? { id: p.id, name: p.name, noDevice: true }
+      : {
+          id: p.id,
+          name: p.name,
+          ...(sessions[p.id] !== undefined
+            ? { sessionId: sessions[p.id] }
+            : {}),
+        },
+  );
 
   return {
     id: lobbyId,

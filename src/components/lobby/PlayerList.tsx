@@ -70,7 +70,11 @@ function AddNoDevicePlayerDialog({
   const [nameValue, setNameValue] = useState("");
 
   return (
-    <AlertDialog>
+    <AlertDialog
+      onOpenChange={(open) => {
+        if (!open) setNameValue("");
+      }}
+    >
       <AlertDialogTrigger
         render={
           <Button variant="outline" size="sm" className="mt-3" disabled={disabled} />
@@ -95,18 +99,13 @@ function AddNoDevicePlayerDialog({
           placeholder={PLAYER_LIST_COPY.addNoDevicePlaceholder}
         />
         <AlertDialogFooter>
-          <AlertDialogCancel
-            onClick={() => {
-              setNameValue("");
-            }}
-          >
+          <AlertDialogCancel>
             {PLAYER_LIST_COPY.addNoDeviceCancel}
           </AlertDialogCancel>
           <AlertDialogAction
             disabled={nameValue.trim() === ""}
             onClick={() => {
               onAdd(nameValue);
-              setNameValue("");
             }}
           >
             {PLAYER_LIST_COPY.addNoDeviceConfirm}

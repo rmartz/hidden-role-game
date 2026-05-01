@@ -45,7 +45,10 @@ export function OwnerStartingScreen({
 
   const noDevicePlayers = gameState.players.filter((p) => p.noDevice);
 
-  const sessionStorageKey = `no-device-roles-viewed-${gameId}`;
+  const sessionStorageKey = useMemo(
+    () => `no-device-roles-viewed-${gameId}`,
+    [gameId],
+  );
 
   const [viewedPlayerIds, setViewedPlayerIds] = useState<Set<string>>(() => {
     if (typeof window === "undefined") return new Set<string>();
@@ -111,9 +114,7 @@ export function OwnerStartingScreen({
                     type="button"
                     disabled={alreadyViewed}
                     onClick={() => {
-                      if (!alreadyViewed) {
-                        handleRevealNoDeviceRole(player.id);
-                      }
+                      handleRevealNoDeviceRole(player.id);
                     }}
                     className={`relative rounded-lg border p-3 text-left transition-colors ${
                       alreadyViewed
