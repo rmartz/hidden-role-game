@@ -89,6 +89,19 @@ describe("WerewolfAction.ConfirmEvilEmpathResult — isValid", () => {
     const game = makeEmpathGame();
     expect(action.isValid(game, "p4", null)).toBe(false);
   });
+
+  it("returns false when the Evil Empath phase action is already confirmed", () => {
+    const game = makeEmpathGame();
+    // Pre-populate a confirmed night action for the Evil Empath phase.
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    if (ts.phase.type !== WerewolfPhase.Nighttime)
+      throw new Error("wrong phase");
+    ts.phase.nightActions[WerewolfRole.EvilEmpath] = {
+      confirmed: true,
+      resultRevealed: true,
+    };
+    expect(action.isValid(game, "owner-1", null)).toBe(false);
+  });
 });
 
 describe("WerewolfAction.ConfirmEvilEmpathResult — adjacency (apply)", () => {
