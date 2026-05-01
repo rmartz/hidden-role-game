@@ -211,7 +211,7 @@ Additional resolution steps:
 
 **Who:** Narrator only
 **When:** During Nighttime or Daytime, when the phase timer is paused (`pausedAt` is set)
-**Effect:** Accumulates the paused duration into `pauseOffset`, clears `pausedAt`, and shifts `startedAt` forward so that elapsed time resumes from where it was when paused.
+**Effect:** Accumulates the elapsed running time up to the pause point (`pausedAt - startedAt`) into `pauseOffset`, clears `pausedAt`, and resets `startedAt` to now so that elapsed time resumes from where it was when paused.
 
 **Payload:** none
 

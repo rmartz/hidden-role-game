@@ -47,7 +47,7 @@ export interface WerewolfNighttimePhase {
   smitedPlayerIds?: string[];
   /** Unix epoch ms when the narrator paused the active timer. Absent when running. */
   pausedAt?: number;
-  /** Accumulated paused milliseconds from prior pause/resume cycles. */
+  /** Accumulated running milliseconds from prior run periods (before the most recent pause). */
   pauseOffset?: number;
 }
 
@@ -132,7 +132,7 @@ export interface WerewolfDaytimePhase {
   startedAt: number;
   /** Unix epoch ms when the narrator paused the active timer. Absent when running. */
   pausedAt?: number;
-  /** Accumulated paused milliseconds from prior pause/resume cycles. */
+  /** Accumulated running milliseconds from prior run periods (before the most recent pause). */
   pauseOffset?: number;
   /** Targets from the preceding night, carried over for narrator summary. */
   nightActions: Record<string, AnyNightAction>;
