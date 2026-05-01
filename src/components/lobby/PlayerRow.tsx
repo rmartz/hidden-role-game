@@ -132,6 +132,12 @@ export function PlayerRow({
   onDragOver,
   onDragEnd,
 }: PlayerRowProps) {
+  const showOwnerRenameNoDevice =
+    !isCurrentUser &&
+    isOwner &&
+    player.noDevice === true &&
+    onRenameNoDevicePlayer !== undefined;
+
   return (
     <li
       className={cn("flex items-center gap-2 py-1", canDrag && "select-none")}
@@ -213,7 +219,7 @@ export function PlayerRow({
             onRename={onRenamePlayer}
           />
         )}
-        {!isCurrentUser && isOwner && player.noDevice && onRenameNoDevicePlayer && (
+        {showOwnerRenameNoDevice && onRenameNoDevicePlayer && (
           <RenamePlayerDialog
             playerName={player.name}
             title={PLAYER_ROW_COPY.renameNoDeviceTitle(player.name)}

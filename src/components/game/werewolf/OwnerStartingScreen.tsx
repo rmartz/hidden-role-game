@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { GameStatus, GameMode } from "@/lib/types";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { GameRolesList, PlayersRoleList } from "@/components/game";
@@ -30,21 +30,6 @@ export function OwnerStartingScreen({
     [startedAtMs],
   );
 
-  const timerConfig = gameState.timerConfig;
-  const timer = {
-    durationSeconds: timerConfig.startCountdownSeconds,
-    autoAdvance: timerConfig.autoAdvance,
-    startedAt,
-    onTimerTrigger: onStart,
-  };
-
-  const hiddenRoles = (gameState.hiddenRoleIds ?? []).flatMap((roleId) => {
-    const role = GAME_MODES[GameMode.Werewolf].roles[roleId];
-    return role ? [role] : [];
-  });
-
-  const noDevicePlayers = gameState.players.filter((p) => p.noDevice);
-
   const sessionStorageKey = useMemo(
     () => `no-device-roles-viewed-${gameId}`,
     [gameId],
@@ -61,11 +46,17 @@ export function OwnerStartingScreen({
     }
   });
 
-  useEffect(() => {
-    return () => {
-      sessionStorage.removeItem(sessionStorageKey);
-    };
-  }, [sessionStorageKey]);
+  const hiddenRoles = (gameState.hiddenRoleIds ?? []).flatMap((roleId) => {
+    const role = GAME_MODES[GameMode.Werewolf].roles[roleId];
+    return role ? [role] : [];
+  });
+
+  const noDevicePlayers = gameState.players.filter((p) => p.noDevice);
+
+  function handleStart() {
+    sessionStorage.removeItem(sessionStorageKey);
+    onStart();
+  }
 
   function handleRevealNoDeviceRole(playerId: string) {
     setViewedPlayerIds((prev) => {
@@ -76,6 +67,14 @@ export function OwnerStartingScreen({
     });
   }
 
+  const timerConfig = gameState.timerConfig;
+  const timer = {
+    durationSeconds: timerConfig.startCountdownSeconds,
+    autoAdvance: timerConfig.autoAdvance,
+    startedAt,
+    onTimerTrigger: handleStart,
+  };
+
   const roleAssignmentMap = new Map(
     (gameState.visibleRoleAssignments ?? []).map((a) => [a.player.id, a.role]),
   );
@@ -85,7 +84,7 @@ export function OwnerStartingScreen({
       <OwnerHeader
         title="Game Starting"
         advanceLabel="Start Now"
-        onAdvance={onStart}
+        onAdvance={handleStart}
         timer={timer}
       />
       <PlayersRoleList
