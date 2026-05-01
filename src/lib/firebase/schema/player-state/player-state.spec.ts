@@ -219,6 +219,30 @@ describe("Werewolf player state round-trip", () => {
     ) as WerewolfPlayerGameState;
     expect(result.evilEmpathRevealedResult).toBeUndefined();
   });
+
+  it("round-trips evilEmpathNightResult when set to true", () => {
+    const state = makeWerewolfState({ evilEmpathNightResult: true });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.evilEmpathNightResult).toBe(true);
+  });
+
+  it("round-trips evilEmpathNightResult when set to false", () => {
+    const state = makeWerewolfState({ evilEmpathNightResult: false });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.evilEmpathNightResult).toBe(false);
+  });
+
+  it("omits evilEmpathNightResult when absent", () => {
+    const state = makeWerewolfState();
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.evilEmpathNightResult).toBeUndefined();
+  });
 });
 
 describe("Secret Villain player state round-trip", () => {

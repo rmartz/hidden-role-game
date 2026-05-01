@@ -229,7 +229,7 @@ describe("Seer investigation — Illusion Artist inversion", () => {
 describe("Evil Empath — extractPlayerNightState", () => {
   const empathRole = WEREWOLF_ROLES[WerewolfRole.EvilEmpath];
 
-  it("returns no evilEmpathRevealedResult when no result has been recorded yet", () => {
+  it("returns no evilEmpathNightResult when no result has been recorded yet", () => {
     const game = makeGame({
       roleAssignments: [
         { playerId: "ee1", roleDefinitionId: WerewolfRole.EvilEmpath },
@@ -250,10 +250,10 @@ describe("Evil Empath — extractPlayerNightState", () => {
       },
     });
     const result = extractPlayerNightState(game, "ee1", empathRole, []);
-    expect(result.evilEmpathRevealedResult).toBeUndefined();
+    expect(result.evilEmpathNightResult).toBeUndefined();
   });
 
-  it("surfaces evilEmpathLastResult to the Evil Empath player as evilEmpathRevealedResult", () => {
+  it("surfaces evilEmpathLastResult to the Evil Empath player as evilEmpathNightResult", () => {
     const game = makeGame({
       roleAssignments: [
         { playerId: "ee1", roleDefinitionId: WerewolfRole.EvilEmpath },
@@ -280,7 +280,7 @@ describe("Evil Empath — extractPlayerNightState", () => {
       },
     });
     const result = extractPlayerNightState(game, "ee1", empathRole, []);
-    expect(result.evilEmpathRevealedResult).toBe(true);
+    expect(result.evilEmpathNightResult).toBe(true);
   });
 });
 

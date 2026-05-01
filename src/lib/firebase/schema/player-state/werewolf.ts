@@ -71,6 +71,7 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
    * True = Seer was adjacent to a Werewolf.
    */
   evilEmpathRevealedResult?: boolean;
+  evilEmpathNightResult?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -146,6 +147,9 @@ export function werewolfStateToFirebase(
       : {}),
     ...(state.evilEmpathRevealedResult !== undefined
       ? { evilEmpathRevealedResult: state.evilEmpathRevealedResult }
+      : {}),
+    ...(state.evilEmpathNightResult !== undefined
+      ? { evilEmpathNightResult: state.evilEmpathNightResult }
       : {}),
   };
 }
@@ -230,6 +234,9 @@ export function werewolfStateFromFirebase(
     ...(raw.hiddenRoleIds?.length ? { hiddenRoleIds: raw.hiddenRoleIds } : {}),
     ...(raw.evilEmpathRevealedResult !== undefined
       ? { evilEmpathRevealedResult: raw.evilEmpathRevealedResult }
+      : {}),
+    ...(raw.evilEmpathNightResult !== undefined
+      ? { evilEmpathNightResult: raw.evilEmpathNightResult }
       : {}),
   } as WerewolfPlayerGameState;
 }
