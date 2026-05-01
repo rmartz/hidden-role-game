@@ -277,10 +277,7 @@ export function PlayerList({
                 onTransferOwner={onTransferOwner}
                 onRenamePlayer={onRenamePlayer}
                 onRenameNoDevicePlayer={
-                  isOwner && player.noDevice
-                    ? (playerName) =>
-                        onRenameNoDevicePlayer(player.id, playerName)
-                    : undefined
+                  isOwner && player.noDevice ? onRenameNoDevicePlayer : undefined
                 }
                 onDragStart={handleDragStart}
                 onDragOver={handleDragOver}

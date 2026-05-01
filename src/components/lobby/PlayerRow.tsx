@@ -38,7 +38,7 @@ interface PlayerRowProps {
   onRemovePlayer: (playerId: string) => void;
   onTransferOwner: (playerId: string) => void;
   onRenamePlayer: (playerName: string) => void;
-  onRenameNoDevicePlayer?: (playerName: string) => void;
+  onRenameNoDevicePlayer?: (playerId: string, playerName: string) => void;
   onDragStart?: (playerId: string) => void;
   onDragOver?: (playerId: string) => void;
   onDragEnd?: () => void;
@@ -135,7 +135,7 @@ export function PlayerRow({
   const showOwnerRenameNoDevice =
     !isCurrentUser &&
     isOwner &&
-    player.noDevice === true &&
+    !!player.noDevice &&
     onRenameNoDevicePlayer !== undefined;
 
   return (
@@ -219,14 +219,16 @@ export function PlayerRow({
             onRename={onRenamePlayer}
           />
         )}
-        {showOwnerRenameNoDevice && onRenameNoDevicePlayer && (
+        {showOwnerRenameNoDevice && (
           <RenamePlayerDialog
             playerName={player.name}
             title={PLAYER_ROW_COPY.renameNoDeviceTitle(player.name)}
             description={PLAYER_ROW_COPY.renameNoDeviceDescription}
             disabled={disabled}
             isPending={isOwnerRenamePending}
-            onRename={onRenameNoDevicePlayer}
+            onRename={(playerName) => {
+              onRenameNoDevicePlayer?.(player.id, playerName);
+            }}
           />
         )}
         {isCurrentUser && showLeave && (
