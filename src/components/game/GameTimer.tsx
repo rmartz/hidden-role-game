@@ -38,7 +38,8 @@ export function GameTimer({
 
   const computeElapsed = useCallback(
     (nowMs: number) => {
-      const effectiveNow = isPaused ? pausedAt.getTime() : nowMs;
+      const rawPausedAtMs = isPaused ? pausedAt.getTime() : nowMs;
+      const effectiveNow = isNaN(rawPausedAtMs) ? nowMs : rawPausedAtMs;
       return Math.max(
         0,
         Math.floor((pauseOffset + (effectiveNow - startedAtMs)) / 1000),
