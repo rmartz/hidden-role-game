@@ -294,5 +294,7 @@ export const WEREWOLF_COPY = {
   illusionArtist: {
     targetLabel: "Illusion target",
     narratorTargetLabel: (name: string) => `Illusion Artist targeted: ${name}`,
+    narratorFlipAnnotation: (actual: string) =>
+      `Flipped from actual: ${actual}`,
   },
 } as const;

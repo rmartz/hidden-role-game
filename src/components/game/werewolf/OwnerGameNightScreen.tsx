@@ -163,6 +163,14 @@ export function OwnerGameNightScreen({
     ? (getPlayerName(gameState.players, secondTargetId) ?? secondTargetId)
     : undefined;
 
+  const illusionAction = nightActions[WerewolfRole.IllusionArtist as string];
+  const illusionTargetId =
+    illusionAction &&
+    !isTeamNightAction(illusionAction) &&
+    illusionAction.confirmed
+      ? illusionAction.targetPlayerId
+      : undefined;
+
   const investigationResult = getInvestigationResultForNarrator(
     isInvestigatePhase,
     activeTarget,
@@ -172,6 +180,7 @@ export function OwnerGameNightScreen({
     activeRoleDef,
     secondTargetId,
     secondTargetName,
+    illusionTargetId,
   );
 
   const exposerRevealData = turnState.exposerReveal;
@@ -333,6 +342,7 @@ export function OwnerGameNightScreen({
               isResultRevealed={isResultRevealed}
               resultLabel={investigationResult.resultLabel}
               secondTargetName={investigationResult.secondTargetName}
+              illusionFlipLabel={investigationResult.illusionFlipLabel}
             />
           )}
           {exposerRevealText && (

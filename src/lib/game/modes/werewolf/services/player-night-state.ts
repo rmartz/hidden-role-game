@@ -245,7 +245,7 @@ function extractRoleSpecificState(
       myNightTarget: undefined,
       myNightTargetConfirmed: soloAction?.confirmed ?? false,
       ...(ts?.evilEmpathLastResult !== undefined
-        ? { evilEmpathRevealedResult: ts.evilEmpathLastResult }
+        ? { evilEmpathNightResult: ts.evilEmpathLastResult }
         : {}),
     };
   }
