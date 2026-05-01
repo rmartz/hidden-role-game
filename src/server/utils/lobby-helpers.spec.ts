@@ -49,14 +49,13 @@ describe("isValidSession", () => {
     expect(isValidSession(lobby, "session-owner")).toBe(false);
   });
 
-  it("returns false when a no-device player exists but sessionId is provided", () => {
+  it("returns false for an unknown sessionId when no-device players are present", () => {
     const lobby = makeLobby({
       players: [
         { id: "player-1", name: "Alice", sessionId: "session-owner" },
         { id: "player-nd", name: "NoDevice", noDevice: true },
       ],
     });
-    // A no-device player has no sessionId, so an empty-ish lookup should not match
     expect(isValidSession(lobby, "session-unknown")).toBe(false);
   });
 });

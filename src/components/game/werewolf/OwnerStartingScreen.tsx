@@ -43,15 +43,16 @@ export function OwnerStartingScreen({
   // Read viewed state from sessionStorage after mount to avoid SSR hydration mismatch.
   // Block interaction until hydrated so previously-viewed cards are not briefly re-clickable.
   useEffect(() => {
-    const stored = sessionStorage.getItem(sessionStorageKey);
-    if (stored) {
-      try {
+    try {
+      const stored = sessionStorage.getItem(sessionStorageKey);
+      if (stored) {
         setViewedPlayerIds(new Set<string>(JSON.parse(stored) as string[]));
-      } catch {
-        // Malformed storage data is ignored; the user can re-reveal roles on this device.
       }
+    } catch {
+      // Storage access may be blocked or data may be malformed; fall back to empty set.
+    } finally {
+      setStorageHydrated(true);
     }
-    setStorageHydrated(true);
   }, [sessionStorageKey]);
 
   const hiddenRoles = (gameState.hiddenRoleIds ?? []).flatMap((roleId) => {
@@ -62,17 +63,23 @@ export function OwnerStartingScreen({
   const noDevicePlayers = gameState.players.filter((p) => p.noDevice);
 
   function handleStart() {
-    sessionStorage.removeItem(sessionStorageKey);
+    try {
+      sessionStorage.removeItem(sessionStorageKey);
+    } catch {
+      // Storage may be blocked; continue with game start.
+    }
     onStart();
   }
 
   function handleRevealNoDeviceRole(playerId: string) {
-    setViewedPlayerIds((prev) => {
-      const next = new Set(prev);
-      next.add(playerId);
+    const next = new Set(viewedPlayerIds);
+    next.add(playerId);
+    setViewedPlayerIds(next);
+    try {
       sessionStorage.setItem(sessionStorageKey, JSON.stringify([...next]));
-      return next;
-    });
+    } catch {
+      // Storage may be full or blocked; continue without persisting.
+    }
   }
 
   const timerConfig = gameState.timerConfig;
