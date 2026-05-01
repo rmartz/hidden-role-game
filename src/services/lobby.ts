@@ -1,5 +1,6 @@
 import type {
   Lobby,
+  LobbyPlayer,
   GameMode,
   ModeConfig,
   RoleBucket,
@@ -139,7 +140,7 @@ export async function removePlayer(
 
 export async function addPlayer(
   lobbyId: string,
-  player: { id: string; name: string; sessionId?: string; noDevice?: boolean },
+  player: LobbyPlayer,
 ): Promise<Lobby | undefined> {
   const snap = await lobbyRef(lobbyId).once("value");
   if (!snap.exists()) return undefined;

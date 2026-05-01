@@ -22,14 +22,26 @@ import type {
   CodenamesModeConfig,
 } from "@/lib/game/modes/codenames/lobby-config";
 
-export interface LobbyPlayer {
+export interface DeviceLobbyPlayer {
   id: string;
   name: string;
-  /** Absent for no-device players who were created by the lobby owner. */
-  sessionId?: string;
-  /** When true, this player has no device and is managed entirely by the lobby owner. */
-  noDevice?: boolean;
+  sessionId: string;
+  noDevice?: false;
 }
+
+export interface NoDeviceLobbyPlayer {
+  id: string;
+  name: string;
+  sessionId?: undefined;
+  noDevice: true;
+}
+
+/**
+ * Discriminated union: a `DeviceLobbyPlayer` always has a `sessionId`; a
+ * `NoDeviceLobbyPlayer` never does and is managed entirely by the lobby owner.
+ * Narrow on `noDevice` (or `sessionId !== undefined`) to access the typed field.
+ */
+export type LobbyPlayer = DeviceLobbyPlayer | NoDeviceLobbyPlayer;
 
 // --- Game Status (no Lobby — Lobby is a separate concept) ---
 
@@ -319,9 +331,7 @@ export interface VisiblePlayer {
   roleId?: string;
 }
 
-export interface GamePlayer extends LobbyPlayer {
-  visiblePlayers: VisiblePlayer[];
-}
+export type GamePlayer = LobbyPlayer & { visiblePlayers: VisiblePlayer[] };
 
 // --- Game (exists only after the game has been started) ---
 

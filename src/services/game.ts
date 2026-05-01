@@ -24,7 +24,7 @@ function gameRef(gameId: string) {
 export async function saveGame(game: Game): Promise<void> {
   const sessionIndex: Record<string, string> = {};
   for (const p of game.players) {
-    sessionIndex[p.sessionId] = p.id;
+    if (p.sessionId) sessionIndex[p.sessionId] = p.id;
   }
 
   await gameRef(game.id).set({
@@ -48,16 +48,26 @@ export async function getGame(gameId: string): Promise<Game | undefined> {
     Object.entries(data.sessionIndex ?? {}).map(([sid, pid]) => [pid, sid]),
   );
 
-  const players: GamePlayer[] = Object.values(data.public.players).map((p) => ({
-    id: p.id,
-    name: p.name,
-    sessionId: playerIdToSession.get(p.id) ?? "",
-    visiblePlayers: (p.visiblePlayers ?? []).map((vp) => ({
+  const players: GamePlayer[] = Object.values(data.public.players).map((p) => {
+    const visiblePlayers = (p.visiblePlayers ?? []).map((vp) => ({
       playerId: vp.playerId,
       reason: vp.reason as VisibilityReason,
       ...(vp.roleId ? { roleId: vp.roleId } : {}),
-    })),
-  }));
+    }));
+    if (p.noDevice)
+      return {
+        id: p.id,
+        name: p.name,
+        noDevice: true as const,
+        visiblePlayers,
+      };
+    return {
+      id: p.id,
+      name: p.name,
+      sessionId: playerIdToSession.get(p.id) ?? "",
+      visiblePlayers,
+    };
+  });
 
   return firebaseToGame(gameId, data.public, players);
 }

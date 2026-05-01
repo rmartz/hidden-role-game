@@ -132,11 +132,10 @@ export function PlayerRow({
   onDragOver,
   onDragEnd,
 }: PlayerRowProps) {
-  const showOwnerRenameNoDevice =
-    !isCurrentUser &&
-    isOwner &&
-    player.noDevice &&
-    onRenameNoDevicePlayer !== undefined;
+  const ownerRenameNoDevice =
+    !isCurrentUser && isOwner && player.noDevice
+      ? onRenameNoDevicePlayer
+      : undefined;
 
   return (
     <li
@@ -219,7 +218,7 @@ export function PlayerRow({
             onRename={onRenamePlayer}
           />
         )}
-        {showOwnerRenameNoDevice && (
+        {ownerRenameNoDevice && (
           <RenamePlayerDialog
             playerName={player.name}
             title={PLAYER_ROW_COPY.renameNoDeviceTitle(player.name)}
@@ -227,7 +226,7 @@ export function PlayerRow({
             disabled={disabled}
             isPending={isOwnerRenamePending}
             onRename={(playerName) => {
-              onRenameNoDevicePlayer?.(player.id, playerName);
+              ownerRenameNoDevice(player.id, playerName);
             }}
           />
         )}

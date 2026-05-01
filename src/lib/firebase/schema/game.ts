@@ -44,6 +44,7 @@ export function gameToFirebase(game: Game): FirebaseGamePublic {
     players[p.id] = {
       id: p.id,
       name: p.name,
+      ...(p.noDevice ? { noDevice: true } : {}),
       ...(p.visiblePlayers.length > 0
         ? { visiblePlayers: p.visiblePlayers }
         : {}),

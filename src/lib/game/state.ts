@@ -190,6 +190,7 @@ export function getPlayerGameState(
 export function buildAllPlayerStates(game: Game): Map<string, PlayerGameState> {
   const states = new Map<string, PlayerGameState>();
   for (const player of game.players) {
+    if (!player.sessionId) continue;
     const state = getPlayerGameState(game, player.id);
     if (state) states.set(player.sessionId, state);
   }

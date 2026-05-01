@@ -53,13 +53,16 @@ export async function PUT(
   if (auth instanceof Response) return auth;
   const { lobby } = auth;
 
+  const targetPlayer = lobby.players.find((p) => p.id === playerId);
+  if (!targetPlayer) {
+    return errorResponse("Player not found", 404);
+  }
   const caller = lobby.players.find(
     (player) => player.sessionId === auth.sessionId,
   );
-  const targetPlayer = lobby.players.find((p) => p.id === playerId);
   const callerIsTarget = caller?.id === playerId;
   const callerIsOwnerRenamingNoDevice =
-    auth.sessionId === lobby.ownerSessionId && targetPlayer?.noDevice === true;
+    auth.sessionId === lobby.ownerSessionId && targetPlayer.noDevice === true;
   if (!callerIsTarget && !callerIsOwnerRenamingNoDevice) {
     return errorResponse("Unauthorized", 403);
   }

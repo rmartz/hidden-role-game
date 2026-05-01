@@ -187,7 +187,7 @@ export function firebaseToLobby(
   const players: LobbyPlayer[] = Object.values(pub.players ?? {}).map((p) => {
     const base = { id: p.id, name: p.name };
     if (p.noDevice) return { ...base, noDevice: true as const };
-    return { ...base, sessionId: sessions[p.id] };
+    return { ...base, sessionId: sessions[p.id] ?? "" };
   });
 
   return {

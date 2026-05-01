@@ -53,13 +53,17 @@ export async function authenticateLobby(
 export async function authenticateGame(
   gameId: string,
   sessionId?: string,
-): Promise<Response | { game: Game; caller: GamePlayer }> {
+): Promise<
+  Response | { game: Game; caller: GamePlayer & { sessionId: string } }
+> {
   if (!sessionId) {
     return errorResponse("No session", 401);
   }
 
   const game = await getGame(gameId);
-  const caller = game?.players.find((p) => p.sessionId === sessionId);
+  const caller = game?.players.find(
+    (p): p is GamePlayer & { sessionId: string } => p.sessionId === sessionId,
+  );
 
   if (!game || !caller) {
     return errorResponse("Forbidden", 403);

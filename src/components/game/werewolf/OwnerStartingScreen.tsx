@@ -38,16 +38,20 @@ export function OwnerStartingScreen({
   const [viewedPlayerIds, setViewedPlayerIds] = useState<Set<string>>(
     new Set<string>(),
   );
+  const [storageHydrated, setStorageHydrated] = useState(false);
 
   // Read viewed state from sessionStorage after mount to avoid SSR hydration mismatch.
+  // Block interaction until hydrated so previously-viewed cards are not briefly re-clickable.
   useEffect(() => {
     const stored = sessionStorage.getItem(sessionStorageKey);
-    if (!stored) return;
-    try {
-      setViewedPlayerIds(new Set<string>(JSON.parse(stored) as string[]));
-    } catch {
-      // Malformed storage data is ignored; the user can re-reveal roles on this device.
+    if (stored) {
+      try {
+        setViewedPlayerIds(new Set<string>(JSON.parse(stored) as string[]));
+      } catch {
+        // Malformed storage data is ignored; the user can re-reveal roles on this device.
+      }
     }
+    setStorageHydrated(true);
   }, [sessionStorageKey]);
 
   const hiddenRoles = (gameState.hiddenRoleIds ?? []).flatMap((roleId) => {
@@ -79,15 +83,23 @@ export function OwnerStartingScreen({
     onTimerTrigger: handleStart,
   };
 
+  const noDevicePlayerIds = useMemo(
+    () => new Set(noDevicePlayers.map((p) => p.id)),
+    [noDevicePlayers],
+  );
+
   const noDeviceRoleMap =
     noDevicePlayers.length > 0
       ? new Map(
-          (gameState.visibleRoleAssignments ?? []).map((a) => [
-            a.player.id,
-            a.role,
-          ]),
+          gameState.visibleRoleAssignments.map((a) => [a.player.id, a.role]),
         )
       : null;
+
+  // Exclude no-device players from PlayersRoleList — their roles are revealed
+  // via the tap-to-reveal grid below to prevent accidental disclosure.
+  const devicePlayerAssignments = gameState.visibleRoleAssignments.filter(
+    (a) => !noDevicePlayerIds.has(a.player.id),
+  );
 
   return (
     <div className="p-5 max-w-4xl mx-auto">
@@ -98,7 +110,7 @@ export function OwnerStartingScreen({
         timer={timer}
       />
       <PlayersRoleList
-        assignments={gameState.visibleRoleAssignments}
+        assignments={devicePlayerAssignments}
         gameMode={gameState.gameMode}
         executionerTargetId={gameState.executionerTargetId}
       />
@@ -121,17 +133,19 @@ export function OwnerStartingScreen({
                   <button
                     key={player.id}
                     type="button"
-                    disabled={alreadyViewed}
+                    disabled={!storageHydrated || alreadyViewed}
                     onClick={() => {
                       handleRevealNoDeviceRole(player.id);
                     }}
                     className={`relative rounded-lg border p-3 text-left transition-colors ${
-                      alreadyViewed
+                      !storageHydrated || alreadyViewed
                         ? "cursor-not-allowed opacity-50 bg-muted"
                         : "cursor-pointer hover:bg-accent border-border"
                     }`}
                   >
-                    <p className="font-medium text-sm truncate">{player.name}</p>
+                    <p className="font-medium text-sm truncate">
+                      {player.name}
+                    </p>
                     {alreadyViewed && role ? (
                       <p className="text-xs text-muted-foreground mt-1">
                         {role.name}

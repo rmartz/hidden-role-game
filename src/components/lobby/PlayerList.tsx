@@ -77,7 +77,12 @@ function AddNoDevicePlayerDialog({
     >
       <AlertDialogTrigger
         render={
-          <Button variant="outline" size="sm" className="mt-3" disabled={disabled} />
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-3"
+            disabled={disabled}
+          />
         }
       >
         {PLAYER_LIST_COPY.addNoDeviceButton}
@@ -103,7 +108,7 @@ function AddNoDevicePlayerDialog({
             {PLAYER_LIST_COPY.addNoDeviceCancel}
           </AlertDialogCancel>
           <AlertDialogAction
-            disabled={nameValue.trim() === ""}
+            disabled={disabled || nameValue.trim() === ""}
             onClick={() => {
               onAdd(nameValue);
             }}
