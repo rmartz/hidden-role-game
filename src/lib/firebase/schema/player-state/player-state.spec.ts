@@ -195,6 +195,37 @@ describe("Werewolf player state round-trip", () => {
     const result = firebaseToPlayerState(playerStateToFirebase(state));
     expect(result.victoryCondition).toBeUndefined();
   });
+
+  it("round-trips illuminatiRoleAssignments including team cast", () => {
+    const state = makeWerewolfState({
+      illuminatiRoleAssignments: [
+        { playerId: "p2", roleName: "Seer", team: Team.Good },
+        { playerId: "p3", roleName: "Werewolf", team: Team.Bad },
+      ],
+    });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.illuminatiRoleAssignments).toHaveLength(2);
+    expect(result.illuminatiRoleAssignments?.[0]).toEqual({
+      playerId: "p2",
+      roleName: "Seer",
+      team: Team.Good,
+    });
+    expect(result.illuminatiRoleAssignments?.[1]).toEqual({
+      playerId: "p3",
+      roleName: "Werewolf",
+      team: Team.Bad,
+    });
+  });
+
+  it("omits illuminatiRoleAssignments when absent", () => {
+    const state = makeWerewolfState();
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.illuminatiRoleAssignments).toBeUndefined();
+  });
 });
 
 describe("Secret Villain player state round-trip", () => {
