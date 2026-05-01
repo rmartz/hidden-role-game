@@ -46,7 +46,7 @@ export function OwnerStartingScreen({
     try {
       setViewedPlayerIds(new Set<string>(JSON.parse(stored) as string[]));
     } catch {
-      // Ignore malformed storage data
+      // Malformed storage data is ignored; the user can re-reveal roles on this device.
     }
   }, [sessionStorageKey]);
 
@@ -79,9 +79,15 @@ export function OwnerStartingScreen({
     onTimerTrigger: handleStart,
   };
 
-  const noDeviceRoleMap = new Map(
-    (gameState.visibleRoleAssignments ?? []).map((a) => [a.player.id, a.role]),
-  );
+  const noDeviceRoleMap =
+    noDevicePlayers.length > 0
+      ? new Map(
+          (gameState.visibleRoleAssignments ?? []).map((a) => [
+            a.player.id,
+            a.role,
+          ]),
+        )
+      : null;
 
   return (
     <div className="p-5 max-w-4xl mx-auto">
@@ -96,7 +102,7 @@ export function OwnerStartingScreen({
         gameMode={gameState.gameMode}
         executionerTargetId={gameState.executionerTargetId}
       />
-      {noDevicePlayers.length > 0 && (
+      {noDevicePlayers.length > 0 && noDeviceRoleMap && (
         <Card className="mb-5 border-blue-500 dark:border-blue-600">
           <CardHeader>
             <CardTitle className="text-blue-700 dark:text-blue-400">

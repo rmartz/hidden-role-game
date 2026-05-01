@@ -144,12 +144,12 @@ export function PlayerList({
 
   const playerMap = new Map(lobby.players.map((p) => [p.id, p]));
 
-  const nonOwnerPlayersWithDevices = lobby.players.filter(
+  const readyEligiblePlayers = lobby.players.filter(
     (p) => p.id !== lobby.ownerPlayerId && !p.noDevice,
   );
   const allPlayersReady =
-    nonOwnerPlayersWithDevices.length > 0 &&
-    nonOwnerPlayersWithDevices.every((p) => readySet.has(p.id));
+    readyEligiblePlayers.length > 0 &&
+    readyEligiblePlayers.every((p) => readySet.has(p.id));
 
   const [committedOrder, setCommittedOrder] = useState<string[]>(
     () => lobby.playerOrder,
