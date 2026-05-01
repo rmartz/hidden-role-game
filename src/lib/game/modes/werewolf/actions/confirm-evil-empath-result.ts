@@ -16,7 +16,8 @@ export const confirmEvilEmpathResultAction: GameAction = {
     if (ts?.phase.type !== WerewolfPhase.Nighttime) return false;
     const phase = ts.phase;
     const activePhaseKey = phase.nightPhaseOrder[phase.currentPhaseIndex];
-    return activePhaseKey === (WerewolfRole.EvilEmpath as string);
+    if (activePhaseKey !== (WerewolfRole.EvilEmpath as string)) return false;
+    return !phase.nightActions[activePhaseKey]?.confirmed;
   },
   apply(game: Game) {
     const ts = currentTurnState(game);
