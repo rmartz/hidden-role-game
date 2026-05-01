@@ -90,7 +90,7 @@ export const CountdownActive: Story = {
   args: {
     lobby: {
       ...baseLobby,
-      readyPlayerIds: ["p1", "p2", "p3", "p4"],
+      readyPlayerIds: ["p1", "p2", "p3", "p4", "p5"],
       countdownStartedAt: Date.now() - 2000,
     },
     userPlayerId: "p2",

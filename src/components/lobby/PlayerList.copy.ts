@@ -4,7 +4,7 @@ export const PLAYER_LIST_COPY = {
   refreshingButton: "Refreshing...",
   readyButton: "Ready",
   notReadyButton: "Not Ready",
-  allPlayersReady: "All players ready!",
+  allPlayersReady: "All players ready — click Ready to start the countdown!",
   waitingForHost: "All players ready — waiting for host...",
   countdownPrefix: "Game starting in ",
   countdownStarting: "Game starting...",

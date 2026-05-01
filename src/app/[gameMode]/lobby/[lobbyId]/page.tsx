@@ -150,13 +150,12 @@ export default function LobbyPage() {
       0,
       LOBBY_COUNTDOWN_SECONDS * 1000 - (Date.now() - countdownStartedAt),
     );
-    const id = setTimeout(() => {
-      if (!startGameMutationRef.current.isPending) {
-        void flushConfigSyncRef.current().then(() => {
-          startGameMutationRef.current.mutate({ gameMode: actualGameMode });
-        });
-      }
-    }, delay);
+    const startGame = async () => {
+      if (startGameMutationRef.current.isPending) return;
+      await flushConfigSyncRef.current();
+      startGameMutationRef.current.mutate({ gameMode: actualGameMode });
+    };
+    const id = setTimeout(() => void startGame(), delay);
     return () => {
       clearTimeout(id);
     };
