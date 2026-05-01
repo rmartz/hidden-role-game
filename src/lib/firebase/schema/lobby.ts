@@ -188,6 +188,8 @@ export function firebaseToLobby(
     const base = { id: p.id, name: p.name };
     if (p.noDevice) return { ...base, noDevice: true as const };
     const sessionId = sessions[p.id];
+    // A regular player without a session entry is a data inconsistency but
+    // is handled gracefully: the player will not match any authenticated session.
     return sessionId !== undefined ? { ...base, sessionId } : base;
   });
 

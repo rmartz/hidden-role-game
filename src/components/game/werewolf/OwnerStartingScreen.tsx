@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { GameStatus, GameMode } from "@/lib/types";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { GameRolesList, PlayersRoleList } from "@/components/game";
@@ -35,16 +35,20 @@ export function OwnerStartingScreen({
     [gameId],
   );
 
-  const [viewedPlayerIds, setViewedPlayerIds] = useState<Set<string>>(() => {
-    if (typeof window === "undefined") return new Set<string>();
+  const [viewedPlayerIds, setViewedPlayerIds] = useState<Set<string>>(
+    new Set<string>(),
+  );
+
+  // Read viewed state from sessionStorage after mount to avoid SSR hydration mismatch.
+  useEffect(() => {
     const stored = sessionStorage.getItem(sessionStorageKey);
-    if (!stored) return new Set<string>();
+    if (!stored) return;
     try {
-      return new Set<string>(JSON.parse(stored) as string[]);
+      setViewedPlayerIds(new Set<string>(JSON.parse(stored) as string[]));
     } catch {
-      return new Set<string>();
+      // Ignore malformed storage data
     }
-  });
+  }, [sessionStorageKey]);
 
   const hiddenRoles = (gameState.hiddenRoleIds ?? []).flatMap((roleId) => {
     const role = GAME_MODES[GameMode.Werewolf].roles[roleId];
