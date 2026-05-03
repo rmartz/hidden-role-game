@@ -14,7 +14,7 @@
 
 ## Assassination Phase Actions
 
-After Good wins 3 quests, the game enters the `Assassination` phase if the Assassin role is in play. If no Assassin (or no Merlin) is in the game, Good wins immediately.
+After Good wins 3 quests, the game enters the `Assassination` phase if the Assassin role is in play. If no Assassin is in the game, Good wins immediately. If the Assassin is in play but Merlin is not, the game still enters the `Assassination` phase; Good wins when `resolveAssassination` is called because no player matches Merlin.
 
 | Action                      | Who can call    | When valid                                           |
 | --------------------------- | --------------- | ---------------------------------------------------- |

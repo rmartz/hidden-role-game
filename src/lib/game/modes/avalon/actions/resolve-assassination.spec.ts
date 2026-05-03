@@ -138,7 +138,7 @@ describe("resolveAssassinationAction", () => {
       }
     });
 
-    it("sets correct=true on the phase when Merlin is targeted", () => {
+    it("Evil wins when Merlin is targeted (correct=true path)", () => {
       const game = makeGame(
         makeAssassinationTurnState({ targetPlayerId: "p1" }),
       );
