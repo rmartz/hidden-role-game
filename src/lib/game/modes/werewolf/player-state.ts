@@ -99,6 +99,10 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
     startedAt: number;
     phase: TrialPhase;
     voteStartedAt?: number;
+    /** Unix epoch ms when the narrator paused the active trial timer. Absent when running. */
+    pausedAt?: number;
+    /** Accumulated elapsed milliseconds from prior running segments, carried into this one on resume. */
+    pauseOffset?: number;
     myVote?: DaytimeVote;
     voteCount: number;
     playerCount: number;

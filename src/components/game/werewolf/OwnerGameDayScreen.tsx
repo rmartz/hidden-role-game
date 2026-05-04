@@ -124,29 +124,30 @@ export function OwnerGameDayScreen({
           }
           pauseOffset={daytimePhase.pauseOffset ?? 0}
         />
-        {daytimePhase.pausedAt !== undefined ? (
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => {
-              action.mutate({ actionId: WerewolfAction.ResumeTimer });
-            }}
-            disabled={action.isPending}
-          >
-            {WEREWOLF_COPY.narrator.resumeTimer}
-          </Button>
-        ) : (
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => {
-              action.mutate({ actionId: WerewolfAction.PauseTimer });
-            }}
-            disabled={action.isPending}
-          >
-            {WEREWOLF_COPY.narrator.pauseTimer}
-          </Button>
-        )}
+        {!hasActiveTrial &&
+          (daytimePhase.pausedAt !== undefined ? (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                action.mutate({ actionId: WerewolfAction.ResumeTimer });
+              }}
+              disabled={action.isPending}
+            >
+              {WEREWOLF_COPY.narrator.resumeTimer}
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                action.mutate({ actionId: WerewolfAction.PauseTimer });
+              }}
+              disabled={action.isPending}
+            >
+              {WEREWOLF_COPY.narrator.pauseTimer}
+            </Button>
+          ))}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
         <OwnerAdvanceCard

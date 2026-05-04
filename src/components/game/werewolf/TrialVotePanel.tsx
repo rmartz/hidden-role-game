@@ -69,12 +69,20 @@ export function TrialVotePanel({
     ? new Date(activeTrial.voteStartedAt)
     : trialStartedAt;
 
+  const trialPausedAt =
+    activeTrial.pausedAt !== undefined
+      ? new Date(activeTrial.pausedAt)
+      : undefined;
+  const trialPauseOffset = activeTrial.pauseOffset ?? 0;
+
   const defenseTimer = (
     <GameTimer
       durationSeconds={defensePhaseSeconds}
       autoAdvance={autoAdvance}
       startedAt={trialStartedAt}
       resetKey={activeTrial.startedAt}
+      pausedAt={trialPausedAt}
+      pauseOffset={trialPauseOffset}
     />
   );
 
@@ -84,6 +92,8 @@ export function TrialVotePanel({
       autoAdvance={autoAdvance}
       startedAt={voteTimerStartedAt}
       resetKey={activeTrial.voteStartedAt ?? activeTrial.startedAt}
+      pausedAt={trialPausedAt}
+      pauseOffset={trialPauseOffset}
     />
   );
 
