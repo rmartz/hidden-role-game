@@ -142,6 +142,7 @@ export async function removePlayer(
   data.public.playerOrder = updatedOrder.length > 0 ? updatedOrder : undefined;
   data.public.readyPlayerIds =
     updatedReadyIds.length > 0 ? updatedReadyIds : undefined;
+  data.public.countdownStartedAt = undefined;
   return firebaseToLobby(lobbyId, data.public, data.private);
 }
 
@@ -230,8 +231,14 @@ export async function toggleReady(
   });
 
   data.public.readyPlayerIds = updated.length > 0 ? updated : undefined;
-  data.public.countdownStartedAt = allReady ? Date.now() : undefined;
-  return firebaseToLobby(lobbyId, data.public, data.private);
+  // Don't propagate countdownStartedAt in the immediate response — Firebase
+  // stores ServerValue.TIMESTAMP (server clock) while we only have the client
+  // clock. Clients receive the authoritative value via the RTDB subscription.
+  return firebaseToLobby(
+    lobbyId,
+    { ...data.public, countdownStartedAt: undefined },
+    data.private,
+  );
 }
 
 export async function clearReadyPlayerIds(lobbyId: string): Promise<void> {
