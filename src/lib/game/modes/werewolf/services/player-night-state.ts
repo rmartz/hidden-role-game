@@ -244,7 +244,7 @@ function extractRoleSpecificState(
     return {
       myNightTarget: undefined,
       myNightTargetConfirmed: soloAction?.confirmed ?? false,
-      ...(ts?.evilEmpathLastResult !== undefined
+      ...(soloAction?.confirmed && ts?.evilEmpathLastResult !== undefined
         ? { evilEmpathNightResult: ts.evilEmpathLastResult }
         : {}),
     };
@@ -428,30 +428,35 @@ function appendInvestigationResult(
       secondTargetName: secondName,
     };
   } else {
-    // Illusion Artist: invert the result when the target matches the illusion target.
-    // During nighttime, illusionTargetId is not yet set on turn state (it is lifted
-    // at start-day), so derive it directly from the confirmed IllusionArtist night
-    // action instead. During daytime, fall back to ts.illusionTargetId which was set
-    // at start-day.
     const isWerewolf = targetRoleDef?.isWerewolf === true;
-    let illusionTargetId: string | undefined;
-    if (ts?.phase.type === WerewolfPhase.Nighttime) {
-      const illusionAction =
-        ts.phase.nightActions[WerewolfRole.IllusionArtist as string];
-      if (
-        illusionAction &&
-        !isTeamNightAction(illusionAction) &&
-        illusionAction.confirmed
-      ) {
-        illusionTargetId = illusionAction.targetPlayerId;
+    // Illusion Artist inversion only applies to Seer investigations. Other
+    // investigate roles (One-Eyed Seer, etc.) always see the true alignment.
+    let effectiveIsWerewolf = isWerewolf;
+    if (myRoleDef.id === WerewolfRole.Seer) {
+      // During nighttime, illusionTargetId is not yet lifted onto turn state
+      // (that happens at start-day), so derive it from the confirmed
+      // IllusionArtist night action instead.
+      let illusionTargetId: string | undefined;
+      if (ts?.phase.type === WerewolfPhase.Nighttime) {
+        const illusionAction =
+          ts.phase.nightActions[WerewolfRole.IllusionArtist as string];
+        if (
+          illusionAction &&
+          !isTeamNightAction(illusionAction) &&
+          illusionAction.confirmed
+        ) {
+          illusionTargetId = illusionAction.targetPlayerId;
+        }
+      } else {
+        illusionTargetId = ts?.illusionTargetId;
       }
-    } else {
-      illusionTargetId = ts?.illusionTargetId;
+      if (illusionTargetId === myAction.targetPlayerId) {
+        effectiveIsWerewolf = !isWerewolf;
+      }
     }
     result.investigationResult = {
       targetPlayerId: myAction.targetPlayerId,
-      isWerewolfTeam:
-        illusionTargetId === myAction.targetPlayerId ? !isWerewolf : isWerewolf,
+      isWerewolfTeam: effectiveIsWerewolf,
     };
   }
 }

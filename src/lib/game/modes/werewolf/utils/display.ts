@@ -187,7 +187,10 @@ export function getInvestigationResultForNarrator(
   }
 
   const isWerewolf = roleDef?.isWerewolf === true;
-  const isFlipped = illusionTargetId === activeTarget;
+  // Illusion Artist inversion only applies when the Seer is the active
+  // investigator — other roles (One-Eyed Seer, etc.) always show true alignment.
+  const isSeerInvestigation = activeRoleDef?.id === WerewolfRole.Seer;
+  const isFlipped = isSeerInvestigation && illusionTargetId === activeTarget;
   return {
     targetName: activeTargetName ?? activeTarget,
     isWerewolfTeam: isFlipped ? !isWerewolf : isWerewolf,
