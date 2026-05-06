@@ -153,7 +153,7 @@ describe("OwnerStartingScreen no-device tap-to-reveal grid", () => {
     expect(dianaButton?.disabled).toBe(false);
   });
 
-  it("clicking an unviewed card reveals the role name and disables the card", () => {
+  it("clicking an unviewed card reveals the role name but does not lock the card", () => {
     render(
       <OwnerStartingScreen
         gameId="game-1"
@@ -169,11 +169,39 @@ describe("OwnerStartingScreen no-device tap-to-reveal grid", () => {
       if (charlieButton) fireEvent.click(charlieButton);
     });
 
-    // Role name should be visible after reveal
+    // Role name should be visible during the revealing phase
     expect(screen.getByText("Werewolf")).toBeDefined();
-    // Button should be disabled after viewing
+    // Button should still be enabled — second tap locks the card
+    expect(charlieButton?.disabled).toBe(false);
+    // sessionStorage should NOT be written until the card is locked
+    const { setItem } = storageMock;
+    expect(setItem).not.toHaveBeenCalled();
+  });
+
+  it("tapping a revealed card a second time locks it and hides the role name", () => {
+    render(
+      <OwnerStartingScreen
+        gameId="game-1"
+        gameState={makeGameState()}
+        onStart={vi.fn()}
+      />,
+    );
+
+    const charlieButton = screen.getByText("Charlie").closest("button");
+
+    act(() => {
+      if (charlieButton) fireEvent.click(charlieButton);
+    });
+    // First tap: role name visible
+    expect(screen.getByText("Werewolf")).toBeDefined();
+
+    act(() => {
+      if (charlieButton) fireEvent.click(charlieButton);
+    });
+    // Second tap: role name hidden, card locked
+    expect(screen.queryByText("Werewolf")).toBeNull();
     expect(charlieButton?.disabled).toBe(true);
-    // sessionStorage should have been written with the viewed ID
+    // sessionStorage written on lock
     const { setItem } = storageMock;
     expect(setItem).toHaveBeenCalledWith(
       "no-device-roles-viewed-game-1",
@@ -181,7 +209,7 @@ describe("OwnerStartingScreen no-device tap-to-reveal grid", () => {
     );
   });
 
-  it("does not reveal the role when the card has already been viewed", () => {
+  it("does not show the role name on a card that has already been viewed", () => {
     const sessionStorageKey = "no-device-roles-viewed-game-1";
     const hydratedMock = makeSessionStorageMock({
       [sessionStorageKey]: JSON.stringify(["nd1"]),
@@ -196,10 +224,10 @@ describe("OwnerStartingScreen no-device tap-to-reveal grid", () => {
       />,
     );
 
-    // nd1 (Charlie) was already viewed — role should show, button disabled
+    // nd1 (Charlie) was already viewed — button disabled, role name hidden
     const charlieButton = screen.getByText("Charlie").closest("button");
     expect(charlieButton?.disabled).toBe(true);
-    expect(screen.getByText("Werewolf")).toBeDefined();
+    expect(screen.queryByText("Werewolf")).toBeNull();
     // nd2 (Diana) was not viewed — only prompt text shown
     expect(
       screen.getAllByText(OWNER_STARTING_SCREEN_COPY.noDeviceRevealPrompt),

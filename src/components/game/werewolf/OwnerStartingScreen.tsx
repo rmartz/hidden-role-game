@@ -39,6 +39,9 @@ export function OwnerStartingScreen({
     new Set<string>(),
   );
   const [storageHydrated, setStorageHydrated] = useState(false);
+  const [revealingPlayerId, setRevealingPlayerId] = useState<
+    string | undefined
+  >(undefined);
 
   // Read viewed state from sessionStorage after mount to avoid SSR hydration mismatch.
   // Block interaction until hydrated so previously-viewed cards are not briefly re-clickable.
@@ -72,6 +75,11 @@ export function OwnerStartingScreen({
   }
 
   function handleRevealNoDeviceRole(playerId: string) {
+    setRevealingPlayerId(playerId);
+  }
+
+  function handleConfirmViewed(playerId: string) {
+    setRevealingPlayerId(undefined);
     setViewedPlayerIds((prev) => {
       const next = new Set(prev);
       next.add(playerId);
@@ -137,6 +145,7 @@ export function OwnerStartingScreen({
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
               {noDevicePlayers.map((player) => {
                 const alreadyViewed = viewedPlayerIds.has(player.id);
+                const isRevealing = revealingPlayerId === player.id;
                 const role = noDeviceRoleMap.get(player.id);
                 return (
                   <button
@@ -144,7 +153,11 @@ export function OwnerStartingScreen({
                     type="button"
                     disabled={!storageHydrated || alreadyViewed}
                     onClick={() => {
-                      handleRevealNoDeviceRole(player.id);
+                      if (isRevealing) {
+                        handleConfirmViewed(player.id);
+                      } else {
+                        handleRevealNoDeviceRole(player.id);
+                      }
                     }}
                     className={`relative rounded-lg border p-3 text-left transition-colors ${
                       !storageHydrated || alreadyViewed
@@ -155,17 +168,19 @@ export function OwnerStartingScreen({
                     <p className="font-medium text-sm truncate">
                       {player.name}
                     </p>
-                    {alreadyViewed && role ? (
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {role.name}
-                      </p>
-                    ) : (
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {alreadyViewed
-                          ? OWNER_STARTING_SCREEN_COPY.noDeviceAlreadyViewed
+                    <p
+                      className={`text-xs mt-1 ${
+                        isRevealing && role
+                          ? "font-medium text-foreground"
+                          : "text-muted-foreground"
+                      }`}
+                    >
+                      {alreadyViewed
+                        ? OWNER_STARTING_SCREEN_COPY.noDeviceAlreadyViewed
+                        : isRevealing && role
+                          ? role.name
                           : OWNER_STARTING_SCREEN_COPY.noDeviceRevealPrompt}
-                      </p>
-                    )}
+                    </p>
                   </button>
                 );
               })}
