@@ -176,7 +176,10 @@ describe("POST /api/lobby/[lobbyId]/players", () => {
     const body = await res.json();
     expect(body.status).toBe("success");
 
-    const players = body.data.lobby.players as { name: string; noDevice?: boolean }[];
+    const players = body.data.lobby.players as {
+      name: string;
+      noDevice?: boolean;
+    }[];
     expect(players).toHaveLength(2);
     const noDevicePlayer = players.find((p) => p.name === "Bob (no device)");
     expect(noDevicePlayer).toBeDefined();
@@ -185,17 +188,14 @@ describe("POST /api/lobby/[lobbyId]/players", () => {
 
   it("returns 404 when the lobby does not exist", async () => {
     const res = await createNoDevicePlayer(
-      new Request(
-        "http://localhost/api/lobby/nonexistent-id/players",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-session-id": "any-session-id",
-          },
-          body: JSON.stringify({ playerName: "Someone" }),
+      new Request("http://localhost/api/lobby/nonexistent-id/players", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-session-id": "any-session-id",
         },
-      ),
+        body: JSON.stringify({ playerName: "Someone" }),
+      }),
       makeParams("nonexistent-id"),
     );
     expect(res.status).toBe(404);

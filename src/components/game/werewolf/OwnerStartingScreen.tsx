@@ -72,14 +72,16 @@ export function OwnerStartingScreen({
   }
 
   function handleRevealNoDeviceRole(playerId: string) {
-    const next = new Set(viewedPlayerIds);
-    next.add(playerId);
-    setViewedPlayerIds(next);
-    try {
-      sessionStorage.setItem(sessionStorageKey, JSON.stringify([...next]));
-    } catch {
-      // Storage may be full or blocked; continue without persisting.
-    }
+    setViewedPlayerIds((prev) => {
+      const next = new Set(prev);
+      next.add(playerId);
+      try {
+        sessionStorage.setItem(sessionStorageKey, JSON.stringify([...next]));
+      } catch {
+        // Storage may be full or blocked; continue without persisting.
+      }
+      return next;
+    });
   }
 
   const timerConfig = gameState.timerConfig;

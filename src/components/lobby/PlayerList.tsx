@@ -269,7 +269,7 @@ export function PlayerList({
                 ownerPlayerId={lobby.ownerPlayerId}
                 isCurrentUser={player.id === userPlayerId}
                 isOwner={isOwner}
-                isReady={readySet.has(player.id)}
+                isReady={player.noDevice === true || readySet.has(player.id)}
                 showLeave={showLeave}
                 showRemovePlayer={showRemovePlayer}
                 showMakeOwner={showMakeOwner}
