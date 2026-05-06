@@ -18,8 +18,9 @@ allowed_patterns:
 # Server-side variables that are non-sensitive and safe to commit.
 # These are identifiers / slugs, not credentials.
 allowed_keys:
-  - FIREBASE_PROJECT_ID # Non-sensitive; also exposed via NEXT_PUBLIC_FIREBASE_PROJECT_ID
   - FIREBASE_DATABASE_URL # Non-sensitive RTDB URL; also exposed as NEXT_PUBLIC_FIREBASE_DATABASE_URL
+  - FIREBASE_PROJECT_ID # Non-sensitive; also exposed via NEXT_PUBLIC_FIREBASE_PROJECT_ID
+  - FIREBASE_SA_EMAIL # Service account email (identifier, not a key); used by sync-env --rotate-keys
 
 # Keys matching these patterns are always rejected, even if they match allowed_patterns.
 # Belt-and-suspenders: catches common secret naming conventions.
