@@ -5,6 +5,7 @@ import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-c
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
 import { DEFAULT_TIMER_CONFIG } from "@/lib/types";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
 import type { AvalonPlayerGameState } from "@/lib/game/modes/avalon/player-state";
 import { SecretVillainPhase } from "@/lib/game/modes/secret-villain/types";
@@ -124,7 +125,9 @@ describe("Werewolf player state round-trip", () => {
   });
 
   it("round-trips roleConversions", () => {
-    const conversions = [{ playerId: "p3", newRoleDefinitionId: "werewolf" }];
+    const conversions = [
+      { playerId: "p3", newRoleDefinitionId: WerewolfRole.Werewolf },
+    ];
     const state = makeWerewolfState({ roleConversions: conversions });
     const result = firebaseToPlayerState(
       playerStateToFirebase(state),

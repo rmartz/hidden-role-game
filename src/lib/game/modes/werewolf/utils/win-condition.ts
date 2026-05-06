@@ -28,15 +28,13 @@ export function checkWinCondition(
   deadPlayerIds: string[],
 ): { type: GameStatus.Finished; winner: WerewolfWinner } | undefined {
   const deadSet = new Set(deadPlayerIds);
-  const roleOverrides = currentTurnState(game)?.roleOverrides;
+  const ts = currentTurnState(game);
   const aliveAssignments = game.roleAssignments
     .filter((a) => !deadSet.has(a.playerId))
     .map((a) => {
-      const override = roleOverrides?.[a.playerId];
+      const override = ts?.roleOverrides?.[a.playerId];
       return override ? { ...a, roleDefinitionId: override } : a;
     });
-
-  const ts = currentTurnState(game);
 
   // Zombie wins if infected alive > healthy alive (Zombie itself is excluded).
   const zombieAssignment = game.roleAssignments.find(

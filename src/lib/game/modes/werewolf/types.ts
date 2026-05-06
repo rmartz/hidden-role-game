@@ -83,21 +83,12 @@ export interface AltruistInterceptedNightResolutionEvent {
   savedPlayerId: string;
 }
 
-export interface RoleConvertedNightResolutionEvent {
-  type: "role-converted";
-  /** The player whose role was changed. */
-  targetPlayerId: string;
-  /** The new role definition ID. */
-  newRoleDefinitionId: string;
-}
-
 export type NightResolutionEvent =
   | AttackNightResolutionEvent
   | SilencedNightResolutionEvent
   | HypnotizedNightResolutionEvent
   | ToughGuyAbsorbedNightResolutionEvent
-  | AltruistInterceptedNightResolutionEvent
-  | RoleConvertedNightResolutionEvent;
+  | AltruistInterceptedNightResolutionEvent;
 
 export enum DaytimeVote {
   Guilty = "guilty",

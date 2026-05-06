@@ -27,6 +27,7 @@ export const alphaWolfBiteAction: GameAction = {
     if (!alphaWolfAssignment) return false;
     if (ts.deadPlayerIds.includes(alphaWolfAssignment.playerId)) return false;
 
+    if (!payload || typeof payload !== "object") return false;
     const { targetPlayerId } = payload as { targetPlayerId?: unknown };
     if (typeof targetPlayerId !== "string") return false;
     if (!game.players.some((p) => p.id === targetPlayerId)) return false;
