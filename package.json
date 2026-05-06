@@ -34,7 +34,8 @@
       "@firebase/util",
       "esbuild",
       "protobufjs",
-      "sharp"
+      "sharp",
+      "vercel-deploy-scripts"
     ]
   },
   "lint-staged": {
