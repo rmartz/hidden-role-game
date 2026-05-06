@@ -1,5 +1,11 @@
 import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
-import { cleanup, render, screen, act, fireEvent } from "@testing-library/react";
+import {
+  cleanup,
+  render,
+  screen,
+  act,
+  fireEvent,
+} from "@testing-library/react";
 import { OwnerStartingScreen } from "./OwnerStartingScreen";
 import { GameStatus, GameMode, Team } from "@/lib/types";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
@@ -8,26 +14,33 @@ import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-s
 
 afterEach(cleanup);
 
+interface SessionStorageMock {
+  getItem: ReturnType<typeof vi.fn>;
+  setItem: ReturnType<typeof vi.fn>;
+  removeItem: ReturnType<typeof vi.fn>;
+  clear: ReturnType<typeof vi.fn>;
+  key: ReturnType<typeof vi.fn>;
+  length: number;
+}
+
 function makeSessionStorageMock(
   initialData: Record<string, string> = {},
-): Storage {
-  const store: Record<string, string> = { ...initialData };
+): SessionStorageMock {
+  const store = new Map<string, string>(Object.entries(initialData));
   return {
-    getItem: vi.fn((key: string) => store[key] ?? null),
+    getItem: vi.fn((key: string): string | null => store.get(key) ?? null),
     setItem: vi.fn((key: string, value: string) => {
-      store[key] = value;
+      store.set(key, value);
     }),
     removeItem: vi.fn((key: string) => {
-      delete store[key];
+      store.delete(key);
     }),
     clear: vi.fn(() => {
-      Object.keys(store).forEach((k) => {
-        delete store[k];
-      });
+      store.clear();
     }),
     key: vi.fn(),
     length: 0,
-  } as unknown as Storage;
+  };
 }
 
 function makeGameState(
@@ -69,7 +82,7 @@ function makeGameState(
 }
 
 describe("OwnerStartingScreen no-device tap-to-reveal grid", () => {
-  let storageMock: Storage;
+  let storageMock: SessionStorageMock;
 
   beforeEach(() => {
     storageMock = makeSessionStorageMock();
@@ -91,17 +104,16 @@ describe("OwnerStartingScreen no-device tap-to-reveal grid", () => {
 
     expect(screen.getByText("Charlie")).toBeDefined();
     expect(screen.getByText("Diana")).toBeDefined();
-    expect(screen.getAllByText(OWNER_STARTING_SCREEN_COPY.noDeviceRevealPrompt)).toHaveLength(2);
+    expect(
+      screen.getAllByText(OWNER_STARTING_SCREEN_COPY.noDeviceRevealPrompt),
+    ).toHaveLength(2);
   });
 
   it("buttons are disabled until sessionStorage has been hydrated", () => {
     const neverResolvesMock = makeSessionStorageMock();
-    // Override getItem to throw so we can detect "blocked storage" behavior
-    (neverResolvesMock.getItem as ReturnType<typeof vi.fn>).mockImplementation(
-      () => {
-        throw new Error("Storage blocked");
-      },
-    );
+    neverResolvesMock.getItem.mockImplementation(() => {
+      throw new Error("Storage blocked");
+    });
     vi.stubGlobal("sessionStorage", neverResolvesMock);
 
     render(
@@ -150,19 +162,20 @@ describe("OwnerStartingScreen no-device tap-to-reveal grid", () => {
       />,
     );
 
-    const charlieButton = screen.getByText("Charlie").closest("button")!;
-    expect(charlieButton.disabled).toBe(false);
+    const charlieButton = screen.getByText("Charlie").closest("button");
+    expect(charlieButton?.disabled).toBe(false);
 
     act(() => {
-      fireEvent.click(charlieButton);
+      if (charlieButton) fireEvent.click(charlieButton);
     });
 
     // Role name should be visible after reveal
     expect(screen.getByText("Werewolf")).toBeDefined();
     // Button should be disabled after viewing
-    expect(charlieButton.disabled).toBe(true);
+    expect(charlieButton?.disabled).toBe(true);
     // sessionStorage should have been written with the viewed ID
-    expect(storageMock.setItem).toHaveBeenCalledWith(
+    const { setItem } = storageMock;
+    expect(setItem).toHaveBeenCalledWith(
       "no-device-roles-viewed-game-1",
       JSON.stringify(["nd1"]),
     );
@@ -184,11 +197,13 @@ describe("OwnerStartingScreen no-device tap-to-reveal grid", () => {
     );
 
     // nd1 (Charlie) was already viewed — role should show, button disabled
-    const charlieButton = screen.getByText("Charlie").closest("button")!;
-    expect(charlieButton.disabled).toBe(true);
+    const charlieButton = screen.getByText("Charlie").closest("button");
+    expect(charlieButton?.disabled).toBe(true);
     expect(screen.getByText("Werewolf")).toBeDefined();
     // nd2 (Diana) was not viewed — only prompt text shown
-    expect(screen.getAllByText(OWNER_STARTING_SCREEN_COPY.noDeviceRevealPrompt)).toHaveLength(1);
+    expect(
+      screen.getAllByText(OWNER_STARTING_SCREEN_COPY.noDeviceRevealPrompt),
+    ).toHaveLength(1);
   });
 
   it("shows the already-viewed label on a viewed card when its role is unknown", () => {
@@ -236,7 +251,9 @@ describe("OwnerStartingScreen no-device tap-to-reveal grid", () => {
       />,
     );
 
-    expect(screen.queryByText(OWNER_STARTING_SCREEN_COPY.noDeviceRolesTitle)).toBeNull();
+    expect(
+      screen.queryByText(OWNER_STARTING_SCREEN_COPY.noDeviceRolesTitle),
+    ).toBeNull();
   });
 
   it("clears sessionStorage when handleStart is called", () => {
@@ -253,9 +270,8 @@ describe("OwnerStartingScreen no-device tap-to-reveal grid", () => {
       fireEvent.click(screen.getByText("Start Now"));
     });
 
-    expect(storageMock.removeItem).toHaveBeenCalledWith(
-      "no-device-roles-viewed-game-1",
-    );
+    const { removeItem } = storageMock;
+    expect(removeItem).toHaveBeenCalledWith("no-device-roles-viewed-game-1");
     expect(onStart).toHaveBeenCalledOnce();
   });
 });
