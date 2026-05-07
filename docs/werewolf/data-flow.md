@@ -55,9 +55,7 @@ The Narrator's session is stored separately and receives a different (fuller) `P
 
 ### Narrator-Only (Daytime)
 
-| Field            | Description                                                                                                                                                                                                      |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `pendingGuiltId` | Player ID of the convicted player awaiting execution during the Martyr window; set by `resolve-trial`/`cast-vote`/`skip-defense` on a Guilty verdict; cleared by `advance-martyr-window` or `use-martyr-ability` |
+No narrator-exclusive daytime fields at this time. All trial-related state (`activeTrial`, `pendingGuiltId`) is visible to all players.
 
 ### Player Fields — Nighttime (own turn only)
 
@@ -92,6 +90,7 @@ These fields are only populated when the active phase matches the player's role.
 | `isHypnotized`           | Whether this player is hypnotized (vote mirrors the Mummy)                                                                                                                                                              |
 | `exposerReveal`          | Publicly revealed role from the Exposer's ability (if any)                                                                                                                                                              |
 | `altruistSave`           | Information about an Altruist intercept that saved a player                                                                                                                                                             |
+| `pendingGuiltId`         | Player ID of the convicted player awaiting execution during the Martyr window; set on a Guilty verdict; cleared by `advance-martyr-window` or `use-martyr-ability`; visible to all players                              |
 | `martyrUsed`             | `true` once the Martyr has used their once-per-game substitution ability; present only for the Martyr player                                                                                                            |
 
 ## Game Phase State Machine
@@ -197,10 +196,9 @@ Trial flow (if nominations are enabled):
   4. Narrator calls resolve-trial (or auto-resolve on final vote) → verdict determined
      - Innocent: trial concludes, no elimination
      - Guilty: sets pendingGuiltId on daytime phase (Martyr window begins)
-       - Clears OES lock and Priest wards for convicted player
   5. Martyr window (pendingGuiltId is set):
-     - Martyr player may call use-martyr-ability → Martyr dies instead, convicted player survives
-     - Narrator calls advance-martyr-window → convicted player is eliminated, downstream checks run
+     - Martyr player may call use-martyr-ability → Martyr dies instead, convicted player survives; clears OES lock and Priest wards for the Martyr
+     - Narrator calls advance-martyr-window → convicted player is eliminated; clears OES lock and Priest wards for the convicted player; downstream checks run
 
 Narrator may also:
   - kill-player → immediately kills a player (for in-person trials)

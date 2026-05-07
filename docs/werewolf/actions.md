@@ -127,7 +127,7 @@ Additional resolution steps:
 
 **Who:** Narrator only
 **When:** During Daytime (after voting completes)
-**Effect:** Resolves the trial verdict — guilty votes exceeding innocent votes results in elimination. The Mayor's vote counts double. Clears One-Eyed Seer lock and Priest wards for a killed player.
+**Effect:** Resolves the trial verdict — guilty votes exceeding innocent votes results in elimination. The Mayor's vote counts double.
 
 On a Guilty verdict, instead of immediately eliminating the player, sets `pendingGuiltId` on the daytime phase and enters the Martyr window. Win-condition checks are deferred until the window is resolved.
 
@@ -137,7 +137,7 @@ On a Guilty verdict, instead of immediately eliminating the player, sets `pendin
 
 **Who:** Narrator only
 **When:** During Daytime, when `pendingGuiltId` is set (Guilty verdict pending)
-**Effect:** Applies the pending conviction — adds the convicted player to `deadPlayerIds`, then checks the Executioner win, Tanner win, Hunter revenge, and general win conditions in that order. Clears `pendingGuiltId`.
+**Effect:** Applies the pending conviction — adds the convicted player to `deadPlayerIds`, clears One-Eyed Seer lock and Priest wards for the eliminated player, then checks the Executioner win, Tanner win, Hunter revenge, and general win conditions in that order. Clears `pendingGuiltId`.
 
 The Martyr window is always inserted after a Guilty verdict, even when no Martyr is in the game, to build drama before the role reveal.
 

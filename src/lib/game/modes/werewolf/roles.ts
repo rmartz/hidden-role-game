@@ -52,8 +52,8 @@ export enum WerewolfRole {
   Exposer = "werewolf-exposer",
   Hunter = "werewolf-hunter",
   LoneWolf = "werewolf-lone-wolf",
-  Mason = "werewolf-mason",
   Martyr = "werewolf-martyr",
+  Mason = "werewolf-mason",
   Mayor = "werewolf-mayor",
   Mentalist = "werewolf-mentalist",
   Minion = "werewolf-minion",
@@ -265,6 +265,18 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     awareOf: { werewolves: true },
     category: WerewolfRoleCategory.NeutralKilling,
   },
+  [WerewolfRole.Martyr]: {
+    id: WerewolfRole.Martyr,
+    name: "Martyr",
+    summary: "Once per game, takes the place of a convicted player",
+    description:
+      "Once per game, after a player is found Guilty but before their role is revealed, the Martyr may step forward to be eliminated in their place. The convicted player survives; the Martyr is eliminated instead. The Martyr cannot use this ability to save themselves.",
+    team: Team.Good,
+    unique: true,
+    wakesAtNight: WakesAtNight.Never,
+    targetCategory: TargetCategory.None,
+    category: WerewolfRoleCategory.VillagerProtection,
+  },
   [WerewolfRole.Mason]: {
     id: WerewolfRole.Mason,
     name: "Mason",
@@ -277,18 +289,6 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     targetCategory: TargetCategory.None,
     aliases: ["brother", "freemason"],
     category: WerewolfRoleCategory.VillagerSupport,
-  },
-  [WerewolfRole.Martyr]: {
-    id: WerewolfRole.Martyr,
-    name: "Martyr",
-    summary: "Once per game, takes the place of a convicted player",
-    description:
-      "Once per game, after a player is found Guilty but before their role is revealed, the Martyr may step forward to be eliminated in their place. The convicted player survives; the Martyr is eliminated instead. The Martyr cannot use this ability to save themselves.",
-    team: Team.Good,
-    unique: true,
-    wakesAtNight: WakesAtNight.Never,
-    targetCategory: TargetCategory.None,
-    category: WerewolfRoleCategory.VillagerProtection,
   },
   [WerewolfRole.Mayor]: {
     id: WerewolfRole.Mayor,

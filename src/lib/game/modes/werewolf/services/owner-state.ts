@@ -233,11 +233,11 @@ export function extractDaytimePlayerState(
         vote: v.vote,
       }));
 
-      // Suppress eliminatedRole while the Martyr window is open — the player
-      // hasn't died yet and revealing the role here would spoil the intercept.
+      // Suppress eliminatedRole if the defendant survived (e.g. Martyr intercept).
+      // Only reveal when the defendant is actually dead.
       if (
         activeTrial.verdict === TrialVerdict.Eliminated &&
-        !phase.pendingGuiltId
+        ts.deadPlayerIds.includes(activeTrial.defendantId)
       ) {
         const assignment = game.roleAssignments.find(
           (a) => a.playerId === activeTrial.defendantId,
@@ -266,9 +266,14 @@ export function extractDaytimePlayerState(
     result.pendingGuiltId = phase.pendingGuiltId;
   }
 
-  // Martyr ability used flag: expose to the Martyr player so they know whether
-  // they can still intervene.
-  if (ts.martyrUsed) {
+  // Martyr ability used flag: only expose to the Martyr player so they know
+  // whether they can still intervene.
+  const callerMartyrAssignment = game.roleAssignments.find(
+    (a) =>
+      a.playerId === callerId &&
+      a.roleDefinitionId === (WerewolfRole.Martyr as string),
+  );
+  if (callerMartyrAssignment && ts.martyrUsed) {
     result.martyrUsed = true;
   }
 

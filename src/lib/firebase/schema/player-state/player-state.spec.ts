@@ -101,6 +101,8 @@ describe("Werewolf player state round-trip", () => {
       isSilenced: true,
       mirrorcasterCharged: true,
       hunterRevengePlayerId: "p1",
+      pendingGuiltId: "p3",
+      martyrUsed: true,
     });
     const result = firebaseToPlayerState(
       playerStateToFirebase(state),
@@ -113,6 +115,8 @@ describe("Werewolf player state round-trip", () => {
     expect(result.isSilenced).toBe(true);
     expect(result.mirrorcasterCharged).toBe(true);
     expect(result.hunterRevengePlayerId).toBe("p1");
+    expect(result.pendingGuiltId).toBe("p3");
+    expect(result.martyrUsed).toBe(true);
   });
 
   it("omits optional fields when absent", () => {
