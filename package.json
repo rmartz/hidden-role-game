@@ -95,7 +95,7 @@
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.1",
     "vite": "^8.0.10",
-    "vercel-deploy-scripts": "https://github.com/rmartz/vercel-deploy-scripts/archive/refs/tags/v2.3.3.tar.gz",
+    "vercel-deploy-scripts": "https://github.com/rmartz/vercel-deploy-scripts/archive/refs/tags/v3.1.0.tar.gz",
     "vitest": "^4.1.5"
   }
 }
