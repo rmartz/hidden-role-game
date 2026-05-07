@@ -362,8 +362,8 @@ Note: The Martyr window is always inserted after a Guilty verdict, even when no 
 
 Win conditions are evaluated after each death (night resolution or trial). The checks run in the following priority order:
 
-1. **Tanner instant win** — If the Tanner dies (at night or at trial), the game ends immediately with a Tanner win.
-2. **Lone Wolf check** (before general wolf win) — When wolves would win (all Good-team players eliminated), if the Lone Wolf is the only surviving wolf-aligned player, the Lone Wolf wins instead of Team Bad.
-3. **Standard team win** — Good wins if all Bad-team players are dead. Bad wins if wolves equal or outnumber Good-team players.
-4. **Spoiler override** (after team win determined) — If a standard team win is detected and the Spoiler is still alive, the Spoiler wins instead of the winning team.
-5. **Executioner win** — Evaluated independently at trial: if the Executioner's assigned target is voted out, the Executioner wins regardless of overall game state.
+1. **Executioner win** _(trial only)_ — If the convicted player is the Executioner's assigned target and the Executioner is alive, the Executioner wins immediately. This check runs before the Tanner check: if the convicted player is both the Executioner's target and the Tanner, the Executioner wins.
+2. **Tanner instant win** — If the Tanner dies (at night or at trial, and the Executioner win above was not triggered), the game ends immediately with a Tanner win.
+3. **Lone Wolf check** (before general wolf win) — When wolves would win (all Good-team players eliminated), if the Lone Wolf is the only surviving wolf-aligned player, the Lone Wolf wins instead of Team Bad.
+4. **Standard team win** — Good wins if all Bad-team players are dead. Bad wins if wolves equal or outnumber Good-team players.
+5. **Spoiler override** (after team win determined) — If a standard team win is detected and the Spoiler is still alive, the Spoiler wins instead of the winning team.
