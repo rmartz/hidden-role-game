@@ -341,8 +341,20 @@ describe("Avalon player state round-trip", () => {
 
   it("round-trips questResults as JSON", () => {
     const questResults = [
-      { questNumber: 1, teamSize: 2, failCount: 0, succeeded: true },
-      { questNumber: 2, teamSize: 3, failCount: 1, succeeded: false },
+      {
+        questNumber: 1,
+        teamSize: 2,
+        teamPlayerIds: ["p1", "p2"],
+        failCount: 0,
+        succeeded: true,
+      },
+      {
+        questNumber: 2,
+        teamSize: 3,
+        teamPlayerIds: ["p1", "p2", "p3"],
+        failCount: 1,
+        succeeded: false,
+      },
     ];
     const state = makeAvalonState({ questResults });
     const result = firebaseToPlayerState(

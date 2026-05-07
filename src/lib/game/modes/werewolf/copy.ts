@@ -111,7 +111,7 @@ export const WEREWOLF_COPY = {
       "As the Pacifist, your vote was automatically cast as Innocent.",
     silencedCannotVote: "You are silenced and cannot vote.",
     hypnotizedStatus:
-      "You are hypnotized by the Mummy. Your vote will mirror theirs.",
+      "You are hypnotized by the Mummy. Your trial vote will mirror theirs.",
   },
   silence: {
     nightSummary:
@@ -272,6 +272,18 @@ export const WEREWOLF_COPY = {
       `Left half: ${String(n)} werewolf${n === 1 ? "" : "s"}`,
     rightCount: (n: number) =>
       `Right half: ${String(n)} werewolf${n === 1 ? "" : "s"}`,
+  },
+  mason: {
+    playerWarning:
+      "Do not let anyone else know you are a Mason — mysterious threats lurk everywhere.",
+    nonMasonWarning:
+      "Rumors exist that there are members of a secretive group called the Masons among you, but do not even mention its name — mysterious threats lurk everywhere.",
+    narratorWarning:
+      "There are Mason characters in this game. If any player mentions Masons or implies they are one, smite them during the night.",
+  },
+  tavernKeeper: {
+    blocked:
+      "You had too much to drink at the tavern. You cannot stay awake tonight.",
   },
   kill: {
     button: "Kill",
