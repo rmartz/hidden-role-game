@@ -41,17 +41,22 @@ export function advanceFromElection(game: Game): void {
   if (votePhase.passed === undefined) return;
 
   if (votePhase.passed) {
-    // Check Special Bad chancellor win condition.
-    const chancellorWin = checkChancellorElectionWinCondition(
+    // If Special Bad is elected chancellor in the danger zone, enter the
+    // reveal checkpoint — chancellor must act before the game resolves.
+    const chancellorWouldWin = checkChancellorElectionWinCondition(
       votePhase.chancellorNomineeId,
       game.roleAssignments,
       ts.badCardsPlayed,
     );
-    if (chancellorWin) {
-      game.status = {
-        type: GameStatus.Finished,
-        winner: chancellorWin.winner,
-        victoryConditionKey: SvVictoryConditionKey.SpecialBadElected,
+
+    if (chancellorWouldWin) {
+      ts.failedElectionCount = 0;
+      ts.specialPresidentId = undefined;
+      ts.phase = {
+        type: SecretVillainPhase.SpecialBadReveal,
+        startedAt: Date.now(),
+        presidentId: votePhase.presidentId,
+        chancellorId: votePhase.chancellorNomineeId,
       };
       return;
     }

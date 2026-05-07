@@ -260,6 +260,36 @@ describe("Secret Villain player state round-trip", () => {
     expect(result.electionVotes?.at(0)?.playerId).toBe("p1");
     expect(result.electionVotes?.at(0)?.vote).toBe("yes");
   });
+
+  it("round-trips svSpecialBadReveal with revealed = true", () => {
+    const state = makeSecretVillainState({
+      svSpecialBadReveal: { chancellorId: "p2", revealed: true },
+    });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as SecretVillainPlayerGameState;
+    expect(result.svSpecialBadReveal?.chancellorId).toBe("p2");
+    expect(result.svSpecialBadReveal?.revealed).toBe(true);
+  });
+
+  it("round-trips svSpecialBadReveal with revealed = false", () => {
+    const state = makeSecretVillainState({
+      svSpecialBadReveal: { chancellorId: "p3", revealed: false },
+    });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as SecretVillainPlayerGameState;
+    expect(result.svSpecialBadReveal?.chancellorId).toBe("p3");
+    expect(result.svSpecialBadReveal?.revealed).toBe(false);
+  });
+
+  it("omits svSpecialBadReveal when absent", () => {
+    const state = makeSecretVillainState();
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as SecretVillainPlayerGameState;
+    expect(result.svSpecialBadReveal).toBeUndefined();
+  });
 });
 
 describe("Avalon player state round-trip", () => {

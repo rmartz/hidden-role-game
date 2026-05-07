@@ -49,6 +49,7 @@ Game state lives in Firebase Realtime Database. `getPlayerGameState` (`src/lib/g
 | `policyCards.remainingCards`        | Policy chancellor  | Chancellor only | The 2 cards passed from president                  |
 | `policyCards.peekedCards`           | Policy peek        | President only  | Top 3 deck cards (after peek action)               |
 | `vetoProposal`                      | Policy chancellor  | President only  | Veto proposed/response state                       |
+| `svSpecialBadReveal`                | SpecialBadReveal   | All players     | chancellorId + revealed state (checkpoint phase)   |
 | `svInvestigationResult`             | Investigate        | President only  | Target's team (after consent)                      |
 | `svInvestigationWaitingForPlayerId` | Investigate        | President only  | Target selected, awaiting consent                  |
 | `svInvestigationConsent`            | Investigate        | Target only     | Prompt to reveal loyalty                           |
@@ -67,7 +68,15 @@ Election Vote
   → [auto-tally when all voted]
   → advance-from-election (any player, after seeing results)
 
-  If passed:
+  If passed and Special Bad is chancellor with 3+ Bad cards played:
+    SpecialBadReveal (identity checkpoint)
+      → confirm-special-bad (chancellor: "I am not the Special Bad") → revealed = false
+      → reveal-special-bad (chancellor: "I am the Special Bad")     → revealed = true
+      → advance-from-special-bad-reveal (any player, after chancellor acts)
+        If revealed = true  → Bad team wins (game over)
+        If revealed = false → Policy President (continues normally)
+
+  If passed (and no Special Bad chancellor win condition):
     Policy President
       → president-discard (president discards 1 of 3)
 

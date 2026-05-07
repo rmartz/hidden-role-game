@@ -1,4 +1,9 @@
-import { SvBoardPreset, SpecialActionType, SecretVillainPhase } from "./types";
+import {
+  SvBoardPreset,
+  SpecialActionType,
+  SecretVillainPhase,
+  BAD_CARDS_FOR_SPECIAL_BAD_WIN,
+} from "./types";
 
 export const SECRET_VILLAIN_COPY = {
   boardPresets: {
@@ -36,6 +41,7 @@ export const SECRET_VILLAIN_COPY = {
       [SecretVillainPhase.PolicyPresident]: "Policy: President",
       [SecretVillainPhase.PolicyChancellor]: "Policy: Chancellor",
       [SecretVillainPhase.SpecialAction]: "Presidential Power",
+      [SecretVillainPhase.SpecialBadReveal]: "Identity Checkpoint",
     } satisfies Record<SecretVillainPhase, string>,
     eliminated: "Eliminated Players",
     noEliminated: "None",
@@ -48,18 +54,17 @@ export const SECRET_VILLAIN_COPY = {
     confirmNomination: "Nominate",
     voteHeading: "Election",
     voteInstructions: (presidentName: string, chancellorName: string) =>
-      `President: ${presidentName} \u00b7 Chancellor: ${chancellorName}`,
+      `President: ${presidentName} · Chancellor: ${chancellorName}`,
     castVote: "Cast your vote",
     // These are the fallback labels when no theme provides vote labels.
     // The Default theme intentionally mirrors these values; the two are
     // independent so each can evolve without affecting the other.
     yes: "Yes",
     no: "No",
-    waitingForVotes: "Waiting for all players to vote\u2026",
-    alreadyVoted: "Vote cast. Waiting for others\u2026",
+    waitingForVotes: "Waiting for all players to vote…",
+    alreadyVoted: "Vote cast. Waiting for others…",
     allVoted: "All votes cast.",
-    waitingForPlayers: (names: string[]) =>
-      `Waiting for ${names.join(", ")}\u2026`,
+    waitingForPlayers: (names: string[]) => `Waiting for ${names.join(", ")}…`,
     resolveVote: "Reveal Results",
     resultPassed: "Election Passed",
     resultFailed: "Election Failed",
@@ -83,16 +88,14 @@ export const SECRET_VILLAIN_COPY = {
     badCard: "Bad",
     vetoAvailable: "Veto power is available.",
     proposeVeto: "Propose Veto",
-    vetoProposed: "Veto proposed. Waiting for the President\u2026",
+    vetoProposed: "Veto proposed. Waiting for the President…",
     vetoAccepted: "Veto accepted. Both cards discarded.",
     vetoRejected: "Veto rejected. You must play a card.",
     presidentVetoPrompt: "The Chancellor has proposed a veto.",
     acceptVeto: "Accept Veto",
     rejectVeto: "Reject Veto",
-    waitingForPresident: (name: string) =>
-      `Waiting for ${name} (President)\u2026`,
-    waitingForChancellor: (name: string) =>
-      `Waiting for ${name} (Chancellor)\u2026`,
+    waitingForPresident: (name: string) => `Waiting for ${name} (President)…`,
+    waitingForChancellor: (name: string) => `Waiting for ${name} (Chancellor)…`,
   },
   specialAction: {
     heading: "Presidential Power",
@@ -101,7 +104,7 @@ export const SECRET_VILLAIN_COPY = {
       "Select a player to investigate their party membership.",
     investigateConfirm: "Investigate",
     investigateWaitingConsent: (playerName: string) =>
-      `Waiting for ${playerName} to reveal\u2026`,
+      `Waiting for ${playerName} to reveal…`,
     investigateConsent: (presidentName: string) =>
       `${presidentName} (President) is investigating your loyalty.`,
     investigateReveal: "Reveal",
@@ -121,6 +124,31 @@ export const SECRET_VILLAIN_COPY = {
     policyPeekCardsRevealed: "These are the top 3 cards of the policy deck.",
     policyPeekConfirm: "Done",
   },
+  specialBadReveal: {
+    waitingHeading: "Identity Checkpoint",
+    outcomeHeading: "Identity Check Result",
+    waitingMessage: (chancellorName: string) =>
+      `Waiting for ${chancellorName} to confirm their identity…`,
+    chancellorHeading: "Confirm Your Identity",
+    chancellorInstructions: (
+      specialBadRoleName: string,
+      badPolicyLabel: string,
+    ) =>
+      `You have been elected Chancellor while ${String(BAD_CARDS_FOR_SPECIAL_BAD_WIN)}+ ${badPolicyLabel} are in play. Are you ${specialBadRoleName}?`,
+    confirmButton: (specialBadRoleName: string) =>
+      `Confirm — I am not ${specialBadRoleName}`,
+    revealButton: (specialBadRoleName: string) =>
+      `Reveal — I am ${specialBadRoleName}`,
+    outcomeConfirmed: (chancellorName: string, specialBadRoleName: string) =>
+      `${chancellorName} confirmed they are not ${specialBadRoleName}.`,
+    outcomeRevealed: (
+      chancellorName: string,
+      specialBadRoleName: string,
+      badTeamLabel: string,
+    ) =>
+      `${chancellorName} revealed as ${specialBadRoleName} — ${badTeamLabel} wins!`,
+    continueButton: "Continue",
+  },
   gameOver: {
     victory: "Victory!",
     defeat: "Game Over",
@@ -136,7 +164,7 @@ export const SECRET_VILLAIN_COPY = {
         `${specialBadRole} elected Chancellor`,
       goodShoot: (specialBadRole: string) => `${specialBadRole} eliminated`,
       chaos: (winningTeam: string) =>
-        `Government in chaos \u2014 ${winningTeam} wins`,
+        `Government in chaos — ${winningTeam} wins`,
     },
   },
   starting: {

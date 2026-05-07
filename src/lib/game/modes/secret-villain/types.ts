@@ -8,6 +8,7 @@ export enum SecretVillainPhase {
   PolicyPresident = "policy-president",
   PolicyChancellor = "policy-chancellor",
   SpecialAction = "special-action",
+  SpecialBadReveal = "special-bad-reveal",
 }
 
 // ---------------------------------------------------------------------------
@@ -135,6 +136,20 @@ export interface PolicyChancellorPhase {
   vetoResponse?: boolean;
 }
 
+/**
+ * Checkpoint when Special Bad is elected chancellor in the danger zone.
+ * The chancellor must explicitly confirm or reveal their identity before
+ * the game resolves or advances to the policy phase.
+ */
+export interface SpecialBadRevealPhase {
+  type: SecretVillainPhase.SpecialBadReveal;
+  startedAt: number;
+  presidentId: string;
+  chancellorId: string;
+  /** Set once the chancellor acts: true = revealed (Bad wins), false = denied (policy proceeds). */
+  revealed?: boolean;
+}
+
 /** A special action triggered by a Bad card being played. */
 export interface SpecialActionPhase {
   type: SecretVillainPhase.SpecialAction;
@@ -162,7 +177,8 @@ export type SecretVillainTurnPhase =
   | ElectionVotePhase
   | PolicyPresidentPhase
   | PolicyChancellorPhase
-  | SpecialActionPhase;
+  | SpecialActionPhase
+  | SpecialBadRevealPhase;
 
 // ---------------------------------------------------------------------------
 // Turn state
