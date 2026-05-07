@@ -230,10 +230,16 @@ export async function toggleReady(
     ? current.filter((id) => id !== playerId)
     : [...current, playerId];
 
-  const allPlayerIds = Object.keys(data.public.players ?? {});
+  const players = data.public.players ?? {};
+  const ownerPlayerId = data.public.ownerPlayerId;
+  // Only non-owner device players must explicitly ready up.
+  // The owner and no-device players are implicitly ready.
+  const readyEligiblePlayerIds = Object.keys(players).filter(
+    (id) => id !== ownerPlayerId && !players[id].noDevice,
+  );
   const allReady =
-    allPlayerIds.length >= 2 &&
-    allPlayerIds.every((id) => updated.includes(id));
+    readyEligiblePlayerIds.length >= 1 &&
+    readyEligiblePlayerIds.every((id) => updated.includes(id));
 
   await lobbyRef(lobbyId).update({
     "public/readyPlayerIds": updated.length > 0 ? updated : null,

@@ -128,7 +128,7 @@ export function OwnerStartingScreen({
     <div className="p-5 max-w-4xl mx-auto">
       <OwnerHeader
         title="Game Starting"
-        advanceLabel="Start Now"
+        advanceLabel={OWNER_STARTING_SCREEN_COPY.startButton}
         onAdvance={handleStart}
         timer={timer}
       />

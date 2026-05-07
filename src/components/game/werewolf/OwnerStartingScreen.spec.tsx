@@ -295,7 +295,7 @@ describe("OwnerStartingScreen no-device tap-to-reveal grid", () => {
     );
 
     act(() => {
-      fireEvent.click(screen.getByText("Start Now"));
+      fireEvent.click(screen.getByText(OWNER_STARTING_SCREEN_COPY.startButton));
     });
 
     const { removeItem } = storageMock;

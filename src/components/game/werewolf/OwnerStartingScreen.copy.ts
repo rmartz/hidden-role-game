@@ -7,4 +7,5 @@ export const OWNER_STARTING_SCREEN_COPY = {
   noDeviceRolesDescription:
     "Tap each player's card to reveal their role, then show them the device. Tap again to lock the card — once locked, the role cannot be seen again.",
   noDeviceRolesTitle: "No-Device Player Roles",
+  startButton: "Start Now",
 } as const;

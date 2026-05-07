@@ -198,6 +198,37 @@ describe("toggleReady — countdown", () => {
     const lobby = await getLobby("lobby-countdown-2");
     expect(lobby!.countdownStartedAt).toBeUndefined();
   });
+
+  it("sets countdownStartedAt without owner readying when only device players are eligible", async () => {
+    await addLobby({ ...makeBaseLobby(), id: "lobby-countdown-4" });
+    await addPlayer("lobby-countdown-4", {
+      id: "player2",
+      name: "Player 2",
+      sessionId: "session-2",
+    });
+
+    // Only player2 needs to ready — owner is implicitly ready
+    await toggleReady("lobby-countdown-4", "player2");
+
+    const lobby = await getLobby("lobby-countdown-4");
+    expect(lobby!.countdownStartedAt).toBeDefined();
+  });
+
+  it("does not set countdownStartedAt when all players are no-device (no eligible players)", async () => {
+    await addLobby({ ...makeBaseLobby(), id: "lobby-countdown-5" });
+    await addPlayer("lobby-countdown-5", {
+      id: "player-no-device",
+      name: "No Device",
+      noDevice: true,
+    });
+
+    // No eligible players: owner and no-device are both excluded.
+    // readyEligiblePlayerIds is empty so allReady condition (length >= 1) is never satisfied.
+    await toggleReady("lobby-countdown-5", "owner");
+
+    const lobby = await getLobby("lobby-countdown-5");
+    expect(lobby!.countdownStartedAt).toBeUndefined();
+  });
 });
 
 describe("removePlayer — countdown", () => {
