@@ -29,6 +29,7 @@ export function WerewolfOwnerScreen({
   if (gameState.status.type === GameStatus.Starting) {
     return (
       <OwnerStartingScreen
+        gameId={gameId}
         gameState={gameState}
         onStart={() => {
           advanceMutation.mutate();

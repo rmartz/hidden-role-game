@@ -1,5 +1,6 @@
 import type {
   Lobby,
+  LobbyPlayer,
   GameMode,
   ModeConfig,
   RoleBucket,
@@ -148,7 +149,7 @@ export async function removePlayer(
 
 export async function addPlayer(
   lobbyId: string,
-  player: { id: string; name: string; sessionId: string },
+  player: LobbyPlayer,
 ): Promise<Lobby | undefined> {
   const snap = await lobbyRef(lobbyId).once("value");
   if (!snap.exists()) return undefined;
@@ -165,16 +166,25 @@ export async function addPlayer(
   ];
 
   await lobbyRef(lobbyId).update({
-    [`public/players/${player.id}`]: { id: player.id, name: player.name },
-    [`private/playerSessions/${player.id}`]: player.sessionId,
+    [`public/players/${player.id}`]: {
+      id: player.id,
+      name: player.name,
+      ...(player.noDevice ? { noDevice: true } : {}),
+    },
+    ...(player.sessionId
+      ? { [`private/playerSessions/${player.id}`]: player.sessionId }
+      : {}),
     "public/playerOrder": updatedOrder,
   });
 
   (data.public.players ??= {})[player.id] = {
     id: player.id,
     name: player.name,
+    ...(player.noDevice ? { noDevice: true } : {}),
   };
-  (data.private.playerSessions ??= {})[player.id] = player.sessionId;
+  if (player.sessionId) {
+    (data.private.playerSessions ??= {})[player.id] = player.sessionId;
+  }
   data.public.playerOrder = updatedOrder;
   return firebaseToLobby(lobbyId, data.public, data.private);
 }
@@ -220,10 +230,18 @@ export async function toggleReady(
     ? current.filter((id) => id !== playerId)
     : [...current, playerId];
 
-  const allPlayerIds = Object.keys(data.public.players ?? {});
+  const players = data.public.players ?? {};
+  const ownerPlayerId = data.public.ownerPlayerId;
+  // Only non-owner device players must explicitly ready up.
+  // The owner and no-device players are implicitly ready.
+  const readyEligiblePlayerIds = Object.keys(players).filter(
+    (id) => id !== ownerPlayerId && !players[id].noDevice,
+  );
+  const totalPlayerCount = Object.keys(players).length;
   const allReady =
-    allPlayerIds.length >= 2 &&
-    allPlayerIds.every((id) => updated.includes(id));
+    totalPlayerCount >= 2 &&
+    readyEligiblePlayerIds.length >= 1 &&
+    readyEligiblePlayerIds.every((id) => updated.includes(id));
 
   await lobbyRef(lobbyId).update({
     "public/readyPlayerIds": updated.length > 0 ? updated : null,

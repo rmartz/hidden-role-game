@@ -12,6 +12,8 @@ import {
   useLobbyWebSocket,
   useRemovePlayer,
   useRenamePlayer,
+  useOwnerRenamePlayer,
+  useAddNoDevicePlayer,
   useReorderPlayers,
   useStartGame,
   useToggleReady,
@@ -116,6 +118,8 @@ export default function LobbyPage() {
     }
   });
   const renameMutation = useRenamePlayer(lobbyId, myPlayerId);
+  const ownerRenameMutation = useOwnerRenamePlayer(lobbyId);
+  const addNoDeviceMutation = useAddNoDevicePlayer(lobbyId);
 
   const startGameMutation = useStartGame(lobbyId);
   const toggleReadyMutation = useToggleReady(lobbyId);
@@ -266,6 +270,14 @@ export default function LobbyPage() {
             renameMutation.mutate(playerName);
           }}
           isRenamePending={renameMutation.isPending}
+          isOwnerRenamePending={ownerRenameMutation.isPending}
+          isAddNoDevicePending={addNoDeviceMutation.isPending}
+          onRenameNoDevicePlayer={(playerId, playerName) => {
+            ownerRenameMutation.mutate({ playerId, playerName });
+          }}
+          onAddNoDevicePlayer={(playerName) => {
+            addNoDeviceMutation.mutate(playerName);
+          }}
           onToggleReady={() => {
             toggleReadyMutation.mutate();
           }}

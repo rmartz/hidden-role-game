@@ -17,6 +17,8 @@ import type { CodenamesModeConfig } from "@/lib/game/modes/codenames/lobby-confi
 export interface PublicLobbyPlayer {
   id: string;
   name: string;
+  /** When true, this player has no device and is managed entirely by the lobby owner. */
+  noDevice?: boolean;
 }
 
 /** Shared game config fields. Game-mode-specific variants extend this. */
@@ -91,6 +93,10 @@ export interface JoinLobbyRequest {
 }
 
 export interface UpdatePlayerNameRequest {
+  playerName: string;
+}
+
+export interface CreateNoDevicePlayerRequest {
   playerName: string;
 }
 

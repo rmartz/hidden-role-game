@@ -7,6 +7,7 @@ import {
   transferOwner,
   reorderPlayers,
   renamePlayer,
+  addNoDevicePlayer,
 } from "@/lib/api";
 import { ServerResponseStatus } from "@/server/types";
 
@@ -64,6 +65,44 @@ export function useRenamePlayer(lobbyId: string, playerId?: string) {
     mutationFn: async (playerName: string) => {
       if (!playerId) throw new Error("Unauthorized");
       const response = await renamePlayer(lobbyId, playerId, playerName);
+      if (response.status === ServerResponseStatus.Error) {
+        throw new Error(response.error);
+      }
+      return response.data.lobby;
+    },
+    onSuccess: (lobby) => {
+      queryClient.setQueryData(["lobby", lobbyId], lobby);
+    },
+  });
+}
+
+export function useOwnerRenamePlayer(lobbyId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({
+      playerId,
+      playerName,
+    }: {
+      playerId: string;
+      playerName: string;
+    }) => {
+      const response = await renamePlayer(lobbyId, playerId, playerName);
+      if (response.status === ServerResponseStatus.Error) {
+        throw new Error(response.error);
+      }
+      return response.data.lobby;
+    },
+    onSuccess: (lobby) => {
+      queryClient.setQueryData(["lobby", lobbyId], lobby);
+    },
+  });
+}
+
+export function useAddNoDevicePlayer(lobbyId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (playerName: string) => {
+      const response = await addNoDevicePlayer(lobbyId, playerName);
       if (response.status === ServerResponseStatus.Error) {
         throw new Error(response.error);
       }
