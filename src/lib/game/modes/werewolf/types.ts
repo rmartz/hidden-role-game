@@ -188,6 +188,15 @@ export interface WerewolfTurnState {
   executionerTargetId?: string;
   /** True when the Mirrorcaster has gained a charge from a successful protection. */
   mirrorcasterCharged?: boolean;
+  /**
+   * Mid-game role overrides: maps playerId → roleDefinitionId.
+   * Overlays roleAssignments for roles that can change during play
+   * (Alpha Wolf bite converts a villager; Village Drunk sobering up).
+   * Use resolveRoleId() to get the effective role for a player.
+   */
+  roleOverrides?: Record<string, string>;
+  /** True once the Alpha Wolf has used their once-per-game bite ability. */
+  alphaWolfBiteUsed?: boolean;
   /** Player IDs that Dracula has claimed as wives. Accumulated across nights. */
   draculaWives?: string[];
   /** Player IDs that the Zombie has infected. Accumulated across nights. */

@@ -1,10 +1,25 @@
 import { GameStatus } from "@/lib/types";
-import type { Game } from "@/lib/types";
+import type { Game, PlayerRoleAssignment } from "@/lib/types";
 import type {
   WerewolfTurnState,
   HypnotizedNightResolutionEvent,
 } from "../types";
 import { WerewolfPhase } from "../types";
+
+/**
+ * Resolves the effective role definition ID for a player, applying any
+ * mid-game roleOverrides from turnState before falling back to roleAssignments.
+ * Use this instead of looking up roleAssignments directly when a player's role
+ * may have changed (Alpha Wolf bite, Village Drunk sobering up).
+ */
+export function resolveRoleId(
+  playerId: string,
+  roleAssignments: PlayerRoleAssignment[],
+  roleOverrides?: Record<string, string>,
+): string | undefined {
+  if (roleOverrides?.[playerId]) return roleOverrides[playerId];
+  return roleAssignments.find((a) => a.playerId === playerId)?.roleDefinitionId;
+}
 
 export function isOwnerPlaying(game: Game, callerId: string): boolean {
   return (

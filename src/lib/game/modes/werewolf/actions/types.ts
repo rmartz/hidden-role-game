@@ -1,4 +1,5 @@
 export enum WerewolfAction {
+  AlphaWolfBite = "alpha-wolf-bite",
   StartNight = "start-night",
   StartDay = "start-day",
   SetNightPhase = "set-night-phase",
