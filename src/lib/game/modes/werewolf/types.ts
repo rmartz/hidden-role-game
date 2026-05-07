@@ -9,6 +9,8 @@ export type NightAction = {
   resultRevealed?: boolean;
   /** For Mentalist only: the second target player ID. */
   secondTargetPlayerId?: string;
+  /** True when the Veteran has chosen to be on alert this night. */
+  alerted?: boolean;
 } & (
   | { targetPlayerId: string; skipped?: never }
   | { skipped: true; targetPlayerId?: never }
@@ -83,12 +85,25 @@ export interface AltruistInterceptedNightResolutionEvent {
   savedPlayerId: string;
 }
 
+export interface VeteranCounterkilledNightResolutionEvent {
+  type: "veteran-counterkilled";
+  /** The player targeted by the Veteran's counter-kill. */
+  counterkilledPlayerId: string;
+  /** The Veteran player who counter-killed. */
+  veteranPlayerId: string;
+  /** Whether the counter-kill was from repelling a wolf attack or killing a visiting protector. */
+  source: "wolf-repel" | "protector-visit";
+  /** Whether the counter-killed player actually died (false if Tough Guy absorbed the hit). */
+  died: boolean;
+}
+
 export type NightResolutionEvent =
   | AttackNightResolutionEvent
   | SilencedNightResolutionEvent
   | HypnotizedNightResolutionEvent
   | ToughGuyAbsorbedNightResolutionEvent
-  | AltruistInterceptedNightResolutionEvent;
+  | AltruistInterceptedNightResolutionEvent
+  | VeteranCounterkilledNightResolutionEvent;
 
 export enum DaytimeVote {
   Guilty = "guilty",
@@ -192,6 +207,8 @@ export interface WerewolfTurnState {
   draculaWives?: string[];
   /** Player IDs that the Zombie has infected. Accumulated across nights. */
   zombieInfected?: string[];
+  /** Number of nights the Veteran has chosen to go on Alert. Maximum 3. */
+  veteranAlertsUsed?: number;
 }
 
 export interface TargetablePlayer {

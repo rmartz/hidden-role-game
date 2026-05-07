@@ -70,6 +70,7 @@ export enum WerewolfRole {
   Spoiler = "werewolf-spoiler",
   Tanner = "werewolf-tanner",
   ToughGuy = "werewolf-tough-guy",
+  Veteran = "werewolf-veteran",
   Vigilante = "werewolf-vigilante",
   VillageIdiot = "werewolf-village-idiot",
   Villager = "werewolf-villager",
@@ -485,6 +486,19 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.Never,
     targetCategory: TargetCategory.None,
     category: WerewolfRoleCategory.VillagerSupport,
+  },
+  [WerewolfRole.Veteran]: {
+    id: WerewolfRole.Veteran,
+    name: "Veteran",
+    summary:
+      "Goes on alert each night; repels werewolves and kills visiting protectors",
+    description:
+      "Each night the Veteran may choose to go on Alert (up to 3 times). While Alerted, the Veteran repels any werewolf attack — one participating wolf dies instead — and kills any protector who visits them. If the Veteran does not Alert, they are treated as a normal Villager for that night.",
+    team: Team.Good,
+    unique: true,
+    wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.None,
+    category: WerewolfRoleCategory.VillagerProtection,
   },
   [WerewolfRole.Vigilante]: {
     id: WerewolfRole.Vigilante,
