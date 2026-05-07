@@ -129,7 +129,32 @@ Additional resolution steps:
 **When:** During Daytime (after voting completes)
 **Effect:** Resolves the trial verdict — guilty votes exceeding innocent votes results in elimination. The Mayor's vote counts double. Clears One-Eyed Seer lock and Priest wards for a killed player.
 
-- **Hunter revenge detection:** If the condemned player is the Hunter, sets `hunterRevengePlayerId` on the Narrator's state and defers the win-condition check until revenge is resolved.
+On a Guilty verdict, instead of immediately eliminating the player, sets `pendingGuiltId` on the daytime phase and enters the Martyr window. Win-condition checks are deferred until the window is resolved.
+
+---
+
+### `advance-martyr-window`
+
+**Who:** Narrator only
+**When:** During Daytime, when `pendingGuiltId` is set (Guilty verdict pending)
+**Effect:** Applies the pending conviction — adds the convicted player to `deadPlayerIds`, then checks the Executioner win, Tanner win, Hunter revenge, and general win conditions in that order. Clears `pendingGuiltId`.
+
+The Martyr window is always inserted after a Guilty verdict, even when no Martyr is in the game, to build drama before the role reveal.
+
+---
+
+### `use-martyr-ability`
+
+**Who:** Martyr player only
+**When:** During Daytime, when `pendingGuiltId` is set (Guilty verdict pending)
+**Effect:** The Martyr intercepts the conviction — the convicted player is spared, and the Martyr dies instead. Checks win condition after the Martyr's death. Sets `martyrUsed: true` (once-per-game ability).
+
+**Validation:**
+
+- Caller must be the Martyr and must be alive.
+- `pendingGuiltId` must be set.
+- `martyrUsed` must be `false`.
+- The Martyr cannot use this ability to save themselves (`pendingGuiltId !== callerId`).
 
 ---
 
@@ -213,6 +238,8 @@ Additional resolution steps:
 | `cast-vote`                   | Player                    | `{ vote: "guilty" \| "innocent" }`                     |
 | `resolve-hunter-revenge`      | Narrator                  | `{ targetPlayerId: string }`                           |
 | `resolve-trial`               | Narrator                  | none                                                   |
+| `advance-martyr-window`       | Narrator                  | none                                                   |
+| `use-martyr-ability`          | Martyr player             | none                                                   |
 | `end-game`                    | Narrator                  | none                                                   |
 | `smite-player`                | Narrator                  | `{ playerId: string }`                                 |
 | `unsmite-player`              | Narrator                  | `{ playerId: string }`                                 |
@@ -317,10 +344,19 @@ flowchart TD
 
 ## Trial Resolution
 
-When a player is voted out at trial (via `mark-player-dead` during Daytime), the following checks run in order:
+When a Guilty verdict is reached, `resolve-trial` (or `cast-vote` / `skip-defense` when all votes are in) sets `pendingGuiltId` instead of applying death immediately. This creates the **Martyr window** — a brief pause before elimination.
 
-1. **Tanner check:** If the killed player is the Tanner, the game ends immediately with a Tanner win.
-2. **Executioner target check:** If the killed player is the Executioner's assigned target, the Executioner wins. (The Executioner win is independent of the overall game outcome — the game may continue.)
+The window is resolved in one of two ways:
+
+1. **Narrator calls `advance-martyr-window`** — the convicted player is eliminated and the following checks run in order:
+   1. **Executioner target check:** If the convicted player is the Executioner's assigned target and the Executioner is alive, the Executioner wins.
+   2. **Tanner check:** If the convicted player is the Tanner, the game ends immediately with a Tanner win.
+   3. **Hunter revenge detection:** If the convicted player is the Hunter, sets `hunterRevengePlayerId` and defers the win-condition check.
+   4. **General win condition check.**
+
+2. **Martyr calls `use-martyr-ability`** — the Martyr dies instead. Win condition is checked after the Martyr's death.
+
+Note: The Martyr window is always inserted after a Guilty verdict, even when no Martyr is in the game.
 
 ## Win Condition Logic
 

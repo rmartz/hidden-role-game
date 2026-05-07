@@ -100,7 +100,8 @@ describe("WerewolfAction.SkipDefense", () => {
       expect(phase.activeTrial?.verdict).toBe(TrialVerdict.Innocent);
     });
 
-    it("triggers win condition when auto-resolve eliminates last non-Bad player", () => {
+    it("sets pendingGuiltId when auto-resolve produces guilty verdict", () => {
+      // Death is deferred to AdvanceMartyrWindow; game stays Playing.
       const game = makePlayingGame(
         makeDayStateWithDefenseTrial({
           defendantId: "p2",
@@ -123,7 +124,10 @@ describe("WerewolfAction.SkipDefense", () => {
         },
       );
       action.apply(game, {}, "owner-1");
-      expect(game.status.type).toBe(GameStatus.Finished);
+      expect(game.status.type).toBe(GameStatus.Playing);
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      const phase = ts.phase as { pendingGuiltId?: string };
+      expect(phase.pendingGuiltId).toBe("p2");
     });
 
     it("does not auto-resolve when votes do not cover all eligible", () => {

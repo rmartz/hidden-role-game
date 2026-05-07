@@ -131,7 +131,8 @@ describe("WerewolfAction.CastVote — apply (basic)", () => {
     expect(p2Vote.vote).toBe(DaytimeVote.Innocent);
   });
 
-  it("triggers Werewolves win when auto-resolve eliminates last non-Bad player", () => {
+  it("sets pendingGuiltId when auto-resolve produces guilty verdict", () => {
+    // Death is deferred to AdvanceMartyrWindow; game stays Playing.
     const game = makePlayingGame(
       makeDayStateWithTrial({
         defendantId: "p2",
@@ -151,6 +152,9 @@ describe("WerewolfAction.CastVote — apply (basic)", () => {
       },
     );
     action.apply(game, { vote: DaytimeVote.Guilty }, "p3");
-    expect(game.status.type).toBe(GameStatus.Finished);
+    expect(game.status.type).toBe(GameStatus.Playing);
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    const phase = ts.phase as { pendingGuiltId?: string };
+    expect(phase.pendingGuiltId).toBe("p2");
   });
 });

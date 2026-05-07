@@ -21,4 +21,6 @@ export enum WerewolfAction {
   ResolveHunterRevenge = "resolve-hunter-revenge",
   CancelTrial = "cancel-trial",
   ResetAbility = "reset-ability",
+  AdvanceMartyrWindow = "advance-martyr-window",
+  UseMartyrAbility = "use-martyr-ability",
 }

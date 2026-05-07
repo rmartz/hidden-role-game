@@ -233,7 +233,12 @@ export function extractDaytimePlayerState(
         vote: v.vote,
       }));
 
-      if (activeTrial.verdict === TrialVerdict.Eliminated) {
+      // Suppress eliminatedRole while the Martyr window is open — the player
+      // hasn't died yet and revealing the role here would spoil the intercept.
+      if (
+        activeTrial.verdict === TrialVerdict.Eliminated &&
+        !phase.pendingGuiltId
+      ) {
         const assignment = game.roleAssignments.find(
           (a) => a.playerId === activeTrial.defendantId,
         );
@@ -254,6 +259,17 @@ export function extractDaytimePlayerState(
   // Concluded trials count for this day.
   if (phase.concludedTrialsCount) {
     result.concludedTrialsCount = phase.concludedTrialsCount;
+  }
+
+  // Martyr window: expose pendingGuiltId so the UI can display the window.
+  if (phase.pendingGuiltId) {
+    result.pendingGuiltId = phase.pendingGuiltId;
+  }
+
+  // Martyr ability used flag: expose to the Martyr player so they know whether
+  // they can still intervene.
+  if (ts.martyrUsed) {
+    result.martyrUsed = true;
   }
 
   return result;
