@@ -10,4 +10,3 @@ tsconfig.tsbuildinfo
 .env*.local
 .env.sentry-build-plugin
 storybook-static
-pnpm-workspace.yaml

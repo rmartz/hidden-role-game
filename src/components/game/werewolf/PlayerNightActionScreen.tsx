@@ -93,7 +93,7 @@ export function PlayerNightActionScreen({
     !isGroupPhase && gameState.myRole?.id === WerewolfRole.Altruist;
 
   const isVeteran =
-    !isGroupPhase && gameState.myRole?.id === (WerewolfRole.Veteran as string);
+    !isGroupPhase && gameState.myRole?.id === WerewolfRole.Veteran;
   const veteranAlertsUsed = gameState.veteranAlertsUsed ?? 0;
   const isVeteranAlerted = gameState.myNightAlerted === true;
 
