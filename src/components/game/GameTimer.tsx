@@ -81,7 +81,7 @@ export function GameTimer({
       <p
         className={
           hasExpired && !autoAdvance
-            ? "text-red-800/60 dark:text-red-400/60"
+            ? "text-red-700 dark:text-red-400"
             : "text-muted-foreground"
         }
       >
