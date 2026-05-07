@@ -12,6 +12,7 @@ interface OwnerInvestigationConfirmProps {
   isResultRevealed: boolean;
   resultLabel?: string;
   secondTargetName?: string;
+  illusionFlipLabel?: string;
 }
 
 export function OwnerInvestigationConfirm({
@@ -21,6 +22,7 @@ export function OwnerInvestigationConfirm({
   isResultRevealed,
   resultLabel,
   secondTargetName,
+  illusionFlipLabel,
 }: OwnerInvestigationConfirmProps) {
   const action = useGameAction(gameId);
   const displayLabel =
@@ -46,6 +48,11 @@ export function OwnerInvestigationConfirm({
           </>
         )}
       </p>
+      {illusionFlipLabel && (
+        <p className="text-xs text-muted-foreground italic mb-2">
+          {illusionFlipLabel}
+        </p>
+      )}
       {isResultRevealed ? (
         <p className="text-xs text-muted-foreground">
           {WEREWOLF_COPY.narrator.investigationResultRevealed}

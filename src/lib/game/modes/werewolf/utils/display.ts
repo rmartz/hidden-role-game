@@ -112,6 +112,11 @@ export interface InvestigationResultForNarrator {
   resultLabel?: string;
   /** For Mentalist: the second target's player name. */
   secondTargetName?: string;
+  /**
+   * When the Illusion Artist has flipped this target's alignment, contains the
+   * annotation text showing the true (unflipped) alignment for the narrator.
+   */
+  illusionFlipLabel?: string;
 }
 
 /**
@@ -119,6 +124,8 @@ export interface InvestigationResultForNarrator {
  * Returns the target name and alignment (plus optional custom label), or
  * undefined if conditions aren't met.
  * Pass `activeRoleDef` to compute role-specific results (Wizard, Mystic Seer, Mentalist).
+ * Pass `illusionTargetId` to apply Illusion Artist inversion: when the active target
+ * matches the illusion target, the result is flipped and an annotation is included.
  */
 export function getInvestigationResultForNarrator(
   isInvestigatePhase: boolean,
@@ -129,6 +136,7 @@ export function getInvestigationResultForNarrator(
   activeRoleDef?: WerewolfRoleDefinition,
   secondTargetId?: string,
   secondTargetName?: string,
+  illusionTargetId?: string,
 ): InvestigationResultForNarrator | undefined {
   if (!isInvestigatePhase || !activeTarget || !activeTargetConfirmed)
     return undefined;
@@ -178,9 +186,22 @@ export function getInvestigationResultForNarrator(
     };
   }
 
+  const isWerewolf = roleDef?.isWerewolf === true;
+  // Illusion Artist inversion only applies when the Seer is the active
+  // investigator — other roles (One-Eyed Seer, etc.) always show true alignment.
+  const isSeerInvestigation = activeRoleDef?.id === WerewolfRole.Seer;
+  const isFlipped = isSeerInvestigation && illusionTargetId === activeTarget;
   return {
     targetName: activeTargetName ?? activeTarget,
-    isWerewolfTeam: roleDef?.isWerewolf === true,
+    isWerewolfTeam: isFlipped ? !isWerewolf : isWerewolf,
+    ...(isFlipped
+      ? {
+          illusionFlipLabel:
+            WEREWOLF_COPY.illusionArtist.narratorFlipAnnotation(
+              WEREWOLF_COPY.narrator.teamStatus(isWerewolf),
+            ),
+        }
+      : {}),
   };
 }
 

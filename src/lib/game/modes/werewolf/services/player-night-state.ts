@@ -133,6 +133,9 @@ function extractGroupPhaseState(
     suggestedTargetId: action.suggestedTargetId,
     allAgreed,
     ...(previousNightTargetId ? { previousNightTargetId } : {}),
+    ...(ts?.evilEmpathRevealedResult !== undefined
+      ? { evilEmpathRevealedResult: ts.evilEmpathRevealedResult }
+      : {}),
   };
 }
 
@@ -230,6 +233,21 @@ function extractRoleSpecificState(
         elusiveSeerVillagerIds,
       };
     }
+  }
+
+  if (myRole.id === WerewolfRole.EvilEmpath) {
+    const empathAction = nightActions[myRole.id];
+    const soloAction =
+      empathAction && !isTeamNightAction(empathAction)
+        ? empathAction
+        : undefined;
+    return {
+      myNightTarget: undefined,
+      myNightTargetConfirmed: soloAction?.confirmed ?? false,
+      ...(soloAction?.confirmed && ts?.evilEmpathLastResult !== undefined
+        ? { evilEmpathNightResult: ts.evilEmpathLastResult }
+        : {}),
+    };
   }
 
   return undefined;
@@ -351,7 +369,7 @@ function extractGenericSoloState(
     myAction.resultRevealed &&
     myAction.targetPlayerId
   ) {
-    appendInvestigationResult(result, game, myRole, myAction);
+    appendInvestigationResult(result, game, myRole, myAction, ts);
   }
 
   return result;
@@ -362,6 +380,7 @@ function appendInvestigationResult(
   game: Game,
   myRoleDef: WerewolfRoleDefinition,
   myAction: { targetPlayerId: string; secondTargetPlayerId?: string },
+  ts: WerewolfTurnState | undefined,
 ): void {
   const targetAssignment = game.roleAssignments.find(
     (a) => a.playerId === myAction.targetPlayerId,
@@ -409,9 +428,35 @@ function appendInvestigationResult(
       secondTargetName: secondName,
     };
   } else {
+    const isWerewolf = targetRoleDef?.isWerewolf === true;
+    // Illusion Artist inversion only applies to Seer investigations. Other
+    // investigate roles (One-Eyed Seer, etc.) always see the true alignment.
+    let effectiveIsWerewolf = isWerewolf;
+    if (myRoleDef.id === WerewolfRole.Seer) {
+      // During nighttime, illusionTargetId is not yet lifted onto turn state
+      // (that happens at start-day), so derive it from the confirmed
+      // IllusionArtist night action instead.
+      let illusionTargetId: string | undefined;
+      if (ts?.phase.type === WerewolfPhase.Nighttime) {
+        const illusionAction =
+          ts.phase.nightActions[WerewolfRole.IllusionArtist as string];
+        if (
+          illusionAction &&
+          !isTeamNightAction(illusionAction) &&
+          illusionAction.confirmed
+        ) {
+          illusionTargetId = illusionAction.targetPlayerId;
+        }
+      } else {
+        illusionTargetId = ts?.illusionTargetId;
+      }
+      if (illusionTargetId === myAction.targetPlayerId) {
+        effectiveIsWerewolf = !isWerewolf;
+      }
+    }
     result.investigationResult = {
       targetPlayerId: myAction.targetPlayerId,
-      isWerewolfTeam: targetRoleDef?.isWerewolf === true,
+      isWerewolfTeam: effectiveIsWerewolf,
     };
   }
 }

@@ -74,6 +74,16 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   priestWardActive?: boolean;
   /** Whether the Mirrorcaster is charged (Attack mode). */
   mirrorcasterCharged?: boolean;
+  /**
+   * The Evil Empath's last adjacency result, revealed to Werewolves upon
+   * the Evil Empath's death. True = Seer was adjacent to a Werewolf.
+   */
+  evilEmpathRevealedResult?: boolean;
+  /**
+   * The Evil Empath's own nightly adjacency result, visible only to the Evil Empath.
+   * True = Seer is adjacent to a Werewolf this night.
+   */
+  evilEmpathNightResult?: boolean;
   /** Executioner: target player ID. */
   executionerTargetId?: string;
   /** Hunter revenge pending: the Hunter's player ID. Narrator-only. */

@@ -3,6 +3,8 @@ import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase } from "../types";
 import type { WerewolfNighttimePhase } from "../types";
 import { currentTurnState, isOwnerPlaying } from "../utils";
+import { WerewolfRole } from "../roles";
+import { confirmEvilEmpathResultAction } from "./confirm-evil-empath-result";
 
 export const setNightPhaseAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {
@@ -21,6 +23,13 @@ export const setNightPhaseAction: GameAction = {
     if (!ts) return;
     const { phaseIndex } = payload as { phaseIndex: number };
     const phase = ts.phase as WerewolfNighttimePhase;
+    const departingPhaseKey = phase.nightPhaseOrder[phase.currentPhaseIndex];
+    if (
+      departingPhaseKey === (WerewolfRole.EvilEmpath as string) &&
+      !phase.nightActions[departingPhaseKey]?.confirmed
+    ) {
+      confirmEvilEmpathResultAction.apply(game, {}, "");
+    }
     game.status = {
       type: GameStatus.Playing,
       turnState: {

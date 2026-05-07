@@ -192,6 +192,21 @@ export interface WerewolfTurnState {
   draculaWives?: string[];
   /** Player IDs that the Zombie has infected. Accumulated across nights. */
   zombieInfected?: string[];
+  /**
+   * The player ID targeted by the Illusion Artist this night.
+   * Seer investigations against this player return an inverted result for the night.
+   */
+  illusionTargetId?: string;
+  /**
+   * The last adjacency result received by the Evil Empath (true = Seer is adjacent to a Werewolf).
+   * Carried forward each night so the Werewolves can learn it when the Evil Empath dies.
+   */
+  evilEmpathLastResult?: boolean;
+  /**
+   * Set when the Evil Empath dies, revealing their last adjacency result to the Werewolves.
+   * Persists for the rest of the game so Werewolves can see it during their night phase.
+   */
+  evilEmpathRevealedResult?: boolean;
 }
 
 export interface TargetablePlayer {
