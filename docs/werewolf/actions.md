@@ -221,7 +221,7 @@ Additional resolution steps:
 
 **Who:** Narrator only
 **When:** During Nighttime, during the Evil Empath's phase
-**Effect:** Auto-computes whether the Evil Empath is seated adjacent (circular seating order in `game.playerOrder`) to any living player with `roleDef.isWerewolf === true`. Stores the boolean result in `evilEmpathLastResult` on the turn state, marks the Evil Empath's night action as `confirmed` and `resultRevealed`. The result is surfaced to the Evil Empath player as `evilEmpathNightResult` in their player state (only while the action is confirmed, to prevent showing a stale result at the start of a new night). When the Evil Empath dies (night via `start-day`, or day via `kill-player`, `resolve-trial`, `resolve-hunter-revenge`), `evilEmpathRevealedResult` is set on the turn state so Werewolves see it in their group phase state.
+**Effect:** Auto-computes whether the Seer is seated adjacent (circular seating order in `game.playerOrder`) to any living player with `roleDef.isWerewolf === true`. Stores the boolean result in `evilEmpathLastResult` on the turn state, marks the Evil Empath's night action as `confirmed` and `resultRevealed`. The result is surfaced to the Evil Empath player as `evilEmpathNightResult` in their player state (only while the action is confirmed, to prevent showing a stale result at the start of a new night). When the Evil Empath dies (night via `start-day`, or day via `kill-player`, `resolve-trial`, `resolve-hunter-revenge`), `evilEmpathRevealedResult` is set on the turn state so Werewolves see it in their group phase state.
 
 **Payload:** none
 
