@@ -222,6 +222,26 @@ The Martyr window is always inserted after a Guilty verdict, even when no Martyr
 
 ---
 
+### `pause-timer`
+
+**Who:** Narrator only
+**When:** During Nighttime or Daytime, when the phase timer is not already paused (`pausedAt` is undefined)
+**Effect:** Records the current timestamp as `pausedAt` on the active phase, freezing the displayed elapsed time in the narrator's `GameTimer`.
+
+**Payload:** none
+
+---
+
+### `resume-timer`
+
+**Who:** Narrator only
+**When:** During Nighttime or Daytime, when the phase timer is paused (`pausedAt` is set)
+**Effect:** Accumulates the elapsed running time up to the pause point (`pausedAt - startedAt`) into `pauseOffset`, clears `pausedAt`, and resets `startedAt` to now so that elapsed time resumes from where it was when paused.
+
+**Payload:** none
+
+---
+
 ## Action Payload Summary
 
 | Action                        | Caller                    | Payload                                                |
@@ -247,6 +267,8 @@ The Martyr window is always inserted after a Guilty verdict, even when no Martyr
 | `withdraw-nomination`         | Player                    | none                                                   |
 | `skip-defense`                | Narrator                  | none                                                   |
 | `kill-player`                 | Narrator                  | `{ playerId: string }`                                 |
+| `pause-timer`                 | Narrator                  | none                                                   |
+| `resume-timer`                | Narrator                  | none                                                   |
 
 ## Night Action Types
 

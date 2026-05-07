@@ -15,3 +15,4 @@ export {
 } from "./resolve-quest";
 export { selectAssassinationTargetAction } from "./select-assassination-target";
 export { resolveAssassinationAction } from "./resolve-assassination";
+export { AvalonAction } from "./types";

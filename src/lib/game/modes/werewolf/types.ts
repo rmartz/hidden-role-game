@@ -45,6 +45,10 @@ export interface WerewolfNighttimePhase {
   nightActions: Record<string, AnyNightAction>;
   /** Player IDs smited by the narrator this night. */
   smitedPlayerIds?: string[];
+  /** Unix epoch ms when the narrator paused the active timer. Absent when running. */
+  pausedAt?: number;
+  /** Accumulated running milliseconds from prior run periods (before the most recent pause). */
+  pauseOffset?: number;
 }
 
 export interface AttackNightResolutionEvent {
@@ -126,6 +130,10 @@ export interface WerewolfDaytimePhase {
   type: WerewolfPhase.Daytime;
   /** Unix epoch ms when the day phase began (for elapsed-time display). */
   startedAt: number;
+  /** Unix epoch ms when the narrator paused the active timer. Absent when running. */
+  pausedAt?: number;
+  /** Accumulated running milliseconds from prior run periods (before the most recent pause). */
+  pauseOffset?: number;
   /** Targets from the preceding night, carried over for narrator summary. */
   nightActions: Record<string, AnyNightAction>;
   /** Resolved attack/protect outcomes, computed when transitioning to day. */
