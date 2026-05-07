@@ -109,7 +109,7 @@ describe("OwnerStartingScreen no-device tap-to-reveal grid", () => {
     ).toHaveLength(2);
   });
 
-  it("buttons are disabled until sessionStorage has been hydrated", () => {
+  it("buttons are enabled after hydration even when sessionStorage throws", () => {
     const neverResolvesMock = makeSessionStorageMock();
     neverResolvesMock.getItem.mockImplementation(() => {
       throw new Error("Storage blocked");
