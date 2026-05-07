@@ -229,6 +229,26 @@ describe("toggleReady — countdown", () => {
     const lobby = await getLobby("lobby-countdown-5");
     expect(lobby!.countdownStartedAt).toBeUndefined();
   });
+
+  it("sets countdownStartedAt when a device player readies in a lobby with owner and no-device players", async () => {
+    await addLobby({ ...makeBaseLobby(), id: "lobby-countdown-6" });
+    await addPlayer("lobby-countdown-6", {
+      id: "player-no-device",
+      name: "No Device",
+      noDevice: true,
+    });
+    await addPlayer("lobby-countdown-6", {
+      id: "player-device",
+      name: "Device Player",
+      sessionId: "session-device",
+    });
+
+    // Only the device player must explicitly ready up; owner and no-device are implicitly ready.
+    await toggleReady("lobby-countdown-6", "player-device");
+
+    const lobby = await getLobby("lobby-countdown-6");
+    expect(lobby!.countdownStartedAt).toBeDefined();
+  });
 });
 
 describe("removePlayer — countdown", () => {

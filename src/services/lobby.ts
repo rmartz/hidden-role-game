@@ -237,7 +237,9 @@ export async function toggleReady(
   const readyEligiblePlayerIds = Object.keys(players).filter(
     (id) => id !== ownerPlayerId && !players[id].noDevice,
   );
+  const totalPlayerCount = Object.keys(players).length;
   const allReady =
+    totalPlayerCount >= 2 &&
     readyEligiblePlayerIds.length >= 1 &&
     readyEligiblePlayerIds.every((id) => updated.includes(id));
 
