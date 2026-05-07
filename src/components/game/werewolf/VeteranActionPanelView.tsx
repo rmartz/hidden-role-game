@@ -25,7 +25,7 @@ export function VeteranActionPanelView({
   onSkip,
   onConfirm,
 }: VeteranActionPanelViewProps) {
-  const alertsRemaining = VETERAN_ALERTS_LIMIT - alertsUsed;
+  const alertsRemaining = Math.max(0, VETERAN_ALERTS_LIMIT - alertsUsed);
   const alertsExhausted = alertsRemaining <= 0;
 
   return (

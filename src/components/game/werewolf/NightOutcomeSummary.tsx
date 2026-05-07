@@ -52,30 +52,32 @@ export function NightOutcomeSummary({
             )}
           </li>
         )}
-        {veteranCounterkills.map((e) => {
-          const veteranName =
-            getPlayerName(players, e.veteranPlayerId) ?? "The Veteran";
-          const counterkilledName =
-            getPlayerName(players, e.counterkilledPlayerId) ?? "a player";
-          const message =
-            e.source === "wolf-repel"
-              ? WEREWOLF_COPY.veteran.dayAnnouncementWolfRepel(
-                  veteranName,
-                  counterkilledName,
-                )
-              : WEREWOLF_COPY.veteran.dayAnnouncementProtectorKilled(
-                  veteranName,
-                  counterkilledName,
-                );
-          return (
-            <li
-              key={`${e.veteranPlayerId}-${e.counterkilledPlayerId}`}
-              className="font-medium text-orange-600"
-            >
-              {message}
-            </li>
-          );
-        })}
+        {veteranCounterkills
+          .filter((e) => e.died)
+          .map((e) => {
+            const veteranName =
+              getPlayerName(players, e.veteranPlayerId) ?? "The Veteran";
+            const counterkilledName =
+              getPlayerName(players, e.counterkilledPlayerId) ?? "a player";
+            const message =
+              e.source === "wolf-repel"
+                ? WEREWOLF_COPY.veteran.dayAnnouncementWolfRepel(
+                    veteranName,
+                    counterkilledName,
+                  )
+                : WEREWOLF_COPY.veteran.dayAnnouncementProtectorKilled(
+                    veteranName,
+                    counterkilledName,
+                  );
+            return (
+              <li
+                key={`${e.veteranPlayerId}-${e.counterkilledPlayerId}`}
+                className="font-medium text-orange-600"
+              >
+                {message}
+              </li>
+            );
+          })}
         {Object.entries(eventsPerPlayer).map(([targetPlayerId, events]) => (
           <li key={targetPlayerId}>
             <NightOutcomeSummaryItem

@@ -1,6 +1,7 @@
 import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase, isTeamNightAction, TargetCategory } from "../types";
 import type { TeamNightAction } from "../types";
+import { VETERAN_ALERTS_LIMIT } from "../constants";
 import {
   currentTurnState,
   validateActiveNightPlayer,
@@ -70,7 +71,7 @@ export const setNightTargetAction: GameAction = {
       if (alerted === true) {
         if (targetPlayerId !== undefined && targetPlayerId !== null)
           return false;
-        if ((ts.veteranAlertsUsed ?? 0) >= 3) return false;
+        if ((ts.veteranAlertsUsed ?? 0) >= VETERAN_ALERTS_LIMIT) return false;
         return true;
       }
       if (targetPlayerId === undefined) return true;
