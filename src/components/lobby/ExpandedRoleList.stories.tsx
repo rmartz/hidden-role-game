@@ -1,18 +1,24 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
 import { GameMode, RoleConfigMode, Team } from "@/lib/types";
 import type { RoleDefinition } from "@/lib/types";
-import { store } from "@/store";
+import gameConfigReducer from "@/store/game-config-slice";
 import { ExpandedRoleList } from "./ExpandedRoleList";
 
 const meta = {
   component: ExpandedRoleList,
   decorators: [
-    (Story) => (
-      <Provider store={store}>
-        <Story />
-      </Provider>
-    ),
+    (Story) => {
+      const freshStore = configureStore({
+        reducer: { gameConfig: gameConfigReducer },
+      });
+      return (
+        <Provider store={freshStore}>
+          <Story />
+        </Provider>
+      );
+    },
   ],
 } satisfies Meta<typeof ExpandedRoleList>;
 
