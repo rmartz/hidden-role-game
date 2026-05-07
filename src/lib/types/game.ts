@@ -368,6 +368,11 @@ export interface ClocktowerGame extends BaseGame {
   gameMode: GameMode.Clocktower;
   timerConfig: TimerConfig;
   modeConfig: ClocktowerModeConfig;
+  /**
+   * The Townsfolk role ID shown to the Drunk player as their fake token.
+   * Assigned at game creation; only present when the Drunk is in play.
+   */
+  drunkFakeRoleId?: string;
 }
 
 export interface CodenamesGame extends BaseGame {
