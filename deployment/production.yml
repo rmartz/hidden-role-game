@@ -18,3 +18,7 @@ variables:
   FIREBASE_PROJECT_ID: "hidden-role-game-e530f"
   FIREBASE_DATABASE_URL: "https://hidden-role-game-e530f-default-rtdb.firebaseio.com"
   FIREBASE_SA_EMAIL: "firebase-adminsdk-fbsvc@hidden-role-game-e530f.iam.gserviceaccount.com"
+
+  # Sentry — identifiers only; DSN and auth token are managed as secrets by sync-env --init sentry
+  SENTRY_ORG: "reedmartz"
+  SENTRY_PROJECT: "hidden-role-game"
