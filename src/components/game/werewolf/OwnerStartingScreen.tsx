@@ -3,10 +3,12 @@
 import { useMemo, useState, useEffect } from "react";
 import { GameStatus, GameMode } from "@/lib/types";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import { GameRolesList, PlayersRoleList } from "@/components/game";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RoleLabel } from "@/components/RoleLabel";
 import { GAME_MODES } from "@/lib/game/modes";
+import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import { OwnerHeader } from "./OwnerHeader";
 import { OWNER_STARTING_SCREEN_COPY } from "./OwnerStartingScreen.copy";
 
@@ -118,6 +120,10 @@ export function OwnerStartingScreen({
     (a) => !noDevicePlayerIds.has(a.player.id),
   );
 
+  const masonInPlay = gameState.visibleRoleAssignments.some(
+    (a) => a.role?.id === WerewolfRole.Mason,
+  );
+
   return (
     <div className="p-5 max-w-4xl mx-auto">
       <OwnerHeader
@@ -126,6 +132,11 @@ export function OwnerStartingScreen({
         onAdvance={handleStart}
         timer={timer}
       />
+      {masonInPlay && (
+        <p className="mb-5 text-sm text-amber-700 dark:text-amber-400">
+          {WEREWOLF_COPY.mason.narratorWarning}
+        </p>
+      )}
       <PlayersRoleList
         assignments={devicePlayerAssignments}
         gameMode={gameState.gameMode}

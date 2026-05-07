@@ -34,5 +34,8 @@ export function toPublicLobby(
     } as GameConfig,
     readyPlayerIds: lobby.readyPlayerIds,
     ...(lobby.gameId && { gameId: lobby.gameId }),
+    ...(lobby.countdownStartedAt !== undefined && {
+      countdownStartedAt: lobby.countdownStartedAt,
+    }),
   };
 }

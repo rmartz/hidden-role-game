@@ -70,6 +70,7 @@ export const PlayerView: Story = {
     isFetching: false,
     disabled: false,
     isReadyPending: false,
+    countdownDurationSeconds: 5,
   },
 };
 
@@ -85,6 +86,27 @@ export const OwnerView: Story = {
     isFetching: false,
     disabled: false,
     isReadyPending: false,
+    countdownDurationSeconds: 5,
+  },
+};
+
+export const CountdownActive: Story = {
+  args: {
+    lobby: {
+      ...baseLobby,
+      readyPlayerIds: ["p1", "p2", "p3", "p4", "p5"],
+      countdownStartedAt: Date.now() - 2000,
+    },
+    userPlayerId: "p2",
+    isOwner: false,
+    showLeave: true,
+    showRemovePlayer: false,
+    showMakeOwner: false,
+    showRefresh: false,
+    isFetching: false,
+    disabled: false,
+    isReadyPending: false,
+    countdownDurationSeconds: 5,
   },
 };
 
@@ -105,6 +127,7 @@ export const SinglePlayerOwner: Story = {
     isFetching: false,
     disabled: false,
     isReadyPending: false,
+    countdownDurationSeconds: 5,
   },
 };
 
@@ -130,5 +153,6 @@ export const OwnerWithNoDevicePlayers: Story = {
     isFetching: false,
     disabled: false,
     isReadyPending: false,
+    countdownDurationSeconds: 5,
   },
 };

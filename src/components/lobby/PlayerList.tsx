@@ -34,6 +34,7 @@ interface PlayerListProps {
   isRenamePending: boolean;
   isOwnerRenamePending: boolean;
   isAddNoDevicePending: boolean;
+  countdownDurationSeconds: number;
   onRefetch: () => void;
   onRemovePlayer: (playerId: string) => void;
   onTransferOwner: (playerId: string) => void;
@@ -135,6 +136,7 @@ export function PlayerList({
   isRenamePending,
   isOwnerRenamePending,
   isAddNoDevicePending,
+  countdownDurationSeconds,
   onRefetch,
   onRemovePlayer,
   onTransferOwner,
@@ -155,6 +157,36 @@ export function PlayerList({
   const allPlayersReady =
     readyEligiblePlayers.length > 0 &&
     readyEligiblePlayers.every((p) => readySet.has(p.id));
+
+  const countdownStartedAt = lobby.countdownStartedAt;
+  const [secondsLeft, setSecondsLeft] = useState(() => {
+    if (!countdownStartedAt) return 0;
+    return Math.max(
+      0,
+      countdownDurationSeconds -
+        Math.floor((Date.now() - countdownStartedAt) / 1000),
+    );
+  });
+
+  useEffect(() => {
+    if (!countdownStartedAt) {
+      setSecondsLeft(0);
+      return;
+    }
+    const tick = () => {
+      const remaining = Math.max(
+        0,
+        countdownDurationSeconds -
+          Math.floor((Date.now() - countdownStartedAt) / 1000),
+      );
+      setSecondsLeft(remaining);
+    };
+    tick();
+    const id = setInterval(tick, 500);
+    return () => {
+      clearInterval(id);
+    };
+  }, [countdownStartedAt, countdownDurationSeconds]);
 
   const [committedOrder, setCommittedOrder] = useState<string[]>(
     () => lobby.playerOrder,
@@ -321,10 +353,20 @@ export function PlayerList({
             onAdd={onAddNoDevicePlayer}
           />
         )}
-        {allPlayersReady && (
-          <p className="text-sm text-green-600 font-medium mt-2">
-            {PLAYER_LIST_COPY.allPlayersReady}
+        {countdownStartedAt !== undefined ? (
+          <p className="text-sm font-medium text-primary mt-2">
+            {secondsLeft > 0
+              ? `${PLAYER_LIST_COPY.countdownPrefix}${String(secondsLeft)}...`
+              : PLAYER_LIST_COPY.countdownStarting}
           </p>
+        ) : (
+          allPlayersReady && (
+            <p className="text-sm text-green-600 font-medium mt-2">
+              {isOwner
+                ? PLAYER_LIST_COPY.allPlayersReady
+                : PLAYER_LIST_COPY.waitingForHost}
+            </p>
+          )
         )}
       </CardContent>
     </Card>

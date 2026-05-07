@@ -249,6 +249,12 @@ export interface GameModeConfig {
    * Returns 0 when not implemented (no hidden roles).
    */
   resolveHiddenRoleCount?(modeConfig: ModeConfig): number;
+  /**
+   * Validates mode-specific role count constraints beyond basic role ID validity
+   * and slot count. Returns an error message, or undefined if valid.
+   * Called for Custom (roleCounts) and Advanced (simple-bucket counts) modes.
+   */
+  validateRoleConfig?(roleCounts: Record<string, number>): string | undefined;
   readonly roles: Record<string, RoleDefinition<string, Team>>;
   readonly teamLabels: Partial<Record<Team, string>>;
   defaultRoleCount(numPlayers: number): RoleBucket[];
@@ -450,4 +456,6 @@ export interface Lobby {
   config: LobbyConfig;
   gameId?: string;
   readyPlayerIds: string[];
+  /** Unix ms timestamp set server-side when all players (including owner) ready up. Cleared on unready, player leave, or game start. */
+  countdownStartedAt?: number;
 }

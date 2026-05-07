@@ -30,13 +30,13 @@ function computeIsValid(
   roleBuckets: RoleBucket[],
   modeConfig: ModeConfig,
 ): boolean {
+  const modeDefinition = GAME_MODES[gameMode];
   if (roleConfigMode === RoleConfigMode.Default) {
-    return playerCount >= GAME_MODES[gameMode].minPlayers;
+    return playerCount >= modeDefinition.minPlayers;
   }
   if (roleConfigMode === RoleConfigMode.Advanced) {
     if (roleBuckets.length === 0) return false;
     const totalPlayerCount = sum(roleBuckets.map((b) => b.playerCount));
-    const modeDefinition = GAME_MODES[gameMode];
     const required =
       modeDefinition.resolveRoleSlotsRequired?.(playerCount, modeConfig) ??
       modeDefinition.roleSlotsRequired?.(playerCount) ??
@@ -48,15 +48,27 @@ function computeIsValid(
       if (getAdvancedBucketMaxCapacity(bucket) < bucket.playerCount)
         return false;
     }
+    // Aggregate simple bucket counts for mode-specific validation.
+    const simpleCounts: Record<string, number> = {};
+    for (const bucket of roleBuckets) {
+      if (!isSimpleRoleBucket(bucket)) continue;
+      simpleCounts[bucket.roleId] =
+        (simpleCounts[bucket.roleId] ?? 0) + bucket.playerCount;
+    }
+    if (modeDefinition.validateRoleConfig?.(simpleCounts)) return false;
     return true;
   }
   // Custom mode
-  const config = GAME_MODES[gameMode];
-  if (config.resolveIsValidRoleCount) {
-    return config.resolveIsValidRoleCount(playerCount, roleCounts, modeConfig);
+  if (modeDefinition.validateRoleConfig?.(roleCounts)) return false;
+  if (modeDefinition.resolveIsValidRoleCount) {
+    return modeDefinition.resolveIsValidRoleCount(
+      playerCount,
+      roleCounts,
+      modeConfig,
+    );
   }
-  if (config.isValidRoleCount) {
-    return config.isValidRoleCount(playerCount, roleCounts);
+  if (modeDefinition.isValidRoleCount) {
+    return modeDefinition.isValidRoleCount(playerCount, roleCounts);
   }
   return sum(Object.values(roleCounts)) === playerCount;
 }

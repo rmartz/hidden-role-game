@@ -29,6 +29,8 @@ import {
 } from "@/components/lobby";
 import { LOBBY_PAGE_COPY } from "./page.copy";
 
+const LOBBY_COUNTDOWN_SECONDS = 5;
+
 export default function LobbyPage() {
   const { lobbyId, gameMode: gameModeParam } = useParams<{
     lobbyId: string;
@@ -140,6 +142,29 @@ export default function LobbyPage() {
     startGameMutation.mutate({ gameMode });
   }
 
+  const startGameMutationRef = useRef(startGameMutation);
+  startGameMutationRef.current = startGameMutation;
+  const flushConfigSyncRef = useRef(flushConfigSync);
+  flushConfigSyncRef.current = flushConfigSync;
+
+  const countdownStartedAt = fetchLobby.data?.countdownStartedAt;
+  useEffect(() => {
+    if (!isOwner || !countdownStartedAt || !actualGameMode) return;
+    const delay = Math.max(
+      0,
+      LOBBY_COUNTDOWN_SECONDS * 1000 - (Date.now() - countdownStartedAt),
+    );
+    const startGame = async () => {
+      if (startGameMutationRef.current.isPending) return;
+      await flushConfigSyncRef.current();
+      startGameMutationRef.current.mutate({ gameMode: actualGameMode });
+    };
+    const id = setTimeout(() => void startGame(), delay);
+    return () => {
+      clearTimeout(id);
+    };
+  }, [isOwner, countdownStartedAt, actualGameMode]);
+
   if (!validatedGameMode || !hasReadStorage || hasDifferentLobby) return null;
 
   const configPanel =
@@ -231,6 +256,7 @@ export default function LobbyPage() {
           isFetching={fetchLobby.isFetching}
           disabled={startGameMutation.isPending || gameId !== undefined}
           isReadyPending={toggleReadyMutation.isPending}
+          countdownDurationSeconds={LOBBY_COUNTDOWN_SECONDS}
           onRefetch={handleRefetch}
           onRemovePlayer={(playerId: string) => {
             removeMutation.mutate(playerId);
