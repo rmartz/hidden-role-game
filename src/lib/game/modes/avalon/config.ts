@@ -7,6 +7,17 @@ import {
   parseAvalonModeConfig,
 } from "./lobby-config";
 import { avalonServices } from "./services";
+import {
+  proposeTeamAction,
+  castTeamVoteAction,
+  resolveTeamVoteAction,
+  advanceFromTeamVoteAction,
+  playQuestCardAction,
+  resolveQuestAction,
+  advanceFromQuestAction,
+  selectAssassinationTargetAction,
+  resolveAssassinationAction,
+} from "./actions";
 
 export const AVALON_CONFIG = {
   name: "Avalon",
@@ -23,6 +34,16 @@ export const AVALON_CONFIG = {
   defaultModeConfig: DEFAULT_AVALON_MODE_CONFIG,
   parseModeConfig: parseAvalonModeConfig,
   buildDefaultLobbyConfig: buildDefaultAvalonLobbyConfig,
-  actions: {},
+  actions: {
+    proposeTeam: proposeTeamAction,
+    castTeamVote: castTeamVoteAction,
+    resolveTeamVote: resolveTeamVoteAction,
+    advanceFromTeamVote: advanceFromTeamVoteAction,
+    playQuestCard: playQuestCardAction,
+    resolveQuest: resolveQuestAction,
+    advanceFromQuest: advanceFromQuestAction,
+    selectAssassinationTarget: selectAssassinationTargetAction,
+    resolveAssassination: resolveAssassinationAction,
+  },
   services: avalonServices,
 } satisfies GameModeConfig;
