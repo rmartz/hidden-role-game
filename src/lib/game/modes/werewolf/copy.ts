@@ -230,6 +230,8 @@ export const WEREWOLF_COPY = {
   },
   veteran: {
     alertButton: "Go on Alert",
+    alertsRemaining: (n: number) =>
+      `${n} alert${n === 1 ? "" : "s"} remaining`,
     skipButton: "Stay Home",
     dayAnnouncementWolfRepel: (veteranName: string, wolfName: string) =>
       `${veteranName} was on alert — ${wolfName} was killed repelling the attack.`,

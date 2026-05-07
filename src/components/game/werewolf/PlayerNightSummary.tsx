@@ -31,6 +31,22 @@ export function PlayerNightSummary({
         ? (getPlayerName(players, altruistEntry.savedPlayerId) ?? "a player")
         : undefined;
 
+      const veteranCounterkillEntry = entries.find(
+        (
+          e,
+        ): e is DaytimeNightStatusEntry & {
+          veteranPlayerId: string;
+          veteranCounterkillSource: "wolf-repel" | "protector-visit";
+        } =>
+          e.effect === "veteran-counterkill" &&
+          "veteranPlayerId" in e &&
+          typeof e.veteranPlayerId === "string",
+      );
+      const veteranName = veteranCounterkillEntry
+        ? (getPlayerName(players, veteranCounterkillEntry.veteranPlayerId) ??
+          "The Veteran")
+        : undefined;
+
       return {
         targetPlayerId,
         playerName: getPlayerName(players, targetPlayerId) ?? targetPlayerId,
@@ -45,6 +61,9 @@ export function PlayerNightSummary({
         hypnotized: entries.some((e) => e.effect === "hypnotized"),
         smited: entries.some((e) => e.effect === "smited"),
         peaceful: entries.some((e) => e.effect === "peaceful"),
+        veteranCounterkillSource:
+          veteranCounterkillEntry?.veteranCounterkillSource,
+        veteranName,
       };
     },
   );
@@ -68,6 +87,8 @@ export function PlayerNightSummary({
             hypnotized,
             smited,
             peaceful,
+            veteranCounterkillSource,
+            veteranName,
           }) => (
             <PlayerNightSummaryItem
               key={targetPlayerId}
@@ -82,6 +103,8 @@ export function PlayerNightSummary({
               smited={smited}
               peaceful={peaceful}
               isMe={myPlayerId === targetPlayerId}
+              veteranCounterkillSource={veteranCounterkillSource}
+              veteranName={veteranName}
             />
           ),
         )}

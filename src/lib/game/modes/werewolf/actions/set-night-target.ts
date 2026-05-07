@@ -68,6 +68,7 @@ export const setNightTargetAction: GameAction = {
     // Alerting is blocked once the Veteran has used all 3 of their alerts.
     if (isRoleActive(phaseKey, WerewolfRole.Veteran)) {
       if (alerted === true) {
+        if (targetPlayerId !== undefined && targetPlayerId !== null) return false;
         if ((ts.veteranAlertsUsed ?? 0) >= 3) return false;
         return true;
       }

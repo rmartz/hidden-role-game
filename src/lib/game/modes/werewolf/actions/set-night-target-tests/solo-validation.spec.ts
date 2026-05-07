@@ -175,5 +175,17 @@ describe("WerewolfAction.SetNightTarget", () => {
       });
       expect(action.isValid(game, "p1", { targetPlayerId: "p2" })).toBe(false);
     });
+
+    it("rejects alerted: true combined with a targetPlayerId string", () => {
+      const game = makePlayingGame(veteranTurn2State, {
+        roleAssignments: [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Veteran },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        ],
+      });
+      expect(
+        action.isValid(game, "p1", { alerted: true, targetPlayerId: "p2" }),
+      ).toBe(false);
+    });
   });
 });

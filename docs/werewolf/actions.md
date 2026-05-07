@@ -271,7 +271,7 @@ interface TeamNightAction {
 - `{ type: "hypnotized", targetPlayerId }`
 - `{ type: "tough-guy-absorbed", targetPlayerId }`
 - `{ type: "altruist-intercepted", targetPlayerId }`
-- `{ type: "veteran-counterkilled", counterkilledPlayerId, veteranPlayerId, source }`
+- `{ type: "veteran-counterkilled", counterkilledPlayerId, veteranPlayerId, source, died }`
 
 After resolution, `start-day` performs additional checks:
 

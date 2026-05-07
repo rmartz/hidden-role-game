@@ -34,6 +34,8 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
   priestWardActive?: boolean;
   isSilenced?: boolean;
   isHypnotized?: boolean;
+  veteranAlertsUsed?: number;
+  myNightAlerted?: boolean;
   activeTrial?: {
     defendantId: string;
     startedAt: number;
@@ -103,6 +105,10 @@ export function werewolfStateToFirebase(
     ...(state.priestWardActive ? { priestWardActive: true } : {}),
     ...(state.isSilenced ? { isSilenced: true } : {}),
     ...(state.isHypnotized ? { isHypnotized: true } : {}),
+    ...(state.veteranAlertsUsed !== undefined
+      ? { veteranAlertsUsed: state.veteranAlertsUsed }
+      : {}),
+    ...(state.myNightAlerted ? { myNightAlerted: true } : {}),
     ...(state.activeTrial ? { activeTrial: state.activeTrial } : {}),
     nominationsEnabled: state.nominationsEnabled,
     trialsPerDay: state.trialsPerDay,
@@ -181,6 +187,10 @@ export function werewolfStateFromFirebase(
     ...(raw.priestWardActive ? { priestWardActive: true } : {}),
     ...(raw.isSilenced ? { isSilenced: true } : {}),
     ...(raw.isHypnotized ? { isHypnotized: true } : {}),
+    ...(raw.veteranAlertsUsed !== undefined
+      ? { veteranAlertsUsed: raw.veteranAlertsUsed }
+      : {}),
+    ...(raw.myNightAlerted ? { myNightAlerted: true } : {}),
     ...(raw.activeTrial
       ? {
           activeTrial:

@@ -93,6 +93,10 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   isSilenced?: boolean;
   /** True if the player is hypnotized by the Mummy. */
   isHypnotized?: boolean;
+  /** Number of nights the Veteran has chosen to Alert so far this game. */
+  veteranAlertsUsed?: number;
+  /** Whether the Veteran has chosen to go on Alert this night (Veteran-only). */
+  myNightAlerted?: boolean;
   /** Active elimination trial. */
   activeTrial?: {
     defendantId: string;

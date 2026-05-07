@@ -12,6 +12,8 @@ interface PlayerNightSummaryItemProps {
   smited: boolean;
   peaceful: boolean;
   isMe: boolean;
+  veteranCounterkillSource?: "wolf-repel" | "protector-visit";
+  veteranName?: string;
 }
 
 export function PlayerNightSummaryItem({
@@ -26,6 +28,8 @@ export function PlayerNightSummaryItem({
   smited,
   peaceful,
   isMe,
+  veteranCounterkillSource,
+  veteranName,
 }: PlayerNightSummaryItemProps) {
   // Personal messages for silenced/hypnotized player (only visible to themselves).
   if (isMe && silenced) {
@@ -64,6 +68,19 @@ export function PlayerNightSummaryItem({
           savedPlayerName ?? "a player",
         )}
       </li>
+    );
+  }
+
+  if (veteranCounterkillSource && veteranName) {
+    const message =
+      veteranCounterkillSource === "wolf-repel"
+        ? WEREWOLF_COPY.veteran.dayAnnouncementWolfRepel(veteranName, playerName)
+        : WEREWOLF_COPY.veteran.dayAnnouncementProtectorKilled(
+            veteranName,
+            playerName,
+          );
+    return (
+      <li className="text-sm font-medium text-orange-600">{message}</li>
     );
   }
 

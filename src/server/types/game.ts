@@ -47,9 +47,14 @@ export interface DaytimeNightStatusEntry {
     | "smited"
     | "survived"
     | "peaceful"
-    | "altruist-sacrifice";
+    | "altruist-sacrifice"
+    | "veteran-counterkill";
   /** For altruist-sacrifice: the player who was saved. */
   savedPlayerId?: string;
+  /** For veteran-counterkill: the Veteran player who performed the counter-kill. */
+  veteranPlayerId?: string;
+  /** For veteran-counterkill: whether the kill came from repelling a wolf attack or a protector visit. */
+  veteranCounterkillSource?: "wolf-repel" | "protector-visit";
 }
 
 /** Night effects visible to the Witch during their nighttime phase only. */

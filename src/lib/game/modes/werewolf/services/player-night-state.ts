@@ -196,6 +196,18 @@ function extractRoleSpecificState(
     };
   }
 
+  if (myRole.id === WerewolfRole.Veteran) {
+    const vetAction = nightActions[myRole.id];
+    const soloAction =
+      vetAction && !isTeamNightAction(vetAction) ? vetAction : undefined;
+    return {
+      myNightTarget: soloAction?.skipped ? null : undefined,
+      myNightTargetConfirmed: soloAction?.confirmed ?? false,
+      veteranAlertsUsed: ts?.veteranAlertsUsed ?? 0,
+      myNightAlerted: soloAction?.alerted === true,
+    };
+  }
+
   if (myRole.id === WerewolfRole.Executioner) {
     return {
       myNightTarget: undefined,
