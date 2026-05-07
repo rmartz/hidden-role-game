@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
+import { render, screen, cleanup, act } from "@testing-library/react";
 import { GameTimer } from "./GameTimer";
 import { GAME_TIMER_COPY } from "./GameTimer.copy";
 
@@ -129,5 +129,52 @@ describe("GameTimer", () => {
     );
 
     expect(screen.getByText(GAME_TIMER_COPY.advancing)).toBeDefined();
+  });
+
+  it("does not re-fire onTimerTrigger when pausing and resuming an expired timer", () => {
+    const onTimerTrigger = vi.fn();
+    const startedAt = new Date(BASE_NOW - 120_000);
+
+    const { rerender } = render(
+      <GameTimer
+        durationSeconds={60}
+        autoAdvance={false}
+        startedAt={startedAt}
+        onTimerTrigger={onTimerTrigger}
+      />,
+    );
+
+    // Timer is expired on mount; tick() fires immediately inside the effect.
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(onTimerTrigger).toHaveBeenCalledTimes(1);
+
+    // Pause the timer — should not reset hasTriggeredRef.
+    rerender(
+      <GameTimer
+        durationSeconds={60}
+        autoAdvance={false}
+        startedAt={startedAt}
+        onTimerTrigger={onTimerTrigger}
+        pausedAt={new Date(BASE_NOW)}
+      />,
+    );
+
+    // Resume — should not fire again.
+    rerender(
+      <GameTimer
+        durationSeconds={60}
+        autoAdvance={false}
+        startedAt={startedAt}
+        onTimerTrigger={onTimerTrigger}
+      />,
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+
+    expect(onTimerTrigger).toHaveBeenCalledTimes(1);
   });
 });

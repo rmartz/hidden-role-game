@@ -53,15 +53,23 @@ export function GameTimer({
   );
   const hasTriggeredRef = useRef(false);
   const onTriggerRef = useRef(onTimerTrigger);
+  const computeElapsedRef = useRef(computeElapsed);
 
   useEffect(() => {
     onTriggerRef.current = onTimerTrigger;
   });
 
+  useEffect(() => {
+    computeElapsedRef.current = computeElapsed;
+  });
+
+  // reset has a stable reference — it reads computeElapsed via computeElapsedRef so
+  // that pause/resume (which update computeElapsed) do not cause this callback to
+  // change identity and spuriously rerun the resetKey/durationSeconds effect below.
   const reset = useCallback(() => {
     hasTriggeredRef.current = false;
-    setElapsedSeconds(computeElapsed(Date.now()));
-  }, [computeElapsed]);
+    setElapsedSeconds(computeElapsedRef.current(Date.now()));
+  }, []);
 
   useEffect(() => {
     reset();

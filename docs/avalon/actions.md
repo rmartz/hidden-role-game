@@ -83,17 +83,17 @@ Actions are the mechanism by which the Quest Leader and players mutate game stat
 
 ---
 
-### `selectAssassinationTarget`
+### `select-assassination-target`
 
 **Who:** Assassin player only
 **When:** During `Assassination` phase, before resolve
-**Effect:** Sets the Assassin's target. The Assassin may change their selection before `resolveAssassination` is called.
+**Effect:** Sets the Assassin's target. The Assassin may change their selection before `resolve-assassination` is called.
 
 **Payload:** `{ targetPlayerId: string }` — must be a valid player ID in the game
 
 ---
 
-### `resolveAssassination`
+### `resolve-assassination`
 
 **Who:** Any player (narrator triggers in practice)
 **When:** During `Assassination` phase, after a target has been selected
@@ -117,8 +117,8 @@ Actions are the mechanism by which the Quest Leader and players mutate game stat
 | `play-quest-card`           | Team member                       | `{ card: "success" \| "fail" }`        |
 | `resolve-quest`             | Any player (narrator in practice) | none                                   |
 | `advance-from-quest`        | Any player (narrator in practice) | none                                   |
-| `selectAssassinationTarget` | Assassin player                   | `{ targetPlayerId: string }`           |
-| `resolveAssassination`      | Any player (narrator in practice) | none                                   |
+| `select-assassination-target` | Assassin player                   | `{ targetPlayerId: string }`           |
+| `resolve-assassination`      | Any player (narrator in practice) | none                                   |
 
 ## Phase State Machine
 
@@ -134,6 +134,6 @@ Quest[resolved, Good wins 3] + Assassin exists → (advance-from-quest) → Assa
 Quest[resolved, Good wins 3] + no Assassin → (advance-from-quest) → Finished[Good wins]
 Quest[resolved, Evil wins 3] → (advance-from-quest) → Finished[Evil wins]
 Quest[resolved, no winner yet] → (advance-from-quest) → TeamProposal[next quest, next leader]
-Assassination → (selectAssassinationTarget) → Assassination[target set]
-Assassination[target set] → (resolveAssassination) → Finished[Good or Evil wins]
+Assassination → (select-assassination-target) → Assassination[target set]
+Assassination[target set] → (resolve-assassination) → Finished[Good or Evil wins]
 ```
