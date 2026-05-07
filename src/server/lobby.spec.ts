@@ -56,6 +56,15 @@ describe("validatePlayerJoin", () => {
   it("returns an error when the display name matches after whitespace normalization", () => {
     expect(validatePlayerJoin(makeLobby(), "  Alice  ")).toBeDefined();
   });
+
+  it("returns an error when a countdown is in progress", () => {
+    expect(
+      validatePlayerJoin(
+        makeLobby({ countdownStartedAt: Date.now() }),
+        "Charlie",
+      ),
+    ).toBeDefined();
+  });
 });
 
 describe("authorizePlayerRemoval", () => {

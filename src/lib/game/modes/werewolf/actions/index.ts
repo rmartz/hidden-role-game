@@ -13,6 +13,8 @@ import { startTrialAction } from "./start-trial";
 import { castVoteAction } from "./cast-vote";
 import { resolveTrialAction } from "./resolve-trial";
 import { endGameAction } from "./end-game";
+import { pauseTimerAction } from "./pause-timer";
+import { resumeTimerAction } from "./resume-timer";
 import { smitePlayerAction } from "./smite-player";
 import { unsmitePlayerAction } from "./unsmite-player";
 import { nominatePlayerAction } from "./nominate-player";
@@ -25,27 +27,29 @@ import { resetAbilityAction } from "./reset-ability";
 import { submitGhostClueAction } from "./submit-ghost-clue";
 
 export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
-  [WerewolfAction.StartNight]: startNightAction,
-  [WerewolfAction.StartDay]: startDayAction,
-  [WerewolfAction.SetNightPhase]: setNightPhaseAction,
-  [WerewolfAction.SetNightTarget]: setNightTargetAction,
+  [WerewolfAction.CancelTrial]: cancelTrialAction,
+  [WerewolfAction.CastVote]: castVoteAction,
   [WerewolfAction.ConfirmNightTarget]: confirmNightTargetAction,
+  [WerewolfAction.EndGame]: endGameAction,
+  [WerewolfAction.KillPlayer]: killPlayerAction,
+  [WerewolfAction.MarkPlayerAlive]: markPlayerAliveAction,
+  [WerewolfAction.MarkPlayerDead]: markPlayerDeadAction,
+  [WerewolfAction.NominatePlayer]: nominatePlayerAction,
+  [WerewolfAction.PauseTimer]: pauseTimerAction,
+  [WerewolfAction.ResetAbility]: resetAbilityAction,
+  [WerewolfAction.ResolveHunterRevenge]: resolveHunterRevengeAction,
+  [WerewolfAction.ResolveTrial]: resolveTrialAction,
+  [WerewolfAction.ResumeTimer]: resumeTimerAction,
   [WerewolfAction.RevealInvestigationResult]: revealInvestigationResultAction,
   [WerewolfAction.RevealNightOutcomeStep]: revealNightOutcomeStepAction,
-  [WerewolfAction.MarkPlayerDead]: markPlayerDeadAction,
-  [WerewolfAction.MarkPlayerAlive]: markPlayerAliveAction,
-  [WerewolfAction.StartTrial]: startTrialAction,
-  [WerewolfAction.CastVote]: castVoteAction,
-  [WerewolfAction.ResolveTrial]: resolveTrialAction,
-  [WerewolfAction.EndGame]: endGameAction,
-  [WerewolfAction.SmitePlayer]: smitePlayerAction,
-  [WerewolfAction.UnsmitePlayer]: unsmitePlayerAction,
-  [WerewolfAction.NominatePlayer]: nominatePlayerAction,
-  [WerewolfAction.WithdrawNomination]: withdrawNominationAction,
+  [WerewolfAction.SetNightPhase]: setNightPhaseAction,
+  [WerewolfAction.SetNightTarget]: setNightTargetAction,
   [WerewolfAction.SkipDefense]: skipDefenseAction,
-  [WerewolfAction.KillPlayer]: killPlayerAction,
-  [WerewolfAction.ResolveHunterRevenge]: resolveHunterRevengeAction,
-  [WerewolfAction.CancelTrial]: cancelTrialAction,
-  [WerewolfAction.ResetAbility]: resetAbilityAction,
+  [WerewolfAction.SmitePlayer]: smitePlayerAction,
+  [WerewolfAction.StartDay]: startDayAction,
+  [WerewolfAction.StartNight]: startNightAction,
+  [WerewolfAction.StartTrial]: startTrialAction,
   [WerewolfAction.SubmitGhostClue]: submitGhostClueAction,
+  [WerewolfAction.UnsmitePlayer]: unsmitePlayerAction,
+  [WerewolfAction.WithdrawNomination]: withdrawNominationAction,
 };

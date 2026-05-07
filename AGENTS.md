@@ -21,7 +21,7 @@ pnpm run secrets-check # Gitleaks secret scan (runs in pre-commit)
 
 ## Secret Management
 
-- Pull `.env.local` for local development: `scripts/generate-local-env.sh` (requires `vercel login`)
+- Pull `.env.local` for local development: `pnpm run env:pull` (requires `vercel login`)
 - Secret scanning runs automatically on every commit via `.husky/pre-commit` and is enforced in CI via `.github/workflows/secret-scan.yml`
 - Never commit `.env.local`, `.vercel/`, service account keys, or Firebase private keys. The `.env.example` file contains only placeholder values. `.vercel/` is listed in `.gitignore` — it is local project metadata created by `vercel env pull` / `vercel link` and must not be committed.
 
