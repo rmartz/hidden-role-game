@@ -69,6 +69,7 @@ export enum WerewolfRole {
   Spellcaster = "werewolf-spellcaster",
   Spoiler = "werewolf-spoiler",
   Tanner = "werewolf-tanner",
+  TavernKeeper = "werewolf-tavern-keeper",
   ToughGuy = "werewolf-tough-guy",
   Vigilante = "werewolf-vigilante",
   VillageIdiot = "werewolf-village-idiot",
@@ -474,6 +475,19 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.Never,
     targetCategory: TargetCategory.None,
     category: WerewolfRoleCategory.NeutralManipulation,
+  },
+  [WerewolfRole.TavernKeeper]: {
+    id: WerewolfRole.TavernKeeper,
+    name: "Tavern Keeper",
+    summary: "Role-blocks a player each night before the Werewolves act",
+    description:
+      "Each night, the Tavern Keeper wakes first — before the Werewolves — and chooses one player to serve too many drinks. The chosen player cannot perform their night action that night. They see a message telling them they are too drunk to stay awake.",
+    team: Team.Good,
+    unique: true,
+    wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Special,
+    preventSelfTarget: true,
+    category: WerewolfRoleCategory.VillagerSupport,
   },
   [WerewolfRole.ToughGuy]: {
     id: WerewolfRole.ToughGuy,

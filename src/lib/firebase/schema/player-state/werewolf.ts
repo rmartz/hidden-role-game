@@ -64,6 +64,8 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
   mySecondNightTarget?: string;
   exposerAbilityUsed?: boolean;
   hunterRevengePlayerId?: string;
+  /** True when this player has been blocked by the Tavern Keeper tonight. */
+  tavernKeeperBlocked?: boolean;
   /** Narrator-only hidden role IDs. Present only when hiddenRoleCount > 0. */
   hiddenRoleIds?: string[];
 }
@@ -136,6 +138,7 @@ export function werewolfStateToFirebase(
     ...(state.hunterRevengePlayerId
       ? { hunterRevengePlayerId: state.hunterRevengePlayerId }
       : {}),
+    ...(state.tavernKeeperBlocked ? { tavernKeeperBlocked: true } : {}),
     ...(state.hiddenRoleIds?.length
       ? { hiddenRoleIds: state.hiddenRoleIds }
       : {}),
@@ -219,6 +222,7 @@ export function werewolfStateFromFirebase(
     ...(raw.hunterRevengePlayerId
       ? { hunterRevengePlayerId: raw.hunterRevengePlayerId }
       : {}),
+    ...(raw.tavernKeeperBlocked ? { tavernKeeperBlocked: true } : {}),
     ...(raw.hiddenRoleIds?.length ? { hiddenRoleIds: raw.hiddenRoleIds } : {}),
   } as WerewolfPlayerGameState;
 }

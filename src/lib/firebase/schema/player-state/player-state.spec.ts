@@ -125,6 +125,22 @@ describe("Werewolf player state round-trip", () => {
     expect(result.nightStatus).toBeUndefined();
   });
 
+  it("preserves tavernKeeperBlocked when true", () => {
+    const state = makeWerewolfState({ tavernKeeperBlocked: true });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.tavernKeeperBlocked).toBe(true);
+  });
+
+  it("omits tavernKeeperBlocked when absent", () => {
+    const state = makeWerewolfState();
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.tavernKeeperBlocked).toBeUndefined();
+  });
+
   it("preserves Werewolf-specific timer fields", () => {
     const state = makeWerewolfState({
       timerConfig: {
