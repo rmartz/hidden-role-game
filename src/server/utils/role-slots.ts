@@ -28,16 +28,23 @@ function validateAdvancedBucketFeasibility(
 /**
  * Validates that all role IDs in a set of buckets are known for the given game mode,
  * and that advanced bucket constraints are feasible.
+ * Also runs any mode-specific role-count constraints (e.g. Mason must be 0 or 2+).
+ * Mode-specific validation only receives deterministic simple-bucket counts; advanced
+ * bucket slots are non-deterministic and are excluded from that check.
  * Returns an error message, or undefined if all are valid.
  */
 export function validateRoleBucketsForMode(
   buckets: RoleBucket[],
   gameMode: GameMode,
 ): string | undefined {
-  const { roles } = getModeDefinition(gameMode);
+  const modeDefinition = getModeDefinition(gameMode);
+  const { roles } = modeDefinition;
+  const simpleCounts: Record<string, number> = {};
   for (const bucket of buckets) {
     if (isSimpleRoleBucket(bucket)) {
       if (!(bucket.roleId in roles)) return `Unknown role: ${bucket.roleId}`;
+      simpleCounts[bucket.roleId] =
+        (simpleCounts[bucket.roleId] ?? 0) + bucket.playerCount;
     } else {
       for (const slot of bucket.roles) {
         if (!(slot.roleId in roles)) return `Unknown role: ${slot.roleId}`;
@@ -46,7 +53,7 @@ export function validateRoleBucketsForMode(
       if (feasibilityError) return feasibilityError;
     }
   }
-  return undefined;
+  return modeDefinition.validateRoleConfig?.(simpleCounts);
 }
 
 /**
