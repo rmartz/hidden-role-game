@@ -192,6 +192,12 @@ export interface WerewolfTurnState {
   draculaWives?: string[];
   /** Player IDs that the Zombie has infected. Accumulated across nights. */
   zombieInfected?: string[];
+  /**
+   * Player ID tapped by The Thing this night.
+   * Stored in the nighttime phase and carried into the daytime phase so the
+   * tapped player can read the notification before it is cleared next night.
+   */
+  thingTapped?: string;
 }
 
 export interface TargetablePlayer {

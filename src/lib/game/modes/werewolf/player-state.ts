@@ -76,6 +76,22 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   mirrorcasterCharged?: boolean;
   /** Executioner: target player ID. */
   executionerTargetId?: string;
+  /**
+   * True when the player was tapped by The Thing this night.
+   * Present only for the tapped player; cleared each night.
+   */
+  thingTappedMe?: boolean;
+  /** The Thing: the player ID the Thing chose to tap this night. */
+  thingTappedPlayerId?: string;
+  /** Insomniac: whether each neighbor woke and acted this night. */
+  insomniacResult?: { leftActed: boolean; rightActed: boolean };
+  /** The Count: werewolf counts in each half of the table (night 1 only). */
+  countResult?: { leftCount: number; rightCount: number };
+  /**
+   * Adjacent player IDs available to target for roles with `adjacentTargetOnly`.
+   * Sent to The Thing so the client can restrict target selection.
+   */
+  adjacentPlayerIds?: string[];
   /** Hunter revenge pending: the Hunter's player ID. Narrator-only. */
   hunterRevengePlayerId?: string;
   /**

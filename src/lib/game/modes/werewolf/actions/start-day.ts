@@ -319,6 +319,14 @@ export const startDayAction: GameAction = {
         ? [...existingInfected, zombieAction.targetPlayerId]
         : existingInfected;
 
+    // The Thing tap: record the tapped player ID so they see the notification
+    // during the following daytime.
+    const thingAction = nightPhase.nightActions[WerewolfRole.TheThing];
+    const thingTapped =
+      thingAction !== undefined && !isTeamNightAction(thingAction)
+        ? thingAction.targetPlayerId
+        : undefined;
+
     const wolfCubDied =
       ts.wolfCubDied === true || didWolfCubDie(newDeadIds, game);
     const revealedPlayerIds = getWerewolfModeConfig(game).autoRevealNightOutcome
@@ -357,6 +365,7 @@ export const startDayAction: GameAction = {
         ...(mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
         ...(draculaWives.length > 0 ? { draculaWives } : {}),
         ...(zombieInfected.length > 0 ? { zombieInfected } : {}),
+        ...(thingTapped ? { thingTapped } : {}),
       },
     };
 
