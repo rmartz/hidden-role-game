@@ -108,17 +108,17 @@ Actions are the mechanism by which the Quest Leader and players mutate game stat
 
 ## Action Payload Summary
 
-| Action                      | Caller                            | Payload                                |
-| --------------------------- | --------------------------------- | -------------------------------------- |
-| `propose-team`              | Quest Leader                      | `{ teamPlayerIds: string[] }`          |
-| `cast-team-vote`            | Any player                        | `{ vote: "approve" \| "reject" }`      |
-| `resolve-team-vote`         | Any player (narrator in practice) | none                                   |
-| `advance-from-team-vote`    | Any player (narrator in practice) | none                                   |
-| `play-quest-card`           | Team member                       | `{ card: "success" \| "fail" }`        |
-| `resolve-quest`             | Any player (narrator in practice) | none                                   |
-| `advance-from-quest`        | Any player (narrator in practice) | none                                   |
-| `select-assassination-target` | Assassin player                   | `{ targetPlayerId: string }`           |
-| `resolve-assassination`      | Any player (narrator in practice) | none                                   |
+| Action                        | Caller                            | Payload                           |
+| ----------------------------- | --------------------------------- | --------------------------------- |
+| `propose-team`                | Quest Leader                      | `{ teamPlayerIds: string[] }`     |
+| `cast-team-vote`              | Any player                        | `{ vote: "approve" \| "reject" }` |
+| `resolve-team-vote`           | Any player (narrator in practice) | none                              |
+| `advance-from-team-vote`      | Any player (narrator in practice) | none                              |
+| `play-quest-card`             | Team member                       | `{ card: "success" \| "fail" }`   |
+| `resolve-quest`               | Any player (narrator in practice) | none                              |
+| `advance-from-quest`          | Any player (narrator in practice) | none                              |
+| `select-assassination-target` | Assassin player                   | `{ targetPlayerId: string }`      |
+| `resolve-assassination`       | Any player (narrator in practice) | none                              |
 
 ## Phase State Machine
 
