@@ -29,7 +29,23 @@ Night-phase fields (`nightActions`, `myNightTarget`, `teamVotes`, `nightStatus`,
 
 ### During Play
 
-The app has no further involvement — questing and voting happen outside the app. No actions or state mutations are defined for Avalon.
+The app manages the full quest loop. Players and the narrator use the seven Avalon actions to drive state mutations:
+
+1. Quest Leader calls `propose-team` → phase transitions from `TeamProposal` to `TeamVote`.
+2. All players call `cast-team-vote` → votes accumulate.
+3. Narrator calls `resolve-team-vote` → `passed` is set.
+4. Narrator calls `advance-from-team-vote`:
+   - Approved: transitions to `Quest` phase.
+   - Rejected: rotates leader and returns to `TeamProposal`, or ends the game with Evil win after 5 consecutive rejections.
+5. Team members call `play-quest-card` → cards accumulate.
+6. Narrator calls `resolve-quest` → `failCount` and `succeeded` are set.
+7. Narrator calls `advance-from-quest`:
+   - 3 Good quest wins + Assassin role: transitions to `Assassination` phase.
+   - 3 Good quest wins, no Assassin: Good wins.
+   - 3 Evil quest wins: Evil wins.
+   - Otherwise: increments quest number, rotates leader, returns to `TeamProposal`.
+
+See `docs/avalon/actions.md` for full action reference.
 
 ## Role Visibility Details
 
