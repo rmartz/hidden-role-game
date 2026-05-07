@@ -30,7 +30,8 @@ export function NightOutcomeSummary({
       e.type === "veteran-counterkilled",
   );
   const regularEvents = events.filter(
-    (e) => e.type !== "altruist-intercepted" && e.type !== "veteran-counterkilled",
+    (e) =>
+      e.type !== "altruist-intercepted" && e.type !== "veteran-counterkilled",
   );
 
   // Group events by targetPlayerId so a player attacked and silenced in the

@@ -74,14 +74,15 @@ export function PlayerNightSummaryItem({
   if (veteranCounterkillSource && veteranName) {
     const message =
       veteranCounterkillSource === "wolf-repel"
-        ? WEREWOLF_COPY.veteran.dayAnnouncementWolfRepel(veteranName, playerName)
+        ? WEREWOLF_COPY.veteran.dayAnnouncementWolfRepel(
+            veteranName,
+            playerName,
+          )
         : WEREWOLF_COPY.veteran.dayAnnouncementProtectorKilled(
             veteranName,
             playerName,
           );
-    return (
-      <li className="text-sm font-medium text-orange-600">{message}</li>
-    );
+    return <li className="text-sm font-medium text-orange-600">{message}</li>;
   }
 
   if (wasProtected) {
