@@ -31,7 +31,7 @@ function makeArgs(overrides: Partial<Story["args"]> = {}): Story["args"] {
     onShowRolesOnDeathChange: fn(),
     onAutoRevealNightOutcomeChange: fn(),
     ...overrides,
-  } as Story["args"];
+  };
 }
 
 export const Default: Story = {
