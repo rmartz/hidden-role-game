@@ -81,7 +81,7 @@ function TrackSlots({ filled, size, variant, labels }: TrackSlotsProps) {
                   ? "text-muted-foreground line-through"
                   : i === filled
                     ? "font-medium"
-                    : "text-muted-foreground/60",
+                    : "text-muted-foreground",
               )}
               data-testid={`${variant}-slot-label-${String(i)}`}
             >
