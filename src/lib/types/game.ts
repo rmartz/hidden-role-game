@@ -437,4 +437,6 @@ export interface Lobby {
   config: LobbyConfig;
   gameId?: string;
   readyPlayerIds: string[];
+  /** Unix ms timestamp set server-side when all players (including owner) ready up. Cleared on unready, player leave, or game start. */
+  countdownStartedAt?: number;
 }
