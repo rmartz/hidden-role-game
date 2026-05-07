@@ -108,6 +108,17 @@ export function PlayerNightActionScreen({
         )
       : undefined;
 
+  const isIlluminati =
+    isFirstTurn && gameState.myRole?.id === WerewolfRole.Illuminati;
+  const illuminatiRoles = isIlluminati
+    ? (gameState.illuminatiRoleAssignments ?? []).map((a) => ({
+        playerId: a.playerId,
+        playerName: getPlayerName(gameState.players, a.playerId) ?? a.playerId,
+        roleName: a.roleName,
+        team: a.team,
+      }))
+    : undefined;
+
   const investigationResult = gameState.investigationResult;
 
   return isFirstTurn ? (
@@ -115,6 +126,7 @@ export function PlayerNightActionScreen({
       roleName={gameState.myRole?.name}
       teammateNames={teammateNames}
       villagerNames={villagerNames}
+      illuminatiRoles={illuminatiRoles}
     />
   ) : (
     <div className="p-5">

@@ -232,6 +232,33 @@ function extractRoleSpecificState(
     }
   }
 
+  if (myRole.id === WerewolfRole.Illuminati) {
+    const illuminatiAction = nightActions[myRole.id];
+    const soloAction =
+      illuminatiAction && !isTeamNightAction(illuminatiAction)
+        ? illuminatiAction
+        : undefined;
+    if (soloAction?.resultRevealed) {
+      const illuminatiRoleAssignments = game.roleAssignments.map((a) => {
+        const roleDef = getWerewolfRole(a.roleDefinitionId);
+        return {
+          playerId: a.playerId,
+          roleName: roleDef?.name ?? a.roleDefinitionId,
+          team: roleDef?.team ?? Team.Good,
+        };
+      });
+      return {
+        myNightTarget: undefined,
+        myNightTargetConfirmed: false,
+        illuminatiRoleAssignments,
+      };
+    }
+    return {
+      myNightTarget: undefined,
+      myNightTargetConfirmed: false,
+    };
+  }
+
   return undefined;
 }
 function extractWitchState(

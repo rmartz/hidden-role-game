@@ -72,8 +72,12 @@ Additional resolution steps:
 ### `reveal-investigation-result`
 
 **Who:** Narrator only
-**When:** During Nighttime, active phase is an Investigate role (Seer, Wizard, One-Eyed Seer, Mystic Seer, Mentalist), action is confirmed
-**Effect:** Sets `resultRevealed: true` on the night action. This causes the Werewolf player state extraction to include the `investigationResult` in the investigating player's `WerewolfPlayerGameState`.
+**When:** During Nighttime, when either:
+
+- The active phase is an Investigate role (Seer, Wizard, One-Eyed Seer, Mystic Seer, Mentalist) and the action is confirmed, **or**
+- The active phase is the Illuminati (a `revealsFullRoleList` role) and the result has not yet been revealed (no target confirmation required)
+
+**Effect:** Sets `resultRevealed: true` on the night action. For Investigate roles, this causes the player state extraction to include `investigationResult` in the investigating player's `WerewolfPlayerGameState`. For the Illuminati, it causes all `roleAssignments` to be included as `illuminatiRoleAssignments` in the Illuminati player's state.
 
 ---
 
@@ -327,7 +331,14 @@ When a player is voted out at trial (via `mark-player-dead` during Daytime), the
 Win conditions are evaluated after each death (night resolution or trial). The checks run in the following priority order:
 
 1. **Tanner instant win** — If the Tanner dies (at night or at trial), the game ends immediately with a Tanner win.
-2. **Lone Wolf check** (before general wolf win) — When wolves would win (all Good-team players eliminated), if the Lone Wolf is the only surviving wolf-aligned player, the Lone Wolf wins instead of Team Bad.
-3. **Standard team win** — Good wins if all Bad-team players are dead. Bad wins if wolves equal or outnumber Good-team players.
-4. **Spoiler override** (after team win determined) — If a standard team win is detected and the Spoiler is still alive, the Spoiler wins instead of the winning team.
-5. **Executioner win** — Evaluated independently at trial: if the Executioner's assigned target is voted out, the Executioner wins regardless of overall game state.
+2. **Zombie check** (before all other conditions) — If infected players alive outnumber healthy players alive, the Zombie wins.
+3. **Standard team checks** — Evaluated in this order:
+   - **Chupacabra win** — If no Bad-team players remain and the Chupacabra is alive with ≤ 1 Good player alive, the Chupacabra wins.
+   - **Draw** — If no Bad, Good, or Neutral players remain (simultaneous eliminations), the game ends in a draw.
+   - **Village wins** — If no Bad and no Neutral players remain (and Chupacabra is not alive), the Village wins.
+   - **Lone Wolf check** (before general wolf win) — When wolves would win (Bad count ≥ non-Bad count) and the Lone Wolf is the only surviving wolf-aligned player, the Lone Wolf wins instead of Team Bad.
+   - **Werewolves win** — If Bad team count ≥ non-Bad count (Good + Neutral + Chupacabra), the Werewolves win.
+4. **Illuminati override** (after standard win determined) — If a standard win condition fires and the Illuminati is alive and ≤ 3 total players remain, the Illuminati wins instead.
+5. **Spoiler override** (after team win determined) — If a standard win condition fires and the Spoiler is still alive (and Illuminati did not already override), the Spoiler wins instead of the winning team.
+6. **Executioner win** — Evaluated independently at trial: if the Executioner's assigned target is voted out, the Executioner wins regardless of overall game state.
+7. **Dracula win** — Checked separately in `startNightAction`, not in `checkWinCondition`.

@@ -28,6 +28,8 @@ function isVictory(
     return myRole.id === (WerewolfRole.Chupacabra as string);
   if (winner === WerewolfWinner.LoneWolf)
     return myRole.id === (WerewolfRole.LoneWolf as string) && !amDead;
+  if (winner === WerewolfWinner.Illuminati)
+    return myRole.id === (WerewolfRole.Illuminati as string) && !amDead;
   if (winner === WerewolfWinner.Tanner)
     return myRole.id === (WerewolfRole.Tanner as string);
   if (winner === WerewolfWinner.Spoiler)

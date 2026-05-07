@@ -390,4 +390,74 @@ describe("checkWinCondition", () => {
       expect(result?.winner).not.toBe(WerewolfWinner.Zombie);
     });
   });
+
+  describe("Illuminati", () => {
+    it("Illuminati wins when alive and ≤3 players remain during a wolf win", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Illuminati },
+      ]);
+      // 1 wolf + 1 illuminati: wolves would win (1 bad >= 1 non-bad), but Illuminati is alive with ≤3
+      const result = checkWinCondition(game, []);
+      expect(result?.winner).toBe(WerewolfWinner.Illuminati);
+    });
+
+    it("Illuminati wins when alive and ≤3 players remain during a village win", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Illuminati },
+      ]);
+      // Wolf dead → Village wins, but Illuminati is alive with ≤3 remaining
+      const result = checkWinCondition(game, ["p1"]);
+      expect(result?.winner).toBe(WerewolfWinner.Illuminati);
+    });
+
+    it("Illuminati does not win when more than 3 players are alive", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p4", roleDefinitionId: WerewolfRole.Illuminati },
+      ]);
+      // 2 wolves + 1 villager + 1 illuminati = 4 alive: wolves win (2 bad >= 2 non-bad)
+      // but 4 > 3, so Illuminati does NOT override
+      const result = checkWinCondition(game, []);
+      expect(result?.winner).toBe(WerewolfWinner.Werewolves);
+    });
+
+    it("dead Illuminati does not affect outcome", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Illuminati },
+      ]);
+      // Illuminati is dead; Wolf dead → Village wins normally
+      const result = checkWinCondition(game, ["p1", "p3"]);
+      expect(result?.winner).toBe(WerewolfWinner.Village);
+    });
+
+    it("Illuminati counts as neutral and prevents premature wolf win", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Illuminati },
+      ]);
+      // 1 wolf vs 1 villager + 1 illuminati: wolves do NOT win yet (1 < 2)
+      const result = checkWinCondition(game, []);
+      expect(result).toBeUndefined();
+    });
+
+    it("Illuminati wins over Spoiler when both are alive and ≤3 remain", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Illuminati },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Spoiler },
+      ]);
+      // Wolf wins (1 bad >= 1 non-bad with only Illuminati as neutral), 3 players alive
+      // Illuminati override fires before Spoiler
+      const result = checkWinCondition(game, []);
+      expect(result?.winner).toBe(WerewolfWinner.Illuminati);
+    });
+  });
 });
