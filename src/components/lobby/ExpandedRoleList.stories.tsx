@@ -1,10 +1,19 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+import { Provider } from "react-redux";
 import { GameMode, RoleConfigMode, Team } from "@/lib/types";
 import type { RoleDefinition } from "@/lib/types";
+import { store } from "@/store";
 import { ExpandedRoleList } from "./ExpandedRoleList";
 
 const meta = {
   component: ExpandedRoleList,
+  decorators: [
+    (Story) => (
+      <Provider store={store}>
+        <Story />
+      </Provider>
+    ),
+  ],
 } satisfies Meta<typeof ExpandedRoleList>;
 
 export default meta;

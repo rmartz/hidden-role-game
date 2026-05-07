@@ -91,7 +91,12 @@ export function CustomPowerTableEditor({
               handleSlotChange(index, value);
             }}
           >
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger
+              className="w-[180px]"
+              aria-label={SECRET_VILLAIN_CONFIG_PANEL_COPY.badCardSlotLabel(
+                index + 1,
+              )}
+            >
               <SelectValue>{toSelectLabel(slot)}</SelectValue>
             </SelectTrigger>
             <SelectContent>

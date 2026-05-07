@@ -52,7 +52,7 @@ export function ConfirmTargetButtonView({
       : WEREWOLF_COPY.confirmButton.skip;
 
   return isConfirmed ? (
-    <p className="mt-3 text-sm text-green-600 font-medium">
+    <p className="mt-3 text-sm text-green-800 font-medium dark:text-green-400">
       {WEREWOLF_COPY.confirmButton.actionConfirmed}
     </p>
   ) : (

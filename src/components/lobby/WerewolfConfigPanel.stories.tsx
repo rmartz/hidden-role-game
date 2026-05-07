@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { fn } from "storybook/test";
+import { expect, fn, userEvent, within } from "storybook/test";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
 import { WerewolfConfigPanel } from "./WerewolfConfigPanel";
+import { WEREWOLF_CONFIG_PANEL_COPY } from "./WerewolfConfigPanel.copy";
 
 const meta = {
   component: WerewolfConfigPanel,
@@ -28,6 +29,17 @@ const DEFAULT_ARGS = {
 
 export const Default: Story = {
   args: DEFAULT_ARGS,
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+
+    const nominationSwitch = canvas.getByRole("switch", {
+      name: WEREWOLF_CONFIG_PANEL_COPY.nominationEnabled,
+    });
+    await expect(nominationSwitch).toBeDefined();
+
+    await userEvent.click(nominationSwitch);
+    await expect(args.onNominationEnabledChange).toHaveBeenCalled();
+  },
 };
 
 export const RolesHiddenOnDeath: Story = {
@@ -48,5 +60,14 @@ export const ReadOnly: Story = {
   args: {
     ...DEFAULT_ARGS,
     disabled: true,
+  },
+  play: async ({ canvasElement, args }) => {
+    const canvas = within(canvasElement);
+
+    const nominationSwitch = canvas.getByRole("switch", {
+      name: WEREWOLF_CONFIG_PANEL_COPY.nominationEnabled,
+    });
+    await userEvent.click(nominationSwitch);
+    await expect(args.onNominationEnabledChange).not.toHaveBeenCalled();
   },
 };
