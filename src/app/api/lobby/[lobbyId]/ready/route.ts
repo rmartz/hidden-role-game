@@ -27,13 +27,6 @@ export async function POST(
     return errorResponse("Player not found", 404);
   }
 
-  if (
-    callerPlayer.id ===
-    lobby.players.find((p) => p.sessionId === lobby.ownerSessionId)?.id
-  ) {
-    return errorResponse("Owner cannot ready up", 400);
-  }
-
   const updated = await toggleReady(lobbyId, callerPlayer.id);
   if (!updated) {
     return errorResponse("Failed to toggle ready state", 500);

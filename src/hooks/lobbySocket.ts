@@ -53,7 +53,8 @@ export function useLobbyWebSocket(
             cached.gameId === lobby.gameId &&
             cached.ownerPlayerId === lobby.ownerPlayerId &&
             JSON.stringify(cached.readyPlayerIds) ===
-              JSON.stringify(lobby.readyPlayerIds);
+              JSON.stringify(lobby.readyPlayerIds) &&
+            cached.countdownStartedAt === lobby.countdownStartedAt;
           if (sameStructure) return;
         }
 

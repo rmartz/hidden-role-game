@@ -2,7 +2,12 @@ import { sum } from "lodash";
 import { Team } from "@/lib/types";
 import type { GameModeConfig, ModeConfig } from "@/lib/types";
 import { isWerewolfModeConfig } from "@/lib/types";
-import { MIN_PLAYERS, defaultRoleCount, WEREWOLF_ROLES } from "./roles";
+import {
+  MIN_PLAYERS,
+  defaultRoleCount,
+  WEREWOLF_ROLES,
+  WerewolfRole,
+} from "./roles";
 import { WEREWOLF_ACTIONS } from "./actions";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "./timer-config";
 import {
@@ -68,5 +73,16 @@ export const WEREWOLF_CONFIG = {
    */
   resolveHiddenRoleCount(modeConfig: ModeConfig): number {
     return hiddenRoleCountFromConfig(modeConfig);
+  },
+  /**
+   * Validates Werewolf-specific role count constraints.
+   * Mason must appear 0 times or 2+ times — exactly 1 Mason is invalid.
+   */
+  validateRoleConfig(roleCounts: Record<string, number>): string | undefined {
+    const masonCount = roleCounts[WerewolfRole.Mason] ?? 0;
+    if (masonCount === 1) {
+      return "Mason must be configured with 0 or 2+ copies — a lone Mason has no one to trust.";
+    }
+    return undefined;
   },
 } satisfies GameModeConfig;
