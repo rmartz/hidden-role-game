@@ -94,7 +94,7 @@ export const WithActions: Story = {
     gameMode: GameMode.Werewolf,
     myRoleId: WerewolfRole.Werewolf,
     renderActions: (_playerId, playerName) => (
-      <button className="text-xs text-blue-500">Select {playerName}</button>
+      <button className="text-xs text-blue-700">Select {playerName}</button>
     ),
   },
 };

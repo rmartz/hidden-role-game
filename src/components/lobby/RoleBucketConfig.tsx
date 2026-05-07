@@ -316,7 +316,10 @@ function BucketEditor({
             onAddRole(roleId as string, bucketIsUnique);
           }}
         >
-          <SelectTrigger className="w-48 h-8 text-sm">
+          <SelectTrigger
+            className="w-48 h-8 text-sm"
+            aria-label={ROLE_BUCKET_CONFIG_COPY.addRole}
+          >
             <SelectValue placeholder={ROLE_BUCKET_CONFIG_COPY.addRole} />
           </SelectTrigger>
           <SelectContent>
