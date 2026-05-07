@@ -62,6 +62,9 @@ export function PlayerNightActionScreen({
   const allAgreed = gameState.allAgreed ?? false;
   const isMentalist =
     !isGroupPhase && gameState.myRole?.id === WerewolfRole.Mentalist;
+  const isSwapper =
+    !isGroupPhase && gameState.myRole?.id === WerewolfRole.Swapper;
+  const requiresDualTarget = isMentalist || isSwapper;
 
   const allTargets = getTargetablePlayers(
     gameState.players,
@@ -76,7 +79,7 @@ export function PlayerNightActionScreen({
     ? allTargets.filter(
         ([player, isSelected]) =>
           isSelected ||
-          (isMentalist && player.id === gameState.mySecondNightTarget),
+          (requiresDualTarget && player.id === gameState.mySecondNightTarget),
       )
     : allTargets;
 
@@ -187,7 +190,7 @@ export function PlayerNightActionScreen({
             myPlayerId={gameState.myPlayerId}
             previousNightTargetId={gameState.previousNightTargetId}
             mySecondNightTarget={gameState.mySecondNightTarget}
-            requiresSecondTarget={isMentalist}
+            requiresSecondTarget={requiresDualTarget}
             mirrorcasterCharged={gameState.mirrorcasterCharged}
           />
         )}

@@ -24,7 +24,9 @@ export function NightOutcomeSummary({
     (e): e is AltruistInterceptedNightResolutionEvent =>
       e.type === "altruist-intercepted",
   );
-  const regularEvents = events.filter((e) => e.type !== "altruist-intercepted");
+  const regularEvents = events.filter(
+    (e) => e.type !== "altruist-intercepted" && e.type !== "swapper-swapped",
+  );
 
   // Group events by targetPlayerId so a player attacked and silenced in the
   // same night is represented by a single list item.

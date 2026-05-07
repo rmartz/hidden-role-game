@@ -34,6 +34,7 @@ Each player is secretly assigned one role. The Narrator has no role and runs the
 | Sentinel      | `werewolf-sentinel`      | Good    | First Night Only          | —                     | Knows who the Seer is (`awareOf: Seer`); no action after night 1. Protects the Seer through daytime discussion.                                                                         |
 | Spellcaster   | `werewolf-spellcaster`   | Good    | Every Night               | Special (silence)     | Target is silenced the following day; cannot silence the same player on consecutive nights (`preventRepeatTarget`)                                                                      |
 | Spoiler       | `werewolf-spoiler`       | Neutral | Never                     | —                     | Wins instead of the winning team if alive when game ends                                                                                                                                |
+| Swapper       | `werewolf-swapper`       | Good    | Every Night               | Special (swap)        | Selects two players; at end of night their final effects (attack, protection, silence, hypnosis) are swapped. Investigations unaffected. `dualTargetSwap`.                              |
 | Tanner        | `werewolf-tanner`        | Neutral | Never                     | —                     | Wins if killed (by wolves or trial). Death triggers immediate game end                                                                                                                  |
 | Tough Guy     | `werewolf-tough-guy`     | Good    | Never                     | —                     | Survives the first attack; dies to a subsequent attack                                                                                                                                  |
 | Vigilante     | `werewolf-vigilante`     | Good    | After First Night         | Attack                | Kills one player per night starting night 2. If target is Good-team and dies, Vigilante also dies. `preventSelfTarget`.                                                                 |
@@ -66,6 +67,7 @@ interface WerewolfRoleDefinition {
   checksForSeer?: boolean; // True = investigates whether target is the Seer (Wizard)
   revealsExactRole?: boolean; // True = investigation reveals the exact role, not just team (Mystic Seer)
   dualTargetInvestigate?: boolean; // True = selects two targets and learns if they share a team (Mentalist)
+  dualTargetSwap?: boolean; // True = selects two targets and swaps their final night effects (Swapper)
   oncePerGame?: boolean; // True = ability can only be used once (Exposer)
 }
 ```

@@ -1,6 +1,11 @@
 import type { PlayerRoleAssignment } from "@/lib/types";
 import { TargetCategory } from "../types";
-import type { AnyNightAction, NightResolutionEvent } from "../types";
+import type {
+  AnyNightAction,
+  NightResolutionEvent,
+  SilencedNightResolutionEvent,
+  HypnotizedNightResolutionEvent,
+} from "../types";
 import { WerewolfRole, getWerewolfRole } from "../roles";
 import { isGroupPhaseKey, isRoleActive } from "./phase-keys";
 
@@ -56,12 +61,15 @@ function collectBaseAttacksAndProtections(
   for (const [phaseKey, action] of Object.entries(nightActions)) {
     // Witch and Spellcaster are handled separately below.
     // Priest protection is handled via priestWards, not the generic Protect pipeline.
+    // Altruist intercept is applied after this loop.
+    // Swapper swap is applied after Altruist intercept.
     if (
       isRoleActive(phaseKey, [
         WerewolfRole.Witch,
         WerewolfRole.Spellcaster,
         WerewolfRole.Priest,
         WerewolfRole.Altruist,
+        WerewolfRole.Swapper,
       ])
     )
       continue;
@@ -253,6 +261,61 @@ export function resolveNightActions(
     }
   }
 
+  // Swapper: swap the attacks and protections between the two selected players.
+  // Runs after all other attack/protect modifiers so it operates on the final
+  // attack and protection state. Silenced and hypnotized events are swapped later.
+  const swapperAction = nightActions[WerewolfRole.Swapper] as
+    | {
+        targetPlayerId?: string;
+        secondTargetPlayerId?: string;
+        skipped?: boolean;
+      }
+    | undefined;
+  const swapperAId = swapperAction?.targetPlayerId;
+  const swapperBId = swapperAction?.secondTargetPlayerId;
+  if (
+    typeof swapperAId === "string" &&
+    typeof swapperBId === "string" &&
+    swapperAId !== swapperBId &&
+    !swapperAction?.skipped
+  ) {
+    const aId = swapperAId;
+    const bId = swapperBId;
+    const aAttacks = attacks.get(aId);
+    const bAttacks = attacks.get(bId);
+    const aProtections = protections.get(aId);
+    const bProtections = protections.get(bId);
+    if (bAttacks !== undefined) {
+      attacks.set(aId, bAttacks);
+    } else {
+      attacks.delete(aId);
+    }
+    if (aAttacks !== undefined) {
+      attacks.set(bId, aAttacks);
+    } else {
+      attacks.delete(bId);
+    }
+    if (bProtections !== undefined) {
+      protections.set(aId, bProtections);
+    } else {
+      protections.delete(aId);
+    }
+    if (aProtections !== undefined) {
+      protections.set(bId, aProtections);
+    } else {
+      protections.delete(bId);
+    }
+
+    // If the Altruist intercept redirected an attack onto the Altruist, but the
+    // Swapper subsequently moved that attack away, the intercept event is stale.
+    if (
+      altruistInterceptEvent?.type === "altruist-intercepted" &&
+      !attacks.has(altruistInterceptEvent.altruistPlayerId)
+    ) {
+      altruistInterceptEvent = undefined;
+    }
+  }
+
   let combatEvents = buildKilledEvents(attacks, protections);
 
   // Narrator smites: force death regardless of protections.
@@ -323,7 +386,7 @@ export function resolveNightActions(
   const spellcasterAction = nightActions[WerewolfRole.Spellcaster] as
     | { targetPlayerId?: string }
     | undefined;
-  const silencedEvents: NightResolutionEvent[] =
+  const silencedEvents: SilencedNightResolutionEvent[] =
     spellcasterAction?.targetPlayerId
       ? [{ type: "silenced", targetPlayerId: spellcasterAction.targetPlayerId }]
       : [];
@@ -335,7 +398,7 @@ export function resolveNightActions(
   const mummyPlayerId = roleAssignments.find(
     (a) => a.roleDefinitionId === (WerewolfRole.Mummy as string),
   )?.playerId;
-  const hypnotizedEvents: NightResolutionEvent[] =
+  const hypnotizedEvents: HypnotizedNightResolutionEvent[] =
     mummyAction?.targetPlayerId && mummyPlayerId
       ? [
           {
@@ -346,11 +409,42 @@ export function resolveNightActions(
         ]
       : [];
 
+  // Swapper: swap silenced and hypnotized events between the two selected players.
+  // (Attacks and protections were already swapped above, before buildKilledEvents.)
+  const swapperEvents: NightResolutionEvent[] = [];
+  let finalSilencedEvents = silencedEvents;
+  let finalHypnotizedEvents = hypnotizedEvents;
+  if (
+    typeof swapperAId === "string" &&
+    typeof swapperBId === "string" &&
+    swapperAId !== swapperBId &&
+    !swapperAction?.skipped
+  ) {
+    const aId = swapperAId;
+    const bId = swapperBId;
+    finalSilencedEvents = silencedEvents.map((e) => {
+      if (e.targetPlayerId === aId) return { ...e, targetPlayerId: bId };
+      if (e.targetPlayerId === bId) return { ...e, targetPlayerId: aId };
+      return e;
+    });
+    finalHypnotizedEvents = hypnotizedEvents.map((e) => {
+      if (e.targetPlayerId === aId) return { ...e, targetPlayerId: bId };
+      if (e.targetPlayerId === bId) return { ...e, targetPlayerId: aId };
+      return e;
+    });
+    swapperEvents.push({
+      type: "swapper-swapped",
+      firstPlayerId: aId,
+      secondPlayerId: bId,
+    });
+  }
+
   return [
     ...combatEvents,
     ...toughGuyEvents,
     ...(altruistInterceptEvent ? [altruistInterceptEvent] : []),
-    ...silencedEvents,
-    ...hypnotizedEvents,
+    ...finalSilencedEvents,
+    ...finalHypnotizedEvents,
+    ...swapperEvents,
   ];
 }
