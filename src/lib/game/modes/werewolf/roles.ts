@@ -275,6 +275,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.AfterFirstNight,
     targetCategory: TargetCategory.Special,
     preventRepeatTarget: true,
+    preventSelfTarget: true,
     category: WerewolfRoleCategory.EvilSupport,
   },
   [WerewolfRole.LoneWolf]: {
