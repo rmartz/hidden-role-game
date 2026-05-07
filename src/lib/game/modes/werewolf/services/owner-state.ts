@@ -256,6 +256,23 @@ export function extractDaytimePlayerState(
     result.concludedTrialsCount = phase.concludedTrialsCount;
   }
 
+  // Ghost clues — visible to all players during daytime.
+  const ghostClues = ts.ghostClues?.filter((c) => c.turn <= ts.turn) ?? [];
+  if (ghostClues.length > 0) {
+    result.ghostClues = ghostClues;
+  }
+
+  // Ghost clue submission status — only relevant for the Ghost player.
+  const callerAssignment = game.roleAssignments.find(
+    (a) => a.playerId === callerId,
+  );
+  if (callerAssignment?.roleDefinitionId === (WerewolfRole.Ghost as string)) {
+    const submittedThisTurn = (ts.ghostClues ?? []).some(
+      (c) => c.turn === ts.turn,
+    );
+    result.ghostClueSubmittedThisTurn = submittedThisTurn;
+  }
+
   return result;
 }
 

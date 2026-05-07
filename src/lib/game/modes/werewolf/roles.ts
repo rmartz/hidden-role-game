@@ -50,6 +50,7 @@ export enum WerewolfRole {
   ElusiveSeer = "werewolf-elusive-seer",
   Executioner = "werewolf-executioner",
   Exposer = "werewolf-exposer",
+  Ghost = "werewolf-ghost",
   Hunter = "werewolf-hunter",
   LoneWolf = "werewolf-lone-wolf",
   Mason = "werewolf-mason",
@@ -237,6 +238,19 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     targetCategory: TargetCategory.Special,
     oncePerGame: true,
     category: WerewolfRoleCategory.VillagerInvestigation,
+  },
+  [WerewolfRole.Ghost]: {
+    id: WerewolfRole.Ghost,
+    name: "Ghost",
+    summary:
+      "After death, observes nightly activity and leaves clues for the living",
+    description:
+      "When the Ghost dies, they gain narrator-level visibility into all nightly actions. Each day phase, the Ghost may leave a single short clue (up to 20 characters — a word or letter, no player names) visible to all living players.",
+    team: Team.Good,
+    unique: true,
+    wakesAtNight: WakesAtNight.Never,
+    targetCategory: TargetCategory.None,
+    category: WerewolfRoleCategory.VillagerSupport,
   },
   [WerewolfRole.Hunter]: {
     id: WerewolfRole.Hunter,

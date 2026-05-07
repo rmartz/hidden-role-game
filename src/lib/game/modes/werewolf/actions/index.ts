@@ -22,6 +22,7 @@ import { killPlayerAction } from "./kill-player";
 import { resolveHunterRevengeAction } from "./resolve-hunter-revenge";
 import { cancelTrialAction } from "./cancel-trial";
 import { resetAbilityAction } from "./reset-ability";
+import { submitGhostClueAction } from "./submit-ghost-clue";
 
 export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.StartNight]: startNightAction,
@@ -46,4 +47,5 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.ResolveHunterRevenge]: resolveHunterRevengeAction,
   [WerewolfAction.CancelTrial]: cancelTrialAction,
   [WerewolfAction.ResetAbility]: resetAbilityAction,
+  [WerewolfAction.SubmitGhostClue]: submitGhostClueAction,
 };

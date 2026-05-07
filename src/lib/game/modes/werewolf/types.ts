@@ -192,6 +192,8 @@ export interface WerewolfTurnState {
   draculaWives?: string[];
   /** Player IDs that the Zombie has infected. Accumulated across nights. */
   zombieInfected?: string[];
+  /** Ghost clues submitted during daytime. Each entry records the turn number and clue text. */
+  ghostClues?: { turn: number; clue: string }[];
 }
 
 export interface TargetablePlayer {

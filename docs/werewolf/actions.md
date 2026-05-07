@@ -197,6 +197,24 @@ Additional resolution steps:
 
 ---
 
+### `submit-ghost-clue`
+
+**Who:** Ghost player only (dead player with Ghost role)
+**When:** During Daytime
+**Effect:** Records a clue from the Ghost player into `ghostClues` on the turn state. The clue is visible to all living players for the rest of the game.
+
+**Payload:** `{ clue: string }`
+
+**Validation:**
+
+- Caller must be dead.
+- Caller must have the Ghost role.
+- Game must be in Daytime phase.
+- Clue must be a non-empty string of at most 20 characters.
+- Caller may only submit one clue per turn.
+
+---
+
 ## Action Payload Summary
 
 | Action                        | Caller                    | Payload                                                |
@@ -220,6 +238,7 @@ Additional resolution steps:
 | `withdraw-nomination`         | Player                    | none                                                   |
 | `skip-defense`                | Narrator                  | none                                                   |
 | `kill-player`                 | Narrator                  | `{ playerId: string }`                                 |
+| `submit-ghost-clue`           | Ghost (dead player)       | `{ clue: string }`                                     |
 
 ## Night Action Types
 
