@@ -219,6 +219,12 @@ export function extractDaytimePlayerState(
       ...(activeTrial.voteStartedAt !== undefined
         ? { voteStartedAt: activeTrial.voteStartedAt }
         : {}),
+      ...(activeTrial.pausedAt !== undefined
+        ? { pausedAt: activeTrial.pausedAt }
+        : {}),
+      ...(activeTrial.pauseOffset !== undefined
+        ? { pauseOffset: activeTrial.pauseOffset }
+        : {}),
       ...(myVote !== undefined ? { myVote } : {}),
       voteCount: activeTrial.votes.length,
       playerCount: alivePlayerCount,

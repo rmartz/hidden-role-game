@@ -110,13 +110,45 @@ export function OwnerGameDayScreen({
           categoryLabels={WEREWOLF_ROLE_CATEGORY_LABELS}
         />
       </div>
-      <GameTimer
-        durationSeconds={dayPhaseSeconds}
-        autoAdvance={autoAdvance}
-        startedAt={phaseStartedAt}
-        onTimerTrigger={handleAdvance}
-        resetKey={turnState.turn}
-      />
+      <div className="flex items-center gap-3 mb-4">
+        <GameTimer
+          durationSeconds={dayPhaseSeconds}
+          autoAdvance={autoAdvance}
+          startedAt={phaseStartedAt}
+          onTimerTrigger={handleAdvance}
+          resetKey={turnState.turn}
+          pausedAt={
+            daytimePhase.pausedAt !== undefined
+              ? new Date(daytimePhase.pausedAt)
+              : undefined
+          }
+          pauseOffset={daytimePhase.pauseOffset ?? 0}
+        />
+        {!hasActiveTrial &&
+          (daytimePhase.pausedAt !== undefined ? (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                action.mutate({ actionId: WerewolfAction.ResumeTimer });
+              }}
+              disabled={action.isPending}
+            >
+              {WEREWOLF_COPY.narrator.resumeTimer}
+            </Button>
+          ) : (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                action.mutate({ actionId: WerewolfAction.PauseTimer });
+              }}
+              disabled={action.isPending}
+            >
+              {WEREWOLF_COPY.narrator.pauseTimer}
+            </Button>
+          ))}
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
         <OwnerAdvanceCard
           label="Start Next Night"

@@ -12,6 +12,8 @@ export enum WerewolfAction {
   CastVote = "cast-vote",
   ResolveTrial = "resolve-trial",
   EndGame = "end-game",
+  PauseTimer = "pause-timer",
+  ResumeTimer = "resume-timer",
   SmitePlayer = "smite-player",
   UnsmitePlayer = "unsmite-player",
   NominatePlayer = "nominate-player",

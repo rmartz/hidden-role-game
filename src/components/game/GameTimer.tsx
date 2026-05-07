@@ -16,6 +16,10 @@ interface GameTimerProps {
   startedAt: Date;
   /** Timer resets whenever this value changes. */
   resetKey?: string | number;
+  /** When set, freezes the timer display at the moment the timer was paused. */
+  pausedAt?: Date;
+  /** Accumulated elapsed milliseconds from prior running segments, carried into this one on resume. */
+  pauseOffset?: number;
 }
 
 export function GameTimer({
@@ -24,14 +28,33 @@ export function GameTimer({
   startedAt,
   onTimerTrigger,
   resetKey,
+  pausedAt,
+  pauseOffset = 0,
 }: GameTimerProps) {
   const rawStartedAtMs = startedAt.getTime();
   const startedAtMs = isNaN(rawStartedAtMs) ? Date.now() : rawStartedAtMs;
 
-  const [elapsedSeconds, setElapsedSeconds] = useState(() =>
-    Math.max(0, Math.floor((Date.now() - startedAtMs) / 1000)),
+  const rawPausedAtMs = pausedAt?.getTime();
+  const isPaused = pausedAt !== undefined;
+
+  const computeElapsed = useCallback(
+    (nowMs: number) => {
+      const pausedAtMs =
+        rawPausedAtMs !== undefined && !isNaN(rawPausedAtMs)
+          ? rawPausedAtMs
+          : nowMs;
+      const effectiveNow = isPaused ? pausedAtMs : nowMs;
+      return Math.max(
+        0,
+        Math.floor((pauseOffset + (effectiveNow - startedAtMs)) / 1000),
+      );
+    },
+    [isPaused, rawPausedAtMs, pauseOffset, startedAtMs],
   );
-  const startTimeRef = useRef(startedAtMs);
+
+  const [elapsedSeconds, setElapsedSeconds] = useState(() =>
+    computeElapsed(Date.now()),
+  );
   const hasTriggeredRef = useRef(false);
   const onTriggerRef = useRef(onTimerTrigger);
 
@@ -40,23 +63,22 @@ export function GameTimer({
   });
 
   const reset = useCallback(() => {
-    startTimeRef.current = startedAtMs;
     hasTriggeredRef.current = false;
-    setElapsedSeconds(
-      Math.max(0, Math.floor((Date.now() - startedAtMs) / 1000)),
-    );
-  }, [startedAtMs]);
+    setElapsedSeconds(computeElapsed(Date.now()));
+  }, [computeElapsed]);
 
   useEffect(() => {
     reset();
   }, [resetKey, durationSeconds, reset]);
 
   useEffect(() => {
+    if (isPaused) {
+      setElapsedSeconds(computeElapsed(Date.now()));
+      return;
+    }
+
     const tick = () => {
-      const elapsed = Math.max(
-        0,
-        Math.floor((Date.now() - startTimeRef.current) / 1000),
-      );
+      const elapsed = computeElapsed(Date.now());
       setElapsedSeconds(elapsed);
 
       if (elapsed >= durationSeconds && !hasTriggeredRef.current) {
@@ -70,7 +92,7 @@ export function GameTimer({
     return () => {
       clearInterval(interval);
     };
-  }, [durationSeconds, autoAdvance]);
+  }, [durationSeconds, autoAdvance, isPaused, computeElapsed]);
 
   const secondsRemaining = Math.max(0, durationSeconds - elapsedSeconds);
   const hasExpired = secondsRemaining === 0;
@@ -94,7 +116,7 @@ export function GameTimer({
           </>
         ) : (
           <>
-            {GAME_TIMER_COPY.timeRemaining}{" "}
+            {isPaused ? GAME_TIMER_COPY.paused : GAME_TIMER_COPY.timeRemaining}{" "}
             <strong className="text-foreground">
               {formatTime(secondsRemaining)}
             </strong>

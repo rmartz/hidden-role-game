@@ -197,6 +197,49 @@ Additional resolution steps:
 
 ---
 
+### `pause-timer`
+
+**Who:** Narrator only
+**When:** During Nighttime or Daytime, while a timer is running (not already paused). When a Daytime active trial is in progress (no verdict yet), targets the **trial timer** instead of the phase timer.
+**Effect:** Freezes the active timer by recording the current time in `pausedAt`. The elapsed-time formula switches to `pauseOffset + (pausedAt - startedAt)` (defense phase) or `pauseOffset + (pausedAt - voteStartedAt)` (voting phase) until the timer is resumed.
+
+**Payload:** `{}` (no payload)
+
+**Validation:**
+
+- Phase must exist; narrator only.
+- If a Daytime active trial (no verdict): `activeTrial.pausedAt` must not already be set.
+- Otherwise: `phase.pausedAt` must not already be set.
+
+**Fields mutated:**
+
+- With active trial: `activeTrial.pausedAt`
+- Without active trial: `phase.pausedAt`
+
+---
+
+### `resume-timer`
+
+**Who:** Narrator only
+**When:** During Nighttime or Daytime, while the timer is paused (`pausedAt` is set). When a Daytime active trial is in progress (no verdict yet), targets the **trial timer** instead of the phase timer.
+**Effect:** Resumes the active timer by accumulating the paused interval into `pauseOffset`, resetting the relevant start timestamp to now, and clearing `pausedAt`. During the trial voting phase, `voteStartedAt` is shifted forward instead of `startedAt`.
+
+**Payload:** `{}` (no payload)
+
+**Validation:**
+
+- Phase must exist; narrator only.
+- If a Daytime active trial (no verdict): `activeTrial.pausedAt` must be set.
+- Otherwise: `phase.pausedAt` must be set.
+
+**Fields mutated:**
+
+- With active trial (defense phase): `activeTrial.pauseOffset`, `activeTrial.startedAt`, `activeTrial.pausedAt` (cleared)
+- With active trial (voting phase): `activeTrial.pauseOffset`, `activeTrial.voteStartedAt`, `activeTrial.pausedAt` (cleared)
+- Without active trial: `phase.pauseOffset`, `phase.startedAt`, `phase.pausedAt` (cleared)
+
+---
+
 ## Action Payload Summary
 
 | Action                        | Caller                    | Payload                                                |
