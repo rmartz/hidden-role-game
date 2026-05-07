@@ -234,9 +234,9 @@ export async function toggleReady(
   const ownerPlayerId = data.public.ownerPlayerId;
   // Only non-owner device players must explicitly ready up.
   // The owner and no-device players are implicitly ready.
-  const readyEligiblePlayerIds = Object.keys(players).filter(
-    (id) => id !== ownerPlayerId && !players[id].noDevice,
-  );
+  const readyEligiblePlayerIds = Object.entries(players)
+    .filter(([id, player]) => id !== ownerPlayerId && !player.noDevice)
+    .map(([id]) => id);
   const totalPlayerCount = Object.keys(players).length;
   const allReady =
     totalPlayerCount >= 2 &&
