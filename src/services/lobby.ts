@@ -118,11 +118,17 @@ export async function removePlayer(
     data.public.playerOrder,
     remainingPlayerIds,
   );
+  const updatedReadyIds = (data.public.readyPlayerIds ?? []).filter(
+    (id) => id !== playerId,
+  );
 
   await lobbyRef(lobbyId).update({
     [`public/players/${playerId}`]: null,
     [`private/playerSessions/${playerId}`]: null,
     "public/playerOrder": updatedOrder.length > 0 ? updatedOrder : null,
+    "public/readyPlayerIds":
+      updatedReadyIds.length > 0 ? updatedReadyIds : null,
+    "public/countdownStartedAt": null,
   });
 
   data.public.players = Object.fromEntries(
@@ -134,6 +140,9 @@ export async function removePlayer(
     ),
   );
   data.public.playerOrder = updatedOrder.length > 0 ? updatedOrder : undefined;
+  data.public.readyPlayerIds =
+    updatedReadyIds.length > 0 ? updatedReadyIds : undefined;
+  data.public.countdownStartedAt = undefined;
   return firebaseToLobby(lobbyId, data.public, data.private);
 }
 
@@ -211,16 +220,32 @@ export async function toggleReady(
     ? current.filter((id) => id !== playerId)
     : [...current, playerId];
 
-  await lobbyRef(lobbyId)
-    .child("public/readyPlayerIds")
-    .set(updated.length > 0 ? updated : null);
+  const allPlayerIds = Object.keys(data.public.players ?? {});
+  const allReady =
+    allPlayerIds.length >= 2 &&
+    allPlayerIds.every((id) => updated.includes(id));
+
+  await lobbyRef(lobbyId).update({
+    "public/readyPlayerIds": updated.length > 0 ? updated : null,
+    "public/countdownStartedAt": allReady ? ServerValue.TIMESTAMP : null,
+  });
 
   data.public.readyPlayerIds = updated.length > 0 ? updated : undefined;
-  return firebaseToLobby(lobbyId, data.public, data.private);
+  // Don't propagate countdownStartedAt in the immediate response — Firebase
+  // stores ServerValue.TIMESTAMP (server clock) while we only have the client
+  // clock. Clients receive the authoritative value via the RTDB subscription.
+  return firebaseToLobby(
+    lobbyId,
+    { ...data.public, countdownStartedAt: undefined },
+    data.private,
+  );
 }
 
 export async function clearReadyPlayerIds(lobbyId: string): Promise<void> {
-  await lobbyRef(lobbyId).child("public/readyPlayerIds").remove();
+  await lobbyRef(lobbyId).update({
+    "public/readyPlayerIds": null,
+    "public/countdownStartedAt": null,
+  });
 }
 
 export async function updateConfig(
