@@ -48,7 +48,7 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
     eliminatedRole?: { id: string; name: string; team: string };
   };
   nominationsEnabled: boolean;
-  trialsPerDay: number;
+  trialsPerDay?: number;
   concludedTrialsCount?: number;
   revealProtections: boolean;
   autoRevealNightOutcome?: boolean;
@@ -103,7 +103,9 @@ export function werewolfStateToFirebase(
     ...(state.isHypnotized ? { isHypnotized: true } : {}),
     ...(state.activeTrial ? { activeTrial: state.activeTrial } : {}),
     nominationsEnabled: state.nominationsEnabled,
-    trialsPerDay: state.trialsPerDay,
+    ...(state.trialsPerDay !== undefined
+      ? { trialsPerDay: state.trialsPerDay }
+      : {}),
     ...(state.concludedTrialsCount
       ? { concludedTrialsCount: state.concludedTrialsCount }
       : {}),
@@ -146,7 +148,9 @@ export function werewolfStateFromFirebase(
     ...baseStateFromFirebase(raw),
     gameMode: GameMode.Werewolf,
     nominationsEnabled: raw.nominationsEnabled,
-    trialsPerDay: raw.trialsPerDay,
+    ...(raw.trialsPerDay !== undefined
+      ? { trialsPerDay: raw.trialsPerDay }
+      : {}),
     ...(raw.concludedTrialsCount
       ? { concludedTrialsCount: raw.concludedTrialsCount }
       : {}),
