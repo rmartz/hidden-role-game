@@ -70,7 +70,7 @@ describe("NightPhaseOrderList", () => {
     expect(screen.queryByText("(current)")).toBeNull();
   });
 
-  it("applies reduced-opacity class to past phases", () => {
+  it("applies line-through class to past phases", () => {
     const { container } = render(
       <NightPhaseOrderList
         nightPhaseOrder={nightPhaseOrder}
@@ -79,11 +79,11 @@ describe("NightPhaseOrderList", () => {
       />,
     );
 
-    const items = container.querySelectorAll("[class*='opacity-40']");
+    const items = container.querySelectorAll("[class*='line-through']");
     expect(items.length).toBe(2);
   });
 
-  it("does not apply reduced-opacity class to future phases", () => {
+  it("does not apply line-through class to future phases", () => {
     const { container } = render(
       <NightPhaseOrderList
         nightPhaseOrder={nightPhaseOrder}
@@ -92,7 +92,7 @@ describe("NightPhaseOrderList", () => {
       />,
     );
 
-    const items = container.querySelectorAll("[class*='opacity-40']");
+    const items = container.querySelectorAll("[class*='line-through']");
     expect(items.length).toBe(0);
   });
 
