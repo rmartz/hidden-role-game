@@ -23,6 +23,7 @@ export const setNightTargetAction: GameAction = {
     if (ts.turn <= 1) return false;
 
     const phase = ts.phase;
+    if (!payload || typeof payload !== "object") return false;
     const {
       roleId: explicitPhaseKey,
       targetPlayerId,
@@ -181,6 +182,7 @@ export const setNightTargetAction: GameAction = {
     if (ts?.phase.type !== WerewolfPhase.Nighttime) return;
 
     const phase = ts.phase;
+    if (!payload || typeof payload !== "object") return;
     const {
       roleId: explicitPhaseKey,
       targetPlayerId,
