@@ -39,6 +39,8 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
     startedAt: number;
     phase: string;
     voteStartedAt?: number;
+    pausedAt?: number;
+    pauseOffset?: number;
     myVote?: DaytimeVote;
     voteCount: number;
     playerCount: number;
