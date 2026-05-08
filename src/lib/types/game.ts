@@ -74,6 +74,7 @@ export type GameWinner =
   | "Chupacabra"
   | "Draw"
   | "Dracula"
+  | "Illuminati"
   | "LoneWolf"
   | "Tanner"
   | "Spoiler"
