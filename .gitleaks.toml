@@ -26,6 +26,9 @@ regexes = [
 ]
 paths = [
   ".env.example",
+  # deployment/*.yml contains only public env vars (e.g. NEXT_PUBLIC_FIREBASE_API_KEY);
+  # Firebase Web API keys are designed to be public and are not secrets.
+  "deployment/.*\\.yml",
 ]
 
 [[rules]]

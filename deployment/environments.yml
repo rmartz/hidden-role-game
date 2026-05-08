@@ -4,7 +4,7 @@
 # ephemeral (7-day TTL, UUID-addressed) with no persistent user accounts,
 # so a separate staging environment provides no meaningful isolation benefit.
 
-environments:
+active:
   - production
 
 single_environment: true

@@ -97,6 +97,7 @@ export type AvalonTurnPhase =
 export interface QuestResult {
   questNumber: number;
   teamSize: number;
+  teamPlayerIds: string[];
   failCount: number;
   succeeded: boolean;
 }
