@@ -17,6 +17,7 @@ Each player is secretly assigned one role. The Narrator has no role and runs the
 | Executioner   | `werewolf-executioner`   | Neutral | Never                     | —                     | Assigned a random Good-team target. Wins if that target is voted out at trial                                                                                                           |
 | Exposer       | `werewolf-exposer`       | Good    | Every Night               | Special (reveal)      | Reveals target's role publicly; one-time ability (`oncePerGame`)                                                                                                                        |
 | Hunter        | `werewolf-hunter`        | Good    | Never                     | —                     | When killed (night or trial), triggers revenge — Narrator selects a target to kill. Revenge kill is unblockable. Win condition deferred until revenge resolved.                         |
+| Illuminati    | `werewolf-illuminati`    | Neutral | First Night Only          | —                     | On night 1, Narrator reveals all players' roles to the Illuminati. Wins if alive in the final 3 players when the game ends (`revealsFullRoleList`)                                      |
 | Lone Wolf     | `werewolf-lone-wolf`     | Neutral | Every Night               | — (wakes with wolves) | `isWerewolf`; `wakesWith: Werewolf`. Werewolves don't know the Lone Wolf's identity. Wins only if they are the last wolf-aligned player alive                                           |
 | Mason         | `werewolf-mason`         | Good    | First Night Only          | —                     | Masons see each other's identities (`awareOf: Masons`); no action after night 1. **Must always be added in pairs** — exactly 1 Mason is invalid and rejected by `validateRoleConfig`    |
 | Mayor         | `werewolf-mayor`         | Good    | Never                     | —                     | Vote counts double during trials (secret — not revealed to other players)                                                                                                               |
@@ -67,6 +68,7 @@ interface WerewolfRoleDefinition {
   revealsExactRole?: boolean; // True = investigation reveals the exact role, not just team (Mystic Seer)
   dualTargetInvestigate?: boolean; // True = selects two targets and learns if they share a team (Mentalist)
   oncePerGame?: boolean; // True = ability can only be used once (Exposer)
+  revealsFullRoleList?: boolean; // True = on night 1 narrator reveals all role assignments to this player (Illuminati)
 }
 ```
 
