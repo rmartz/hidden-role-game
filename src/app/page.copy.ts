@@ -6,6 +6,7 @@ export const HOME_PAGE_COPY = {
   rejoinGame: "Rejoin Game",
   activeLobby: (lobbyId: string) => `You are already in lobby: ${lobbyId}`,
   rejoinLobby: "Rejoin Lobby",
+  orStartFresh: "or start fresh",
   errorPrefix: "Error: ",
   playerNameLabel: "Your name",
   playerNamePlaceholder: "Enter your name",
