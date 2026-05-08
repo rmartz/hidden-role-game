@@ -289,7 +289,7 @@ interface TeamNightAction {
 - `{ type: "silenced", targetPlayerId }`
 - `{ type: "hypnotized", targetPlayerId }`
 - `{ type: "tough-guy-absorbed", targetPlayerId }`
-- `{ type: "altruist-intercepted", targetPlayerId }`
+- `{ type: "altruist-intercepted", altruistPlayerId, savedPlayerId }`
 
 After resolution, `start-day` performs additional checks:
 
