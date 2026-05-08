@@ -48,6 +48,7 @@ export const confirmNightTargetAction: GameAction = {
     if (!ts) return false;
     if (ts.phase.type !== ClocktowerPhase.Night) return false;
 
+    if (!payload || typeof payload !== "object") return false;
     const { roleId } = payload as { roleId?: unknown };
 
     const activeRoleId = resolveActingRoleId(
@@ -81,6 +82,7 @@ export const confirmNightTargetAction: GameAction = {
     if (!ts) return;
     if (ts.phase.type !== ClocktowerPhase.Night) return;
 
+    if (!payload || typeof payload !== "object") return;
     const { roleId } = payload as { roleId?: string };
 
     const activeRoleId = resolveActingRoleId(game, callerId, roleId);
