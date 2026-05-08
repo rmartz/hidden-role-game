@@ -21,6 +21,7 @@ export const shootPlayerAction: GameAction = {
     if (ts.phase.presidentId !== callerId) return false;
     if (ts.phase.resolved) return false;
 
+    if (!payload || typeof payload !== "object") return false;
     const { targetPlayerId } = payload as { targetPlayerId?: unknown };
     if (typeof targetPlayerId !== "string") return false;
     if (targetPlayerId === callerId) return false;
@@ -31,6 +32,7 @@ export const shootPlayerAction: GameAction = {
   apply(game: Game, payload: unknown) {
     const ts = currentTurnState(game);
     if (ts?.phase.type !== SecretVillainPhase.SpecialAction) return;
+    if (!payload || typeof payload !== "object") return;
 
     const { targetPlayerId } = payload as { targetPlayerId: string };
     ts.eliminatedPlayerIds = [...ts.eliminatedPlayerIds, targetPlayerId];
