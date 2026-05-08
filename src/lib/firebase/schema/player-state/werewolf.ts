@@ -1,4 +1,5 @@
 import { GameMode } from "@/lib/types";
+import type { Team } from "@/lib/types";
 import type { AnyNightAction, DaytimeVote } from "@/lib/game/modes/werewolf";
 import { TrialVerdict } from "@/lib/game/modes/werewolf";
 import type { NightStatusEntry } from "@/server/types";
@@ -38,6 +39,8 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
     startedAt: number;
     phase: string;
     voteStartedAt?: number;
+    pausedAt?: number;
+    pauseOffset?: number;
     myVote?: DaytimeVote;
     voteCount: number;
     playerCount: number;
@@ -59,6 +62,11 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
   mirrorcasterCharged?: boolean;
   oneEyedSeerLockedTargetId?: string;
   elusiveSeerVillagerIds?: string[];
+  illuminatiRoleAssignments?: {
+    playerId: string;
+    roleName: string;
+    team: string;
+  }[];
   mySecondNightTarget?: string;
   exposerAbilityUsed?: boolean;
   hunterRevengePlayerId?: string;
@@ -127,6 +135,9 @@ export function werewolfStateToFirebase(
       : {}),
     ...(state.elusiveSeerVillagerIds?.length
       ? { elusiveSeerVillagerIds: state.elusiveSeerVillagerIds }
+      : {}),
+    ...(state.illuminatiRoleAssignments?.length
+      ? { illuminatiRoleAssignments: state.illuminatiRoleAssignments }
       : {}),
     ...(state.mySecondNightTarget
       ? { mySecondNightTarget: state.mySecondNightTarget }
@@ -204,6 +215,14 @@ export function werewolfStateFromFirebase(
       : {}),
     ...(raw.elusiveSeerVillagerIds?.length
       ? { elusiveSeerVillagerIds: raw.elusiveSeerVillagerIds }
+      : {}),
+    ...(raw.illuminatiRoleAssignments?.length
+      ? {
+          illuminatiRoleAssignments: raw.illuminatiRoleAssignments.map((a) => ({
+            ...a,
+            team: a.team as Team,
+          })),
+        }
       : {}),
     ...(raw.mySecondNightTarget
       ? { mySecondNightTarget: raw.mySecondNightTarget }

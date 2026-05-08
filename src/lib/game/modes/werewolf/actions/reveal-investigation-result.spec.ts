@@ -125,3 +125,68 @@ describe("RevealInvestigationResult", () => {
     });
   });
 });
+
+// ---------------------------------------------------------------------------
+// RevealInvestigationResult — Illuminati (revealsFullRoleList)
+// ---------------------------------------------------------------------------
+
+describe("RevealInvestigationResult (Illuminati)", () => {
+  const action = WEREWOLF_ACTIONS[WerewolfAction.RevealInvestigationResult];
+
+  const illuminatiNightPhaseOrder = [WerewolfRole.Illuminati];
+
+  function makeIlluminatiGame(nightState: WerewolfTurnState): Game {
+    return makePlayingGame(nightState, {
+      players: [
+        { id: "p1", name: "Alice", sessionId: "s1", visiblePlayers: [] },
+        { id: "p2", name: "Bob", sessionId: "s2", visiblePlayers: [] },
+        { id: "p3", name: "Charlie", sessionId: "s3", visiblePlayers: [] },
+      ],
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Illuminati },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+      ],
+    });
+  }
+
+  it("is valid for Illuminati when no action exists yet", () => {
+    const game = makeIlluminatiGame(
+      makeNightState({
+        turn: 1,
+        nightPhaseOrder: illuminatiNightPhaseOrder,
+        nightActions: {},
+      }),
+    );
+    expect(action.isValid(game, "owner-1", null)).toBe(true);
+  });
+
+  it("is invalid for Illuminati when result is already revealed", () => {
+    const game = makeIlluminatiGame(
+      makeNightState({
+        turn: 1,
+        nightPhaseOrder: illuminatiNightPhaseOrder,
+        nightActions: {
+          [WerewolfRole.Illuminati]: { resultRevealed: true },
+        },
+      }),
+    );
+    expect(action.isValid(game, "owner-1", null)).toBe(false);
+  });
+
+  it("apply creates a resultRevealed action for Illuminati with no prior action", () => {
+    const game = makeIlluminatiGame(
+      makeNightState({
+        turn: 1,
+        nightPhaseOrder: illuminatiNightPhaseOrder,
+        nightActions: {},
+      }),
+    );
+    action.apply(game, null, "owner-1");
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    const phase = ts.phase as WerewolfNighttimePhase;
+    expect(phase.nightActions[WerewolfRole.Illuminati]).toMatchObject({
+      resultRevealed: true,
+    });
+  });
+});
