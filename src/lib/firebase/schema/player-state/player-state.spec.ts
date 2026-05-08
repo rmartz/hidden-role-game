@@ -30,7 +30,7 @@ function makeWerewolfState(
     gameMode: GameMode.Werewolf,
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     nominationsEnabled: true,
-    trialsPerDay: 0,
+    trialsPerDay: undefined,
     revealProtections: true,
     autoRevealNightOutcome: true,
     ...overrides,
