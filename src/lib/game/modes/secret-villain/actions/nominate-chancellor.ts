@@ -9,6 +9,7 @@ export const nominateChancellorAction: GameAction = {
     if (ts.phase.type !== SecretVillainPhase.ElectionNomination) return false;
     if (ts.phase.presidentId !== callerId) return false;
 
+    if (!payload || typeof payload !== "object") return false;
     const { chancellorId } = payload as { chancellorId?: unknown };
     if (typeof chancellorId !== "string") return false;
 
@@ -20,6 +21,7 @@ export const nominateChancellorAction: GameAction = {
     const ts = currentTurnState(game);
     if (ts?.phase.type !== SecretVillainPhase.ElectionNomination) return;
 
+    if (!payload || typeof payload !== "object") return;
     const { chancellorId } = payload as { chancellorId: string };
 
     ts.phase = {

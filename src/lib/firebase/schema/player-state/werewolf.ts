@@ -49,7 +49,7 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
     eliminatedRole?: { id: string; name: string; team: string };
   };
   nominationsEnabled: boolean;
-  trialsPerDay: number;
+  trialsPerDay?: number;
   concludedTrialsCount?: number;
   revealProtections: boolean;
   autoRevealNightOutcome?: boolean;
@@ -62,6 +62,11 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
   mirrorcasterCharged?: boolean;
   oneEyedSeerLockedTargetId?: string;
   elusiveSeerVillagerIds?: string[];
+  illuminatiRoleAssignments?: {
+    playerId: string;
+    roleName: string;
+    team: string;
+  }[];
   exposerReveal?: { playerName: string; roleName: string; team: string };
   mySecondNightTarget?: string;
   exposerAbilityUsed?: boolean;
@@ -107,7 +112,9 @@ export function werewolfStateToFirebase(
     ...(state.isHypnotized ? { isHypnotized: true } : {}),
     ...(state.activeTrial ? { activeTrial: state.activeTrial } : {}),
     nominationsEnabled: state.nominationsEnabled,
-    trialsPerDay: state.trialsPerDay,
+    ...(state.trialsPerDay !== undefined
+      ? { trialsPerDay: state.trialsPerDay }
+      : {}),
     ...(state.concludedTrialsCount
       ? { concludedTrialsCount: state.concludedTrialsCount }
       : {}),
@@ -132,6 +139,9 @@ export function werewolfStateToFirebase(
     ...(state.elusiveSeerVillagerIds?.length
       ? { elusiveSeerVillagerIds: state.elusiveSeerVillagerIds }
       : {}),
+    ...(state.illuminatiRoleAssignments?.length
+      ? { illuminatiRoleAssignments: state.illuminatiRoleAssignments }
+      : {}),
     ...(state.exposerReveal ? { exposerReveal: state.exposerReveal } : {}),
     ...(state.mySecondNightTarget
       ? { mySecondNightTarget: state.mySecondNightTarget }
@@ -153,7 +163,9 @@ export function werewolfStateFromFirebase(
     ...baseStateFromFirebase(raw),
     gameMode: GameMode.Werewolf,
     nominationsEnabled: raw.nominationsEnabled,
-    trialsPerDay: raw.trialsPerDay,
+    ...(raw.trialsPerDay !== undefined
+      ? { trialsPerDay: raw.trialsPerDay }
+      : {}),
     ...(raw.concludedTrialsCount
       ? { concludedTrialsCount: raw.concludedTrialsCount }
       : {}),
@@ -209,6 +221,14 @@ export function werewolfStateFromFirebase(
       : {}),
     ...(raw.elusiveSeerVillagerIds?.length
       ? { elusiveSeerVillagerIds: raw.elusiveSeerVillagerIds }
+      : {}),
+    ...(raw.illuminatiRoleAssignments?.length
+      ? {
+          illuminatiRoleAssignments: raw.illuminatiRoleAssignments.map((a) => ({
+            ...a,
+            team: a.team as Team,
+          })),
+        }
       : {}),
     ...(raw.exposerReveal
       ? {

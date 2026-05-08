@@ -31,6 +31,7 @@ export const castVoteAction: GameAction = {
     if (silencedIds.includes(callerId)) return false;
     // Hypnotized players cannot vote manually (their vote follows the Mummy)
     if (getHypnotizedPlayerId(ts) === callerId) return false;
+    if (!payload || typeof payload !== "object") return false;
     const { vote } = payload as { vote?: unknown };
     if (typeof vote !== "string" || !VALID_VOTES.includes(vote as DaytimeVote))
       return false;
@@ -60,6 +61,7 @@ export const castVoteAction: GameAction = {
     if (ts?.phase.type !== WerewolfPhase.Daytime) return;
     const { activeTrial } = ts.phase;
     if (!activeTrial) return;
+    if (!payload || typeof payload !== "object") return;
     const { vote } = payload as { vote: DaytimeVote };
     activeTrial.votes = [
       ...activeTrial.votes.filter((v) => v.playerId !== callerId),

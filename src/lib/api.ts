@@ -260,6 +260,21 @@ export async function removePlayer(
   }>;
 }
 
+export async function addNoDevicePlayer(
+  lobbyId: string,
+  playerName: string,
+): Promise<ServerResponse<{ lobby: PublicLobby }>> {
+  const sessionId = getSessionId();
+  const headers: HeadersInit = { "Content-Type": "application/json" };
+  if (sessionId) headers["x-session-id"] = sessionId;
+  const response = await fetch(`/api/lobby/${lobbyId}/players`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ playerName }),
+  });
+  return (await response.json()) as ServerResponse<{ lobby: PublicLobby }>;
+}
+
 export async function renamePlayer(
   lobbyId: string,
   playerId: string,

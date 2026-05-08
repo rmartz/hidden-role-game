@@ -250,7 +250,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
     expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(false);
   });
 
-  it("returns true when trial has a verdict (resolved) and trialsPerDay is 0 (unlimited)", () => {
+  it("returns true when trial has a verdict (resolved) and trialsPerDay is undefined (unlimited)", () => {
     const ts: WerewolfTurnState = {
       turn: 1,
       phase: {
@@ -271,7 +271,7 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: true,
-        trialsPerDay: 0,
+        trialsPerDay: undefined,
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
@@ -459,14 +459,14 @@ describe("WerewolfAction.NominatePlayer — trialsPerDay", () => {
     expect(action.isValid(game, "p2", { defendantId: "p4" })).toBe(false);
   });
 
-  it("allows nomination when trialsPerDay is 0 (unlimited)", () => {
+  it("allows nomination when trialsPerDay is undefined (unlimited)", () => {
     const ds = makeDayState();
     (ds.phase as WerewolfDaytimePhase).concludedTrialsCount = 5;
     const game = makePlayingGame(ds, {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: true,
-        trialsPerDay: 0,
+        trialsPerDay: undefined,
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
