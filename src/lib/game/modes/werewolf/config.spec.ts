@@ -171,3 +171,44 @@ describe("WEREWOLF_CONFIG.roleSlotsRequired", () => {
     expect(WEREWOLF_CONFIG.roleSlotsRequired(10)).toBe(9);
   });
 });
+
+describe("WEREWOLF_CONFIG.validateRoleConfig — Mason constraint", () => {
+  it("returns undefined when there are no Masons", () => {
+    const roleCounts = {
+      [WerewolfRole.Werewolf]: 1,
+      [WerewolfRole.Villager]: 4,
+      [WerewolfRole.Seer]: 1,
+    };
+    expect(WEREWOLF_CONFIG.validateRoleConfig(roleCounts)).toBeUndefined();
+  });
+
+  it("returns undefined when there are two Masons", () => {
+    const roleCounts = {
+      [WerewolfRole.Werewolf]: 1,
+      [WerewolfRole.Villager]: 2,
+      [WerewolfRole.Seer]: 1,
+      [WerewolfRole.Mason]: 2,
+    };
+    expect(WEREWOLF_CONFIG.validateRoleConfig(roleCounts)).toBeUndefined();
+  });
+
+  it("returns undefined when there are three or more Masons", () => {
+    const roleCounts = {
+      [WerewolfRole.Werewolf]: 1,
+      [WerewolfRole.Villager]: 1,
+      [WerewolfRole.Seer]: 1,
+      [WerewolfRole.Mason]: 3,
+    };
+    expect(WEREWOLF_CONFIG.validateRoleConfig(roleCounts)).toBeUndefined();
+  });
+
+  it("returns an error message when there is exactly one Mason", () => {
+    const roleCounts = {
+      [WerewolfRole.Werewolf]: 1,
+      [WerewolfRole.Villager]: 3,
+      [WerewolfRole.Seer]: 1,
+      [WerewolfRole.Mason]: 1,
+    };
+    expect(WEREWOLF_CONFIG.validateRoleConfig(roleCounts)).toBeDefined();
+  });
+});

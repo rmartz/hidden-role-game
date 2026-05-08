@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { WerewolfPhase, TrialPhase } from "../types";
 import type {
   WerewolfNighttimePhase,
@@ -12,6 +12,17 @@ import { makePlayingGame } from "./test-helpers";
 
 const pauseTimer = WEREWOLF_ACTIONS[WerewolfAction.PauseTimer];
 const resumeTimer = WEREWOLF_ACTIONS[WerewolfAction.ResumeTimer];
+
+const FIXED_TIME = 10_000;
+
+beforeEach(() => {
+  vi.useFakeTimers();
+  vi.setSystemTime(FIXED_TIME);
+});
+
+afterEach(() => {
+  vi.useRealTimers();
+});
 
 function makeNightTurnState(
   overrides: Partial<WerewolfNighttimePhase> = {},
@@ -83,28 +94,22 @@ describe("WerewolfAction.PauseTimer", () => {
   });
 
   describe("apply", () => {
-    it("sets pausedAt to a recent timestamp during nighttime", () => {
-      const before = Date.now();
+    it("sets pausedAt to current timestamp during nighttime", () => {
       const game = makePlayingGame(makeNightTurnState());
       pauseTimer.apply(game, null, "owner-1");
-      const after = Date.now();
       const phase = (
         game.status as { turnState: { phase: WerewolfNighttimePhase } }
       ).turnState.phase;
-      expect(phase.pausedAt).toBeGreaterThanOrEqual(before);
-      expect(phase.pausedAt).toBeLessThanOrEqual(after);
+      expect(phase.pausedAt).toBe(FIXED_TIME);
     });
 
-    it("sets pausedAt to a recent timestamp during daytime", () => {
-      const before = Date.now();
+    it("sets pausedAt to current timestamp during daytime", () => {
       const game = makePlayingGame(makeDayTurnState());
       pauseTimer.apply(game, null, "owner-1");
-      const after = Date.now();
       const phase = (
         game.status as { turnState: { phase: WerewolfDaytimePhase } }
       ).turnState.phase;
-      expect(phase.pausedAt).toBeGreaterThanOrEqual(before);
-      expect(phase.pausedAt).toBeLessThanOrEqual(after);
+      expect(phase.pausedAt).toBe(FIXED_TIME);
     });
   });
 });
@@ -155,17 +160,14 @@ describe("WerewolfAction.ResumeTimer", () => {
       const game = makePlayingGame(
         makeNightTurnState({ startedAt: 1000, pausedAt: 3000 }),
       );
-      const before = Date.now();
       resumeTimer.apply(game, null, "owner-1");
-      const after = Date.now();
       const phase = (
         game.status as { turnState: { phase: WerewolfNighttimePhase } }
       ).turnState.phase;
       // pauseOffset should be pausedAt - startedAt = 3000 - 1000 = 2000
       expect(phase.pauseOffset).toBe(2000);
-      // startedAt is reset to now so elapsed continues from 2000ms
-      expect(phase.startedAt).toBeGreaterThanOrEqual(before);
-      expect(phase.startedAt).toBeLessThanOrEqual(after);
+      // startedAt is reset to now (FIXED_TIME) so elapsed continues from 2000ms
+      expect(phase.startedAt).toBe(FIXED_TIME);
     });
 
     it("adds to existing pauseOffset on successive pause/resume cycles", () => {
@@ -193,25 +195,23 @@ describe("WerewolfAction.ResumeTimer", () => {
 
 describe("PauseTimer / ResumeTimer round-trip", () => {
   it("preserves the elapsed value across a pause and resume cycle", () => {
-    const startedAt = Date.now() - 10_000; // started 10s ago
-    const game = makePlayingGame(makeNightTurnState({ startedAt }));
+    // Phase started at t=0; FIXED_TIME is 10_000ms so 10s has elapsed.
+    const game = makePlayingGame(makeNightTurnState({ startedAt: 0 }));
 
-    // Pause immediately
+    // Pause — pausedAt is set to FIXED_TIME (10_000)
     pauseTimer.apply(game, null, "owner-1");
     const phase = (
       game.status as { turnState: { phase: WerewolfNighttimePhase } }
     ).turnState.phase;
-    const pausedAtMs = phase.pausedAt!;
-    const elapsedBeforePause = pausedAtMs - startedAt;
+    expect(phase.pausedAt).toBe(FIXED_TIME);
+    const elapsedBeforePause = FIXED_TIME - 0; // 10_000ms
 
-    // Resume
+    // Resume — pauseOffset captures the elapsed time, startedAt resets to now
     resumeTimer.apply(game, null, "owner-1");
     const phaseAfter = (
       game.status as { turnState: { phase: WerewolfNighttimePhase } }
     ).turnState.phase;
 
-    // After resume: elapsed = pauseOffset + (now - newStartedAt)
-    // At the instant of resume, (now - newStartedAt) ≈ 0, so elapsed ≈ pauseOffset
     expect(phaseAfter.pauseOffset).toBe(elapsedBeforePause);
     expect(phaseAfter.pausedAt).toBeUndefined();
   });
@@ -246,19 +246,16 @@ describe("WerewolfAction.PauseTimer — active trial", () => {
   });
 
   describe("apply", () => {
-    it("sets pausedAt on activeTrial, not on the phase", () => {
-      const before = Date.now();
+    it("sets pausedAt on activeTrial to current timestamp, not on the phase", () => {
       const game = makePlayingGame(
         makeDayTurnState({ activeTrial: makeActiveTrial() }),
       );
       pauseTimer.apply(game, null, "owner-1");
-      const after = Date.now();
       const phase = (
         game.status as { turnState: { phase: WerewolfDaytimePhase } }
       ).turnState.phase;
       expect(phase.pausedAt).toBeUndefined();
-      expect(phase.activeTrial?.pausedAt).toBeGreaterThanOrEqual(before);
-      expect(phase.activeTrial?.pausedAt).toBeLessThanOrEqual(after);
+      expect(phase.activeTrial?.pausedAt).toBe(FIXED_TIME);
     });
   });
 });
@@ -281,30 +278,27 @@ describe("WerewolfAction.ResumeTimer — active trial (defense phase)", () => {
   });
 
   describe("apply", () => {
-    it("clears pausedAt on the trial and shifts startedAt forward", () => {
+    it("clears pausedAt on the trial and shifts startedAt to current time", () => {
       // Trial started at 1000ms, paused at 3000ms — 2000ms elapsed on defense timer.
       const game = makePlayingGame(
         makeDayTurnState({
           activeTrial: makeActiveTrial({ startedAt: 1000, pausedAt: 3000 }),
         }),
       );
-      const before = Date.now();
       resumeTimer.apply(game, null, "owner-1");
-      const after = Date.now();
       const phase = (
         game.status as { turnState: { phase: WerewolfDaytimePhase } }
       ).turnState.phase;
       expect(phase.activeTrial?.pausedAt).toBeUndefined();
       expect(phase.activeTrial?.pauseOffset).toBe(2000);
-      expect(phase.activeTrial?.startedAt).toBeGreaterThanOrEqual(before);
-      expect(phase.activeTrial?.startedAt).toBeLessThanOrEqual(after);
+      expect(phase.activeTrial?.startedAt).toBe(FIXED_TIME);
     });
   });
 });
 
 describe("WerewolfAction.ResumeTimer — active trial (voting phase)", () => {
   describe("apply", () => {
-    it("clears pausedAt and shifts voteStartedAt forward, leaving startedAt unchanged", () => {
+    it("clears pausedAt and shifts voteStartedAt to current time, leaving startedAt unchanged", () => {
       // Vote started at 5000ms, paused at 7000ms — 2000ms elapsed on vote timer.
       const game = makePlayingGame(
         makeDayTurnState({
@@ -317,16 +311,13 @@ describe("WerewolfAction.ResumeTimer — active trial (voting phase)", () => {
         }),
       );
       const originalStartedAt = 1000;
-      const before = Date.now();
       resumeTimer.apply(game, null, "owner-1");
-      const after = Date.now();
       const phase = (
         game.status as { turnState: { phase: WerewolfDaytimePhase } }
       ).turnState.phase;
       expect(phase.activeTrial?.pausedAt).toBeUndefined();
       expect(phase.activeTrial?.pauseOffset).toBe(2000);
-      expect(phase.activeTrial?.voteStartedAt).toBeGreaterThanOrEqual(before);
-      expect(phase.activeTrial?.voteStartedAt).toBeLessThanOrEqual(after);
+      expect(phase.activeTrial?.voteStartedAt).toBe(FIXED_TIME);
       // startedAt (defense timer base) must not be modified
       expect(phase.activeTrial?.startedAt).toBe(originalStartedAt);
     });

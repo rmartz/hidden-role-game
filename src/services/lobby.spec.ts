@@ -1,5 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { addLobby, getLobby, updateConfig } from "./lobby";
+import {
+  addLobby,
+  getLobby,
+  updateConfig,
+  toggleReady,
+  removePlayer,
+  addPlayer,
+} from "./lobby";
 import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
 import type { Lobby } from "@/lib/types";
 import type { WerewolfModeConfig } from "@/lib/game/modes/werewolf/lobby-config";
@@ -157,5 +164,56 @@ describe("updateConfig — nominationsEnabled", () => {
     });
 
     expect(result).toBeUndefined();
+  });
+});
+
+describe("toggleReady — countdown", () => {
+  it("sets countdownStartedAt when all players become ready", async () => {
+    await addLobby({ ...makeBaseLobby(), id: "lobby-countdown-1" });
+    await addPlayer("lobby-countdown-1", {
+      id: "player2",
+      name: "Player 2",
+      sessionId: "session-2",
+    });
+
+    await toggleReady("lobby-countdown-1", "owner");
+    await toggleReady("lobby-countdown-1", "player2");
+
+    const lobby = await getLobby("lobby-countdown-1");
+    expect(lobby!.countdownStartedAt).toBeDefined();
+  });
+
+  it("clears countdownStartedAt when a player unreadies", async () => {
+    await addLobby({ ...makeBaseLobby(), id: "lobby-countdown-2" });
+    await addPlayer("lobby-countdown-2", {
+      id: "player2",
+      name: "Player 2",
+      sessionId: "session-2",
+    });
+    await toggleReady("lobby-countdown-2", "owner");
+    await toggleReady("lobby-countdown-2", "player2");
+
+    await toggleReady("lobby-countdown-2", "player2");
+
+    const lobby = await getLobby("lobby-countdown-2");
+    expect(lobby!.countdownStartedAt).toBeUndefined();
+  });
+});
+
+describe("removePlayer — countdown", () => {
+  it("clears countdownStartedAt when a player leaves during an active countdown", async () => {
+    await addLobby({ ...makeBaseLobby(), id: "lobby-countdown-3" });
+    await addPlayer("lobby-countdown-3", {
+      id: "player2",
+      name: "Player 2",
+      sessionId: "session-2",
+    });
+    await toggleReady("lobby-countdown-3", "owner");
+    await toggleReady("lobby-countdown-3", "player2");
+
+    await removePlayer("lobby-countdown-3", "player2");
+
+    const lobby = await getLobby("lobby-countdown-3");
+    expect(lobby!.countdownStartedAt).toBeUndefined();
   });
 });

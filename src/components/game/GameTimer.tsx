@@ -18,7 +18,7 @@ interface GameTimerProps {
   resetKey?: string | number;
   /** When set, freezes the timer display at the moment the timer was paused. */
   pausedAt?: Date;
-  /** Accumulated elapsed milliseconds from prior running segments, carried into this one on resume. */
+  /** Accumulated running milliseconds from prior run periods (before the most recent pause). */
   pauseOffset?: number;
 }
 
@@ -34,22 +34,18 @@ export function GameTimer({
   const rawStartedAtMs = startedAt.getTime();
   const startedAtMs = isNaN(rawStartedAtMs) ? Date.now() : rawStartedAtMs;
 
-  const rawPausedAtMs = pausedAt?.getTime();
   const isPaused = pausedAt !== undefined;
 
   const computeElapsed = useCallback(
     (nowMs: number) => {
-      const pausedAtMs =
-        rawPausedAtMs !== undefined && !isNaN(rawPausedAtMs)
-          ? rawPausedAtMs
-          : nowMs;
-      const effectiveNow = isPaused ? pausedAtMs : nowMs;
+      const rawPausedAtMs = isPaused ? pausedAt.getTime() : nowMs;
+      const effectiveNow = isNaN(rawPausedAtMs) ? nowMs : rawPausedAtMs;
       return Math.max(
         0,
         Math.floor((pauseOffset + (effectiveNow - startedAtMs)) / 1000),
       );
     },
-    [isPaused, rawPausedAtMs, pauseOffset, startedAtMs],
+    [isPaused, pausedAt, pauseOffset, startedAtMs],
   );
 
   const [elapsedSeconds, setElapsedSeconds] = useState(() =>
@@ -57,15 +53,23 @@ export function GameTimer({
   );
   const hasTriggeredRef = useRef(false);
   const onTriggerRef = useRef(onTimerTrigger);
+  const computeElapsedRef = useRef(computeElapsed);
 
   useEffect(() => {
     onTriggerRef.current = onTimerTrigger;
   });
 
+  useEffect(() => {
+    computeElapsedRef.current = computeElapsed;
+  });
+
+  // reset has a stable reference — it reads computeElapsed via computeElapsedRef so
+  // that pause/resume (which update computeElapsed) do not cause this callback to
+  // change identity and spuriously rerun the resetKey/durationSeconds effect below.
   const reset = useCallback(() => {
     hasTriggeredRef.current = false;
-    setElapsedSeconds(computeElapsed(Date.now()));
-  }, [computeElapsed]);
+    setElapsedSeconds(computeElapsedRef.current(Date.now()));
+  }, []);
 
   useEffect(() => {
     reset();
@@ -103,7 +107,7 @@ export function GameTimer({
       <p
         className={
           hasExpired && !autoAdvance
-            ? "text-red-800/60 dark:text-red-400/60"
+            ? "text-red-700 dark:text-red-400"
             : "text-muted-foreground"
         }
       >

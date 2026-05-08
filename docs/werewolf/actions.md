@@ -263,6 +263,8 @@ Additional resolution steps:
 | `withdraw-nomination`         | Player                    | none                                                   |
 | `skip-defense`                | Narrator                  | none                                                   |
 | `kill-player`                 | Narrator                  | `{ playerId: string }`                                 |
+| `pause-timer`                 | Narrator                  | none                                                   |
+| `resume-timer`                | Narrator                  | none                                                   |
 
 ## Night Action Types
 
@@ -310,7 +312,7 @@ interface TeamNightAction {
 - `{ type: "silenced", targetPlayerId }`
 - `{ type: "hypnotized", targetPlayerId }`
 - `{ type: "tough-guy-absorbed", targetPlayerId }`
-- `{ type: "altruist-intercepted", targetPlayerId }`
+- `{ type: "altruist-intercepted", altruistPlayerId, savedPlayerId }`
 
 After resolution, `start-day` performs additional checks:
 
