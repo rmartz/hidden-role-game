@@ -54,11 +54,15 @@ const defaultProps = {
   disabled: false,
   isReadyPending: false,
   isRenamePending: false,
+  isOwnerRenamePending: false,
+  isAddNoDevicePending: false,
   countdownDurationSeconds: 5,
   onRefetch: noop,
   onRemovePlayer: noop,
   onTransferOwner: noop,
   onRenamePlayer: noop,
+  onRenameNoDevicePlayer: noop,
+  onAddNoDevicePlayer: noop,
   onToggleReady: noop,
 };
 
@@ -101,7 +105,7 @@ describe("PlayerList", () => {
     expect(container.textContent).toContain(PLAYER_LIST_COPY.waitingForHost);
   });
 
-  it("shows Ready button for the owner", () => {
+  it("shows add-no-device button for the owner", () => {
     const { container } = render(
       <PlayerList
         {...defaultProps}
@@ -110,15 +114,16 @@ describe("PlayerList", () => {
         lobby={baseLobby}
       />,
     );
-    expect(container.textContent).toContain(PLAYER_LIST_COPY.readyButton);
+    expect(container.textContent).toContain(PLAYER_LIST_COPY.addNoDeviceButton);
   });
 
   it("shows Not Ready button when current user is already ready", () => {
     const { container } = render(
       <PlayerList
         {...defaultProps}
-        userPlayerId="p1"
-        lobby={{ ...baseLobby, readyPlayerIds: ["p1"] }}
+        isOwner={false}
+        userPlayerId="p2"
+        lobby={{ ...baseLobby, readyPlayerIds: ["p2"] }}
       />,
     );
     expect(container.textContent).toContain(PLAYER_LIST_COPY.notReadyButton);
