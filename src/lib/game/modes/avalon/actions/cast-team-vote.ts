@@ -19,6 +19,7 @@ export const castTeamVoteAction: GameAction = {
     if (ts.phase.passed !== undefined) return false;
     if (!game.players.some((p) => p.id === callerId)) return false;
 
+    if (!payload || typeof payload !== "object") return false;
     const { vote } = payload as { vote?: unknown };
     return typeof vote === "string" && VALID_VOTES.includes(vote as TeamVote);
   },
@@ -26,6 +27,7 @@ export const castTeamVoteAction: GameAction = {
   apply(game: Game, payload: unknown, callerId: string) {
     const ts = currentTurnState(game);
     if (ts?.phase.type !== AvalonPhase.TeamVote) return;
+    if (!payload || typeof payload !== "object") return;
 
     const { vote } = payload as { vote: TeamVote };
 

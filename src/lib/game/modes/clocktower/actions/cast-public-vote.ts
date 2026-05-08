@@ -29,6 +29,7 @@ export const castPublicVoteAction: GameAction = {
     // Only one execution per day — no voting once resolved
     if (ts.phase.executedToday !== undefined) return false;
 
+    if (!payload || typeof payload !== "object") return false;
     const { nomineeId, voted } = payload as {
       nomineeId?: unknown;
       voted?: unknown;
@@ -67,6 +68,7 @@ export const castPublicVoteAction: GameAction = {
     const ts = currentTurnState(game);
     if (ts?.phase.type !== ClocktowerPhase.Day) return;
 
+    if (!payload || typeof payload !== "object") return;
     const { nomineeId, voted } = payload as {
       nomineeId: string;
       voted: boolean;

@@ -22,6 +22,7 @@ export const selectAssassinationTargetAction: GameAction = {
     // Target cannot be changed once the assassination is resolved
     if (ts.phase.correct !== undefined) return false;
 
+    if (!payload || typeof payload !== "object") return false;
     const { targetPlayerId } = payload as { targetPlayerId?: unknown };
     if (typeof targetPlayerId !== "string") return false;
     // Target must be a valid player in the game
@@ -31,6 +32,7 @@ export const selectAssassinationTargetAction: GameAction = {
   apply(game: Game, payload: unknown) {
     const ts = currentTurnState(game);
     if (ts?.phase.type !== AvalonPhase.Assassination) return;
+    if (!payload || typeof payload !== "object") return;
 
     const { targetPlayerId } = payload as { targetPlayerId: string };
     ts.phase.targetPlayerId = targetPlayerId;
