@@ -40,6 +40,7 @@ export const respondVetoAction: GameAction = {
     if (!ts.phase.vetoProposed) return false;
     if (ts.phase.vetoResponse !== undefined) return false;
 
+    if (!payload || typeof payload !== "object") return false;
     const { consent } = payload as { consent?: unknown };
     return typeof consent === "boolean";
   },
@@ -48,6 +49,7 @@ export const respondVetoAction: GameAction = {
     const ts = currentTurnState(game);
     if (ts?.phase.type !== SecretVillainPhase.PolicyChancellor) return;
 
+    if (!payload || typeof payload !== "object") return;
     const { consent } = payload as { consent: boolean };
     ts.phase.vetoResponse = consent;
 

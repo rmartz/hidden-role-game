@@ -15,6 +15,7 @@ export const callSpecialElectionAction: GameAction = {
     if (ts.phase.presidentId !== callerId) return false;
     if (ts.phase.resolved) return false;
 
+    if (!payload || typeof payload !== "object") return false;
     const { targetPlayerId } = payload as { targetPlayerId?: unknown };
     if (typeof targetPlayerId !== "string") return false;
     if (targetPlayerId === callerId) return false;
@@ -26,6 +27,7 @@ export const callSpecialElectionAction: GameAction = {
     const ts = currentTurnState(game);
     if (ts?.phase.type !== SecretVillainPhase.SpecialAction) return;
 
+    if (!payload || typeof payload !== "object") return;
     const { targetPlayerId } = payload as { targetPlayerId: string };
 
     // Set the special president — getNextPresidentId will return this player
