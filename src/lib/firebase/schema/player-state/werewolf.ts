@@ -62,6 +62,11 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
   mirrorcasterCharged?: boolean;
   oneEyedSeerLockedTargetId?: string;
   elusiveSeerVillagerIds?: string[];
+  illuminatiRoleAssignments?: {
+    playerId: string;
+    roleName: string;
+    team: string;
+  }[];
   exposerReveal?: { playerName: string; roleName: string; team: string };
   mySecondNightTarget?: string;
   exposerAbilityUsed?: boolean;
@@ -131,6 +136,9 @@ export function werewolfStateToFirebase(
       : {}),
     ...(state.elusiveSeerVillagerIds?.length
       ? { elusiveSeerVillagerIds: state.elusiveSeerVillagerIds }
+      : {}),
+    ...(state.illuminatiRoleAssignments?.length
+      ? { illuminatiRoleAssignments: state.illuminatiRoleAssignments }
       : {}),
     ...(state.exposerReveal ? { exposerReveal: state.exposerReveal } : {}),
     ...(state.mySecondNightTarget
@@ -209,6 +217,14 @@ export function werewolfStateFromFirebase(
       : {}),
     ...(raw.elusiveSeerVillagerIds?.length
       ? { elusiveSeerVillagerIds: raw.elusiveSeerVillagerIds }
+      : {}),
+    ...(raw.illuminatiRoleAssignments?.length
+      ? {
+          illuminatiRoleAssignments: raw.illuminatiRoleAssignments.map((a) => ({
+            ...a,
+            team: a.team as Team,
+          })),
+        }
       : {}),
     ...(raw.exposerReveal
       ? {
