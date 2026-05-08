@@ -81,6 +81,7 @@ export const provideInformationAction: GameAction = {
     if (!ts) return false;
     if (ts.phase.type !== ClocktowerPhase.Night) return false;
 
+    if (!payload || typeof payload !== "object") return false;
     const { roleId, information } = payload as {
       roleId?: unknown;
       information?: unknown;
@@ -104,6 +105,7 @@ export const provideInformationAction: GameAction = {
     if (!ts) return;
     if (ts.phase.type !== ClocktowerPhase.Night) return;
 
+    if (!payload || typeof payload !== "object") return;
     const { roleId, information } = payload as {
       roleId: string;
       information: ClocktowerNightInformation;

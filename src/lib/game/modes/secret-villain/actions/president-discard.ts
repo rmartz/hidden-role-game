@@ -10,6 +10,7 @@ export const presidentDiscardAction: GameAction = {
     if (ts.phase.presidentId !== callerId) return false;
     if (ts.phase.discardedCard !== undefined) return false;
 
+    if (!payload || typeof payload !== "object") return false;
     const { cardIndex } = payload as { cardIndex?: unknown };
     if (typeof cardIndex !== "number") return false;
     return cardIndex >= 0 && cardIndex < 3;
@@ -20,6 +21,7 @@ export const presidentDiscardAction: GameAction = {
     if (ts?.phase.type !== SecretVillainPhase.PolicyPresident) return;
     if (ts.phase.presidentId !== callerId) return;
 
+    if (!payload || typeof payload !== "object") return;
     const { cardIndex } = payload as { cardIndex: number };
     const drawnCards = [...ts.phase.drawnCards];
     const [discarded] = drawnCards.splice(cardIndex, 1);

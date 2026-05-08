@@ -50,6 +50,7 @@ export const setNightTargetAction: GameAction = {
     if (!ts) return false;
     if (ts.phase.type !== ClocktowerPhase.Night) return false;
 
+    if (!payload || typeof payload !== "object") return false;
     const { roleId, targetPlayerId, secondTargetPlayerId } = payload as {
       roleId?: unknown;
       targetPlayerId?: unknown;
@@ -99,6 +100,7 @@ export const setNightTargetAction: GameAction = {
     if (!ts) return;
     if (ts.phase.type !== ClocktowerPhase.Night) return;
 
+    if (!payload || typeof payload !== "object") return;
     const { roleId, targetPlayerId, secondTargetPlayerId } = payload as {
       roleId?: string;
       targetPlayerId?: string;
