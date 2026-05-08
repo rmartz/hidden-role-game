@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { fn } from "storybook/test";
+import { expect, fn, within } from "storybook/test";
 import { PlayerList } from "./PlayerList";
+import { PLAYER_LIST_COPY } from "./PlayerList.copy";
 import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
 import type { PublicLobby } from "@/server/types";
@@ -72,6 +73,19 @@ export const PlayerView: Story = {
     isReadyPending: false,
     countdownDurationSeconds: 5,
   },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(
+      canvas.getByText(`${PLAYER_LIST_COPY.title} (5)`),
+    ).toBeDefined();
+    await expect(canvas.getByText("Alice")).toBeDefined();
+    await expect(canvas.getByText("Bob")).toBeDefined();
+    await expect(canvas.getByText("Charlie")).toBeDefined();
+    await expect(
+      canvas.getByRole("button", { name: PLAYER_LIST_COPY.readyButton }),
+    ).toBeDefined();
+  },
 };
 
 export const OwnerView: Story = {
@@ -87,6 +101,15 @@ export const OwnerView: Story = {
     disabled: false,
     isReadyPending: false,
     countdownDurationSeconds: 5,
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(canvas.getByText("Alice")).toBeDefined();
+    await expect(
+      canvas.getByRole("button", { name: PLAYER_LIST_COPY.readyButton }),
+    ).toBeDefined();
+    await expect(canvas.getByText(PLAYER_LIST_COPY.dragHint)).toBeDefined();
   },
 };
 
