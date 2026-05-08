@@ -13,4 +13,5 @@ export { SecretVillainGameScreen } from "./SecretVillainGameScreen";
 export { SecretVillainGameScreenView } from "./SecretVillainGameScreenView";
 export { SecretVillainStartingView } from "./SecretVillainStartingView";
 export { SpecialActionView } from "./SpecialActionView";
+export { SpecialBadRevealView } from "./SpecialBadRevealView";
 export { VetoPromptView } from "./VetoPromptView";
