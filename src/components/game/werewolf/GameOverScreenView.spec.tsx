@@ -34,7 +34,7 @@ function makeGameState(
     ],
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     nominationsEnabled: false,
-    trialsPerDay: 0,
+    trialsPerDay: undefined,
     revealProtections: false,
     autoRevealNightOutcome: true,
     ...overrides,

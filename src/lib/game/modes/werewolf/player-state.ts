@@ -19,8 +19,8 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   timerConfig: WerewolfTimerConfig;
   /** Whether player nominations for trial are enabled in this game. */
   nominationsEnabled: boolean;
-  /** Maximum number of trials allowed per day phase. 0 means unlimited. */
-  trialsPerDay: number;
+  /** Maximum number of trials allowed per day phase. undefined means unlimited. */
+  trialsPerDay?: number;
   /** Number of trials that have concluded this day phase. */
   concludedTrialsCount?: number;
   /** When true, the night summary reveals players who were attacked but saved by protection. */
@@ -125,7 +125,7 @@ export function isNominationsBlocked(
     !!gameState.activeTrial && !gameState.activeTrial.verdict;
   return (
     hasActiveTrial ||
-    (gameState.trialsPerDay > 0 &&
+    (gameState.trialsPerDay !== undefined &&
       (gameState.concludedTrialsCount ?? 0) >= gameState.trialsPerDay)
   );
 }
