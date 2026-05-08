@@ -34,8 +34,8 @@ export function PolicyPeekView({
               className={cn(
                 "rounded border-2 px-4 py-2 text-sm font-medium",
                 card === "good"
-                  ? "border-green-500 bg-green-500 text-white"
-                  : "border-red-500 bg-red-500 text-white",
+                  ? "border-green-700 bg-green-700 text-white"
+                  : "border-red-700 bg-red-700 text-white",
               )}
             >
               {card === "good"

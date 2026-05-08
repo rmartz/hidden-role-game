@@ -241,13 +241,42 @@ export function OwnerGameNightScreen({
           nightPhaseOrder.length,
         )}
       </h1>
-      <GameTimer
-        durationSeconds={timerConfig.nightPhaseSeconds}
-        autoAdvance={timerConfig.autoAdvance}
-        startedAt={phaseStartedAt}
-        onTimerTrigger={handleAdvance}
-        resetKey={currentPhaseIndex}
-      />
+      <div className="flex items-center gap-3 mb-4">
+        <GameTimer
+          durationSeconds={timerConfig.nightPhaseSeconds}
+          autoAdvance={timerConfig.autoAdvance}
+          startedAt={phaseStartedAt}
+          onTimerTrigger={handleAdvance}
+          resetKey={currentPhaseIndex}
+          pausedAt={
+            phase.pausedAt !== undefined ? new Date(phase.pausedAt) : undefined
+          }
+          pauseOffset={phase.pauseOffset ?? 0}
+        />
+        {phase.pausedAt !== undefined ? (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              action.mutate({ actionId: WerewolfAction.ResumeTimer });
+            }}
+            disabled={action.isPending}
+          >
+            {WEREWOLF_COPY.narrator.resumeTimer}
+          </Button>
+        ) : (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              action.mutate({ actionId: WerewolfAction.PauseTimer });
+            }}
+            disabled={action.isPending}
+          >
+            {WEREWOLF_COPY.narrator.pauseTimer}
+          </Button>
+        )}
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
         <OwnerAdvanceCard
           label={
