@@ -107,7 +107,7 @@ export const OwnerView: Story = {
 
     await expect(canvas.getByText("Alice")).toBeDefined();
     await expect(
-      canvas.getByRole("button", { name: PLAYER_LIST_COPY.readyButton }),
+      canvas.getByRole("button", { name: PLAYER_LIST_COPY.addNoDeviceButton }),
     ).toBeDefined();
     await expect(canvas.getByText(PLAYER_LIST_COPY.dragHint)).toBeDefined();
   },

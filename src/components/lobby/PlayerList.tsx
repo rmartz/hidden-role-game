@@ -361,7 +361,7 @@ export function PlayerList({
           </p>
         ) : (
           allPlayersReady && (
-            <p className="text-sm text-green-600 font-medium mt-2">
+            <p className="text-sm text-green-700 font-medium mt-2">
               {isOwner
                 ? PLAYER_LIST_COPY.allPlayersReady
                 : PLAYER_LIST_COPY.waitingForHost}
