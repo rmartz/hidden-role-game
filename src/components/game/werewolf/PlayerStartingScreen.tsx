@@ -3,16 +3,18 @@
 import { useMemo } from "react";
 import { GAME_MODES } from "@/lib/game/modes";
 import { GameStatus } from "@/lib/types";
-import type { PlayerGameState } from "@/server/types";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import {
   GameRolesList,
   GameTimer,
   PlayersRoleList,
   RoleLabel,
 } from "@/components/game";
+import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 
 interface PlayerStartingScreenProps {
-  gameState: PlayerGameState;
+  gameState: WerewolfPlayerGameState;
 }
 
 export function PlayerStartingScreen({ gameState }: PlayerStartingScreenProps) {
@@ -39,6 +41,16 @@ export function PlayerStartingScreen({ gameState }: PlayerStartingScreenProps) {
       </div>
     ) : null;
 
+  const isMason = gameState.myRole?.id === WerewolfRole.Mason;
+  const masonInPlay =
+    isMason ||
+    gameState.rolesInPlay?.some((r) => r.id === (WerewolfRole.Mason as string));
+  const masonWarning = masonInPlay
+    ? isMason
+      ? WEREWOLF_COPY.mason.playerWarning
+      : WEREWOLF_COPY.mason.nonMasonWarning
+    : undefined;
+
   return (
     <div className="p-5 max-w-lg mx-auto">
       <h1 className="text-2xl font-bold mb-4">Game Starting</h1>
@@ -54,6 +66,12 @@ export function PlayerStartingScreen({ gameState }: PlayerStartingScreenProps) {
           <RoleLabel role={gameState.myRole} gameMode={gameState.gameMode} />
           {roleDescription}
         </div>
+      )}
+
+      {masonWarning && (
+        <p className="mb-5 text-sm text-amber-700 dark:text-amber-400">
+          {masonWarning}
+        </p>
       )}
 
       <PlayersRoleList

@@ -6,6 +6,7 @@ import {
 import { GameMode } from "@/lib/types";
 import type { RoleBucket } from "@/lib/types";
 import { SecretVillainRole } from "@/lib/game/modes/secret-villain/roles";
+import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 
 describe("validateRoleBucketsCoverPlayerCount", () => {
   // SecretVillain has no custom roleSlotsRequired, so required == playerCount
@@ -82,5 +83,29 @@ describe("validateRoleBucketsForMode", () => {
     const error = validateRoleBucketsForMode(buckets, GameMode.SecretVillain);
     expect(error).toBeDefined();
     expect(error).toContain("not-a-real-role");
+  });
+
+  it("returns undefined for Werewolf buckets with two Masons", () => {
+    const buckets: RoleBucket[] = [
+      { playerCount: 1, roleId: WerewolfRole.Werewolf },
+      { playerCount: 3, roleId: WerewolfRole.Villager },
+      { playerCount: 1, roleId: WerewolfRole.Seer },
+      { playerCount: 2, roleId: WerewolfRole.Mason },
+    ];
+    expect(
+      validateRoleBucketsForMode(buckets, GameMode.Werewolf),
+    ).toBeUndefined();
+  });
+
+  it("returns an error for Werewolf buckets with exactly one Mason", () => {
+    const buckets: RoleBucket[] = [
+      { playerCount: 1, roleId: WerewolfRole.Werewolf },
+      { playerCount: 4, roleId: WerewolfRole.Villager },
+      { playerCount: 1, roleId: WerewolfRole.Seer },
+      { playerCount: 1, roleId: WerewolfRole.Mason },
+    ];
+    expect(
+      validateRoleBucketsForMode(buckets, GameMode.Werewolf),
+    ).toBeDefined();
   });
 });

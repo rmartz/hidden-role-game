@@ -20,6 +20,7 @@ interface PlayerListProps {
   disabled: boolean;
   isReadyPending: boolean;
   isRenamePending: boolean;
+  countdownDurationSeconds: number;
   onRefetch: () => void;
   onRemovePlayer: (playerId: string) => void;
   onTransferOwner: (playerId: string) => void;
@@ -54,6 +55,7 @@ export function PlayerList({
   disabled,
   isReadyPending,
   isRenamePending,
+  countdownDurationSeconds,
   onRefetch,
   onRemovePlayer,
   onTransferOwner,
@@ -69,9 +71,39 @@ export function PlayerList({
   const nonOwnerPlayers = lobby.players.filter(
     (p) => p.id !== lobby.ownerPlayerId,
   );
-  const allPlayersReady =
+  const allNonOwnerPlayersReady =
     nonOwnerPlayers.length > 0 &&
     nonOwnerPlayers.every((p) => readySet.has(p.id));
+
+  const countdownStartedAt = lobby.countdownStartedAt;
+  const [secondsLeft, setSecondsLeft] = useState(() => {
+    if (!countdownStartedAt) return 0;
+    return Math.max(
+      0,
+      countdownDurationSeconds -
+        Math.floor((Date.now() - countdownStartedAt) / 1000),
+    );
+  });
+
+  useEffect(() => {
+    if (!countdownStartedAt) {
+      setSecondsLeft(0);
+      return;
+    }
+    const tick = () => {
+      const remaining = Math.max(
+        0,
+        countdownDurationSeconds -
+          Math.floor((Date.now() - countdownStartedAt) / 1000),
+      );
+      setSecondsLeft(remaining);
+    };
+    tick();
+    const id = setInterval(tick, 500);
+    return () => {
+      clearInterval(id);
+    };
+  }, [countdownStartedAt, countdownDurationSeconds]);
 
   const [committedOrder, setCommittedOrder] = useState<string[]>(
     () => lobby.playerOrder,
@@ -216,23 +248,31 @@ export function PlayerList({
             />
           )}
         </ul>
-        {!isOwner && (
-          <Button
-            variant={isCurrentUserReady ? "secondary" : "default"}
-            size="sm"
-            className="mt-3"
-            disabled={disabled || isReadyPending}
-            onClick={onToggleReady}
-          >
-            {isCurrentUserReady
-              ? PLAYER_LIST_COPY.notReadyButton
-              : PLAYER_LIST_COPY.readyButton}
-          </Button>
-        )}
-        {allPlayersReady && (
-          <p className="text-sm text-green-600 font-medium mt-2">
-            {PLAYER_LIST_COPY.allPlayersReady}
+        <Button
+          variant={isCurrentUserReady ? "secondary" : "default"}
+          size="sm"
+          className="mt-3"
+          disabled={disabled || isReadyPending}
+          onClick={onToggleReady}
+        >
+          {isCurrentUserReady
+            ? PLAYER_LIST_COPY.notReadyButton
+            : PLAYER_LIST_COPY.readyButton}
+        </Button>
+        {countdownStartedAt !== undefined ? (
+          <p className="text-sm font-medium text-primary mt-2">
+            {secondsLeft > 0
+              ? `${PLAYER_LIST_COPY.countdownPrefix}${String(secondsLeft)}...`
+              : PLAYER_LIST_COPY.countdownStarting}
           </p>
+        ) : (
+          allNonOwnerPlayersReady && (
+            <p className="text-sm text-green-600 font-medium mt-2">
+              {isOwner
+                ? PLAYER_LIST_COPY.allPlayersReady
+                : PLAYER_LIST_COPY.waitingForHost}
+            </p>
+          )
         )}
       </CardContent>
     </Card>

@@ -88,6 +88,9 @@ export function validatePlayerJoin(
   if (lobby.players.length >= MAX_LOBBY_PLAYERS) {
     return "Lobby is full";
   }
+  if (lobby.countdownStartedAt !== undefined) {
+    return "Cannot join while the game is about to start";
+  }
   const incomingKey = playerNameKey(displayName);
   const isDuplicate = lobby.players.some(
     (p) => playerNameKey(p.name) === incomingKey,

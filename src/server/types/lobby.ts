@@ -77,6 +77,8 @@ export interface PublicLobby {
   config: GameConfig;
   gameId?: string;
   readyPlayerIds: string[];
+  /** Unix ms timestamp set when all players (including owner) are ready. Absent when no countdown is running. */
+  countdownStartedAt?: number;
 }
 
 export interface CreateLobbyRequest {

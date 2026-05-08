@@ -23,6 +23,8 @@ export interface FirebaseLobbyPublic {
   gameId: string | null;
   /** Player IDs that have readied up. Firebase omits empty arrays. */
   readyPlayerIds?: string[];
+  /** Unix ms timestamp set when all players (including owner) ready up. Firebase omits when absent. */
+  countdownStartedAt?: number;
   /** Unix ms timestamp set server-side at lobby creation. Used for TTL cleanup. */
   createdAt?: number;
 }
@@ -100,6 +102,9 @@ export function lobbyToFirebase(lobby: Lobby): {
       gameId: lobby.gameId ?? null,
       ...(lobby.readyPlayerIds.length > 0
         ? { readyPlayerIds: lobby.readyPlayerIds }
+        : {}),
+      ...(lobby.countdownStartedAt !== undefined
+        ? { countdownStartedAt: lobby.countdownStartedAt }
         : {}),
     },
     private: {
@@ -193,6 +198,9 @@ export function firebaseToLobby(
     config: firebaseToLobbyConfig(pub.config),
     readyPlayerIds: pub.readyPlayerIds ?? [],
     ...(pub.gameId ? { gameId: pub.gameId } : {}),
+    ...(pub.countdownStartedAt !== undefined
+      ? { countdownStartedAt: pub.countdownStartedAt }
+      : {}),
   };
 }
 
@@ -276,5 +284,8 @@ export function firebaseToPublicLobby(
     config: firebaseToLobbyConfig(pub.config),
     readyPlayerIds: pub.readyPlayerIds ?? [],
     ...(pub.gameId ? { gameId: pub.gameId } : {}),
+    ...(pub.countdownStartedAt !== undefined
+      ? { countdownStartedAt: pub.countdownStartedAt }
+      : {}),
   };
 }

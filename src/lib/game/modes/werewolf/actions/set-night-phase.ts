@@ -29,6 +29,8 @@ export const setNightPhaseAction: GameAction = {
           ...phase,
           currentPhaseIndex: phaseIndex,
           startedAt: Date.now(),
+          pausedAt: undefined,
+          pauseOffset: undefined,
         },
       },
     };
