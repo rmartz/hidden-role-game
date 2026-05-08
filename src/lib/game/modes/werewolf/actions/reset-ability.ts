@@ -14,6 +14,7 @@ export const resetAbilityAction: GameAction = {
     if (!isOwnerPlaying(game, callerId)) return false;
     const ts = currentTurnState(game);
     if (!ts) return false;
+    if (!payload || typeof payload !== "object") return false;
     const { roleId } = payload as { roleId?: unknown };
     if (typeof roleId !== "string") return false;
     return roleId in RESETTABLE_ABILITIES;
@@ -21,6 +22,7 @@ export const resetAbilityAction: GameAction = {
   apply(game: Game, payload: unknown) {
     const ts = currentTurnState(game);
     if (!ts) return;
+    if (!payload || typeof payload !== "object") return;
     const { roleId } = payload as { roleId: string };
     const flagKey = RESETTABLE_ABILITIES[roleId];
     if (flagKey) {
