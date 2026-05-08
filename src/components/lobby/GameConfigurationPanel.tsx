@@ -146,7 +146,8 @@ export function GameConfigurationPanel(props: GameConfigurationPanelProps) {
       }
       onTrialsPerDayChange={
         onModeConfigFieldChange
-          ? (v: number) => onModeConfigFieldChange("trialsPerDay", v)
+          ? (v: number | undefined) =>
+              onModeConfigFieldChange("trialsPerDay", v)
           : undefined
       }
       onRevealProtectionsChange={

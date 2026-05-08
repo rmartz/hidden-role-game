@@ -18,7 +18,7 @@ export const nominatePlayerAction: GameAction = {
     if (ts.phase.activeTrial && !ts.phase.activeTrial.verdict) return false;
     // Trials-per-day limit: cannot nominate once the limit has been reached
     if (
-      trialsPerDay > 0 &&
+      trialsPerDay !== undefined &&
       (ts.phase.concludedTrialsCount ?? 0) >= trialsPerDay
     )
       return false;
