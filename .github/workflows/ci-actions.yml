@@ -50,3 +50,21 @@ jobs:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
       - run: pnpm build
+
+  sentry-release:
+    name: Sentry Release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    needs: [tests, lint, format, typecheck, build]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: getsentry/action-release@v3
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: reedmartz
+          SENTRY_PROJECT: hidden-role-game
+        with:
+          environment: production
+          version: ${{ github.sha }}
