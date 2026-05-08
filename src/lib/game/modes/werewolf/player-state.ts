@@ -19,8 +19,8 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   timerConfig: WerewolfTimerConfig;
   /** Whether player nominations for trial are enabled in this game. */
   nominationsEnabled: boolean;
-  /** Maximum number of trials allowed per day phase. 0 means unlimited. */
-  trialsPerDay: number;
+  /** Maximum number of trials allowed per day phase. undefined means unlimited. */
+  trialsPerDay?: number;
   /** Number of trials that have concluded this day phase. */
   concludedTrialsCount?: number;
   /** When true, the night summary reveals players who were attacked but saved by protection. */
@@ -60,6 +60,12 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   oneEyedSeerLockedTargetId?: string;
   /** Elusive Seer: player IDs of all Villagers. */
   elusiveSeerVillagerIds?: string[];
+  /** Illuminati: full list of all player role assignments (revealed by narrator on night 1). */
+  illuminatiRoleAssignments?: {
+    playerId: string;
+    roleName: string;
+    team: Team;
+  }[];
   /** Role publicly revealed by the Exposer. */
   exposerReveal?: { playerName: string; roleName: string; team: Team };
   /** Mentalist: second night target. */
@@ -137,7 +143,7 @@ export function isNominationsBlocked(
     !!gameState.activeTrial && !gameState.activeTrial.verdict;
   return (
     hasActiveTrial ||
-    (gameState.trialsPerDay > 0 &&
+    (gameState.trialsPerDay !== undefined &&
       (gameState.concludedTrialsCount ?? 0) >= gameState.trialsPerDay)
   );
 }

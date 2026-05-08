@@ -52,6 +52,7 @@ export enum WerewolfRole {
   Executioner = "werewolf-executioner",
   Exposer = "werewolf-exposer",
   Hunter = "werewolf-hunter",
+  Illuminati = "werewolf-illuminati",
   Insomniac = "werewolf-insomniac",
   LoneWolf = "werewolf-lone-wolf",
   Mason = "werewolf-mason",
@@ -122,6 +123,8 @@ export interface WerewolfRoleDefinition extends RoleDefinition<
    * `game.playerOrder` is used to determine adjacency.
    */
   adjacentTargetOnly?: boolean;
+  /** Illuminati only: on night 1, the narrator reveals all role assignments to this player. */
+  revealsFullRoleList?: boolean;
   /** Used for grouping in the role config UI. */
   category: WerewolfRoleCategory;
 }
@@ -270,6 +273,19 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     targetCategory: TargetCategory.None,
     aliases: ["gunslinger"],
     category: WerewolfRoleCategory.VillagerKilling,
+  },
+  [WerewolfRole.Illuminati]: {
+    id: WerewolfRole.Illuminati,
+    name: "Illuminati",
+    summary: "Sees all roles on night 1; wins if alive in the final 3",
+    description:
+      "On the first night, the Illuminati wakes and the Narrator reveals every player's role. They have no night action after night 1. The Illuminati wins if they are one of the last 3 players alive when the game ends.",
+    team: Team.Neutral,
+    unique: true,
+    wakesAtNight: WakesAtNight.FirstNightOnly,
+    targetCategory: TargetCategory.None,
+    revealsFullRoleList: true,
+    category: WerewolfRoleCategory.NeutralManipulation,
   },
   [WerewolfRole.Insomniac]: {
     id: WerewolfRole.Insomniac,

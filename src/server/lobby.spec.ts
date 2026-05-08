@@ -101,6 +101,18 @@ describe("authorizePlayerRemoval", () => {
       authorizePlayerRemoval(lobby, "player-1", "session-owner"),
     ).toBeDefined();
   });
+
+  it("returns undefined when the owner removes a no-device player", () => {
+    const lobby = makeLobby({
+      players: [
+        { id: "player-1", name: "Alice", sessionId: "session-owner" },
+        { id: "player-nd", name: "NoDevice", noDevice: true },
+      ],
+    });
+    expect(
+      authorizePlayerRemoval(lobby, "player-nd", "session-owner"),
+    ).toBeUndefined();
+  });
 });
 
 describe("validatePlayerRename", () => {
