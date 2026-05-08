@@ -96,12 +96,18 @@ export async function POST(request: Request): Promise<Response> {
     return Response.json({ error: message }, { status: 500 });
   }
 
-  const debugPlayers: DebugPlayer[] = players.map((p) => ({
-    id: p.id,
-    name: p.name,
-    sessionId: p.sessionId,
-    isOwner: p.id === ownerPlayer?.id,
-  }));
+  const debugPlayers: DebugPlayer[] = players.flatMap((p) =>
+    p.sessionId
+      ? [
+          {
+            id: p.id,
+            name: p.name,
+            sessionId: p.sessionId,
+            isOwner: p.id === ownerPlayer?.id,
+          },
+        ]
+      : [],
+  );
 
   return Response.json({
     status: ServerResponseStatus.Success,
