@@ -54,6 +54,7 @@ export const nominatePlayerAction: GameAction = {
     // Each player may only nominate once per day
     if (ts.phase.nominatedByPlayerIds.includes(callerId)) return false;
 
+    if (!payload || typeof payload !== "object") return false;
     const { nomineeId } = payload as { nomineeId?: unknown };
     if (typeof nomineeId !== "string") return false;
     // Cannot nominate yourself
@@ -77,6 +78,7 @@ export const nominatePlayerAction: GameAction = {
     const ts = currentTurnState(game);
     if (ts?.phase.type !== ClocktowerPhase.Day) return;
 
+    if (!payload || typeof payload !== "object") return;
     const { nomineeId } = payload as { nomineeId: string };
 
     // Virgin ability: if Virgin is nominated for the first time by a Townsfolk,

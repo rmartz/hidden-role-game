@@ -14,6 +14,7 @@ export const castElectionVoteAction: GameAction = {
     if (ts.eliminatedPlayerIds.includes(callerId)) return false;
     if (!game.players.some((p) => p.id === callerId)) return false;
 
+    if (!payload || typeof payload !== "object") return false;
     const { vote } = payload as { vote?: unknown };
     return (
       typeof vote === "string" && VALID_VOTES.includes(vote as ElectionVote)
@@ -24,6 +25,7 @@ export const castElectionVoteAction: GameAction = {
     const ts = currentTurnState(game);
     if (ts?.phase.type !== SecretVillainPhase.ElectionVote) return;
 
+    if (!payload || typeof payload !== "object") return;
     const { vote } = payload as { vote: ElectionVote };
 
     // Replace existing vote if the player already voted, otherwise append.
