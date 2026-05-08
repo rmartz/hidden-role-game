@@ -14,6 +14,8 @@ export const PLAYER_ROW_COPY = {
   transferCancel: "Cancel",
   renameTitle: "Rename yourself?",
   renameDescription: "Update your player name for this lobby.",
+  renameNoDeviceTitle: (name: string) => `Rename ${name}?`,
+  renameNoDeviceDescription: "Update this player's name for this lobby.",
   renamePlaceholder: "Enter a new name",
   renameConfirm: "Rename",
   renameCancel: "Cancel",
@@ -21,4 +23,5 @@ export const PLAYER_ROW_COPY = {
   renameButton: "Rename",
   removeButton: "Remove",
   makeOwnerButton: "Make Owner",
+  noDeviceBadge: "No device",
 } as const;
