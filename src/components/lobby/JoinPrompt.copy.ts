@@ -1,9 +1,12 @@
 export const JOIN_PROMPT_COPY = {
   cardTitle: "Join Lobby",
-  description: "Enter your name to join this lobby.",
   errorPrefix: "Error: ",
+  eyebrow: "You've been invited",
+  invitedCount: (count: number) =>
+    `${String(count)} ${count === 1 ? "player" : "players"} already joined`,
+  joinButton: "Join lobby →",
+  joining: "Joining...",
   nameLabel: "Your name",
   namePlaceholder: "Enter your name",
-  joining: "Joining...",
-  joinButton: "Join Lobby",
+  redirectNote: "Joining this lobby will leave any lobby you are currently in.",
 } as const;
