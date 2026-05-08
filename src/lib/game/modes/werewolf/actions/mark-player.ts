@@ -7,6 +7,7 @@ export const markPlayerDeadAction: GameAction = {
     if (!isOwnerPlaying(game, callerId)) return false;
     const ts = currentTurnState(game);
     if (!ts) return false;
+    if (!payload || typeof payload !== "object") return false;
     const { playerId } = payload as { playerId?: unknown };
     if (typeof playerId !== "string") return false;
     if (playerId === game.ownerPlayerId) return false;
@@ -16,6 +17,7 @@ export const markPlayerDeadAction: GameAction = {
   apply(game: Game, payload: unknown) {
     const ts = currentTurnState(game);
     if (!ts) return;
+    if (!payload || typeof payload !== "object") return;
     const { playerId } = payload as { playerId: string };
     ts.deadPlayerIds = [...ts.deadPlayerIds, playerId];
     if (didWolfCubDie([playerId], game)) {
@@ -29,6 +31,7 @@ export const markPlayerAliveAction: GameAction = {
     if (!isOwnerPlaying(game, callerId)) return false;
     const ts = currentTurnState(game);
     if (!ts) return false;
+    if (!payload || typeof payload !== "object") return false;
     const { playerId } = payload as { playerId?: unknown };
     if (typeof playerId !== "string") return false;
     return ts.deadPlayerIds.includes(playerId);
@@ -36,6 +39,7 @@ export const markPlayerAliveAction: GameAction = {
   apply(game: Game, payload: unknown) {
     const ts = currentTurnState(game);
     if (!ts) return;
+    if (!payload || typeof payload !== "object") return;
     const { playerId } = payload as { playerId: string };
     ts.deadPlayerIds = ts.deadPlayerIds.filter((id) => id !== playerId);
   },

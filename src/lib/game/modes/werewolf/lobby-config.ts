@@ -8,8 +8,8 @@ export interface WerewolfModeConfig {
   gameMode: GameMode.Werewolf;
   /** Whether player nominations for trial are enabled. */
   nominationsEnabled: boolean;
-  /** Maximum number of trials allowed per day phase. 0 means unlimited. */
-  trialsPerDay: number;
+  /** Maximum number of trials allowed per day phase. undefined means unlimited. */
+  trialsPerDay?: number;
   /** When true, the night summary reveals players who were attacked but saved by protection. */
   revealProtections: boolean;
   /** When true, a killed player's role is revealed during the game. */
@@ -69,20 +69,13 @@ export function buildDefaultWerewolfLobbyConfig(
 export function parseWerewolfModeConfig(
   raw: Record<string, unknown>,
 ): WerewolfModeConfig {
-  // Backward-compat: old config used a boolean `singleTrialPerDay` (true = 1 trial/day).
-  const legacySingleTrial =
-    typeof raw["singleTrialPerDay"] === "boolean"
-      ? raw["singleTrialPerDay"]
-        ? 1
-        : 0
-      : undefined;
   const rawTrialsPerDay = raw["trialsPerDay"];
   const trialsPerDay =
     typeof rawTrialsPerDay === "number" &&
     Number.isFinite(rawTrialsPerDay) &&
-    rawTrialsPerDay >= 0
+    rawTrialsPerDay > 0
       ? Math.floor(rawTrialsPerDay)
-      : (legacySingleTrial ?? DEFAULT_WEREWOLF_MODE_CONFIG.trialsPerDay);
+      : undefined;
   return {
     gameMode: GameMode.Werewolf,
     nominationsEnabled:

@@ -19,10 +19,11 @@ export const startTrialAction: GameAction = {
     // Trials-per-day limit: cannot start another trial once the limit is reached
     const { trialsPerDay } = getWerewolfModeConfig(game);
     if (
-      trialsPerDay > 0 &&
+      trialsPerDay !== undefined &&
       (ts.phase.concludedTrialsCount ?? 0) >= trialsPerDay
     )
       return false;
+    if (!payload || typeof payload !== "object") return false;
     const { defendantId } = payload as { defendantId?: unknown };
     if (typeof defendantId !== "string") return false;
     if (defendantId === game.ownerPlayerId) return false;
@@ -32,6 +33,7 @@ export const startTrialAction: GameAction = {
   apply(game: Game, payload: unknown) {
     const ts = currentTurnState(game);
     if (ts?.phase.type !== WerewolfPhase.Daytime) return;
+    if (!payload || typeof payload !== "object") return;
     const { defendantId } = payload as { defendantId: string };
     const silencedIds = getSilencedPlayerIds(ts);
     const hypnotizedId = getHypnotizedPlayerId(ts);

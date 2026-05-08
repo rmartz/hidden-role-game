@@ -16,6 +16,11 @@ import {
   avalonStateFromFirebase,
 } from "./avalon";
 import {
+  type FirebaseClocktowerPlayerState,
+  clocktowerStateToFirebase,
+  clocktowerStateFromFirebase,
+} from "./clocktower";
+import {
   type FirebaseCodenamesPlayerState,
   codenamesStateToFirebase,
   codenamesStateFromFirebase,
@@ -25,6 +30,7 @@ export type { FirebaseBasePlayerState } from "./base";
 export type { FirebaseWerewolfPlayerState } from "./werewolf";
 export type { FirebaseSecretVillainPlayerState } from "./secret-villain";
 export type { FirebaseAvalonPlayerState } from "./avalon";
+export type { FirebaseClocktowerPlayerState } from "./clocktower";
 export type { FirebaseCodenamesPlayerState } from "./codenames";
 
 // ---------------------------------------------------------------------------
@@ -35,6 +41,7 @@ export type FirebasePlayerState =
   | FirebaseWerewolfPlayerState
   | FirebaseSecretVillainPlayerState
   | FirebaseAvalonPlayerState
+  | FirebaseClocktowerPlayerState
   | FirebaseCodenamesPlayerState;
 
 // ---------------------------------------------------------------------------
@@ -51,6 +58,8 @@ export function playerStateToFirebase(
       return secretVillainStateToFirebase(state);
     case GameMode.Avalon:
       return avalonStateToFirebase(state);
+    case GameMode.Clocktower:
+      return clocktowerStateToFirebase(state);
     case GameMode.Codenames:
       return codenamesStateToFirebase(state);
   }
@@ -72,6 +81,8 @@ export function firebaseToPlayerState(
       return secretVillainStateFromFirebase(raw);
     case GameMode.Avalon:
       return avalonStateFromFirebase(raw);
+    case GameMode.Clocktower:
+      return clocktowerStateFromFirebase(raw as FirebaseClocktowerPlayerState);
     case GameMode.Codenames:
       return codenamesStateFromFirebase(raw);
     default:
