@@ -32,6 +32,7 @@ import { useGameAction } from "@/hooks";
 import { GameTimer } from "@/components/game";
 import { OwnerAdvanceCard } from "./OwnerAdvanceCard";
 import { OwnerInvestigationConfirm } from "./OwnerInvestigationConfirm";
+import { OwnerIlluminatiRevealPanel } from "./OwnerIlluminatiRevealPanel";
 import { OwnerNightTargetPanel } from "./OwnerNightTargetPanel";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
 import { NightPhaseOrderList } from "./NightPhaseOrderList";
@@ -167,6 +168,15 @@ export function OwnerGameNightScreen({
     activeAction.resultRevealed
   );
 
+  const isIlluminatiPhase = activeRoleDef?.revealsFullRoleList === true;
+  const isIlluminatiRevealed =
+    isIlluminatiPhase &&
+    !!(
+      activeAction &&
+      !isTeamNightAction(activeAction) &&
+      activeAction.resultRevealed
+    );
+
   const secondTargetId =
     activeAction && !isTeamNightAction(activeAction)
       ? activeAction.secondTargetPlayerId
@@ -202,7 +212,9 @@ export function OwnerGameNightScreen({
       ? WEREWOLF_COPY.narrator.playerUnconfirmed
       : investigationResult && !isResultRevealed
         ? WEREWOLF_COPY.narrator.investigationUnrevealed
-        : undefined;
+        : isIlluminatiPhase && !isIlluminatiRevealed
+          ? WEREWOLF_COPY.illuminati.revealUnconfirmed
+          : undefined;
 
   const advanceIcon = unconfirmedWarning ? (
     <ClockWarningRegular />
@@ -377,6 +389,14 @@ export function OwnerGameNightScreen({
               isResultRevealed={isResultRevealed}
               resultLabel={investigationResult.resultLabel}
               secondTargetName={investigationResult.secondTargetName}
+            />
+          )}
+          {isIlluminatiPhase && (
+            <OwnerIlluminatiRevealPanel
+              gameId={gameId}
+              players={gameState.players}
+              roleAssignments={gameState.visibleRoleAssignments}
+              isRevealed={isIlluminatiRevealed}
             />
           )}
           {exposerRevealText && (
