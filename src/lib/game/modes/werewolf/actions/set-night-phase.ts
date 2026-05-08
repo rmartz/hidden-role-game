@@ -9,6 +9,7 @@ export const setNightPhaseAction: GameAction = {
     if (!isOwnerPlaying(game, callerId)) return false;
     const ts = currentTurnState(game);
     if (ts?.phase.type !== WerewolfPhase.Nighttime) return false;
+    if (!payload || typeof payload !== "object") return false;
     const { phaseIndex } = payload as { phaseIndex?: unknown };
     return (
       typeof phaseIndex === "number" &&
@@ -19,6 +20,7 @@ export const setNightPhaseAction: GameAction = {
   apply(game: Game, payload: unknown) {
     const ts = currentTurnState(game);
     if (!ts) return;
+    if (!payload || typeof payload !== "object") return;
     const { phaseIndex } = payload as { phaseIndex: number };
     const phase = ts.phase as WerewolfNighttimePhase;
     game.status = {

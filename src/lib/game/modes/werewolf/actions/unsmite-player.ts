@@ -7,6 +7,7 @@ export const unsmitePlayerAction: GameAction = {
     if (!isOwnerPlaying(game, callerId)) return false;
     const ts = currentTurnState(game);
     if (!ts) return false;
+    if (!payload || typeof payload !== "object") return false;
     const { playerId } = payload as { playerId?: unknown };
     if (typeof playerId !== "string") return false;
     switch (ts.phase.type) {
@@ -21,6 +22,7 @@ export const unsmitePlayerAction: GameAction = {
   apply(game: Game, payload: unknown) {
     const ts = currentTurnState(game);
     if (!ts) return;
+    if (!payload || typeof payload !== "object") return;
     const { playerId } = payload as { playerId: string };
     switch (ts.phase.type) {
       case WerewolfPhase.Nighttime:
