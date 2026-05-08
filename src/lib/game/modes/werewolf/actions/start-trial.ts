@@ -19,7 +19,7 @@ export const startTrialAction: GameAction = {
     // Trials-per-day limit: cannot start another trial once the limit is reached
     const { trialsPerDay } = getWerewolfModeConfig(game);
     if (
-      trialsPerDay > 0 &&
+      trialsPerDay !== undefined &&
       (ts.phase.concludedTrialsCount ?? 0) >= trialsPerDay
     )
       return false;
