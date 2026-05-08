@@ -12,6 +12,15 @@ export const revealInvestigationResultAction: GameAction = {
     const activePhaseKey = phase.nightPhaseOrder[phase.currentPhaseIndex];
     if (!activePhaseKey) return false;
     const roleDef = getWerewolfRole(activePhaseKey);
+
+    // Illuminati (revealsFullRoleList): no target confirmation needed — just reveal the role list.
+    if (roleDef?.revealsFullRoleList) {
+      const action = phase.nightActions[activePhaseKey];
+      if (!action) return true;
+      if (isTeamNightAction(action)) return false;
+      return !action.resultRevealed;
+    }
+
     if (roleDef?.targetCategory !== TargetCategory.Investigate) return false;
     const action = phase.nightActions[activePhaseKey];
     if (!action || isTeamNightAction(action)) return false;
@@ -30,6 +39,12 @@ export const revealInvestigationResultAction: GameAction = {
         ...action,
         resultRevealed: true,
       };
+    } else if (!action) {
+      // Illuminati case: no prior action — create one with resultRevealed.
+      const roleDef = getWerewolfRole(activePhaseKey);
+      if (roleDef?.revealsFullRoleList) {
+        phase.nightActions[activePhaseKey] = { resultRevealed: true };
+      }
     }
   },
 };

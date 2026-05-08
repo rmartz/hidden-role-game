@@ -186,6 +186,17 @@ export function SecretVillainGameScreen({
           actionId: SecretVillainAction.AdvanceFromElection,
         });
       }}
+      onConfirmSpecialBad={() => {
+        action.mutate({ actionId: SecretVillainAction.ConfirmSpecialBad });
+      }}
+      onRevealSpecialBad={() => {
+        action.mutate({ actionId: SecretVillainAction.RevealSpecialBad });
+      }}
+      onAdvanceFromSpecialBadReveal={() => {
+        action.mutate({
+          actionId: SecretVillainAction.AdvanceFromSpecialBadReveal,
+        });
+      }}
       onConsent={() => {
         action.mutate({
           actionId: SecretVillainAction.ConsentInvestigation,
