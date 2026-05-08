@@ -319,14 +319,14 @@ describe("WerewolfAction.StartTrial — trialsPerDay", () => {
     expect(action.isValid(game, "owner-1", { defendantId: "p4" })).toBe(false);
   });
 
-  it("allows starting a trial when trialsPerDay is 0 (unlimited)", () => {
+  it("allows starting a trial when trialsPerDay is undefined (unlimited)", () => {
     const ds = makeDayState();
     (ds.phase as WerewolfDaytimePhase).concludedTrialsCount = 5;
     const game = makePlayingGame(ds, {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: false,
-        trialsPerDay: 0,
+        trialsPerDay: undefined,
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
