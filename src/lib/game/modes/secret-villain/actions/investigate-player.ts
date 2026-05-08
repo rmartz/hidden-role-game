@@ -18,6 +18,7 @@ export const selectInvestigationTargetAction: GameAction = {
     if (ts.phase.presidentId !== callerId) return false;
     if (ts.phase.targetPlayerId !== undefined) return false;
 
+    if (!payload || typeof payload !== "object") return false;
     const { targetPlayerId } = payload as { targetPlayerId?: unknown };
     if (typeof targetPlayerId !== "string") return false;
     if (targetPlayerId === callerId) return false;
@@ -29,6 +30,7 @@ export const selectInvestigationTargetAction: GameAction = {
     const ts = currentTurnState(game);
     if (ts?.phase.type !== SecretVillainPhase.SpecialAction) return;
 
+    if (!payload || typeof payload !== "object") return;
     const { targetPlayerId } = payload as { targetPlayerId: string };
     ts.phase.targetPlayerId = targetPlayerId;
   },

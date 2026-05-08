@@ -10,6 +10,7 @@ export const resolveHunterRevengeAction: GameAction = {
     if (!ts) return false;
     if (ts.phase.type !== WerewolfPhase.Daytime) return false;
     if (!ts.hunterRevengePlayerId) return false;
+    if (!payload || typeof payload !== "object") return false;
     const { targetPlayerId } = payload as { targetPlayerId?: unknown };
     if (typeof targetPlayerId !== "string") return false;
     return !ts.deadPlayerIds.includes(targetPlayerId);
@@ -17,6 +18,7 @@ export const resolveHunterRevengeAction: GameAction = {
   apply(game: Game, payload: unknown) {
     const ts = currentTurnState(game);
     if (!ts) return;
+    if (!payload || typeof payload !== "object") return;
 
     const { targetPlayerId } = payload as { targetPlayerId: string };
     ts.deadPlayerIds = [...ts.deadPlayerIds, targetPlayerId];

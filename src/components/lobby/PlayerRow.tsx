@@ -23,12 +23,14 @@ interface PlayerRowProps {
   player: PublicLobbyPlayer;
   ownerPlayerId: string;
   isCurrentUser: boolean;
+  isOwner: boolean;
   isReady: boolean;
   showLeave: boolean;
   showRemovePlayer: boolean;
   showMakeOwner: boolean;
   disabled: boolean;
   isRenamePending: boolean;
+  isOwnerRenamePending: boolean;
   /** Show grip and allow this row to be dragged. */
   canDrag?: boolean;
   /** Accept dragover events so other players can be dropped here. */
@@ -36,6 +38,7 @@ interface PlayerRowProps {
   onRemovePlayer: (playerId: string) => void;
   onTransferOwner: (playerId: string) => void;
   onRenamePlayer: (playerName: string) => void;
+  onRenameNoDevicePlayer?: (playerId: string, playerName: string) => void;
   onDragStart?: (playerId: string) => void;
   onDragOver?: (playerId: string) => void;
   onDragEnd?: () => void;
@@ -43,6 +46,8 @@ interface PlayerRowProps {
 
 interface RenamePlayerDialogProps {
   playerName: string;
+  title: string;
+  description: string;
   disabled: boolean;
   isPending: boolean;
   onRename: (name: string) => void;
@@ -50,6 +55,8 @@ interface RenamePlayerDialogProps {
 
 function RenamePlayerDialog({
   playerName,
+  title,
+  description,
   disabled,
   isPending,
   onRename,
@@ -71,10 +78,8 @@ function RenamePlayerDialog({
       </AlertDialogTrigger>
       <AlertDialogContent size="sm">
         <AlertDialogHeader>
-          <AlertDialogTitle>{PLAYER_ROW_COPY.renameTitle}</AlertDialogTitle>
-          <AlertDialogDescription>
-            {PLAYER_ROW_COPY.renameDescription}
-          </AlertDialogDescription>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <Input
           value={renameValue}
@@ -109,21 +114,29 @@ export function PlayerRow({
   player,
   ownerPlayerId,
   isCurrentUser,
+  isOwner,
   isReady,
   showLeave,
   showRemovePlayer,
   showMakeOwner,
   disabled,
   isRenamePending,
+  isOwnerRenamePending,
   canDrag,
   canReceiveDrop,
   onRemovePlayer,
   onTransferOwner,
   onRenamePlayer,
+  onRenameNoDevicePlayer,
   onDragStart,
   onDragOver,
   onDragEnd,
 }: PlayerRowProps) {
+  const ownerRenameNoDevice =
+    !isCurrentUser && isOwner && player.noDevice
+      ? onRenameNoDevicePlayer
+      : undefined;
+
   return (
     <li
       className={cn("flex items-center gap-2 py-1", canDrag && "select-none")}
@@ -189,13 +202,32 @@ export function PlayerRow({
           Lobby owner
         </Badge>
       )}
+      {player.noDevice && (
+        <Badge variant="outline" className="shrink-0 text-muted-foreground">
+          {PLAYER_ROW_COPY.noDeviceBadge}
+        </Badge>
+      )}
       <div className="ml-auto flex items-center gap-2 shrink-0">
         {isCurrentUser && (
           <RenamePlayerDialog
             playerName={player.name}
+            title={PLAYER_ROW_COPY.renameTitle}
+            description={PLAYER_ROW_COPY.renameDescription}
             disabled={disabled}
             isPending={isRenamePending}
             onRename={onRenamePlayer}
+          />
+        )}
+        {ownerRenameNoDevice && (
+          <RenamePlayerDialog
+            playerName={player.name}
+            title={PLAYER_ROW_COPY.renameNoDeviceTitle(player.name)}
+            description={PLAYER_ROW_COPY.renameNoDeviceDescription}
+            disabled={disabled}
+            isPending={isOwnerRenamePending}
+            onRename={(playerName) => {
+              ownerRenameNoDevice(player.id, playerName);
+            }}
           />
         )}
         {isCurrentUser && showLeave && (
@@ -266,7 +298,7 @@ export function PlayerRow({
             </AlertDialogContent>
           </AlertDialog>
         )}
-        {!isCurrentUser && showMakeOwner && (
+        {!isCurrentUser && showMakeOwner && !player.noDevice && (
           <AlertDialog>
             <AlertDialogTrigger
               render={

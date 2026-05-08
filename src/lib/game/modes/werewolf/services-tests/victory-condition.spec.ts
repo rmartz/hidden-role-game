@@ -111,7 +111,7 @@ describe("werewolfServices extractPlayerState victoryCondition", () => {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: false,
-        trialsPerDay: 0,
+        trialsPerDay: undefined,
         revealProtections: true,
         hiddenRoleCount: 0,
         showRolesOnDeath: true,
