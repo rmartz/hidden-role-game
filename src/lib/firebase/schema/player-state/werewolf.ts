@@ -1,5 +1,4 @@
 import { GameMode } from "@/lib/types";
-import type { Team } from "@/lib/types";
 import type { AnyNightAction, DaytimeVote } from "@/lib/game/modes/werewolf";
 import { TrialVerdict } from "@/lib/game/modes/werewolf";
 import type { NightStatusEntry } from "@/server/types";
@@ -60,7 +59,6 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
   mirrorcasterCharged?: boolean;
   oneEyedSeerLockedTargetId?: string;
   elusiveSeerVillagerIds?: string[];
-  exposerReveal?: { playerName: string; roleName: string; team: string };
   mySecondNightTarget?: string;
   exposerAbilityUsed?: boolean;
   hunterRevengePlayerId?: string;
@@ -128,7 +126,6 @@ export function werewolfStateToFirebase(
     ...(state.elusiveSeerVillagerIds?.length
       ? { elusiveSeerVillagerIds: state.elusiveSeerVillagerIds }
       : {}),
-    ...(state.exposerReveal ? { exposerReveal: state.exposerReveal } : {}),
     ...(state.mySecondNightTarget
       ? { mySecondNightTarget: state.mySecondNightTarget }
       : {}),
@@ -203,14 +200,6 @@ export function werewolfStateFromFirebase(
       : {}),
     ...(raw.elusiveSeerVillagerIds?.length
       ? { elusiveSeerVillagerIds: raw.elusiveSeerVillagerIds }
-      : {}),
-    ...(raw.exposerReveal
-      ? {
-          exposerReveal: {
-            ...raw.exposerReveal,
-            team: raw.exposerReveal.team as Team,
-          },
-        }
       : {}),
     ...(raw.mySecondNightTarget
       ? { mySecondNightTarget: raw.mySecondNightTarget }

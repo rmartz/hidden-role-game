@@ -60,8 +60,6 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   oneEyedSeerLockedTargetId?: string;
   /** Elusive Seer: player IDs of all Villagers. */
   elusiveSeerVillagerIds?: string[];
-  /** Role publicly revealed by the Exposer. */
-  exposerReveal?: { playerName: string; roleName: string; team: Team };
   /** Mentalist: second night target. */
   mySecondNightTarget?: string;
   /** Whether the Witch has used their once-per-game ability. */

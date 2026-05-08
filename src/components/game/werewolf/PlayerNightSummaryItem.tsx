@@ -11,6 +11,7 @@ interface PlayerNightSummaryItemProps {
   hypnotized: boolean;
   smited: boolean;
   peaceful: boolean;
+  exposedRoleName?: string;
   isMe: boolean;
 }
 
@@ -25,6 +26,7 @@ export function PlayerNightSummaryItem({
   hypnotized,
   smited,
   peaceful,
+  exposedRoleName,
   isMe,
 }: PlayerNightSummaryItemProps) {
   // Personal messages for silenced/hypnotized player (only visible to themselves).
@@ -79,6 +81,14 @@ export function PlayerNightSummaryItem({
     return (
       <li className="text-sm">
         {WEREWOLF_COPY.oldMan.peacefulDeath(playerName)}
+      </li>
+    );
+  }
+
+  if (exposedRoleName) {
+    return (
+      <li className="text-sm font-medium text-purple-700 dark:text-purple-400">
+        {WEREWOLF_COPY.exposer.nightSummary(playerName, exposedRoleName)}
       </li>
     );
   }

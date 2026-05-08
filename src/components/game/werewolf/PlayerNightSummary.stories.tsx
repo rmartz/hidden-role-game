@@ -70,6 +70,15 @@ export const MultipleEffects: Story = {
   },
 };
 
+export const PlayerExposed: Story = {
+  args: {
+    players,
+    nightStatus: [
+      { targetPlayerId: "p4", effect: "exposed", roleName: "Seer" },
+    ] satisfies DaytimeNightStatusEntry[],
+  },
+};
+
 export const NoEvents: Story = {
   args: {
     players,

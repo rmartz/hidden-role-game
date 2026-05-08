@@ -44,6 +44,7 @@ export function makeDaytimeGame(
     revealedPlayerIds: string[];
     deadPlayerIds: string[];
     modeConfig: Partial<WerewolfModeConfig>;
+    exposerReveal: WerewolfTurnState["exposerReveal"];
   }> = {},
 ): Game {
   const modeConfig: WerewolfModeConfig = {
@@ -73,6 +74,9 @@ export function makeDaytimeGame(
         : {}),
     },
     deadPlayerIds: overrides.deadPlayerIds ?? [],
+    ...(overrides.exposerReveal
+      ? { exposerReveal: overrides.exposerReveal }
+      : {}),
   };
   return {
     id: "game-1",

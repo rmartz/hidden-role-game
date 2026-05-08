@@ -220,4 +220,51 @@ describe("extractDaytimeNightSummary", () => {
       { targetPlayerId: "p3", effect: "silenced" },
     ]);
   });
+
+  it("nightStatus contains exposed entry when exposerReveal is set", () => {
+    const game = makeDaytimeGame({
+      exposerReveal: { playerId: "p2", roleId: WerewolfRole.Seer },
+    });
+
+    const result = extractDaytimeState(game, "p1");
+    expect(result.nightStatus).toEqual([
+      { targetPlayerId: "p2", effect: "exposed", roleName: "Seer" },
+    ]);
+  });
+
+  it("nightStatus exposed entry is visible to all players", () => {
+    const game = makeDaytimeGame({
+      exposerReveal: { playerId: "p2", roleId: WerewolfRole.Seer },
+    });
+
+    const playerResult = extractDaytimeState(game, "p3");
+    const narratorResult = extractDaytimeState(game, "owner");
+    expect(playerResult.nightStatus).toEqual([
+      { targetPlayerId: "p2", effect: "exposed", roleName: "Seer" },
+    ]);
+    expect(narratorResult.nightStatus).toEqual([
+      { targetPlayerId: "p2", effect: "exposed", roleName: "Seer" },
+    ]);
+  });
+
+  it("nightStatus contains both kill and exposed entries when both occur", () => {
+    const game = makeDaytimeGame({
+      nightResolution: [
+        {
+          type: "killed" as const,
+          targetPlayerId: "p3",
+          attackedBy: ["p1"],
+          protectedBy: [],
+          died: true,
+        },
+      ],
+      exposerReveal: { playerId: "p2", roleId: WerewolfRole.Seer },
+    });
+
+    const result = extractDaytimeState(game, "p1");
+    expect(result.nightStatus).toEqual([
+      { targetPlayerId: "p3", effect: "killed" },
+      { targetPlayerId: "p2", effect: "exposed", roleName: "Seer" },
+    ]);
+  });
 });
