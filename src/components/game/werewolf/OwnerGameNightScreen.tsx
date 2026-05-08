@@ -36,6 +36,86 @@ import { OwnerNightTargetPanel } from "./OwnerNightTargetPanel";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
 import { NightPhaseOrderList } from "./NightPhaseOrderList";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import type { AnyNightAction } from "@/lib/game/modes/werewolf";
+import { NightMarkerEffect } from "./NightActionMarker";
+
+/**
+ * Derives per-player night action status markers from the narrator's night actions.
+ * Each player gets a marker for every confirmed role action targeting them.
+ * Priest wards are included for warded players.
+ */
+function buildNightMarkers(
+  nightActions: Record<string, AnyNightAction>,
+  priestWards?: Record<string, string>,
+  mirrorcasterCharged?: boolean,
+): Map<string, NightMarkerEffect[]> {
+  const markers = new Map<string, NightMarkerEffect[]>();
+
+  const addMarker = (playerId: string, effect: NightMarkerEffect) => {
+    const existing = markers.get(playerId);
+    if (existing) {
+      existing.push(effect);
+    } else {
+      markers.set(playerId, [effect]);
+    }
+  };
+
+  for (const [phaseKey, action] of Object.entries(nightActions)) {
+    const targetId = isTeamNightAction(action)
+      ? action.suggestedTargetId
+      : action.targetPlayerId;
+    if (!targetId) continue;
+
+    if (isGroupPhaseKey(phaseKey)) {
+      addMarker(targetId, NightMarkerEffect.Attacked);
+      continue;
+    }
+
+    if (isRoleActive(phaseKey, WerewolfRole.Spellcaster)) {
+      addMarker(targetId, NightMarkerEffect.Silenced);
+      continue;
+    }
+
+    if (isRoleActive(phaseKey, WerewolfRole.Mummy)) {
+      addMarker(targetId, NightMarkerEffect.Hypnotized);
+      continue;
+    }
+
+    if (isRoleActive(phaseKey, WerewolfRole.Mirrorcaster)) {
+      addMarker(
+        targetId,
+        mirrorcasterCharged
+          ? NightMarkerEffect.Attacked
+          : NightMarkerEffect.Protected,
+      );
+      continue;
+    }
+
+    const roleDef = getWerewolfRole(phaseKey);
+    if (!roleDef) continue;
+
+    switch (roleDef.targetCategory) {
+      case TargetCategory.Attack:
+        addMarker(targetId, NightMarkerEffect.Attacked);
+        break;
+      case TargetCategory.Protect:
+        addMarker(targetId, NightMarkerEffect.Protected);
+        break;
+      case TargetCategory.Investigate:
+        addMarker(targetId, NightMarkerEffect.Investigated);
+        break;
+      default:
+        addMarker(targetId, NightMarkerEffect.Special);
+    }
+  }
+
+  // Priest wards: mark all warded players as Protected.
+  for (const wardedPlayerId of Object.keys(priestWards ?? {})) {
+    addMarker(wardedPlayerId, NightMarkerEffect.Protected);
+  }
+
+  return markers;
+}
 
 interface OwnerGameNightScreenProps {
   gameId: string;
@@ -79,6 +159,22 @@ export function OwnerGameNightScreen({
   );
 
   const nightActions = phase.nightActions;
+  const nightStatusMarkers = useMemo(
+    () =>
+      isNighttime
+        ? buildNightMarkers(
+            nightActions,
+            turnState.priestWards,
+            turnState.mirrorcasterCharged,
+          )
+        : undefined,
+    [
+      isNighttime,
+      nightActions,
+      turnState.priestWards,
+      turnState.mirrorcasterCharged,
+    ],
+  );
   const activePhaseKey = nightPhaseOrder[currentPhaseIndex] ?? "";
   useEffect(() => {
     setAbilityBypass(false);
@@ -384,6 +480,7 @@ export function OwnerGameNightScreen({
         gameOwnerId={gameState.gameOwner?.id}
         smitedPlayerIds={phase.smitedPlayerIds}
         executionerTargetId={gameState.executionerTargetId}
+        nightStatusMarkers={nightStatusMarkers}
       />
     </div>
   );
