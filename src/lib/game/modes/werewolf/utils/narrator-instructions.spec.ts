@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { buildNarratorInstruction } from "./narrator-instructions";
 import { WerewolfRole } from "../roles";
+import { GROUP_PHASE_KEY_SEPARATOR } from "./phase-keys";
 
 describe("buildNarratorInstruction", () => {
   describe("Werewolf group phase", () => {
@@ -44,7 +45,7 @@ describe("buildNarratorInstruction", () => {
         activeRoleIds,
       );
       expect(result?.preWake).toBe(
-        "All werewolves, including Wolf Cub, raise your thumbs.",
+        "All Werewolves, including Wolf Cub, raise your thumbs.",
       );
     });
 
@@ -59,7 +60,7 @@ describe("buildNarratorInstruction", () => {
         activeRoleIds,
       );
       expect(result?.preWake).toBe(
-        "All werewolves, including Lone Wolf, raise your thumbs.",
+        "All Werewolves, including Lone Wolf, raise your thumbs.",
       );
     });
   });
@@ -129,6 +130,20 @@ describe("buildNarratorInstruction", () => {
         "Tell Elusive Seer to open their eyes.",
       );
       expect(result?.postWake).toBeUndefined();
+    });
+  });
+
+  describe("group phase key with suffix", () => {
+    it("normalizes a suffixed group phase key to the base role", () => {
+      const suffixedKey = `${WerewolfRole.Werewolf}${GROUP_PHASE_KEY_SEPARATOR}2`;
+      const activeRoleIds = new Set([WerewolfRole.Werewolf]);
+      const result = buildNarratorInstruction(suffixedKey, activeRoleIds);
+      expect(result?.wakeInstruction).toBe(
+        "Tell all Werewolves to open their eyes.",
+      );
+      expect(result?.postWake).toBe(
+        "Tell them to find their teammates and choose a target.",
+      );
     });
   });
 

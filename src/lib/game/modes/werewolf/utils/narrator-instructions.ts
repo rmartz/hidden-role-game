@@ -36,7 +36,7 @@ export function buildNarratorInstruction(
     const extraNames = extraWerewolfRoleNames(activeRoleIds);
     const preWake =
       extraNames.length > 0
-        ? `All werewolves, including ${extraNames.join(", ")}, raise your thumbs.`
+        ? `All Werewolves, including ${extraNames.join(", ")}, raise your thumbs.`
         : "All Werewolves, raise your thumbs.";
     return {
       preWake,

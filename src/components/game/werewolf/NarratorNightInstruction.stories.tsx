@@ -25,7 +25,7 @@ export const MinionWithExtraWerewolves: Story = {
   args: {
     instruction: {
       preWake:
-        "All werewolves, including Wolf Cub, Lone Wolf, raise your thumbs.",
+        "All Werewolves, including Wolf Cub, Lone Wolf, raise your thumbs.",
       wakeInstruction: "Tell Minion to open their eyes.",
       postWake: "Tell them to look around, then close their eyes.",
     },
