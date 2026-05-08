@@ -18,6 +18,7 @@ export const chancellorPlayAction: GameAction = {
     if (ts.phase.chancellorId !== callerId) return false;
     if (ts.phase.playedCard !== undefined) return false;
 
+    if (!payload || typeof payload !== "object") return false;
     const { cardIndex } = payload as { cardIndex?: unknown };
     if (typeof cardIndex !== "number") return false;
     return cardIndex >= 0 && cardIndex < 2;
@@ -28,6 +29,7 @@ export const chancellorPlayAction: GameAction = {
     if (ts?.phase.type !== SecretVillainPhase.PolicyChancellor) return;
     if (ts.phase.chancellorId !== callerId) return;
 
+    if (!payload || typeof payload !== "object") return;
     const { cardIndex } = payload as { cardIndex: number };
     const remainingCards = [...ts.phase.remainingCards];
     const [played] = remainingCards.splice(cardIndex, 1);

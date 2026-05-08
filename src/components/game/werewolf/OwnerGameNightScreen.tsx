@@ -32,6 +32,7 @@ import { useGameAction } from "@/hooks";
 import { GameTimer } from "@/components/game";
 import { OwnerAdvanceCard } from "./OwnerAdvanceCard";
 import { OwnerInvestigationConfirm } from "./OwnerInvestigationConfirm";
+import { OwnerIlluminatiRevealPanel } from "./OwnerIlluminatiRevealPanel";
 import { OwnerNightTargetPanel } from "./OwnerNightTargetPanel";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
 import { NightPhaseOrderList } from "./NightPhaseOrderList";
@@ -155,6 +156,15 @@ export function OwnerGameNightScreen({
     activeAction.resultRevealed
   );
 
+  const isIlluminatiPhase = activeRoleDef?.revealsFullRoleList === true;
+  const isIlluminatiRevealed =
+    isIlluminatiPhase &&
+    !!(
+      activeAction &&
+      !isTeamNightAction(activeAction) &&
+      activeAction.resultRevealed
+    );
+
   const secondTargetId =
     activeAction && !isTeamNightAction(activeAction)
       ? activeAction.secondTargetPlayerId
@@ -190,7 +200,9 @@ export function OwnerGameNightScreen({
       ? WEREWOLF_COPY.narrator.playerUnconfirmed
       : investigationResult && !isResultRevealed
         ? WEREWOLF_COPY.narrator.investigationUnrevealed
-        : undefined;
+        : isIlluminatiPhase && !isIlluminatiRevealed
+          ? WEREWOLF_COPY.illuminati.revealUnconfirmed
+          : undefined;
 
   const advanceIcon = unconfirmedWarning ? (
     <ClockWarningRegular />
@@ -241,13 +253,42 @@ export function OwnerGameNightScreen({
           nightPhaseOrder.length,
         )}
       </h1>
-      <GameTimer
-        durationSeconds={timerConfig.nightPhaseSeconds}
-        autoAdvance={timerConfig.autoAdvance}
-        startedAt={phaseStartedAt}
-        onTimerTrigger={handleAdvance}
-        resetKey={currentPhaseIndex}
-      />
+      <div className="flex items-center gap-3 mb-4">
+        <GameTimer
+          durationSeconds={timerConfig.nightPhaseSeconds}
+          autoAdvance={timerConfig.autoAdvance}
+          startedAt={phaseStartedAt}
+          onTimerTrigger={handleAdvance}
+          resetKey={currentPhaseIndex}
+          pausedAt={
+            phase.pausedAt !== undefined ? new Date(phase.pausedAt) : undefined
+          }
+          pauseOffset={phase.pauseOffset ?? 0}
+        />
+        {phase.pausedAt !== undefined ? (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              action.mutate({ actionId: WerewolfAction.ResumeTimer });
+            }}
+            disabled={action.isPending}
+          >
+            {WEREWOLF_COPY.narrator.resumeTimer}
+          </Button>
+        ) : (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              action.mutate({ actionId: WerewolfAction.PauseTimer });
+            }}
+            disabled={action.isPending}
+          >
+            {WEREWOLF_COPY.narrator.pauseTimer}
+          </Button>
+        )}
+      </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
         <OwnerAdvanceCard
           label={
@@ -333,6 +374,14 @@ export function OwnerGameNightScreen({
               isResultRevealed={isResultRevealed}
               resultLabel={investigationResult.resultLabel}
               secondTargetName={investigationResult.secondTargetName}
+            />
+          )}
+          {isIlluminatiPhase && (
+            <OwnerIlluminatiRevealPanel
+              gameId={gameId}
+              players={gameState.players}
+              roleAssignments={gameState.visibleRoleAssignments}
+              isRevealed={isIlluminatiRevealed}
             />
           )}
           {exposerRevealText && (

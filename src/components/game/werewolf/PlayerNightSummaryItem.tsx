@@ -49,7 +49,7 @@ export function PlayerNightSummaryItem({
   if (survived) {
     const suffix = silenced ? " You have also been silenced." : "";
     return (
-      <li className="text-sm font-medium text-orange-600">
+      <li className="text-sm font-medium text-orange-800 dark:text-orange-400">
         {WEREWOLF_COPY.day.toughGuySurvived}
         {suffix}
       </li>
@@ -69,7 +69,7 @@ export function PlayerNightSummaryItem({
 
   if (wasProtected) {
     return (
-      <li className="text-sm font-medium text-green-600">
+      <li className="text-sm font-medium text-green-800 dark:text-green-400">
         {WEREWOLF_COPY.day.protected(playerName)}
       </li>
     );

@@ -15,6 +15,7 @@ export const proposeTeamAction: GameAction = {
     if (ts.phase.type !== AvalonPhase.TeamProposal) return false;
     if (ts.phase.leaderId !== callerId) return false;
 
+    if (!payload || typeof payload !== "object") return false;
     const { teamPlayerIds } = payload as { teamPlayerIds?: unknown };
     if (!Array.isArray(teamPlayerIds)) return false;
     if (teamPlayerIds.length !== ts.phase.teamSize) return false;
@@ -31,6 +32,7 @@ export const proposeTeamAction: GameAction = {
   apply(game: Game, payload: unknown) {
     const ts = currentTurnState(game);
     if (ts?.phase.type !== AvalonPhase.TeamProposal) return;
+    if (!payload || typeof payload !== "object") return;
 
     const { teamPlayerIds } = payload as { teamPlayerIds: string[] };
 

@@ -51,6 +51,13 @@ export interface SvElectionVoteEntry {
   vote: ElectionVote;
 }
 
+/** State for the SpecialBadReveal checkpoint, visible to all players. */
+export interface SvSpecialBadRevealState {
+  chancellorId: string;
+  /** Set once the chancellor acts. true = revealed (Bad wins), false = denied (policy continues). */
+  revealed?: boolean;
+}
+
 /** Investigation result visible to the president. */
 export interface SvInvestigationResult {
   targetPlayerId: string;
@@ -90,6 +97,8 @@ export interface SecretVillainPlayerGameState extends BasePlayerGameState {
   electionPassed?: boolean;
   /** Whether veto power is unlocked (4+ Bad cards). */
   vetoUnlocked?: boolean;
+  /** Special Bad reveal checkpoint state (all players). */
+  svSpecialBadReveal?: SvSpecialBadRevealState;
   /** Investigation result (president only). */
   svInvestigationResult?: SvInvestigationResult;
   /** True when this player is the investigation target and needs to consent. */

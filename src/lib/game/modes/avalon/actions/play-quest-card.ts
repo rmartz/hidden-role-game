@@ -31,6 +31,7 @@ export const playQuestCardAction: GameAction = {
     // No replaying
     if (ts.phase.cards.some((c) => c.playerId === callerId)) return false;
 
+    if (!payload || typeof payload !== "object") return false;
     const { card } = payload as { card?: unknown };
     if (typeof card !== "string") return false;
     if (!VALID_CARDS.includes(card as QuestCard)) return false;
@@ -46,6 +47,7 @@ export const playQuestCardAction: GameAction = {
   apply(game: Game, payload: unknown, callerId: string) {
     const ts = currentTurnState(game);
     if (ts?.phase.type !== AvalonPhase.Quest) return;
+    if (!payload || typeof payload !== "object") return;
 
     const { card } = payload as { card: QuestCard };
     ts.phase.cards = [...ts.phase.cards, { playerId: callerId, card }];
