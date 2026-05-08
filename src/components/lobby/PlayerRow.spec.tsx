@@ -17,12 +17,14 @@ const otherPlayer: PublicLobbyPlayer = { id: "player-2", name: "Bob" };
 
 const defaultProps = {
   ownerPlayerId: "player-1",
+  isOwner: false,
   isReady: false,
   showLeave: true,
   showRemovePlayer: false,
   showMakeOwner: false,
   disabled: false,
   isRenamePending: false,
+  isOwnerRenamePending: false,
   onRemovePlayer: vi.fn(),
   onTransferOwner: vi.fn(),
   onRenamePlayer: vi.fn(),
@@ -134,6 +136,64 @@ describe("PlayerRow", () => {
       </ul>,
     );
     expect(screen.getByText(PLAYER_ROW_COPY.makeOwnerButton)).toBeDefined();
+  });
+
+  it("shows 'No device' badge for no-device players", () => {
+    const noDevicePlayer: PublicLobbyPlayer = {
+      id: "player-3",
+      name: "Charlie",
+      noDevice: true,
+    };
+    render(
+      <ul>
+        <PlayerRow
+          {...defaultProps}
+          player={noDevicePlayer}
+          isCurrentUser={false}
+        />
+      </ul>,
+    );
+    expect(screen.getByText(PLAYER_ROW_COPY.noDeviceBadge)).toBeDefined();
+  });
+
+  it("shows Rename button for owner renaming a no-device player", () => {
+    const noDevicePlayer: PublicLobbyPlayer = {
+      id: "player-3",
+      name: "Charlie",
+      noDevice: true,
+    };
+    const onRenameNoDevicePlayer = vi.fn();
+    render(
+      <ul>
+        <PlayerRow
+          {...defaultProps}
+          player={noDevicePlayer}
+          isCurrentUser={false}
+          isOwner={true}
+          onRenameNoDevicePlayer={onRenameNoDevicePlayer}
+        />
+      </ul>,
+    );
+    expect(screen.getByText(PLAYER_ROW_COPY.renameButton)).toBeDefined();
+  });
+
+  it("does not show Make Owner button for no-device players", () => {
+    const noDevicePlayer: PublicLobbyPlayer = {
+      id: "player-3",
+      name: "Charlie",
+      noDevice: true,
+    };
+    render(
+      <ul>
+        <PlayerRow
+          {...defaultProps}
+          player={noDevicePlayer}
+          isCurrentUser={false}
+          showMakeOwner={true}
+        />
+      </ul>,
+    );
+    expect(screen.queryByText(PLAYER_ROW_COPY.makeOwnerButton)).toBeNull();
   });
 
   it("calls onRenamePlayer when the rename dialog is confirmed", () => {
