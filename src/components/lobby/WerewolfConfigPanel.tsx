@@ -11,7 +11,7 @@ import type { IncrementDirection } from "./Incrementer";
 interface WerewolfConfigPanelProps {
   timerConfig: WerewolfTimerConfig;
   nominationEnabled: boolean;
-  trialsPerDay: number;
+  trialsPerDay?: number;
   revealProtections: boolean;
   showRolesOnDeath: boolean;
   hiddenRole: boolean;
@@ -19,7 +19,7 @@ interface WerewolfConfigPanelProps {
   disabled?: boolean;
   onWerewolfTimerConfigChange?: (config: WerewolfTimerConfig) => void;
   onNominationEnabledChange?: (value: boolean) => void;
-  onTrialsPerDayChange?: (value: number) => void;
+  onTrialsPerDayChange?: (value: number | undefined) => void;
   onRevealProtectionsChange?: (value: boolean) => void;
   onShowRolesOnDeathChange?: (value: boolean) => void;
   onHiddenRoleChange?: (value: boolean) => void;
@@ -45,9 +45,9 @@ export function WerewolfConfigPanel({
 }: WerewolfConfigPanelProps) {
   function handleTrialsPerDayChange(direction: IncrementDirection) {
     if (!onTrialsPerDayChange) return;
-    const next =
-      direction === "increment" ? trialsPerDay + 1 : trialsPerDay - 1;
-    onTrialsPerDayChange(Math.max(0, next));
+    const current = trialsPerDay ?? 0;
+    const next = direction === "increment" ? current + 1 : current - 1;
+    onTrialsPerDayChange(next <= 0 ? undefined : next);
   }
 
   return (
@@ -65,7 +65,7 @@ export function WerewolfConfigPanel({
       </div>
       <div className="flex items-center gap-2">
         <Incrementer
-          value={trialsPerDay}
+          value={trialsPerDay ?? 0}
           minValue={0}
           maxValue={10}
           disabled={
