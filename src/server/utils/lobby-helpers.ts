@@ -2,7 +2,9 @@ import type { Lobby } from "@/lib/types";
 import type { GameConfig, PublicLobby } from "@/server/types";
 
 export function isValidSession(lobby: Lobby, sessionId: string): boolean {
-  return lobby.players.some((p) => p.sessionId === sessionId);
+  return lobby.players.some(
+    (p) => p.sessionId !== undefined && p.sessionId === sessionId,
+  );
 }
 
 export function toPublicLobby(
@@ -15,7 +17,11 @@ export function toPublicLobby(
   return {
     id: lobby.id,
     ownerPlayerId: owner?.id ?? "",
-    players: lobby.players.map((p) => ({ id: p.id, name: p.name })),
+    players: lobby.players.map((p) => ({
+      id: p.id,
+      name: p.name,
+      ...(p.noDevice ? { noDevice: true } : {}),
+    })),
     playerOrder: lobby.playerOrder,
     config: {
       gameMode: lobby.config.gameMode,
