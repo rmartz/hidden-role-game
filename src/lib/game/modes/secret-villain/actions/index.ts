@@ -17,11 +17,19 @@ import {
   resolveElectionAction,
 } from "./resolve-election";
 import { shootPlayerAction } from "./shoot-player";
+import {
+  advanceFromSpecialBadRevealAction,
+  confirmSpecialBadAction,
+  revealSpecialBadAction,
+} from "./special-bad-reveal";
 
 export enum SecretVillainAction {
   AdvanceFromElection = "advance-from-election",
+  AdvanceFromSpecialBadReveal = "advance-from-special-bad-reveal",
   CallSpecialElection = "call-special-election",
   CastElectionVote = "cast-election-vote",
+  ConfirmSpecialBad = "confirm-special-bad",
+  RevealSpecialBad = "reveal-special-bad",
   ChancellorPlay = "chancellor-play",
   ConsentInvestigation = "consent-investigation",
   NominateChancellor = "nominate-chancellor",
@@ -39,10 +47,14 @@ export enum SecretVillainAction {
 
 export const SECRET_VILLAIN_ACTIONS: Record<SecretVillainAction, GameAction> = {
   [SecretVillainAction.AdvanceFromElection]: advanceFromElectionAction,
+  [SecretVillainAction.AdvanceFromSpecialBadReveal]:
+    advanceFromSpecialBadRevealAction,
   [SecretVillainAction.CallSpecialElection]: callSpecialElectionAction,
   [SecretVillainAction.CastElectionVote]: castElectionVoteAction,
   [SecretVillainAction.ChancellorPlay]: chancellorPlayAction,
+  [SecretVillainAction.ConfirmSpecialBad]: confirmSpecialBadAction,
   [SecretVillainAction.ConsentInvestigation]: consentInvestigationAction,
+  [SecretVillainAction.RevealSpecialBad]: revealSpecialBadAction,
   [SecretVillainAction.NominateChancellor]: nominateChancellorAction,
   [SecretVillainAction.PolicyPeek]: policyPeekAction,
   [SecretVillainAction.PresidentDraw]: presidentDrawAction,

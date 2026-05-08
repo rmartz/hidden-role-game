@@ -30,6 +30,8 @@ export interface FirebaseSecretVillainPlayerState extends FirebaseBasePlayerStat
   votedPlayerIds?: string[];
   electionPassed?: boolean;
   vetoUnlocked?: boolean;
+  /** JSON-serialized SvSpecialBadRevealState. */
+  svSpecialBadReveal?: string;
   /** JSON-serialized SvInvestigationResult. */
   svInvestigationResult?: string;
   svInvestigationConsent?: boolean;
@@ -78,6 +80,9 @@ export function secretVillainStateToFirebase(
       : {}),
     ...(state.vetoUnlocked !== undefined
       ? { vetoUnlocked: state.vetoUnlocked }
+      : {}),
+    ...(state.svSpecialBadReveal !== undefined
+      ? { svSpecialBadReveal: JSON.stringify(state.svSpecialBadReveal) }
       : {}),
     ...(state.svInvestigationResult !== undefined
       ? {
@@ -160,6 +165,13 @@ export function secretVillainStateFromFirebase(
       : {}),
     ...(raw.vetoUnlocked !== undefined
       ? { vetoUnlocked: raw.vetoUnlocked }
+      : {}),
+    ...(raw.svSpecialBadReveal !== undefined
+      ? {
+          svSpecialBadReveal: JSON.parse(
+            raw.svSpecialBadReveal,
+          ) as SecretVillainPlayerGameState["svSpecialBadReveal"],
+        }
       : {}),
     ...(raw.svInvestigationResult !== undefined
       ? {

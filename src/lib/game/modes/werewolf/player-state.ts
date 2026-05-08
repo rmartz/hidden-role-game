@@ -60,6 +60,12 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   oneEyedSeerLockedTargetId?: string;
   /** Elusive Seer: player IDs of all Villagers. */
   elusiveSeerVillagerIds?: string[];
+  /** Illuminati: full list of all player role assignments (revealed by narrator on night 1). */
+  illuminatiRoleAssignments?: {
+    playerId: string;
+    roleName: string;
+    team: Team;
+  }[];
   /** Role publicly revealed by the Exposer. */
   exposerReveal?: { playerName: string; roleName: string; team: Team };
   /** Mentalist: second night target. */
