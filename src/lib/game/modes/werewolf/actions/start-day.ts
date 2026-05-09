@@ -290,12 +290,11 @@ export const startDayAction: GameAction = {
     // - If charged (bribe mode) and a bribe target was submitted → append to bribedPlayerIds, clear charge
     // - If charged (bribe mode) and no bribe target was submitted → carry charge forward
     let mercenaryCharged = false;
-    const existingMercenaryBribed = ts.mercenaryBribedPlayerIds ?? [];
-    let mercenaryBribedPlayerIds = existingMercenaryBribed;
+    let mercenaryBribedPlayerIds = ts.mercenaryBribedPlayerIds ?? [];
+    const mercAction =
+      nightPhase.nightActions[WerewolfRole.Mercenary as string];
     if (ts.mercenaryCharged) {
       // Bribe mode: check if a bribe target was submitted.
-      const mercAction =
-        nightPhase.nightActions[WerewolfRole.Mercenary as string];
       if (
         mercAction !== undefined &&
         !isTeamNightAction(mercAction) &&
@@ -303,7 +302,7 @@ export const startDayAction: GameAction = {
       ) {
         // Bribe used: append target and clear charge.
         mercenaryBribedPlayerIds = [
-          ...existingMercenaryBribed,
+          ...mercenaryBribedPlayerIds,
           mercAction.targetPlayerId,
         ];
       } else {
@@ -312,8 +311,6 @@ export const startDayAction: GameAction = {
       }
     } else {
       // Protect mode: check if the Mercenary's protection target was attacked.
-      const mercAction =
-        nightPhase.nightActions[WerewolfRole.Mercenary as string];
       if (
         mercAction !== undefined &&
         !isTeamNightAction(mercAction) &&
