@@ -206,6 +206,21 @@ function extractRoleSpecificState(
     };
   }
 
+  if (myRole.id === WerewolfRole.Arsonist) {
+    const arsonistAction = nightActions[myRole.id];
+    const soloAction =
+      arsonistAction && !isTeamNightAction(arsonistAction)
+        ? arsonistAction
+        : undefined;
+    return {
+      myNightTarget: soloAction?.skipped ? null : soloAction?.targetPlayerId,
+      myNightTargetConfirmed: soloAction?.confirmed ?? false,
+      ...(ts?.arsonistDousedPlayerIds?.length
+        ? { arsonistDousedPlayerIds: ts.arsonistDousedPlayerIds }
+        : {}),
+    };
+  }
+
   if (myRole.id === WerewolfRole.OneEyedSeer) {
     if (
       ts?.oneEyedSeerLockedTargetId &&

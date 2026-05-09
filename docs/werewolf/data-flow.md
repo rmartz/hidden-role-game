@@ -73,6 +73,7 @@ These fields are only populated when the active phase matches the player's role.
 | `elusiveSeerVillagerIds`    | Elusive Seer                                        | List of player IDs who have the Villager role (shown on first night only)                                                                                                                 |
 | `oneEyedSeerLockedTargetId` | One-Eyed Seer                                       | Player ID the One-Eyed Seer is locked onto after detecting a werewolf                                                                                                                     |
 | `executionerTargetId`       | Executioner                                         | The player ID of the Executioner's assigned Good-team target; visible only to the Executioner                                                                                             |
+| `arsonistDousedPlayerIds`   | Arsonist                                            | List of player IDs currently doused by the Arsonist; shown to the Arsonist at night. Reset after an ignite (self-target).                                                                |
 
 ### Player Fields — Daytime (day start)
 
@@ -161,11 +162,16 @@ Narrator starts day (start-day)
     1. Collect attacks/protections (Werewolves, Bodyguard, Doctor, Chupacabra)
     2. Apply Priest wards (ward absorbs attack, ward is consumed)
     3. Apply Witch action (protect or attack)
-    4. Apply Altruist intercept (redirects attack onto self)
-    5. Apply Tough Guy absorption (survives first attack)
-    6. Apply Smite (forced death regardless of protections)
-    7. Apply Spellcaster silence and Mummy hypnotize
-    8. Resolve remaining attacks (protected → survived, else → killed)
+    4. Apply Arsonist ignite (if self-targeted: attack each doused player independently)
+    5. Apply Altruist intercept (redirects attack onto self)
+    6. Apply Tough Guy absorption (survives first attack)
+    7. Apply Smite (forced death regardless of protections)
+    8. Apply Spellcaster silence and Mummy hypnotize
+    9. Resolve remaining attacks (protected → survived, else → killed)
+  → Arsonist doused list updated:
+    - Self-target (ignite): list reset to empty after attacks resolved
+    - Other-target (douse): target appended to arsonistDousedPlayerIds (dead targets skipped)
+    - Dead players removed from doused list
   → Killed players added to deadPlayerIds
   → nightResolution stored in daytime phase
   → PlayerGameState rebuilt: nightStatus and myLastNightAction populated

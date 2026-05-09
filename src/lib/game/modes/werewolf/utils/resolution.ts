@@ -185,6 +185,11 @@ export interface NightResolutionOptions {
   oldManTimerPlayerId?: string;
   /** When true, the Mirrorcaster is in Attack mode (charged from a prior protection). */
   mirrorcasterCharged?: boolean;
+  /**
+   * Player IDs that the Arsonist has previously doused. When the Arsonist
+   * self-targets (ignite), all of these players are simultaneously attacked.
+   */
+  arsonistDousedPlayerIds?: string[];
 }
 
 export function resolveNightActions(
@@ -219,6 +224,26 @@ export function resolveNightActions(
       ]);
     } else {
       attacks.set(tid, [...(attacks.get(tid) ?? []), WerewolfRole.Witch]);
+    }
+  }
+
+  // Arsonist ignite: if the Arsonist self-targeted, attack every doused player simultaneously.
+  const arsonistAction = nightActions[WerewolfRole.Arsonist] as
+    | { targetPlayerId?: string }
+    | undefined;
+  const arsonistPlayerId = roleAssignments.find(
+    (a) => a.roleDefinitionId === (WerewolfRole.Arsonist as string),
+  )?.playerId;
+  if (
+    arsonistAction?.targetPlayerId &&
+    arsonistAction.targetPlayerId === arsonistPlayerId &&
+    options?.arsonistDousedPlayerIds?.length
+  ) {
+    for (const dousedId of options.arsonistDousedPlayerIds) {
+      attacks.set(dousedId, [
+        ...(attacks.get(dousedId) ?? []),
+        WerewolfRole.Arsonist,
+      ]);
     }
   }
 

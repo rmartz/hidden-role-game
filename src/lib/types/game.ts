@@ -69,6 +69,7 @@ export interface PlayingGameStatus {
  * Secret Villain: "Good", "Bad"
  */
 export type GameWinner =
+  | "Arsonist"
   | "Village"
   | "Werewolves"
   | "Chupacabra"
