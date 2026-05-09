@@ -73,6 +73,7 @@ export const startDayAction: GameAction = {
         toughGuyHitIds: ts.toughGuyHitIds,
         ...(oldManTimerPlayerId ? { oldManTimerPlayerId } : {}),
         ...(ts.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
+        ...(ts.mercenaryCharged ? { mercenaryCharged: true } : {}),
       },
     );
     const newDeadIds: string[] = nightResolution
@@ -284,6 +285,51 @@ export const startDayAction: GameAction = {
       }
     }
 
+    // Mercenary charge/bribe tracking:
+    // - If uncharged (protect mode) and the protected target was attacked → gain charge (earn coin)
+    // - If charged (bribe mode) and a bribe target was submitted → append to bribedPlayerIds, clear charge
+    // - If charged (bribe mode) and no bribe target was submitted → carry charge forward
+    let mercenaryCharged = false;
+    const existingMercenaryBribed = ts.mercenaryBribedPlayerIds ?? [];
+    let mercenaryBribedPlayerIds = existingMercenaryBribed;
+    if (ts.mercenaryCharged) {
+      // Bribe mode: check if a bribe target was submitted.
+      const mercAction =
+        nightPhase.nightActions[WerewolfRole.Mercenary as string];
+      if (
+        mercAction !== undefined &&
+        !isTeamNightAction(mercAction) &&
+        mercAction.targetPlayerId !== undefined
+      ) {
+        // Bribe used: append target and clear charge.
+        mercenaryBribedPlayerIds = [
+          ...existingMercenaryBribed,
+          mercAction.targetPlayerId,
+        ];
+      } else {
+        // Bribe not used: carry charge forward.
+        mercenaryCharged = true;
+      }
+    } else {
+      // Protect mode: check if the Mercenary's protection target was attacked.
+      const mercAction =
+        nightPhase.nightActions[WerewolfRole.Mercenary as string];
+      if (
+        mercAction !== undefined &&
+        !isTeamNightAction(mercAction) &&
+        mercAction.targetPlayerId !== undefined
+      ) {
+        const protectedId = mercAction.targetPlayerId;
+        const protectionTriggered = nightResolution.some(
+          (e) =>
+            e.type === "killed" &&
+            e.targetPlayerId === protectedId &&
+            e.protectedBy.includes(WerewolfRole.Mercenary),
+        );
+        mercenaryCharged = protectionTriggered;
+      }
+    }
+
     const updatedDeadIds = [...ts.deadPlayerIds, ...newDeadIds];
 
     // Dracula: add the night's wife target to the accumulated list.
@@ -355,6 +401,10 @@ export const startDayAction: GameAction = {
           ? { executionerTargetId: ts.executionerTargetId }
           : {}),
         ...(mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
+        ...(mercenaryCharged ? { mercenaryCharged: true } : {}),
+        ...(mercenaryBribedPlayerIds.length > 0
+          ? { mercenaryBribedPlayerIds }
+          : {}),
         ...(draculaWives.length > 0 ? { draculaWives } : {}),
         ...(zombieInfected.length > 0 ? { zombieInfected } : {}),
       },

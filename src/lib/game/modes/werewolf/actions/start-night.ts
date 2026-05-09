@@ -87,6 +87,10 @@ export const startNightAction: GameAction = {
           ? { executionerTargetId: ts.executionerTargetId }
           : {}),
         ...(ts.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
+        ...(ts.mercenaryCharged ? { mercenaryCharged: true } : {}),
+        ...(ts.mercenaryBribedPlayerIds?.length
+          ? { mercenaryBribedPlayerIds: ts.mercenaryBribedPlayerIds }
+          : {}),
         ...(aliveWives.length > 0 ? { draculaWives: aliveWives } : {}),
         ...(aliveInfected.length > 0 ? { zombieInfected: aliveInfected } : {}),
       },

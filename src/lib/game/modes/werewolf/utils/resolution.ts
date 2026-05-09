@@ -46,6 +46,7 @@ function collectBaseAttacksAndProtections(
   roleAssignments: PlayerRoleAssignment[],
   deadPlayerIds: string[],
   mirrorcasterCharged?: boolean,
+  mercenaryCharged?: boolean,
 ): {
   attacks: Map<string, string[]>;
   protections: Map<string, string[]>;
@@ -102,6 +103,13 @@ function collectBaseAttacksAndProtections(
       if (mirrorcasterCharged) {
         attacks.set(tid, [...(attacks.get(tid) ?? []), phaseKey]);
       } else {
+        protections.set(tid, [...(protections.get(tid) ?? []), phaseKey]);
+      }
+    }
+
+    // Mercenary: acts as Protect when uncharged (no combat effect when charged — bribe only).
+    if (isRoleActive(phaseKey, WerewolfRole.Mercenary)) {
+      if (!mercenaryCharged) {
         protections.set(tid, [...(protections.get(tid) ?? []), phaseKey]);
       }
     }
@@ -185,6 +193,8 @@ export interface NightResolutionOptions {
   oldManTimerPlayerId?: string;
   /** When true, the Mirrorcaster is in Attack mode (charged from a prior protection). */
   mirrorcasterCharged?: boolean;
+  /** When true, the Mercenary is in Bribe mode (charged from a prior protection). */
+  mercenaryCharged?: boolean;
 }
 
 export function resolveNightActions(
@@ -199,6 +209,7 @@ export function resolveNightActions(
     roleAssignments,
     deadPlayerIds,
     options?.mirrorcasterCharged,
+    options?.mercenaryCharged,
   );
 
   // Priest wards: warded players count as protected.

@@ -460,4 +460,131 @@ describe("checkWinCondition", () => {
       expect(result?.winner).toBe(WerewolfWinner.Illuminati);
     });
   });
+
+  describe("Mercenary win condition", () => {
+    it("Mercenary alive prevents wolves from winning by being uncounted", () => {
+      // 1 wolf + 1 villager + 1 mercenary: Mercenary counts as neutral, wolves don't win yet
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Mercenary },
+      ]);
+      const result = checkWinCondition(game, []);
+      expect(result).toBeUndefined();
+    });
+
+    it("Mercenary wins when Village wins and a bribed Good player is alive", () => {
+      const game = makeGame(
+        [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Mercenary },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        ],
+        makeDayTurnState({
+          mercenaryBribedPlayerIds: ["p3"],
+          deadPlayerIds: [],
+        }),
+      );
+      // Wolf dead → Village wins; Mercenary alive with bribed Good player alive → Mercenary wins
+      const result = checkWinCondition(game, []);
+      expect(result?.winner).toBe(WerewolfWinner.Mercenary);
+    });
+
+    it("Mercenary wins when Werewolves win and a bribed Bad player is alive", () => {
+      const game = makeGame(
+        [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Mercenary },
+        ],
+        makeDayTurnState({
+          mercenaryBribedPlayerIds: ["p1"],
+          deadPlayerIds: [],
+        }),
+      );
+      // 1 wolf, 1 neutral Mercenary — wolves outnumber non-bad (0 good, 1 neutral = 1 non-bad; 1 bad >= 1 non-bad → wolves win)
+      const result = checkWinCondition(game, []);
+      expect(result?.winner).toBe(WerewolfWinner.Mercenary);
+    });
+
+    it("Mercenary does not win when bribed player is dead", () => {
+      const game = makeGame(
+        [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Mercenary },
+        ],
+        makeDayTurnState({
+          mercenaryBribedPlayerIds: ["p3"],
+          deadPlayerIds: ["p3"],
+        }),
+      );
+      // Wolf dead → Village wins; but bribed player p3 is dead → Mercenary doesn't win
+      const result = checkWinCondition(game, []);
+      expect(result?.winner).toBe(WerewolfWinner.Village);
+    });
+
+    it("Mercenary does not win when they have no bribed players", () => {
+      const game = makeGame(
+        [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Mercenary },
+        ],
+        makeDayTurnState({ deadPlayerIds: [] }),
+      );
+      // Wolf dead → Village wins; but Mercenary has no bribed players → no win
+      const result = checkWinCondition(game, []);
+      expect(result?.winner).toBe(WerewolfWinner.Village);
+    });
+
+    it("Mercenary does not win when they are dead", () => {
+      const game = makeGame(
+        [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Mercenary },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        ],
+        makeDayTurnState({
+          mercenaryBribedPlayerIds: ["p3"],
+          deadPlayerIds: ["p2"],
+        }),
+      );
+      // Wolf dead → Village wins; Mercenary dead → Mercenary doesn't win
+      const result = checkWinCondition(game, ["p2"]);
+      expect(result?.winner).toBe(WerewolfWinner.Village);
+    });
+
+    it("Mercenary does not win when bribed player is on wrong team", () => {
+      const game = makeGame(
+        [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Mercenary },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Tanner },
+        ],
+        makeDayTurnState({
+          mercenaryBribedPlayerIds: ["p3"],
+          deadPlayerIds: [],
+        }),
+      );
+      // Wolf dead → Village wins (p3 Tanner is neutral, not Team.Good) → Mercenary doesn't win
+      const result = checkWinCondition(game, []);
+      expect(result?.winner).toBe(WerewolfWinner.Village);
+    });
+
+    it("Spoiler beats Mercenary when Spoiler is alive", () => {
+      const game = makeGame(
+        [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Mercenary },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Spoiler },
+          { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+        ],
+        makeDayTurnState({
+          mercenaryBribedPlayerIds: ["p4"],
+          deadPlayerIds: [],
+        }),
+      );
+      // Village wins; Spoiler and Mercenary both alive; Spoiler takes priority
+      const result = checkWinCondition(game, []);
+      expect(result?.winner).toBe(WerewolfWinner.Spoiler);
+    });
+  });
 });

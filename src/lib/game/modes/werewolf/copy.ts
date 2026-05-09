@@ -146,6 +146,7 @@ export const WEREWOLF_COPY = {
       [WerewolfWinner.Dracula]: "3 wives survived a full cycle",
       [WerewolfWinner.Illuminati]: "Survived to the final 3",
       [WerewolfWinner.LoneWolf]: "By elimination",
+      [WerewolfWinner.Mercenary]: "Bribed player on winning team",
       [WerewolfWinner.Spoiler]: "Spoiler stole the victory",
       [WerewolfWinner.Executioner]: "Executioner's target eliminated",
       [WerewolfWinner.Zombie]: "Infected outnumber the healthy",

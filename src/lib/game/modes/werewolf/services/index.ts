@@ -34,6 +34,7 @@ const WEREWOLF_WINNER_TEAMS = {
   [WerewolfWinner.Chupacabra]: Team.Neutral,
   [WerewolfWinner.Dracula]: Team.Neutral,
   [WerewolfWinner.LoneWolf]: Team.Neutral,
+  [WerewolfWinner.Mercenary]: Team.Neutral,
   [WerewolfWinner.Spoiler]: Team.Neutral,
   [WerewolfWinner.Executioner]: Team.Neutral,
   [WerewolfWinner.Zombie]: Team.Neutral,

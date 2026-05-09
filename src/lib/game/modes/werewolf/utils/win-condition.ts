@@ -152,6 +152,45 @@ export function checkWinCondition(
     return { type: GameStatus.Finished, winner: WerewolfWinner.Spoiler };
   }
 
+  // Mercenary override: if a standard Village or Werewolves win fires, the Mercenary
+  // is alive, and at least one bribed player is alive on the winning team, the
+  // Mercenary wins instead (lower priority than Illuminati and Spoiler).
+  if (winResult) {
+    const mercenaryAssignment = game.roleAssignments.find(
+      (a) => a.roleDefinitionId === (WerewolfRole.Mercenary as string),
+    );
+    if (mercenaryAssignment && !deadSet.has(mercenaryAssignment.playerId)) {
+      const bribedPlayerIds = ts?.mercenaryBribedPlayerIds ?? [];
+      if (bribedPlayerIds.length > 0) {
+        const winningTeam =
+          winResult.winner === (WerewolfWinner.Village as string)
+            ? Team.Good
+            : winResult.winner === (WerewolfWinner.Werewolves as string) ||
+                winResult.winner === (WerewolfWinner.LoneWolf as string)
+              ? Team.Bad
+              : undefined;
+        if (winningTeam !== undefined) {
+          const mercenaryWins = bribedPlayerIds.some((bribedId) => {
+            if (deadSet.has(bribedId)) return false;
+            const assignment = game.roleAssignments.find(
+              (a) => a.playerId === bribedId,
+            );
+            const role = assignment
+              ? getWerewolfRole(assignment.roleDefinitionId)
+              : undefined;
+            return role?.team === winningTeam;
+          });
+          if (mercenaryWins) {
+            return {
+              type: GameStatus.Finished,
+              winner: WerewolfWinner.Mercenary,
+            };
+          }
+        }
+      }
+    }
+  }
+
   return winResult;
 }
 
@@ -164,6 +203,7 @@ export const WerewolfWinner = {
   Draw: "Draw",
   Illuminati: "Illuminati",
   LoneWolf: "LoneWolf",
+  Mercenary: "Mercenary",
   Tanner: "Tanner",
   Spoiler: "Spoiler",
   Executioner: "Executioner",

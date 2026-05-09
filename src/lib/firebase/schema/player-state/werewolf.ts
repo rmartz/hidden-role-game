@@ -60,6 +60,8 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
   myNominatedDefendantId?: string;
   pendingSmitePlayerIds?: string[];
   mirrorcasterCharged?: boolean;
+  mercenaryCharged?: boolean;
+  mercenaryBribedPlayerIds?: string[];
   oneEyedSeerLockedTargetId?: string;
   elusiveSeerVillagerIds?: string[];
   illuminatiRoleAssignments?: {
@@ -131,6 +133,10 @@ export function werewolfStateToFirebase(
       ? { pendingSmitePlayerIds: state.pendingSmitePlayerIds }
       : {}),
     ...(state.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
+    ...(state.mercenaryCharged ? { mercenaryCharged: true } : {}),
+    ...(state.mercenaryBribedPlayerIds?.length
+      ? { mercenaryBribedPlayerIds: state.mercenaryBribedPlayerIds }
+      : {}),
     ...(state.oneEyedSeerLockedTargetId
       ? { oneEyedSeerLockedTargetId: state.oneEyedSeerLockedTargetId }
       : {}),
@@ -212,6 +218,10 @@ export function werewolfStateFromFirebase(
       ? { pendingSmitePlayerIds: raw.pendingSmitePlayerIds }
       : {}),
     ...(raw.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
+    ...(raw.mercenaryCharged ? { mercenaryCharged: true } : {}),
+    ...(raw.mercenaryBribedPlayerIds?.length
+      ? { mercenaryBribedPlayerIds: raw.mercenaryBribedPlayerIds }
+      : {}),
     ...(raw.oneEyedSeerLockedTargetId
       ? { oneEyedSeerLockedTargetId: raw.oneEyedSeerLockedTargetId }
       : {}),

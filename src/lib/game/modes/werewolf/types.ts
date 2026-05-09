@@ -200,6 +200,10 @@ export interface WerewolfTurnState {
   executionerTargetId?: string;
   /** True when the Mirrorcaster has gained a charge from a successful protection. */
   mirrorcasterCharged?: boolean;
+  /** True when the Mercenary has earned a coin from a successful protection. */
+  mercenaryCharged?: boolean;
+  /** Player IDs that the Mercenary has bribed. Accumulated across nights. */
+  mercenaryBribedPlayerIds?: string[];
   /** Player IDs that Dracula has claimed as wives. Accumulated across nights. */
   draculaWives?: string[];
   /** Player IDs that the Zombie has infected. Accumulated across nights. */

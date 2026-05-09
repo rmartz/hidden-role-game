@@ -55,6 +55,7 @@ export enum WerewolfRole {
   LoneWolf = "werewolf-lone-wolf",
   Mason = "werewolf-mason",
   Mayor = "werewolf-mayor",
+  Mercenary = "werewolf-mercenary",
   Mentalist = "werewolf-mentalist",
   Minion = "werewolf-minion",
   Mirrorcaster = "werewolf-mirrorcaster",
@@ -330,6 +331,20 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     targetCategory: TargetCategory.None,
     aliases: ["servant", "thrall"],
     category: WerewolfRoleCategory.EvilSupport,
+  },
+  [WerewolfRole.Mercenary]: {
+    id: WerewolfRole.Mercenary,
+    name: "Mercenary",
+    summary:
+      "Protects players for coins; bribes players to tie win condition to their team",
+    description:
+      "The Mercenary is a Neutral player who alternates between two modes each night. In Protect mode (uncharged), they shield one player — if that player would have been killed, the Mercenary earns a coin and switches to Bribe mode. In Bribe mode (charged), they spend the coin to bribe one player, tying their win condition to that player's team. The Mercenary wins at game end if they are alive and at least one bribed player is alive on the winning team. A bribed player is unaware they have been bribed.",
+    team: Team.Neutral,
+    unique: true,
+    wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Special,
+    preventSelfTarget: true,
+    category: WerewolfRoleCategory.NeutralManipulation,
   },
   [WerewolfRole.Mirrorcaster]: {
     id: WerewolfRole.Mirrorcaster,
