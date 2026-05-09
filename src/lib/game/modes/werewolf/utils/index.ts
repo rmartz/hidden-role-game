@@ -1,3 +1,4 @@
+export * from "./narrator-instructions";
 export * from "./phase-keys";
 export * from "./targeting";
 export * from "./game-state";
