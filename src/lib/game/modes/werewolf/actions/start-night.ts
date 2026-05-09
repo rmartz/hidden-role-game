@@ -89,6 +89,9 @@ export const startNightAction: GameAction = {
         ...(ts.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
         ...(aliveWives.length > 0 ? { draculaWives: aliveWives } : {}),
         ...(aliveInfected.length > 0 ? { zombieInfected: aliveInfected } : {}),
+        ...(ts.veteranAlertsUsed !== undefined
+          ? { veteranAlertsUsed: ts.veteranAlertsUsed }
+          : {}),
       },
     };
 

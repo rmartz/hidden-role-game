@@ -39,6 +39,7 @@ import { NightPhaseOrderList } from "./NightPhaseOrderList";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import { buildNarratorInstruction } from "@/lib/game/modes/werewolf";
 import { NarratorNightInstruction } from "./NarratorNightInstruction";
+import { VeteranActionPanelView } from "./VeteranActionPanelView";
 
 interface OwnerGameNightScreenProps {
   gameId: string;
@@ -156,6 +157,16 @@ export function OwnerGameNightScreen({
   const isWitchAbilitySkipped =
     isRoleActive(activePhaseKey, WerewolfRole.Witch) &&
     turnState.witchAbilityUsed;
+
+  const isVeteranPhase =
+    !isFirstTurn && isRoleActive(activePhaseKey, WerewolfRole.Veteran);
+  const veteranAction =
+    isVeteranPhase && activeAction && !isTeamNightAction(activeAction)
+      ? activeAction
+      : undefined;
+  const isVeteranAlerted = veteranAction?.alerted === true;
+  const veteranHasDecided = veteranAction !== undefined;
+  const narratorVeteranAlertsUsed = turnState.veteranAlertsUsed ?? 0;
 
   const activeRoleDef = modeConfig.roles[baseActivePhaseKey] as
     | WerewolfRoleDefinition
@@ -365,19 +376,49 @@ export function OwnerGameNightScreen({
                   </div>
                 </div>
               )}
-              {(!isWitchAbilitySkipped || abilityBypass) && (
-                <OwnerNightTargetPanel
-                  groupAction={!!groupAction}
-                  groupMemberCount={activePlayerNames.length}
-                  resolvedVotes={resolvedVotes}
-                  activeTargetName={activeTargetName}
-                  activeTargetConfirmed={activeTargetConfirmed}
-                  targetablePlayers={targetablePlayers}
-                  activeTarget={activeTarget}
-                  onTargetClick={handleTargetClick}
+              {isVeteranPhase ? (
+                <VeteranActionPanelView
+                  alertsUsed={narratorVeteranAlertsUsed}
+                  isAlerted={isVeteranAlerted}
+                  hasDecided={veteranHasDecided}
+                  isConfirmed={activeTargetConfirmed}
                   isPending={action.isPending}
-                  previousTargetId={previousTargetId}
+                  onAlert={() => {
+                    action.mutate({
+                      actionId: WerewolfAction.SetNightTarget,
+                      payload: { roleId: activePhaseKey, alerted: true },
+                    });
+                  }}
+                  onSkip={() => {
+                    action.mutate({
+                      actionId: WerewolfAction.SetNightTarget,
+                      payload: {
+                        roleId: activePhaseKey,
+                        targetPlayerId: null,
+                      },
+                    });
+                  }}
+                  onConfirm={() => {
+                    action.mutate({
+                      actionId: WerewolfAction.ConfirmNightTarget,
+                    });
+                  }}
                 />
+              ) : (
+                (!isWitchAbilitySkipped || abilityBypass) && (
+                  <OwnerNightTargetPanel
+                    groupAction={!!groupAction}
+                    groupMemberCount={activePlayerNames.length}
+                    resolvedVotes={resolvedVotes}
+                    activeTargetName={activeTargetName}
+                    activeTargetConfirmed={activeTargetConfirmed}
+                    targetablePlayers={targetablePlayers}
+                    activeTarget={activeTarget}
+                    onTargetClick={handleTargetClick}
+                    isPending={action.isPending}
+                    previousTargetId={previousTargetId}
+                  />
+                )
               )}
             </>
           )}

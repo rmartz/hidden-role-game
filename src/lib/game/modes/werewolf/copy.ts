@@ -245,11 +245,8 @@ export const WEREWOLF_COPY = {
     skipButton: "Stay Home",
     dayAnnouncementWolfRepel: (veteranName: string, wolfName: string) =>
       `${veteranName} was on alert — ${wolfName} was killed repelling the attack.`,
-    dayAnnouncementProtectorKilled: (
-      veteranName: string,
-      protectorName: string,
-    ) =>
-      `${veteranName} was on alert and killed ${protectorName}, who tried to protect them.`,
+    dayAnnouncementVisitorKilled: (veteranName: string, visitorName: string) =>
+      `${veteranName} was on alert and counter-killed ${visitorName}, who visited them.`,
   },
   altruist: {
     attackedIntro:

@@ -246,29 +246,29 @@ Additional resolution steps:
 
 ## Action Payload Summary
 
-| Action                        | Caller                    | Payload                                                |
-| ----------------------------- | ------------------------- | ------------------------------------------------------ |
-| `start-night`                 | Narrator                  | none                                                   |
-| `start-day`                   | Narrator                  | none                                                   |
-| `set-night-phase`             | Narrator                  | `{ phaseIndex: number }`                               |
-| `set-night-target`            | Narrator or active player | `{ roleId?: string; targetPlayerId?: string \| null }` |
-| `confirm-night-target`        | Active player             | none                                                   |
-| `reveal-investigation-result` | Narrator                  | none                                                   |
-| `mark-player-dead`            | Narrator                  | `{ playerId: string }`                                 |
-| `mark-player-alive`           | Narrator                  | `{ playerId: string }`                                 |
-| `start-trial`                 | Narrator                  | `{ defendantId: string }`                              |
-| `cast-vote`                   | Player                    | `{ vote: "guilty" \| "innocent" }`                     |
-| `resolve-hunter-revenge`      | Narrator                  | `{ targetPlayerId: string }`                           |
-| `resolve-trial`               | Narrator                  | none                                                   |
-| `end-game`                    | Narrator                  | none                                                   |
-| `smite-player`                | Narrator                  | `{ playerId: string }`                                 |
-| `unsmite-player`              | Narrator                  | `{ playerId: string }`                                 |
-| `nominate-player`             | Player                    | `{ defendantId: string }`                              |
-| `withdraw-nomination`         | Player                    | none                                                   |
-| `skip-defense`                | Narrator                  | none                                                   |
-| `kill-player`                 | Narrator                  | `{ playerId: string }`                                 |
-| `pause-timer`                 | Narrator                  | none                                                   |
-| `resume-timer`                | Narrator                  | none                                                   |
+| Action                        | Caller                                       | Payload                                                |
+| ----------------------------- | -------------------------------------------- | ------------------------------------------------------ |
+| `start-night`                 | Narrator                                     | none                                                   |
+| `start-day`                   | Narrator                                     | none                                                   |
+| `set-night-phase`             | Narrator                                     | `{ phaseIndex: number }`                               |
+| `set-night-target`            | Narrator or active player                    | `{ roleId?: string; targetPlayerId?: string \| null }` |
+| `confirm-night-target`        | Active player or Narrator (solo phases only) | none                                                   |
+| `reveal-investigation-result` | Narrator                                     | none                                                   |
+| `mark-player-dead`            | Narrator                                     | `{ playerId: string }`                                 |
+| `mark-player-alive`           | Narrator                                     | `{ playerId: string }`                                 |
+| `start-trial`                 | Narrator                                     | `{ defendantId: string }`                              |
+| `cast-vote`                   | Player                                       | `{ vote: "guilty" \| "innocent" }`                     |
+| `resolve-hunter-revenge`      | Narrator                                     | `{ targetPlayerId: string }`                           |
+| `resolve-trial`               | Narrator                                     | none                                                   |
+| `end-game`                    | Narrator                                     | none                                                   |
+| `smite-player`                | Narrator                                     | `{ playerId: string }`                                 |
+| `unsmite-player`              | Narrator                                     | `{ playerId: string }`                                 |
+| `nominate-player`             | Player                                       | `{ defendantId: string }`                              |
+| `withdraw-nomination`         | Player                                       | none                                                   |
+| `skip-defense`                | Narrator                                     | none                                                   |
+| `kill-player`                 | Narrator                                     | `{ playerId: string }`                                 |
+| `pause-timer`                 | Narrator                                     | none                                                   |
+| `resume-timer`                | Narrator                                     | none                                                   |
 
 ## Night Action Types
 
@@ -307,7 +307,7 @@ interface TeamNightAction {
 4. Applies Altruist action (last): if the Altruist's target is under attack, the attack is redirected onto the Altruist (the Altruist dies instead).
 5. Applies Veteran counter-kill (after Altruist, so the Altruist cannot intercept the counter-kill): if the Veteran alerted this night (action has `alerted: true`):
    - **Wolf repel:** if any wolf group targeted the Veteran, the wolf attack on the Veteran is removed and one alive wolf-group participant is counter-killed instead. Emits `veteran-counterkilled (source: "wolf-repel")`.
-   - **Protector kill:** any Protect-category role (Bodyguard, Doctor, etc., excluding Priest wards) that visited the Veteran is killed, and their protection of the Veteran is discarded. Emits `veteran-counterkilled (source: "protector-visit")` per killed protector.
+   - **Visitor kill:** any solo role (except Priest wards and Investigation-category roles such as Seer, which observe from afar using mystical powers) that visited the Veteran is counter-killed and any attack or protection they provided to the Veteran is discarded. Emits `veteran-counterkilled (source: "visitor")` per killed visitor.
 6. Applies Tough Guy absorption: if a Tough Guy is attacked for the first time, the attack is absorbed (survives this night, dies on the next attack).
 7. Applies Smite: any smited player is killed regardless of protections.
 8. Applies Spellcaster action: emits a `silenced` event.
@@ -320,7 +320,7 @@ interface TeamNightAction {
 - `{ type: "hypnotized", targetPlayerId }`
 - `{ type: "tough-guy-absorbed", targetPlayerId }`
 - `{ type: "altruist-intercepted", altruistPlayerId, savedPlayerId }`
-- `{ type: "veteran-counterkilled", counterkilledPlayerId, veteranPlayerId, source, died }`
+- `{ type: "veteran-counterkilled", counterkilledPlayerId, veteranPlayerId, source: "wolf-repel" | "visitor", died }`
 
 After resolution, `start-day` performs additional checks:
 

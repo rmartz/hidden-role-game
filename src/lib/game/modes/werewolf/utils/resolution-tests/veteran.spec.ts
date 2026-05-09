@@ -72,7 +72,7 @@ describe("resolveNightActions", () => {
         type: "veteran-counterkilled",
         counterkilledPlayerId: "bg1",
         veteranPlayerId: "vet1",
-        source: "protector-visit",
+        source: "visitor",
       });
     });
 
@@ -185,8 +185,68 @@ describe("resolveNightActions", () => {
       );
       expect(counterkilledEvent).toMatchObject({
         counterkilledPlayerId: "doc1",
-        source: "protector-visit",
+        source: "visitor",
       });
+    });
+
+    it("alerts and Vigilante targets Veteran: Vigilante dies", () => {
+      const vigilanteAssignments = [
+        { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "vet1", roleDefinitionId: WerewolfRole.Veteran },
+        { playerId: "vig1", roleDefinitionId: WerewolfRole.Vigilante },
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+      ];
+
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Vigilante]: { targetPlayerId: "vet1" },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        vigilanteAssignments,
+        [],
+      );
+
+      const vigEvent = findKilled(events, "vig1");
+      expect(vigEvent).toMatchObject({
+        died: true,
+        attackedBy: expect.arrayContaining([WerewolfRole.Veteran]),
+      });
+
+      const vetEvent = findKilled(events, "vet1");
+      expect(vetEvent).toBeUndefined();
+
+      const counterkilledEvent = events.find(
+        (e) => e.type === "veteran-counterkilled",
+      );
+      expect(counterkilledEvent).toMatchObject({
+        counterkilledPlayerId: "vig1",
+        veteranPlayerId: "vet1",
+        source: "visitor",
+      });
+    });
+
+    it("alerts and Seer investigates Veteran: Seer is NOT counter-killed", () => {
+      const seerAssignments = [
+        { playerId: "vet1", roleDefinitionId: WerewolfRole.Veteran },
+        { playerId: "s1", roleDefinitionId: WerewolfRole.Seer },
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+      ];
+
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Seer]: { targetPlayerId: "vet1" },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        seerAssignments,
+        [],
+      );
+
+      const seerEvent = findKilled(events, "s1");
+      expect(seerEvent).toBeUndefined();
+
+      expect(
+        events.find((e) => e.type === "veteran-counterkilled"),
+      ).toBeUndefined();
     });
 
     it("confirmed alert action: Veteran is alerted", () => {

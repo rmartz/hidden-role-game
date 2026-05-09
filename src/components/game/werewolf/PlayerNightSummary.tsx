@@ -36,7 +36,7 @@ export function PlayerNightSummary({
           e,
         ): e is DaytimeNightStatusEntry & {
           veteranPlayerId: string;
-          veteranCounterkillSource: "wolf-repel" | "protector-visit";
+          veteranCounterkillSource: "wolf-repel" | "visitor";
         } =>
           e.effect === "veteran-counterkill" &&
           "veteranPlayerId" in e &&

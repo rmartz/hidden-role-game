@@ -65,7 +65,7 @@ export function NightOutcomeSummary({
                     veteranName,
                     counterkilledName,
                   )
-                : WEREWOLF_COPY.veteran.dayAnnouncementProtectorKilled(
+                : WEREWOLF_COPY.veteran.dayAnnouncementVisitorKilled(
                     veteranName,
                     counterkilledName,
                   );

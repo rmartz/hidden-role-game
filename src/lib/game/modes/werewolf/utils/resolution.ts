@@ -267,7 +267,7 @@ export function resolveNightActions(
   const pendingVeteranKills: {
     counterkilledPlayerId: string;
     veteranPlayerId: string;
-    source: "wolf-repel" | "protector-visit";
+    source: "wolf-repel" | "visitor";
   }[] = [];
 
   if (veteranAlerted) {
@@ -320,24 +320,25 @@ export function resolveNightActions(
         }
       }
 
-      // Protection visit kill: any Protect-category role (except Priest, which
-      // uses a ward rather than a direct visit) whose targetPlayerId is the
-      // Veteran is killed, and their protection is discarded.
+      // Visitor counter-kill: any solo role (except Priest, which uses a ward
+      // rather than a direct visit, and Investigation roles, which use mystical
+      // powers without physically visiting) whose targetPlayerId is the Veteran
+      // is counter-killed and any protection they provide is discarded.
       for (const [phaseKey, action] of Object.entries(nightActions)) {
         if (isGroupPhaseKey(phaseKey)) continue;
         if (isRoleActive(phaseKey, WerewolfRole.Priest)) continue;
         const soloAction = action as NightAction;
         if (soloAction.targetPlayerId !== veteranPlayerId) continue;
         const role = getWerewolfRole(phaseKey);
-        if (role?.targetCategory !== TargetCategory.Protect) continue;
+        if (role?.targetCategory === TargetCategory.Investigate) continue;
 
-        const protectorPlayerId = roleAssignments.find(
+        const visitorPlayerId = roleAssignments.find(
           (a) => a.roleDefinitionId === phaseKey,
         )?.playerId;
-        if (!protectorPlayerId || deadPlayerIds.includes(protectorPlayerId))
+        if (!visitorPlayerId || deadPlayerIds.includes(visitorPlayerId))
           continue;
 
-        // Discard the protection of the Veteran.
+        // Discard any protection the visitor provided to the Veteran.
         const veteranProtectors = protections.get(veteranPlayerId) ?? [];
         const filteredProtectors = veteranProtectors.filter(
           (p) => p !== phaseKey,
@@ -348,15 +349,25 @@ export function resolveNightActions(
           protections.set(veteranPlayerId, filteredProtectors);
         }
 
+        // Remove any attack the visitor had on the Veteran (attack roles that
+        // targeted the Veteran are repelled, not just protectors).
+        const vetAttackers = attacks.get(veteranPlayerId) ?? [];
+        const filteredVetAttackers = vetAttackers.filter((a) => a !== phaseKey);
+        if (filteredVetAttackers.length === 0) {
+          attacks.delete(veteranPlayerId);
+        } else {
+          attacks.set(veteranPlayerId, filteredVetAttackers);
+        }
+
         // Queue the counter-kill attack.
-        attacks.set(protectorPlayerId, [
-          ...(attacks.get(protectorPlayerId) ?? []),
+        attacks.set(visitorPlayerId, [
+          ...(attacks.get(visitorPlayerId) ?? []),
           WerewolfRole.Veteran,
         ]);
         pendingVeteranKills.push({
-          counterkilledPlayerId: protectorPlayerId,
+          counterkilledPlayerId: visitorPlayerId,
           veteranPlayerId,
-          source: "protector-visit",
+          source: "visitor",
         });
       }
     }

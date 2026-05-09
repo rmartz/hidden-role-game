@@ -54,8 +54,8 @@ export interface DaytimeNightStatusEntry {
   savedPlayerId?: string;
   /** For veteran-counterkill: the Veteran player who performed the counter-kill. */
   veteranPlayerId?: string;
-  /** For veteran-counterkill: whether the kill came from repelling a wolf attack or a protector visit. */
-  veteranCounterkillSource?: "wolf-repel" | "protector-visit";
+  /** For veteran-counterkill: whether the kill came from repelling a wolf attack or a player visiting. */
+  veteranCounterkillSource?: "wolf-repel" | "visitor";
 }
 
 /** Night effects visible to the Witch during their nighttime phase only. */

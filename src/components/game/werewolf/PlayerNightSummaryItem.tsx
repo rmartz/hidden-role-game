@@ -12,7 +12,7 @@ interface PlayerNightSummaryItemProps {
   smited: boolean;
   peaceful: boolean;
   isMe: boolean;
-  veteranCounterkillSource?: "wolf-repel" | "protector-visit";
+  veteranCounterkillSource?: "wolf-repel" | "visitor";
   veteranName?: string;
 }
 
@@ -78,7 +78,7 @@ export function PlayerNightSummaryItem({
             veteranName,
             playerName,
           )
-        : WEREWOLF_COPY.veteran.dayAnnouncementProtectorKilled(
+        : WEREWOLF_COPY.veteran.dayAnnouncementVisitorKilled(
             veteranName,
             playerName,
           );

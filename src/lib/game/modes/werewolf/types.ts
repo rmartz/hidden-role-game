@@ -95,8 +95,8 @@ export interface VeteranCounterkilledNightResolutionEvent {
   counterkilledPlayerId: string;
   /** The Veteran player who counter-killed. */
   veteranPlayerId: string;
-  /** Whether the counter-kill was from repelling a wolf attack or killing a visiting protector. */
-  source: "wolf-repel" | "protector-visit";
+  /** Whether the counter-kill was from repelling a wolf attack or killing a visiting player. */
+  source: "wolf-repel" | "visitor";
   /** Whether the counter-killed player actually died (false if Tough Guy absorbed the hit). */
   died: boolean;
 }

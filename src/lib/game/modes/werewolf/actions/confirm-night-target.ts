@@ -4,11 +4,25 @@ import {
   currentTurnState,
   validateActiveNightPlayer,
   getGroupPhasePlayerIds,
+  isGroupPhaseKey,
 } from "../utils";
 import { getWerewolfRole } from "../roles";
 
 export const confirmNightTargetAction: GameAction = {
   isValid(game: Game, callerId: string) {
+    // Narrator can confirm for no-device players on any solo phase.
+    if (callerId === game.ownerPlayerId) {
+      const ts = currentTurnState(game);
+      if (ts?.phase.type !== WerewolfPhase.Nighttime) return false;
+      if (ts.turn <= 1) return false;
+      const phase = ts.phase;
+      const activePhaseKey = phase.nightPhaseOrder[phase.currentPhaseIndex];
+      if (!activePhaseKey || isGroupPhaseKey(activePhaseKey)) return false;
+      const action = phase.nightActions[activePhaseKey];
+      if (!action || action.confirmed) return false;
+      return true;
+    }
+
     const result = validateActiveNightPlayer(game, callerId);
     if (!result) return false;
 
