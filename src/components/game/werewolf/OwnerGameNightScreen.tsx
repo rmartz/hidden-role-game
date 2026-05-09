@@ -94,7 +94,7 @@ export function OwnerGameNightScreen({
         payload: {
           roleId: activePhaseKey,
           targetPlayerId: playerId,
-          ...(isSecondTarget ? { isSecondTarget: true } : {}),
+          isSecondTarget: isSecondTarget ?? false,
         },
       });
     },
