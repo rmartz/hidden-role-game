@@ -28,6 +28,7 @@ function getAttackerIdsForEvent(
 ): string[] {
   const attackerIds = new Set<string>();
   for (const phaseKey of event.attackedBy) {
+    // Smite bypasses protections and is not a player-driven attack source.
     if (phaseKey === SMITE_PHASE_KEY) continue;
     if (phaseKey.includes(":")) {
       for (const playerId of getGroupPhasePlayerIds(
@@ -64,7 +65,7 @@ function applyMonarchNightProtection(
 
   const monarchAssignment = game.roleAssignments.find(
     (assignment) =>
-      assignment.roleDefinitionId === (WerewolfRole.Monarch as string),
+      getWerewolfRole(assignment.roleDefinitionId)?.id === WerewolfRole.Monarch,
   );
   if (
     !monarchAssignment ||
@@ -90,9 +91,9 @@ function applyMonarchNightProtection(
   const livingKnightedRoleDefs = livingKnightedPlayerIds
     .map((playerId) => getRoleDefForPlayer(playerId))
     .filter((roleDef) => roleDef !== undefined);
-  const allLivingKnightedPlayersAreBad =
-    livingKnightedRoleDefs.length > 0 &&
-    livingKnightedRoleDefs.every((roleDef) => roleDef.team === Team.Bad);
+  const allLivingKnightedPlayersAreBad = livingKnightedRoleDefs.every(
+    (roleDef) => roleDef.team === Team.Bad,
+  );
   const badAttackerExists = attackerIds.some((playerId) => {
     const attackerRole = getRoleDefForPlayer(playerId);
     return attackerRole?.team === Team.Bad;
@@ -183,7 +184,10 @@ export const startDayAction: GameAction = {
       monarchAction.targetPlayerId !== undefined
         ? monarchAction.targetPlayerId
         : undefined;
-    const monarchKnightedPlayerIds = targetKnightedTonight
+    const previousMonarchKnightingsUsed = ts.monarchKnightingsUsed ?? 0;
+    const monarchCanKnight =
+      targetKnightedTonight !== undefined && previousMonarchKnightingsUsed < 3;
+    const monarchKnightedPlayerIds = monarchCanKnight
       ? [
           ...new Set([
             ...(ts.monarchKnightedPlayerIds ?? []),
@@ -191,9 +195,9 @@ export const startDayAction: GameAction = {
           ]),
         ]
       : (ts.monarchKnightedPlayerIds ?? []);
-    const monarchKnightingsUsed = targetKnightedTonight
-      ? Math.min(3, (ts.monarchKnightingsUsed ?? 0) + 1)
-      : (ts.monarchKnightingsUsed ?? 0);
+    const monarchKnightingsUsed = monarchCanKnight
+      ? previousMonarchKnightingsUsed + 1
+      : previousMonarchKnightingsUsed;
 
     applyMonarchNightProtection(
       nightResolution,

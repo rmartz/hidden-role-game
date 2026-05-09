@@ -84,6 +84,7 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
 export function werewolfStateToFirebase(
   state: WerewolfPlayerGameState,
 ): FirebaseWerewolfPlayerState {
+  const monarchKnightingsUsed = state.monarchKnightingsUsed;
   return {
     ...baseStateToFirebase(state),
     ...(state.nightActions ? { nightActions: state.nightActions } : {}),
@@ -112,9 +113,7 @@ export function werewolfStateToFirebase(
     ...(state.monarchKnightedPlayerIds?.length
       ? { monarchKnightedPlayerIds: state.monarchKnightedPlayerIds }
       : {}),
-    ...((state.monarchKnightingsUsed ?? 0) > 0
-      ? { monarchKnightingsUsed: state.monarchKnightingsUsed }
-      : {}),
+    ...((monarchKnightingsUsed ?? 0) > 0 ? { monarchKnightingsUsed } : {}),
     ...(state.priestWardActive ? { priestWardActive: true } : {}),
     ...(state.isSilenced ? { isSilenced: true } : {}),
     ...(state.isHypnotized ? { isHypnotized: true } : {}),
@@ -165,6 +164,7 @@ export function werewolfStateToFirebase(
 export function werewolfStateFromFirebase(
   raw: FirebaseWerewolfPlayerState,
 ): WerewolfPlayerGameState {
+  const monarchKnightingsUsed = raw.monarchKnightingsUsed;
   return {
     ...baseStateFromFirebase(raw),
     gameMode: GameMode.Werewolf,
@@ -203,9 +203,7 @@ export function werewolfStateFromFirebase(
     ...(raw.monarchKnightedPlayerIds?.length
       ? { monarchKnightedPlayerIds: raw.monarchKnightedPlayerIds }
       : {}),
-    ...((raw.monarchKnightingsUsed ?? 0) > 0
-      ? { monarchKnightingsUsed: raw.monarchKnightingsUsed }
-      : {}),
+    ...((monarchKnightingsUsed ?? 0) > 0 ? { monarchKnightingsUsed } : {}),
     ...(raw.priestWardActive ? { priestWardActive: true } : {}),
     ...(raw.isSilenced ? { isSilenced: true } : {}),
     ...(raw.isHypnotized ? { isHypnotized: true } : {}),

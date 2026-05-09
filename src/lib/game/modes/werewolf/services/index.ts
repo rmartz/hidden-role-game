@@ -65,6 +65,7 @@ function extractNonOwnerState(
   const daytimeNightState = extractDaytimeNightSummary(game, callerId);
   const daytimePlayerState = extractDaytimePlayerState(game, callerId);
   const ts = currentTurnState(game);
+  const monarchKnightingsUsed = ts?.monarchKnightingsUsed;
 
   const amDead = deadPlayerIds.includes(callerId);
   const visibleDeadPlayerIds = extractVisibleDeadPlayerIds(game, callerId);
@@ -93,9 +94,7 @@ function extractNonOwnerState(
     ...(ts?.monarchKnightedPlayerIds?.length
       ? { monarchKnightedPlayerIds: ts.monarchKnightedPlayerIds }
       : {}),
-    ...((ts?.monarchKnightingsUsed ?? 0) > 0
-      ? { monarchKnightingsUsed: ts?.monarchKnightingsUsed }
-      : {}),
+    ...((monarchKnightingsUsed ?? 0) > 0 ? { monarchKnightingsUsed } : {}),
     ...executionerState,
   };
 }

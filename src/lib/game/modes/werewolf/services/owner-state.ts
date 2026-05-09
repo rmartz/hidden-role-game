@@ -275,6 +275,7 @@ export function extractOwnerState(
   const nightActions = extractNightActions(game);
   const deadPlayerIds = extractDeadPlayerIds(game);
   const hunterRevengePlayerId = extractHunterRevengePlayerId(game);
+  const monarchKnightingsUsed = ts?.monarchKnightingsUsed;
   const callerId = game.ownerPlayerId ?? "";
   const daytimeNightState = extractDaytimeNightSummary(game, callerId);
 
@@ -295,9 +296,7 @@ export function extractOwnerState(
     ...(ts?.monarchKnightedPlayerIds?.length
       ? { monarchKnightedPlayerIds: ts.monarchKnightedPlayerIds }
       : {}),
-    ...((ts?.monarchKnightingsUsed ?? 0) > 0
-      ? { monarchKnightingsUsed: ts?.monarchKnightingsUsed }
-      : {}),
+    ...((monarchKnightingsUsed ?? 0) > 0 ? { monarchKnightingsUsed } : {}),
     ...(hiddenRoleIds ? { hiddenRoleIds } : {}),
   };
 }

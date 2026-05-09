@@ -55,6 +55,7 @@ export const startNightAction: GameAction = {
     const aliveInfected = (ts.zombieInfected ?? []).filter(
       (id) => !ts.deadPlayerIds.includes(id),
     );
+    const monarchKnightingsUsed = ts.monarchKnightingsUsed;
 
     game.status = {
       type: GameStatus.Playing,
@@ -85,9 +86,7 @@ export const startNightAction: GameAction = {
         ...(ts.monarchKnightedPlayerIds?.length
           ? { monarchKnightedPlayerIds: ts.monarchKnightedPlayerIds }
           : {}),
-        ...((ts.monarchKnightingsUsed ?? 0) > 0
-          ? { monarchKnightingsUsed: ts.monarchKnightingsUsed }
-          : {}),
+        ...((monarchKnightingsUsed ?? 0) > 0 ? { monarchKnightingsUsed } : {}),
         ...(ts.exposerReveal ? { exposerReveal: ts.exposerReveal } : {}),
         ...(ts.executionerTargetId
           ? { executionerTargetId: ts.executionerTargetId }

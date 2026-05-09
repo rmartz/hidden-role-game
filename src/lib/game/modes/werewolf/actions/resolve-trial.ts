@@ -28,15 +28,12 @@ export function applyTrialVerdict(
     const roleId = game.roleAssignments.find(
       (a) => a.playerId === v.playerId,
     )?.roleDefinitionId;
-    if (roleId === WerewolfRole.Mayor) {
-      if (v.vote === DaytimeVote.Guilty) guiltyCount++;
-      else innocentCount++;
-    }
-    // Monarch-knighted players have +1 vote in trials (public).
-    if ((ts.monarchKnightedPlayerIds ?? []).includes(v.playerId)) {
-      if (v.vote === DaytimeVote.Guilty) guiltyCount++;
-      else innocentCount++;
-    }
+    const extraVoteWeight =
+      Number(roleId === WerewolfRole.Mayor) +
+      Number((ts.monarchKnightedPlayerIds ?? []).includes(v.playerId));
+    if (extraVoteWeight === 0) continue;
+    if (v.vote === DaytimeVote.Guilty) guiltyCount += extraVoteWeight;
+    else innocentCount += extraVoteWeight;
   }
 
   // Strictly more Guilty than Innocent → eliminated; ties/abstentions → innocent
