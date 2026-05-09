@@ -11,14 +11,16 @@ interface NightOutcomeSummaryProps {
   events: NightResolutionEvent[];
   players: { id: string; name: string }[];
   roles: Record<string, { name: string }>;
+  knightedPlayerId?: string;
 }
 
 export function NightOutcomeSummary({
   events,
   players,
   roles,
+  knightedPlayerId,
 }: NightOutcomeSummaryProps) {
-  if (events.length === 0) return null;
+  if (events.length === 0 && !knightedPlayerId) return null;
 
   const altruistIntercept = events.find(
     (e): e is AltruistInterceptedNightResolutionEvent =>
@@ -55,6 +57,14 @@ export function NightOutcomeSummary({
             />
           </li>
         ))}
+        {knightedPlayerId && (
+          <li>
+            <strong className="text-foreground">
+              {getPlayerName(players, knightedPlayerId) ?? knightedPlayerId}
+            </strong>
+            <span className="ml-1 text-blue-600 font-medium">(knighted)</span>
+          </li>
+        )}
       </ul>
     </div>
   );

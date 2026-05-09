@@ -95,6 +95,13 @@ export function PlayerNightActionScreen({
     !isGroupPhase &&
     gameState.myRole?.id === (WerewolfRole.Exposer as string) &&
     (gameState.exposerAbilityUsed ?? false);
+  const isMonarch =
+    !isGroupPhase && gameState.myRole?.id === (WerewolfRole.Monarch as string);
+  const monarchKnightingsRemaining = Math.max(
+    0,
+    3 - (gameState.monarchKnightingsUsed ?? 0),
+  );
+  const monarchOutOfKnightings = isMonarch && monarchKnightingsRemaining === 0;
 
   const oesLockedTargetName = gameState.oneEyedSeerLockedTargetId
     ? (getPlayerName(gameState.players, gameState.oneEyedSeerLockedTargetId) ??
@@ -184,6 +191,10 @@ export function PlayerNightActionScreen({
               isConfirmed={isConfirmed}
             />
           </>
+        ) : monarchOutOfKnightings ? (
+          <p className="text-sm text-muted-foreground mb-3 italic">
+            {WEREWOLF_COPY.monarch.outOfKnighthoods}
+          </p>
         ) : (
           <PlayerTargetSelection
             gameId={gameId}
@@ -205,6 +216,9 @@ export function PlayerNightActionScreen({
             mySecondNightTarget={gameState.mySecondNightTarget}
             requiresSecondTarget={isMentalist}
             mirrorcasterCharged={gameState.mirrorcasterCharged}
+            monarchKnightingsRemaining={
+              isMonarch ? monarchKnightingsRemaining : undefined
+            }
           />
         )}
         {investigationResult && (

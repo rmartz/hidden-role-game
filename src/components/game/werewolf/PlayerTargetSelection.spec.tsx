@@ -359,4 +359,38 @@ describe("PlayerTargetSelection", () => {
       }),
     ).toBeDefined();
   });
+
+  it("shows Monarch-specific heading, remaining count, and Knight confirm label", () => {
+    render(
+      <PlayerTargetSelection
+        gameId="game-1"
+        players={[
+          { id: "p1", name: "Alice" },
+          { id: "p2", name: "Bob" },
+          { id: "p3", name: "Charlie" },
+        ]}
+        targets={[
+          [{ id: "p2", name: "Bob" }, true],
+          [{ id: "p3", name: "Charlie" }, false],
+        ]}
+        isConfirmed={false}
+        isGroupPhase={false}
+        confirmPhaseKey={WerewolfRole.Monarch}
+        hasTarget={true}
+        allAgreed={false}
+        myNightTarget="p2"
+        monarchKnightingsRemaining={2}
+      />,
+    );
+
+    expect(
+      screen.getByRole("heading", {
+        name: WEREWOLF_COPY.monarch.choosePlayerToKnight,
+      }),
+    ).toBeDefined();
+    expect(
+      screen.getByText(WEREWOLF_COPY.monarch.knighthoodsRemaining(2)),
+    ).toBeDefined();
+    expect(screen.getByRole("button", { name: "Knight" })).toBeDefined();
+  });
 });
