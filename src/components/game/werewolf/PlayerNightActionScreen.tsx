@@ -205,6 +205,7 @@ export function PlayerNightActionScreen({
             mySecondNightTarget={gameState.mySecondNightTarget}
             requiresSecondTarget={isMentalist}
             mirrorcasterCharged={gameState.mirrorcasterCharged}
+            mercenaryCharged={gameState.mercenaryCharged}
           />
         )}
         {investigationResult && (

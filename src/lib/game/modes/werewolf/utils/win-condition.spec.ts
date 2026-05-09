@@ -473,7 +473,7 @@ describe("checkWinCondition", () => {
       expect(result).toBeUndefined();
     });
 
-    it("Mercenary wins when Village wins and a bribed Good player is alive", () => {
+    it("Mercenary co-wins when Village wins and a bribed Good player is alive", () => {
       const game = makeGame(
         [
           { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
@@ -485,12 +485,13 @@ describe("checkWinCondition", () => {
           deadPlayerIds: [],
         }),
       );
-      // Wolf dead → Village wins; Mercenary alive with bribed Good player alive → Mercenary wins
+      // Wolf dead → Village wins; Mercenary alive with bribed Good player alive → co-win
       const result = checkWinCondition(game, []);
-      expect(result?.winner).toBe(WerewolfWinner.Mercenary);
+      expect(result?.winner).toBe(WerewolfWinner.Village);
+      expect(result?.victoryConditionKey).toBe(WerewolfWinner.Mercenary);
     });
 
-    it("Mercenary wins when Werewolves win and a bribed Bad player is alive", () => {
+    it("Mercenary co-wins when Werewolves win and a bribed Bad player is alive", () => {
       const game = makeGame(
         [
           { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -501,9 +502,10 @@ describe("checkWinCondition", () => {
           deadPlayerIds: [],
         }),
       );
-      // 1 wolf, 1 neutral Mercenary — wolves outnumber non-bad (0 good, 1 neutral = 1 non-bad; 1 bad >= 1 non-bad → wolves win)
+      // 1 wolf, 1 neutral Mercenary — wolves outnumber non-bad → wolves win; Mercenary co-wins
       const result = checkWinCondition(game, []);
-      expect(result?.winner).toBe(WerewolfWinner.Mercenary);
+      expect(result?.winner).toBe(WerewolfWinner.Werewolves);
+      expect(result?.victoryConditionKey).toBe(WerewolfWinner.Mercenary);
     });
 
     it("Mercenary does not win when bribed player is dead", () => {
@@ -569,7 +571,7 @@ describe("checkWinCondition", () => {
       expect(result?.winner).toBe(WerewolfWinner.Village);
     });
 
-    it("Spoiler beats Mercenary when Spoiler is alive", () => {
+    it("Spoiler wins alone when Spoiler is alive and bribed player is not the Spoiler", () => {
       const game = makeGame(
         [
           { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
@@ -582,9 +584,46 @@ describe("checkWinCondition", () => {
           deadPlayerIds: [],
         }),
       );
-      // Village wins; Spoiler and Mercenary both alive; Spoiler takes priority
+      // Village wins; Spoiler alive → Spoiler wins; Mercenary bribed p4 (Villager, not Spoiler) → no co-win
       const result = checkWinCondition(game, []);
       expect(result?.winner).toBe(WerewolfWinner.Spoiler);
+      expect(result?.victoryConditionKey).toBeUndefined();
+    });
+
+    it("Mercenary co-wins with Spoiler when Spoiler is bribed and alive", () => {
+      const game = makeGame(
+        [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Mercenary },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Spoiler },
+        ],
+        makeDayTurnState({
+          mercenaryBribedPlayerIds: ["p3"],
+          deadPlayerIds: [],
+        }),
+      );
+      // Village wins; Spoiler alive → Spoiler wins; Mercenary bribed the Spoiler → co-win
+      const result = checkWinCondition(game, []);
+      expect(result?.winner).toBe(WerewolfWinner.Spoiler);
+      expect(result?.victoryConditionKey).toBe(WerewolfWinner.Mercenary);
+    });
+
+    it("Mercenary co-wins with Illuminati when Illuminati is bribed and alive", () => {
+      const game = makeGame(
+        [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Mercenary },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Illuminati },
+        ],
+        makeDayTurnState({
+          mercenaryBribedPlayerIds: ["p3"],
+          deadPlayerIds: [],
+        }),
+      );
+      // ≤3 players, win fires → Illuminati wins; Mercenary bribed the Illuminati → co-win
+      const result = checkWinCondition(game, []);
+      expect(result?.winner).toBe(WerewolfWinner.Illuminati);
+      expect(result?.victoryConditionKey).toBe(WerewolfWinner.Mercenary);
     });
   });
 });

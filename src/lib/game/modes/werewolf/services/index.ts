@@ -50,6 +50,13 @@ function extractVictoryCondition(game: Game): VictoryCondition | undefined {
   return { label, winner: WEREWOLF_WINNER_TEAMS[winner] };
 }
 
+function extractMercenaryAlsoWins(game: Game): boolean {
+  if (game.status.type !== GameStatus.Finished) return false;
+  return (
+    game.status.victoryConditionKey === (WerewolfWinner.Mercenary as string)
+  );
+}
+
 function extractNonOwnerState(
   game: Game,
   callerId: string,
@@ -127,6 +134,7 @@ export const werewolfServices: GameModeServices = {
 
     // Include Werewolf-specific game settings in the player state.
     const wwConfig = getWerewolfModeConfig(game);
+    const mercenaryAlsoWins = extractMercenaryAlsoWins(game);
     return {
       ...modeState,
       nominationsEnabled: wwConfig.nominationsEnabled,
@@ -134,6 +142,7 @@ export const werewolfServices: GameModeServices = {
       revealProtections: wwConfig.revealProtections,
       autoRevealNightOutcome: wwConfig.autoRevealNightOutcome,
       victoryCondition: extractVictoryCondition(game),
+      ...(mercenaryAlsoWins ? { mercenaryAlsoWins: true } : {}),
     };
   },
 };

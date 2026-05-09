@@ -2,6 +2,7 @@ import { afterEach, describe, it, expect, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import { GameOverScreenView } from "./GameOverScreenView";
 import { WerewolfWinner } from "@/lib/game/modes/werewolf/utils/win-condition";
+import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import { GameStatus, GameMode, Team } from "@/lib/types";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
@@ -132,5 +133,46 @@ describe("GameOverScreenView", () => {
     expect(screen.getByText("Bob")).toBeDefined();
     expect(screen.getByText("Villager")).toBeDefined();
     expect(screen.getByText("Werewolf")).toBeDefined();
+  });
+
+  it("shows '(Mercenary also wins)' in subheading when mercenaryAlsoWins is true", () => {
+    const gameState = makeGameState({
+      myRole: { id: "villager", name: "Villager", team: Team.Good },
+      myPlayerId: "p1",
+      mercenaryAlsoWins: true,
+    });
+    render(<GameOverScreenView {...defaultProps} gameState={gameState} />);
+    expect(
+      screen.getByText(
+        WEREWOLF_COPY.gameOver.winnerLabelWithMercenary(WerewolfWinner.Village),
+      ),
+    ).toBeDefined();
+  });
+
+  it("shows victory for Mercenary role when mercenaryAlsoWins is true", () => {
+    const gameState = makeGameState({
+      myRole: {
+        id: WerewolfRole.Mercenary,
+        name: "Mercenary",
+        team: Team.Neutral,
+      },
+      myPlayerId: "p1",
+      mercenaryAlsoWins: true,
+    });
+    render(<GameOverScreenView {...defaultProps} gameState={gameState} />);
+    expect(screen.getByText(WEREWOLF_COPY.gameOver.victory)).toBeDefined();
+  });
+
+  it("shows defeat for Mercenary role when mercenaryAlsoWins is false", () => {
+    const gameState = makeGameState({
+      myRole: {
+        id: WerewolfRole.Mercenary,
+        name: "Mercenary",
+        team: Team.Neutral,
+      },
+      myPlayerId: "p1",
+    });
+    render(<GameOverScreenView {...defaultProps} gameState={gameState} />);
+    expect(screen.getByText(WEREWOLF_COPY.gameOver.defeat)).toBeDefined();
   });
 });

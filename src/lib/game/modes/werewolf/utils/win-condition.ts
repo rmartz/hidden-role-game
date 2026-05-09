@@ -26,7 +26,13 @@ import { currentTurnState } from "./game-state";
 export function checkWinCondition(
   game: Game,
   deadPlayerIds: string[],
-): { type: GameStatus.Finished; winner: WerewolfWinner } | undefined {
+):
+  | {
+      type: GameStatus.Finished;
+      winner: WerewolfWinner;
+      victoryConditionKey?: string;
+    }
+  | undefined {
   const deadSet = new Set(deadPlayerIds);
   const aliveAssignments = game.roleAssignments.filter(
     (a) => !deadSet.has(a.playerId),
@@ -143,50 +149,31 @@ export function checkWinCondition(
   // Illuminati override: if any win condition fires, the Illuminati is alive,
   // and ≤ 3 total players remain, the Illuminati wins instead (takes priority over Spoiler).
   if (winResult && illuminatiAlive && aliveAssignments.length <= 3) {
-    return { type: GameStatus.Finished, winner: WerewolfWinner.Illuminati };
+    winResult = {
+      type: GameStatus.Finished,
+      winner: WerewolfWinner.Illuminati,
+    };
   }
-
   // Spoiler override: if a standard win condition is met and the Spoiler is alive,
   // the Spoiler wins instead (lower priority than Illuminati).
-  if (winResult && spoilerAlive) {
-    return { type: GameStatus.Finished, winner: WerewolfWinner.Spoiler };
+  else if (winResult && spoilerAlive) {
+    winResult = { type: GameStatus.Finished, winner: WerewolfWinner.Spoiler };
   }
 
-  // Mercenary override: if a standard Village or Werewolves win fires, the Mercenary
-  // is alive, and at least one bribed player is alive on the winning team, the
-  // Mercenary wins instead (lower priority than Illuminati and Spoiler).
+  // Mercenary co-win: if any win fires, the Mercenary is alive, and at least
+  // one bribed player is alive on the winning side, the Mercenary also wins
+  // (shown alongside the main winner, lower priority than Illuminati and Spoiler).
   if (winResult) {
     const mercenaryAssignment = game.roleAssignments.find(
       (a) => a.roleDefinitionId === (WerewolfRole.Mercenary as string),
     );
     if (mercenaryAssignment && !deadSet.has(mercenaryAssignment.playerId)) {
       const bribedPlayerIds = ts?.mercenaryBribedPlayerIds ?? [];
-      if (bribedPlayerIds.length > 0) {
-        const winningTeam =
-          winResult.winner === (WerewolfWinner.Village as string)
-            ? Team.Good
-            : winResult.winner === (WerewolfWinner.Werewolves as string) ||
-                winResult.winner === (WerewolfWinner.LoneWolf as string)
-              ? Team.Bad
-              : undefined;
-        if (winningTeam !== undefined) {
-          const mercenaryWins = bribedPlayerIds.some((bribedId) => {
-            if (deadSet.has(bribedId)) return false;
-            const assignment = game.roleAssignments.find(
-              (a) => a.playerId === bribedId,
-            );
-            const role = assignment
-              ? getWerewolfRole(assignment.roleDefinitionId)
-              : undefined;
-            return role?.team === winningTeam;
-          });
-          if (mercenaryWins) {
-            return {
-              type: GameStatus.Finished,
-              winner: WerewolfWinner.Mercenary,
-            };
-          }
-        }
+      const mercenaryWins = bribedPlayerIds.some((bribedId) =>
+        isBribedPlayerOnWinningSide(bribedId, deadSet, game, winResult.winner),
+      );
+      if (mercenaryWins) {
+        return { ...winResult, victoryConditionKey: WerewolfWinner.Mercenary };
       }
     }
   }
@@ -211,3 +198,45 @@ export const WerewolfWinner = {
 } as const;
 export type WerewolfWinner =
   (typeof WerewolfWinner)[keyof typeof WerewolfWinner];
+
+/**
+ * Checks whether a bribed player is on the winning side for the given winner.
+ * For team wins (Village, Werewolves/LoneWolf), the bribed player must be alive
+ * and on the winning team. For individual-role wins (Spoiler, Illuminati, etc.),
+ * the bribed player must be alive and have that specific winning role.
+ */
+function isBribedPlayerOnWinningSide(
+  bribedId: string,
+  deadSet: Set<string>,
+  game: Game,
+  winner: string,
+): boolean {
+  if (deadSet.has(bribedId)) return false;
+  const assignment = game.roleAssignments.find((a) => a.playerId === bribedId);
+  if (!assignment) return false;
+
+  if (winner === WerewolfWinner.Village) {
+    const role = getWerewolfRole(assignment.roleDefinitionId);
+    return role?.team === Team.Good;
+  }
+  if (
+    winner === WerewolfWinner.Werewolves ||
+    winner === WerewolfWinner.LoneWolf
+  ) {
+    const role = getWerewolfRole(assignment.roleDefinitionId);
+    return role?.team === Team.Bad;
+  }
+
+  // Individual-role wins: bribed player must be that specific winning role.
+  const winnerToRole: Partial<Record<string, string>> = {
+    [WerewolfWinner.Chupacabra]: WerewolfRole.Chupacabra,
+    [WerewolfWinner.Dracula]: WerewolfRole.Dracula,
+    [WerewolfWinner.Executioner]: WerewolfRole.Executioner,
+    [WerewolfWinner.Illuminati]: WerewolfRole.Illuminati,
+    [WerewolfWinner.Spoiler]: WerewolfRole.Spoiler,
+    [WerewolfWinner.Zombie]: WerewolfRole.Zombie,
+  };
+  const winningRoleId = winnerToRole[winner];
+  if (!winningRoleId) return false;
+  return assignment.roleDefinitionId === winningRoleId;
+}

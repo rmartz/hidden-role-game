@@ -84,6 +84,8 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   mercenaryCharged?: boolean;
   /** Player IDs that the Mercenary has bribed. Narrator-only. */
   mercenaryBribedPlayerIds?: string[];
+  /** Whether the Mercenary also won alongside the main winner. */
+  mercenaryAlsoWins?: boolean;
   /** Executioner: target player ID. */
   executionerTargetId?: string;
   /** Hunter revenge pending: the Hunter's player ID. Narrator-only. */

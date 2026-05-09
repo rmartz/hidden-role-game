@@ -302,6 +302,24 @@ describe("getConfirmLabel", () => {
     );
   });
 
+  it("returns 'Protect' for Mercenary when uncharged", () => {
+    expect(
+      getConfirmLabel(WerewolfRole.Mercenary, undefined, undefined, false),
+    ).toBe("Protect");
+  });
+
+  it("returns 'Protect' for Mercenary when mercenaryCharged is undefined", () => {
+    expect(
+      getConfirmLabel(WerewolfRole.Mercenary, undefined, undefined, undefined),
+    ).toBe("Protect");
+  });
+
+  it("returns 'Bribe' for Mercenary when charged", () => {
+    expect(
+      getConfirmLabel(WerewolfRole.Mercenary, undefined, undefined, true),
+    ).toBe("Bribe");
+  });
+
   it("returns 'Confirm' for undefined roleId", () => {
     expect(getConfirmLabel(undefined)).toBe("Confirm");
   });

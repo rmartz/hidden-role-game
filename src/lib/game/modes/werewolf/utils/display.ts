@@ -192,7 +192,7 @@ export interface WitchConfirmContext {
 /**
  * Returns the confirm button label for a given phase key based on its target category.
  * Group phase keys return "Attack". Solo roles: Attack, Protect, Investigate,
- * Silence (Spellcaster), or "Confirm".
+ * Silence (Spellcaster), Bribe/Protect (Mercenary), or "Confirm".
  * For the Witch: "Protect" if the selected target is under attack, "Attack" if not,
  * or "Use Ability" when no target is selected.
  */
@@ -200,6 +200,7 @@ export function getConfirmLabel(
   phaseKey?: PhaseKey,
   witchContext?: WitchConfirmContext,
   mirrorcasterCharged?: boolean,
+  mercenaryCharged?: boolean,
 ): string {
   if (!phaseKey) return "Confirm";
   if (isGroupPhaseKey(phaseKey)) return "Attack";
@@ -214,6 +215,9 @@ export function getConfirmLabel(
   if (isRoleActive(phaseKey, WerewolfRole.Spellcaster)) return "Silence";
   if (isRoleActive(phaseKey, WerewolfRole.Mirrorcaster)) {
     return mirrorcasterCharged ? "Attack" : "Protect";
+  }
+  if (isRoleActive(phaseKey, WerewolfRole.Mercenary)) {
+    return mercenaryCharged ? "Bribe" : "Protect";
   }
   const roleDef = getWerewolfRole(phaseKey);
   if (!roleDef) return "Confirm";

@@ -17,6 +17,7 @@ interface ConfirmTargetButtonProps {
   allAgreed?: boolean;
   witchContext?: WitchConfirmContext;
   mirrorcasterCharged?: boolean;
+  mercenaryCharged?: boolean;
 }
 
 export function ConfirmTargetButton({
@@ -30,6 +31,7 @@ export function ConfirmTargetButton({
   allAgreed,
   witchContext,
   mirrorcasterCharged,
+  mercenaryCharged,
 }: ConfirmTargetButtonProps) {
   const action = useGameAction(gameId);
 
@@ -44,6 +46,7 @@ export function ConfirmTargetButton({
       allAgreed={allAgreed}
       witchContext={witchContext}
       mirrorcasterCharged={mirrorcasterCharged}
+      mercenaryCharged={mercenaryCharged}
       isPending={action.isPending}
       onConfirm={() => {
         action.mutate({ actionId: WerewolfAction.ConfirmNightTarget });
