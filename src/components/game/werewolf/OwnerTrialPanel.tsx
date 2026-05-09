@@ -21,6 +21,7 @@ interface OwnerTrialPanelProps {
   votePhaseSeconds: number;
   defensePhaseSeconds: number;
   autoAdvance: boolean;
+  pendingGuiltId?: string;
 }
 
 export function OwnerTrialPanel({
@@ -30,6 +31,7 @@ export function OwnerTrialPanel({
   votePhaseSeconds,
   defensePhaseSeconds,
   autoAdvance,
+  pendingGuiltId,
 }: OwnerTrialPanelProps) {
   const action = useGameAction(gameId);
   const defendant = players.find((p) => p.id === activeTrial.defendantId);
@@ -45,6 +47,10 @@ export function OwnerTrialPanel({
 
   const handleResolve = useCallback(() => {
     action.mutate({ actionId: WerewolfAction.ResolveTrial });
+  }, [action]);
+
+  const handleAdvanceMartyrWindow = useCallback(() => {
+    action.mutate({ actionId: WerewolfAction.AdvanceMartyrWindow });
   }, [action]);
 
   const handleSkipDefense = useCallback(() => {
@@ -86,9 +92,19 @@ export function OwnerTrialPanel({
           <p className="font-semibold mb-1">
             {trial.narratorVerdictHeading(defendantName, verdictLabel)}
           </p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground mb-2">
             {trial.guiltyInnocentCount(guiltyCount, innocentCount)}
           </p>
+          {pendingGuiltId && (
+            <Button
+              size="sm"
+              className="flex-1"
+              onClick={handleAdvanceMartyrWindow}
+              disabled={action.isPending}
+            >
+              {trial.advanceToSentencing}
+            </Button>
+          )}
         </>
       ) : activeTrial.phase === TrialPhase.Defense ? (
         <>
@@ -205,7 +221,7 @@ export function OwnerTrialPanel({
               onClick={handleResolve}
               disabled={action.isPending}
             >
-              {trial.resolveTrial}
+              {trial.revealTrialResults}
             </Button>
             <Button
               size="sm"

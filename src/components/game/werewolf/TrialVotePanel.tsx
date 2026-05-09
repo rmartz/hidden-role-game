@@ -26,6 +26,9 @@ interface TrialVotePanelProps {
   autoAdvance: boolean;
   isSilenced?: boolean;
   isHypnotized?: boolean;
+  pendingGuiltId?: string;
+  isMartyr?: boolean;
+  martyrUsed?: boolean;
 }
 
 export function TrialVotePanel({
@@ -39,6 +42,9 @@ export function TrialVotePanel({
   autoAdvance,
   isSilenced,
   isHypnotized,
+  pendingGuiltId,
+  isMartyr,
+  martyrUsed,
 }: TrialVotePanelProps) {
   const action = useGameAction(gameId);
   const defendant = players.find((p) => p.id === activeTrial.defendantId);
@@ -50,6 +56,10 @@ export function TrialVotePanel({
     },
     [action],
   );
+
+  const handleUseMartyrAbility = useCallback(() => {
+    action.mutate({ actionId: WerewolfAction.UseMartyrAbility });
+  }, [action]);
 
   const { trial } = WEREWOLF_COPY;
   const [silencedDefenseMessage] = useState(() => {
@@ -122,6 +132,21 @@ export function TrialVotePanel({
             </span>
             {trial.eliminatedRoleSuffix}
           </p>
+        )}
+      {isMartyr &&
+        !martyrUsed &&
+        !isDefendant &&
+        pendingGuiltId === activeTrial.defendantId && (
+          <div className="mt-3">
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={handleUseMartyrAbility}
+              disabled={action.isPending}
+            >
+              {trial.martyrSacrificeButton}
+            </Button>
+          </div>
         )}
     </>
   ) : activeTrial.phase === TrialPhase.Defense ? (

@@ -76,7 +76,9 @@ export function OwnerGameDayScreen({
   const daytimePhase = phase;
   const modeConfig = GAME_MODES[gameState.gameMode];
   const activeTrial = daytimePhase.activeTrial;
-  const hasActiveTrial = !!activeTrial && !activeTrial.verdict;
+  const pendingGuiltId = gameState.pendingGuiltId;
+  const hasActiveTrial =
+    (!!activeTrial && !activeTrial.verdict) || !!pendingGuiltId;
   const nominationsBlocked = isNominationsBlocked(gameState);
   const hunterRevengePending = !!gameState.hunterRevengePlayerId;
   const glossaryRoles = gameState.rolesInPlay?.length
@@ -164,6 +166,7 @@ export function OwnerGameDayScreen({
               votePhaseSeconds={votePhaseSeconds}
               defensePhaseSeconds={defensePhaseSeconds}
               autoAdvance={autoAdvance}
+              pendingGuiltId={pendingGuiltId}
             />
           )}
         </OwnerAdvanceCard>

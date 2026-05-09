@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { GAME_MODES } from "@/lib/game/modes";
-import { WerewolfPhase } from "@/lib/game/modes/werewolf";
+import { WerewolfPhase, WerewolfRole } from "@/lib/game/modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import {
@@ -126,6 +126,9 @@ export function PlayerGameDayScreen({
           autoAdvance={timerConfig.autoAdvance}
           isSilenced={gameState.isSilenced}
           isHypnotized={gameState.isHypnotized}
+          pendingGuiltId={gameState.pendingGuiltId}
+          isMartyr={gameState.myRole?.id === WerewolfRole.Martyr}
+          martyrUsed={gameState.martyrUsed}
         />
       )}
 
