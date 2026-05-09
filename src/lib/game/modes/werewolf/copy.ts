@@ -181,6 +181,16 @@ export const WEREWOLF_COPY = {
     differentTeams: "on different teams",
     chooseSecondTarget: "Choose a second target",
     yourTargets: "Your targets",
+    narratorNoTargets: "Select a player to investigate",
+    narratorOneTarget: "Select a second player to compare",
+    narratorTwoTargets: (first: string, second: string) =>
+      `Investigate if ${first} and ${second} are on the same team`,
+  },
+  swapper: {
+    narratorNoTargets: "Select a player to swap",
+    narratorOneTarget: "Select a second player to swap",
+    narratorTwoTargets: (first: string, second: string) =>
+      `Swap effects for ${first} and ${second}`,
   },
   mysticSeer: {
     resultPrefix: "is",
