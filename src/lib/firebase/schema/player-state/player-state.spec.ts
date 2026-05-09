@@ -100,6 +100,8 @@ describe("Werewolf player state round-trip", () => {
       nightStatus: [{ targetPlayerId: "p2", effect: "killed" }],
       isSilenced: true,
       mirrorcasterCharged: true,
+      monarchKnightedPlayerIds: ["p2", "p3"],
+      monarchKnightingsUsed: 2,
       hunterRevengePlayerId: "p1",
     });
     const result = firebaseToPlayerState(
@@ -112,6 +114,8 @@ describe("Werewolf player state round-trip", () => {
     ]);
     expect(result.isSilenced).toBe(true);
     expect(result.mirrorcasterCharged).toBe(true);
+    expect(result.monarchKnightedPlayerIds).toEqual(["p2", "p3"]);
+    expect(result.monarchKnightingsUsed).toBe(2);
     expect(result.hunterRevengePlayerId).toBe("p1");
   });
 

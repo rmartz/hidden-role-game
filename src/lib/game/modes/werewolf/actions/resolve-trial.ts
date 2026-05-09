@@ -32,6 +32,11 @@ export function applyTrialVerdict(
       if (v.vote === DaytimeVote.Guilty) guiltyCount++;
       else innocentCount++;
     }
+    // Monarch-knighted players have +1 vote in trials (public).
+    if ((ts.monarchKnightedPlayerIds ?? []).includes(v.playerId)) {
+      if (v.vote === DaytimeVote.Guilty) guiltyCount++;
+      else innocentCount++;
+    }
   }
 
   // Strictly more Guilty than Innocent → eliminated; ties/abstentions → innocent

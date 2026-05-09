@@ -9,6 +9,7 @@ import type { WerewolfPlayerGameState } from "../player-state";
 import { getWerewolfModeConfig } from "../lobby-config";
 import { WerewolfRole, getWerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
+import { currentTurnState } from "../utils";
 import {
   selectExecutionerTarget,
   buildInitialTurnState,
@@ -63,6 +64,7 @@ function extractNonOwnerState(
 
   const daytimeNightState = extractDaytimeNightSummary(game, callerId);
   const daytimePlayerState = extractDaytimePlayerState(game, callerId);
+  const ts = currentTurnState(game);
 
   const amDead = deadPlayerIds.includes(callerId);
   const visibleDeadPlayerIds = extractVisibleDeadPlayerIds(game, callerId);
@@ -87,6 +89,12 @@ function extractNonOwnerState(
     ...(amDead ? { amDead: true } : {}),
     ...(visibleDeadPlayerIds.length > 0
       ? { deadPlayerIds: visibleDeadPlayerIds }
+      : {}),
+    ...(ts?.monarchKnightedPlayerIds?.length
+      ? { monarchKnightedPlayerIds: ts.monarchKnightedPlayerIds }
+      : {}),
+    ...((ts?.monarchKnightingsUsed ?? 0) > 0
+      ? { monarchKnightingsUsed: ts?.monarchKnightingsUsed }
       : {}),
     ...executionerState,
   };

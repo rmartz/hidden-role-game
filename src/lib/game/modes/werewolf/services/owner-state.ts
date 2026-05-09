@@ -271,6 +271,7 @@ export function extractDaytimePlayerState(
 export function extractOwnerState(
   game: Game,
 ): Partial<WerewolfPlayerGameState> {
+  const ts = currentTurnState(game);
   const nightActions = extractNightActions(game);
   const deadPlayerIds = extractDeadPlayerIds(game);
   const hunterRevengePlayerId = extractHunterRevengePlayerId(game);
@@ -290,6 +291,12 @@ export function extractOwnerState(
     ...(hunterRevengePlayerId ? { hunterRevengePlayerId } : {}),
     ...(game.executionerTargetId
       ? { executionerTargetId: game.executionerTargetId }
+      : {}),
+    ...(ts?.monarchKnightedPlayerIds?.length
+      ? { monarchKnightedPlayerIds: ts.monarchKnightedPlayerIds }
+      : {}),
+    ...((ts?.monarchKnightingsUsed ?? 0) > 0
+      ? { monarchKnightingsUsed: ts?.monarchKnightingsUsed }
       : {}),
     ...(hiddenRoleIds ? { hiddenRoleIds } : {}),
   };

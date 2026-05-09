@@ -82,6 +82,12 @@ export const startNightAction: GameAction = {
           : {}),
         ...(ts.exposerAbilityUsed ? { exposerAbilityUsed: true } : {}),
         ...(ts.morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),
+        ...(ts.monarchKnightedPlayerIds?.length
+          ? { monarchKnightedPlayerIds: ts.monarchKnightedPlayerIds }
+          : {}),
+        ...((ts.monarchKnightingsUsed ?? 0) > 0
+          ? { monarchKnightingsUsed: ts.monarchKnightingsUsed }
+          : {}),
         ...(ts.exposerReveal ? { exposerReveal: ts.exposerReveal } : {}),
         ...(ts.executionerTargetId
           ? { executionerTargetId: ts.executionerTargetId }

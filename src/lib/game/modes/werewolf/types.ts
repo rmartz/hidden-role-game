@@ -196,6 +196,10 @@ export interface WerewolfTurnState {
   exposerReveal?: { playerId: string; roleId: string };
   /** True once the Mortician has successfully killed a Werewolf. */
   morticianAbilityEnded?: boolean;
+  /** Player IDs that have been knighted by the Monarch. Public information. */
+  monarchKnightedPlayerIds?: string[];
+  /** Number of times the Monarch has used their knighting ability (max 3). */
+  monarchKnightingsUsed?: number;
   /** The player ID that the Executioner must get eliminated at trial to win. */
   executionerTargetId?: string;
   /** True when the Mirrorcaster has gained a charge from a successful protection. */

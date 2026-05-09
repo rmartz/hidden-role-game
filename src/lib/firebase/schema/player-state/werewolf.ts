@@ -31,6 +31,8 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
   investigationResult?: { targetPlayerId: string; isWerewolfTeam: boolean };
   witchAbilityUsed?: boolean;
   morticianAbilityEnded?: boolean;
+  monarchKnightedPlayerIds?: string[];
+  monarchKnightingsUsed?: number;
   priestWardActive?: boolean;
   isSilenced?: boolean;
   isHypnotized?: boolean;
@@ -107,6 +109,12 @@ export function werewolfStateToFirebase(
       : {}),
     ...(state.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
     ...(state.morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),
+    ...(state.monarchKnightedPlayerIds?.length
+      ? { monarchKnightedPlayerIds: state.monarchKnightedPlayerIds }
+      : {}),
+    ...((state.monarchKnightingsUsed ?? 0) > 0
+      ? { monarchKnightingsUsed: state.monarchKnightingsUsed }
+      : {}),
     ...(state.priestWardActive ? { priestWardActive: true } : {}),
     ...(state.isSilenced ? { isSilenced: true } : {}),
     ...(state.isHypnotized ? { isHypnotized: true } : {}),
@@ -192,6 +200,12 @@ export function werewolfStateFromFirebase(
       : {}),
     ...(raw.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
     ...(raw.morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),
+    ...(raw.monarchKnightedPlayerIds?.length
+      ? { monarchKnightedPlayerIds: raw.monarchKnightedPlayerIds }
+      : {}),
+    ...((raw.monarchKnightingsUsed ?? 0) > 0
+      ? { monarchKnightingsUsed: raw.monarchKnightingsUsed }
+      : {}),
     ...(raw.priestWardActive ? { priestWardActive: true } : {}),
     ...(raw.isSilenced ? { isSilenced: true } : {}),
     ...(raw.isHypnotized ? { isHypnotized: true } : {}),

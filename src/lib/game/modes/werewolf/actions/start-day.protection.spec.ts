@@ -169,4 +169,108 @@ describe("WerewolfAction.StartDay — protections", () => {
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
     expect(ts.deadPlayerIds).toContain("p2");
   });
+
+  it("Monarch survives a normal night attack while a Knighted player is alive", () => {
+    const nightState = makeNightState({
+      nightActions: {
+        [WerewolfRole.Werewolf]: {
+          votes: [],
+          suggestedTargetId: "p2",
+        },
+      },
+      nightPhaseOrder: [WerewolfRole.Werewolf],
+    });
+    nightState.monarchKnightedPlayerIds = ["p3"];
+    nightState.monarchKnightingsUsed = 1;
+    const game = makePlayingGame(nightState, {
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Monarch },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p4", roleDefinitionId: WerewolfRole.Seer },
+        { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+      ],
+    });
+    action.apply(game, null, "owner-1");
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.deadPlayerIds).not.toContain("p2");
+  });
+
+  it("Monarch is not protected against Bad attackers when all living Knighted players are Bad", () => {
+    const nightState = makeNightState({
+      nightActions: {
+        [WerewolfRole.Werewolf]: {
+          votes: [],
+          suggestedTargetId: "p2",
+        },
+      },
+      nightPhaseOrder: [WerewolfRole.Werewolf],
+    });
+    nightState.monarchKnightedPlayerIds = ["p1"];
+    nightState.monarchKnightingsUsed = 1;
+    const game = makePlayingGame(nightState, {
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Monarch },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p4", roleDefinitionId: WerewolfRole.Seer },
+        { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+      ],
+    });
+    action.apply(game, null, "owner-1");
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.deadPlayerIds).toContain("p2");
+  });
+
+  it("Monarch is not protected when the only living Knighted player is the attacker", () => {
+    const nightState = makeNightState({
+      nightActions: {
+        [WerewolfRole.Mortician]: { targetPlayerId: "p2" },
+      },
+      nightPhaseOrder: [WerewolfRole.Mortician],
+    });
+    nightState.monarchKnightedPlayerIds = ["p3"];
+    nightState.monarchKnightingsUsed = 1;
+    const game = makePlayingGame(nightState, {
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Monarch },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Mortician },
+        { playerId: "p4", roleDefinitionId: WerewolfRole.Seer },
+        { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+      ],
+    });
+    action.apply(game, null, "owner-1");
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.deadPlayerIds).toContain("p2");
+  });
+
+  it("Monarch knighting count increases even if the newly knighted player dies", () => {
+    const game = makePlayingGame(
+      makeNightState({
+        nightActions: {
+          [WerewolfRole.Werewolf]: {
+            votes: [],
+            suggestedTargetId: "p3",
+          },
+          [WerewolfRole.Monarch]: { targetPlayerId: "p3" },
+        },
+        nightPhaseOrder: [WerewolfRole.Werewolf, WerewolfRole.Monarch],
+      }),
+      {
+        roleAssignments: [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Monarch },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p4", roleDefinitionId: WerewolfRole.Seer },
+          { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+        ],
+      },
+    );
+    action.apply(game, null, "owner-1");
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.monarchKnightedPlayerIds).toContain("p3");
+    expect(ts.monarchKnightingsUsed).toBe(1);
+    expect(ts.deadPlayerIds).toContain("p3");
+  });
 });
