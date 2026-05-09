@@ -38,6 +38,21 @@ function chupacabraAttackApplies(
   );
 }
 
+/** Removes one occurrence of `value` from `map[key]`, deleting the key if it becomes empty. */
+function removeFromMapSet(
+  map: Map<string, string[]>,
+  key: string,
+  value: string,
+): void {
+  const existing = map.get(key) ?? [];
+  const filtered = existing.filter((v) => v !== value);
+  if (filtered.length === 0) {
+    map.delete(key);
+  } else {
+    map.set(key, filtered);
+  }
+}
+
 /**
  * Collects attacks and protections from all non-Witch, non-Spellcaster actions.
  * Returns the base attack/protect maps used by both full resolution and the
@@ -287,13 +302,7 @@ export function resolveNightActions(
         if (groupAction.suggestedTargetId !== veteranPlayerId) continue;
 
         // Remove this wolf-group's attack entry from the Veteran.
-        const attackers = attacks.get(veteranPlayerId) ?? [];
-        const filteredAttackers = attackers.filter((a) => a !== phaseKey);
-        if (filteredAttackers.length === 0) {
-          attacks.delete(veteranPlayerId);
-        } else {
-          attacks.set(veteranPlayerId, filteredAttackers);
-        }
+        removeFromMapSet(attacks, veteranPlayerId, phaseKey);
 
         // Find the first alive participant in this wolf group not already
         // selected as a victim this resolution pass.
@@ -339,25 +348,11 @@ export function resolveNightActions(
           continue;
 
         // Discard any protection the visitor provided to the Veteran.
-        const veteranProtectors = protections.get(veteranPlayerId) ?? [];
-        const filteredProtectors = veteranProtectors.filter(
-          (p) => p !== phaseKey,
-        );
-        if (filteredProtectors.length === 0) {
-          protections.delete(veteranPlayerId);
-        } else {
-          protections.set(veteranPlayerId, filteredProtectors);
-        }
+        removeFromMapSet(protections, veteranPlayerId, phaseKey);
 
         // Remove any attack the visitor had on the Veteran (attack roles that
         // targeted the Veteran are repelled, not just protectors).
-        const vetAttackers = attacks.get(veteranPlayerId) ?? [];
-        const filteredVetAttackers = vetAttackers.filter((a) => a !== phaseKey);
-        if (filteredVetAttackers.length === 0) {
-          attacks.delete(veteranPlayerId);
-        } else {
-          attacks.set(veteranPlayerId, filteredVetAttackers);
-        }
+        removeFromMapSet(attacks, veteranPlayerId, phaseKey);
 
         // Queue the counter-kill attack.
         attacks.set(visitorPlayerId, [

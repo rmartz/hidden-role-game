@@ -104,6 +104,24 @@ export function OwnerGameNightScreen({
     [action, activePhaseKey],
   );
 
+  const handleVeteranAlert = useCallback(() => {
+    action.mutate({
+      actionId: WerewolfAction.SetNightTarget,
+      payload: { roleId: activePhaseKey, alerted: true },
+    });
+  }, [action, activePhaseKey]);
+
+  const handleVeteranSkip = useCallback(() => {
+    action.mutate({
+      actionId: WerewolfAction.SetNightTarget,
+      payload: { roleId: activePhaseKey, targetPlayerId: null },
+    });
+  }, [action, activePhaseKey]);
+
+  const handleVeteranConfirm = useCallback(() => {
+    action.mutate({ actionId: WerewolfAction.ConfirmNightTarget });
+  }, [action]);
+
   if (!isNighttime) return null;
 
   const modeConfig = GAME_MODES[gameState.gameMode];
@@ -383,26 +401,9 @@ export function OwnerGameNightScreen({
                   hasDecided={veteranHasDecided}
                   isConfirmed={activeTargetConfirmed}
                   isPending={action.isPending}
-                  onAlert={() => {
-                    action.mutate({
-                      actionId: WerewolfAction.SetNightTarget,
-                      payload: { roleId: activePhaseKey, alerted: true },
-                    });
-                  }}
-                  onSkip={() => {
-                    action.mutate({
-                      actionId: WerewolfAction.SetNightTarget,
-                      payload: {
-                        roleId: activePhaseKey,
-                        targetPlayerId: null,
-                      },
-                    });
-                  }}
-                  onConfirm={() => {
-                    action.mutate({
-                      actionId: WerewolfAction.ConfirmNightTarget,
-                    });
-                  }}
+                  onAlert={handleVeteranAlert}
+                  onSkip={handleVeteranSkip}
+                  onConfirm={handleVeteranConfirm}
                 />
               ) : (
                 (!isWitchAbilitySkipped || abilityBypass) && (
