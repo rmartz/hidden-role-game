@@ -84,6 +84,11 @@ export function TrialVotePanel({
       ? new Date(activeTrial.pausedAt)
       : undefined;
   const trialPauseOffset = activeTrial.pauseOffset ?? 0;
+  const canUseMartyrAbility =
+    isMartyr &&
+    !martyrUsed &&
+    !isDefendant &&
+    pendingGuiltId === activeTrial.defendantId;
 
   const defenseTimer = (
     <GameTimer
@@ -133,10 +138,7 @@ export function TrialVotePanel({
             {trial.eliminatedRoleSuffix}
           </p>
         )}
-      {isMartyr &&
-        !martyrUsed &&
-        !isDefendant &&
-        pendingGuiltId === activeTrial.defendantId && (
+      {canUseMartyrAbility && (
           <div className="mt-3">
             <Button
               size="sm"
