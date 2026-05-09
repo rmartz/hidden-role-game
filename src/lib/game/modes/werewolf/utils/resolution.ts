@@ -232,7 +232,7 @@ export function resolveNightActions(
     | { targetPlayerId?: string }
     | undefined;
   const arsonistPlayerId = roleAssignments.find(
-    (a) => a.roleDefinitionId === (WerewolfRole.Arsonist as string),
+    (a) => a.roleDefinitionId === WerewolfRole.Arsonist,
   )?.playerId;
   if (
     arsonistAction?.targetPlayerId &&
