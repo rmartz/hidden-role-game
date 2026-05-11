@@ -38,7 +38,7 @@ function chupacabraAttackApplies(
   );
 }
 
-/** Removes one occurrence of `value` from `map[key]`, deleting the key if it becomes empty. */
+/** Removes all occurrences of `value` from `map[key]`, deleting the key if it becomes empty. */
 function removeFromMapSet(
   map: Map<string, string[]>,
   key: string,

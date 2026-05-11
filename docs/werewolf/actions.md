@@ -251,7 +251,7 @@ Additional resolution steps:
 | `start-night`                 | Narrator                                     | none                                                   |
 | `start-day`                   | Narrator                                     | none                                                   |
 | `set-night-phase`             | Narrator                                     | `{ phaseIndex: number }`                               |
-| `set-night-target`            | Narrator or active player                    | `{ roleId?: string; targetPlayerId?: string \| null }` |
+| `set-night-target`            | Narrator or active player                    | `{ roleId?: string; targetPlayerId?: string \| null; alerted?: boolean }` |
 | `confirm-night-target`        | Active player or Narrator (solo phases only) | none                                                   |
 | `reveal-investigation-result` | Narrator                                     | none                                                   |
 | `mark-player-dead`            | Narrator                                     | `{ playerId: string }`                                 |
@@ -273,13 +273,14 @@ Additional resolution steps:
 ## Night Action Types
 
 ```typescript
-// Solo role action (Seer, Bodyguard, Witch, Spellcaster, Chupacabra, Doctor, Priest, Mummy, Wizard, One-Eyed Seer, Exposer, Mystic Seer, Altruist, Mortician)
+// Solo role action (Seer, Bodyguard, Witch, Spellcaster, Chupacabra, Doctor, Priest, Mummy, Wizard, One-Eyed Seer, Exposer, Mystic Seer, Altruist, Mortician, Veteran)
 interface NightAction {
   targetPlayerId?: string; // absent when skipped
   skipped?: true; // set when the player intentionally chose "Skip"
   confirmed?: boolean;
   resultRevealed?: boolean; // Seer, Wizard, One-Eyed Seer, Mystic Seer
   secondTargetPlayerId?: string; // Mentalist dual-target
+  alerted?: boolean; // set when the Veteran chose Alert
 }
 
 // Individual vote within a group phase
