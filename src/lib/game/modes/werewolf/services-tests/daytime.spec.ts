@@ -223,9 +223,7 @@ describe("extractDaytimeNightSummary", () => {
 
   it("includes monarch knighting in daytime night summary", () => {
     const game = makeDaytimeGame({
-      nightActions: {
-        [WerewolfRole.Monarch]: { targetPlayerId: "p3" },
-      },
+      knightedPlayerId: "p3",
       nightResolution: [],
     });
     const result = extractDaytimeState(game, "p1");

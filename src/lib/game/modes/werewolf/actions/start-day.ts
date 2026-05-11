@@ -13,6 +13,7 @@ import {
   resolveNightActions,
   checkWinCondition,
   getGroupPhasePlayerIds,
+  isGroupPhaseKey,
   SMITE_PHASE_KEY,
   WerewolfWinner,
 } from "../utils";
@@ -30,7 +31,7 @@ function getAttackerIdsForEvent(
   for (const phaseKey of event.attackedBy) {
     // Smite bypasses protections and is not a player-driven attack source.
     if (phaseKey === SMITE_PHASE_KEY) continue;
-    if (phaseKey.includes(":")) {
+    if (isGroupPhaseKey(phaseKey)) {
       for (const playerId of getGroupPhasePlayerIds(
         game.roleAssignments,
         phaseKey,
@@ -187,17 +188,21 @@ export const startDayAction: GameAction = {
     const previousMonarchKnightingsUsed = ts.monarchKnightingsUsed ?? 0;
     const monarchCanKnight =
       targetKnightedTonight !== undefined && previousMonarchKnightingsUsed < 3;
+    const previousMonarchKnightedPlayerIds = ts.monarchKnightedPlayerIds ?? [];
     const monarchKnightedPlayerIds = monarchCanKnight
       ? [
           ...new Set([
-            ...(ts.monarchKnightedPlayerIds ?? []),
+            ...previousMonarchKnightedPlayerIds,
             targetKnightedTonight,
           ]),
         ]
-      : (ts.monarchKnightedPlayerIds ?? []);
+      : previousMonarchKnightedPlayerIds;
     const monarchKnightingsUsed = monarchCanKnight
       ? previousMonarchKnightingsUsed + 1
       : previousMonarchKnightingsUsed;
+    const knightedPlayerId = monarchKnightedPlayerIds.find(
+      (playerId) => !previousMonarchKnightedPlayerIds.includes(playerId),
+    );
 
     applyMonarchNightProtection(
       nightResolution,
@@ -465,6 +470,7 @@ export const startDayAction: GameAction = {
           nightActions: nightPhase.nightActions,
           revealedPlayerIds,
           ...(nightResolution.length > 0 ? { nightResolution } : {}),
+          ...(knightedPlayerId !== undefined ? { knightedPlayerId } : {}),
           ...(nightPhase.smitedPlayerIds?.length
             ? { smitedPlayerIds: nightPhase.smitedPlayerIds }
             : {}),

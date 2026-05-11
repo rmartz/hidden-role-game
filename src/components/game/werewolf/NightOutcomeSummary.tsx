@@ -31,6 +31,13 @@ export function NightOutcomeSummary({
   // Group events by targetPlayerId so a player attacked and silenced in the
   // same night is represented by a single list item.
   const eventsPerPlayer = groupBy(regularEvents, "targetPlayerId");
+  const targetPlayerIds = Object.keys(eventsPerPlayer);
+  if (
+    knightedPlayerId !== undefined &&
+    eventsPerPlayer[knightedPlayerId] === undefined
+  ) {
+    targetPlayerIds.push(knightedPlayerId);
+  }
 
   return (
     <div className="mb-4 rounded-md border p-3">
@@ -46,25 +53,18 @@ export function NightOutcomeSummary({
             )}
           </li>
         )}
-        {Object.entries(eventsPerPlayer).map(([targetPlayerId, events]) => (
+        {targetPlayerIds.map((targetPlayerId) => (
           <li key={targetPlayerId}>
             <NightOutcomeSummaryItem
               playerName={
                 getPlayerName(players, targetPlayerId) ?? targetPlayerId
               }
-              events={events}
+              events={eventsPerPlayer[targetPlayerId]}
               roles={roles}
+              knighted={targetPlayerId === knightedPlayerId}
             />
           </li>
         ))}
-        {knightedPlayerId && (
-          <li>
-            <strong className="text-foreground">
-              {getPlayerName(players, knightedPlayerId) ?? knightedPlayerId}
-            </strong>
-            <span className="ml-1 text-blue-600 font-medium">(knighted)</span>
-          </li>
-        )}
       </ul>
     </div>
   );

@@ -7,7 +7,7 @@ import type {
   AltruistInterceptedNightResolutionEvent,
   AnyNightAction,
 } from "../types";
-import { TrialVerdict, WerewolfPhase, isTeamNightAction } from "../types";
+import { TrialVerdict, WerewolfPhase } from "../types";
 import { SMITE_PHASE_KEY, OLD_MAN_TIMER_KEY } from "../utils";
 import { getSilencedPlayerIds, getHypnotizedPlayerId } from "../utils";
 import { currentTurnState } from "../utils/game-state";
@@ -111,14 +111,9 @@ export function extractDaytimeNightSummary(
       return [{ targetPlayerId: e.targetPlayerId, effect: "hypnotized" }];
     return [];
   });
-  const monarchAction = phase.nightActions[WerewolfRole.Monarch];
-  if (
-    monarchAction !== undefined &&
-    !isTeamNightAction(monarchAction) &&
-    monarchAction.targetPlayerId !== undefined
-  ) {
+  if (phase.knightedPlayerId !== undefined) {
     nightStatus.push({
-      targetPlayerId: monarchAction.targetPlayerId,
+      targetPlayerId: phase.knightedPlayerId,
       effect: "knighted",
     });
   }

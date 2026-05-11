@@ -7,9 +7,7 @@ import {
   WerewolfAction,
   WerewolfPhase,
   getOrderedAffectedPlayers,
-  isTeamNightAction,
 } from "@/lib/game/modes/werewolf";
-import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import {
@@ -98,13 +96,7 @@ export function OwnerGameDayScreen({
     nextToReveal &&
     (gameState.players.find((p) => p.id === nextToReveal.playerId)?.name ??
       nextToReveal.playerId);
-  const monarchAction = daytimePhase.nightActions[WerewolfRole.Monarch];
-  const knightedPlayerId =
-    monarchAction !== undefined &&
-    !isTeamNightAction(monarchAction) &&
-    monarchAction.targetPlayerId !== undefined
-      ? monarchAction.targetPlayerId
-      : undefined;
+  const knightedPlayerId = daytimePhase.knightedPlayerId;
 
   return (
     <div className="p-5 max-w-4xl mx-auto">

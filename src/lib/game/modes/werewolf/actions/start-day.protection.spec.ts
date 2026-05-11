@@ -222,6 +222,35 @@ describe("WerewolfAction.StartDay — protections", () => {
     expect(ts.deadPlayerIds).toContain("p2");
   });
 
+  it("Monarch remains protected when multiple Werewolves attack and no Knighted attacker exception applies", () => {
+    const nightState = makeNightState({
+      nightActions: {
+        [WerewolfRole.Werewolf]: {
+          votes: [
+            { playerId: "p1", targetPlayerId: "p2" },
+            { playerId: "p4", targetPlayerId: "p2" },
+          ],
+          suggestedTargetId: "p2",
+        },
+      },
+      nightPhaseOrder: [WerewolfRole.Werewolf],
+    });
+    nightState.monarchKnightedPlayerIds = ["p3"];
+    nightState.monarchKnightingsUsed = 1;
+    const game = makePlayingGame(nightState, {
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Monarch },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p4", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+      ],
+    });
+    action.apply(game, null, "owner-1");
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.deadPlayerIds).not.toContain("p2");
+  });
+
   it("Monarch is not protected when the only living Knighted player is the attacker", () => {
     const nightState = makeNightState({
       nightActions: {
