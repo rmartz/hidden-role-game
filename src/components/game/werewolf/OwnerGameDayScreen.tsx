@@ -76,7 +76,7 @@ export function OwnerGameDayScreen({
   const daytimePhase = phase;
   const modeConfig = GAME_MODES[gameState.gameMode];
   const activeTrial = daytimePhase.activeTrial;
-  const pendingGuiltId = gameState.pendingGuiltId;
+  const pendingGuiltId = daytimePhase.pendingGuiltId;
   const hasActiveTrial =
     (!!activeTrial && !activeTrial.verdict) || !!pendingGuiltId;
   const nominationsBlocked = isNominationsBlocked(gameState);

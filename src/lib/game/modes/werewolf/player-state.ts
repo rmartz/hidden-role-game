@@ -130,13 +130,15 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
 
 /**
  * Returns true when no new nominations can be started — either a trial is
- * active (no verdict yet) or the per-day trial cap has been reached.
+ * active (no verdict yet), the Martyr window is open (pendingGuiltId set),
+ * or the per-day trial cap has been reached.
  */
 export function isNominationsBlocked(
   gameState: WerewolfPlayerGameState,
 ): boolean {
   const hasActiveTrial =
-    !!gameState.activeTrial && !gameState.activeTrial.verdict;
+    (!!gameState.activeTrial && !gameState.activeTrial.verdict) ||
+    !!gameState.pendingGuiltId;
   return (
     hasActiveTrial ||
     (gameState.trialsPerDay !== undefined &&

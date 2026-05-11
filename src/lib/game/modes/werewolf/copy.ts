@@ -74,6 +74,7 @@ export const WEREWOLF_COPY = {
     verdictHeading: (name: string, label: string) =>
       `Verdict: ${name} — ${label}`,
     verdictLabelEliminated: "Eliminated",
+    verdictLabelSpared: "Spared",
     verdictLabelInnocent: "Innocent",
     eliminatedWereRole: (name: string) => `${name} was eliminated. They were a`,
     eliminatedRoleSuffix: ".",

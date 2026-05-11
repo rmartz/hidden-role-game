@@ -66,10 +66,16 @@ export function TrialVotePanel({
     const msgs = trial.defenseSilenced;
     return msgs[Math.floor(Math.random() * msgs.length)];
   });
+  const defendantSpared =
+    activeTrial.verdict === TrialVerdict.Eliminated &&
+    !pendingGuiltId &&
+    !activeTrial.eliminatedRole;
   const verdictLabel = activeTrial.verdict
-    ? activeTrial.verdict === TrialVerdict.Eliminated
-      ? trial.verdictLabelEliminated
-      : trial.verdictLabelInnocent
+    ? defendantSpared
+      ? trial.verdictLabelSpared
+      : activeTrial.verdict === TrialVerdict.Eliminated
+        ? trial.verdictLabelEliminated
+        : trial.verdictLabelInnocent
     : undefined;
   const isDefendant = myPlayerId === activeTrial.defendantId;
   const canVote = !amDead && !isDefendant;
