@@ -534,8 +534,9 @@ describe("checkWinCondition", () => {
         { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
         { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
       ]);
+      // Wolf dead, Arsonist + 2 Good remain — Arsonist still has >1 Good to overcome, game continues
       const result = checkWinCondition(game, ["p1"]);
-      expect(result?.winner).not.toBe(WerewolfWinner.Village);
+      expect(result).toBeUndefined();
     });
   });
 });

@@ -326,7 +326,7 @@ export const startDayAction: GameAction = {
     // If the Arsonist self-targeted (ignite), reset the doused list.
     // If the Arsonist targeted another player (douse), add them to the list.
     const arsonistAssignment = game.roleAssignments.find(
-      (a) => a.roleDefinitionId === WerewolfRole.Arsonist,
+      (a) => a.roleDefinitionId === (WerewolfRole.Arsonist as string),
     );
     const arsonistAction = nightPhase.nightActions[WerewolfRole.Arsonist];
     let arsonistDousedPlayerIds = (ts.arsonistDousedPlayerIds ?? []).filter(
@@ -334,19 +334,19 @@ export const startDayAction: GameAction = {
     );
     if (
       arsonistAssignment &&
-      !updatedDeadIds.includes(arsonistAssignment.playerId) &&
       arsonistAction &&
       !isTeamNightAction(arsonistAction) &&
       arsonistAction.targetPlayerId
     ) {
       if (arsonistAction.targetPlayerId === arsonistAssignment.playerId) {
-        // Ignite: reset the doused list
+        // Ignite: reset the doused list (regardless of whether the Arsonist died)
         arsonistDousedPlayerIds = [];
       } else if (
+        !updatedDeadIds.includes(arsonistAssignment.playerId) &&
         !arsonistDousedPlayerIds.includes(arsonistAction.targetPlayerId) &&
         !updatedDeadIds.includes(arsonistAction.targetPlayerId)
       ) {
-        // Douse: add to the list (deduplicated, skip if already dead)
+        // Douse: add to the list (deduplicated, skip if already dead, skip if Arsonist died)
         arsonistDousedPlayerIds = [
           ...arsonistDousedPlayerIds,
           arsonistAction.targetPlayerId,

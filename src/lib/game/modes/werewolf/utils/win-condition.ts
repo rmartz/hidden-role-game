@@ -134,8 +134,7 @@ export function checkWinCondition(
     // Bad players still alive but only neutral killers remain as opposition:
     // their win conditions conflict and will resolve through night kills — game continues
     if (!(killerNeutralsAlive > 0 && goodAlive === 0 && neutralAlive === 0)) {
-      const nonBadAlive =
-        goodAlive + neutralAlive + killerNeutralsAlive;
+      const nonBadAlive = goodAlive + neutralAlive + killerNeutralsAlive;
 
       // Lone Wolf wins: fires before general Werewolf win check.
       // When all remaining Bad are Lone Wolves and they match/outnumber non-Bad.

@@ -82,7 +82,9 @@ describe("Arsonist — dousing", () => {
     const game = makeGameWithArsonist(ts);
     startDay.apply(game, null, "owner-1");
     const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(newTs.arsonistDousedPlayerIds?.filter((id) => id === "p2")).toHaveLength(1);
+    expect(
+      newTs.arsonistDousedPlayerIds?.filter((id) => id === "p2"),
+    ).toHaveLength(1);
   });
 
   it("does not add a player who died this night to the doused list", () => {
@@ -129,7 +131,10 @@ describe("Arsonist — ignite", () => {
   it("kills all doused players when Arsonist self-targets", () => {
     const ts = makeNightState({
       nightActions: {
-        [WerewolfRole.Arsonist]: { targetPlayerId: "arsonist", confirmed: true },
+        [WerewolfRole.Arsonist]: {
+          targetPlayerId: "arsonist",
+          confirmed: true,
+        },
       },
     });
     ts.arsonistDousedPlayerIds = ["p2", "p3"];
@@ -143,7 +148,10 @@ describe("Arsonist — ignite", () => {
   it("resets doused list after ignite", () => {
     const ts = makeNightState({
       nightActions: {
-        [WerewolfRole.Arsonist]: { targetPlayerId: "arsonist", confirmed: true },
+        [WerewolfRole.Arsonist]: {
+          targetPlayerId: "arsonist",
+          confirmed: true,
+        },
       },
     });
     ts.arsonistDousedPlayerIds = ["p2", "p3"];
@@ -156,7 +164,10 @@ describe("Arsonist — ignite", () => {
   it("ignite with no doused players kills nobody", () => {
     const ts = makeNightState({
       nightActions: {
-        [WerewolfRole.Arsonist]: { targetPlayerId: "arsonist", confirmed: true },
+        [WerewolfRole.Arsonist]: {
+          targetPlayerId: "arsonist",
+          confirmed: true,
+        },
       },
     });
     const game = makeGameWithArsonist(ts);
@@ -170,7 +181,10 @@ describe("Arsonist — ignite", () => {
   it("protection (Bodyguard) saves a doused player from ignite", () => {
     const ts = makeNightState({
       nightActions: {
-        [WerewolfRole.Arsonist]: { targetPlayerId: "arsonist", confirmed: true },
+        [WerewolfRole.Arsonist]: {
+          targetPlayerId: "arsonist",
+          confirmed: true,
+        },
         [WerewolfRole.Bodyguard]: { targetPlayerId: "p2", confirmed: true },
       },
     });
@@ -178,11 +192,65 @@ describe("Arsonist — ignite", () => {
     const game = makeGameWithArsonist(ts, [
       { playerId: "p5", roleDefinitionId: WerewolfRole.Bodyguard },
     ]);
-    game.players.push({ id: "p5", name: "P5", sessionId: "s5", visiblePlayers: [] });
+    game.players.push({
+      id: "p5",
+      name: "P5",
+      sessionId: "s5",
+      visiblePlayers: [],
+    });
     startDay.apply(game, null, "owner-1");
     const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
     // p2 is doused but protected — should survive
     expect(newTs.deadPlayerIds).not.toContain("p2");
+  });
+
+  it("doused list resets after ignite even when Arsonist dies same night", () => {
+    const ts = makeNightState({
+      nightActions: {
+        [WerewolfRole.Arsonist]: {
+          targetPlayerId: "arsonist",
+          confirmed: true,
+        },
+        [WerewolfRole.Werewolf]: {
+          votes: [{ playerId: "p1", targetPlayerId: "arsonist" }],
+          confirmed: true,
+          suggestedTargetId: "arsonist",
+        },
+      },
+    });
+    ts.arsonistDousedPlayerIds = ["p2"];
+    // Use a game with many Good players so wolves don't win after arsonist dies
+    const game = makePlayingGame(ts, {
+      players: [
+        {
+          id: "arsonist",
+          name: "Arsonist",
+          sessionId: "sa",
+          visiblePlayers: [],
+        },
+        { id: "p1", name: "P1", sessionId: "s1", visiblePlayers: [] },
+        { id: "p2", name: "P2", sessionId: "s2", visiblePlayers: [] },
+        { id: "p3", name: "P3", sessionId: "s3", visiblePlayers: [] },
+        { id: "p4", name: "P4", sessionId: "s4", visiblePlayers: [] },
+        { id: "p5", name: "P5", sessionId: "s5", visiblePlayers: [] },
+        { id: "p6", name: "P6", sessionId: "s6", visiblePlayers: [] },
+      ],
+      roleAssignments: [
+        { playerId: "arsonist", roleDefinitionId: WerewolfRole.Arsonist },
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p6", roleDefinitionId: WerewolfRole.Villager },
+      ],
+    });
+    startDay.apply(game, null, "owner-1");
+    const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
+    // Arsonist died this night (killed by wolves) and ignited — list should still reset
+    expect(newTs.deadPlayerIds).toContain("arsonist");
+    expect(newTs.deadPlayerIds).toContain("p2");
+    expect(newTs.arsonistDousedPlayerIds ?? []).toHaveLength(0);
   });
 });
 
@@ -197,7 +265,10 @@ describe("Arsonist — win condition", () => {
     // p1 (Werewolf) attacked by wolves (irrelevant), p2 is the surviving Good player
     const ts = makeNightState({
       nightActions: {
-        [WerewolfRole.Arsonist]: { targetPlayerId: "arsonist", confirmed: true },
+        [WerewolfRole.Arsonist]: {
+          targetPlayerId: "arsonist",
+          confirmed: true,
+        },
       },
       deadPlayerIds: ["p1"], // werewolf already dead
     });
@@ -206,13 +277,18 @@ describe("Arsonist — win condition", () => {
     startDay.apply(game, null, "owner-1");
     // p3 and p4 killed by ignite; only p2 (Good) and arsonist remain
     expect(game.status.type).toBe(GameStatus.Finished);
-    expect((game.status as { winner: string }).winner).toBe(WerewolfWinner.Arsonist);
+    expect((game.status as { winner: string }).winner).toBe(
+      WerewolfWinner.Arsonist,
+    );
   });
 
   it("Arsonist wins when all Bad are dead and 0 Good remain", () => {
     const ts = makeNightState({
       nightActions: {
-        [WerewolfRole.Arsonist]: { targetPlayerId: "arsonist", confirmed: true },
+        [WerewolfRole.Arsonist]: {
+          targetPlayerId: "arsonist",
+          confirmed: true,
+        },
       },
       deadPlayerIds: ["p1"], // werewolf already dead
     });
@@ -221,7 +297,9 @@ describe("Arsonist — win condition", () => {
     const game = makeGameWithArsonist(ts);
     startDay.apply(game, null, "owner-1");
     expect(game.status.type).toBe(GameStatus.Finished);
-    expect((game.status as { winner: string }).winner).toBe(WerewolfWinner.Arsonist);
+    expect((game.status as { winner: string }).winner).toBe(
+      WerewolfWinner.Arsonist,
+    );
   });
 
   it("game continues when Arsonist is alive and >1 Good remain", () => {
@@ -245,7 +323,12 @@ describe("Arsonist — win condition", () => {
     });
     const game = makePlayingGame(ts, {
       players: [
-        { id: "arsonist", name: "Arsonist", sessionId: "sa", visiblePlayers: [] },
+        {
+          id: "arsonist",
+          name: "Arsonist",
+          sessionId: "sa",
+          visiblePlayers: [],
+        },
         { id: "chupa", name: "Chupa", sessionId: "sc", visiblePlayers: [] },
         { id: "p1", name: "P1", sessionId: "s1", visiblePlayers: [] },
         { id: "p2", name: "P2", sessionId: "s2", visiblePlayers: [] },
@@ -292,7 +375,9 @@ describe("Arsonist — win condition", () => {
     WEREWOLF_ACTIONS[WerewolfAction.StartDay].apply(game, null, "owner-1");
     // Arsonist killed by wolves, no non-bad remain
     expect(game.status.type).toBe(GameStatus.Finished);
-    expect((game.status as { winner: string }).winner).toBe(WerewolfWinner.Werewolves);
+    expect((game.status as { winner: string }).winner).toBe(
+      WerewolfWinner.Werewolves,
+    );
   });
 
   it("daytime phase carries over arsonistDousedPlayerIds", () => {
@@ -308,7 +393,9 @@ describe("Arsonist — win condition", () => {
     WEREWOLF_ACTIONS[WerewolfAction.StartNight].apply(game, null, "owner-1");
     const nightTs = (game.status as { turnState: WerewolfTurnState }).turnState;
     // Doused list from previous day should be in the next night's turn state
-    expect(nightTs.arsonistDousedPlayerIds).toEqual(dayTs.arsonistDousedPlayerIds);
+    expect(nightTs.arsonistDousedPlayerIds).toEqual(
+      dayTs.arsonistDousedPlayerIds,
+    );
   });
 });
 

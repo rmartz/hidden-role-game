@@ -65,7 +65,7 @@ export interface PlayingGameStatus {
 
 /**
  * Union of all valid winner identifiers across game modes.
- * Werewolf: "Village", "Werewolves", "Chupacabra", "Draw", "LoneWolf", "Tanner", "Spoiler", "Executioner"
+ * Werewolf: "Arsonist", "Village", "Werewolves", "Chupacabra", "Draw", "LoneWolf", "Tanner", "Spoiler", "Executioner", "Illuminati", "Dracula", "Zombie"
  * Secret Villain: "Good", "Bad"
  */
 export type GameWinner =
