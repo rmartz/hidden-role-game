@@ -41,7 +41,7 @@ export function makeDaytimeGame(
       WerewolfTurnState["phase"],
       { type: WerewolfPhase.Daytime }
     >["nightResolution"];
-    knightedPlayerId: string;
+    knightedPlayerId: string | undefined;
     revealedPlayerIds: string[];
     deadPlayerIds: string[];
     modeConfig: Partial<WerewolfModeConfig>;
