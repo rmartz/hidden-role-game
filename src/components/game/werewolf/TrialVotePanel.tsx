@@ -139,17 +139,17 @@ export function TrialVotePanel({
           </p>
         )}
       {canUseMartyrAbility && (
-          <div className="mt-3">
-            <Button
-              size="sm"
-              variant="destructive"
-              onClick={handleUseMartyrAbility}
-              disabled={action.isPending}
-            >
-              {trial.martyrSacrificeButton}
-            </Button>
-          </div>
-        )}
+        <div className="mt-3">
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={handleUseMartyrAbility}
+            disabled={action.isPending}
+          >
+            {trial.martyrSacrificeButton}
+          </Button>
+        </div>
+      )}
     </>
   ) : activeTrial.phase === TrialPhase.Defense ? (
     <>
