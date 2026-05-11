@@ -294,6 +294,7 @@ function extractWitchState(
       deadPlayerIds,
       ts?.priestWards,
       ts?.mirrorcasterCharged,
+      ts?.mercenaryCharged,
     );
     if (attacked.length > 0) {
       result.nightStatus = attacked.map(
@@ -330,6 +331,7 @@ function extractAltruistState(
     deadPlayerIds,
     ts?.priestWards,
     ts?.mirrorcasterCharged,
+    ts?.mercenaryCharged,
   ).filter((id) => id !== callerId && id !== witchProtectedId);
   const result: Partial<WerewolfPlayerGameState> = {
     myNightTarget: soloAction?.skipped ? null : soloAction?.targetPlayerId,

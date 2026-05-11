@@ -59,7 +59,11 @@ export function checkWinCondition(
         a.playerId !== zombieAssignment.playerId,
     ).length;
     if (infectedAlive > healthyAlive) {
-      return { type: GameStatus.Finished, winner: WerewolfWinner.Zombie };
+      return withMercenaryCoWin(
+        { type: GameStatus.Finished, winner: WerewolfWinner.Zombie },
+        game,
+        deadPlayerIds,
+      );
     }
   }
 
@@ -164,24 +168,40 @@ export function checkWinCondition(
   // one bribed player is alive on the winning side, the Mercenary also wins
   // (shown alongside the main winner, lower priority than Illuminati and Spoiler).
   if (winResult) {
-    const mercenaryAssignment = game.roleAssignments.find(
-      (a) => a.roleDefinitionId === (WerewolfRole.Mercenary as string),
-    );
-    if (mercenaryAssignment && !deadSet.has(mercenaryAssignment.playerId)) {
-      const bribedPlayerIds = ts?.mercenaryBribedPlayerIds ?? [];
-      const mercenaryWins = bribedPlayerIds.some((bribedId) =>
-        isBribedPlayerOnWinningSide(bribedId, deadSet, game, winResult.winner),
-      );
-      if (mercenaryWins) {
-        return { ...winResult, victoryConditionKey: WerewolfWinner.Mercenary };
-      }
-    }
+    return withMercenaryCoWin(winResult, game, deadPlayerIds);
   }
 
   return winResult;
 }
 
-/** Canonical winner identifier strings for Werewolf win conditions. */
+/**
+ * Augments a win result with a Mercenary co-win (`victoryConditionKey`) if the
+ * Mercenary is alive and at least one bribed player is alive on the winning side.
+ * Returns the original result unchanged if the Mercenary co-win does not apply.
+ */
+export function withMercenaryCoWin(
+  result: { type: GameStatus.Finished; winner: WerewolfWinner },
+  game: Game,
+  deadPlayerIds: string[],
+): { type: GameStatus.Finished; winner: WerewolfWinner; victoryConditionKey?: string } {
+  const deadSet = new Set(deadPlayerIds);
+  const ts = currentTurnState(game);
+  const mercenaryAssignment = game.roleAssignments.find(
+    (a) => a.roleDefinitionId === (WerewolfRole.Mercenary as string),
+  );
+  if (mercenaryAssignment && !deadSet.has(mercenaryAssignment.playerId)) {
+    const bribedPlayerIds = ts?.mercenaryBribedPlayerIds ?? [];
+    const mercenaryWins = bribedPlayerIds.some((bribedId) =>
+      isBribedPlayerOnWinningSide(bribedId, deadSet, game, result.winner),
+    );
+    if (mercenaryWins) {
+      return { ...result, victoryConditionKey: WerewolfWinner.Mercenary };
+    }
+  }
+  return result;
+}
+
+
 export const WerewolfWinner = {
   Werewolves: "Werewolves",
   Village: "Village",
@@ -201,9 +221,10 @@ export type WerewolfWinner =
 
 /**
  * Checks whether a bribed player is on the winning side for the given winner.
- * For team wins (Village, Werewolves/LoneWolf), the bribed player must be alive
- * and on the winning team. For individual-role wins (Spoiler, Illuminati, etc.),
- * the bribed player must be alive and have that specific winning role.
+ * For team wins (Village, Werewolves), the bribed player must be alive
+ * and on the winning team. For individual-role wins (Spoiler, Illuminati,
+ * LoneWolf, Chupacabra, Executioner, Zombie, Dracula), the bribed player
+ * must be alive and have that specific winning role.
  */
 function isBribedPlayerOnWinningSide(
   bribedId: string,

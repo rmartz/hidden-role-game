@@ -136,6 +136,8 @@ export const setNightTargetAction: GameAction = {
         game.roleAssignments,
         ts.deadPlayerIds,
         ts.priestWards,
+        ts.mirrorcasterCharged,
+        ts.mercenaryCharged,
       );
       if (!attacked.includes(callerId)) return false;
     }

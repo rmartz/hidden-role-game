@@ -8,6 +8,7 @@ import {
   isOwnerPlaying,
   GROUP_PHASE_KEY_SEPARATOR,
   WerewolfWinner,
+  withMercenaryCoWin,
 } from "../utils";
 import { WerewolfRole } from "../roles";
 
@@ -106,10 +107,11 @@ export const startNightAction: GameAction = {
         draculaAssignment &&
         !ts.deadPlayerIds.includes(draculaAssignment.playerId)
       ) {
-        game.status = {
-          type: GameStatus.Finished,
-          winner: WerewolfWinner.Dracula,
-        };
+        game.status = withMercenaryCoWin(
+          { type: GameStatus.Finished, winner: WerewolfWinner.Dracula },
+          game,
+          ts.deadPlayerIds,
+        );
         return;
       }
     }

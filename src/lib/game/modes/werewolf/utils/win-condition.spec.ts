@@ -660,5 +660,26 @@ describe("checkWinCondition", () => {
       expect(result?.winner).toBe(WerewolfWinner.LoneWolf);
       expect(result?.victoryConditionKey).toBeUndefined();
     });
+
+    it("Mercenary co-wins with Zombie when the Zombie is bribed and wins", () => {
+      // p1=Zombie, p2=Villager(infected), p3=Villager(infected), p4=Mercenary
+      // infected(2) > healthy(0) → Zombie wins; Mercenary bribed Zombie → co-win
+      const game = makeGame(
+        [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Zombie },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p4", roleDefinitionId: WerewolfRole.Mercenary },
+        ],
+        makeDayTurnState({
+          zombieInfected: ["p2", "p3"],
+          mercenaryBribedPlayerIds: ["p1"],
+          deadPlayerIds: [],
+        }),
+      );
+      const result = checkWinCondition(game, []);
+      expect(result?.winner).toBe(WerewolfWinner.Zombie);
+      expect(result?.victoryConditionKey).toBe(WerewolfWinner.Mercenary);
+    });
   });
 });

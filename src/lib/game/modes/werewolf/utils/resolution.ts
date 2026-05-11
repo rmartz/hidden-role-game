@@ -161,12 +161,14 @@ export function getInterimAttackedPlayerIds(
   deadPlayerIds: string[],
   priestWards?: Record<string, string>,
   mirrorcasterCharged?: boolean,
+  mercenaryCharged?: boolean,
 ): string[] {
   const { attacks, protections } = collectBaseAttacksAndProtections(
     nightActions,
     roleAssignments,
     deadPlayerIds,
     mirrorcasterCharged,
+    mercenaryCharged,
   );
   if (priestWards) applyPriestWards(attacks, protections, priestWards);
   return Array.from(attacks.keys()).filter((id) => !protections.has(id));
