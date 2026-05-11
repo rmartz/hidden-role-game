@@ -246,29 +246,29 @@ Additional resolution steps:
 
 ## Action Payload Summary
 
-| Action                        | Caller                                       | Payload                                                |
-| ----------------------------- | -------------------------------------------- | ------------------------------------------------------ |
-| `start-night`                 | Narrator                                     | none                                                   |
-| `start-day`                   | Narrator                                     | none                                                   |
-| `set-night-phase`             | Narrator                                     | `{ phaseIndex: number }`                               |
+| Action                        | Caller                                       | Payload                                                                   |
+| ----------------------------- | -------------------------------------------- | ------------------------------------------------------------------------- |
+| `start-night`                 | Narrator                                     | none                                                                      |
+| `start-day`                   | Narrator                                     | none                                                                      |
+| `set-night-phase`             | Narrator                                     | `{ phaseIndex: number }`                                                  |
 | `set-night-target`            | Narrator or active player                    | `{ roleId?: string; targetPlayerId?: string \| null; alerted?: boolean }` |
-| `confirm-night-target`        | Active player or Narrator (solo phases only) | none                                                   |
-| `reveal-investigation-result` | Narrator                                     | none                                                   |
-| `mark-player-dead`            | Narrator                                     | `{ playerId: string }`                                 |
-| `mark-player-alive`           | Narrator                                     | `{ playerId: string }`                                 |
-| `start-trial`                 | Narrator                                     | `{ defendantId: string }`                              |
-| `cast-vote`                   | Player                                       | `{ vote: "guilty" \| "innocent" }`                     |
-| `resolve-hunter-revenge`      | Narrator                                     | `{ targetPlayerId: string }`                           |
-| `resolve-trial`               | Narrator                                     | none                                                   |
-| `end-game`                    | Narrator                                     | none                                                   |
-| `smite-player`                | Narrator                                     | `{ playerId: string }`                                 |
-| `unsmite-player`              | Narrator                                     | `{ playerId: string }`                                 |
-| `nominate-player`             | Player                                       | `{ defendantId: string }`                              |
-| `withdraw-nomination`         | Player                                       | none                                                   |
-| `skip-defense`                | Narrator                                     | none                                                   |
-| `kill-player`                 | Narrator                                     | `{ playerId: string }`                                 |
-| `pause-timer`                 | Narrator                                     | none                                                   |
-| `resume-timer`                | Narrator                                     | none                                                   |
+| `confirm-night-target`        | Active player or Narrator (solo phases only) | none                                                                      |
+| `reveal-investigation-result` | Narrator                                     | none                                                                      |
+| `mark-player-dead`            | Narrator                                     | `{ playerId: string }`                                                    |
+| `mark-player-alive`           | Narrator                                     | `{ playerId: string }`                                                    |
+| `start-trial`                 | Narrator                                     | `{ defendantId: string }`                                                 |
+| `cast-vote`                   | Player                                       | `{ vote: "guilty" \| "innocent" }`                                        |
+| `resolve-hunter-revenge`      | Narrator                                     | `{ targetPlayerId: string }`                                              |
+| `resolve-trial`               | Narrator                                     | none                                                                      |
+| `end-game`                    | Narrator                                     | none                                                                      |
+| `smite-player`                | Narrator                                     | `{ playerId: string }`                                                    |
+| `unsmite-player`              | Narrator                                     | `{ playerId: string }`                                                    |
+| `nominate-player`             | Player                                       | `{ defendantId: string }`                                                 |
+| `withdraw-nomination`         | Player                                       | none                                                                      |
+| `skip-defense`                | Narrator                                     | none                                                                      |
+| `kill-player`                 | Narrator                                     | `{ playerId: string }`                                                    |
+| `pause-timer`                 | Narrator                                     | none                                                                      |
+| `resume-timer`                | Narrator                                     | none                                                                      |
 
 ## Night Action Types
 
