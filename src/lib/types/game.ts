@@ -79,6 +79,7 @@ export type GameWinner =
   | "Tanner"
   | "Spoiler"
   | "Executioner"
+  | "Evil"
   | "Good"
   | "Bad"
   | "Zombie";
