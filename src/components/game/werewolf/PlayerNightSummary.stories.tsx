@@ -79,6 +79,16 @@ export const PlayerExposed: Story = {
   },
 };
 
+export const PlayerExposedAndKilled: Story = {
+  args: {
+    players,
+    nightStatus: [
+      { targetPlayerId: "p2", effect: "killed" },
+      { targetPlayerId: "p2", effect: "exposed", roleName: "Altruist" },
+    ] satisfies DaytimeNightStatusEntry[],
+  },
+};
+
 export const NoEvents: Story = {
   args: {
     players,

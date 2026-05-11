@@ -173,7 +173,7 @@ export const WEREWOLF_COPY = {
     publicReveal: (playerName: string, roleName: string) =>
       `The Exposer has revealed ${playerName}'s role: ${roleName}`,
     nightSummary: (playerName: string, roleName: string) =>
-      `${playerName} was exposed to be a ${roleName}.`,
+      `${playerName} was exposed to be the ${roleName}.`,
   },
   elusiveSeer: {
     villagerListHeading: "You see the following Villagers:",
