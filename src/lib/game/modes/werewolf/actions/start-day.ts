@@ -202,7 +202,9 @@ export const startDayAction: GameAction = {
     const monarchKnightingsUsed = monarchCanKnight
       ? previousMonarchKnightingsUsed + 1
       : previousMonarchKnightingsUsed;
-    const knightedPlayerId = monarchCanKnight ? targetKnightedTonight : undefined;
+    const knightedPlayerId = monarchCanKnight
+      ? targetKnightedTonight
+      : undefined;
 
     applyMonarchNightProtection(
       nightResolution,
