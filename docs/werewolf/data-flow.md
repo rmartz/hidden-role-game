@@ -55,9 +55,9 @@ The Narrator's session is stored separately and receives a different (fuller) `P
 
 ### Narrator-Only (Daytime)
 
-| Field                     | Description                                                                                  |
-| ------------------------- | -------------------------------------------------------------------------------------------- |
-| `pendingSmitePlayerIds`   | Player IDs awaiting a narrator-controlled smite; only exposed to the narrator (owner) caller |
+| Field                   | Description                                                                                  |
+| ----------------------- | -------------------------------------------------------------------------------------------- |
+| `pendingSmitePlayerIds` | Player IDs awaiting a narrator-controlled smite; only exposed to the narrator (owner) caller |
 
 All trial-related state (`activeTrial`, `pendingGuiltId`) is visible to all players.
 
