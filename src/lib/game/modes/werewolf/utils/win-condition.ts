@@ -183,7 +183,11 @@ export function withMercenaryCoWin(
   result: { type: GameStatus.Finished; winner: WerewolfWinner },
   game: Game,
   deadPlayerIds: string[],
-): { type: GameStatus.Finished; winner: WerewolfWinner; victoryConditionKey?: string } {
+): {
+  type: GameStatus.Finished;
+  winner: WerewolfWinner;
+  victoryConditionKey?: string;
+} {
   const deadSet = new Set(deadPlayerIds);
   const ts = currentTurnState(game);
   const mercenaryAssignment = game.roleAssignments.find(
@@ -200,7 +204,6 @@ export function withMercenaryCoWin(
   }
   return result;
 }
-
 
 export const WerewolfWinner = {
   Werewolves: "Werewolves",

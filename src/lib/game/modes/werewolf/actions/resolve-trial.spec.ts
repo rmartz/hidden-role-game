@@ -367,9 +367,9 @@ describe("WerewolfAction.ResolveTrial", () => {
       expect((game.status as { winner?: string }).winner).toBe(
         WerewolfWinner.Executioner,
       );
-      expect((game.status as { victoryConditionKey?: string }).victoryConditionKey).toBe(
-        WerewolfWinner.Mercenary,
-      );
+      expect(
+        (game.status as { victoryConditionKey?: string }).victoryConditionKey,
+      ).toBe(WerewolfWinner.Mercenary);
     });
   });
 });
