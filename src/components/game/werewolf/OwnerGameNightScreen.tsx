@@ -330,6 +330,13 @@ export function OwnerGameNightScreen({
                 : WEREWOLF_COPY.mirrorcaster.narratorProtectMode}
             </p>
           )}
+          {isRoleActive(activePhaseKey, WerewolfRole.Mercenary) && (
+            <p className="mb-3 text-sm text-muted-foreground italic">
+              {turnState.mercenaryCharged
+                ? WEREWOLF_COPY.mercenary.narratorBribeMode
+                : WEREWOLF_COPY.mercenary.narratorProtectMode}
+            </p>
+          )}
           {!isFirstTurn && (
             <>
               {isWitchAbilitySkipped && !activeTargetConfirmed && (

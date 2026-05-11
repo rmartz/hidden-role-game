@@ -625,5 +625,40 @@ describe("checkWinCondition", () => {
       expect(result?.winner).toBe(WerewolfWinner.Illuminati);
       expect(result?.victoryConditionKey).toBe(WerewolfWinner.Mercenary);
     });
+
+    it("Mercenary co-wins with Lone Wolf when Lone Wolf is bribed and alive", () => {
+      const game = makeGame(
+        [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.LoneWolf },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Mercenary },
+        ],
+        makeDayTurnState({
+          mercenaryBribedPlayerIds: ["p1"],
+          deadPlayerIds: [],
+        }),
+      );
+      // Lone Wolf wins; Mercenary bribed the Lone Wolf → co-win
+      const result = checkWinCondition(game, []);
+      expect(result?.winner).toBe(WerewolfWinner.LoneWolf);
+      expect(result?.victoryConditionKey).toBe(WerewolfWinner.Mercenary);
+    });
+
+    it("Mercenary does not co-win on Lone Wolf victory when bribed player is dead", () => {
+      const game = makeGame(
+        [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.LoneWolf },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Mercenary },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        ],
+        makeDayTurnState({
+          mercenaryBribedPlayerIds: ["p3"],
+          deadPlayerIds: ["p3"],
+        }),
+      );
+      // Lone Wolf wins (only Bad is LoneWolf, matches Mercenary neutral); bribed p3 is dead → no co-win
+      const result = checkWinCondition(game, ["p3"]);
+      expect(result?.winner).toBe(WerewolfWinner.LoneWolf);
+      expect(result?.victoryConditionKey).toBeUndefined();
+    });
   });
 });

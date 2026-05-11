@@ -219,10 +219,7 @@ function isBribedPlayerOnWinningSide(
     const role = getWerewolfRole(assignment.roleDefinitionId);
     return role?.team === Team.Good;
   }
-  if (
-    winner === WerewolfWinner.Werewolves ||
-    winner === WerewolfWinner.LoneWolf
-  ) {
+  if (winner === WerewolfWinner.Werewolves) {
     const role = getWerewolfRole(assignment.roleDefinitionId);
     return role?.team === Team.Bad;
   }
@@ -233,6 +230,7 @@ function isBribedPlayerOnWinningSide(
     [WerewolfWinner.Dracula]: WerewolfRole.Dracula,
     [WerewolfWinner.Executioner]: WerewolfRole.Executioner,
     [WerewolfWinner.Illuminati]: WerewolfRole.Illuminati,
+    [WerewolfWinner.LoneWolf]: WerewolfRole.LoneWolf,
     [WerewolfWinner.Spoiler]: WerewolfRole.Spoiler,
     [WerewolfWinner.Zombie]: WerewolfRole.Zombie,
   };

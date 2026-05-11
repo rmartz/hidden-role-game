@@ -90,6 +90,26 @@ export const MirrorcasterAttack: Story = {
   },
 };
 
+export const MercenaryProtect: Story = {
+  args: {
+    hasTarget: true,
+    hasDecided: true,
+    isConfirmed: false,
+    roleId: WerewolfRole.Mercenary,
+    mercenaryCharged: false,
+  },
+};
+
+export const MercenaryBribe: Story = {
+  args: {
+    hasTarget: true,
+    hasDecided: true,
+    isConfirmed: false,
+    roleId: WerewolfRole.Mercenary,
+    mercenaryCharged: true,
+  },
+};
+
 export const Pending: Story = {
   args: {
     hasTarget: true,
