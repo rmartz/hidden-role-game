@@ -44,13 +44,16 @@ describe("criterion 2: no window.innerWidth reads — branching is CSS-only", ()
       configurable: true,
     });
 
-    render(<LobbyLayout>content</LobbyLayout>);
-
-    if (originalDescriptor) {
-      Object.defineProperty(window, "innerWidth", originalDescriptor);
+    try {
+      render(<LobbyLayout>content</LobbyLayout>);
+      expect(innerWidthRead).toBe(false);
+    } finally {
+      if (originalDescriptor) {
+        Object.defineProperty(window, "innerWidth", originalDescriptor);
+      } else {
+        delete (window as { innerWidth?: number }).innerWidth;
+      }
     }
-
-    expect(innerWidthRead).toBe(false);
   });
 
   it("uses Tailwind breakpoint classes rather than inline style width", () => {
