@@ -35,17 +35,14 @@ export const NoActiveLobby: Story = {};
 
 export const ActiveLobbyWithGame: Story = {
   args: {
-    activeLobby: {
-      gameId: "game-abc123",
-      config: { gameMode: GameMode.Werewolf },
-    },
+    activeLobby: { gameId: "game-abc123" },
     storedLobbyId: "lobby-abc123",
   },
 };
 
 export const ActiveLobbyWithoutGame: Story = {
   args: {
-    activeLobby: { gameId: undefined, config: { gameMode: GameMode.Werewolf } },
+    activeLobby: { gameId: undefined },
     storedLobbyId: "lobby-abc123",
   },
 };

@@ -17,7 +17,6 @@ import { HOME_PAGE_COPY } from "./page.copy";
 
 interface ActiveLobbyData {
   gameId: string | undefined;
-  config: { gameMode: GameMode };
 }
 
 interface GameModeOption {

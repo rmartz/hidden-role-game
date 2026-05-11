@@ -33,7 +33,7 @@ describe("Active lobby banner", () => {
     const { container } = render(
       <HomePageView
         {...defaultProps}
-        activeLobby={{ gameId: "g1", config: { gameMode: GameMode.Werewolf } }}
+        activeLobby={{ gameId: "g1" }}
         storedLobbyId="lobby-1"
       />,
     );
@@ -44,10 +44,7 @@ describe("Active lobby banner", () => {
     const { container } = render(
       <HomePageView
         {...defaultProps}
-        activeLobby={{
-          gameId: undefined,
-          config: { gameMode: GameMode.Werewolf },
-        }}
+        activeLobby={{ gameId: undefined }}
         storedLobbyId="lobby-1"
       />,
     );
@@ -68,7 +65,7 @@ describe("Divider with 'or start fresh' label", () => {
     const { container } = render(
       <HomePageView
         {...defaultProps}
-        activeLobby={{ gameId: "g1", config: { gameMode: GameMode.Werewolf } }}
+        activeLobby={{ gameId: "g1" }}
         storedLobbyId="lobby-1"
       />,
     );

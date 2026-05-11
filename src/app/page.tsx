@@ -55,12 +55,7 @@ export default function Home() {
       selectedGameMode={selectedGameMode}
       gameModeOptions={GAME_MODE_OPTIONS}
       activeLobby={
-        activeLobby
-          ? {
-              gameId: activeLobby.gameId ?? undefined,
-              config: activeLobby.config,
-            }
-          : undefined
+        activeLobby ? { gameId: activeLobby.gameId ?? undefined } : undefined
       }
       storedLobbyId={storedLobbyId ?? undefined}
       error={error}
