@@ -186,9 +186,11 @@ export const startDayAction: GameAction = {
         ? monarchAction.targetPlayerId
         : undefined;
     const previousMonarchKnightingsUsed = ts.monarchKnightingsUsed ?? 0;
-    const monarchCanKnight =
-      targetKnightedTonight !== undefined && previousMonarchKnightingsUsed < 3;
     const previousMonarchKnightedPlayerIds = ts.monarchKnightedPlayerIds ?? [];
+    const monarchCanKnight =
+      targetKnightedTonight !== undefined &&
+      previousMonarchKnightingsUsed < 3 &&
+      !previousMonarchKnightedPlayerIds.includes(targetKnightedTonight);
     const monarchKnightedPlayerIds = monarchCanKnight
       ? [
           ...new Set([
@@ -200,9 +202,7 @@ export const startDayAction: GameAction = {
     const monarchKnightingsUsed = monarchCanKnight
       ? previousMonarchKnightingsUsed + 1
       : previousMonarchKnightingsUsed;
-    const knightedPlayerId = [...monarchKnightedPlayerIds]
-      .reverse()
-      .find((playerId) => !previousMonarchKnightedPlayerIds.includes(playerId));
+    const knightedPlayerId = monarchCanKnight ? targetKnightedTonight : undefined;
 
     applyMonarchNightProtection(
       nightResolution,

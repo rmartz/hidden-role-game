@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import type { WerewolfTurnState } from "../types";
+import { WerewolfPhase } from "../types";
 import { WerewolfRole } from "../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
 import { makePlayingGame, makeNightState } from "./test-helpers";
@@ -301,5 +302,39 @@ describe("WerewolfAction.StartDay — protections", () => {
     expect(ts.monarchKnightedPlayerIds).toContain("p3");
     expect(ts.monarchKnightingsUsed).toBe(1);
     expect(ts.deadPlayerIds).toContain("p3");
+  });
+
+  it("Monarch re-knighting an already knighted player does not consume a charge", () => {
+    const nightState = makeNightState({
+      nightActions: {
+        [WerewolfRole.Werewolf]: {
+          votes: [],
+          suggestedTargetId: "p5",
+        },
+        [WerewolfRole.Monarch]: { targetPlayerId: "p3" },
+      },
+      nightPhaseOrder: [WerewolfRole.Werewolf, WerewolfRole.Monarch],
+    });
+    nightState.monarchKnightedPlayerIds = ["p3"];
+    nightState.monarchKnightingsUsed = 1;
+
+    const game = makePlayingGame(nightState, {
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Monarch },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p4", roleDefinitionId: WerewolfRole.Seer },
+        { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+      ],
+    });
+
+    action.apply(game, null, "owner-1");
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.monarchKnightedPlayerIds).toEqual(["p3"]);
+    expect(ts.monarchKnightingsUsed).toBe(1);
+    expect(ts.phase.type).toBe(WerewolfPhase.Daytime);
+    if (ts.phase.type === WerewolfPhase.Daytime) {
+      expect(ts.phase.knightedPlayerId).toBeUndefined();
+    }
   });
 });

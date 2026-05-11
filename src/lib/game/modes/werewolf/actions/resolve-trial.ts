@@ -23,7 +23,7 @@ export function applyTrialVerdict(
     (v) => v.vote === DaytimeVote.Innocent,
   ).length;
 
-  // Mayor's vote counts double (secret — extra vote added to their side)
+  // Extra trial vote weight: Mayor gets +1 and each Monarch-knighted voter gets +1.
   for (const v of activeTrial.votes) {
     const roleId = game.roleAssignments.find(
       (a) => a.playerId === v.playerId,
