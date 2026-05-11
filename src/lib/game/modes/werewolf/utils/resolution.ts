@@ -145,7 +145,7 @@ function applyPriestWards(
 /**
  * Returns player IDs who are currently attacked but not yet protected,
  * excluding the Witch's own action. Used to show the Witch their available
- * targets before they act. Also considers priest wards.
+ * targets before they act. Also considers priest wards and Arsonist ignite.
  */
 export function getInterimAttackedPlayerIds(
   nightActions: Record<string, AnyNightAction>,
@@ -153,6 +153,7 @@ export function getInterimAttackedPlayerIds(
   deadPlayerIds: string[],
   priestWards?: Record<string, string>,
   mirrorcasterCharged?: boolean,
+  arsonistDousedPlayerIds?: string[],
 ): string[] {
   const { attacks, protections } = collectBaseAttacksAndProtections(
     nightActions,
@@ -160,6 +161,24 @@ export function getInterimAttackedPlayerIds(
     deadPlayerIds,
     mirrorcasterCharged,
   );
+  const arsonistAction = nightActions[WerewolfRole.Arsonist] as
+    | { targetPlayerId?: string }
+    | undefined;
+  const arsonistPlayerId = roleAssignments.find(
+    (a) => a.roleDefinitionId === (WerewolfRole.Arsonist as string),
+  )?.playerId;
+  if (
+    arsonistAction?.targetPlayerId &&
+    arsonistAction.targetPlayerId === arsonistPlayerId &&
+    arsonistDousedPlayerIds?.length
+  ) {
+    for (const dousedId of arsonistDousedPlayerIds) {
+      attacks.set(dousedId, [
+        ...(attacks.get(dousedId) ?? []),
+        WerewolfRole.Arsonist,
+      ]);
+    }
+  }
   if (priestWards) applyPriestWards(attacks, protections, priestWards);
   return Array.from(attacks.keys()).filter((id) => !protections.has(id));
 }
@@ -206,6 +225,27 @@ export function resolveNightActions(
     options?.mirrorcasterCharged,
   );
 
+  // Arsonist ignite: if the Arsonist self-targeted, attack every doused player simultaneously.
+  // Applied before Priest wards and the Witch so that wards/protections can apply to ignite targets.
+  const arsonistAction = nightActions[WerewolfRole.Arsonist] as
+    | { targetPlayerId?: string }
+    | undefined;
+  const arsonistPlayerId = roleAssignments.find(
+    (a) => a.roleDefinitionId === (WerewolfRole.Arsonist as string),
+  )?.playerId;
+  if (
+    arsonistAction?.targetPlayerId &&
+    arsonistAction.targetPlayerId === arsonistPlayerId &&
+    options?.arsonistDousedPlayerIds?.length
+  ) {
+    for (const dousedId of options.arsonistDousedPlayerIds) {
+      attacks.set(dousedId, [
+        ...(attacks.get(dousedId) ?? []),
+        WerewolfRole.Arsonist,
+      ]);
+    }
+  }
+
   // Priest wards: warded players count as protected.
   if (options?.priestWards) {
     applyPriestWards(attacks, protections, options.priestWards);
@@ -224,26 +264,6 @@ export function resolveNightActions(
       ]);
     } else {
       attacks.set(tid, [...(attacks.get(tid) ?? []), WerewolfRole.Witch]);
-    }
-  }
-
-  // Arsonist ignite: if the Arsonist self-targeted, attack every doused player simultaneously.
-  const arsonistAction = nightActions[WerewolfRole.Arsonist] as
-    | { targetPlayerId?: string }
-    | undefined;
-  const arsonistPlayerId = roleAssignments.find(
-    (a) => a.roleDefinitionId === (WerewolfRole.Arsonist as string),
-  )?.playerId;
-  if (
-    arsonistAction?.targetPlayerId &&
-    arsonistAction.targetPlayerId === arsonistPlayerId &&
-    options?.arsonistDousedPlayerIds?.length
-  ) {
-    for (const dousedId of options.arsonistDousedPlayerIds) {
-      attacks.set(dousedId, [
-        ...(attacks.get(dousedId) ?? []),
-        WerewolfRole.Arsonist,
-      ]);
     }
   }
 

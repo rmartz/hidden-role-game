@@ -204,6 +204,61 @@ describe("Arsonist — ignite", () => {
     expect(newTs.deadPlayerIds).not.toContain("p2");
   });
 
+  it("Priest ward saves a doused player from ignite", () => {
+    const ts = makeNightState({
+      nightActions: {
+        [WerewolfRole.Arsonist]: {
+          targetPlayerId: "arsonist",
+          confirmed: true,
+        },
+      },
+    });
+    ts.arsonistDousedPlayerIds = ["p2"];
+    // Priest has previously warded p2
+    ts.priestWards = { p2: "p5" };
+    const game = makeGameWithArsonist(ts, [
+      { playerId: "p5", roleDefinitionId: WerewolfRole.Priest },
+    ]);
+    game.players.push({
+      id: "p5",
+      name: "P5",
+      sessionId: "s5",
+      visiblePlayers: [],
+    });
+    startDay.apply(game, null, "owner-1");
+    const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
+    // p2 is doused but warded by Priest — should survive
+    expect(newTs.deadPlayerIds).not.toContain("p2");
+  });
+
+  it("Witch protects a doused player from ignite", () => {
+    const ts = makeNightState({
+      nightActions: {
+        [WerewolfRole.Arsonist]: {
+          targetPlayerId: "arsonist",
+          confirmed: true,
+        },
+        [WerewolfRole.Witch]: { targetPlayerId: "p2", confirmed: true },
+      },
+    });
+    ts.arsonistDousedPlayerIds = ["p2"];
+    const game = makeGameWithArsonist(ts, [
+      { playerId: "p5", roleDefinitionId: WerewolfRole.Witch },
+    ]);
+    game.players.push({
+      id: "p5",
+      name: "P5",
+      sessionId: "s5",
+      visiblePlayers: [],
+    });
+    startDay.apply(game, null, "owner-1");
+    const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
+    // p2 is doused but the Witch targeted them — Witch sees them as attacked and protects
+    expect(newTs.deadPlayerIds).not.toContain("p2");
+    // p5 (Witch) was not attacked, so they shouldn't die either
+    expect(newTs.deadPlayerIds).not.toContain("p5");
+  });
+
   it("doused list resets after ignite even when Arsonist dies same night", () => {
     const ts = makeNightState({
       nightActions: {
