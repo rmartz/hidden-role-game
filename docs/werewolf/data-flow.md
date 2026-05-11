@@ -248,6 +248,38 @@ The `wolfCubDied` flag is cleared when `start-night` consumes it to generate the
 
 When the Old Man role is in play, `start-day` checks whether the Old Man's timer has fired. The timer fires on turn `#werewolves + 2` (where `#werewolves` counts all roles with `isWerewolf`, including Wolf Cub). If the Old Man is still alive and was **not** attacked that same night, they die peacefully — the resolution emits a kill event with `attackedBy: [OLD_MAN_TIMER_KEY]`. If the Old Man was attacked and killed by wolves (or any other attacker), the attack takes precedence and no timer event is emitted.
 
+## Narrator Night Instructions
+
+`buildNarratorInstruction` (`src/lib/game/modes/werewolf/utils/narrator-instructions.ts`) produces a
+`NarratorInstruction` for the narrator's UI during Night 1. The instruction is shown by the
+`NarratorNightInstruction` component and contains three optional fields:
+
+| Field             | Description                                                                        |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| `preWake`         | Script line spoken before waking a role (e.g. Werewolf thumb cue for Minion phase) |
+| `wakeInstruction` | Always-present line telling the role(s) to open their eyes                         |
+| `postWake`        | Script line spoken after the role is awake (e.g. action reminder)                  |
+
+The function accepts a `phaseKey` (which may be a suffixed group-phase key such as
+`"werewolf-werewolf:2"`) and a set of active role IDs. It normalises suffixed group-phase keys via
+`baseGroupPhaseKey()` before looking up the role definition.
+
+Per-role script logic:
+
+- **Minion** — `preWake` tells all Werewolves to raise their thumbs. When extra werewolf-aligned
+  roles (e.g. Wolf Cub, Lone Wolf) are in play, their names are interpolated:
+  `"All Werewolves, including Wolf Cub, raise your thumbs."`
+- **Sentinel** — `preWake` tells the Seer to raise their thumb only when the Seer is active.
+- **Mason** — `wakeInstruction` uses the plural form; `postWake` asks them to find each other.
+- **Group-phase roles** (`teamTargeting: true`, e.g. Werewolves) — plural `wakeInstruction` with
+  target-selection reminder.
+- **Solo roles with night activity** (`targetCategory !== None`) — standard wake plus "look at
+  the Narrator" `postWake`.
+- **All other roles** — wake instruction only, no `postWake`.
+
+The narrator instruction is displayed during Night 1 only; subsequent nights do not show the
+`NarratorNightInstruction` panel.
+
 ## WerewolfWinner Values
 
 The `WerewolfWinner` enum determines the outcome of the game. In addition to the standard team-based outcomes, the following individual-win values exist:
