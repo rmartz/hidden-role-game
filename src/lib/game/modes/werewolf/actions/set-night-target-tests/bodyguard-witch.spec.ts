@@ -212,4 +212,49 @@ describe("SetNightTarget — Witch cannot self-attack", () => {
     });
     expect(action.isValid(game, "p2", { targetPlayerId: "p4" })).toBe(true);
   });
+
+  it("allows Witch to self-protect when doused and Arsonist ignites", () => {
+    const ts: WerewolfTurnState = {
+      turn: 2,
+      phase: {
+        type: WerewolfPhase.Nighttime,
+        startedAt: 1000,
+        nightPhaseOrder: [WerewolfRole.Arsonist, WerewolfRole.Witch],
+        currentPhaseIndex: 1,
+        nightActions: {
+          // Arsonist self-targeted → ignite
+          [WerewolfRole.Arsonist]: {
+            targetPlayerId: "arsonist",
+            confirmed: true,
+          },
+        },
+      },
+      deadPlayerIds: [],
+      // p2 (Witch) is in the doused list
+      arsonistDousedPlayerIds: ["p2"],
+    };
+    const game = makePlayingGame(ts, {
+      players: [
+        {
+          id: "arsonist",
+          name: "Arsonist",
+          sessionId: "sa",
+          visiblePlayers: [],
+        },
+        { id: "p2", name: "Witch", sessionId: "s2", visiblePlayers: [] },
+        { id: "p3", name: "P3", sessionId: "s3", visiblePlayers: [] },
+        { id: "p4", name: "P4", sessionId: "s4", visiblePlayers: [] },
+        { id: "p5", name: "P5", sessionId: "s5", visiblePlayers: [] },
+      ],
+      roleAssignments: [
+        { playerId: "arsonist", roleDefinitionId: WerewolfRole.Arsonist },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Witch },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+      ],
+    });
+    // Witch is targeted by ignite → self-protect should be valid
+    expect(action.isValid(game, "p2", { targetPlayerId: "p2" })).toBe(true);
+  });
 });

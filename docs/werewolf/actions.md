@@ -25,6 +25,7 @@ Additional resolution steps:
 - **Illusion Artist:** If the Illusion Artist confirmed a target this night, stores `illusionTargetId` on the new daytime turn state. This is night-specific and not carried forward to the next night.
 - **Evil Empath death trigger:** If the Evil Empath was killed this night and `evilEmpathLastResult` is set, populates `evilEmpathRevealedResult` on the turn state so Werewolves see the result.
 - **Evil Empath carry-forward:** `evilEmpathLastResult` and `evilEmpathRevealedResult` are preserved across the day/night boundary.
+- **Arsonist douse/ignite:** If the Arsonist targeted another player, that player is added to `arsonistDousedPlayerIds` in the new turn state. If the Arsonist self-targeted (ignite), all players in the existing `arsonistDousedPlayerIds` are simultaneously attacked (protections apply to each independently), and the doused list is reset to empty. Dead players are removed from the doused list during this step.
 
 ---
 

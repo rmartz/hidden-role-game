@@ -79,6 +79,8 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
    */
   evilEmpathRevealedResult?: boolean;
   evilEmpathNightResult?: boolean;
+  /** Arsonist: player IDs that have been doused. */
+  arsonistDousedPlayerIds?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -162,6 +164,9 @@ export function werewolfStateToFirebase(
       : {}),
     ...(state.evilEmpathNightResult !== undefined
       ? { evilEmpathNightResult: state.evilEmpathNightResult }
+      : {}),
+    ...(state.arsonistDousedPlayerIds?.length
+      ? { arsonistDousedPlayerIds: state.arsonistDousedPlayerIds }
       : {}),
   };
 }
@@ -259,6 +264,9 @@ export function werewolfStateFromFirebase(
       : {}),
     ...(raw.evilEmpathNightResult !== undefined
       ? { evilEmpathNightResult: raw.evilEmpathNightResult }
+      : {}),
+    ...(raw.arsonistDousedPlayerIds?.length
+      ? { arsonistDousedPlayerIds: raw.arsonistDousedPlayerIds }
       : {}),
   } as WerewolfPlayerGameState;
 }

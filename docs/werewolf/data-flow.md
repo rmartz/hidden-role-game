@@ -73,6 +73,7 @@ These fields are only populated when the active phase matches the player's role.
 | `elusiveSeerVillagerIds`    | Elusive Seer                                        | List of player IDs who have the Villager role (shown on first night only)                                                                                                                 |
 | `oneEyedSeerLockedTargetId` | One-Eyed Seer                                       | Player ID the One-Eyed Seer is locked onto after detecting a werewolf                                                                                                                     |
 | `executionerTargetId`       | Executioner                                         | The player ID of the Executioner's assigned Good-team target; visible only to the Executioner                                                                                             |
+| `arsonistDousedPlayerIds`   | Arsonist                                            | List of player IDs currently doused by the Arsonist; shown to the Arsonist at night. Reset after an ignite (self-target).                                                                 |
 
 ### Player Fields — Daytime (day start)
 
@@ -159,13 +160,18 @@ Narrator reveals investigation (reveal-investigation-result)
 Narrator starts day (start-day)
   → resolveNightActions() runs:
     1. Collect attacks/protections (Werewolves, Bodyguard, Doctor, Chupacabra)
-    2. Apply Priest wards (ward absorbs attack, ward is consumed)
-    3. Apply Witch action (protect or attack)
-    4. Apply Altruist intercept (redirects attack onto self)
-    5. Apply Tough Guy absorption (survives first attack)
-    6. Apply Smite (forced death regardless of protections)
-    7. Apply Spellcaster silence and Mummy hypnotize
-    8. Resolve remaining attacks (protected → survived, else → killed)
+    2. Apply Arsonist ignite (if self-targeted: attack each doused player independently)
+    3. Apply Priest wards (ward absorbs attack, ward is consumed)
+    4. Apply Witch action (protect or attack)
+    5. Apply Altruist intercept (redirects attack onto self)
+    6. Apply Tough Guy absorption (survives first attack)
+    7. Apply Smite (forced death regardless of protections)
+    8. Apply Spellcaster silence and Mummy hypnotize
+    9. Resolve remaining attacks (protected → survived, else → killed)
+  → Arsonist doused list updated:
+    - Self-target (ignite): list reset to empty after attacks resolved
+    - Other-target (douse): target appended to arsonistDousedPlayerIds (dead targets skipped)
+    - Dead players removed from doused list
   → Killed players added to deadPlayerIds
   → nightResolution stored in daytime phase
   → PlayerGameState rebuilt: nightStatus and myLastNightAction populated
@@ -247,6 +253,38 @@ The `wolfCubDied` flag is cleared when `start-night` consumes it to generate the
 ## Old Man Timer
 
 When the Old Man role is in play, `start-day` checks whether the Old Man's timer has fired. The timer fires on turn `#werewolves + 2` (where `#werewolves` counts all roles with `isWerewolf`, including Wolf Cub). If the Old Man is still alive and was **not** attacked that same night, they die peacefully — the resolution emits a kill event with `attackedBy: [OLD_MAN_TIMER_KEY]`. If the Old Man was attacked and killed by wolves (or any other attacker), the attack takes precedence and no timer event is emitted.
+
+## Narrator Night Instructions
+
+`buildNarratorInstruction` (`src/lib/game/modes/werewolf/utils/narrator-instructions.ts`) produces a
+`NarratorInstruction` for the narrator's UI during Night 1. The instruction is shown by the
+`NarratorNightInstruction` component and contains three optional fields:
+
+| Field             | Description                                                                        |
+| ----------------- | ---------------------------------------------------------------------------------- |
+| `preWake`         | Script line spoken before waking a role (e.g. Werewolf thumb cue for Minion phase) |
+| `wakeInstruction` | Always-present line telling the role(s) to open their eyes                         |
+| `postWake`        | Script line spoken after the role is awake (e.g. action reminder)                  |
+
+The function accepts a `phaseKey` (which may be a suffixed group-phase key such as
+`"werewolf-werewolf:2"`) and a set of active role IDs. It normalises suffixed group-phase keys via
+`baseGroupPhaseKey()` before looking up the role definition.
+
+Per-role script logic:
+
+- **Minion** — `preWake` tells all Werewolves to raise their thumbs. When extra werewolf-aligned
+  roles (e.g. Wolf Cub, Lone Wolf) are in play, their names are interpolated:
+  `"All Werewolves, including Wolf Cub, raise your thumbs."`
+- **Sentinel** — `preWake` tells the Seer to raise their thumb only when the Seer is active.
+- **Mason** — `wakeInstruction` uses the plural form; `postWake` asks them to find each other.
+- **Group-phase roles** (`teamTargeting: true`, e.g. Werewolves) — plural `wakeInstruction` with
+  target-selection reminder.
+- **Solo roles with night activity** (`targetCategory !== None`) — standard wake plus "look at
+  the Narrator" `postWake`.
+- **All other roles** — wake instruction only, no `postWake`.
+
+The narrator instruction is displayed during Night 1 only; subsequent nights do not show the
+`NarratorNightInstruction` panel.
 
 ## WerewolfWinner Values
 

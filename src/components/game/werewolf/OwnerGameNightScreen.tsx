@@ -37,6 +37,8 @@ import { OwnerNightTargetPanel } from "./OwnerNightTargetPanel";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
 import { NightPhaseOrderList } from "./NightPhaseOrderList";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import { buildNarratorInstruction } from "@/lib/game/modes/werewolf";
+import { NarratorNightInstruction } from "./NarratorNightInstruction";
 
 interface OwnerGameNightScreenProps {
   gameId: string;
@@ -137,6 +139,16 @@ export function OwnerGameNightScreen({
       : undefined;
 
   const isFirstTurn = turnState.turn === 1;
+  const activeRoleIds = isFirstTurn
+    ? new Set(
+        gameState.visibleRoleAssignments.flatMap((a) =>
+          a.role ? [a.role.id] : [],
+        ),
+      )
+    : new Set<string>();
+  const narratorInstruction = isFirstTurn
+    ? buildNarratorInstruction(activePhaseKey, activeRoleIds)
+    : undefined;
 
   const isActionConfirmed = isGroupPhase
     ? !!groupAction?.confirmed
@@ -317,6 +329,9 @@ export function OwnerGameNightScreen({
               <span> ({activePlayerNames.join(", ")})</span>
             )}
           </p>
+          {isFirstTurn && narratorInstruction && (
+            <NarratorNightInstruction instruction={narratorInstruction} />
+          )}
           {isRoleActive(activePhaseKey, WerewolfRole.Mirrorcaster) && (
             <p className="mb-3 text-sm text-muted-foreground italic">
               {turnState.mirrorcasterCharged

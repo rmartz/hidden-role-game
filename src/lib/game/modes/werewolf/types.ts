@@ -219,6 +219,8 @@ export interface WerewolfTurnState {
    * Persists for the rest of the game so Werewolves can see it during their night phase.
    */
   evilEmpathRevealedResult?: boolean;
+  /** Player IDs that the Arsonist has doused. Accumulated across nights; reset after an ignite. */
+  arsonistDousedPlayerIds?: string[];
 }
 
 export interface TargetablePlayer {

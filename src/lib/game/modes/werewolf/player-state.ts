@@ -105,6 +105,8 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   myNominatedDefendantId?: string;
   /** Player IDs pending elimination at the end of the next night (narrator daytime smite). */
   pendingSmitePlayerIds?: string[];
+  /** Arsonist: player IDs that have been doused by the Arsonist. */
+  arsonistDousedPlayerIds?: string[];
   /** True if the player is silenced this day. */
   isSilenced?: boolean;
   /** True if the player is hypnotized by the Mummy. */
