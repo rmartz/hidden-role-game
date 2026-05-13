@@ -120,6 +120,8 @@ export function PlayerNightActionScreen({
     : undefined;
 
   const investigationResult = gameState.investigationResult;
+  const evilEmpathNightResult = gameState.evilEmpathNightResult;
+  const evilEmpathRevealedResult = gameState.evilEmpathRevealedResult;
 
   return isFirstTurn ? (
     <PlayerFirstTurnScreen
@@ -219,6 +221,20 @@ export function PlayerNightActionScreen({
             resultLabel={investigationResult.resultLabel}
             secondTargetName={investigationResult.secondTargetName}
           />
+        )}
+        {evilEmpathNightResult !== undefined && (
+          <p className="mt-3 text-sm font-medium">
+            {evilEmpathNightResult
+              ? WEREWOLF_COPY.evilEmpath.adjacentResult
+              : WEREWOLF_COPY.evilEmpath.notAdjacentResult}
+          </p>
+        )}
+        {evilEmpathRevealedResult !== undefined && (
+          <p className="mt-3 text-sm font-medium">
+            {WEREWOLF_COPY.evilEmpath.revealedToWerewolves(
+              evilEmpathRevealedResult,
+            )}
+          </p>
         )}
       </div>
     </div>

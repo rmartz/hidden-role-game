@@ -15,6 +15,7 @@ import {
 } from "../utils";
 import { WerewolfRole, getWerewolfRole } from "../roles";
 import { didWolfCubDie } from "./helpers";
+import { confirmEvilEmpathResultAction } from "./confirm-evil-empath-result";
 import { getWerewolfModeConfig } from "../lobby-config";
 import { getOrderedAffectedPlayerIds } from "../services";
 
@@ -173,6 +174,18 @@ export const startDayAction: GameAction = {
       illusionAction?.confirmed && illusionAction.targetPlayerId
         ? illusionAction.targetPlayerId
         : undefined;
+
+    // Evil Empath: if the Evil Empath was the last (active) night phase and the
+    // result was never computed (e.g. narrator advanced directly to start-day),
+    // auto-compute it now — same guard used in setNightPhaseAction.
+    const finalPhaseKey =
+      nightPhase.nightPhaseOrder[nightPhase.currentPhaseIndex];
+    if (
+      finalPhaseKey === (WerewolfRole.EvilEmpath as string) &&
+      !nightPhase.nightActions[finalPhaseKey]?.confirmed
+    ) {
+      confirmEvilEmpathResultAction.apply(game, {}, "");
+    }
 
     // Evil Empath: carry the last known adjacency result forward so it can be
     // revealed to Werewolves when the Evil Empath dies.

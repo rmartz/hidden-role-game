@@ -26,9 +26,21 @@ export const setNightPhaseAction: GameAction = {
     const { phaseIndex } = payload as { phaseIndex: number };
     const phase = ts.phase as WerewolfNighttimePhase;
     const departingPhaseKey = phase.nightPhaseOrder[phase.currentPhaseIndex];
+    // Auto-compute the Evil Empath adjacency result whenever departing the
+    // Evil Empath phase. We skip only if the action was already confirmed
+    // via confirmEvilEmpathResultAction (indicated by resultRevealed being
+    // set), because the generic set-night-target/confirm-night-target flow
+    // can produce a confirmed action without computing the result.
+    const departingAction = phase.nightActions[departingPhaseKey ?? ""];
+    const alreadyComputedByEvilEmpathAction =
+      departingPhaseKey === (WerewolfRole.EvilEmpath as string) &&
+      departingAction &&
+      !("votes" in departingAction) &&
+      departingAction.confirmed === true &&
+      departingAction.resultRevealed === true;
     if (
       departingPhaseKey === (WerewolfRole.EvilEmpath as string) &&
-      !phase.nightActions[departingPhaseKey]?.confirmed
+      !alreadyComputedByEvilEmpathAction
     ) {
       confirmEvilEmpathResultAction.apply(game, {}, "");
     }

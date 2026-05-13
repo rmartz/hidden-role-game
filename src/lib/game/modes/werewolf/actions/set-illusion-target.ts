@@ -18,6 +18,7 @@ export const setIllusionTargetAction: GameAction = {
     if (result.activePhaseKey !== (WerewolfRole.IllusionArtist as string))
       return false;
 
+    if (!payload || typeof payload !== "object") return false;
     const { targetPlayerId } = payload as { targetPlayerId?: unknown };
     if (typeof targetPlayerId !== "string") return false;
     if (targetPlayerId === callerId) return false;

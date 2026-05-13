@@ -216,6 +216,15 @@ export function OwnerGameNightScreen({
       )
     : undefined;
 
+  const isEvilEmpathPhase = isRoleActive(
+    activePhaseKey,
+    WerewolfRole.EvilEmpath,
+  );
+  const evilEmpathNightResult =
+    isEvilEmpathPhase && turnState.evilEmpathLastResult !== undefined
+      ? turnState.evilEmpathLastResult
+      : undefined;
+
   const unconfirmedWarning =
     !isFirstTurn && !isWitchAbilitySkipped && !isActionConfirmed
       ? WEREWOLF_COPY.narrator.playerUnconfirmed
@@ -412,6 +421,13 @@ export function OwnerGameNightScreen({
           {exposerRevealText && (
             <p className="mt-2 text-xs text-muted-foreground italic">
               {exposerRevealText}
+            </p>
+          )}
+          {evilEmpathNightResult !== undefined && (
+            <p className="mt-2 text-sm font-medium">
+              {evilEmpathNightResult
+                ? WEREWOLF_COPY.evilEmpath.adjacentResult
+                : WEREWOLF_COPY.evilEmpath.notAdjacentResult}
             </p>
           )}
         </OwnerAdvanceCard>

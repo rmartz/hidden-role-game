@@ -95,6 +95,9 @@ function extractGroupPhaseState(
       myNightTarget: undefined,
       myNightTargetConfirmed: false,
       ...(previousNightTargetId ? { previousNightTargetId } : {}),
+      ...(ts?.evilEmpathRevealedResult !== undefined
+        ? { evilEmpathRevealedResult: ts.evilEmpathRevealedResult }
+        : {}),
     };
   }
 
