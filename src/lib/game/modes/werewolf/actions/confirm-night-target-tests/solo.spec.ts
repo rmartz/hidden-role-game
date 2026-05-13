@@ -2,11 +2,7 @@ import { describe, it, expect } from "vitest";
 import type { WerewolfTurnState, WerewolfNighttimePhase } from "../../types";
 import { WerewolfRole } from "../../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "../index";
-import {
-  makePlayingGame,
-  makeNightState,
-  dayTurnState,
-} from "../test-helpers";
+import { makePlayingGame, makeNightState, dayTurnState } from "../test-helpers";
 
 // ---------------------------------------------------------------------------
 // ConfirmNightTarget — solo roles
