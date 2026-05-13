@@ -409,11 +409,9 @@ describe("WerewolfAction.NominatePlayer — Martyr window", () => {
   const action = WEREWOLF_ACTIONS[WerewolfAction.NominatePlayer];
 
   it("returns false when pendingGuiltId is set", () => {
-    const ts: WerewolfTurnState = {
-      ...makeDayState(),
-    };
-    (ts.phase as WerewolfDaytimePhase).pendingGuiltId = "p1";
-    const game = makePlayingGame(ts, {
+    const ds = makeDayState();
+    (ds.phase as WerewolfDaytimePhase).pendingGuiltId = "p1";
+    const game = makePlayingGame(ds, {
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: true,
