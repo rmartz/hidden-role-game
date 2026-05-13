@@ -394,5 +394,30 @@ describe("resolveNightActions", () => {
         died: true,
       });
     });
+    it("alerts and Priest wards the Veteran: Priest is NOT counter-killed", () => {
+      const priestAssignments = [
+        { playerId: "vet1", roleDefinitionId: WerewolfRole.Veteran },
+        { playerId: "priest1", roleDefinitionId: WerewolfRole.Priest },
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+      ];
+
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        priestAssignments,
+        [],
+        undefined,
+        { priestWards: { vet1: "priest1" } },
+      );
+
+      const priestEvent = findKilled(events, "priest1");
+      expect(priestEvent).toBeUndefined();
+
+      expect(
+        events.find((e) => e.type === "veteran-counterkilled"),
+      ).toBeUndefined();
+    });
+
   });
 });

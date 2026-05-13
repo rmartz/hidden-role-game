@@ -174,6 +174,128 @@ describe("WerewolfAction.ConfirmNightTarget", () => {
     });
   });
 
+  describe("isValid (narrator solo-phase confirm)", () => {
+    it("returns true when narrator confirms an active unconfirmed solo phase on turn 2+", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightPhaseOrder: [WerewolfRole.Veteran, WerewolfRole.Werewolf],
+          currentPhaseIndex: 0,
+          nightActions: {
+            [WerewolfRole.Veteran]: { alerted: true },
+          },
+        }),
+      );
+      expect(action.isValid(game, "owner-1", null)).toBe(true);
+    });
+
+    it("returns false for narrator on group phase", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightPhaseOrder: [WerewolfRole.Werewolf, WerewolfRole.Seer],
+          currentPhaseIndex: 0,
+          nightActions: {
+            [WerewolfRole.Werewolf]: {
+              votes: [{ playerId: "p1", targetPlayerId: "p3" }],
+              suggestedTargetId: "p3",
+            },
+          },
+        }),
+      );
+      expect(action.isValid(game, "owner-1", null)).toBe(false);
+    });
+
+    it("returns false for narrator when action is already confirmed", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightPhaseOrder: [WerewolfRole.Veteran, WerewolfRole.Werewolf],
+          currentPhaseIndex: 0,
+          nightActions: {
+            [WerewolfRole.Veteran]: { alerted: true, confirmed: true },
+          },
+        }),
+      );
+      expect(action.isValid(game, "owner-1", null)).toBe(false);
+    });
+
+    it("returns false for narrator when no action is set", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightPhaseOrder: [WerewolfRole.Veteran, WerewolfRole.Werewolf],
+          currentPhaseIndex: 0,
+          nightActions: {},
+        }),
+      );
+      expect(action.isValid(game, "owner-1", null)).toBe(false);
+    });
+
+    it("returns false for narrator on turn 1", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 1,
+          nightPhaseOrder: [WerewolfRole.Veteran, WerewolfRole.Werewolf],
+          currentPhaseIndex: 0,
+          nightActions: {
+            [WerewolfRole.Veteran]: { alerted: true },
+          },
+        }),
+      );
+      expect(action.isValid(game, "owner-1", null)).toBe(false);
+    });
+
+    it("returns false for narrator confirming Mentalist with only one target", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightPhaseOrder: [WerewolfRole.Mentalist],
+          currentPhaseIndex: 0,
+          nightActions: {
+            [WerewolfRole.Mentalist]: { targetPlayerId: "p1" },
+          },
+        }),
+        {
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Mentalist },
+            { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+          ],
+        },
+      );
+      expect(action.isValid(game, "owner-1", null)).toBe(false);
+    });
+
+    it("returns true for narrator confirming Mentalist with both targets", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightPhaseOrder: [WerewolfRole.Mentalist],
+          currentPhaseIndex: 0,
+          nightActions: {
+            [WerewolfRole.Mentalist]: {
+              targetPlayerId: "p1",
+              secondTargetPlayerId: "p3",
+            },
+          },
+        }),
+        {
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Mentalist },
+            { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+          ],
+        },
+      );
+      expect(action.isValid(game, "owner-1", null)).toBe(true);
+    });
+  });
+
   describe("apply (solo)", () => {
     it("sets confirmed to true on the active role's night action", () => {
       const game = makePlayingGame(

@@ -310,12 +310,13 @@ interface TeamNightAction {
 5. Applies Veteran counter-kill (after Altruist, so the Altruist cannot intercept the counter-kill): if the Veteran alerted this night (action has `alerted: true`):
    - **Wolf repel:** if any wolf group targeted the Veteran, the wolf attack on the Veteran is removed and one alive wolf-group participant is counter-killed instead. Emits `veteran-counterkilled (source: "wolf-repel")`.
    - **Visitor kill:** any solo role (except Priest wards and Investigation-category roles such as Seer, which observe from afar using mystical powers) that visited the Veteran is counter-killed and any attack or protection they provided to the Veteran is discarded. Emits `veteran-counterkilled (source: "visitor")` per killed visitor.
-6. Applies Tough Guy absorption: if a Tough Guy is attacked for the first time, the attack is absorbed (survives this night, dies on the next attack).
-7. Applies Smite: any smited player is killed regardless of protections.
-8. Applies Spellcaster action: emits a `silenced` event.
-9. Applies Mummy action: emits a `hypnotized` event for the target.
-10. Checks Old Man timer (`oldManTimerPlayerId` option): if the timer has fired **and** the Old Man was not attacked this night, emits a killed event with `attackedBy: [OLD_MAN_TIMER_KEY]`, `died: true`. This bypasses protections (applied after `buildKilledEvents`, like smite). If the Old Man was attacked, the attack takes precedence.
-11. Returns `NightResolutionEvent[]`:
+6. Applies Smite: any smited player is killed regardless of protections.
+7. Checks Old Man timer (`oldManTimerPlayerId` option): if the timer has fired **and** the Old Man was not attacked this night, emits a killed event with `attackedBy: [OLD_MAN_TIMER_KEY]`, `died: true`. This bypasses protections. If the Old Man was attacked, the attack takes precedence.
+8. Applies Tough Guy absorption: if a Tough Guy is attacked for the first time, the attack is absorbed (survives this night, dies on the next attack). Applies after Smite and Old Man timer so that those bypass the absorption.
+9. Emits `veteran-counterkilled` events (after Tough Guy absorption so the `died` field reflects the actual outcome, e.g., Tough Guy absorbing the counter-kill).
+10. Applies Spellcaster action: emits a `silenced` event.
+11. Applies Mummy action: emits a `hypnotized` event for the target.
+12. Returns `NightResolutionEvent[]`:
 
 - `{ type: "killed", targetPlayerId, attackedBy, protectedBy, died }`
 - `{ type: "silenced", targetPlayerId }`
