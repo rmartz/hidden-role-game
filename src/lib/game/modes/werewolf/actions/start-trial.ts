@@ -16,6 +16,7 @@ export const startTrialAction: GameAction = {
     if (!ts) return false;
     if (ts.phase.type !== WerewolfPhase.Daytime) return false;
     if (ts.phase.activeTrial && !ts.phase.activeTrial.verdict) return false;
+    if (ts.phase.pendingGuiltId) return false;
     // Trials-per-day limit: cannot start another trial once the limit is reached
     const { trialsPerDay } = getWerewolfModeConfig(game);
     if (

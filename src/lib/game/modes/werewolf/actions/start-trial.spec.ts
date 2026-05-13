@@ -265,6 +265,17 @@ describe("WerewolfAction.StartTrial — silenced, hypnotized, and auto-resolve",
   });
 });
 
+describe("WerewolfAction.StartTrial — Martyr window", () => {
+  const action = WEREWOLF_ACTIONS[WerewolfAction.StartTrial];
+
+  it("blocks starting a trial when pendingGuiltId is set", () => {
+    const ds = makeDayState();
+    (ds.phase as WerewolfDaytimePhase).pendingGuiltId = "p1";
+    const game = makePlayingGame(ds);
+    expect(action.isValid(game, "owner-1", { defendantId: "p4" })).toBe(false);
+  });
+});
+
 describe("WerewolfAction.StartTrial — trialsPerDay", () => {
   const action = WEREWOLF_ACTIONS[WerewolfAction.StartTrial];
 
