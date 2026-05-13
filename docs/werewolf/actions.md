@@ -310,10 +310,10 @@ interface TeamNightAction {
 5. Applies Veteran counter-kill (after Altruist, so the Altruist cannot intercept the counter-kill): if the Veteran alerted this night (action has `alerted: true`):
    - **Wolf repel:** if any wolf group targeted the Veteran, the wolf attack on the Veteran is removed and one alive wolf-group participant is counter-killed instead. Emits `veteran-counterkilled (source: "wolf-repel")`.
    - **Visitor kill:** any solo role (except Priest wards and Investigation-category roles such as Seer, which observe from afar using mystical powers) that visited the Veteran is counter-killed and any attack or protection they provided to the Veteran is discarded. Emits `veteran-counterkilled (source: "visitor")` per killed visitor.
-6. Applies Smite: any smited player is killed regardless of protections.
-7. Checks Old Man timer (`oldManTimerPlayerId` option): if the timer has fired **and** the Old Man was not attacked this night, emits a killed event with `attackedBy: [OLD_MAN_TIMER_KEY]`, `died: true`. This bypasses protections. If the Old Man was attacked, the attack takes precedence.
-8. Applies Tough Guy absorption: if a Tough Guy is attacked for the first time, the attack is absorbed (survives this night, dies on the next attack). Applies after Smite and Old Man timer so that those bypass the absorption.
-9. Emits `veteran-counterkilled` events (after Tough Guy absorption so the `died` field reflects the actual outcome, e.g., Tough Guy absorbing the counter-kill).
+6. Applies Smite: any smited player is killed regardless of protections. Applied before Tough Guy so that smited players cannot absorb the forced death.
+7. Checks Old Man timer (`oldManTimerPlayerId` option): if the timer has fired **and** the Old Man was not attacked this night, emits a killed event with `attackedBy: [OLD_MAN_TIMER_KEY]`, `died: true`. Applied before Tough Guy for the same reason as Smite.
+8. Applies Tough Guy absorption: if a Tough Guy is attacked (after Smite and the Old Man timer have been applied) for the first time, the attack is absorbed (survives this night, dies on the next attack).
+9. Emits `veteran-counterkilled` events: emitted here (after Tough Guy absorption) so the `died` field reflects the actual combat outcome (e.g. `died: false` if the counter-killed visitor was a first-hit Tough Guy).
 10. Applies Spellcaster action: emits a `silenced` event.
 11. Applies Mummy action: emits a `hypnotized` event for the target.
 12. Returns `NightResolutionEvent[]`:
@@ -345,29 +345,30 @@ flowchart TD
     NewAttack --> Altruist
     Altruist{Altruist target\nunder attack?}
     Altruist -->|yes| Intercept[Redirect attack onto Altruist\nemit altruist-intercepted]
-    Altruist -->|no| ToughGuy
-    Intercept --> ToughGuy
-    ToughGuy{Tough Guy attacked\nfor first time?}
-    ToughGuy -->|yes| Absorb[Absorb attack\nemit tough-guy-absorbed]
-    ToughGuy -->|no| Smite
-    Absorb --> Smite
+    Altruist -->|no| Resolve
+    Intercept --> Resolve
+    Resolve[For each collected attack:\nif protected → died = false\nelse → died = true\nemit killed event]
+    Resolve --> Smite
     Smite{Player smited?}
     Smite -->|yes| ForceDeath[Force death regardless\nof protections]
-    Smite -->|no| Spellcaster
-    ForceDeath --> Spellcaster
+    Smite -->|no| OldMan
+    ForceDeath --> OldMan
+    OldMan{Old Man timer expired\nand not attacked?}
+    OldMan -->|yes| Peaceful[Emit killed event\nattackedBy: OLD_MAN_TIMER_KEY\ndied: true]
+    OldMan -->|no| ToughGuy
+    Peaceful --> ToughGuy
+    ToughGuy{Tough Guy attacked\nfor first time?}
+    ToughGuy -->|yes| Absorb[Absorb attack\nemit tough-guy-absorbed]
+    ToughGuy -->|no| Spellcaster
+    Absorb --> Spellcaster
     Spellcaster{Spellcaster acted?}
     Spellcaster -->|yes| Silence[Emit silenced event for target]
     Spellcaster -->|no| Mummy
     Silence --> Mummy
     Mummy{Mummy acted?}
     Mummy -->|yes| Hypnotize[Emit hypnotized event for target]
-    Mummy -->|no| Resolve
-    Hypnotize --> Resolve
-    Resolve[For each collected attack:\nif protected → died = false\nelse → died = true\nemit killed event]
-    Resolve --> OldMan{Old Man timer expired\nand not attacked?}
-    OldMan -->|yes| Peaceful[Emit killed event\nattackedBy: OLD_MAN_TIMER_KEY\ndied: true]
-    OldMan -->|no| Return
-    Peaceful --> Return
+    Mummy -->|no| Return
+    Hypnotize --> Return
     Return([Return NightResolutionEvent array])
 ```
 

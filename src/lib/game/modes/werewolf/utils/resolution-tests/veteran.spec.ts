@@ -357,6 +357,32 @@ describe("resolveNightActions", () => {
       ).toBeUndefined();
     });
 
+    it("alerts and Priest wards alerted Veteran: Priest is NOT counter-killed", () => {
+      const priestAssignments = [
+        { playerId: "vet1", roleDefinitionId: WerewolfRole.Veteran },
+        { playerId: "pr1", roleDefinitionId: WerewolfRole.Priest },
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+      ];
+
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Priest]: { targetPlayerId: "vet1" },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        priestAssignments,
+        [],
+        undefined,
+        { priestWards: { vet1: "pr1" } },
+      );
+
+      const priestEvent = findKilled(events, "pr1");
+      expect(priestEvent).toBeUndefined();
+
+      expect(
+        events.find((e) => e.type === "veteran-counterkilled"),
+      ).toBeUndefined();
+    });
+
     it("Altruist is counter-killed as a visitor when they target the alerted Veteran", () => {
       const altruistAssignments = [
         { playerId: "vet1", roleDefinitionId: WerewolfRole.Veteran },
