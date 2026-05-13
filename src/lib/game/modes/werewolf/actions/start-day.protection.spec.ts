@@ -197,6 +197,41 @@ describe("WerewolfAction.StartDay — protections", () => {
     expect(ts.deadPlayerIds).not.toContain("p2");
   });
 
+  it("Altruist does not intercept an attack on a Monarch protected by a living Knighted player", () => {
+    const nightState = makeNightState({
+      nightActions: {
+        [WerewolfRole.Werewolf]: {
+          votes: [],
+          suggestedTargetId: "p2",
+        },
+        [WerewolfRole.Altruist]: { targetPlayerId: "p2" },
+      },
+      nightPhaseOrder: [WerewolfRole.Werewolf, WerewolfRole.Altruist],
+    });
+    nightState.monarchKnightedPlayerIds = ["p4"];
+    nightState.monarchKnightingsUsed = 1;
+    const game = makePlayingGame(nightState, {
+      roleAssignments: [
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Monarch },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Altruist },
+        { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p5", roleDefinitionId: WerewolfRole.Seer },
+      ],
+    });
+    action.apply(game, null, "owner-1");
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.deadPlayerIds).not.toContain("p2");
+    expect(ts.deadPlayerIds).not.toContain("p3");
+    if (ts.phase.type === WerewolfPhase.Daytime) {
+      expect(
+        ts.phase.nightResolution?.find(
+          (event) => event.type === "altruist-intercepted",
+        ),
+      ).toBeUndefined();
+    }
+  });
+
   it("Monarch is not protected against Bad attackers when all living Knighted players are Bad", () => {
     const nightState = makeNightState({
       nightActions: {

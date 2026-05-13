@@ -3,7 +3,6 @@ import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase, isTeamNightAction } from "../types";
 import type {
   AttackNightResolutionEvent,
-  NightResolutionEvent,
   ToughGuyAbsorbedNightResolutionEvent,
   WerewolfNighttimePhase,
 } from "../types";
@@ -12,113 +11,12 @@ import {
   isOwnerPlaying,
   resolveNightActions,
   checkWinCondition,
-  getGroupPhasePlayerIds,
-  isGroupPhaseKey,
-  SMITE_PHASE_KEY,
   WerewolfWinner,
 } from "../utils";
 import { WerewolfRole, getWerewolfRole } from "../roles";
 import { didWolfCubDie } from "./helpers";
 import { getWerewolfModeConfig } from "../lobby-config";
 import { getOrderedAffectedPlayerIds } from "../services";
-
-function getAttackerIdsForEvent(
-  event: AttackNightResolutionEvent,
-  game: Game,
-  deadPlayerIds: string[],
-): string[] {
-  const attackerIds = new Set<string>();
-  for (const phaseKey of event.attackedBy) {
-    // Smite bypasses protections and is not a player-driven attack source.
-    if (phaseKey === SMITE_PHASE_KEY) continue;
-    if (isGroupPhaseKey(phaseKey)) {
-      for (const playerId of getGroupPhasePlayerIds(
-        game.roleAssignments,
-        phaseKey,
-        deadPlayerIds,
-      )) {
-        attackerIds.add(playerId);
-      }
-      continue;
-    }
-    const attacker = game.roleAssignments.find(
-      (assignment) =>
-        assignment.roleDefinitionId === phaseKey &&
-        !deadPlayerIds.includes(assignment.playerId),
-    );
-    if (attacker) attackerIds.add(attacker.playerId);
-  }
-  return [...attackerIds];
-}
-
-function applyMonarchNightProtection(
-  nightResolution: NightResolutionEvent[],
-  game: Game,
-  deadPlayerIds: string[],
-  monarchKnightedPlayerIds: string[],
-): void {
-  const getRoleDefForPlayer = (playerId: string) => {
-    const roleDefinitionId = game.roleAssignments.find(
-      (assignment) => assignment.playerId === playerId,
-    )?.roleDefinitionId;
-    return roleDefinitionId ? getWerewolfRole(roleDefinitionId) : undefined;
-  };
-
-  const monarchAssignment = game.roleAssignments.find(
-    (assignment) =>
-      getWerewolfRole(assignment.roleDefinitionId)?.id === WerewolfRole.Monarch,
-  );
-  if (
-    !monarchAssignment ||
-    deadPlayerIds.includes(monarchAssignment.playerId)
-  ) {
-    return;
-  }
-  const monarchEvent = nightResolution.find(
-    (event): event is AttackNightResolutionEvent =>
-      event.type === "killed" &&
-      event.targetPlayerId === monarchAssignment.playerId &&
-      event.died &&
-      !event.attackedBy.includes(SMITE_PHASE_KEY),
-  );
-  if (!monarchEvent) return;
-
-  const livingKnightedPlayerIds = monarchKnightedPlayerIds.filter(
-    (playerId) => !deadPlayerIds.includes(playerId),
-  );
-  if (livingKnightedPlayerIds.length === 0) return;
-
-  const attackerIds = getAttackerIdsForEvent(monarchEvent, game, deadPlayerIds);
-  const livingKnightedRoleDefs = livingKnightedPlayerIds
-    .map((playerId) => getRoleDefForPlayer(playerId))
-    .filter((roleDef) => roleDef !== undefined);
-  const allLivingKnightedPlayersAreBad = livingKnightedRoleDefs.every(
-    (roleDef) => roleDef.team === Team.Bad,
-  );
-  const badAttackerExists = attackerIds.some((playerId) => {
-    const attackerRole = getRoleDefForPlayer(playerId);
-    return attackerRole?.team === Team.Bad;
-  });
-  const onlyLivingKnightedPlayerId =
-    livingKnightedPlayerIds.length === 1
-      ? livingKnightedPlayerIds[0]
-      : undefined;
-  const attackerIsOnlyLivingKnightedPlayer =
-    onlyLivingKnightedPlayerId !== undefined &&
-    attackerIds.includes(onlyLivingKnightedPlayerId);
-
-  if (
-    (badAttackerExists && allLivingKnightedPlayersAreBad) ||
-    attackerIsOnlyLivingKnightedPlayer
-  ) {
-    return;
-  }
-
-  monarchEvent.died = false;
-  monarchEvent.protectedBy = [
-    ...new Set([...monarchEvent.protectedBy, WerewolfRole.Monarch]),
-  ];
-}
 
 export const startDayAction: GameAction = {
   isValid(game: Game, callerId: string) {
@@ -165,19 +63,6 @@ export const startDayAction: GameAction = {
         ? oldManAssignment.playerId
         : undefined;
 
-    const nightResolution = resolveNightActions(
-      nightPhase.nightActions,
-      game.roleAssignments,
-      ts.deadPlayerIds,
-      nightPhase.smitedPlayerIds,
-      {
-        priestWards: priestWardsForResolution,
-        toughGuyHitIds: ts.toughGuyHitIds,
-        ...(oldManTimerPlayerId ? { oldManTimerPlayerId } : {}),
-        ...(ts.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
-      },
-    );
-
     const monarchAction = nightPhase.nightActions[WerewolfRole.Monarch];
     const targetKnightedTonight =
       monarchAction &&
@@ -205,12 +90,30 @@ export const startDayAction: GameAction = {
     const knightedPlayerId = monarchCanKnight
       ? targetKnightedTonight
       : undefined;
+    const monarchPlayerId = game.roleAssignments.find(
+      (assignment) =>
+        assignment.roleDefinitionId === (WerewolfRole.Monarch as string),
+    )?.playerId;
 
-    applyMonarchNightProtection(
-      nightResolution,
-      game,
+    const nightResolution = resolveNightActions(
+      nightPhase.nightActions,
+      game.roleAssignments,
       ts.deadPlayerIds,
-      monarchKnightedPlayerIds,
+      nightPhase.smitedPlayerIds,
+      {
+        priestWards: priestWardsForResolution,
+        toughGuyHitIds: ts.toughGuyHitIds,
+        ...(oldManTimerPlayerId ? { oldManTimerPlayerId } : {}),
+        ...(ts.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
+        ...(monarchPlayerId
+          ? {
+              monarchProtection: {
+                monarchPlayerId,
+                monarchKnightedPlayerIds,
+              },
+            }
+          : {}),
+      },
     );
 
     const newDeadIds: string[] = nightResolution
