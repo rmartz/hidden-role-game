@@ -276,12 +276,19 @@ export function extractOwnerState(
   const hunterRevengePlayerId = extractHunterRevengePlayerId(game);
   const callerId = game.ownerPlayerId ?? "";
   const daytimeNightState = extractDaytimeNightSummary(game, callerId);
+  const ts = currentTurnState(game);
 
   // hiddenRoleIds is only present on WerewolfGame when hiddenRoleCount > 0.
   const hiddenRoleIds =
     game.gameMode === GameMode.Werewolf && game.hiddenRoleIds?.length
       ? game.hiddenRoleIds
       : undefined;
+
+  // mercenaryBribedPlayerIds is narrator-only: lets the narrator track which
+  // players have been bribed across nights when running a no-device Mercenary.
+  const mercenaryBribedPlayerIds = ts?.mercenaryBribedPlayerIds?.length
+    ? ts.mercenaryBribedPlayerIds
+    : undefined;
 
   return {
     ...(nightActions ? { nightActions } : {}),
@@ -292,6 +299,7 @@ export function extractOwnerState(
       ? { executionerTargetId: game.executionerTargetId }
       : {}),
     ...(hiddenRoleIds ? { hiddenRoleIds } : {}),
+    ...(mercenaryBribedPlayerIds ? { mercenaryBribedPlayerIds } : {}),
   };
 }
 
