@@ -211,6 +211,8 @@ export interface WerewolfTurnState {
   draculaWives?: string[];
   /** Player IDs that the Zombie has infected. Accumulated across nights. */
   zombieInfected?: string[];
+  /** Player IDs that the Arsonist has doused. Accumulated across nights; reset after an ignite. */
+  arsonistDousedPlayerIds?: string[];
   /** True once the Martyr has used their once-per-game substitution ability. */
   martyrUsed?: boolean;
 }

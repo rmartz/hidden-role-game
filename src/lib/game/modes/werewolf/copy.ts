@@ -141,6 +141,7 @@ export const WEREWOLF_COPY = {
     returnToLobby: "Return to Lobby",
     returnToLobbyError: "Failed to return to lobby. Please try again.",
     victoryConditions: {
+      [WerewolfWinner.Arsonist]: "By elimination",
       [WerewolfWinner.Village]: "By elimination",
       [WerewolfWinner.Werewolves]: "By elimination",
       [WerewolfWinner.Tanner]: "Tanner eliminated",

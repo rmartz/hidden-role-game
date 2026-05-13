@@ -95,6 +95,8 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   myNominatedDefendantId?: string;
   /** Player IDs pending elimination at the end of the next night (narrator daytime smite). */
   pendingSmitePlayerIds?: string[];
+  /** Arsonist: player IDs that have been doused by the Arsonist. */
+  arsonistDousedPlayerIds?: string[];
   /**
    * Convicted player ID awaiting final elimination during the post-verdict
    * Martyr window. Populated for all players so the UI can present the window.
