@@ -460,4 +460,83 @@ describe("checkWinCondition", () => {
       expect(result?.winner).toBe(WerewolfWinner.Illuminati);
     });
   });
+
+  describe("Arsonist", () => {
+    it("Arsonist wins when all Bad are dead and ≤1 Good remains", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Arsonist },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+      ]);
+      const result = checkWinCondition(game, ["p1"]);
+      expect(result?.winner).toBe(WerewolfWinner.Arsonist);
+    });
+
+    it("Arsonist wins when all Bad are dead and 0 Good remain", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Arsonist },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+      ]);
+      const result = checkWinCondition(game, ["p1", "p3"]);
+      expect(result?.winner).toBe(WerewolfWinner.Arsonist);
+    });
+
+    it("game continues when Arsonist is alive and >1 Good remain", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Arsonist },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+      ]);
+      const result = checkWinCondition(game, ["p1"]);
+      expect(result).toBeUndefined();
+    });
+
+    it("game continues when Bad and Arsonist are the only survivors", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Arsonist },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+      ]);
+      // Only wolf and arsonist remain — conflicting win conditions
+      const result = checkWinCondition(game, ["p3"]);
+      expect(result).toBeUndefined();
+    });
+
+    it("game continues when both Arsonist and Chupacabra are alive with ≤1 Good", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Arsonist },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Chupacabra },
+        { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+      ]);
+      // Wolf dead, both neutral killers alive with 1 Good — neither can win yet
+      const result = checkWinCondition(game, ["p1"]);
+      expect(result).toBeUndefined();
+    });
+
+    it("Arsonist counts as a non-Bad threat for Werewolf win condition", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Arsonist },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+      ]);
+      // 1 wolf vs 1 arsonist + 1 villager: wolves do NOT win (1 < 2)
+      const result = checkWinCondition(game, []);
+      expect(result).toBeUndefined();
+    });
+
+    it("Village does not win while Arsonist is alive", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Arsonist },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+      ]);
+      // Wolf dead, Arsonist + 2 Good remain — Arsonist still has >1 Good to overcome, game continues
+      const result = checkWinCondition(game, ["p1"]);
+      expect(result).toBeUndefined();
+    });
+  });
 });
