@@ -226,6 +226,24 @@ describe("Werewolf player state round-trip", () => {
     ) as WerewolfPlayerGameState;
     expect(result.illuminatiRoleAssignments).toBeUndefined();
   });
+
+  it("round-trips arsonistDousedPlayerIds when present", () => {
+    const state = makeWerewolfState({
+      arsonistDousedPlayerIds: ["p2", "p3"],
+    });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.arsonistDousedPlayerIds).toEqual(["p2", "p3"]);
+  });
+
+  it("omits arsonistDousedPlayerIds when absent", () => {
+    const state = makeWerewolfState();
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.arsonistDousedPlayerIds).toBeUndefined();
+  });
 });
 
 describe("Secret Villain player state round-trip", () => {
