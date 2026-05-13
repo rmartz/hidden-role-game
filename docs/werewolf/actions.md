@@ -23,6 +23,7 @@ Additional resolution steps:
 - **Vigilante self-death:** If the Vigilante's target is a Good-team player and was killed, the Vigilante also dies.
 - **Hunter revenge detection:** If a killed player is the Hunter, sets `hunterRevengePlayerId` on the Narrator's state and defers the win-condition check until revenge is resolved.
 - **Monarch updates:** Applies the Monarch's dynamic night protection, records newly knighted players (`monarchKnightedPlayerIds`), and increments `monarchKnightingsUsed` (max 3).
+- **Arsonist douse/ignite:** If the Arsonist targeted another player, that player is added to `arsonistDousedPlayerIds` in the new turn state. If the Arsonist self-targeted (ignite), all players in the existing `arsonistDousedPlayerIds` are simultaneously attacked (protections apply to each independently), and the doused list is reset to empty. Dead players are removed from the doused list during this step.
 
 ---
 

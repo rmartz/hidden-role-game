@@ -77,6 +77,7 @@ These fields are only populated when the active phase matches the player's role.
 | `executionerTargetId`       | Executioner                                         | The player ID of the Executioner's assigned Good-team target; visible only to the Executioner                                                                                             |
 | `monarchKnightedPlayerIds`  | All players                                         | Public list of knighted players                                                                                                                                                           |
 | `monarchKnightingsUsed`     | All players                                         | Number of knightings used by the Monarch (0-3)                                                                                                                                            |
+| `arsonistDousedPlayerIds`   | Arsonist                                            | List of player IDs currently doused by the Arsonist; shown to the Arsonist at night. Reset after an ignite (self-target).                                                                 |
 
 ### Player Fields — Daytime (day start)
 
@@ -166,13 +167,18 @@ Narrator reveals investigation (reveal-investigation-result)
 Narrator starts day (start-day)
   → resolveNightActions() runs:
     1. Collect attacks/protections (Werewolves, Bodyguard, Doctor, Chupacabra)
-    2. Apply Priest wards (ward absorbs attack, ward is consumed)
-    3. Apply Witch action (protect or attack)
-    4. Apply Altruist intercept (redirects attack onto self)
-    5. Apply Tough Guy absorption (survives first attack)
-    6. Apply Smite (forced death regardless of protections)
-    7. Apply Spellcaster silence and Mummy hypnotize
-    8. Resolve remaining attacks (protected → survived, else → killed)
+    2. Apply Arsonist ignite (if self-targeted: attack each doused player independently)
+    3. Apply Priest wards (ward absorbs attack, ward is consumed)
+    4. Apply Witch action (protect or attack)
+    5. Apply Altruist intercept (redirects attack onto self)
+    6. Apply Tough Guy absorption (survives first attack)
+    7. Apply Smite (forced death regardless of protections)
+    8. Apply Spellcaster silence and Mummy hypnotize
+    9. Resolve remaining attacks (protected → survived, else → killed)
+  → Arsonist doused list updated:
+    - Self-target (ignite): list reset to empty after attacks resolved
+    - Other-target (douse): target appended to arsonistDousedPlayerIds (dead targets skipped)
+    - Dead players removed from doused list
   → Killed players added to deadPlayerIds
   → nightResolution stored in daytime phase
   → PlayerGameState rebuilt: nightStatus and myLastNightAction populated
