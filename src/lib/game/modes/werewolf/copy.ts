@@ -95,6 +95,7 @@ export const WEREWOLF_COPY = {
       `Guilty: ${String(guilty)} · Innocent: ${String(innocent)} · Total votes: ${String(total)}`,
     advanceToSentencing: "Advance to Sentencing",
     martyrSacrificeButton: "Sacrifice Yourself",
+    narratorMartyrSacrificeButton: "Use Martyr Ability (no-device)",
     revealTrialResults: "Reveal Trial Results",
     defenseHeading: (name: string) => `${name} has the floor`,
     defenseSubtext: "The accused may speak in their defense.",

@@ -168,6 +168,7 @@ export function OwnerGameDayScreen({
               defensePhaseSeconds={defensePhaseSeconds}
               autoAdvance={autoAdvance}
               pendingGuiltId={pendingGuiltId}
+              martyrUsed={turnState.martyrUsed}
             />
           )}
         </OwnerAdvanceCard>
