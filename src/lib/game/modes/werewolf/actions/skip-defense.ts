@@ -21,6 +21,9 @@ export const skipDefenseAction: GameAction = {
 
     activeTrial.phase = TrialPhase.Voting;
     activeTrial.voteStartedAt = Date.now();
+    // Reset pause state so the vote timer starts fresh
+    activeTrial.pausedAt = undefined;
+    activeTrial.pauseOffset = undefined;
 
     // Auto-resolve if precast votes already cover all eligible voters
     const eligibleCount = game.players.filter(

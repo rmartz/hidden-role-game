@@ -30,7 +30,7 @@ function makeWerewolfState(
     gameMode: GameMode.Werewolf,
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     nominationsEnabled: true,
-    trialsPerDay: 0,
+    trialsPerDay: undefined,
     revealProtections: true,
     autoRevealNightOutcome: true,
     ...overrides,
@@ -195,6 +195,55 @@ describe("Werewolf player state round-trip", () => {
     const result = firebaseToPlayerState(playerStateToFirebase(state));
     expect(result.victoryCondition).toBeUndefined();
   });
+
+  it("round-trips illuminatiRoleAssignments including team cast", () => {
+    const state = makeWerewolfState({
+      illuminatiRoleAssignments: [
+        { playerId: "p2", roleName: "Seer", team: Team.Good },
+        { playerId: "p3", roleName: "Werewolf", team: Team.Bad },
+      ],
+    });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.illuminatiRoleAssignments).toHaveLength(2);
+    expect(result.illuminatiRoleAssignments?.[0]).toEqual({
+      playerId: "p2",
+      roleName: "Seer",
+      team: Team.Good,
+    });
+    expect(result.illuminatiRoleAssignments?.[1]).toEqual({
+      playerId: "p3",
+      roleName: "Werewolf",
+      team: Team.Bad,
+    });
+  });
+
+  it("omits illuminatiRoleAssignments when absent", () => {
+    const state = makeWerewolfState();
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.illuminatiRoleAssignments).toBeUndefined();
+  });
+
+  it("round-trips arsonistDousedPlayerIds when present", () => {
+    const state = makeWerewolfState({
+      arsonistDousedPlayerIds: ["p2", "p3"],
+    });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.arsonistDousedPlayerIds).toEqual(["p2", "p3"]);
+  });
+
+  it("omits arsonistDousedPlayerIds when absent", () => {
+    const state = makeWerewolfState();
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.arsonistDousedPlayerIds).toBeUndefined();
+  });
 });
 
 describe("Secret Villain player state round-trip", () => {
@@ -259,6 +308,36 @@ describe("Secret Villain player state round-trip", () => {
     expect(result.electionVotes).toHaveLength(2);
     expect(result.electionVotes?.at(0)?.playerId).toBe("p1");
     expect(result.electionVotes?.at(0)?.vote).toBe("yes");
+  });
+
+  it("round-trips svSpecialBadReveal with revealed = true", () => {
+    const state = makeSecretVillainState({
+      svSpecialBadReveal: { chancellorId: "p2", revealed: true },
+    });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as SecretVillainPlayerGameState;
+    expect(result.svSpecialBadReveal?.chancellorId).toBe("p2");
+    expect(result.svSpecialBadReveal?.revealed).toBe(true);
+  });
+
+  it("round-trips svSpecialBadReveal with revealed = false", () => {
+    const state = makeSecretVillainState({
+      svSpecialBadReveal: { chancellorId: "p3", revealed: false },
+    });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as SecretVillainPlayerGameState;
+    expect(result.svSpecialBadReveal?.chancellorId).toBe("p3");
+    expect(result.svSpecialBadReveal?.revealed).toBe(false);
+  });
+
+  it("omits svSpecialBadReveal when absent", () => {
+    const state = makeSecretVillainState();
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as SecretVillainPlayerGameState;
+    expect(result.svSpecialBadReveal).toBeUndefined();
   });
 });
 

@@ -138,12 +138,14 @@ export const WEREWOLF_COPY = {
     returnToLobby: "Return to Lobby",
     returnToLobbyError: "Failed to return to lobby. Please try again.",
     victoryConditions: {
+      [WerewolfWinner.Arsonist]: "By elimination",
       [WerewolfWinner.Village]: "By elimination",
       [WerewolfWinner.Werewolves]: "By elimination",
       [WerewolfWinner.Tanner]: "Tanner eliminated",
       [WerewolfWinner.Draw]: "All players eliminated simultaneously",
       [WerewolfWinner.Chupacabra]: "By elimination",
       [WerewolfWinner.Dracula]: "3 wives survived a full cycle",
+      [WerewolfWinner.Illuminati]: "Survived to the final 3",
       [WerewolfWinner.LoneWolf]: "By elimination",
       [WerewolfWinner.Spoiler]: "Spoiler stole the victory",
       [WerewolfWinner.Executioner]: "Executioner's target eliminated",
@@ -175,6 +177,13 @@ export const WEREWOLF_COPY = {
   elusiveSeer: {
     villagerListHeading: "You see the following Villagers:",
     noVillagers: "There are no plain Villagers in this game.",
+  },
+  illuminati: {
+    rolesListHeading: "All player roles:",
+    waitingForNarrator: "Waiting for the Narrator to reveal roles…",
+    narratorRevealHeading: "Reveal all roles to the Illuminati:",
+    revealUnconfirmed:
+      "Role list has not been revealed to the Illuminati player",
   },
   mentalist: {
     sameTeam: "on the same team",

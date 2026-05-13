@@ -43,6 +43,7 @@ export const WEREWOLF_ROLE_CATEGORY_LABELS: Record<
 
 export enum WerewolfRole {
   Altruist = "werewolf-altruist",
+  Arsonist = "werewolf-arsonist",
   Bodyguard = "werewolf-bodyguard",
   Chupacabra = "werewolf-chupacabra",
   Doctor = "werewolf-doctor",
@@ -51,6 +52,7 @@ export enum WerewolfRole {
   Executioner = "werewolf-executioner",
   Exposer = "werewolf-exposer",
   Hunter = "werewolf-hunter",
+  Illuminati = "werewolf-illuminati",
   LoneWolf = "werewolf-lone-wolf",
   Mason = "werewolf-mason",
   Mayor = "werewolf-mayor",
@@ -116,6 +118,8 @@ export interface WerewolfRoleDefinition extends RoleDefinition<
   dualTargetSwap?: boolean;
   /** Exposer only: ability can only be used once per game. */
   oncePerGame?: boolean;
+  /** Illuminati only: on night 1, the narrator reveals all role assignments to this player. */
+  revealsFullRoleList?: boolean;
   /** Used for grouping in the role config UI. */
   category: WerewolfRoleCategory;
 }
@@ -151,6 +155,18 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     wakesAtNight: WakesAtNight.EveryNight,
     targetCategory: TargetCategory.Special,
     category: WerewolfRoleCategory.VillagerProtection,
+  },
+  [WerewolfRole.Arsonist]: {
+    id: WerewolfRole.Arsonist,
+    name: "Arsonist",
+    summary: "Douses players and ignites them all at once",
+    description:
+      "Each night the Arsonist targets a player. Targeting another player douses them — they remain doused for the rest of the game. Targeting themselves instead ignites every currently doused player simultaneously (protections still apply to each doused player individually). After an ignite, all doused players are reset. The Arsonist is Neutral and wins by surviving to the endgame as the last opposing threat.",
+    team: Team.Neutral,
+    unique: true,
+    wakesAtNight: WakesAtNight.EveryNight,
+    targetCategory: TargetCategory.Special,
+    category: WerewolfRoleCategory.NeutralKilling,
   },
   [WerewolfRole.Bodyguard]: {
     id: WerewolfRole.Bodyguard,
@@ -252,6 +268,19 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     targetCategory: TargetCategory.None,
     aliases: ["gunslinger"],
     category: WerewolfRoleCategory.VillagerKilling,
+  },
+  [WerewolfRole.Illuminati]: {
+    id: WerewolfRole.Illuminati,
+    name: "Illuminati",
+    summary: "Sees all roles on night 1; wins if alive in the final 3",
+    description:
+      "On the first night, the Illuminati wakes and the Narrator reveals every player's role. They have no night action after night 1. The Illuminati wins if they are one of the last 3 players alive when the game ends.",
+    team: Team.Neutral,
+    unique: true,
+    wakesAtNight: WakesAtNight.FirstNightOnly,
+    targetCategory: TargetCategory.None,
+    revealsFullRoleList: true,
+    category: WerewolfRoleCategory.NeutralManipulation,
   },
   [WerewolfRole.LoneWolf]: {
     id: WerewolfRole.LoneWolf,
