@@ -29,6 +29,13 @@ export function NightOutcomeSummary({
     (e): e is VeteranCounterkilledNightResolutionEvent =>
       e.type === "veteran-counterkilled",
   );
+  // Counter-killed player IDs that died (shown in the veteran-specific section)
+  // must be excluded from the generic killed list to avoid duplicate entries.
+  const veteranCounterkilledPlayerIds = new Set(
+    veteranCounterkills
+      .filter((e) => e.died)
+      .map((e) => e.counterkilledPlayerId),
+  );
   const regularEvents = events.filter(
     (e) =>
       e.type !== "altruist-intercepted" && e.type !== "veteran-counterkilled",
@@ -78,17 +85,22 @@ export function NightOutcomeSummary({
               </li>
             );
           })}
-        {Object.entries(eventsPerPlayer).map(([targetPlayerId, events]) => (
-          <li key={targetPlayerId}>
-            <NightOutcomeSummaryItem
-              playerName={
-                getPlayerName(players, targetPlayerId) ?? targetPlayerId
-              }
-              events={events}
-              roles={roles}
-            />
-          </li>
-        ))}
+        {Object.entries(eventsPerPlayer)
+          .filter(
+            ([targetPlayerId]) =>
+              !veteranCounterkilledPlayerIds.has(targetPlayerId),
+          )
+          .map(([targetPlayerId, events]) => (
+            <li key={targetPlayerId}>
+              <NightOutcomeSummaryItem
+                playerName={
+                  getPlayerName(players, targetPlayerId) ?? targetPlayerId
+                }
+                events={events}
+                roles={roles}
+              />
+            </li>
+          ))}
       </ul>
     </div>
   );

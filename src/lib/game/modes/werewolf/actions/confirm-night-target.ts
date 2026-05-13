@@ -20,6 +20,14 @@ export const confirmNightTargetAction: GameAction = {
       if (!activePhaseKey || isGroupPhaseKey(activePhaseKey)) return false;
       const action = phase.nightActions[activePhaseKey];
       if (!action || action.confirmed) return false;
+      // Mentalist requires both targets to be set (unless skipping entirely).
+      const roleDef = getWerewolfRole(activePhaseKey);
+      if (roleDef?.dualTargetInvestigate) {
+        if (!isTeamNightAction(action) && !action.skipped) {
+          if (!action.targetPlayerId || !action.secondTargetPlayerId)
+            return false;
+        }
+      }
       return true;
     }
 

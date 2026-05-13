@@ -60,7 +60,7 @@ Additional resolution steps:
 
 ### `confirm-night-target`
 
-**Who:** Active player
+**Who:** Active player (group and solo phases); Narrator (solo phases only, for no-device players)
 **When:** During Nighttime, turn 2+
 **Effect:** Locks in the player's selected target.
 

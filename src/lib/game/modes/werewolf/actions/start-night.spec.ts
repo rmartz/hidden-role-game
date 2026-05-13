@@ -372,4 +372,23 @@ describe("StartNight — Mirrorcaster charge persistence", () => {
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
     expect(ts.morticianAbilityEnded).toBeUndefined();
   });
+
+  it("carries veteranAlertsUsed forward to the next night", () => {
+    const game = makePlayingGame({
+      ...dayTurnState,
+      veteranAlertsUsed: 2,
+    });
+    startNightAction.apply(game, null, "owner-1");
+
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.veteranAlertsUsed).toBe(2);
+  });
+
+  it("does not carry veteranAlertsUsed when it is undefined", () => {
+    const game = makePlayingGame(dayTurnState);
+    startNightAction.apply(game, null, "owner-1");
+
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.veteranAlertsUsed).toBeUndefined();
+  });
 });

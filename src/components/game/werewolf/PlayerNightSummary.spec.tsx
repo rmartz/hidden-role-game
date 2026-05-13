@@ -65,4 +65,42 @@ describe("PlayerNightSummary", () => {
       screen.getByText(WEREWOLF_COPY.oldMan.peacefulDeath("Charlie")),
     ).toBeDefined();
   });
+
+  it("renders veteran-counterkill wolf-repel text", () => {
+    const nightStatus: DaytimeNightStatusEntry[] = [
+      {
+        targetPlayerId: "p1",
+        effect: "veteran-counterkill",
+        veteranPlayerId: "p2",
+        veteranCounterkillSource: "wolf-repel",
+      },
+    ];
+
+    render(<PlayerNightSummary players={players} nightStatus={nightStatus} />);
+
+    const expectedText = WEREWOLF_COPY.veteran.dayAnnouncementWolfRepel(
+      "Bob",
+      "Alice",
+    );
+    expect(screen.getByText(expectedText)).toBeDefined();
+  });
+
+  it("renders veteran-counterkill visitor text", () => {
+    const nightStatus: DaytimeNightStatusEntry[] = [
+      {
+        targetPlayerId: "p1",
+        effect: "veteran-counterkill",
+        veteranPlayerId: "p3",
+        veteranCounterkillSource: "visitor",
+      },
+    ];
+
+    render(<PlayerNightSummary players={players} nightStatus={nightStatus} />);
+
+    const expectedText = WEREWOLF_COPY.veteran.dayAnnouncementVisitorKilled(
+      "Charlie",
+      "Alice",
+    );
+    expect(screen.getByText(expectedText)).toBeDefined();
+  });
 });

@@ -301,6 +301,10 @@ export function resolveNightActions(
         const groupAction = action as TeamNightAction;
         if (groupAction.suggestedTargetId !== veteranPlayerId) continue;
 
+        // If the attack was already redirected away from the Veteran (e.g. by the
+        // Altruist), it is no longer in the attacks map — skip the counter-kill.
+        if (!attacks.get(veteranPlayerId)?.includes(phaseKey)) continue;
+
         // Remove this wolf-group's attack entry from the Veteran.
         removeFromMapSet(attacks, veteranPlayerId, phaseKey);
 

@@ -399,7 +399,7 @@ export function OwnerGameNightScreen({
                   alertsUsed={narratorVeteranAlertsUsed}
                   isAlerted={isVeteranAlerted}
                   hasDecided={veteranHasDecided}
-                  isConfirmed={activeTargetConfirmed}
+                  isConfirmed={false}
                   isPending={action.isPending}
                   onAlert={handleVeteranAlert}
                   onSkip={handleVeteranSkip}
