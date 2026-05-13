@@ -261,7 +261,9 @@ function applyMonarchProtection(
     return attackerRole?.team === Team.Bad;
   });
   const onlyLivingKnightedPlayerId =
-    livingKnightedPlayerIds.length === 1 ? livingKnightedPlayerIds[0] : undefined;
+    livingKnightedPlayerIds.length === 1
+      ? livingKnightedPlayerIds[0]
+      : undefined;
   const attackerIsOnlyLivingKnightedPlayer =
     onlyLivingKnightedPlayerId !== undefined &&
     attackerIds.includes(onlyLivingKnightedPlayerId);
