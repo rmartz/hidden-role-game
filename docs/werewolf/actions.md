@@ -22,6 +22,7 @@ Additional resolution steps:
 
 - **Vigilante self-death:** If the Vigilante's target is a Good-team player and was killed, the Vigilante also dies.
 - **Hunter revenge detection:** If a killed player is the Hunter, sets `hunterRevengePlayerId` on the Narrator's state and defers the win-condition check until revenge is resolved.
+- **Arsonist douse/ignite:** If the Arsonist targeted another player, that player is added to `arsonistDousedPlayerIds` in the new turn state. If the Arsonist self-targeted (ignite), all players in the existing `arsonistDousedPlayerIds` are simultaneously attacked (protections apply to each independently), and the doused list is reset to empty. Dead players are removed from the doused list during this step.
 
 ---
 
@@ -72,8 +73,12 @@ Additional resolution steps:
 ### `reveal-investigation-result`
 
 **Who:** Narrator only
-**When:** During Nighttime, active phase is an Investigate role (Seer, Wizard, One-Eyed Seer, Mystic Seer, Mentalist), action is confirmed
-**Effect:** Sets `resultRevealed: true` on the night action. This causes the Werewolf player state extraction to include the `investigationResult` in the investigating player's `WerewolfPlayerGameState`.
+**When:** During Nighttime, when either:
+
+- The active phase is an Investigate role (Seer, Wizard, One-Eyed Seer, Mystic Seer, Mentalist) and the action is confirmed, **or**
+- The active phase is the Illuminati (a `revealsFullRoleList` role) and the result has not yet been revealed (no target confirmation required)
+
+**Effect:** Sets `resultRevealed: true` on the night action. For Investigate roles, this causes the player state extraction to include `investigationResult` in the investigating player's `WerewolfPlayerGameState`. For the Illuminati, it causes all `roleAssignments` to be included as `illuminatiRoleAssignments` in the Illuminati player's state.
 
 ---
 
@@ -218,20 +223,43 @@ Additional resolution steps:
 ### `pause-timer`
 
 **Who:** Narrator only
-**When:** During Nighttime or Daytime, when the phase timer is not already paused (`pausedAt` is undefined)
-**Effect:** Records the current timestamp as `pausedAt` on the active phase, freezing the displayed elapsed time in the narrator's `GameTimer`.
+**When:** During Nighttime or Daytime, while a timer is running (not already paused). When a Daytime active trial is in progress (no verdict yet), targets the **trial timer** instead of the phase timer.
+**Effect:** Freezes the active timer by recording the current time in `pausedAt`. The elapsed-time formula switches to `pauseOffset + (pausedAt - startedAt)` (defense phase) or `pauseOffset + (pausedAt - voteStartedAt)` (voting phase) until the timer is resumed.
 
-**Payload:** none
+**Payload:** `{}` (no payload)
+
+**Validation:**
+
+- Phase must exist; narrator only.
+- If a Daytime active trial (no verdict): `activeTrial.pausedAt` must not already be set.
+- Otherwise: `phase.pausedAt` must not already be set.
+
+**Fields mutated:**
+
+- With active trial: `activeTrial.pausedAt`
+- Without active trial: `phase.pausedAt`
 
 ---
 
 ### `resume-timer`
 
 **Who:** Narrator only
-**When:** During Nighttime or Daytime, when the phase timer is paused (`pausedAt` is set)
-**Effect:** Accumulates the elapsed running time up to the pause point (`pausedAt - startedAt`) into `pauseOffset`, clears `pausedAt`, and resets `startedAt` to now so that elapsed time resumes from where it was when paused.
+**When:** During Nighttime or Daytime, while the timer is paused (`pausedAt` is set). When a Daytime active trial is in progress (no verdict yet), targets the **trial timer** instead of the phase timer.
+**Effect:** Resumes the active timer by accumulating the paused interval into `pauseOffset`, resetting the relevant start timestamp to now, and clearing `pausedAt`. During the trial voting phase, `voteStartedAt` is shifted forward instead of `startedAt`.
 
-**Payload:** none
+**Payload:** `{}` (no payload)
+
+**Validation:**
+
+- Phase must exist; narrator only.
+- If a Daytime active trial (no verdict): `activeTrial.pausedAt` must be set.
+- Otherwise: `phase.pausedAt` must be set.
+
+**Fields mutated:**
+
+- With active trial (defense phase): `activeTrial.pauseOffset`, `activeTrial.startedAt`, `activeTrial.pausedAt` (cleared)
+- With active trial (voting phase): `activeTrial.pauseOffset`, `activeTrial.voteStartedAt`, `activeTrial.pausedAt` (cleared)
+- Without active trial: `phase.pauseOffset`, `phase.startedAt`, `phase.pausedAt` (cleared)
 
 ---
 
@@ -308,7 +336,7 @@ interface TeamNightAction {
 - `{ type: "silenced", targetPlayerId }`
 - `{ type: "hypnotized", targetPlayerId }`
 - `{ type: "tough-guy-absorbed", targetPlayerId }`
-- `{ type: "altruist-intercepted", targetPlayerId }`
+- `{ type: "altruist-intercepted", altruistPlayerId, savedPlayerId }`
 
 After resolution, `start-day` performs additional checks:
 
@@ -368,7 +396,14 @@ When a player is voted out at trial (via `mark-player-dead` during Daytime), the
 Win conditions are evaluated after each death (night resolution or trial). The checks run in the following priority order:
 
 1. **Tanner instant win** — If the Tanner dies (at night or at trial), the game ends immediately with a Tanner win.
-2. **Lone Wolf check** (before general wolf win) — When wolves would win (all Good-team players eliminated), if the Lone Wolf is the only surviving wolf-aligned player, the Lone Wolf wins instead of Team Bad.
-3. **Standard team win** — Good wins if all Bad-team players are dead. Bad wins if wolves equal or outnumber Good-team players.
-4. **Spoiler override** (after team win determined) — If a standard team win is detected and the Spoiler is still alive, the Spoiler wins instead of the winning team.
-5. **Executioner win** — Evaluated independently at trial: if the Executioner's assigned target is voted out, the Executioner wins regardless of overall game state.
+2. **Zombie check** (before all other conditions) — If infected players alive outnumber healthy players alive, the Zombie wins.
+3. **Standard team checks** — Evaluated in this order:
+   - **Chupacabra win** — If no Bad-team players remain and the Chupacabra is alive with ≤ 1 Good player alive, the Chupacabra wins.
+   - **Draw** — If no Bad, Good, or Neutral players remain (simultaneous eliminations), the game ends in a draw.
+   - **Village wins** — If no Bad and no Neutral players remain (and Chupacabra is not alive), the Village wins.
+   - **Lone Wolf check** (before general wolf win) — When wolves would win (Bad count ≥ non-Bad count) and the Lone Wolf is the only surviving wolf-aligned player, the Lone Wolf wins instead of Team Bad.
+   - **Werewolves win** — If Bad team count ≥ non-Bad count (Good + Neutral + Chupacabra), the Werewolves win.
+4. **Illuminati override** (after standard win determined) — If a standard win condition fires and the Illuminati is alive and ≤ 3 total players remain, the Illuminati wins instead.
+5. **Spoiler override** (after team win determined) — If a standard win condition fires and the Spoiler is still alive (and Illuminati did not already override), the Spoiler wins instead of the winning team.
+6. **Executioner win** — Evaluated independently at trial: if the Executioner's assigned target is voted out, the Executioner wins regardless of overall game state.
+7. **Dracula win** — Checked separately in `startNightAction`, not in `checkWinCondition`.

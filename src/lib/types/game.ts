@@ -22,11 +22,26 @@ import type {
   CodenamesModeConfig,
 } from "@/lib/game/modes/codenames/lobby-config";
 
-export interface LobbyPlayer {
+export interface DeviceLobbyPlayer {
   id: string;
   name: string;
   sessionId: string;
+  noDevice?: false;
 }
+
+export interface NoDeviceLobbyPlayer {
+  id: string;
+  name: string;
+  sessionId?: undefined;
+  noDevice: true;
+}
+
+/**
+ * Discriminated union: a `DeviceLobbyPlayer` always has a `sessionId`; a
+ * `NoDeviceLobbyPlayer` never does and is managed entirely by the lobby owner.
+ * Narrow on `noDevice` (or `sessionId !== undefined`) to access the typed field.
+ */
+export type LobbyPlayer = DeviceLobbyPlayer | NoDeviceLobbyPlayer;
 
 // --- Game Status (no Lobby — Lobby is a separate concept) ---
 
@@ -50,19 +65,22 @@ export interface PlayingGameStatus {
 
 /**
  * Union of all valid winner identifiers across game modes.
- * Werewolf: "Village", "Werewolves", "Chupacabra", "Draw", "LoneWolf", "Tanner", "Spoiler", "Executioner"
+ * Werewolf: "Arsonist", "Village", "Werewolves", "Chupacabra", "Draw", "LoneWolf", "Tanner", "Spoiler", "Executioner", "Illuminati", "Dracula", "Zombie"
  * Secret Villain: "Good", "Bad"
  */
 export type GameWinner =
+  | "Arsonist"
   | "Village"
   | "Werewolves"
   | "Chupacabra"
   | "Draw"
   | "Dracula"
+  | "Illuminati"
   | "LoneWolf"
   | "Tanner"
   | "Spoiler"
   | "Executioner"
+  | "Evil"
   | "Good"
   | "Bad"
   | "Zombie";
@@ -322,9 +340,7 @@ export interface VisiblePlayer {
   roleId?: string;
 }
 
-export interface GamePlayer extends LobbyPlayer {
-  visiblePlayers: VisiblePlayer[];
-}
+export type GamePlayer = LobbyPlayer & { visiblePlayers: VisiblePlayer[] };
 
 // --- Game (exists only after the game has been started) ---
 
@@ -368,6 +384,11 @@ export interface ClocktowerGame extends BaseGame {
   gameMode: GameMode.Clocktower;
   timerConfig: TimerConfig;
   modeConfig: ClocktowerModeConfig;
+  /**
+   * The Townsfolk role ID shown to the Drunk player as their fake token.
+   * Assigned at game creation; only present when the Drunk is in play.
+   */
+  drunkFakeRoleId?: string;
 }
 
 export interface CodenamesGame extends BaseGame {

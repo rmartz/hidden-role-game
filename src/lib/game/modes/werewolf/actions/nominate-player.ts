@@ -18,7 +18,7 @@ export const nominatePlayerAction: GameAction = {
     if (ts.phase.activeTrial && !ts.phase.activeTrial.verdict) return false;
     // Trials-per-day limit: cannot nominate once the limit has been reached
     if (
-      trialsPerDay > 0 &&
+      trialsPerDay !== undefined &&
       (ts.phase.concludedTrialsCount ?? 0) >= trialsPerDay
     )
       return false;
@@ -26,6 +26,7 @@ export const nominatePlayerAction: GameAction = {
     // Silenced players cannot nominate
     const silencedIds = getSilencedPlayerIds(ts);
     if (silencedIds.includes(callerId)) return false;
+    if (!payload || typeof payload !== "object") return false;
     const { defendantId } = payload as { defendantId?: unknown };
     if (typeof defendantId !== "string") return false;
     // Cannot nominate yourself, the owner, or a dead player
@@ -42,6 +43,7 @@ export const nominatePlayerAction: GameAction = {
   apply(game: Game, payload: unknown, callerId: string) {
     const ts = currentTurnState(game);
     if (ts?.phase.type !== WerewolfPhase.Daytime) return;
+    if (!payload || typeof payload !== "object") return;
     const { defendantId } = payload as { defendantId: string };
 
     // Remove any prior nomination by this caller

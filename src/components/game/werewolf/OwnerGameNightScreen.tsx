@@ -32,10 +32,13 @@ import { useGameAction } from "@/hooks";
 import { GameTimer } from "@/components/game";
 import { OwnerAdvanceCard } from "./OwnerAdvanceCard";
 import { OwnerInvestigationConfirm } from "./OwnerInvestigationConfirm";
+import { OwnerIlluminatiRevealPanel } from "./OwnerIlluminatiRevealPanel";
 import { OwnerNightTargetPanel } from "./OwnerNightTargetPanel";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
 import { NightPhaseOrderList } from "./NightPhaseOrderList";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import { buildNarratorInstruction } from "@/lib/game/modes/werewolf";
+import { NarratorNightInstruction } from "./NarratorNightInstruction";
 
 interface OwnerGameNightScreenProps {
   gameId: string;
@@ -136,6 +139,16 @@ export function OwnerGameNightScreen({
       : undefined;
 
   const isFirstTurn = turnState.turn === 1;
+  const activeRoleIds = isFirstTurn
+    ? new Set(
+        gameState.visibleRoleAssignments.flatMap((a) =>
+          a.role ? [a.role.id] : [],
+        ),
+      )
+    : new Set<string>();
+  const narratorInstruction = isFirstTurn
+    ? buildNarratorInstruction(activePhaseKey, activeRoleIds)
+    : undefined;
 
   const isActionConfirmed = isGroupPhase
     ? !!groupAction?.confirmed
@@ -154,6 +167,15 @@ export function OwnerGameNightScreen({
     "resultRevealed" in activeAction &&
     activeAction.resultRevealed
   );
+
+  const isIlluminatiPhase = activeRoleDef?.revealsFullRoleList === true;
+  const isIlluminatiRevealed =
+    isIlluminatiPhase &&
+    !!(
+      activeAction &&
+      !isTeamNightAction(activeAction) &&
+      activeAction.resultRevealed
+    );
 
   const secondTargetId =
     activeAction && !isTeamNightAction(activeAction)
@@ -190,7 +212,9 @@ export function OwnerGameNightScreen({
       ? WEREWOLF_COPY.narrator.playerUnconfirmed
       : investigationResult && !isResultRevealed
         ? WEREWOLF_COPY.narrator.investigationUnrevealed
-        : undefined;
+        : isIlluminatiPhase && !isIlluminatiRevealed
+          ? WEREWOLF_COPY.illuminati.revealUnconfirmed
+          : undefined;
 
   const advanceIcon = unconfirmedWarning ? (
     <ClockWarningRegular />
@@ -296,6 +320,9 @@ export function OwnerGameNightScreen({
               <span> ({activePlayerNames.join(", ")})</span>
             )}
           </p>
+          {isFirstTurn && narratorInstruction && (
+            <NarratorNightInstruction instruction={narratorInstruction} />
+          )}
           {isRoleActive(activePhaseKey, WerewolfRole.Mirrorcaster) && (
             <p className="mb-3 text-sm text-muted-foreground italic">
               {turnState.mirrorcasterCharged
@@ -362,6 +389,14 @@ export function OwnerGameNightScreen({
               isResultRevealed={isResultRevealed}
               resultLabel={investigationResult.resultLabel}
               secondTargetName={investigationResult.secondTargetName}
+            />
+          )}
+          {isIlluminatiPhase && (
+            <OwnerIlluminatiRevealPanel
+              gameId={gameId}
+              players={gameState.players}
+              roleAssignments={gameState.visibleRoleAssignments}
+              isRevealed={isIlluminatiRevealed}
             />
           )}
           {exposerRevealText && (

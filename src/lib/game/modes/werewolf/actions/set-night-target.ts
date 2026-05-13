@@ -22,6 +22,7 @@ export const setNightTargetAction: GameAction = {
     if (ts.turn <= 1) return false;
 
     const phase = ts.phase;
+    if (!payload || typeof payload !== "object") return false;
     const { roleId: explicitPhaseKey, targetPlayerId } = payload as {
       roleId?: unknown;
       targetPlayerId?: unknown;
@@ -135,6 +136,8 @@ export const setNightTargetAction: GameAction = {
         game.roleAssignments,
         ts.deadPlayerIds,
         ts.priestWards,
+        ts.mirrorcasterCharged,
+        ts.arsonistDousedPlayerIds,
       );
       if (!attacked.includes(callerId)) return false;
     }
@@ -159,6 +162,7 @@ export const setNightTargetAction: GameAction = {
     if (ts?.phase.type !== WerewolfPhase.Nighttime) return;
 
     const phase = ts.phase;
+    if (!payload || typeof payload !== "object") return;
     const {
       roleId: explicitPhaseKey,
       targetPlayerId,

@@ -15,9 +15,13 @@ const meta = {
     onRemovePlayer: noop,
     onTransferOwner: noop,
     onRenamePlayer: noop,
+    onRenameNoDevicePlayer: noop,
+    onAddNoDevicePlayer: noop,
     onToggleReady: noop,
     onReorderPlayers: fn(),
     isRenamePending: false,
+    isOwnerRenamePending: false,
+    isAddNoDevicePending: false,
   },
 } satisfies Meta<typeof PlayerList>;
 
@@ -103,7 +107,7 @@ export const OwnerView: Story = {
 
     await expect(canvas.getByText("Alice")).toBeDefined();
     await expect(
-      canvas.getByRole("button", { name: PLAYER_LIST_COPY.readyButton }),
+      canvas.getByRole("button", { name: PLAYER_LIST_COPY.addNoDeviceButton }),
     ).toBeDefined();
     await expect(canvas.getByText(PLAYER_LIST_COPY.dragHint)).toBeDefined();
   },
@@ -143,6 +147,32 @@ export const SinglePlayerOwner: Story = {
     showRemovePlayer: false,
     showMakeOwner: false,
     showRefresh: true,
+    isFetching: false,
+    disabled: false,
+    isReadyPending: false,
+    countdownDurationSeconds: 5,
+  },
+};
+
+export const OwnerWithNoDevicePlayers: Story = {
+  args: {
+    lobby: {
+      ...baseLobby,
+      players: [
+        { id: "p1", name: "Alice" },
+        { id: "p2", name: "Bob" },
+        { id: "nd1", name: "Charlie (no device)", noDevice: true },
+        { id: "nd2", name: "Diana (no device)", noDevice: true },
+      ],
+      playerOrder: ["p1", "p2", "nd1", "nd2"],
+      readyPlayerIds: ["p2"],
+    },
+    userPlayerId: "p1",
+    isOwner: true,
+    showLeave: false,
+    showRemovePlayer: true,
+    showMakeOwner: true,
+    showRefresh: false,
     isFetching: false,
     disabled: false,
     isReadyPending: false,
