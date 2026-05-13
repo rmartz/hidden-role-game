@@ -170,8 +170,6 @@ export const WEREWOLF_COPY = {
   },
   exposer: {
     abilityUsed: "You have already used your Exposer ability this game.",
-    publicReveal: (playerName: string, roleName: string) =>
-      `The Exposer has revealed ${playerName}'s role: ${roleName}`,
     nightSummary: (playerName: string, roleName: string) =>
       `${playerName} was exposed to be the ${roleName}.`,
   },

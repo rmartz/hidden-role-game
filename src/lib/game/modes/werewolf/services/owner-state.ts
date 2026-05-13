@@ -112,9 +112,11 @@ export function extractDaytimeNightSummary(
     return [];
   });
 
-  // Exposer reveal: emit an "exposed" entry visible to all players.
-  if (ts.exposerReveal) {
-    const exposerReveal = ts.exposerReveal;
+  // Exposer reveal: emit an "exposed" entry visible to all players. The reveal
+  // lives on the daytime phase so it only surfaces on the day after the
+  // exposure, not on every subsequent day.
+  if (phase.exposerReveal) {
+    const exposerReveal = phase.exposerReveal;
     const revealedPlayer = game.players.find(
       (p) => p.id === exposerReveal.playerId,
     );
