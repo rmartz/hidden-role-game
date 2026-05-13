@@ -150,10 +150,37 @@ function applyPriestWards(
   }
 }
 
+/** Adds Arsonist ignite attacks to the attacks map when the Arsonist self-targeted. */
+function applyArsonistIgnite(
+  attacks: Map<string, string[]>,
+  nightActions: Record<string, AnyNightAction>,
+  roleAssignments: PlayerRoleAssignment[],
+  arsonistDousedPlayerIds: string[] | undefined,
+): void {
+  if (!arsonistDousedPlayerIds?.length) return;
+  const arsonistAction = nightActions[WerewolfRole.Arsonist] as
+    | { targetPlayerId?: string }
+    | undefined;
+  const arsonistPlayerId = roleAssignments.find(
+    (a) => a.roleDefinitionId === (WerewolfRole.Arsonist as string),
+  )?.playerId;
+  if (
+    arsonistAction?.targetPlayerId &&
+    arsonistAction.targetPlayerId === arsonistPlayerId
+  ) {
+    for (const dousedId of arsonistDousedPlayerIds) {
+      attacks.set(dousedId, [
+        ...(attacks.get(dousedId) ?? []),
+        WerewolfRole.Arsonist,
+      ]);
+    }
+  }
+}
+
 /**
  * Returns player IDs who are currently attacked but not yet protected,
  * excluding the Witch's own action. Used to show the Witch their available
- * targets before they act. Also considers priest wards.
+ * targets before they act. Also considers priest wards and Arsonist ignite.
  */
 export function getInterimAttackedPlayerIds(
   nightActions: Record<string, AnyNightAction>,
@@ -162,6 +189,7 @@ export function getInterimAttackedPlayerIds(
   priestWards?: Record<string, string>,
   mirrorcasterCharged?: boolean,
   mercenaryCharged?: boolean,
+  arsonistDousedPlayerIds?: string[],
 ): string[] {
   const { attacks, protections } = collectBaseAttacksAndProtections(
     nightActions,
@@ -169,6 +197,12 @@ export function getInterimAttackedPlayerIds(
     deadPlayerIds,
     mirrorcasterCharged,
     mercenaryCharged,
+  );
+  applyArsonistIgnite(
+    attacks,
+    nightActions,
+    roleAssignments,
+    arsonistDousedPlayerIds,
   );
   if (priestWards) applyPriestWards(attacks, protections, priestWards);
   return Array.from(attacks.keys()).filter((id) => !protections.has(id));
@@ -197,6 +231,11 @@ export interface NightResolutionOptions {
   mirrorcasterCharged?: boolean;
   /** When true, the Mercenary is in Bribe mode (charged from a prior protection). */
   mercenaryCharged?: boolean;
+  /**
+   * Player IDs that the Arsonist has previously doused. When the Arsonist
+   * self-targets (ignite), all of these players are simultaneously attacked.
+   */
+  arsonistDousedPlayerIds?: string[];
 }
 
 export function resolveNightActions(
@@ -212,6 +251,15 @@ export function resolveNightActions(
     deadPlayerIds,
     options?.mirrorcasterCharged,
     options?.mercenaryCharged,
+  );
+
+  // Arsonist ignite: if the Arsonist self-targeted, attack every doused player simultaneously.
+  // Applied before Priest wards and the Witch so that wards/protections can apply to ignite targets.
+  applyArsonistIgnite(
+    attacks,
+    nightActions,
+    roleAssignments,
+    options?.arsonistDousedPlayerIds,
   );
 
   // Priest wards: warded players count as protected.

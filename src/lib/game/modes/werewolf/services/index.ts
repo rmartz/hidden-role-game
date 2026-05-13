@@ -27,6 +27,7 @@ import { WEREWOLF_COPY } from "../copy";
 import type { VictoryCondition } from "@/server/types/game";
 
 const WEREWOLF_WINNER_TEAMS = {
+  [WerewolfWinner.Arsonist]: Team.Neutral,
   [WerewolfWinner.Village]: Team.Good,
   [WerewolfWinner.Werewolves]: Team.Bad,
   [WerewolfWinner.Tanner]: Team.Neutral,

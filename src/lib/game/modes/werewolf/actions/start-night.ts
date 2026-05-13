@@ -57,6 +57,11 @@ export const startNightAction: GameAction = {
       (id) => !ts.deadPlayerIds.includes(id),
     );
 
+    // Arsonist: carry forward doused list (filtering out the dead).
+    const aliveDousedPlayerIds = (ts.arsonistDousedPlayerIds ?? []).filter(
+      (id) => !ts.deadPlayerIds.includes(id),
+    );
+
     game.status = {
       type: GameStatus.Playing,
       turnState: {
@@ -94,6 +99,9 @@ export const startNightAction: GameAction = {
           : {}),
         ...(aliveWives.length > 0 ? { draculaWives: aliveWives } : {}),
         ...(aliveInfected.length > 0 ? { zombieInfected: aliveInfected } : {}),
+        ...(aliveDousedPlayerIds.length > 0
+          ? { arsonistDousedPlayerIds: aliveDousedPlayerIds }
+          : {}),
       },
     };
 
