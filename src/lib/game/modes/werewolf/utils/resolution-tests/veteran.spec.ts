@@ -418,6 +418,5 @@ describe("resolveNightActions", () => {
         events.find((e) => e.type === "veteran-counterkilled"),
       ).toBeUndefined();
     });
-
   });
 });

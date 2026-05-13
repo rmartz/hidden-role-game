@@ -9,7 +9,10 @@ import { extractDaytimeNightSummary } from "./owner-state";
 
 function makeDaytimeGame(
   nightResolution: NightResolutionEvent[],
-  overrides: Partial<{ revealedPlayerIds: string[]; ownerPlayerId: string }> = {},
+  overrides: Partial<{
+    revealedPlayerIds: string[];
+    ownerPlayerId: string;
+  }> = {},
 ): Game {
   const ts: WerewolfTurnState = {
     turn: 2,
@@ -51,7 +54,7 @@ function makeDaytimeGame(
       autoRevealNightOutcome: false,
     },
     timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
-  } as Game;
+  };
 }
 
 describe("extractDaytimeNightSummary — veteran-counterkill mapping", () => {

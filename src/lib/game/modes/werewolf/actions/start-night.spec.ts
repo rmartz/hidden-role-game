@@ -332,9 +332,9 @@ describe("StartNight — Wolf Cub bonus phase lifecycle", () => {
   });
 });
 
-describe("StartNight — Mirrorcaster charge persistence", () => {
-  const startNightAction = WEREWOLF_ACTIONS[WerewolfAction.StartNight];
+const startNightAction = WEREWOLF_ACTIONS[WerewolfAction.StartNight];
 
+describe("StartNight — Mirrorcaster charge persistence", () => {
   it("carries mirrorcasterCharged forward to the next night", () => {
     const game = makePlayingGame({
       ...dayTurnState,
@@ -375,8 +375,6 @@ describe("StartNight — Mirrorcaster charge persistence", () => {
 });
 
 describe("StartNight — veteranAlertsUsed persistence", () => {
-  const startNightAction = WEREWOLF_ACTIONS[WerewolfAction.StartNight];
-
   it("carries veteranAlertsUsed forward to the next night", () => {
     const game = makePlayingGame({
       ...dayTurnState,
