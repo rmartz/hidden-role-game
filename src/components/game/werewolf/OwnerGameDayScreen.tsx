@@ -163,6 +163,7 @@ export function OwnerGameDayScreen({
               gameId={gameId}
               activeTrial={activeTrial}
               players={gameState.players}
+              deadPlayerIds={gameState.deadPlayerIds ?? []}
               votePhaseSeconds={votePhaseSeconds}
               defensePhaseSeconds={defensePhaseSeconds}
               autoAdvance={autoAdvance}

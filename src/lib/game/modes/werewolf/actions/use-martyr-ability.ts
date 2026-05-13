@@ -1,6 +1,7 @@
+import { GameStatus } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase } from "../types";
-import { currentTurnState, checkWinCondition } from "../utils";
+import { currentTurnState, checkWinCondition, WerewolfWinner } from "../utils";
 import { WerewolfRole } from "../roles";
 import { didWolfCubDie, cleanupAfterDaytimeKill } from "./helpers";
 
@@ -48,6 +49,23 @@ export const useMartyrAbilityAction: GameAction = {
         ts.wolfCubDied = true;
       }
       cleanupAfterDaytimeKill(callerId, ts);
+    }
+
+    // Executioner wins if their target was the Martyr (who voluntarily died).
+    if (ts.executionerTargetId === callerId) {
+      const executionerAssignment = game.roleAssignments.find(
+        (a) => a.roleDefinitionId === (WerewolfRole.Executioner as string),
+      );
+      const executionerAlive =
+        executionerAssignment !== undefined &&
+        !ts.deadPlayerIds.includes(executionerAssignment.playerId);
+      if (executionerAlive) {
+        game.status = {
+          type: GameStatus.Finished,
+          winner: WerewolfWinner.Executioner,
+        };
+        return;
+      }
     }
 
     const winResult = checkWinCondition(game, ts.deadPlayerIds);

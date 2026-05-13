@@ -244,5 +244,44 @@ describe("WerewolfAction.UseMartyrAbility", () => {
       const dayTs = (game.status as { turnState: WerewolfTurnState }).turnState;
       expect(dayTs.martyrUsed).toBe(true);
     });
+
+    it("Executioner wins when Martyr is their target and Martyr self-sacrifices", () => {
+      const ts: WerewolfTurnState = {
+        ...makeDayStateWithMartyrWindow("p3"),
+        executionerTargetId: "p2",
+      };
+      const game = makePlayingGame(ts, {
+        roleAssignments: [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Martyr },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p4", roleDefinitionId: WerewolfRole.Executioner },
+          { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+        ],
+      });
+      action.apply(game, {}, "p2");
+      expect(game.status.type).toBe(GameStatus.Finished);
+      expect((game.status as { winner?: string }).winner).toBe(
+        WerewolfWinner.Executioner,
+      );
+    });
+
+    it("Executioner does not win when they are dead when Martyr self-sacrifices", () => {
+      const ts: WerewolfTurnState = {
+        ...makeDayStateWithMartyrWindow("p3", ["p4"]),
+        executionerTargetId: "p2",
+      };
+      const game = makePlayingGame(ts, {
+        roleAssignments: [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Martyr },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p4", roleDefinitionId: WerewolfRole.Executioner },
+          { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+        ],
+      });
+      action.apply(game, {}, "p2");
+      expect(game.status.type).toBe(GameStatus.Playing);
+    });
   });
 });

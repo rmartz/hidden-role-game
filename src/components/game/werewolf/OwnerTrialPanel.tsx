@@ -18,6 +18,7 @@ interface OwnerTrialPanelProps {
   gameId: string;
   activeTrial: ActiveTrial;
   players: PublicLobbyPlayer[];
+  deadPlayerIds: string[];
   votePhaseSeconds: number;
   defensePhaseSeconds: number;
   autoAdvance: boolean;
@@ -28,6 +29,7 @@ export function OwnerTrialPanel({
   gameId,
   activeTrial,
   players,
+  deadPlayerIds,
   votePhaseSeconds,
   defensePhaseSeconds,
   autoAdvance,
@@ -75,10 +77,16 @@ export function OwnerTrialPanel({
       ? new Date(activeTrial.pausedAt)
       : undefined;
   const trialPauseOffset = activeTrial.pauseOffset ?? 0;
+  const defendantSpared =
+    activeTrial.verdict === TrialVerdict.Eliminated &&
+    !pendingGuiltId &&
+    !deadPlayerIds.includes(activeTrial.defendantId);
   const verdictLabel = activeTrial.verdict
-    ? activeTrial.verdict === TrialVerdict.Eliminated
-      ? trial.verdictLabelEliminated
-      : trial.verdictLabelInnocent
+    ? defendantSpared
+      ? trial.verdictLabelSpared
+      : activeTrial.verdict === TrialVerdict.Eliminated
+        ? trial.verdictLabelEliminated
+        : trial.verdictLabelInnocent
     : undefined;
   const trialStartedAt = new Date(activeTrial.startedAt);
   const voteTimerStartedAt = activeTrial.voteStartedAt
