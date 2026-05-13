@@ -147,6 +147,29 @@ describe("WerewolfAction.StartDay — Mercenary bribe tracking", () => {
     expect(ts.mercenaryCharged).toBeUndefined();
   });
 
+  it("does not duplicate bribed player IDs when same player is bribed again", () => {
+    const baseState = makeNightState({
+      nightActions: {
+        [WerewolfRole.Mercenary]: { targetPlayerId: "p3" },
+      },
+      nightPhaseOrder: [WerewolfRole.Mercenary],
+    });
+    const game = makePlayingGame(
+      {
+        ...baseState,
+        mercenaryCharged: true,
+        mercenaryBribedPlayerIds: ["p3"],
+      },
+      { roleAssignments: mercRoleAssignments },
+    );
+
+    action.apply(game, null, "owner-1");
+
+    const ts = getTurnState(game);
+    expect(ts.mercenaryBribedPlayerIds).toEqual(["p3"]);
+    expect(ts.mercenaryCharged).toBeUndefined();
+  });
+
   it("protect mode does not interact with bribed player IDs", () => {
     const game = makePlayingGame(
       makeNightState({

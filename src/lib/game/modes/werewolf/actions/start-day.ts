@@ -303,11 +303,12 @@ export const startDayAction: GameAction = {
         !isTeamNightAction(mercAction) &&
         mercAction.targetPlayerId !== undefined
       ) {
-        // Bribe used: append target and clear charge.
-        mercenaryBribedPlayerIds = [
-          ...mercenaryBribedPlayerIds,
+        // Bribe used: append target (deduplicating) and clear charge.
+        mercenaryBribedPlayerIds = mercenaryBribedPlayerIds.includes(
           mercAction.targetPlayerId,
-        ];
+        )
+          ? mercenaryBribedPlayerIds
+          : [...mercenaryBribedPlayerIds, mercAction.targetPlayerId];
       } else {
         // Bribe not used: carry charge forward.
         mercenaryCharged = true;

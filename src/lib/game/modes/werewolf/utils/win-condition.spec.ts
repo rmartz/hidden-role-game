@@ -592,6 +592,7 @@ describe("checkWinCondition", () => {
         [
           { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
           { playerId: "p2", roleDefinitionId: WerewolfRole.Mercenary },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
         ],
         makeDayTurnState({
           mercenaryBribedPlayerIds: ["p3"],
@@ -599,8 +600,9 @@ describe("checkWinCondition", () => {
         }),
       );
       // Wolf dead → Village wins; but bribed player p3 is dead → Mercenary doesn't win
-      const result = checkWinCondition(game, []);
+      const result = checkWinCondition(game, ["p3"]);
       expect(result?.winner).toBe(WerewolfWinner.Village);
+      expect(result?.victoryConditionKey).toBeUndefined();
     });
 
     it("Mercenary does not win when they have no bribed players", () => {
@@ -758,6 +760,26 @@ describe("checkWinCondition", () => {
       );
       const result = checkWinCondition(game, []);
       expect(result?.winner).toBe(WerewolfWinner.Zombie);
+      expect(result?.victoryConditionKey).toBe(WerewolfWinner.Mercenary);
+    });
+
+    it("Mercenary co-wins with Arsonist when the Arsonist is bribed and wins", () => {
+      // p1=Arsonist, p2=Mercenary; Bad dead → Arsonist wins (≤1 Good remains);
+      // Mercenary bribed the Arsonist → co-win
+      const game = makeGame(
+        [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Arsonist },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Mercenary },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+        ],
+        makeDayTurnState({
+          mercenaryBribedPlayerIds: ["p1"],
+          deadPlayerIds: ["p3"],
+        }),
+      );
+      // Arsonist + Mercenary remain; ≤1 Good (p3 dead) → Arsonist wins; Mercenary bribed Arsonist → co-win
+      const result = checkWinCondition(game, ["p3"]);
+      expect(result?.winner).toBe(WerewolfWinner.Arsonist);
       expect(result?.victoryConditionKey).toBe(WerewolfWinner.Mercenary);
     });
   });

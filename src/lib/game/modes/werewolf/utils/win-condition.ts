@@ -240,8 +240,8 @@ export type WerewolfWinner =
  * Checks whether a bribed player is on the winning side for the given winner.
  * For team wins (Village, Werewolves), the bribed player must be alive
  * and on the winning team. For individual-role wins (Spoiler, Illuminati,
- * LoneWolf, Chupacabra, Executioner, Zombie, Dracula), the bribed player
- * must be alive and have that specific winning role.
+ * LoneWolf, Arsonist, Chupacabra, Executioner, Zombie, Dracula), the bribed
+ * player must be alive and have that specific winning role.
  */
 function isBribedPlayerOnWinningSide(
   bribedId: string,
@@ -264,6 +264,7 @@ function isBribedPlayerOnWinningSide(
 
   // Individual-role wins: bribed player must be that specific winning role.
   const winnerToRole: Partial<Record<string, string>> = {
+    [WerewolfWinner.Arsonist]: WerewolfRole.Arsonist,
     [WerewolfWinner.Chupacabra]: WerewolfRole.Chupacabra,
     [WerewolfWinner.Dracula]: WerewolfRole.Dracula,
     [WerewolfWinner.Executioner]: WerewolfRole.Executioner,
