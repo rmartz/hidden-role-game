@@ -117,6 +117,10 @@ export interface ActiveTrial {
   phase: TrialPhase;
   /** Unix epoch ms when the voting phase began. Set when transitioning from defense to voting. */
   voteStartedAt?: number;
+  /** Unix epoch ms when the narrator paused the active trial timer. Absent when running. */
+  pausedAt?: number;
+  /** Accumulated elapsed milliseconds from prior running segments, carried into this one on resume. */
+  pauseOffset?: number;
   votes: { playerId: string; vote: DaytimeVote }[];
   verdict?: TrialVerdict;
 }
@@ -206,6 +210,8 @@ export interface WerewolfTurnState {
    * tapped player can read the notification before it is cleared next night.
    */
   thingTapped?: string;
+  /** Player IDs that the Arsonist has doused. Accumulated across nights; reset after an ignite. */
+  arsonistDousedPlayerIds?: string[];
 }
 
 export interface TargetablePlayer {

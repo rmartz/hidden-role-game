@@ -73,6 +73,9 @@ export const startDayAction: GameAction = {
         toughGuyHitIds: ts.toughGuyHitIds,
         ...(oldManTimerPlayerId ? { oldManTimerPlayerId } : {}),
         ...(ts.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
+        ...(ts.arsonistDousedPlayerIds?.length
+          ? { arsonistDousedPlayerIds: ts.arsonistDousedPlayerIds }
+          : {}),
       },
     );
     const newDeadIds: string[] = nightResolution
@@ -327,6 +330,38 @@ export const startDayAction: GameAction = {
         ? thingAction.targetPlayerId
         : undefined;
 
+    // Arsonist: update the doused player list.
+    // If the Arsonist self-targeted (ignite), reset the doused list.
+    // If the Arsonist targeted another player (douse), add them to the list.
+    const arsonistAssignment = game.roleAssignments.find(
+      (a) => a.roleDefinitionId === (WerewolfRole.Arsonist as string),
+    );
+    const arsonistAction = nightPhase.nightActions[WerewolfRole.Arsonist];
+    let arsonistDousedPlayerIds = (ts.arsonistDousedPlayerIds ?? []).filter(
+      (id) => !updatedDeadIds.includes(id),
+    );
+    if (
+      arsonistAssignment &&
+      arsonistAction &&
+      !isTeamNightAction(arsonistAction) &&
+      arsonistAction.targetPlayerId
+    ) {
+      if (arsonistAction.targetPlayerId === arsonistAssignment.playerId) {
+        // Ignite: reset the doused list (regardless of whether the Arsonist died)
+        arsonistDousedPlayerIds = [];
+      } else if (
+        !updatedDeadIds.includes(arsonistAssignment.playerId) &&
+        !arsonistDousedPlayerIds.includes(arsonistAction.targetPlayerId) &&
+        !updatedDeadIds.includes(arsonistAction.targetPlayerId)
+      ) {
+        // Douse: add to the list (deduplicated, skip if already dead, skip if Arsonist died)
+        arsonistDousedPlayerIds = [
+          ...arsonistDousedPlayerIds,
+          arsonistAction.targetPlayerId,
+        ];
+      }
+    }
+
     const wolfCubDied =
       ts.wolfCubDied === true || didWolfCubDie(newDeadIds, game);
     const revealedPlayerIds = getWerewolfModeConfig(game).autoRevealNightOutcome
@@ -366,6 +401,9 @@ export const startDayAction: GameAction = {
         ...(draculaWives.length > 0 ? { draculaWives } : {}),
         ...(zombieInfected.length > 0 ? { zombieInfected } : {}),
         ...(thingTapped ? { thingTapped } : {}),
+        ...(arsonistDousedPlayerIds.length > 0
+          ? { arsonistDousedPlayerIds }
+          : {}),
       },
     };
 

@@ -111,6 +111,8 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   myNominatedDefendantId?: string;
   /** Player IDs pending elimination at the end of the next night (narrator daytime smite). */
   pendingSmitePlayerIds?: string[];
+  /** Arsonist: player IDs that have been doused by the Arsonist. */
+  arsonistDousedPlayerIds?: string[];
   /** True if the player is silenced this day. */
   isSilenced?: boolean;
   /** True if the player is hypnotized by the Mummy. */
@@ -121,6 +123,10 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
     startedAt: number;
     phase: TrialPhase;
     voteStartedAt?: number;
+    /** Unix epoch ms when the narrator paused the active trial timer. Absent when running. */
+    pausedAt?: number;
+    /** Accumulated elapsed milliseconds from prior running segments, carried into this one on resume. */
+    pauseOffset?: number;
     myVote?: DaytimeVote;
     voteCount: number;
     playerCount: number;

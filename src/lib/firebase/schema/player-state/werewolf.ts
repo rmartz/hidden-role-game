@@ -39,6 +39,8 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
     startedAt: number;
     phase: string;
     voteStartedAt?: number;
+    pausedAt?: number;
+    pauseOffset?: number;
     myVote?: DaytimeVote;
     voteCount: number;
     playerCount: number;
@@ -76,6 +78,8 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
   insomniacResult?: { leftActed: boolean; rightActed: boolean };
   countResult?: { leftCount: number; rightCount: number };
   adjacentPlayerIds?: string[];
+  /** Arsonist: player IDs that have been doused. */
+  arsonistDousedPlayerIds?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -164,6 +168,9 @@ export function werewolfStateToFirebase(
     ...(state.countResult ? { countResult: state.countResult } : {}),
     ...(state.adjacentPlayerIds?.length
       ? { adjacentPlayerIds: state.adjacentPlayerIds }
+      : {}),
+    ...(state.arsonistDousedPlayerIds?.length
+      ? { arsonistDousedPlayerIds: state.arsonistDousedPlayerIds }
       : {}),
   };
 }
@@ -264,6 +271,9 @@ export function werewolfStateFromFirebase(
     ...(raw.countResult ? { countResult: raw.countResult } : {}),
     ...(raw.adjacentPlayerIds?.length
       ? { adjacentPlayerIds: raw.adjacentPlayerIds }
+      : {}),
+    ...(raw.arsonistDousedPlayerIds?.length
+      ? { arsonistDousedPlayerIds: raw.arsonistDousedPlayerIds }
       : {}),
   } as WerewolfPlayerGameState;
 }
