@@ -596,7 +596,7 @@ describe("checkWinCondition", () => {
         ],
         makeDayTurnState({
           mercenaryBribedPlayerIds: ["p3"],
-          deadPlayerIds: ["p3"],
+          deadPlayerIds: [],
         }),
       );
       // Wolf dead → Village wins; but bribed player p3 is dead → Mercenary doesn't win
