@@ -302,5 +302,97 @@ describe("resolveNightActions", () => {
         died: false,
       });
     });
+
+    it("Altruist intercepts a wolf attack on alerted Veteran: wolf NOT counter-killed, Altruist dies", () => {
+      const altruistAssignments = [
+        { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "vet1", roleDefinitionId: WerewolfRole.Veteran },
+        { playerId: "alt1", roleDefinitionId: WerewolfRole.Altruist },
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+      ];
+
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Werewolf]: {
+            votes: [{ playerId: "w1", targetPlayerId: "vet1" }],
+            suggestedTargetId: "vet1",
+          },
+          [WerewolfRole.Altruist]: { targetPlayerId: "vet1" },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        altruistAssignments,
+        [],
+      );
+
+      // Altruist intercepted the attack; the wolf is not counter-killed.
+      const wolfKilled = findKilled(events, "w1");
+      expect(wolfKilled).toBeUndefined();
+
+      // Altruist took the wolf attack and died.
+      const altKilled = findKilled(events, "alt1");
+      expect(altKilled).toMatchObject({ died: true });
+
+      // Veteran survives.
+      const vetKilled = findKilled(events, "vet1");
+      expect(vetKilled).toBeUndefined();
+
+      // Altruist intercept event is emitted.
+      const interceptEvent = events.find(
+        (e) => e.type === "altruist-intercepted",
+      );
+      expect(interceptEvent).toMatchObject({
+        type: "altruist-intercepted",
+        altruistPlayerId: "alt1",
+        savedPlayerId: "vet1",
+      });
+
+      // No veteran-counterkilled event for the wolf.
+      expect(
+        events.find(
+          (e) =>
+            e.type === "veteran-counterkilled" &&
+            (e as { counterkilledPlayerId: string }).counterkilledPlayerId ===
+              "w1",
+        ),
+      ).toBeUndefined();
+    });
+
+    it("Altruist is counter-killed as a visitor when they target the alerted Veteran", () => {
+      const altruistAssignments = [
+        { playerId: "vet1", roleDefinitionId: WerewolfRole.Veteran },
+        { playerId: "alt1", roleDefinitionId: WerewolfRole.Altruist },
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+      ];
+
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Altruist]: { targetPlayerId: "vet1" },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        altruistAssignments,
+        [],
+      );
+
+      // Altruist physically visits the Veteran and is counter-killed.
+      const altKilled = findKilled(events, "alt1");
+      expect(altKilled).toMatchObject({
+        died: true,
+        attackedBy: expect.arrayContaining([WerewolfRole.Veteran]),
+      });
+
+      // Veteran survives.
+      const vetKilled = findKilled(events, "vet1");
+      expect(vetKilled).toBeUndefined();
+
+      const counterkilledEvent = events.find(
+        (e) => e.type === "veteran-counterkilled",
+      );
+      expect(counterkilledEvent).toMatchObject({
+        counterkilledPlayerId: "alt1",
+        veteranPlayerId: "vet1",
+        source: "visitor",
+        died: true,
+      });
+    });
   });
 });
