@@ -77,6 +77,8 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
   roleConversions?: { playerId: string; newRoleDefinitionId: string }[];
   /** Narrator-only hidden role IDs. Present only when hiddenRoleCount > 0. */
   hiddenRoleIds?: string[];
+  /** Arsonist: player IDs that have been doused. */
+  arsonistDousedPlayerIds?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -158,6 +160,9 @@ export function werewolfStateToFirebase(
       : {}),
     ...(state.hiddenRoleIds?.length
       ? { hiddenRoleIds: state.hiddenRoleIds }
+      : {}),
+    ...(state.arsonistDousedPlayerIds?.length
+      ? { arsonistDousedPlayerIds: state.arsonistDousedPlayerIds }
       : {}),
   };
 }
@@ -254,5 +259,8 @@ export function werewolfStateFromFirebase(
       ? { roleConversions: raw.roleConversions }
       : {}),
     ...(raw.hiddenRoleIds?.length ? { hiddenRoleIds: raw.hiddenRoleIds } : {}),
+    ...(raw.arsonistDousedPlayerIds?.length
+      ? { arsonistDousedPlayerIds: raw.arsonistDousedPlayerIds }
+      : {}),
   } as WerewolfPlayerGameState;
 }
