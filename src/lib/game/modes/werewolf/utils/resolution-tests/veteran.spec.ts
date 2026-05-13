@@ -268,5 +268,39 @@ describe("resolveNightActions", () => {
       const wolfEvent = findKilled(events, "w1");
       expect(wolfEvent).toMatchObject({ died: true });
     });
+
+    it("alerts and a first-hit Tough Guy visits: counter-kill absorbed, died is false", () => {
+      const toughGuyVisitorAssignments = [
+        { playerId: "vet1", roleDefinitionId: WerewolfRole.Veteran },
+        { playerId: "tg1", roleDefinitionId: WerewolfRole.ToughGuy },
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+      ];
+
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.ToughGuy]: { targetPlayerId: "vet1" },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        toughGuyVisitorAssignments,
+        [],
+      );
+
+      const tgKilled = findKilled(events, "tg1");
+      expect(tgKilled).toMatchObject({
+        died: false,
+        attackedBy: expect.arrayContaining([WerewolfRole.Veteran]),
+      });
+
+      const counterkilledEvent = events.find(
+        (e) => e.type === "veteran-counterkilled",
+      );
+      expect(counterkilledEvent).toMatchObject({
+        type: "veteran-counterkilled",
+        counterkilledPlayerId: "tg1",
+        veteranPlayerId: "vet1",
+        source: "visitor",
+        died: false,
+      });
+    });
   });
 });
