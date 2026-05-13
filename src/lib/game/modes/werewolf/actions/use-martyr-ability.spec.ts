@@ -61,8 +61,20 @@ describe("WerewolfAction.UseMartyrAbility", () => {
       expect(action.isValid(game, "p2", {})).toBe(true);
     });
 
-    it("returns false for narrator (owner)", () => {
+    it("returns true for narrator (owner) when Martyr is alive and pendingGuiltId is set for another player", () => {
       const ts = makeDayStateWithMartyrWindow("p3");
+      const game = makeGameWithMartyr(ts, "p2");
+      expect(action.isValid(game, "owner-1", {})).toBe(true);
+    });
+
+    it("returns false for narrator (owner) when Martyr has already used the ability", () => {
+      const ts = makeDayStateWithMartyrWindow("p3", [], true);
+      const game = makeGameWithMartyr(ts, "p2");
+      expect(action.isValid(game, "owner-1", {})).toBe(false);
+    });
+
+    it("returns false for narrator (owner) when the Martyr is the convicted player", () => {
+      const ts = makeDayStateWithMartyrWindow("p2");
       const game = makeGameWithMartyr(ts, "p2");
       expect(action.isValid(game, "owner-1", {})).toBe(false);
     });
@@ -264,6 +276,17 @@ describe("WerewolfAction.UseMartyrAbility", () => {
       expect((game.status as { winner?: string }).winner).toBe(
         WerewolfWinner.Executioner,
       );
+    });
+
+    it("narrator (owner) acting on behalf of Martyr kills the Martyr, not the narrator", () => {
+      const ts = makeDayStateWithMartyrWindow("p3");
+      const game = makeGameWithMartyr(ts, "p2");
+      action.apply(game, {}, "owner-1");
+      const result = (game.status as { turnState: WerewolfTurnState })
+        .turnState;
+      expect(result.deadPlayerIds).toContain("p2");
+      expect(result.deadPlayerIds).not.toContain("owner-1");
+      expect(result.deadPlayerIds).not.toContain("p3");
     });
 
     it("Executioner does not win when they are dead when Martyr self-sacrifices", () => {

@@ -59,8 +59,6 @@ The Narrator's session is stored separately and receives a different (fuller) `P
 | ----------------------- | -------------------------------------------------------------------------------------------- |
 | `pendingSmitePlayerIds` | Player IDs awaiting a narrator-controlled smite; only exposed to the narrator (owner) caller |
 
-All trial-related state (`activeTrial`, `pendingGuiltId`) is visible to all players.
-
 ### Player Fields — Nighttime (own turn only)
 
 These fields are only populated when the active phase matches the player's role.
@@ -84,6 +82,8 @@ These fields are only populated when the active phase matches the player's role.
 | `arsonistDousedPlayerIds`   | Arsonist                                            | List of player IDs currently doused by the Arsonist; shown to the Arsonist at night. Reset after an ignite (self-target).                                                                 |
 
 ### Player Fields — Daytime (day start)
+
+All fields in this section, including trial-related state (`activeTrial`, `pendingGuiltId`), are visible to all players. Contrast with the Narrator-Only (Daytime) section above, which lists fields exposed exclusively to the narrator.
 
 | Field                    | Description                                                                                                                                                                                                             |
 | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

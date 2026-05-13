@@ -11,27 +11,33 @@ import { didWolfCubDie, cleanupAfterDaytimeKill } from "./helpers";
  *
  * Valid only when:
  * - A Guilty verdict is pending (pendingGuiltId is set).
- * - The caller is the Martyr.
+ * - The caller is the Martyr (or the narrator acting on their behalf).
  * - The Martyr is alive and has not previously used this ability.
  * - The Martyr is not the convicted player (cannot save themselves).
+ *
+ * The narrator (owner) may call this action on behalf of a no-device Martyr
+ * player, bypassing the caller-identity check.
  */
 export const useMartyrAbilityAction: GameAction = {
   isValid(game: Game, callerId: string) {
-    if (callerId === game.ownerPlayerId) return false;
     const ts = currentTurnState(game);
     if (!ts) return false;
     if (ts.phase.type !== WerewolfPhase.Daytime) return false;
     if (!ts.phase.pendingGuiltId) return false;
     if (ts.martyrUsed) return false;
-    // Caller must be the Martyr
+    const isOwner = callerId === game.ownerPlayerId;
+    // Find the Martyr assignment — needed for both owner and player callers.
     const martyrAssignment = game.roleAssignments.find(
       (a) => a.roleDefinitionId === (WerewolfRole.Martyr as string),
     );
-    if (martyrAssignment?.playerId !== callerId) return false;
+    if (!martyrAssignment) return false;
+    const martyrId = martyrAssignment.playerId;
+    // Non-owner callers must be the Martyr themselves.
+    if (!isOwner && callerId !== martyrId) return false;
     // Martyr must be alive
-    if (ts.deadPlayerIds.includes(callerId)) return false;
+    if (ts.deadPlayerIds.includes(martyrId)) return false;
     // Martyr cannot save themselves
-    if (ts.phase.pendingGuiltId === callerId) return false;
+    if (ts.phase.pendingGuiltId === martyrId) return false;
     return true;
   },
   apply(game: Game, _payload: unknown, callerId: string) {
@@ -39,20 +45,29 @@ export const useMartyrAbilityAction: GameAction = {
     if (ts?.phase.type !== WerewolfPhase.Daytime) return;
     if (!ts.phase.pendingGuiltId) return;
 
+    // Resolve the Martyr player ID (narrator acts on their behalf when isOwner).
+    const martyrAssignment = game.roleAssignments.find(
+      (a) => a.roleDefinitionId === (WerewolfRole.Martyr as string),
+    );
+    const martyrId =
+      callerId === game.ownerPlayerId
+        ? (martyrAssignment?.playerId ?? callerId)
+        : callerId;
+
     // Convicted player is spared; Martyr dies instead.
     ts.phase.pendingGuiltId = undefined;
     ts.martyrUsed = true;
 
-    if (!ts.deadPlayerIds.includes(callerId)) {
-      ts.deadPlayerIds = [...ts.deadPlayerIds, callerId];
-      if (didWolfCubDie([callerId], game)) {
+    if (!ts.deadPlayerIds.includes(martyrId)) {
+      ts.deadPlayerIds = [...ts.deadPlayerIds, martyrId];
+      if (didWolfCubDie([martyrId], game)) {
         ts.wolfCubDied = true;
       }
-      cleanupAfterDaytimeKill(callerId, ts);
+      cleanupAfterDaytimeKill(martyrId, ts);
     }
 
     // Executioner wins if their target was the Martyr (who voluntarily died).
-    if (ts.executionerTargetId === callerId) {
+    if (ts.executionerTargetId === martyrId) {
       const executionerAssignment = game.roleAssignments.find(
         (a) => a.roleDefinitionId === (WerewolfRole.Executioner as string),
       );
