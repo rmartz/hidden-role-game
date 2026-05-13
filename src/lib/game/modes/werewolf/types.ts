@@ -221,6 +221,8 @@ export interface WerewolfTurnState {
   zombieInfected?: string[];
   /** Number of nights the Veteran has chosen to go on Alert. Maximum 3. */
   veteranAlertsUsed?: number;
+  /** Player IDs that the Arsonist has doused. Accumulated across nights; reset after an ignite. */
+  arsonistDousedPlayerIds?: string[];
 }
 
 export interface TargetablePlayer {
