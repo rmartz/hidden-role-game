@@ -204,6 +204,8 @@ export interface WerewolfTurnState {
   draculaWives?: string[];
   /** Player IDs that the Zombie has infected. Accumulated across nights. */
   zombieInfected?: string[];
+  /** Player IDs that the Arsonist has doused. Accumulated across nights; reset after an ignite. */
+  arsonistDousedPlayerIds?: string[];
   /**
    * The player ID blocked by the Tavern Keeper this night.
    * That player cannot submit a night action; their phase is removed from
