@@ -31,6 +31,12 @@ export function PlayerNightSummary({
         ? (getPlayerName(players, altruistEntry.savedPlayerId) ?? "a player")
         : undefined;
 
+      const exposedEntry = entries.find((e) => e.effect === "exposed");
+      const exposedRoleName =
+        exposedEntry && "roleName" in exposedEntry
+          ? exposedEntry.roleName
+          : undefined;
+
       return {
         targetPlayerId,
         playerName: getPlayerName(players, targetPlayerId) ?? targetPlayerId,
@@ -46,6 +52,7 @@ export function PlayerNightSummary({
         hypnotized: entries.some((e) => e.effect === "hypnotized"),
         smited: entries.some((e) => e.effect === "smited"),
         peaceful: entries.some((e) => e.effect === "peaceful"),
+        exposedRoleName,
       };
     },
   );
@@ -70,6 +77,7 @@ export function PlayerNightSummary({
             hypnotized,
             smited,
             peaceful,
+            exposedRoleName,
           }) => (
             <PlayerNightSummaryItem
               key={targetPlayerId}
@@ -84,6 +92,7 @@ export function PlayerNightSummary({
               hypnotized={hypnotized}
               smited={smited}
               peaceful={peaceful}
+              exposedRoleName={exposedRoleName}
               isMe={myPlayerId === targetPlayerId}
             />
           ),

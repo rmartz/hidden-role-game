@@ -72,6 +72,15 @@ export interface TavernKeeperTurnState {
   blockedPlayerId: string;
 }
 
+export interface TheThingTurnState {
+  /**
+   * Player ID tapped by The Thing this night.
+   * Carried into the daytime phase so the tapped player can read the
+   * notification before it is cleared at the start of the next night.
+   */
+  tapped?: string;
+}
+
 export interface ToughGuyTurnState {
   /** Player IDs that have already survived one attack. */
   hitIds: string[];

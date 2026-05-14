@@ -45,6 +45,10 @@ export function makeDaytimeGame(
     revealedPlayerIds: string[];
     deadPlayerIds: string[];
     modeConfig: Partial<WerewolfModeConfig>;
+    exposerReveal: Extract<
+      WerewolfTurnState["phase"],
+      { type: WerewolfPhase.Daytime }
+    >["exposerReveal"];
   }> = {},
 ): Game {
   const modeConfig: WerewolfModeConfig = {
@@ -71,6 +75,9 @@ export function makeDaytimeGame(
       ...(revealedPlayerIds !== undefined ? { revealedPlayerIds } : {}),
       ...(overrides.nightResolution !== undefined
         ? { nightResolution: overrides.nightResolution }
+        : {}),
+      ...(overrides.exposerReveal
+        ? { exposerReveal: overrides.exposerReveal }
         : {}),
       ...(overrides.knightedPlayerId !== undefined
         ? { knightedPlayerId: overrides.knightedPlayerId }
