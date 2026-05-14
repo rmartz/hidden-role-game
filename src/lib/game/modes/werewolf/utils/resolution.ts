@@ -489,6 +489,8 @@ export function resolveNightActions(
       // physically visit the Veteran; Investigation and Special roles (Seer,
       // Exposer, Spellcaster, Mummy, Dracula, Zombie, …) use mystical powers
       // or non-physical means and are not counter-killed.
+      // Mirrorcaster is classified as Special but effectively acts as Protect
+      // (uncharged) or Attack (charged) — treat it as a physical visitor.
       for (const [phaseKey, action] of Object.entries(nightActions)) {
         if (isGroupPhaseKey(phaseKey)) continue;
         if (isRoleActive(phaseKey, WerewolfRole.Priest)) continue;
@@ -497,7 +499,8 @@ export function resolveNightActions(
         const role = getWerewolfRole(phaseKey);
         if (
           role?.targetCategory !== TargetCategory.Protect &&
-          role?.targetCategory !== TargetCategory.Attack
+          role?.targetCategory !== TargetCategory.Attack &&
+          !isRoleActive(phaseKey, WerewolfRole.Mirrorcaster)
         )
           continue;
 

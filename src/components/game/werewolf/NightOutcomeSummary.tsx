@@ -37,10 +37,12 @@ export function NightOutcomeSummary({
     (e) =>
       e.type !== "altruist-intercepted" && e.type !== "veteran-counterkilled",
   );
-  // Suppress the generic killed row for a veteran-counter-killed player only
-  // when the Veteran is the sole attacker. If the player was also attacked by
-  // another source, keep the generic row so the narrator sees all the details.
-  const veteranCounterkilledPlayerIds = new Set(
+  // For a veteran-counter-killed player who was killed solely by the Veteran,
+  // strip the generic "killed" event from the row so the narrator sees the
+  // special Veteran announcement instead of a duplicate. Non-kill events on
+  // that same player (silenced, knighted, tough-guy-absorbed, etc.) are
+  // preserved — the row is only omitted entirely when nothing else remains.
+  const veteranOnlyKilledPlayerIds = new Set(
     veteranCounterkills
       .filter((e) => e.died)
       .filter((e) => {
@@ -59,10 +61,22 @@ export function NightOutcomeSummary({
   // Group events by targetPlayerId so a player attacked and silenced in the
   // same night is represented by a single list item.
   const eventsPerPlayer = groupBy(regularEvents, "targetPlayerId");
-  const targetPlayerIds = Object.keys(eventsPerPlayer);
+  // For Veteran-only-killed players, remove the "killed" event so the generic
+  // row doesn't duplicate the Veteran announcement, but keep other events.
+  const filteredEventsPerPlayer: Record<string, NightResolutionEvent[]> = {};
+  for (const [playerId, playerEvents] of Object.entries(eventsPerPlayer)) {
+    filteredEventsPerPlayer[playerId] = veteranOnlyKilledPlayerIds.has(playerId)
+      ? playerEvents.filter((e) => e.type !== "killed")
+      : playerEvents;
+  }
+  const targetPlayerIds = Object.keys(filteredEventsPerPlayer).filter(
+    (playerId) =>
+      (filteredEventsPerPlayer[playerId]?.length ?? 0) > 0 ||
+      playerId === knightedPlayerId,
+  );
   if (
     knightedPlayerId !== undefined &&
-    eventsPerPlayer[knightedPlayerId] === undefined
+    filteredEventsPerPlayer[knightedPlayerId] === undefined
   ) {
     targetPlayerIds.push(knightedPlayerId);
   }
@@ -107,23 +121,18 @@ export function NightOutcomeSummary({
               </li>
             );
           })}
-        {targetPlayerIds
-          .filter(
-            (targetPlayerId) =>
-              !veteranCounterkilledPlayerIds.has(targetPlayerId),
-          )
-          .map((targetPlayerId) => (
-            <li key={targetPlayerId}>
-              <NightOutcomeSummaryItem
-                playerName={
-                  getPlayerName(players, targetPlayerId) ?? targetPlayerId
-                }
-                events={eventsPerPlayer[targetPlayerId]}
-                roles={roles}
-                knighted={targetPlayerId === knightedPlayerId}
-              />
-            </li>
-          ))}
+        {targetPlayerIds.map((targetPlayerId) => (
+          <li key={targetPlayerId}>
+            <NightOutcomeSummaryItem
+              playerName={
+                getPlayerName(players, targetPlayerId) ?? targetPlayerId
+              }
+              events={filteredEventsPerPlayer[targetPlayerId]}
+              roles={roles}
+              knighted={targetPlayerId === knightedPlayerId}
+            />
+          </li>
+        ))}
       </ul>
     </div>
   );

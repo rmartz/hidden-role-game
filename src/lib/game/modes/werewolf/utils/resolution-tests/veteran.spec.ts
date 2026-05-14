@@ -429,5 +429,80 @@ describe("resolveNightActions", () => {
         events.find((e) => e.type === "veteran-counterkilled"),
       ).toBeUndefined();
     });
+
+    it("alerts and uncharged Mirrorcaster targets Veteran: Mirrorcaster is counter-killed", () => {
+      // Mirrorcaster is TargetCategory.Special but acts as a physical Protect
+      // visit when uncharged — it should be counter-killed like a Bodyguard.
+      const mirrorcasterAssignments = [
+        { playerId: "vet1", roleDefinitionId: WerewolfRole.Veteran },
+        { playerId: "mc1", roleDefinitionId: WerewolfRole.Mirrorcaster },
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+      ];
+
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Mirrorcaster]: { targetPlayerId: "vet1" },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        mirrorcasterAssignments,
+        [],
+        undefined,
+        { mirrorcasterCharged: false },
+      );
+
+      const mcKilled = findKilled(events, "mc1");
+      expect(mcKilled).toMatchObject({
+        died: true,
+        attackedBy: expect.arrayContaining([WerewolfRole.Veteran]),
+      });
+
+      const vetKilled = findKilled(events, "vet1");
+      expect(vetKilled).toBeUndefined();
+
+      expect(
+        events.find((e) => e.type === "veteran-counterkilled"),
+      ).toMatchObject({
+        counterkilledPlayerId: "mc1",
+        veteranPlayerId: "vet1",
+        source: "visitor",
+      });
+    });
+
+    it("alerts and charged Mirrorcaster targets Veteran: Mirrorcaster is counter-killed", () => {
+      // Charged Mirrorcaster acts as an Attack visit — should be counter-killed.
+      const mirrorcasterAssignments = [
+        { playerId: "vet1", roleDefinitionId: WerewolfRole.Veteran },
+        { playerId: "mc1", roleDefinitionId: WerewolfRole.Mirrorcaster },
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+      ];
+
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Mirrorcaster]: { targetPlayerId: "vet1" },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        mirrorcasterAssignments,
+        [],
+        undefined,
+        { mirrorcasterCharged: true },
+      );
+
+      const mcKilled = findKilled(events, "mc1");
+      expect(mcKilled).toMatchObject({
+        died: true,
+        attackedBy: expect.arrayContaining([WerewolfRole.Veteran]),
+      });
+
+      const vetKilled = findKilled(events, "vet1");
+      expect(vetKilled).toBeUndefined();
+
+      expect(
+        events.find((e) => e.type === "veteran-counterkilled"),
+      ).toMatchObject({
+        counterkilledPlayerId: "mc1",
+        veteranPlayerId: "vet1",
+        source: "visitor",
+      });
+    });
   });
 });
