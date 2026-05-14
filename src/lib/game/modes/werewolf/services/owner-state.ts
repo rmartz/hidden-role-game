@@ -188,6 +188,9 @@ export function extractDaytimePlayerState(
     result.executionerTargetId = ts.roleState.executioner.targetId;
   }
 
+  // The Thing tap notification.
+  if (ts.roleState?.theThing?.tapped === callerId) result.thingTappedMe = true;
+
   // Silenced / hypnotized.
   const silencedIds = getSilencedPlayerIds(ts);
   if (silencedIds.includes(callerId)) result.isSilenced = true;

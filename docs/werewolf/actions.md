@@ -61,6 +61,7 @@ Additional resolution steps:
 - In a suffixed repeat group phase (e.g., `"werewolf-werewolf:2"`), the target cannot match the `suggestedTargetId` from the base phase's action (within-night exclusion).
 - Cannot change a confirmed target (players only; Narrator can override).
 - Monarch cannot target already-knighted players and cannot target after 3 knightings are used.
+- Roles with `adjacentTargetOnly` (The Thing) may only target immediate seating neighbours. The narrator is excluded from `playerOrder` before computing adjacency, so a player seated next to the narrator always has two selectable neighbours.
 
 ---
 

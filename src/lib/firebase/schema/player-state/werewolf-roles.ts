@@ -35,6 +35,11 @@ export interface FirebaseWerewolfRoleState {
   evilEmpathNightResult?: boolean;
   arsonistDousedPlayerIds?: string[];
   pendingSmitePlayerIds?: string[];
+  thingTappedMe?: boolean;
+  thingTappedPlayerId?: string;
+  insomniacResult?: { leftActed: boolean; rightActed: boolean };
+  countResult?: { leftCount: number; rightCount: number };
+  adjacentPlayerIds?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -90,6 +95,17 @@ export function werewolfRoleStateToFirebase(
     ...(state.pendingSmitePlayerIds?.length
       ? { pendingSmitePlayerIds: state.pendingSmitePlayerIds }
       : {}),
+    ...(state.thingTappedMe ? { thingTappedMe: true } : {}),
+    ...(state.thingTappedPlayerId
+      ? { thingTappedPlayerId: state.thingTappedPlayerId }
+      : {}),
+    ...(state.insomniacResult
+      ? { insomniacResult: state.insomniacResult }
+      : {}),
+    ...(state.countResult ? { countResult: state.countResult } : {}),
+    ...(state.adjacentPlayerIds?.length
+      ? { adjacentPlayerIds: state.adjacentPlayerIds }
+      : {}),
   };
 }
 
@@ -144,6 +160,15 @@ export function werewolfRoleStateFromFirebase(
       : {}),
     ...(raw.pendingSmitePlayerIds?.length
       ? { pendingSmitePlayerIds: raw.pendingSmitePlayerIds }
+      : {}),
+    ...(raw.thingTappedMe ? { thingTappedMe: true } : {}),
+    ...(raw.thingTappedPlayerId
+      ? { thingTappedPlayerId: raw.thingTappedPlayerId }
+      : {}),
+    ...(raw.insomniacResult ? { insomniacResult: raw.insomniacResult } : {}),
+    ...(raw.countResult ? { countResult: raw.countResult } : {}),
+    ...(raw.adjacentPlayerIds?.length
+      ? { adjacentPlayerIds: raw.adjacentPlayerIds }
       : {}),
   };
 }

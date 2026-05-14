@@ -224,6 +224,53 @@ describe("Werewolf player state round-trip", () => {
     expect(result.evilEmpathRevealedResult).toBeUndefined();
   });
 
+  it("round-trips thingTappedMe", () => {
+    const state = makeWerewolfState({ thingTappedMe: true });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.thingTappedMe).toBe(true);
+  });
+
+  it("round-trips thingTappedPlayerId", () => {
+    const state = makeWerewolfState({ thingTappedPlayerId: "p2" });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.thingTappedPlayerId).toBe("p2");
+  });
+
+  it("round-trips insomniacResult", () => {
+    const state = makeWerewolfState({
+      insomniacResult: { leftActed: true, rightActed: false },
+    });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.insomniacResult).toEqual({
+      leftActed: true,
+      rightActed: false,
+    });
+  });
+
+  it("round-trips countResult", () => {
+    const state = makeWerewolfState({
+      countResult: { leftCount: 2, rightCount: 1 },
+    });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.countResult).toEqual({ leftCount: 2, rightCount: 1 });
+  });
+
+  it("round-trips adjacentPlayerIds", () => {
+    const state = makeWerewolfState({ adjacentPlayerIds: ["p1", "p3"] });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.adjacentPlayerIds).toEqual(["p1", "p3"]);
+  });
+
   it("round-trips illuminatiRoleAssignments including team cast", () => {
     const state = makeWerewolfState({
       illuminatiRoleAssignments: [
@@ -271,11 +318,18 @@ describe("Werewolf player state round-trip", () => {
     expect(result.evilEmpathNightResult).toBeUndefined();
   });
 
-  it("omits illuminatiRoleAssignments when absent", () => {
+  it("omits positional, evil empath, and illuminati fields when absent", () => {
     const state = makeWerewolfState();
     const result = firebaseToPlayerState(
       playerStateToFirebase(state),
     ) as WerewolfPlayerGameState;
+    expect(result.thingTappedMe).toBeUndefined();
+    expect(result.thingTappedPlayerId).toBeUndefined();
+    expect(result.insomniacResult).toBeUndefined();
+    expect(result.countResult).toBeUndefined();
+    expect(result.adjacentPlayerIds).toBeUndefined();
+    expect(result.evilEmpathRevealedResult).toBeUndefined();
+    expect(result.evilEmpathNightResult).toBeUndefined();
     expect(result.illuminatiRoleAssignments).toBeUndefined();
   });
 
