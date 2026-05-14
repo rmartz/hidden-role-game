@@ -14,6 +14,8 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RoleLabel } from "@/components/RoleLabel";
 import { NARRATOR_PLAYER_ROLE_LISTS_COPY } from "./NarratorPlayerRoleLists.copy";
+import { NightActionMarker } from "./NightActionMarker";
+import type { NightMarkerEffect } from "./NightActionMarker";
 
 interface NarratorPlayerRoleListsProps {
   assignments: VisibleTeammate[];
@@ -27,6 +29,11 @@ interface NarratorPlayerRoleListsProps {
     playerName: string,
     isDead: boolean,
   ) => ReactNode;
+  /**
+   * Optional night action status markers to display next to each player's name.
+   * Keyed by player ID; each entry lists the effects active for that player this night.
+   */
+  nightStatusMarkers?: Map<string, NightMarkerEffect[]>;
 }
 
 export function NarratorPlayerRoleLists({
@@ -35,6 +42,7 @@ export function NarratorPlayerRoleLists({
   deadPlayerIds,
   executionerTargetId,
   renderActions,
+  nightStatusMarkers,
 }: NarratorPlayerRoleListsProps) {
   if (assignments.length === 0) return null;
 
@@ -70,6 +78,9 @@ export function NarratorPlayerRoleLists({
                         }
                       />
                     )}
+                    {nightStatusMarkers?.get(player.id)?.map((effect) => (
+                      <NightActionMarker key={effect} effect={effect} />
+                    ))}
                   </ItemTitle>
                 </ItemContent>
                 <ItemActions>
