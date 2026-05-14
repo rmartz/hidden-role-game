@@ -47,11 +47,13 @@ The Narrator's session is stored separately and receives a different (fuller) `P
 
 ### Narrator-Only (Nighttime)
 
-| Field                   | Description                                                                                                                                        |
-| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nightActions`          | Full record of all night actions keyed by phase key                                                                                                |
-| `hunterRevengePlayerId` | Player ID of the Hunter awaiting revenge resolution; set when Hunter dies                                                                          |
-| `hiddenRoleIds`         | Role IDs drawn from the pool but not assigned to any player; stored in `FirebaseWerewolfPlayerState` (session-scoped, not in `FirebaseGamePublic`) |
+| Field                      | Description                                                                                                                                        |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nightActions`             | Full record of all night actions keyed by phase key                                                                                                |
+| `hunterRevengePlayerId`    | Player ID of the Hunter awaiting revenge resolution; set when Hunter dies                                                                          |
+| `monarchKnightedPlayerIds` | Public list of player IDs currently marked as Knighted by the Monarch                                                                              |
+| `monarchKnightingsUsed`    | Number of Monarch knightings already used (max 3)                                                                                                  |
+| `hiddenRoleIds`            | Role IDs drawn from the pool but not assigned to any player; stored in `FirebaseWerewolfPlayerState` (session-scoped, not in `FirebaseGamePublic`) |
 
 ### Player Fields — Nighttime (own turn only)
 
@@ -73,23 +75,26 @@ These fields are only populated when the active phase matches the player's role.
 | `elusiveSeerVillagerIds`    | Elusive Seer                                        | List of player IDs who have the Villager role (shown on first night only)                                                                                                                 |
 | `oneEyedSeerLockedTargetId` | One-Eyed Seer                                       | Player ID the One-Eyed Seer is locked onto after detecting a werewolf                                                                                                                     |
 | `executionerTargetId`       | Executioner                                         | The player ID of the Executioner's assigned Good-team target; visible only to the Executioner                                                                                             |
+| `monarchKnightedPlayerIds`  | All players                                         | Public list of knighted players                                                                                                                                                           |
+| `monarchKnightingsUsed`     | All players                                         | Number of knightings used by the Monarch (0-3)                                                                                                                                            |
 | `arsonistDousedPlayerIds`   | Arsonist                                            | List of player IDs currently doused by the Arsonist; shown to the Arsonist at night. Reset after an ignite (self-target).                                                                 |
 | `ghostVisible`              | Ghost (dead only)                                   | `true` when the Ghost is dead during nighttime; enables narrator-level night observer view. When set, `nightActions` is also fully populated for this player.                             |
 
 ### Player Fields — Daytime (day start)
 
-| Field                        | Description                                                                                                                                                                                                             |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nightStatus`                | `{ targetPlayerId, effect }[]` — outcome of the previous night. Effects: `"killed"`, `"silenced"`, `"hypnotized"`, `"smited"`, `"survived"`, `"peaceful"` (`"peaceful"` indicates the Old Man died from timer expiring) |
-| `nominations`                | Current nominations for trial defendants                                                                                                                                                                                |
-| `myNominatedDefendantId`     | The defendant this player has nominated (if any)                                                                                                                                                                        |
-| `activeTrial`                | Active trial state (defendant, phase, votes) if a trial is in progress                                                                                                                                                  |
-| `isSilenced`                 | Whether this player is silenced (cannot vote or nominate)                                                                                                                                                               |
-| `isHypnotized`               | Whether this player is hypnotized (vote mirrors the Mummy)                                                                                                                                                              |
-| `exposerReveal`              | Publicly revealed role from the Exposer's ability (if any)                                                                                                                                                              |
-| `altruistSave`               | Information about an Altruist intercept that saved a player                                                                                                                                                             |
-| `ghostClues`                 | `{ turn: number; clue: string }[]` — all clues submitted by the Ghost player; visible to all players                                                                                                                    |
-| `ghostClueSubmittedThisTurn` | Ghost player only. `true` when the Ghost has already submitted a clue this turn; disables the clue submission UI                                                                                                        |
+| Field                        | Description                                                                                                                                                                                                                           |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nightStatus`                | `{ targetPlayerId, effect }[]` — outcome of the previous night. Effects: `"killed"`, `"knighted"`, `"silenced"`, `"hypnotized"`, `"smited"`, `"survived"`, `"peaceful"` (`"peaceful"` indicates the Old Man died from timer expiring) |
+| `nominations`                | Current nominations for trial defendants                                                                                                                                                                                              |
+| `myNominatedDefendantId`     | The defendant this player has nominated (if any)                                                                                                                                                                                      |
+| `activeTrial`                | Active trial state (defendant, phase, votes) if a trial is in progress                                                                                                                                                                |
+| `isSilenced`                 | Whether this player is silenced (cannot vote or nominate)                                                                                                                                                                             |
+| `isHypnotized`               | Whether this player is hypnotized (vote mirrors the Mummy)                                                                                                                                                                            |
+| `exposerReveal`              | Publicly revealed role from the Exposer's ability (if any)                                                                                                                                                                            |
+| `monarchKnightedPlayerIds`   | Public list of players knighted by the Monarch                                                                                                                                                                                        |
+| `altruistSave`               | Information about an Altruist intercept that saved a player                                                                                                                                                                           |
+| `ghostClues`                 | `{ turn: number; clue: string }[]` — all clues submitted by the Ghost player; visible to all players                                                                                                                                  |
+| `ghostClueSubmittedThisTurn` | Ghost player only. `true` when the Ghost has already submitted a clue this turn; disables the clue submission UI                                                                                                                      |
 
 ## Game Phase State Machine
 
@@ -116,6 +121,8 @@ stateDiagram-v2
    - `hiddenRoleIds` is written only to the Narrator's session-scoped `FirebaseWerewolfPlayerState`; it is never included in `FirebaseGamePublic`.
 3. `buildAllPlayerStates` computes per-player `PlayerGameState` for each session; `writeAllPlayerStates` writes them to Firebase.
 4. Clients receive real-time updates via Firebase `onValue`.
+
+Monarch-specific flow: when `start-day` resolves night actions, any confirmed Monarch target is added to `monarchKnightedPlayerIds` and `monarchKnightingsUsed` is incremented (capped at 3). In the same pass, Monarch auto-protection is evaluated against attackers and living Knighted players.
 
 ### Night Phase
 
