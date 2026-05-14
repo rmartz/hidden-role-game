@@ -4,6 +4,7 @@ import type { VisibleTeammate } from "@/server/types";
 import type { GameMode } from "@/lib/types";
 import { NarratorPlayerRoleLists } from "./NarratorPlayerRoleLists";
 import { OwnerPlayerActionItem } from "./OwnerPlayerActionItem";
+import type { NightMarkerEffect } from "./NightActionMarker";
 
 interface OwnerPlayerActionsGridProps {
   gameId: string;
@@ -15,6 +16,7 @@ interface OwnerPlayerActionsGridProps {
   trialBlocked?: boolean;
   smitedPlayerIds?: string[];
   executionerTargetId?: string;
+  nightStatusMarkers?: Map<string, NightMarkerEffect[]>;
 }
 
 export function OwnerPlayerActionsGrid({
@@ -27,6 +29,7 @@ export function OwnerPlayerActionsGrid({
   trialBlocked,
   smitedPlayerIds,
   executionerTargetId,
+  nightStatusMarkers,
 }: OwnerPlayerActionsGridProps) {
   return (
     <NarratorPlayerRoleLists
@@ -34,6 +37,7 @@ export function OwnerPlayerActionsGrid({
       gameMode={gameMode}
       deadPlayerIds={deadPlayerIds}
       executionerTargetId={executionerTargetId}
+      nightStatusMarkers={nightStatusMarkers}
       renderActions={(playerId, playerName, isDead) =>
         playerId === gameOwnerId ? null : (
           <OwnerPlayerActionItem
