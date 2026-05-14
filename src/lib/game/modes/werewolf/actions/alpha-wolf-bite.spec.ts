@@ -1,4 +1,4 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 
