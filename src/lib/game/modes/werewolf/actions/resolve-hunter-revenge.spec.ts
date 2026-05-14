@@ -20,7 +20,7 @@ function makeDayWithHunterRevenge(): WerewolfTurnState {
       nightActions: {},
     },
     deadPlayerIds: ["p2"],
-    hunterRevengePlayerId: "p2",
+    roleState: { hunter: { revengePlayerId: "p2" } },
   };
 }
 
@@ -71,7 +71,7 @@ describe("WerewolfAction.ResolveHunterRevenge", () => {
     resolveRevenge.apply(game, { targetPlayerId: "p3" }, "owner-1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
     expect(ts.deadPlayerIds).toContain("p3");
-    expect(ts.hunterRevengePlayerId).toBeUndefined();
+    expect(ts.roleState?.hunter?.revengePlayerId).toBeUndefined();
   });
 
   it("Hunter revenge on the last wolf triggers Village win", () => {

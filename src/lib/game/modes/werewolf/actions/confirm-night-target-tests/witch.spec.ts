@@ -42,7 +42,7 @@ describe("ConfirmNightTarget — sets witchAbilityUsed for Witch", () => {
 
     const resultTs = (game.status as { turnState: WerewolfTurnState })
       .turnState;
-    expect(resultTs.witchAbilityUsed).toBe(true);
+    expect(resultTs.roleState?.witch?.abilityUsed).toBe(true);
   });
 
   it("witchAbilityUsed is carried forward into the next night", () => {
@@ -61,7 +61,7 @@ describe("ConfirmNightTarget — sets witchAbilityUsed for Witch", () => {
         },
       },
       deadPlayerIds: [],
-      witchAbilityUsed: true,
+      roleState: { witch: { abilityUsed: true } },
     };
     // Werewolf added to prevent Village win after Witch kills p2
     const game = makePlayingGame(ts, {
@@ -83,6 +83,6 @@ describe("ConfirmNightTarget — sets witchAbilityUsed for Witch", () => {
     startNight.apply(game, null, "owner-1");
 
     const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(newTs.witchAbilityUsed).toBe(true);
+    expect(newTs.roleState?.witch?.abilityUsed).toBe(true);
   });
 });
