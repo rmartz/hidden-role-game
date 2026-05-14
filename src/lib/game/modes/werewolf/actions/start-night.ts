@@ -86,8 +86,8 @@ export const startNightAction: GameAction = {
       ...(aliveDousedPlayerIds.length > 0
         ? { arsonist: { dousedPlayerIds: aliveDousedPlayerIds } }
         : {}),
-      ...(rs.veteran?.alertsUsed !== undefined
-        ? { veteran: { alertsUsed: rs.veteran.alertsUsed } }
+      ...(rs.veteran
+        ? { veteran: rs.veteran }
         : {}),
       // wolfCub.died is intentionally NOT carried forward — consumed by this night's bonus phase
     };
