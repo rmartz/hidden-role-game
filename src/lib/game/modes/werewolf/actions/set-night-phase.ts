@@ -1,7 +1,8 @@
-import { GameStatus } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
-import { WerewolfPhase } from "../types";
+import { GameStatus } from "@/lib/types";
+
 import type { WerewolfNighttimePhase } from "../types";
+import { WerewolfPhase } from "../types";
 import { currentTurnState, isOwnerPlaying } from "../utils";
 import { WerewolfRole } from "../roles";
 import { confirmEvilEmpathResultAction } from "./confirm-evil-empath-result";

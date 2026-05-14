@@ -1,10 +1,12 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import type { RoleBucket } from "@/lib/types";
 import { isSimpleRoleBucket } from "@/lib/types";
 import { GameMode } from "@/lib/types";
-import { WerewolfRole, MIN_PLAYERS, MIN_ROLE_PLAYERS } from "./roles";
+
 import { WEREWOLF_CONFIG } from "./config";
 import type { WerewolfModeConfig } from "./lobby-config";
+import { MIN_PLAYERS, MIN_ROLE_PLAYERS, WerewolfRole } from "./roles";
 
 const defaultModeConfig: WerewolfModeConfig = {
   gameMode: GameMode.Werewolf,

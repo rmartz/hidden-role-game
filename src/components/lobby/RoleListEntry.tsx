@@ -1,5 +1,6 @@
 import type { GameMode, RoleDefinition, Team } from "@/lib/types";
 import { RoleConfigMode } from "@/lib/types";
+
 import { RoleConfigEntry } from "./RoleConfigEntry";
 
 export interface RoleListEntryProps {

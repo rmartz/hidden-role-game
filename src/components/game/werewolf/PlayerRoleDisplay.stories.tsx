@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { PlayerRoleDisplay } from "./PlayerRoleDisplay";
+
 import { GameMode, Team } from "@/lib/types";
+
+import { PlayerRoleDisplay } from "./PlayerRoleDisplay";
 
 const meta = {
   component: PlayerRoleDisplay,

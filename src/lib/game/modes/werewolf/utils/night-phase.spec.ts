@@ -1,7 +1,8 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { WerewolfRole } from "../roles";
-import { GROUP_PHASE_KEY_SEPARATOR } from "./phase-keys";
 import { buildNightPhaseOrder } from "./night-phase";
+import { GROUP_PHASE_KEY_SEPARATOR } from "./phase-keys";
 
 const assignments = [
   { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },

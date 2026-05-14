@@ -1,10 +1,5 @@
 export { createDeck, drawCards, reshuffleIfNeeded } from "./deck";
 export {
-  currentTurnState,
-  getNextPresidentId,
-  getEligibleChancellorIds,
-} from "./turn-state";
-export {
   BOARD_PRESETS,
   DEFAULT_CUSTOM_POWER_CONFIG,
   getDefaultBoardPreset,
@@ -15,9 +10,14 @@ export {
   type SvConcretePreset,
 } from "./special-actions";
 export {
+  currentTurnState,
+  getEligibleChancellorIds,
+  getNextPresidentId,
+} from "./turn-state";
+export {
+  checkBoardWinCondition,
+  checkChancellorElectionWinCondition,
+  checkShootWinCondition,
   SecretVillainWinner,
   SvVictoryConditionKey,
-  checkBoardWinCondition,
-  checkShootWinCondition,
-  checkChancellorElectionWinCondition,
 } from "./win-condition";

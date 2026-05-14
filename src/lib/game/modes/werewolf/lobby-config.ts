@@ -1,5 +1,6 @@
-import { GameMode } from "@/lib/types";
 import type { BaseLobbyConfig, Game } from "@/lib/types";
+import { GameMode } from "@/lib/types";
+
 import type { WerewolfTimerConfig } from "./timer-config";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "./timer-config";
 

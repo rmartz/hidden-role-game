@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useGameAction } from "@/hooks";
 import { WerewolfAction } from "@/lib/game/modes/werewolf";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import type { PublicLobbyPlayer } from "@/server/types";
-import { useGameAction } from "@/hooks";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface HunterRevengePanelProps {
   gameId: string;

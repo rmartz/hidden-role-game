@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
 import { throttle } from "lodash";
+import { useEffect, useMemo, useRef } from "react";
+
 import { useAppSelector } from "@/store";
 import { selectRoleBuckets } from "@/store/game-config-slice";
+
 import { useUpdateLobbyConfig } from "./lobby";
 
 const SYNC_INTERVAL_MS = 1000;

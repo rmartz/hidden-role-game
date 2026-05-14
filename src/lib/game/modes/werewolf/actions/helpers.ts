@@ -1,6 +1,7 @@
 import type { Game } from "@/lib/types";
-import type { WerewolfTurnState } from "../types";
+
 import { WerewolfRole } from "../roles";
+import type { WerewolfTurnState } from "../types";
 
 export function didWolfCubDie(newDeadIds: string[], game: Game): boolean {
   const wolfCubId = game.roleAssignments.find(

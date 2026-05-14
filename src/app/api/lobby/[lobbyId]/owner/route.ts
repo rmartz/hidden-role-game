@@ -1,10 +1,10 @@
+import { transferOwner } from "@/server/lobby";
 import { ServerResponseStatus } from "@/server/types";
 import {
   authenticateLobby,
   errorResponse,
   toPublicLobby,
 } from "@/server/utils";
-import { transferOwner } from "@/server/lobby";
 
 export async function PUT(
   request: Request,

@@ -1,5 +1,9 @@
 import { sum } from "lodash";
 import { useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import type {
   AdvancedRoleBucket,
   GameMode,
@@ -7,19 +11,17 @@ import type {
   RoleDefinition,
   Team,
 } from "@/lib/types";
-import { RoleConfigMode, isSimpleRoleBucket } from "@/lib/types";
+import { isSimpleRoleBucket, RoleConfigMode } from "@/lib/types";
 import { useAppSelector } from "@/store";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { RoleConfigEntry } from "./RoleConfigEntry";
-import { RoleConfigModePicker } from "./RoleConfigModePicker";
-import { RoleBucketConfig } from "./RoleBucketConfig";
-import { ROLE_CONFIG_COPY } from "./RoleConfig.copy";
-import { searchRoles } from "./searchRoles";
+
 import type { CategoryGroup } from "./ExpandedRoleList";
 import { ExpandedRoleList } from "./ExpandedRoleList";
+import { RoleBucketConfig } from "./RoleBucketConfig";
+import { ROLE_CONFIG_COPY } from "./RoleConfig.copy";
+import { RoleConfigEntry } from "./RoleConfigEntry";
+import { RoleConfigModePicker } from "./RoleConfigModePicker";
 import { RoleListEntry } from "./RoleListEntry";
+import { searchRoles } from "./searchRoles";
 
 interface ReadOnlyProps {
   roleDefinitions: Record<string, RoleDefinition<string, Team>>;

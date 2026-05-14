@@ -1,15 +1,5 @@
 "use client";
 
-import type { GameMode } from "@/lib/types";
-import {
-  ALL_GAME_MODES,
-  ENABLED_GAME_MODES,
-  GAME_MODES,
-  isGameModeEnabled,
-  parseGameMode,
-} from "@/lib/game/modes";
-import { useAppDispatch, useAppSelector } from "@/store";
-import { setGameMode } from "@/store/game-config-slice";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -18,6 +8,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  ALL_GAME_MODES,
+  ENABLED_GAME_MODES,
+  GAME_MODES,
+  isGameModeEnabled,
+  parseGameMode,
+} from "@/lib/game/modes";
+import type { GameMode } from "@/lib/types";
+import { useAppDispatch, useAppSelector } from "@/store";
+import { setGameMode } from "@/store/game-config-slice";
+
 import { GAME_MODE_PICKER_COPY } from "./GameModePicker.copy";
 
 interface GameModePickerProps {

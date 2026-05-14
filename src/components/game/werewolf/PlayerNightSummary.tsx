@@ -1,10 +1,12 @@
 "use client";
 
 import groupBy from "lodash/groupBy";
+
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { getPlayerName } from "@/lib/player";
 import type { PlayerGameState } from "@/server/types";
 import type { DaytimeNightStatusEntry } from "@/server/types";
-import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+
 import { PlayerNightSummaryItem } from "./PlayerNightSummaryItem";
 
 interface PlayerNightSummaryProps {

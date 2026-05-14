@@ -1,12 +1,14 @@
-import { afterEach, describe, it, expect } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
-import { BoardDisplay } from "./BoardDisplay";
+import { afterEach, describe, expect, it } from "vitest";
+
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
 import {
   BAD_CARDS_TO_WIN,
   GOOD_CARDS_TO_WIN,
   SpecialActionType,
 } from "@/lib/game/modes/secret-villain/types";
+
+import { BoardDisplay } from "./BoardDisplay";
 
 afterEach(cleanup);
 

@@ -1,13 +1,14 @@
 "use client";
 
+import { RoleLabel } from "@/components/RoleLabel";
 import type { GameMode, RoleDefinition, Team } from "@/lib/types";
 import { RoleConfigMode } from "@/lib/types";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
-  incrementRoleCount,
   decrementRoleCount,
+  incrementRoleCount,
 } from "@/store/game-config-slice";
-import { RoleLabel } from "@/components/RoleLabel";
+
 import type { IncrementDirection } from "./Incrementer";
 import { Incrementer } from "./Incrementer";
 

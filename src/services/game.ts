@@ -1,3 +1,14 @@
+import { ServerValue } from "firebase-admin/database";
+
+import { getAdminDatabase } from "@/lib/firebase/admin";
+import {
+  type FirebaseGamePublic,
+  type FirebasePlayerState,
+  firebaseToGame,
+  firebaseToPlayerState,
+  gameToFirebase,
+  playerStateToFirebase,
+} from "@/lib/firebase/schema";
 import type {
   Game,
   GamePlayer,
@@ -5,16 +16,6 @@ import type {
   VisibilityReason,
 } from "@/lib/types";
 import type { PlayerGameState } from "@/server/types";
-import { getAdminDatabase } from "@/lib/firebase/admin";
-import { ServerValue } from "firebase-admin/database";
-import {
-  gameToFirebase,
-  firebaseToGame,
-  playerStateToFirebase,
-  firebaseToPlayerState,
-  type FirebaseGamePublic,
-  type FirebasePlayerState,
-} from "@/lib/firebase/schema";
 
 function gameRef(gameId: string) {
   return getAdminDatabase().ref(`games/${gameId}`);

@@ -1,11 +1,12 @@
 import type { PlayerRoleAssignment } from "@/lib/types";
+
+import { SecretVillainRole } from "../roles";
 import type { SecretVillainTurnState } from "../types";
 import {
-  GOOD_CARDS_TO_WIN,
-  BAD_CARDS_TO_WIN,
   BAD_CARDS_FOR_SPECIAL_BAD_WIN,
+  BAD_CARDS_TO_WIN,
+  GOOD_CARDS_TO_WIN,
 } from "../types";
-import { SecretVillainRole } from "../roles";
 
 export enum SecretVillainWinner {
   Good = "Good",

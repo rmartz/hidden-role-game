@@ -1,8 +1,8 @@
-export * from "./_types";
 export * from "./_config";
+export * from "./_types";
 
-import { WerewolfRole } from "./_types";
 import type { WerewolfRoleDefinition } from "./_types";
+import { WerewolfRole } from "./_types";
 import { ALTRUIST_ROLE } from "./altruist";
 import { ARSONIST_ROLE } from "./arsonist";
 import { BODYGUARD_ROLE } from "./bodyguard";

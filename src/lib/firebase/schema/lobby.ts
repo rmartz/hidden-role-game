@@ -1,3 +1,5 @@
+import { GAME_MODES } from "@/lib/game/modes";
+import { resolvePlayerOrder } from "@/lib/player-order";
 import type {
   Lobby,
   LobbyConfig,
@@ -9,9 +11,7 @@ import type {
 } from "@/lib/types";
 import { isSimpleRoleBucket } from "@/lib/types";
 import { DEFAULT_TIMER_CONFIG, GameMode } from "@/lib/types";
-import { GAME_MODES } from "@/lib/game/modes";
 import type { PublicLobby } from "@/server/types";
-import { resolvePlayerOrder } from "@/lib/player-order";
 
 export interface FirebaseLobbyPublic {
   ownerPlayerId: string;

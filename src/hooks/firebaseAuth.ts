@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { signInWithCustomToken } from "firebase/auth";
-import { getClientAuth } from "@/lib/firebase/client";
+import { useEffect, useState } from "react";
+
 import { getSessionId } from "@/lib/api";
+import { getClientAuth } from "@/lib/firebase/client";
 
 // Module-level deduplication: only one sign-in attempt at a time.
 let signInPromise: Promise<void> | undefined = undefined;

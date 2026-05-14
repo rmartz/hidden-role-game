@@ -1,7 +1,9 @@
-import { afterEach, describe, it, expect, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
-import { ConfirmTargetButtonView } from "./ConfirmTargetButtonView";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+
+import { ConfirmTargetButtonView } from "./ConfirmTargetButtonView";
 
 afterEach(cleanup);
 

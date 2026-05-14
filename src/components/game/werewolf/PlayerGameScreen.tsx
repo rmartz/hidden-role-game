@@ -1,11 +1,12 @@
 "use client";
 
-import { GameStatus } from "@/lib/types";
-import { WerewolfPhase } from "@/lib/game/modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
+import { WerewolfPhase } from "@/lib/game/modes/werewolf";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
-import { PlayerGameNightScreen } from "./PlayerGameNightScreen";
+import { GameStatus } from "@/lib/types";
+
 import { PlayerGameDayScreen } from "./PlayerGameDayScreen";
+import { PlayerGameNightScreen } from "./PlayerGameNightScreen";
 
 interface PlayerGameScreenProps {
   gameId: string;

@@ -1,9 +1,10 @@
-import { GameStatus } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
+import { GameStatus } from "@/lib/types";
+
 import { SecretVillainPhase, SpecialActionType } from "../types";
 import {
-  currentTurnState,
   checkShootWinCondition,
+  currentTurnState,
   SvVictoryConditionKey,
 } from "../utils";
 import { advanceToNextElection } from "./advance-to-election";

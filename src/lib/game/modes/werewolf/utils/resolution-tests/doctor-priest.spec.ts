@@ -1,8 +1,9 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { WerewolfRole } from "../../roles";
 import {
-  resolveNightActions,
   getInterimAttackedPlayerIds,
+  resolveNightActions,
 } from "../resolution";
 import { findKilled } from "./helpers";
 

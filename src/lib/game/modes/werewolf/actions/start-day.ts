@@ -1,24 +1,25 @@
-import { GameStatus, Team } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
-import { WerewolfPhase, isTeamNightAction } from "../types";
+import { GameStatus, Team } from "@/lib/types";
+
+import { getWerewolfModeConfig } from "../lobby-config";
+import { getWerewolfRole, WerewolfRole } from "../roles";
+import { getOrderedAffectedPlayerIds } from "../services";
 import type {
   AttackNightResolutionEvent,
   ToughGuyAbsorbedNightResolutionEvent,
   WerewolfNighttimePhase,
   WerewolfRoleTurnState,
 } from "../types";
+import { isTeamNightAction, WerewolfPhase } from "../types";
 import {
+  checkWinCondition,
   currentTurnState,
   isOwnerPlaying,
   resolveNightActions,
-  checkWinCondition,
   WerewolfWinner,
 } from "../utils";
-import { WerewolfRole, getWerewolfRole } from "../roles";
-import { didWolfCubDie } from "./helpers";
 import { confirmEvilEmpathResultAction } from "./confirm-evil-empath-result";
-import { getWerewolfModeConfig } from "../lobby-config";
-import { getOrderedAffectedPlayerIds } from "../services";
+import { didWolfCubDie } from "./helpers";
 
 export const startDayAction: GameAction = {
   isValid(game: Game, callerId: string) {
