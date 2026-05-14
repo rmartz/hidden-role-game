@@ -75,12 +75,15 @@ function collectBaseAttacksAndProtections(
   for (const [phaseKey, action] of Object.entries(nightActions)) {
     // Witch and Spellcaster are handled separately below.
     // Priest protection is handled via priestWards, not the generic Protect pipeline.
+    // Altruist intercept is applied after this loop.
+    // Swapper swap is applied after Altruist intercept.
     if (
       isRoleActive(phaseKey, [
         WerewolfRole.Witch,
         WerewolfRole.Spellcaster,
         WerewolfRole.Priest,
         WerewolfRole.Altruist,
+        WerewolfRole.Swapper,
       ])
     )
       continue;
@@ -422,8 +425,63 @@ export function resolveNightActions(
     }
   }
 
+  // Swapper: swap the attacks and protections between the two selected players.
+  // Runs after all other attack/protect modifiers so it operates on the final
+  // attack and protection state. Silenced and hypnotized events are swapped later.
+  const swapperAction = nightActions[WerewolfRole.Swapper] as
+    | {
+        targetPlayerId?: string;
+        secondTargetPlayerId?: string;
+        skipped?: boolean;
+      }
+    | undefined;
+  const swapperAId = swapperAction?.targetPlayerId;
+  const swapperBId = swapperAction?.secondTargetPlayerId;
+  if (
+    typeof swapperAId === "string" &&
+    typeof swapperBId === "string" &&
+    swapperAId !== swapperBId &&
+    !swapperAction?.skipped
+  ) {
+    const aId = swapperAId;
+    const bId = swapperBId;
+    const aAttacks = attacks.get(aId);
+    const bAttacks = attacks.get(bId);
+    const aProtections = protections.get(aId);
+    const bProtections = protections.get(bId);
+    if (bAttacks !== undefined) {
+      attacks.set(aId, bAttacks);
+    } else {
+      attacks.delete(aId);
+    }
+    if (aAttacks !== undefined) {
+      attacks.set(bId, aAttacks);
+    } else {
+      attacks.delete(bId);
+    }
+    if (bProtections !== undefined) {
+      protections.set(aId, bProtections);
+    } else {
+      protections.delete(aId);
+    }
+    if (aProtections !== undefined) {
+      protections.set(bId, aProtections);
+    } else {
+      protections.delete(bId);
+    }
+
+    // If the Altruist intercept redirected an attack onto the Altruist, but the
+    // Swapper subsequently moved that attack away, the intercept event is stale.
+    if (
+      altruistInterceptEvent?.type === "altruist-intercepted" &&
+      !attacks.has(altruistInterceptEvent.altruistPlayerId)
+    ) {
+      altruistInterceptEvent = undefined;
+    }
+  }
+
   // Veteran alert: if the Veteran alerted this night, resolve counter-kills.
-  // Counter-kills happen after the Altruist so the Altruist cannot intercept them.
+  // Counter-kills happen after the Altruist and Swapper so both cannot intercept them.
   const veteranAction = nightActions[WerewolfRole.Veteran];
   const veteranAlerted =
     veteranAction !== undefined &&
@@ -647,12 +705,47 @@ export function resolveNightActions(
         ]
       : [];
 
+  // Swapper: swap silenced and hypnotized events between the two selected players.
+  // (Attacks and protections were already swapped above, before buildKilledEvents.)
+  const swapperEvents: NightResolutionEvent[] = [];
+  let finalSilencedEvents = silencedEvents;
+  let finalHypnotizedEvents = hypnotizedEvents;
+  if (
+    typeof swapperAId === "string" &&
+    typeof swapperBId === "string" &&
+    swapperAId !== swapperBId &&
+    !swapperAction?.skipped
+  ) {
+    const aId = swapperAId;
+    const bId = swapperBId;
+    finalSilencedEvents = silencedEvents.map((e) => {
+      if (e.type === "silenced" && e.targetPlayerId === aId)
+        return { ...e, targetPlayerId: bId };
+      if (e.type === "silenced" && e.targetPlayerId === bId)
+        return { ...e, targetPlayerId: aId };
+      return e;
+    });
+    finalHypnotizedEvents = hypnotizedEvents.map((e) => {
+      if (e.type === "hypnotized" && e.targetPlayerId === aId)
+        return { ...e, targetPlayerId: bId };
+      if (e.type === "hypnotized" && e.targetPlayerId === bId)
+        return { ...e, targetPlayerId: aId };
+      return e;
+    });
+    swapperEvents.push({
+      type: "swapper-swapped",
+      firstPlayerId: aId,
+      secondPlayerId: bId,
+    });
+  }
+
   return [
     ...combatEvents,
     ...toughGuyEvents,
     ...(altruistInterceptEvent ? [altruistInterceptEvent] : []),
     ...veteranCounterkilledEvents,
-    ...silencedEvents,
-    ...hypnotizedEvents,
+    ...finalSilencedEvents,
+    ...finalHypnotizedEvents,
+    ...swapperEvents,
   ];
 }

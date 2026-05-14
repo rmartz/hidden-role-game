@@ -305,19 +305,22 @@ interface TeamNightAction {
 
 `resolveNightActions()` runs when `start-day` is called:
 
-1. Collects base attacks and protections from all roles except Witch, Altruist, Spellcaster, and Mummy.
+1. Collects base attacks and protections from all roles except Witch, Altruist, Spellcaster, Mummy, Swapper, and Priest.
 2. Applies Priest ward protection: any player with an active ward has the ward consume the attack (ward is removed, player survives).
 3. Applies Witch action: if target is already under attack → protect; otherwise → attack.
 4. Applies Altruist action (last): if the Altruist's target is under attack, the attack is redirected onto the Altruist (the Altruist dies instead).
-5. Applies Veteran counter-kill (after Altruist, so the Altruist cannot intercept the counter-kill): if the Veteran alerted this night (action has `alerted: true`):
+5. Applies Swapper action: swaps the attacks and protections maps between the two selected players. If the Altruist intercept is made stale by the swap, it is cancelled.
+6. Applies Veteran counter-kill (after Altruist and Swapper, so neither can intercept the counter-kill): if the Veteran alerted this night (action has `alerted: true`):
    - **Wolf repel:** if any wolf group targeted the Veteran, the wolf attack on the Veteran is removed and one alive wolf-group participant is counter-killed instead. Emits `veteran-counterkilled (source: "wolf-repel")`.
    - **Visitor kill:** any solo role (except Priest wards and Investigation-category roles such as Seer, which observe from afar using mystical powers) that visited the Veteran is counter-killed and any attack or protection they provided to the Veteran is discarded. Emits `veteran-counterkilled (source: "visitor")` per killed visitor.
-6. Applies Smite: any smited player is killed regardless of protections. Smite deaths cannot be absorbed by Tough Guy.
-7. Checks Old Man timer (`oldManTimerPlayerId` option): if the timer has fired **and** the Old Man was not attacked this night, emits a killed event with `attackedBy: [OLD_MAN_TIMER_KEY]`, `died: true`. Old Man timer deaths cannot be absorbed by Tough Guy.
-8. Applies Tough Guy absorption: if a Tough Guy is attacked (after Smite and the Old Man timer have been applied) for the first time, the attack is absorbed (survives this night, dies on the next attack). Smite and Old Man timer deaths bypass this step.
-9. Emits `veteran-counterkilled` events: emitted here (after Tough Guy absorption) so the `died` field reflects the actual combat outcome (e.g. `died: false` if the counter-killed visitor was a first-hit Tough Guy).
-10. Applies Spellcaster action: emits a `silenced` event.
-11. Applies Mummy action: emits a `hypnotized` event for the target.
+7. Builds kill events from the final attack/protect state.
+8. Applies Smite: any smited player is killed regardless of protections. Smite deaths cannot be absorbed by Tough Guy.
+9. Checks Old Man timer (`oldManTimerPlayerId` option): if the timer has fired **and** the Old Man was not attacked this night, emits a killed event with `attackedBy: [OLD_MAN_TIMER_KEY]`, `died: true`. Old Man timer deaths cannot be absorbed by Tough Guy.
+10. Applies Tough Guy absorption: if a Tough Guy is attacked (after Smite and the Old Man timer have been applied) for the first time, the attack is absorbed (survives this night, dies on the next attack). Smite and Old Man timer deaths bypass this step.
+11. Emits `veteran-counterkilled` events: emitted here (after Tough Guy absorption) so the `died` field reflects the actual combat outcome (e.g. `died: false` if the counter-killed visitor was a first-hit Tough Guy).
+12. Applies Spellcaster action: emits a `silenced` event.
+13. Applies Mummy action: emits a `hypnotized` event for the target.
+14. Applies Swapper to silenced and hypnotized events: swaps the `targetPlayerId` of any silenced or hypnotized event between the two Swapper targets, then emits a `swapper-swapped` event.
 12. Returns `NightResolutionEvent[]`:
 
 - `{ type: "killed", targetPlayerId, attackedBy, protectedBy, died }`
@@ -326,6 +329,7 @@ interface TeamNightAction {
 - `{ type: "tough-guy-absorbed", targetPlayerId }`
 - `{ type: "altruist-intercepted", altruistPlayerId, savedPlayerId }`
 - `{ type: "veteran-counterkilled", counterkilledPlayerId, veteranPlayerId, source: "wolf-repel" | "visitor", died }`
+- `{ type: "swapper-swapped", firstPlayerId, secondPlayerId }`
 
 After resolution, `start-day` performs additional checks:
 
@@ -347,8 +351,12 @@ flowchart TD
     NewAttack --> Altruist
     Altruist{Altruist target\nunder attack?}
     Altruist -->|yes| Intercept[Redirect attack onto Altruist\nemit altruist-intercepted]
-    Altruist -->|no| Veteran
-    Intercept --> Veteran
+    Altruist -->|no| Swapper
+    Intercept --> Swapper
+    Swapper{Swapper acted?}
+    Swapper -->|yes| SwapAP[Swap attacks and protections\nbetween selected players]
+    Swapper -->|no| Veteran
+    SwapAP --> Veteran
     Veteran{Veteran alerted\nthis night?}
     Veteran -->|yes - wolf targeted Vet| WolfRepel[Remove wolf attack on Vet\ncounter-kill one wolf]
     Veteran -->|yes - solo visitor| VisitorKill[Counter-kill visiting player\ndiscard visitor's attack/protect]
@@ -375,8 +383,12 @@ flowchart TD
     Silence --> Mummy
     Mummy{Mummy acted?}
     Mummy -->|yes| Hypnotize[Emit hypnotized event for target]
-    Mummy -->|no| Return
-    Hypnotize --> Return
+    Mummy -->|no| SwapEffects
+    Hypnotize --> SwapEffects
+    SwapEffects{Swapper acted?}
+    SwapEffects -->|yes| SwapSH[Swap silenced and hypnotized\nevents between selected players\nemit swapper-swapped]
+    SwapEffects -->|no| Return
+    SwapSH --> Return
     Return([Return NightResolutionEvent array])
 ```
 

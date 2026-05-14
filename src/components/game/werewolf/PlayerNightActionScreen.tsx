@@ -63,6 +63,9 @@ export function PlayerNightActionScreen({
   const allAgreed = gameState.allAgreed ?? false;
   const isMentalist =
     !isGroupPhase && gameState.myRole?.id === WerewolfRole.Mentalist;
+  const isSwapper =
+    !isGroupPhase && gameState.myRole?.id === WerewolfRole.Swapper;
+  const requiresDualTarget = isMentalist || isSwapper;
   const isMonarch =
     !isGroupPhase && gameState.myRole?.id === (WerewolfRole.Monarch as string);
   const monarchKnightedPlayerIds = gameState.monarchKnightedPlayerIds ?? [];
@@ -85,7 +88,7 @@ export function PlayerNightActionScreen({
     ? selectableTargets.filter(
         ([player, isSelected]) =>
           isSelected ||
-          (isMentalist && player.id === gameState.mySecondNightTarget),
+          (requiresDualTarget && player.id === gameState.mySecondNightTarget),
       )
     : selectableTargets;
 
@@ -234,7 +237,7 @@ export function PlayerNightActionScreen({
             myPlayerId={gameState.myPlayerId}
             previousNightTargetId={gameState.previousNightTargetId}
             mySecondNightTarget={gameState.mySecondNightTarget}
-            requiresSecondTarget={isMentalist}
+            requiresSecondTarget={requiresDualTarget}
             mirrorcasterCharged={gameState.mirrorcasterCharged}
             monarchKnightingsRemaining={
               isMonarch ? monarchKnightingsRemaining : undefined

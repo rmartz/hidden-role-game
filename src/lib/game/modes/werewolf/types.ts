@@ -125,6 +125,14 @@ export interface AltruistInterceptedNightResolutionEvent {
   savedPlayerId: string;
 }
 
+export interface SwapperSwappedNightResolutionEvent {
+  type: "swapper-swapped";
+  /** The first player selected by the Swapper. */
+  firstPlayerId: string;
+  /** The second player selected by the Swapper. */
+  secondPlayerId: string;
+}
+
 export interface VeteranCounterkilledNightResolutionEvent {
   type: "veteran-counterkilled";
   /** The player targeted by the Veteran's counter-kill. */
@@ -143,6 +151,7 @@ export type NightResolutionEvent =
   | HypnotizedNightResolutionEvent
   | ToughGuyAbsorbedNightResolutionEvent
   | AltruistInterceptedNightResolutionEvent
+  | SwapperSwappedNightResolutionEvent
   | VeteranCounterkilledNightResolutionEvent;
 
 export enum DaytimeVote {

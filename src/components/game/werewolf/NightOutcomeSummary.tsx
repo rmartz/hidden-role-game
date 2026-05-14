@@ -35,7 +35,9 @@ export function NightOutcomeSummary({
   );
   const regularEvents = events.filter(
     (e) =>
-      e.type !== "altruist-intercepted" && e.type !== "veteran-counterkilled",
+      e.type !== "altruist-intercepted" &&
+      e.type !== "veteran-counterkilled" &&
+      e.type !== "swapper-swapped",
   );
   // For a veteran-counter-killed player who was killed solely by the Veteran,
   // strip the generic "killed" event from the row so the narrator sees the
