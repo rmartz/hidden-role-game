@@ -72,6 +72,7 @@ export enum WerewolfRole {
   Sentinel = "werewolf-sentinel",
   Spellcaster = "werewolf-spellcaster",
   Spoiler = "werewolf-spoiler",
+  Swapper = "werewolf-swapper",
   Tanner = "werewolf-tanner",
   ToughGuy = "werewolf-tough-guy",
   Vigilante = "werewolf-vigilante",
@@ -116,6 +117,8 @@ export interface WerewolfRoleDefinition extends RoleDefinition<
   revealsExactRole?: boolean;
   /** Mentalist only: investigation checks if two selected targets share the same team. */
   dualTargetInvestigate?: boolean;
+  /** Swapper only: requires two swap targets; resolves by swapping final night effects. */
+  dualTargetSwap?: boolean;
   /** Exposer only: ability can only be used once per game. */
   oncePerGame?: boolean;
   /** Illuminati only: on night 1, the narrator reveals all role assignments to this player. */

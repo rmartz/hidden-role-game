@@ -4,6 +4,7 @@ export * from "./GameConfigurationPanel";
 export * from "./GameModePicker";
 export * from "./JoinPrompt";
 export * from "./LobbyConflictResolution";
+export * from "./LobbyLayout";
 export * from "./PlayerList";
 export * from "./PlayerList.copy";
 export * from "./PlayerRow";
