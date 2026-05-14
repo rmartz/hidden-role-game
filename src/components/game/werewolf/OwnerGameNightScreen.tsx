@@ -184,7 +184,8 @@ export function OwnerGameNightScreen({
       : undefined;
   const isVeteranAlerted = veteranAction?.alerted === true;
   const veteranHasDecided = veteranAction !== undefined;
-  const narratorVeteranAlertsUsed = turnState.roleState?.veteran?.alertsUsed ?? 0;
+  const narratorVeteranAlertsUsed =
+    turnState.roleState?.veteran?.alertsUsed ?? 0;
 
   const activeRoleDef = modeConfig.roles[baseActivePhaseKey] as
     | WerewolfRoleDefinition

@@ -378,7 +378,8 @@ export const startDayAction: GameAction = {
       !isTeamNightAction(veteranNightAction) &&
       veteranNightAction.alerted === true;
     const veteranAlertsUsed =
-      (ts.roleState?.veteran?.alertsUsed ?? 0) + (veteranAlertedThisNight ? 1 : 0);
+      (ts.roleState?.veteran?.alertsUsed ?? 0) +
+      (veteranAlertedThisNight ? 1 : 0);
 
     // Arsonist: update the doused player list.
     // If the Arsonist self-targeted (ignite), reset the doused list.
@@ -461,7 +462,9 @@ export const startDayAction: GameAction = {
       ...(arsonistDousedPlayerIds.length > 0
         ? { arsonist: { dousedPlayerIds: arsonistDousedPlayerIds } }
         : {}),
-      ...(veteranAlertsUsed > 0 ? { veteran: { alertsUsed: veteranAlertsUsed } } : {}),
+      ...(veteranAlertsUsed > 0
+        ? { veteran: { alertsUsed: veteranAlertsUsed } }
+        : {}),
     };
 
     game.status = {

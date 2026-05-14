@@ -83,7 +83,8 @@ export const setNightTargetAction: GameAction = {
       if (alerted === true) {
         if (targetPlayerId !== undefined && targetPlayerId !== null)
           return false;
-        if ((ts.roleState?.veteran?.alertsUsed ?? 0) >= VETERAN_ALERTS_LIMIT) return false;
+        if ((ts.roleState?.veteran?.alertsUsed ?? 0) >= VETERAN_ALERTS_LIMIT)
+          return false;
         return true;
       }
       if (targetPlayerId === undefined) return true;
