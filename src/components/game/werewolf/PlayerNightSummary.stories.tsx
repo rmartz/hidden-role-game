@@ -72,6 +72,25 @@ export const MultipleEffects: Story = {
   },
 };
 
+export const PlayerExposed: Story = {
+  args: {
+    players,
+    nightStatus: [
+      { targetPlayerId: "p4", effect: "exposed", roleName: "Seer" },
+    ] satisfies DaytimeNightStatusEntry[],
+  },
+};
+
+export const PlayerExposedAndKilled: Story = {
+  args: {
+    players,
+    nightStatus: [
+      { targetPlayerId: "p2", effect: "killed" },
+      { targetPlayerId: "p2", effect: "exposed", roleName: "Altruist" },
+    ] satisfies DaytimeNightStatusEntry[],
+  },
+};
+
 export const PlayerKnighted: Story = {
   args: {
     players,

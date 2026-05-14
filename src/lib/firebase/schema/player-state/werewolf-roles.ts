@@ -27,13 +27,17 @@ export interface FirebaseWerewolfRoleState {
     roleName: string;
     team: string;
   }[];
-  exposerReveal?: { playerName: string; roleName: string; team: string };
   mySecondNightTarget?: string;
   exposerAbilityUsed?: boolean;
   hunterRevengePlayerId?: string;
   hiddenRoleIds?: string[];
   arsonistDousedPlayerIds?: string[];
   pendingSmitePlayerIds?: string[];
+  thingTappedMe?: boolean;
+  thingTappedPlayerId?: string;
+  insomniacResult?: { leftActed: boolean; rightActed: boolean };
+  countResult?: { leftCount: number; rightCount: number };
+  adjacentPlayerIds?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -67,7 +71,6 @@ export function werewolfRoleStateToFirebase(
     ...(state.illuminatiRoleAssignments?.length
       ? { illuminatiRoleAssignments: state.illuminatiRoleAssignments }
       : {}),
-    ...(state.exposerReveal ? { exposerReveal: state.exposerReveal } : {}),
     ...(state.mySecondNightTarget
       ? { mySecondNightTarget: state.mySecondNightTarget }
       : {}),
@@ -83,6 +86,17 @@ export function werewolfRoleStateToFirebase(
       : {}),
     ...(state.pendingSmitePlayerIds?.length
       ? { pendingSmitePlayerIds: state.pendingSmitePlayerIds }
+      : {}),
+    ...(state.thingTappedMe ? { thingTappedMe: true } : {}),
+    ...(state.thingTappedPlayerId
+      ? { thingTappedPlayerId: state.thingTappedPlayerId }
+      : {}),
+    ...(state.insomniacResult
+      ? { insomniacResult: state.insomniacResult }
+      : {}),
+    ...(state.countResult ? { countResult: state.countResult } : {}),
+    ...(state.adjacentPlayerIds?.length
+      ? { adjacentPlayerIds: state.adjacentPlayerIds }
       : {}),
   };
 }
@@ -119,14 +133,6 @@ export function werewolfRoleStateFromFirebase(
           })),
         }
       : {}),
-    ...(raw.exposerReveal
-      ? {
-          exposerReveal: {
-            ...raw.exposerReveal,
-            team: raw.exposerReveal.team as Team,
-          },
-        }
-      : {}),
     ...(raw.mySecondNightTarget
       ? { mySecondNightTarget: raw.mySecondNightTarget }
       : {}),
@@ -140,6 +146,15 @@ export function werewolfRoleStateFromFirebase(
       : {}),
     ...(raw.pendingSmitePlayerIds?.length
       ? { pendingSmitePlayerIds: raw.pendingSmitePlayerIds }
+      : {}),
+    ...(raw.thingTappedMe ? { thingTappedMe: true } : {}),
+    ...(raw.thingTappedPlayerId
+      ? { thingTappedPlayerId: raw.thingTappedPlayerId }
+      : {}),
+    ...(raw.insomniacResult ? { insomniacResult: raw.insomniacResult } : {}),
+    ...(raw.countResult ? { countResult: raw.countResult } : {}),
+    ...(raw.adjacentPlayerIds?.length
+      ? { adjacentPlayerIds: raw.adjacentPlayerIds }
       : {}),
   };
 }

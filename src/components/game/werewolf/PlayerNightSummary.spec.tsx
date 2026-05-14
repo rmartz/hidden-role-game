@@ -60,6 +60,32 @@ describe("PlayerNightSummary", () => {
     expect(container.querySelector("h2")).toBeNull();
   });
 
+  it("renders exposed player text", () => {
+    const nightStatus: DaytimeNightStatusEntry[] = [
+      { targetPlayerId: "p1", effect: "exposed", roleName: "Werewolf" },
+    ];
+
+    render(<PlayerNightSummary players={players} nightStatus={nightStatus} />);
+
+    expect(
+      screen.getByText(WEREWOLF_COPY.exposer.nightSummary("Alice", "Werewolf")),
+    ).toBeDefined();
+  });
+
+  it("renders exposed message alongside kill when both apply to the same player", () => {
+    const nightStatus: DaytimeNightStatusEntry[] = [
+      { targetPlayerId: "p1", effect: "killed" },
+      { targetPlayerId: "p1", effect: "exposed", roleName: "Altruist" },
+    ];
+
+    render(<PlayerNightSummary players={players} nightStatus={nightStatus} />);
+
+    expect(screen.getByText("Alice was eliminated.")).toBeDefined();
+    expect(
+      screen.getByText(WEREWOLF_COPY.exposer.nightSummary("Alice", "Altruist")),
+    ).toBeDefined();
+  });
+
   it("renders multiple effects", () => {
     const nightStatus: DaytimeNightStatusEntry[] = [
       { targetPlayerId: "p1", effect: "killed" },

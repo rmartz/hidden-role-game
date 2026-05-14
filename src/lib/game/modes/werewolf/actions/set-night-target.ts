@@ -159,6 +159,29 @@ export const setNightTargetAction: GameAction = {
         return false;
     }
 
+    // Roles with adjacentTargetOnly may only target immediate seating neighbours.
+    if (!isOwner) {
+      const callerAssignment = game.roleAssignments.find(
+        (a) => a.playerId === callerId,
+      );
+      const callerRoleDef = callerAssignment
+        ? getWerewolfRole(callerAssignment.roleDefinitionId)
+        : undefined;
+      if (callerRoleDef?.adjacentTargetOnly) {
+        const rawOrder = game.playerOrder ?? game.players.map((p) => p.id);
+        // Exclude the narrator so a player seated next to the narrator still
+        // has two selectable neighbours, matching the pattern used by
+        // extractCountState and extractTheThingState.
+        const playerOrder = rawOrder.filter((id) => id !== game.ownerPlayerId);
+        const idx = playerOrder.indexOf(callerId);
+        if (idx === -1 || playerOrder.length < 2) return false;
+        const left =
+          playerOrder[(idx - 1 + playerOrder.length) % playerOrder.length];
+        const right = playerOrder[(idx + 1) % playerOrder.length];
+        if (targetPlayerId !== left && targetPlayerId !== right) return false;
+      }
+    }
+
     // Zombie cannot infect an already-infected player.
     if (isRoleActive(phaseKey, WerewolfRole.Zombie)) {
       if (ts.roleState?.zombie?.infected.includes(targetPlayerId)) return false;

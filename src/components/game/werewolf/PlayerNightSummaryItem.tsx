@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 
 interface PlayerNightSummaryItemProps {
@@ -12,10 +13,11 @@ interface PlayerNightSummaryItemProps {
   hypnotized: boolean;
   smited: boolean;
   peaceful: boolean;
+  exposedRoleName?: string;
   isMe: boolean;
 }
 
-export function PlayerNightSummaryItem({
+function renderPrimaryLine({
   playerName,
   killed,
   altruistSacrifice,
@@ -28,7 +30,7 @@ export function PlayerNightSummaryItem({
   smited,
   peaceful,
   isMe,
-}: PlayerNightSummaryItemProps) {
+}: Omit<PlayerNightSummaryItemProps, "exposedRoleName">) {
   // Personal messages for silenced/hypnotized player (only visible to themselves).
   if (isMe && silenced) {
     return (
@@ -97,9 +99,30 @@ export function PlayerNightSummaryItem({
     .filter(Boolean)
     .join(" and ");
 
+  if (!effects) return undefined;
+
   return (
     <li className="text-sm">
       {playerName} was {effects}.
     </li>
+  );
+}
+
+export function PlayerNightSummaryItem({
+  exposedRoleName,
+  ...rest
+}: PlayerNightSummaryItemProps) {
+  const primaryLine = renderPrimaryLine(rest);
+  const exposedLine = exposedRoleName ? (
+    <li className="text-sm font-medium text-purple-700 dark:text-purple-400">
+      {WEREWOLF_COPY.exposer.nightSummary(rest.playerName, exposedRoleName)}
+    </li>
+  ) : undefined;
+
+  return (
+    <Fragment>
+      {primaryLine}
+      {exposedLine}
+    </Fragment>
   );
 }

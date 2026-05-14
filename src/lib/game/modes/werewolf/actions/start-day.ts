@@ -186,8 +186,11 @@ export const startDayAction: GameAction = {
       oneEyedSeerLockedTargetId = undefined;
     }
 
-    // Exposer reveal: if the Exposer confirmed a target this night, store the reveal.
+    // Exposer reveal: if the Exposer confirmed a target this night, capture the
+    // new reveal for this day's summary on the daytime phase. The persistent
+    // roleState field carries it forward for the narrator night screen.
     let exposerReveal = rs.exposer?.reveal;
+    let newExposerReveal: { playerId: string; roleId: string } | undefined;
     const exposerAction =
       nightPhase.nightActions[WerewolfRole.Exposer as string];
     if (
@@ -201,10 +204,11 @@ export const startDayAction: GameAction = {
         (a) => a.playerId === exposerAction.targetPlayerId,
       );
       if (exposerTargetAssignment) {
-        exposerReveal = {
+        newExposerReveal = {
           playerId: exposerAction.targetPlayerId,
           roleId: exposerTargetAssignment.roleDefinitionId,
         };
+        exposerReveal = newExposerReveal;
       }
     }
 
@@ -372,6 +376,14 @@ export const startDayAction: GameAction = {
         ? [...existingInfected, zombieAction.targetPlayerId]
         : existingInfected;
 
+    // The Thing tap: record the tapped player ID so they see the notification
+    // during the following daytime.
+    const thingAction = nightPhase.nightActions[WerewolfRole.TheThing];
+    const thingTapped =
+      thingAction !== undefined && !isTeamNightAction(thingAction)
+        ? thingAction.targetPlayerId
+        : undefined;
+
     // Arsonist: update the doused player list.
     // If the Arsonist self-targeted (ignite), reset the doused list.
     // If the Arsonist targeted another player (douse), add them to the list.
@@ -446,6 +458,7 @@ export const startDayAction: GameAction = {
         ? { executioner: { targetId: rs.executioner.targetId } }
         : {}),
       ...(mirrorcasterCharged ? { mirrorcaster: { charged: true } } : {}),
+      ...(thingTapped ? { theThing: { tapped: thingTapped } } : {}),
       ...(draculaWives.length > 0 ? { dracula: { wives: draculaWives } } : {}),
       ...(zombieInfected.length > 0
         ? { zombie: { infected: zombieInfected } }
@@ -465,6 +478,7 @@ export const startDayAction: GameAction = {
           nightActions: nightPhase.nightActions,
           revealedPlayerIds,
           ...(nightResolution.length > 0 ? { nightResolution } : {}),
+          ...(newExposerReveal ? { exposerReveal: newExposerReveal } : {}),
           ...(knightedPlayerId !== undefined ? { knightedPlayerId } : {}),
           ...(nightPhase.smitedPlayerIds?.length
             ? { smitedPlayerIds: nightPhase.smitedPlayerIds }

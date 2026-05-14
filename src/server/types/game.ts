@@ -50,9 +50,12 @@ export interface DaytimeNightStatusEntry {
     | "smited"
     | "survived"
     | "peaceful"
-    | "altruist-sacrifice";
+    | "altruist-sacrifice"
+    | "exposed";
   /** For altruist-sacrifice: the player who was saved. */
   savedPlayerId?: string;
+  /** For exposed: the name of the publicly revealed role. */
+  roleName?: string;
 }
 
 /** Night effects visible to the Witch during their nighttime phase only. */
