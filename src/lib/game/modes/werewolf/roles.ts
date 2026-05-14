@@ -41,6 +41,9 @@ export const WEREWOLF_ROLE_CATEGORY_LABELS: Record<
   [WerewolfRoleCategory.VillagerHandicap]: "Villager — Handicap",
 };
 
+// Append-only: add new roles at the end of this enum to avoid merge conflicts.
+// Two role PRs inserting into the same alphabetical window will collide;
+// appending avoids that class of conflict entirely (string values are stable serially).
 export enum WerewolfRole {
   Altruist = "werewolf-altruist",
   Arsonist = "werewolf-arsonist",
