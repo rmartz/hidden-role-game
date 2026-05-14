@@ -1,10 +1,12 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import type { Game } from "@/lib/types";
-import type { WerewolfTurnState, WerewolfDaytimePhase } from "../types";
-import { WerewolfPhase } from "../types";
+
 import { WerewolfRole } from "../roles";
-import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
-import { makePlayingGame, makeNightState } from "./test-helpers";
+import type { WerewolfDaytimePhase, WerewolfTurnState } from "../types";
+import { WerewolfPhase } from "../types";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "./index";
+import { makeNightState, makePlayingGame } from "./test-helpers";
 
 const startDay = WEREWOLF_ACTIONS[WerewolfAction.StartDay];
 const startNight = WEREWOLF_ACTIONS[WerewolfAction.StartNight];
