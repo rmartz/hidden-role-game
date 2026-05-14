@@ -86,8 +86,10 @@ export enum WerewolfRole {
   Zombie = "werewolf-zombie",
 }
 
-export interface WerewolfRoleDefinition
-  extends RoleDefinition<WerewolfRole, Team> {
+export interface WerewolfRoleDefinition extends RoleDefinition<
+  WerewolfRole,
+  Team
+> {
   /** Override to allow werewolf-specific awareness criteria. */
   awareOf?: { teams?: Team[]; roles?: WerewolfRole[]; werewolves?: boolean };
   wakesAtNight: WakesAtNight;
