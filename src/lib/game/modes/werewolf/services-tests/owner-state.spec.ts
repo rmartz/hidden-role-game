@@ -5,7 +5,7 @@ import { WerewolfPhase } from "../types";
 import type { WerewolfTurnState, NightResolutionEvent } from "../types";
 import { WerewolfRole } from "../roles";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "../timer-config";
-import { extractDaytimeNightSummary } from "./owner-state";
+import { extractDaytimeNightSummary } from "../services/owner-state";
 
 function makeDaytimeGame(
   nightResolution: NightResolutionEvent[],

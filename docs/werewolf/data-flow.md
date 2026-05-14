@@ -83,7 +83,7 @@ These fields are only populated when the active phase matches the player's role.
 
 | Field                      | Description                                                                                                                                                                                                                           |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nightStatus`              | `{ targetPlayerId, effect }[]` — outcome of the previous night. Effects: `"killed"`, `"knighted"`, `"silenced"`, `"hypnotized"`, `"smited"`, `"survived"`, `"peaceful"` (`"peaceful"` indicates the Old Man died from timer expiring) |
+| `nightStatus`              | `{ targetPlayerId, effect }[]` — outcome of the previous night. Effects: `"killed"`, `"knighted"`, `"silenced"`, `"hypnotized"`, `"smited"`, `"survived"`, `"peaceful"` (`"peaceful"` indicates the Old Man died from timer expiring), `"veteran-counterkill"` (player was counter-killed by the Veteran) |
 | `nominations`              | Current nominations for trial defendants                                                                                                                                                                                              |
 | `myNominatedDefendantId`   | The defendant this player has nominated (if any)                                                                                                                                                                                      |
 | `activeTrial`              | Active trial state (defendant, phase, votes) if a trial is in progress                                                                                                                                                                |
@@ -171,10 +171,15 @@ Narrator starts day (start-day)
     3. Apply Priest wards (ward absorbs attack, ward is consumed)
     4. Apply Witch action (protect or attack)
     5. Apply Altruist intercept (redirects attack onto self)
-    6. Apply Tough Guy absorption (survives first attack)
+    6. Apply Veteran counter-kill (after Altruist, so Altruist cannot intercept the counter-kill):
+       - Wolf repel: wolf attack on alerted Veteran removed, one wolf counter-killed
+       - Visitor kill: Protect/Attack roles and Mirrorcaster that physically visited the Veteran are counter-killed
     7. Apply Smite (forced death regardless of protections)
-    8. Apply Spellcaster silence and Mummy hypnotize
-    9. Resolve remaining attacks (protected → survived, else → killed)
+    8. Check Old Man timer
+    9. Apply Tough Guy absorption (survives first attack; Smite and Old Man timer deaths are forced and bypass this)
+   10. Emit veteran-counterkilled events (after Tough Guy absorption, so died reflects actual outcome)
+   11. Apply Spellcaster silence and Mummy hypnotize
+   12. Resolve remaining attacks (protected → survived, else → killed)
   → Arsonist doused list updated:
     - Self-target (ignite): list reset to empty after attacks resolved
     - Other-target (douse): target appended to arsonistDousedPlayerIds (dead targets skipped)
