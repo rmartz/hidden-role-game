@@ -43,6 +43,7 @@ export interface DaytimeNightStatusEntry {
   effect:
     | "killed"
     | "protected"
+    | "knighted"
     | "silenced"
     | "hypnotized"
     | "smited"

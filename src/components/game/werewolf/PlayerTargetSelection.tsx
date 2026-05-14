@@ -35,6 +35,7 @@ export interface PlayerTargetSelectionViewProps {
   requiresSecondTarget?: boolean;
   mirrorcasterCharged?: boolean;
   mercenaryCharged?: boolean;
+  monarchKnightingsRemaining?: number;
   isPending: boolean;
   onMutate: (params: { actionId: string; payload?: unknown }) => void;
   onConfirm: () => void;
@@ -67,6 +68,7 @@ export function PlayerTargetSelectionView({
   requiresSecondTarget = false,
   mirrorcasterCharged,
   mercenaryCharged,
+  monarchKnightingsRemaining,
   isPending,
   onMutate,
   onConfirm,
@@ -87,6 +89,7 @@ export function PlayerTargetSelectionView({
   const shouldShowMentalistSecondTargetHeading =
     requiresSecondTarget &&
     hasFirstMentalistTarget !== hasSecondMentalistTarget;
+  const isMonarch = confirmPhaseKey === WerewolfRole.Monarch;
 
   const handleTargetClick = (player: TargetablePlayer, isSelected: boolean) => {
     if (requiresSecondTarget) {
@@ -213,8 +216,19 @@ export function PlayerTargetSelectionView({
                     : WEREWOLF_COPY.mercenary.chooseProtectTarget
                   : shouldShowMentalistSecondTargetHeading
                     ? WEREWOLF_COPY.mentalist.chooseSecondTarget
-                    : WEREWOLF_COPY.targetSelection.chooseTarget}
+                    : isMonarch
+                      ? WEREWOLF_COPY.monarch.choosePlayerToKnight
+                      : WEREWOLF_COPY.targetSelection.chooseTarget}
           </h2>
+          {isMonarch &&
+            monarchKnightingsRemaining !== undefined &&
+            !isConfirmed && (
+              <p className="text-sm text-muted-foreground mb-2 text-center">
+                {WEREWOLF_COPY.monarch.knighthoodsRemaining(
+                  monarchKnightingsRemaining,
+                )}
+              </p>
+            )}
           {!(isConfirmed && myNightTarget === null) && (
             <div className="flex flex-col gap-2 max-w-sm mx-auto">
               {targets.map(([player, isSelected]) => (

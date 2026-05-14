@@ -103,6 +103,8 @@ describe("Werewolf player state round-trip", () => {
       mercenaryCharged: true,
       mercenaryBribedPlayerIds: ["p3", "p4"],
       mercenaryAlsoWins: true,
+      monarchKnightedPlayerIds: ["p2", "p3"],
+      monarchKnightingsUsed: 2,
       hunterRevengePlayerId: "p1",
     });
     const result = firebaseToPlayerState(
@@ -118,6 +120,8 @@ describe("Werewolf player state round-trip", () => {
     expect(result.mercenaryCharged).toBe(true);
     expect(result.mercenaryBribedPlayerIds).toEqual(["p3", "p4"]);
     expect(result.mercenaryAlsoWins).toBe(true);
+    expect(result.monarchKnightedPlayerIds).toEqual(["p2", "p3"]);
+    expect(result.monarchKnightingsUsed).toBe(2);
     expect(result.hunterRevengePlayerId).toBe("p1");
   });
 

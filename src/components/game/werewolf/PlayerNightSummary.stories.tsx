@@ -70,6 +70,15 @@ export const MultipleEffects: Story = {
   },
 };
 
+export const PlayerKnighted: Story = {
+  args: {
+    players,
+    nightStatus: [
+      { targetPlayerId: "p4", effect: "knighted" },
+    ] satisfies DaytimeNightStatusEntry[],
+  },
+};
+
 export const NoEvents: Story = {
   args: {
     players,

@@ -280,6 +280,10 @@ describe("getConfirmLabel", () => {
     expect(getConfirmLabel(WerewolfRole.Spellcaster)).toBe("Silence");
   });
 
+  it("returns 'Knight' for Monarch", () => {
+    expect(getConfirmLabel(WerewolfRole.Monarch)).toBe("Knight");
+  });
+
   it("returns 'Confirm' for None roles like Villager", () => {
     expect(getConfirmLabel(WerewolfRole.Villager)).toBe("Confirm");
   });

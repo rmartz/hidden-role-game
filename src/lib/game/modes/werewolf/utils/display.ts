@@ -213,6 +213,7 @@ export function getConfirmLabel(
       : "Attack";
   }
   if (isRoleActive(phaseKey, WerewolfRole.Spellcaster)) return "Silence";
+  if (isRoleActive(phaseKey, WerewolfRole.Monarch)) return "Knight";
   if (isRoleActive(phaseKey, WerewolfRole.Mirrorcaster)) {
     return mirrorcasterCharged ? "Attack" : "Protect";
   }
