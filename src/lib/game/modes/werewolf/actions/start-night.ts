@@ -1,7 +1,7 @@
 import { GameStatus } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
 import { WerewolfPhase } from "../types";
-import type { WerewolfDaytimePhase } from "../types";
+import type { WerewolfDaytimePhase, WerewolfRoleTurnState } from "../types";
 import {
   buildNightPhaseOrder,
   currentTurnState,
@@ -21,7 +21,7 @@ export const startNightAction: GameAction = {
     const ts = currentTurnState(game);
     if (ts?.phase.type !== WerewolfPhase.Daytime) return false;
     // Cannot advance to night while Hunter revenge is pending
-    if (ts.hunterRevengePlayerId) return false;
+    if (ts.roleState?.hunter?.revengePlayerId) return false;
     // Cannot advance to night while a trial is actively ongoing
     if (ts.phase.activeTrial && !ts.phase.activeTrial.verdict) return false;
     return true;
@@ -31,11 +31,12 @@ export const startNightAction: GameAction = {
     if (!ts) return;
     const dayPhase = ts.phase as WerewolfDaytimePhase;
     const nextTurn = ts.turn + 1;
+    const rs = ts.roleState ?? {};
     // If a Wolf Cub died last turn, Werewolves get an extra phase this night.
     // Use a suffixed key so the second phase has its own nightActions entry.
     const wolfCubBonusPhaseKey =
       WerewolfRole.Werewolf + GROUP_PHASE_KEY_SEPARATOR + "2";
-    const extraGroupPhaseKeys = ts.wolfCubDied ? [wolfCubBonusPhaseKey] : [];
+    const extraGroupPhaseKeys = rs.wolfCub?.died ? [wolfCubBonusPhaseKey] : [];
 
     // Village Drunk: sober up on VILLAGE_DRUNK_SOBER_TURN.
     // Apply the sober role override before building the night phase order so
@@ -89,19 +90,47 @@ export const startNightAction: GameAction = {
     // Dracula: carry forward wives (filtering out the dead) and check win condition.
     // Dracula wins if alive and ≥3 wives are alive at the start of any night
     // (after the first full day-and-night cycle, i.e. turn > 1).
-    const aliveWives = (ts.draculaWives ?? []).filter(
+    const aliveWives = (rs.dracula?.wives ?? []).filter(
       (id) => !ts.deadPlayerIds.includes(id),
     );
 
     // Zombie: carry forward infected list (filtering out the dead).
-    const aliveInfected = (ts.zombieInfected ?? []).filter(
+    const aliveInfected = (rs.zombie?.infected ?? []).filter(
       (id) => !ts.deadPlayerIds.includes(id),
     );
 
     // Arsonist: carry forward doused list (filtering out the dead).
-    const aliveDousedPlayerIds = (ts.arsonistDousedPlayerIds ?? []).filter(
+    const aliveDousedPlayerIds = (rs.arsonist?.dousedPlayerIds ?? []).filter(
       (id) => !ts.deadPlayerIds.includes(id),
     );
+
+    // Build the new roleState: carry forward persistent role state, reset wolfCub.
+    // One-Eyed Seer lock is dropped if the locked target is now dead.
+    const newRoleState: WerewolfRoleTurnState = {
+      ...(rs.alphaWolf?.biteUsed ? { alphaWolf: rs.alphaWolf } : {}),
+      ...(rs.witch?.abilityUsed ? { witch: rs.witch } : {}),
+      ...(rs.priest?.wards ? { priest: rs.priest } : {}),
+      ...(rs.toughGuy?.hitIds.length ? { toughGuy: rs.toughGuy } : {}),
+      ...(rs.oneEyedSeer?.lockedTargetId &&
+      !ts.deadPlayerIds.includes(rs.oneEyedSeer.lockedTargetId)
+        ? { oneEyedSeer: rs.oneEyedSeer }
+        : {}),
+      ...(rs.exposer?.abilityUsed || rs.exposer?.reveal
+        ? { exposer: rs.exposer }
+        : {}),
+      ...(rs.mortician?.abilityEnded ? { mortician: rs.mortician } : {}),
+      ...(rs.monarch ? { monarch: rs.monarch } : {}),
+      ...(rs.executioner?.targetId ? { executioner: rs.executioner } : {}),
+      ...(rs.mirrorcaster?.charged ? { mirrorcaster: rs.mirrorcaster } : {}),
+      ...(aliveWives.length > 0 ? { dracula: { wives: aliveWives } } : {}),
+      ...(aliveInfected.length > 0
+        ? { zombie: { infected: aliveInfected } }
+        : {}),
+      ...(aliveDousedPlayerIds.length > 0
+        ? { arsonist: { dousedPlayerIds: aliveDousedPlayerIds } }
+        : {}),
+      // wolfCub.died is intentionally NOT carried forward — consumed by this night's bonus phase
+    };
 
     game.status = {
       type: GameStatus.Playing,
@@ -116,30 +145,10 @@ export const startNightAction: GameAction = {
           ...(pendingSmites?.length ? { smitedPlayerIds: pendingSmites } : {}),
         },
         deadPlayerIds: ts.deadPlayerIds,
-        ...(ts.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
         ...(ts.lastTargets ? { lastTargets: ts.lastTargets } : {}),
-        ...(ts.priestWards ? { priestWards: ts.priestWards } : {}),
-        ...(ts.toughGuyHitIds?.length
-          ? { toughGuyHitIds: ts.toughGuyHitIds }
-          : {}),
-        // One-Eyed Seer: carry forward lock unless the locked target is now dead.
-        ...(ts.oneEyedSeerLockedTargetId &&
-        !ts.deadPlayerIds.includes(ts.oneEyedSeerLockedTargetId)
-          ? { oneEyedSeerLockedTargetId: ts.oneEyedSeerLockedTargetId }
-          : {}),
-        ...(ts.exposerAbilityUsed ? { exposerAbilityUsed: true } : {}),
-        ...(ts.morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),
-        ...(ts.exposerReveal ? { exposerReveal: ts.exposerReveal } : {}),
-        ...(ts.executionerTargetId
-          ? { executionerTargetId: ts.executionerTargetId }
-          : {}),
-        ...(ts.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
         ...(roleOverrides ? { roleOverrides } : {}),
-        ...(ts.alphaWolfBiteUsed ? { alphaWolfBiteUsed: true } : {}),
-        ...(aliveWives.length > 0 ? { draculaWives: aliveWives } : {}),
-        ...(aliveInfected.length > 0 ? { zombieInfected: aliveInfected } : {}),
-        ...(aliveDousedPlayerIds.length > 0
-          ? { arsonistDousedPlayerIds: aliveDousedPlayerIds }
+        ...(Object.keys(newRoleState).length > 0
+          ? { roleState: newRoleState }
           : {}),
       },
     };

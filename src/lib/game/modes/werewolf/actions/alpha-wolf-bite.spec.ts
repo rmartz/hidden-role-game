@@ -92,7 +92,9 @@ describe("alphaWolfBiteAction.isValid", () => {
   });
 
   it("rejects when bite already used", () => {
-    const game = makeGame(makeNightTurnState({ alphaWolfBiteUsed: true }));
+    const game = makeGame(
+      makeNightTurnState({ roleState: { alphaWolf: { biteUsed: true } } }),
+    );
     expect(
       alphaWolfBiteAction.isValid(game as never, "owner-1", {
         targetPlayerId: "p3",
@@ -169,7 +171,7 @@ describe("alphaWolfBiteAction.apply", () => {
       "owner-1",
     );
 
-    expect(ts.alphaWolfBiteUsed).toBe(true);
+    expect(ts.roleState?.alphaWolf?.biteUsed).toBe(true);
     expect(ts.roleOverrides?.["p3"]).toBe(WerewolfRole.Werewolf);
   });
 

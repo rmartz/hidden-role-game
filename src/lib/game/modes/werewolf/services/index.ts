@@ -5,11 +5,11 @@ import type {
   PlayerRoleAssignment,
   RoleDefinition,
 } from "@/lib/types";
-import { currentTurnState } from "../utils/game-state";
 import type { WerewolfPlayerGameState } from "../player-state";
 import { getWerewolfModeConfig } from "../lobby-config";
 import { WerewolfRole, getWerewolfRole } from "../roles";
 import type { WerewolfRoleDefinition } from "../roles";
+import { currentTurnState } from "../utils";
 import {
   selectExecutionerTarget,
   buildInitialTurnState,
@@ -65,6 +65,8 @@ function extractNonOwnerState(
 
   const daytimeNightState = extractDaytimeNightSummary(game, callerId);
   const daytimePlayerState = extractDaytimePlayerState(game, callerId);
+  const ts = currentTurnState(game);
+  const monarchKnightingsUsed = ts?.roleState?.monarch?.knightingsUsed;
 
   const amDead = deadPlayerIds.includes(callerId);
   const visibleDeadPlayerIds = extractVisibleDeadPlayerIds(game, callerId);
@@ -86,10 +88,10 @@ function extractNonOwnerState(
   // Only include entries where the override is WerewolfRole.Werewolf (Alpha Wolf bites);
   // Village Drunk sober transitions must not be visible to other players.
   const isWerewolfTeam = myRole.isWerewolf === true || myRole.team === Team.Bad;
-  const ts = currentTurnState(game);
   const wolfTeamState: Partial<WerewolfPlayerGameState> = {};
   if (isWerewolfTeam && ts) {
-    if (ts.alphaWolfBiteUsed) wolfTeamState.alphaWolfBiteUsed = true;
+    if (ts.roleState?.alphaWolf?.biteUsed)
+      wolfTeamState.alphaWolfBiteUsed = true;
     const biteConversions = ts.roleOverrides
       ? Object.entries(ts.roleOverrides).filter(
           ([, newRoleDefinitionId]) =>
@@ -114,6 +116,10 @@ function extractNonOwnerState(
     ...(visibleDeadPlayerIds.length > 0
       ? { deadPlayerIds: visibleDeadPlayerIds }
       : {}),
+    ...(ts?.roleState?.monarch?.knightedPlayerIds.length
+      ? { monarchKnightedPlayerIds: ts.roleState.monarch.knightedPlayerIds }
+      : {}),
+    ...((monarchKnightingsUsed ?? 0) > 0 ? { monarchKnightingsUsed } : {}),
     ...executionerState,
     ...wolfTeamState,
   };

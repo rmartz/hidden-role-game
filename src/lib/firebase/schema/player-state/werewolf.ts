@@ -1,5 +1,4 @@
 import { GameMode } from "@/lib/types";
-import type { Team } from "@/lib/types";
 import type { AnyNightAction, DaytimeVote } from "@/lib/game/modes/werewolf";
 import { TrialVerdict } from "@/lib/game/modes/werewolf";
 import type { NightStatusEntry } from "@/server/types";
@@ -9,12 +8,18 @@ import {
   baseStateToFirebase,
   baseStateFromFirebase,
 } from "./base";
+import {
+  type FirebaseWerewolfRoleState,
+  werewolfRoleStateToFirebase,
+  werewolfRoleStateFromFirebase,
+} from "./werewolf-roles";
 
 // ---------------------------------------------------------------------------
 // Werewolf-specific Firebase player state
 // ---------------------------------------------------------------------------
 
-export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
+export interface FirebaseWerewolfPlayerState
+  extends FirebaseBasePlayerState, FirebaseWerewolfRoleState {
   nightActions?: Record<string, AnyNightAction>;
   myNightTarget?: string;
   /** True when the player has intentionally chosen to skip their night action. */
@@ -29,11 +34,6 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
   nightStatus?: NightStatusEntry[];
   previousNightTargetId?: string;
   investigationResult?: { targetPlayerId: string; isWerewolfTeam: boolean };
-  witchAbilityUsed?: boolean;
-  morticianAbilityEnded?: boolean;
-  priestWardActive?: boolean;
-  isSilenced?: boolean;
-  isHypnotized?: boolean;
   activeTrial?: {
     defendantId: string;
     startedAt: number;
@@ -55,30 +55,8 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
   concludedTrialsCount?: number;
   revealProtections: boolean;
   autoRevealNightOutcome?: boolean;
-  executionerTargetId?: string;
   nominations?: { defendantId: string; nominatorIds: string[] }[];
   myNominatedDefendantId?: string;
-  pendingSmitePlayerIds?: string[];
-  mirrorcasterCharged?: boolean;
-  oneEyedSeerLockedTargetId?: string;
-  elusiveSeerVillagerIds?: string[];
-  illuminatiRoleAssignments?: {
-    playerId: string;
-    roleName: string;
-    team: string;
-  }[];
-  exposerReveal?: { playerName: string; roleName: string; team: string };
-  mySecondNightTarget?: string;
-  exposerAbilityUsed?: boolean;
-  hunterRevengePlayerId?: string;
-  /** Whether the Alpha Wolf has used their once-per-game bite ability. */
-  alphaWolfBiteUsed?: boolean;
-  /** Players whose roles have been changed mid-game (Alpha Wolf bite). */
-  roleConversions?: { playerId: string; newRoleDefinitionId: string }[];
-  /** Narrator-only hidden role IDs. Present only when hiddenRoleCount > 0. */
-  hiddenRoleIds?: string[];
-  /** Arsonist: player IDs that have been doused. */
-  arsonistDousedPlayerIds?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -111,11 +89,6 @@ export function werewolfStateToFirebase(
     ...(state.investigationResult
       ? { investigationResult: state.investigationResult }
       : {}),
-    ...(state.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
-    ...(state.morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),
-    ...(state.priestWardActive ? { priestWardActive: true } : {}),
-    ...(state.isSilenced ? { isSilenced: true } : {}),
-    ...(state.isHypnotized ? { isHypnotized: true } : {}),
     ...(state.activeTrial ? { activeTrial: state.activeTrial } : {}),
     nominationsEnabled: state.nominationsEnabled,
     ...(state.trialsPerDay !== undefined
@@ -126,44 +99,11 @@ export function werewolfStateToFirebase(
       : {}),
     revealProtections: state.revealProtections,
     autoRevealNightOutcome: state.autoRevealNightOutcome,
-    ...(state.executionerTargetId
-      ? { executionerTargetId: state.executionerTargetId }
-      : {}),
     ...(state.nominations?.length ? { nominations: state.nominations } : {}),
     ...(state.myNominatedDefendantId
       ? { myNominatedDefendantId: state.myNominatedDefendantId }
       : {}),
-    ...(state.pendingSmitePlayerIds?.length
-      ? { pendingSmitePlayerIds: state.pendingSmitePlayerIds }
-      : {}),
-    ...(state.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
-    ...(state.oneEyedSeerLockedTargetId
-      ? { oneEyedSeerLockedTargetId: state.oneEyedSeerLockedTargetId }
-      : {}),
-    ...(state.elusiveSeerVillagerIds?.length
-      ? { elusiveSeerVillagerIds: state.elusiveSeerVillagerIds }
-      : {}),
-    ...(state.illuminatiRoleAssignments?.length
-      ? { illuminatiRoleAssignments: state.illuminatiRoleAssignments }
-      : {}),
-    ...(state.exposerReveal ? { exposerReveal: state.exposerReveal } : {}),
-    ...(state.mySecondNightTarget
-      ? { mySecondNightTarget: state.mySecondNightTarget }
-      : {}),
-    ...(state.exposerAbilityUsed ? { exposerAbilityUsed: true } : {}),
-    ...(state.hunterRevengePlayerId
-      ? { hunterRevengePlayerId: state.hunterRevengePlayerId }
-      : {}),
-    ...(state.alphaWolfBiteUsed ? { alphaWolfBiteUsed: true } : {}),
-    ...(state.roleConversions?.length
-      ? { roleConversions: state.roleConversions }
-      : {}),
-    ...(state.hiddenRoleIds?.length
-      ? { hiddenRoleIds: state.hiddenRoleIds }
-      : {}),
-    ...(state.arsonistDousedPlayerIds?.length
-      ? { arsonistDousedPlayerIds: state.arsonistDousedPlayerIds }
-      : {}),
+    ...werewolfRoleStateToFirebase(state),
   };
 }
 
@@ -203,64 +143,16 @@ export function werewolfStateFromFirebase(
     ...(raw.investigationResult
       ? { investigationResult: raw.investigationResult }
       : {}),
-    ...(raw.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
-    ...(raw.morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),
-    ...(raw.priestWardActive ? { priestWardActive: true } : {}),
-    ...(raw.isSilenced ? { isSilenced: true } : {}),
-    ...(raw.isHypnotized ? { isHypnotized: true } : {}),
     ...(raw.activeTrial
       ? {
           activeTrial:
             raw.activeTrial as WerewolfPlayerGameState["activeTrial"],
         }
       : {}),
-    ...(raw.executionerTargetId
-      ? { executionerTargetId: raw.executionerTargetId }
-      : {}),
     ...(raw.nominations?.length ? { nominations: raw.nominations } : {}),
     ...(raw.myNominatedDefendantId
       ? { myNominatedDefendantId: raw.myNominatedDefendantId }
       : {}),
-    ...(raw.pendingSmitePlayerIds?.length
-      ? { pendingSmitePlayerIds: raw.pendingSmitePlayerIds }
-      : {}),
-    ...(raw.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
-    ...(raw.oneEyedSeerLockedTargetId
-      ? { oneEyedSeerLockedTargetId: raw.oneEyedSeerLockedTargetId }
-      : {}),
-    ...(raw.elusiveSeerVillagerIds?.length
-      ? { elusiveSeerVillagerIds: raw.elusiveSeerVillagerIds }
-      : {}),
-    ...(raw.illuminatiRoleAssignments?.length
-      ? {
-          illuminatiRoleAssignments: raw.illuminatiRoleAssignments.map((a) => ({
-            ...a,
-            team: a.team as Team,
-          })),
-        }
-      : {}),
-    ...(raw.exposerReveal
-      ? {
-          exposerReveal: {
-            ...raw.exposerReveal,
-            team: raw.exposerReveal.team as Team,
-          },
-        }
-      : {}),
-    ...(raw.mySecondNightTarget
-      ? { mySecondNightTarget: raw.mySecondNightTarget }
-      : {}),
-    ...(raw.exposerAbilityUsed ? { exposerAbilityUsed: true } : {}),
-    ...(raw.hunterRevengePlayerId
-      ? { hunterRevengePlayerId: raw.hunterRevengePlayerId }
-      : {}),
-    ...(raw.alphaWolfBiteUsed ? { alphaWolfBiteUsed: true } : {}),
-    ...(raw.roleConversions?.length
-      ? { roleConversions: raw.roleConversions }
-      : {}),
-    ...(raw.hiddenRoleIds?.length ? { hiddenRoleIds: raw.hiddenRoleIds } : {}),
-    ...(raw.arsonistDousedPlayerIds?.length
-      ? { arsonistDousedPlayerIds: raw.arsonistDousedPlayerIds }
-      : {}),
+    ...werewolfRoleStateFromFirebase(raw),
   } as WerewolfPlayerGameState;
 }

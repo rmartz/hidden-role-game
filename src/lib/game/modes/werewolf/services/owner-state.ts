@@ -45,7 +45,7 @@ function extractDeadPlayerIds(game: Game): string[] {
 /** Extracts the Hunter revenge player ID (narrator-only). */
 function extractHunterRevengePlayerId(game: Game): string | undefined {
   const ts = currentTurnState(game);
-  return ts?.hunterRevengePlayerId;
+  return ts?.roleState?.hunter?.revengePlayerId;
 }
 
 /**
@@ -111,14 +111,20 @@ export function extractDaytimeNightSummary(
       return [{ targetPlayerId: e.targetPlayerId, effect: "hypnotized" }];
     return [];
   });
+  if (phase.knightedPlayerId !== undefined) {
+    nightStatus.push({
+      targetPlayerId: phase.knightedPlayerId,
+      effect: "knighted",
+    });
+  }
 
   const result: Partial<WerewolfPlayerGameState> = {
     ...(nightStatus.length > 0 ? { nightStatus } : {}),
   };
 
   // Exposer reveal: show the publicly revealed role to all players.
-  if (ts.exposerReveal) {
-    const exposerReveal = ts.exposerReveal;
+  if (ts.roleState?.exposer?.reveal) {
+    const exposerReveal = ts.roleState.exposer.reveal;
     const revealedPlayer = game.players.find(
       (p) => p.id === exposerReveal.playerId,
     );
@@ -178,8 +184,8 @@ export function extractDaytimePlayerState(
       a.playerId === callerId &&
       a.roleDefinitionId === (WerewolfRole.Executioner as string),
   );
-  if (callerExecutionerAssignment && ts.executionerTargetId) {
-    result.executionerTargetId = ts.executionerTargetId;
+  if (callerExecutionerAssignment && ts.roleState?.executioner?.targetId) {
+    result.executionerTargetId = ts.roleState.executioner.targetId;
   }
 
   // Silenced / hypnotized.
@@ -271,9 +277,11 @@ export function extractDaytimePlayerState(
 export function extractOwnerState(
   game: Game,
 ): Partial<WerewolfPlayerGameState> {
+  const ts = currentTurnState(game);
   const nightActions = extractNightActions(game);
   const deadPlayerIds = extractDeadPlayerIds(game);
   const hunterRevengePlayerId = extractHunterRevengePlayerId(game);
+  const monarchKnightingsUsed = ts?.roleState?.monarch?.knightingsUsed;
   const callerId = game.ownerPlayerId ?? "";
   const daytimeNightState = extractDaytimeNightSummary(game, callerId);
 
@@ -291,6 +299,10 @@ export function extractOwnerState(
     ...(game.executionerTargetId
       ? { executionerTargetId: game.executionerTargetId }
       : {}),
+    ...(ts?.roleState?.monarch?.knightedPlayerIds.length
+      ? { monarchKnightedPlayerIds: ts.roleState.monarch.knightedPlayerIds }
+      : {}),
+    ...((monarchKnightingsUsed ?? 0) > 0 ? { monarchKnightingsUsed } : {}),
     ...(hiddenRoleIds ? { hiddenRoleIds } : {}),
   };
 }

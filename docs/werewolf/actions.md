@@ -32,6 +32,7 @@ Additional resolution steps:
 
 - **Vigilante self-death:** If the Vigilante's target is a Good-team player and was killed, the Vigilante also dies.
 - **Hunter revenge detection:** If a killed player is the Hunter, sets `hunterRevengePlayerId` on the Narrator's state and defers the win-condition check until revenge is resolved.
+- **Monarch updates:** Applies the Monarch's dynamic night protection, records newly knighted players (`monarchKnightedPlayerIds`), and increments `monarchKnightingsUsed` (max 3).
 - **Arsonist douse/ignite:** If the Arsonist targeted another player, that player is added to `arsonistDousedPlayerIds` in the new turn state. If the Arsonist self-targeted (ignite), all players in the existing `arsonistDousedPlayerIds` are simultaneously attacked (protections apply to each independently), and the doused list is reset to empty. Dead players are removed from the doused list during this step.
 
 ---
@@ -66,6 +67,7 @@ Additional resolution steps:
 - Roles with `preventRepeatTarget` (Bodyguard, Spellcaster) cannot target the same player as they targeted the previous night (`lastTargets` in `WerewolfTurnState`).
 - In a suffixed repeat group phase (e.g., `"werewolf-werewolf:2"`), the target cannot match the `suggestedTargetId` from the base phase's action (within-night exclusion).
 - Cannot change a confirmed target (players only; Narrator can override).
+- Monarch cannot target already-knighted players and cannot target after 3 knightings are used.
 
 ---
 
@@ -142,7 +144,7 @@ Additional resolution steps:
 
 **Who:** Narrator only
 **When:** During Daytime (after voting completes)
-**Effect:** Resolves the trial verdict — guilty votes exceeding innocent votes results in elimination. The Mayor's vote counts double. Clears One-Eyed Seer lock and Priest wards for a killed player.
+**Effect:** Resolves the trial verdict — guilty votes exceeding innocent votes results in elimination. The Mayor's vote counts double, and each living Monarch-knighted voter contributes +1 extra vote. Clears One-Eyed Seer lock and Priest wards for a killed player.
 
 - **Hunter revenge detection:** If the condemned player is the Hunter, sets `hunterRevengePlayerId` on the Narrator's state and defers the win-condition check until revenge is resolved.
 
@@ -284,7 +286,7 @@ Additional resolution steps:
 ## Night Action Types
 
 ```typescript
-// Solo role action (Seer, Bodyguard, Witch, Spellcaster, Chupacabra, Doctor, Priest, Mummy, Wizard, One-Eyed Seer, Exposer, Mystic Seer, Altruist, Mortician)
+// Solo role action (Seer, Bodyguard, Witch, Spellcaster, Chupacabra, Doctor, Priest, Mummy, Wizard, One-Eyed Seer, Exposer, Mystic Seer, Altruist, Mortician, Monarch)
 interface NightAction {
   targetPlayerId?: string; // absent when skipped
   skipped?: true; // set when the player intentionally chose "Skip"

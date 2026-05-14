@@ -18,7 +18,7 @@ export const alphaWolfBiteAction: GameAction = {
     if (!isOwnerPlaying(game, callerId)) return false;
     const ts = currentTurnState(game);
     if (ts?.phase.type !== WerewolfPhase.Nighttime) return false;
-    if (ts.alphaWolfBiteUsed) return false;
+    if (ts.roleState?.alphaWolf?.biteUsed) return false;
 
     // Alpha Wolf must be alive.
     const alphaWolfAssignment = game.roleAssignments.find(
@@ -54,7 +54,7 @@ export const alphaWolfBiteAction: GameAction = {
 
     const { targetPlayerId } = payload as { targetPlayerId: string };
 
-    ts.alphaWolfBiteUsed = true;
+    ts.roleState = { ...(ts.roleState ?? {}), alphaWolf: { biteUsed: true } };
     ts.roleOverrides = {
       ...(ts.roleOverrides ?? {}),
       [targetPlayerId]: WerewolfRole.Werewolf,

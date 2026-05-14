@@ -128,10 +128,14 @@ describe("startNightAction — Village Drunk sober transition", () => {
   });
 
   it("carries forward alphaWolfBiteUsed to the next night", () => {
-    const game = makeGame(makeDayTurnState(2, { alphaWolfBiteUsed: true }));
+    const game = makeGame(
+      makeDayTurnState(2, {
+        roleState: { alphaWolf: { biteUsed: true } },
+      }),
+    );
     startNightAction.apply(game, undefined, "owner-1");
     const ts = getTurnState(game);
-    expect(ts.alphaWolfBiteUsed).toBe(true);
+    expect(ts.roleState?.alphaWolf?.biteUsed).toBe(true);
   });
 
   it("carries forward roleOverrides unchanged for turns that are not turn 3", () => {

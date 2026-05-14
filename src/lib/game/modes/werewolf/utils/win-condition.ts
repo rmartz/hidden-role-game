@@ -44,9 +44,9 @@ export function checkWinCondition(
   if (
     zombieAssignment &&
     !deadSet.has(zombieAssignment.playerId) &&
-    ts?.zombieInfected?.length
+    ts?.roleState?.zombie?.infected.length
   ) {
-    const infectedSet = new Set(ts.zombieInfected);
+    const infectedSet = new Set(ts.roleState.zombie.infected);
     const infectedAlive = aliveAssignments.filter((a) =>
       infectedSet.has(a.playerId),
     ).length;
