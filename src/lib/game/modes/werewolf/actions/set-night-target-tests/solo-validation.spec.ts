@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import type { WerewolfTurnState } from "../../types";
 import { WerewolfRole } from "../../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "../index";
 import {
@@ -141,9 +142,11 @@ describe("WerewolfAction.SetNightTarget", () => {
       );
       (
         game.status as {
-          turnState: { monarchKnightingsUsed?: number };
+          turnState: WerewolfTurnState;
         }
-      ).turnState.monarchKnightingsUsed = 3;
+      ).turnState.roleState = {
+        monarch: { knightedPlayerIds: [], knightingsUsed: 3 },
+      };
       expect(action.isValid(game, "p2", { targetPlayerId: "p3" })).toBe(false);
     });
 
@@ -166,9 +169,11 @@ describe("WerewolfAction.SetNightTarget", () => {
       );
       (
         game.status as {
-          turnState: { monarchKnightedPlayerIds?: string[] };
+          turnState: WerewolfTurnState;
         }
-      ).turnState.monarchKnightedPlayerIds = ["p3"];
+      ).turnState.roleState = {
+        monarch: { knightedPlayerIds: ["p3"], knightingsUsed: 0 },
+      };
       expect(action.isValid(game, "p2", { targetPlayerId: "p3" })).toBe(false);
     });
   });
@@ -192,7 +197,7 @@ describe("WerewolfAction.SetNightTarget", () => {
 
     it("blocks alerted: true when 3 alerts already used", () => {
       const game = makePlayingGame(
-        { ...veteranTurn2State, veteranAlertsUsed: 3 },
+        { ...veteranTurn2State, roleState: { veteran: { alertsUsed: 3 } } },
         {
           roleAssignments: [
             { playerId: "p1", roleDefinitionId: WerewolfRole.Veteran },
@@ -205,7 +210,7 @@ describe("WerewolfAction.SetNightTarget", () => {
 
     it("still allows skip when 3 alerts already used", () => {
       const game = makePlayingGame(
-        { ...veteranTurn2State, veteranAlertsUsed: 3 },
+        { ...veteranTurn2State, roleState: { veteran: { alertsUsed: 3 } } },
         {
           roleAssignments: [
             { playerId: "p1", roleDefinitionId: WerewolfRole.Veteran },

@@ -34,7 +34,7 @@ describe("WerewolfAction.StartDay — veteranAlertsUsed tracking", () => {
     action.apply(game, null, "owner-1");
 
     const ts = getTurnState(game);
-    expect(ts.veteranAlertsUsed).toBe(1);
+    expect(ts.roleState?.veteran?.alertsUsed).toBe(1);
   });
 
   it("does not increment veteranAlertsUsed when the Veteran stays home", () => {
@@ -51,7 +51,7 @@ describe("WerewolfAction.StartDay — veteranAlertsUsed tracking", () => {
     action.apply(game, null, "owner-1");
 
     const ts = getTurnState(game);
-    expect(ts.veteranAlertsUsed ?? 0).toBe(0);
+    expect(ts.roleState?.veteran?.alertsUsed ?? 0).toBe(0);
   });
 
   it("does not increment veteranAlertsUsed when there is no Veteran action", () => {
@@ -66,7 +66,7 @@ describe("WerewolfAction.StartDay — veteranAlertsUsed tracking", () => {
     action.apply(game, null, "owner-1");
 
     const ts = getTurnState(game);
-    expect(ts.veteranAlertsUsed ?? 0).toBe(0);
+    expect(ts.roleState?.veteran?.alertsUsed ?? 0).toBe(0);
   });
 
   it("accumulates veteranAlertsUsed across multiple alert nights", () => {
@@ -80,13 +80,13 @@ describe("WerewolfAction.StartDay — veteranAlertsUsed tracking", () => {
       { roleAssignments: veteranRoleAssignments },
     );
     // Simulate 1 prior alert already used.
-    (
-      game.status as { turnState: WerewolfTurnState }
-    ).turnState.veteranAlertsUsed = 1;
+    (game.status as { turnState: WerewolfTurnState }).turnState.roleState = {
+      veteran: { alertsUsed: 1 },
+    };
 
     action.apply(game, null, "owner-1");
 
     const ts = getTurnState(game);
-    expect(ts.veteranAlertsUsed).toBe(2);
+    expect(ts.roleState?.veteran?.alertsUsed).toBe(2);
   });
 });

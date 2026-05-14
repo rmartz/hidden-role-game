@@ -30,7 +30,9 @@ export function applyTrialVerdict(
     )?.roleDefinitionId;
     const extraVoteWeight =
       Number(roleId === WerewolfRole.Mayor) +
-      Number((ts.monarchKnightedPlayerIds ?? []).includes(v.playerId));
+      Number(
+        (ts.roleState?.monarch?.knightedPlayerIds ?? []).includes(v.playerId),
+      );
     if (extraVoteWeight === 0) continue;
     if (v.vote === DaytimeVote.Guilty) guiltyCount += extraVoteWeight;
     else innocentCount += extraVoteWeight;
@@ -54,7 +56,7 @@ export function applyTrialVerdict(
     if (!ts.deadPlayerIds.includes(defendantId)) {
       ts.deadPlayerIds = [...ts.deadPlayerIds, defendantId];
       if (didWolfCubDie([defendantId], game)) {
-        ts.wolfCubDied = true;
+        ts.roleState = { ...(ts.roleState ?? {}), wolfCub: { died: true } };
       }
       cleanupAfterDaytimeKill(defendantId, ts);
     }
@@ -84,7 +86,7 @@ export const resolveTrialAction: GameAction = {
 
       // Executioner wins if their target was eliminated and the Executioner is alive.
       // Check Executioner before Tanner (if target is also the Tanner, Executioner wins).
-      if (ts.executionerTargetId === defendantId) {
+      if (ts.roleState?.executioner?.targetId === defendantId) {
         const executionerAssignment = game.roleAssignments.find(
           (a) => a.roleDefinitionId === (WerewolfRole.Executioner as string),
         );
@@ -117,7 +119,10 @@ export const resolveTrialAction: GameAction = {
         (a) => a.playerId === defendantId,
       )?.roleDefinitionId;
       if (eliminatedRole === (WerewolfRole.Hunter as string)) {
-        ts.hunterRevengePlayerId = defendantId;
+        ts.roleState = {
+          ...(ts.roleState ?? {}),
+          hunter: { revengePlayerId: defendantId },
+        };
         return;
       }
     }
