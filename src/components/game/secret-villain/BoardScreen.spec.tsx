@@ -1,13 +1,15 @@
-import { afterEach, describe, it, expect } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
-import { GameMode, GameStatus } from "@/lib/types";
+import { afterEach, describe, expect, it } from "vitest";
+
+import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
+import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
 import {
   SecretVillainPhase,
   SpecialActionType,
 } from "@/lib/game/modes/secret-villain/types";
-import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
-import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
+import { GameMode, GameStatus } from "@/lib/types";
+
 import { BoardScreen } from "./BoardScreen";
 
 afterEach(cleanup);

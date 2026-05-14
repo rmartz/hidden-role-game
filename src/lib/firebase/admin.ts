@@ -1,6 +1,6 @@
-import { initializeApp, getApps, cert } from "firebase-admin/app";
-import { getDatabase } from "firebase-admin/database";
+import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
+import { getDatabase } from "firebase-admin/database";
 
 function requireEnv(name: string): string {
   const value = process.env[name];

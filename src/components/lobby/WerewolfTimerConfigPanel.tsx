@@ -1,7 +1,8 @@
 "use client";
 
-import type { TimerConfig } from "@/lib/types";
 import type { WerewolfTimerConfig } from "@/lib/game/modes/werewolf/timer-config";
+import type { TimerConfig } from "@/lib/types";
+
 import { TimerConfigPanel } from "./TimerConfigPanel";
 import type { TimerRow } from "./TimerConfigPanelRow";
 import { WEREWOLF_TIMER_CONFIG_PANEL_COPY } from "./WerewolfTimerConfigPanel.copy";

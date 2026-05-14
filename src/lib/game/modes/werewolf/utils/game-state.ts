@@ -1,8 +1,9 @@
-import { GameStatus } from "@/lib/types";
 import type { Game, PlayerRoleAssignment } from "@/lib/types";
+import { GameStatus } from "@/lib/types";
+
 import type {
-  WerewolfTurnState,
   HypnotizedNightResolutionEvent,
+  WerewolfTurnState,
 } from "../types";
 import { WerewolfPhase } from "../types";
 

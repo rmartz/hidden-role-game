@@ -1,10 +1,11 @@
 "use client";
 
-import type { VisibleTeammate } from "@/server/types";
 import type { GameMode } from "@/lib/types";
+import type { VisibleTeammate } from "@/server/types";
+
 import { NarratorPlayerRoleLists } from "./NarratorPlayerRoleLists";
-import { OwnerPlayerActionItem } from "./OwnerPlayerActionItem";
 import type { NightMarkerEffect } from "./NightActionMarker";
+import { OwnerPlayerActionItem } from "./OwnerPlayerActionItem";
 
 interface OwnerPlayerActionsGridProps {
   gameId: string;

@@ -1,24 +1,25 @@
 "use client";
 
-import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+
 import {
   clearGameId,
+  clearSession,
   createLobby,
+  getLobby,
   joinLobby,
   removePlayer,
   returnToLobby,
   updateLobbyConfig,
-  getLobby,
-  clearSession,
 } from "@/lib/api";
-import { ServerResponseStatus } from "@/server/types";
+import type { GameMode } from "@/lib/types";
 import type {
   LobbyJoinResponse,
   UpdateLobbyConfigRequest,
 } from "@/server/types";
-import type { GameMode } from "@/lib/types";
+import { ServerResponseStatus } from "@/server/types";
 
 export function useCreateLobby(gameMode: GameMode) {
   const router = useRouter();

@@ -1,22 +1,24 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import {
-  errorResponse,
-  authenticateLobby,
-  authenticateGame,
-  normalizeDisplayName,
-  playerNameKey,
-  validatePlayerName,
-} from "./api-helpers";
-import { ServerResponseStatus } from "@/server/types";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-villain/lobby-config";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
+import type { Game, GamePlayer, Lobby } from "@/lib/types";
 import {
   GameMode,
   GameStatus,
   RoleConfigMode,
   ShowRolesInPlay,
 } from "@/lib/types";
-import type { Lobby, Game, GamePlayer } from "@/lib/types";
-import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
-import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-villain/lobby-config";
+import { ServerResponseStatus } from "@/server/types";
+
+import {
+  authenticateGame,
+  authenticateLobby,
+  errorResponse,
+  normalizeDisplayName,
+  playerNameKey,
+  validatePlayerName,
+} from "./api-helpers";
 
 const { mockGetLobby, mockGetGame } = vi.hoisted(() => ({
   mockGetLobby: vi.fn(),

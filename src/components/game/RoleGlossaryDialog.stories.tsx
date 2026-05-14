@@ -1,12 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { RoleGlossaryDialog } from "./RoleGlossaryDialog";
-import { GameMode, Team } from "@/lib/types";
-import type { RoleDefinition } from "@/lib/types";
+
 import {
-  WEREWOLF_ROLE_CATEGORY_ORDER,
   WEREWOLF_ROLE_CATEGORY_LABELS,
+  WEREWOLF_ROLE_CATEGORY_ORDER,
   WerewolfRoleCategory,
 } from "@/lib/game/modes/werewolf/roles";
+import type { RoleDefinition } from "@/lib/types";
+import { GameMode, Team } from "@/lib/types";
+
+import { RoleGlossaryDialog } from "./RoleGlossaryDialog";
 
 const meta = {
   component: RoleGlossaryDialog,

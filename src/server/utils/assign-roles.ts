@@ -4,7 +4,7 @@ import type {
   RoleBucket,
   RoleDefinition,
 } from "@/lib/types";
-import { Team, isSimpleRoleBucket } from "@/lib/types";
+import { isSimpleRoleBucket, Team } from "@/lib/types";
 
 function fisherYates(arr: string[]): void {
   for (let i = arr.length - 1; i > 0; i--) {

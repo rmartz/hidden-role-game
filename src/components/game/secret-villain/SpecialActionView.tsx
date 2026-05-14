@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
-import { getSvThemeLabels } from "@/lib/game/modes/secret-villain/themes";
 import type { SvTheme } from "@/lib/game/modes/secret-villain/themes";
-import { Team } from "@/lib/types";
+import { getSvThemeLabels } from "@/lib/game/modes/secret-villain/themes";
 import { SpecialActionType } from "@/lib/game/modes/secret-villain/types";
+import { Team } from "@/lib/types";
 
 import { ActionGateView } from "./ActionGateView";
 import { InvestigationConsentView } from "./InvestigationConsentView";

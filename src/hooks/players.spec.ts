@@ -1,9 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { renderHook, act, waitFor } from "@testing-library/react";
-import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
+import { act, renderHook, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
-import { ServerResponseStatus } from "@/server/types";
+import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
 import type { PublicLobby } from "@/server/types";
+import { ServerResponseStatus } from "@/server/types";
+
 import { createWrapper } from "./test-utils";
 
 const mockLobby: PublicLobby = {
@@ -38,7 +40,8 @@ vi.mock("@/lib/api", () => ({
 }));
 
 import * as api from "@/lib/api";
-import { useRemovePlayer, useTransferOwner, useRenamePlayer } from "./players";
+
+import { useRemovePlayer, useRenamePlayer, useTransferOwner } from "./players";
 
 beforeEach(() => {
   vi.clearAllMocks();

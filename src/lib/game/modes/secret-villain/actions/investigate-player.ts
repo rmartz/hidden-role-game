@@ -1,8 +1,9 @@
-import { Team } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
+import { Team } from "@/lib/types";
+
+import { SECRET_VILLAIN_ROLES } from "../roles";
 import { SecretVillainPhase, SpecialActionType } from "../types";
 import { currentTurnState } from "../utils";
-import { SECRET_VILLAIN_ROLES } from "../roles";
 import { advanceToNextElection } from "./advance-to-election";
 
 /**

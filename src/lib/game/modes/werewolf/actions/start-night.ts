@@ -1,16 +1,17 @@
-import { GameStatus } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
-import { WerewolfPhase } from "../types";
+import { GameStatus } from "@/lib/types";
+
+import { getWerewolfModeConfig } from "../lobby-config";
+import { WerewolfRole } from "../roles";
 import type { WerewolfDaytimePhase, WerewolfRoleTurnState } from "../types";
+import { WerewolfPhase } from "../types";
 import {
   buildNightPhaseOrder,
   currentTurnState,
-  isOwnerPlaying,
   GROUP_PHASE_KEY_SEPARATOR,
+  isOwnerPlaying,
   WerewolfWinner,
 } from "../utils";
-import { WerewolfRole } from "../roles";
-import { getWerewolfModeConfig } from "../lobby-config";
 
 /** Night at which the Village Drunk sobers up and gains their alternate role. */
 const VILLAGE_DRUNK_SOBER_TURN = 3;

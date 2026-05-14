@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { BoardDisplay } from "./BoardDisplay";
+
 import { SvTheme } from "@/lib/game/modes/secret-villain/themes";
 import { SpecialActionType } from "@/lib/game/modes/secret-villain/types";
+
+import { BoardDisplay } from "./BoardDisplay";
 
 // Medium preset (7–8 players): Investigate → Shoot → Shoot on slots 3–5
 const MEDIUM_POWER_TABLE = [

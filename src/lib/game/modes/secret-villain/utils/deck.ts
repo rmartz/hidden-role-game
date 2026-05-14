@@ -1,4 +1,4 @@
-import { PolicyCard, DECK_GOOD_CARDS, DECK_BAD_CARDS } from "../types";
+import { DECK_BAD_CARDS, DECK_GOOD_CARDS, PolicyCard } from "../types";
 
 /** Minimum cards required in the deck before a draw. Below this, reshuffle. */
 const MIN_DECK_SIZE = 3;

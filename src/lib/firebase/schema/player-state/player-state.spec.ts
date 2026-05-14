@@ -1,20 +1,22 @@
-import { describe, it, expect } from "vitest";
-import { playerStateToFirebase, firebaseToPlayerState } from "./index";
-import { GameMode, GameStatus, Team } from "@/lib/types";
-import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
-import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
-import { DEFAULT_TIMER_CONFIG } from "@/lib/types";
-import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
-import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
-import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
+import { describe, expect, it } from "vitest";
+
 import type { AvalonPlayerGameState } from "@/lib/game/modes/avalon/player-state";
-import { SecretVillainPhase } from "@/lib/game/modes/secret-villain/types";
-import { SvTheme } from "@/lib/game/modes/secret-villain/themes";
 import {
   AvalonPhase,
   QuestCard,
   TeamVote,
 } from "@/lib/game/modes/avalon/types";
+import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
+import { SvTheme } from "@/lib/game/modes/secret-villain/themes";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
+import { SecretVillainPhase } from "@/lib/game/modes/secret-villain/types";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
+import { GameMode, GameStatus, Team } from "@/lib/types";
+import { DEFAULT_TIMER_CONFIG } from "@/lib/types";
+
+import { firebaseToPlayerState, playerStateToFirebase } from "./index";
 
 const BASE_FIELDS = {
   lobbyId: "lobby-1",
@@ -229,6 +231,53 @@ describe("Werewolf player state round-trip", () => {
     expect(result.victoryCondition).toBeUndefined();
   });
 
+  it("round-trips thingTappedMe", () => {
+    const state = makeWerewolfState({ thingTappedMe: true });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.thingTappedMe).toBe(true);
+  });
+
+  it("round-trips thingTappedPlayerId", () => {
+    const state = makeWerewolfState({ thingTappedPlayerId: "p2" });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.thingTappedPlayerId).toBe("p2");
+  });
+
+  it("round-trips insomniacResult", () => {
+    const state = makeWerewolfState({
+      insomniacResult: { leftActed: true, rightActed: false },
+    });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.insomniacResult).toEqual({
+      leftActed: true,
+      rightActed: false,
+    });
+  });
+
+  it("round-trips countResult", () => {
+    const state = makeWerewolfState({
+      countResult: { leftCount: 2, rightCount: 1 },
+    });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.countResult).toEqual({ leftCount: 2, rightCount: 1 });
+  });
+
+  it("round-trips adjacentPlayerIds", () => {
+    const state = makeWerewolfState({ adjacentPlayerIds: ["p1", "p3"] });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.adjacentPlayerIds).toEqual(["p1", "p3"]);
+  });
+
   it("round-trips illuminatiRoleAssignments including team cast", () => {
     const state = makeWerewolfState({
       illuminatiRoleAssignments: [
@@ -252,11 +301,16 @@ describe("Werewolf player state round-trip", () => {
     });
   });
 
-  it("omits illuminatiRoleAssignments when absent", () => {
+  it("omits positional and illuminati fields when absent", () => {
     const state = makeWerewolfState();
     const result = firebaseToPlayerState(
       playerStateToFirebase(state),
     ) as WerewolfPlayerGameState;
+    expect(result.thingTappedMe).toBeUndefined();
+    expect(result.thingTappedPlayerId).toBeUndefined();
+    expect(result.insomniacResult).toBeUndefined();
+    expect(result.countResult).toBeUndefined();
+    expect(result.adjacentPlayerIds).toBeUndefined();
     expect(result.illuminatiRoleAssignments).toBeUndefined();
   });
 

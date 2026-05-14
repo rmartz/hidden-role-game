@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { PlayerNightSummary } from "./PlayerNightSummary";
+
 import type { DaytimeNightStatusEntry } from "@/server/types";
 import type { PublicLobbyPlayer } from "@/server/types";
+
+import { PlayerNightSummary } from "./PlayerNightSummary";
 
 const meta = {
   component: PlayerNightSummary,
@@ -66,6 +68,25 @@ export const MultipleEffects: Story = {
       { targetPlayerId: "p2", effect: "killed" },
       { targetPlayerId: "p3", effect: "protected" },
       { targetPlayerId: "p5", effect: "silenced" },
+    ] satisfies DaytimeNightStatusEntry[],
+  },
+};
+
+export const PlayerExposed: Story = {
+  args: {
+    players,
+    nightStatus: [
+      { targetPlayerId: "p4", effect: "exposed", roleName: "Seer" },
+    ] satisfies DaytimeNightStatusEntry[],
+  },
+};
+
+export const PlayerExposedAndKilled: Story = {
+  args: {
+    players,
+    nightStatus: [
+      { targetPlayerId: "p2", effect: "killed" },
+      { targetPlayerId: "p2", effect: "exposed", roleName: "Altruist" },
     ] satisfies DaytimeNightStatusEntry[],
   },
 };

@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { ConfirmTargetButtonView } from "./ConfirmTargetButtonView";
-import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import { fn } from "storybook/test";
+
+import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
+
+import { ConfirmTargetButtonView } from "./ConfirmTargetButtonView";
 
 const meta = {
   component: ConfirmTargetButtonView,

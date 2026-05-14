@@ -1,8 +1,8 @@
 import {
-  SvBoardPreset,
-  SpecialActionType,
-  SecretVillainPhase,
   BAD_CARDS_FOR_SPECIAL_BAD_WIN,
+  SecretVillainPhase,
+  SpecialActionType,
+  SvBoardPreset,
 } from "./types";
 
 export const SECRET_VILLAIN_COPY = {

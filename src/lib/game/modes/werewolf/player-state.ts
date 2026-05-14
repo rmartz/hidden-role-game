@@ -1,12 +1,13 @@
 import type { Team } from "@/lib/types";
-import type { WerewolfTimerConfig } from "./timer-config";
 import { GameMode } from "@/lib/types";
 import type {
   BasePlayerGameState,
   NightStatusEntry,
 } from "@/server/types/game";
+
+import type { WerewolfTimerConfig } from "./timer-config";
 import type { AnyNightAction } from "./types";
-import { TrialVerdict, TrialPhase, DaytimeVote } from "./types";
+import { DaytimeVote, TrialPhase, TrialVerdict } from "./types";
 
 /**
  * Werewolf-specific extension of PlayerGameState. Includes all fields that
@@ -66,8 +67,6 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
     roleName: string;
     team: Team;
   }[];
-  /** Role publicly revealed by the Exposer. */
-  exposerReveal?: { playerName: string; roleName: string; team: Team };
   /** Mentalist: second night target. */
   mySecondNightTarget?: string;
   /** Whether the Witch has used their once-per-game ability. */
@@ -93,6 +92,22 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
    * Visible to Werewolf-team players so they know who was converted.
    */
   roleConversions?: { playerId: string; newRoleDefinitionId: string }[];
+  /**
+   * True when the player was tapped by The Thing this night.
+   * Present only for the tapped player; cleared each night.
+   */
+  thingTappedMe?: boolean;
+  /** The Thing: the player ID the Thing chose to tap this night. */
+  thingTappedPlayerId?: string;
+  /** Insomniac: whether each neighbor woke and acted this night. */
+  insomniacResult?: { leftActed: boolean; rightActed: boolean };
+  /** The Count: werewolf counts in each half of the table (night 1 only). */
+  countResult?: { leftCount: number; rightCount: number };
+  /**
+   * Adjacent player IDs available to target for roles with `adjacentTargetOnly`.
+   * Sent to The Thing so the client can restrict target selection.
+   */
+  adjacentPlayerIds?: string[];
   /** Hunter revenge pending: the Hunter's player ID. Narrator-only. */
   hunterRevengePlayerId?: string;
   /**

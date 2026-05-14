@@ -1,8 +1,9 @@
-import { Team } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
+import { Team } from "@/lib/types";
+
+import { getWerewolfRole,WerewolfRole } from "../roles";
 import { WerewolfPhase } from "../types";
 import { currentTurnState, isOwnerPlaying, resolveRoleId } from "../utils";
-import { WerewolfRole, getWerewolfRole } from "../roles";
 
 /**
  * Alpha Wolf Bite: narrator converts a villager to the Werewolf team.

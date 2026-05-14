@@ -1,3 +1,4 @@
+// eslint-disable-next-line simple-import-sort/imports
 import "./globals.css";
 import Providers from "./providers";
 import { Geist } from "next/font/google";

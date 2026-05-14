@@ -1,5 +1,5 @@
-import { ServerResponseStatus } from "@/server/types";
 import { getGame } from "@/server/game";
+import { ServerResponseStatus } from "@/server/types";
 import { errorResponse } from "@/server/utils";
 
 export async function GET(

@@ -1,5 +1,6 @@
-import { describe, it, expect } from "vitest";
-import { PolicyCard, DECK_GOOD_CARDS, DECK_BAD_CARDS } from "../types";
+import { describe, expect, it } from "vitest";
+
+import { DECK_BAD_CARDS, DECK_GOOD_CARDS, PolicyCard } from "../types";
 import { createDeck, drawCards, reshuffleIfNeeded } from "./deck";
 
 describe("createDeck", () => {

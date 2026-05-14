@@ -1,16 +1,16 @@
 "use client";
 
-import { Team } from "@/lib/types";
-import type { FinishedGameStatus } from "@/lib/types";
-import { SecretVillainWinner } from "@/lib/game/modes/secret-villain/utils/win-condition";
-import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
-import { getSvThemeLabels } from "@/lib/game/modes/secret-villain/themes";
-import type { SvThemeLabels } from "@/lib/game/modes/secret-villain/themes";
-import { SecretVillainRole } from "@/lib/game/modes/secret-villain/roles";
-import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
-import type { VisibleTeammate } from "@/server/types";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
+import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
+import { SecretVillainRole } from "@/lib/game/modes/secret-villain/roles";
+import type { SvThemeLabels } from "@/lib/game/modes/secret-villain/themes";
+import { getSvThemeLabels } from "@/lib/game/modes/secret-villain/themes";
+import { SecretVillainWinner } from "@/lib/game/modes/secret-villain/utils/win-condition";
+import type { FinishedGameStatus } from "@/lib/types";
+import { Team } from "@/lib/types";
+import type { VisibleTeammate } from "@/server/types";
 
 export interface SecretVillainGameOverViewProps {
   gameState: SecretVillainPlayerGameState;

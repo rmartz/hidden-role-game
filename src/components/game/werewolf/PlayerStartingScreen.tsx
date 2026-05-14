@@ -1,17 +1,18 @@
 "use client";
 
 import { useMemo } from "react";
-import { GAME_MODES } from "@/lib/game/modes";
-import { GameStatus } from "@/lib/types";
-import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
-import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
+
 import {
   GameRolesList,
   GameTimer,
   PlayersRoleList,
   RoleLabel,
 } from "@/components/game";
+import { GAME_MODES } from "@/lib/game/modes";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
+import { GameStatus } from "@/lib/types";
 
 interface PlayerStartingScreenProps {
   gameState: WerewolfPlayerGameState;

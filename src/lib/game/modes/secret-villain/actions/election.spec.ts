@@ -1,22 +1,24 @@
-import { describe, it, expect } from "vitest";
-import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
-import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "../timer-config";
+import { describe, expect, it } from "vitest";
+
 import type { Game } from "@/lib/types";
+import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
+
+import { SecretVillainRole } from "../roles";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "../timer-config";
+import type { ElectionVotePhase, SecretVillainTurnState } from "../types";
 import {
-  SecretVillainPhase,
-  PolicyCard,
-  FAILED_ELECTION_THRESHOLD,
   BAD_CARDS_FOR_SPECIAL_BAD_WIN,
+  FAILED_ELECTION_THRESHOLD,
+  PolicyCard,
+  SecretVillainPhase,
   SvBoardPreset,
 } from "../types";
-import type { SecretVillainTurnState, ElectionVotePhase } from "../types";
 import { BOARD_PRESETS, SvVictoryConditionKey } from "../utils";
-import { SecretVillainRole } from "../roles";
-import { nominateChancellorAction } from "./nominate-chancellor";
 import { castElectionVoteAction } from "./cast-election-vote";
+import { nominateChancellorAction } from "./nominate-chancellor";
 import {
-  resolveElectionAction,
   advanceFromElectionAction,
+  resolveElectionAction,
 } from "./resolve-election";
 
 function makePlayer(id: string) {

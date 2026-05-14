@@ -1,10 +1,12 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import type { AdvancedRoleBucket } from "@/lib/types";
+
 import {
   ClocktowerRole,
   defaultRoleCount,
-  MIN_PLAYERS,
   MAX_PLAYERS,
+  MIN_PLAYERS,
 } from "./roles";
 
 function advancedBuckets(numPlayers: number): AdvancedRoleBucket[] {

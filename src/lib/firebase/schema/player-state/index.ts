@@ -1,37 +1,38 @@
 import { GameMode } from "@/lib/types";
 import type { PlayerGameState } from "@/server/types";
+
 import {
-  type FirebaseWerewolfPlayerState,
-  werewolfStateToFirebase,
-  werewolfStateFromFirebase,
-} from "./werewolf";
-import {
-  type FirebaseSecretVillainPlayerState,
-  secretVillainStateToFirebase,
-  secretVillainStateFromFirebase,
-} from "./secret-villain";
-import {
-  type FirebaseAvalonPlayerState,
-  avalonStateToFirebase,
   avalonStateFromFirebase,
+  avalonStateToFirebase,
+  type FirebaseAvalonPlayerState,
 } from "./avalon";
 import {
-  type FirebaseClocktowerPlayerState,
-  clocktowerStateToFirebase,
   clocktowerStateFromFirebase,
+  clocktowerStateToFirebase,
+  type FirebaseClocktowerPlayerState,
 } from "./clocktower";
 import {
-  type FirebaseCodenamesPlayerState,
-  codenamesStateToFirebase,
   codenamesStateFromFirebase,
+  codenamesStateToFirebase,
+  type FirebaseCodenamesPlayerState,
 } from "./codenames";
+import {
+  type FirebaseSecretVillainPlayerState,
+  secretVillainStateFromFirebase,
+  secretVillainStateToFirebase,
+} from "./secret-villain";
+import {
+  type FirebaseWerewolfPlayerState,
+  werewolfStateFromFirebase,
+  werewolfStateToFirebase,
+} from "./werewolf";
 
-export type { FirebaseBasePlayerState } from "./base";
-export type { FirebaseWerewolfPlayerState } from "./werewolf";
-export type { FirebaseSecretVillainPlayerState } from "./secret-villain";
 export type { FirebaseAvalonPlayerState } from "./avalon";
+export type { FirebaseBasePlayerState } from "./base";
 export type { FirebaseClocktowerPlayerState } from "./clocktower";
 export type { FirebaseCodenamesPlayerState } from "./codenames";
+export type { FirebaseSecretVillainPlayerState } from "./secret-villain";
+export type { FirebaseWerewolfPlayerState } from "./werewolf";
 
 // ---------------------------------------------------------------------------
 // Discriminated union

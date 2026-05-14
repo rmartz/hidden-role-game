@@ -1,18 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
-import type { GameConfig } from "@/server/types";
-import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
-import { DEFAULT_WEREWOLF_MODE_CONFIG } from "@/lib/game/modes/werewolf/lobby-config";
+
+import type { DebugPlayer } from "@/app/api/debug/game/route";
 import { GameConfigurationPanel } from "@/components/lobby";
-import { useAppSelector } from "@/store";
-import { selectRoleBuckets } from "@/store/game-config-slice";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import type { DebugPlayer } from "@/app/api/debug/game/route";
-import { DebugGameView } from "./DebugGameView";
+import { DEFAULT_WEREWOLF_MODE_CONFIG } from "@/lib/game/modes/werewolf/lobby-config";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
+import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
+import type { GameConfig } from "@/server/types";
+import { useAppSelector } from "@/store";
+import { selectRoleBuckets } from "@/store/game-config-slice";
+
 import type { GameInfo } from "./DebugGameView";
+import { DebugGameView } from "./DebugGameView";
 
 const DEFAULT_CONFIG: GameConfig = {
   gameMode: GameMode.Werewolf,
