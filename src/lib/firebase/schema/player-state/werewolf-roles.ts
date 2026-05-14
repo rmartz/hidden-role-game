@@ -27,7 +27,6 @@ export interface FirebaseWerewolfRoleState {
     roleName: string;
     team: string;
   }[];
-  exposerReveal?: { playerName: string; roleName: string; team: string };
   mySecondNightTarget?: string;
   exposerAbilityUsed?: boolean;
   hunterRevengePlayerId?: string;
@@ -67,7 +66,6 @@ export function werewolfRoleStateToFirebase(
     ...(state.illuminatiRoleAssignments?.length
       ? { illuminatiRoleAssignments: state.illuminatiRoleAssignments }
       : {}),
-    ...(state.exposerReveal ? { exposerReveal: state.exposerReveal } : {}),
     ...(state.mySecondNightTarget
       ? { mySecondNightTarget: state.mySecondNightTarget }
       : {}),
@@ -117,14 +115,6 @@ export function werewolfRoleStateFromFirebase(
             ...a,
             team: a.team as Team,
           })),
-        }
-      : {}),
-    ...(raw.exposerReveal
-      ? {
-          exposerReveal: {
-            ...raw.exposerReveal,
-            team: raw.exposerReveal.team as Team,
-          },
         }
       : {}),
     ...(raw.mySecondNightTarget

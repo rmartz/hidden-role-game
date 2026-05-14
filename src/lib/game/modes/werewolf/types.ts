@@ -185,6 +185,8 @@ export interface WerewolfDaytimePhase {
   nightActions: Record<string, AnyNightAction>;
   /** Resolved attack/protect outcomes, computed when transitioning to day. */
   nightResolution?: NightResolutionEvent[];
+  /** Reveal newly produced by the Exposer during the preceding night, if any. */
+  exposerReveal?: { playerId: string; roleId: string };
   /** Player ID newly knighted by the Monarch during the preceding night, if any. */
   knightedPlayerId?: string;
   /**

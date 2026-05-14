@@ -185,8 +185,11 @@ export const startDayAction: GameAction = {
       oneEyedSeerLockedTargetId = undefined;
     }
 
-    // Exposer reveal: if the Exposer confirmed a target this night, store the reveal.
+    // Exposer reveal: if the Exposer confirmed a target this night, capture the
+    // new reveal for this day's summary on the daytime phase. The persistent
+    // roleState field carries it forward for the narrator night screen.
     let exposerReveal = rs.exposer?.reveal;
+    let newExposerReveal: { playerId: string; roleId: string } | undefined;
     const exposerAction =
       nightPhase.nightActions[WerewolfRole.Exposer as string];
     if (
@@ -200,10 +203,11 @@ export const startDayAction: GameAction = {
         (a) => a.playerId === exposerAction.targetPlayerId,
       );
       if (exposerTargetAssignment) {
-        exposerReveal = {
+        newExposerReveal = {
           playerId: exposerAction.targetPlayerId,
           roleId: exposerTargetAssignment.roleDefinitionId,
         };
+        exposerReveal = newExposerReveal;
       }
     }
 
@@ -464,6 +468,7 @@ export const startDayAction: GameAction = {
           nightActions: nightPhase.nightActions,
           revealedPlayerIds,
           ...(nightResolution.length > 0 ? { nightResolution } : {}),
+          ...(newExposerReveal ? { exposerReveal: newExposerReveal } : {}),
           ...(knightedPlayerId !== undefined ? { knightedPlayerId } : {}),
           ...(nightPhase.smitedPlayerIds?.length
             ? { smitedPlayerIds: nightPhase.smitedPlayerIds }
