@@ -171,8 +171,8 @@ export const WEREWOLF_COPY = {
   },
   exposer: {
     abilityUsed: "You have already used your Exposer ability this game.",
-    publicReveal: (playerName: string, roleName: string) =>
-      `The Exposer has revealed ${playerName}'s role: ${roleName}`,
+    nightSummary: (playerName: string, roleName: string) =>
+      `${playerName} was exposed to be the ${roleName}.`,
   },
   elusiveSeer: {
     villagerListHeading: "You see the following Villagers:",
@@ -190,6 +190,16 @@ export const WEREWOLF_COPY = {
     differentTeams: "on different teams",
     chooseSecondTarget: "Choose a second target",
     yourTargets: "Your targets",
+    narratorNoTargets: "Select a player to investigate",
+    narratorOneTarget: "Select a second player to compare",
+    narratorTwoTargets: (first: string, second: string) =>
+      `Investigate if ${first} and ${second} are on the same team`,
+  },
+  swapper: {
+    narratorNoTargets: "Select a player to swap",
+    narratorOneTarget: "Select a second player to swap",
+    narratorTwoTargets: (first: string, second: string) =>
+      `Swap effects for ${first} and ${second}`,
   },
   mysticSeer: {
     resultPrefix: "is",
@@ -268,7 +278,6 @@ export const WEREWOLF_COPY = {
     knighthoodsRemaining: (remaining: number) =>
       `Knighthoods remaining: ${String(remaining)}`,
     outOfKnighthoods: "You have used all of your Knighthoods for the game.",
-    wasKnighted: (name: string) => `${name} was Knighted.`,
   },
   mason: {
     playerWarning:

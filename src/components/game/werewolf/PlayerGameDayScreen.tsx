@@ -101,15 +101,6 @@ export function PlayerGameDayScreen({
         </p>
       )}
 
-      {gameState.exposerReveal && (
-        <p className="mb-4 text-sm text-muted-foreground italic">
-          {WEREWOLF_COPY.exposer.publicReveal(
-            gameState.exposerReveal.playerName,
-            gameState.exposerReveal.roleName,
-          )}
-        </p>
-      )}
-
       {executionerTargetName && (
         <p className="mb-4 text-sm text-muted-foreground italic">
           {WEREWOLF_COPY.executioner.yourTarget(executionerTargetName)}

@@ -125,12 +125,21 @@ export interface AltruistInterceptedNightResolutionEvent {
   savedPlayerId: string;
 }
 
+export interface SwapperSwappedNightResolutionEvent {
+  type: "swapper-swapped";
+  /** The first player selected by the Swapper. */
+  firstPlayerId: string;
+  /** The second player selected by the Swapper. */
+  secondPlayerId: string;
+}
+
 export type NightResolutionEvent =
   | AttackNightResolutionEvent
   | SilencedNightResolutionEvent
   | HypnotizedNightResolutionEvent
   | ToughGuyAbsorbedNightResolutionEvent
-  | AltruistInterceptedNightResolutionEvent;
+  | AltruistInterceptedNightResolutionEvent
+  | SwapperSwappedNightResolutionEvent;
 
 export enum DaytimeVote {
   Guilty = "guilty",
@@ -180,6 +189,8 @@ export interface WerewolfDaytimePhase {
   nightActions: Record<string, AnyNightAction>;
   /** Resolved attack/protect outcomes, computed when transitioning to day. */
   nightResolution?: NightResolutionEvent[];
+  /** Reveal newly produced by the Exposer during the preceding night, if any. */
+  exposerReveal?: { playerId: string; roleId: string };
   /** Player ID newly knighted by the Monarch during the preceding night, if any. */
   knightedPlayerId?: string;
   /**

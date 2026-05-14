@@ -202,12 +202,13 @@ export function OwnerGameNightScreen({
     getSoloTarget(activeAction);
 
   const handleTargetClick = useCallback(
-    (playerId: string | undefined) => {
+    (playerId: string | null | undefined, isSecondTarget?: boolean) => {
       action.mutate({
         actionId: WerewolfAction.SetNightTarget,
         payload: {
           roleId: activePhaseKey,
           targetPlayerId: playerId,
+          isSecondTarget: isSecondTarget ?? false,
         },
       });
     },
@@ -302,6 +303,30 @@ export function OwnerGameNightScreen({
     !isTeamNightAction(illusionAction) &&
     illusionAction.confirmed
       ? illusionAction.targetPlayerId
+      : undefined;
+
+  const requiresDualTarget =
+    activeRoleDef?.dualTargetSwap === true ||
+    activeRoleDef?.dualTargetInvestigate === true;
+
+  const dualTargetPrompt = activeRoleDef?.dualTargetSwap
+    ? activeTarget !== undefined && secondTargetId !== undefined
+      ? WEREWOLF_COPY.swapper.narratorTwoTargets(
+          activeTargetName ?? activeTarget,
+          secondTargetName ?? secondTargetId,
+        )
+      : activeTarget !== undefined
+        ? WEREWOLF_COPY.swapper.narratorOneTarget
+        : WEREWOLF_COPY.swapper.narratorNoTargets
+    : activeRoleDef?.dualTargetInvestigate
+      ? activeTarget !== undefined && secondTargetId !== undefined
+        ? WEREWOLF_COPY.mentalist.narratorTwoTargets(
+            activeTargetName ?? activeTarget,
+            secondTargetName ?? secondTargetId,
+          )
+        : activeTarget !== undefined
+          ? WEREWOLF_COPY.mentalist.narratorOneTarget
+          : WEREWOLF_COPY.mentalist.narratorNoTargets
       : undefined;
 
   const investigationResult = getInvestigationResultForNarrator(
@@ -507,6 +532,9 @@ export function OwnerGameNightScreen({
                   onTargetClick={handleTargetClick}
                   isPending={action.isPending}
                   previousTargetId={previousTargetId}
+                  requiresDualTarget={requiresDualTarget}
+                  secondTarget={secondTargetId}
+                  dualTargetPrompt={dualTargetPrompt}
                 />
               )}
             </>
