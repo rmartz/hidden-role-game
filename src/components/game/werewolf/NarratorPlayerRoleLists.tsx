@@ -16,8 +16,8 @@ import type { GameMode } from "@/lib/types";
 import type { VisibleTeammate } from "@/server/types";
 
 import { NARRATOR_PLAYER_ROLE_LISTS_COPY } from "./NarratorPlayerRoleLists.copy";
-import { NightActionMarker } from "./NightActionMarker";
 import type { NightMarkerEffect } from "./NightActionMarker";
+import { NightActionMarker } from "./NightActionMarker";
 
 interface NarratorPlayerRoleListsProps {
   assignments: VisibleTeammate[];

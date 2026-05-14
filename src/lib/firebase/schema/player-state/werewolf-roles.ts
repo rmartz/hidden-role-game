@@ -1,5 +1,5 @@
-import type { Team } from "@/lib/types";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import type { Team } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
 // Role-specific Firebase player state

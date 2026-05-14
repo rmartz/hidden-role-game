@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { useCreateLobby, useJoinLobby, useStoredLobbyQuery } from "@/hooks";
 import { getLobbyId, getPlayerId } from "@/lib/api";

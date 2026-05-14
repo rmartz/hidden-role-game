@@ -1,13 +1,13 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-
 import { Team } from "@/lib/types";
 import type { VisibleTeammate } from "@/server/types";
+
 import { NarratorPlayerRoleLists } from "./NarratorPlayerRoleLists";
+import { NARRATOR_PLAYER_ROLE_LISTS_COPY } from "./NarratorPlayerRoleLists.copy";
 import { NightMarkerEffect } from "./NightActionMarker";
 import { NIGHT_ACTION_MARKER_COPY } from "./NightActionMarker.copy";
-import { NARRATOR_PLAYER_ROLE_LISTS_COPY } from "./NarratorPlayerRoleLists.copy";
 
 afterEach(cleanup);
 

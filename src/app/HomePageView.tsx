@@ -11,8 +11,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { GameMode } from "@/lib/types";
 import { GAME_MODES } from "@/lib/game/modes";
+import { GameMode } from "@/lib/types";
+
 import { HOME_PAGE_COPY } from "./page.copy";
 
 interface ActiveLobbyData {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import type { WerewolfTurnState } from "../../types";
 import { WerewolfRole } from "../../roles";
+import type { WerewolfTurnState } from "../../types";
 import { WEREWOLF_ACTIONS, WerewolfAction } from "../index";
 import {
   dayTurnState,

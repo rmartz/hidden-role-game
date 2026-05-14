@@ -1,7 +1,6 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
-
 import { NightActionMarker, NightMarkerEffect } from "./NightActionMarker";
 import { NIGHT_ACTION_MARKER_COPY } from "./NightActionMarker.copy";
 
