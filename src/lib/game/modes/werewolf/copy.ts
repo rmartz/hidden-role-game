@@ -268,7 +268,6 @@ export const WEREWOLF_COPY = {
     knighthoodsRemaining: (remaining: number) =>
       `Knighthoods remaining: ${String(remaining)}`,
     outOfKnighthoods: "You have used all of your Knighthoods for the game.",
-    wasKnighted: (name: string) => `${name} was Knighted.`,
   },
   mason: {
     playerWarning:
