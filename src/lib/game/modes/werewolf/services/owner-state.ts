@@ -294,7 +294,7 @@ export function extractOwnerState(
   // mercenaryBribedPlayerIds is narrator-only: lets the narrator track which
   // players have been bribed across nights when running a no-device Mercenary.
   const mercenaryBribedPlayerIds = ts?.roleState?.mercenary?.bribedPlayerIds
-    ?.length
+    .length
     ? ts.roleState.mercenary.bribedPlayerIds
     : undefined;
 

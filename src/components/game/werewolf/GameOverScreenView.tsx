@@ -5,13 +5,13 @@ import type { FinishedGameStatus } from "@/lib/types";
 import { WerewolfWinner } from "@/lib/game/modes/werewolf/utils/win-condition";
 import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
-import type { PlayerGameState, VisibleTeammate } from "@/server/types";
+import type { VisibleTeammate } from "@/server/types";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 export interface GameOverScreenViewProps {
-  gameState: PlayerGameState;
+  gameState: WerewolfPlayerGameState;
   onReturnToLobby: () => void;
   isReturning?: boolean;
   returnError?: boolean;
@@ -19,7 +19,7 @@ export interface GameOverScreenViewProps {
 
 function isVictory(
   winner: string | undefined,
-  myRole: PlayerGameState["myRole"],
+  myRole: WerewolfPlayerGameState["myRole"],
   amDead?: boolean,
   mercenaryAlsoWins?: boolean,
 ): boolean {
@@ -73,8 +73,7 @@ export function GameOverScreenView({
 }: GameOverScreenViewProps) {
   const finishedStatus = gameState.status as FinishedGameStatus;
   const { winner } = finishedStatus;
-  const mercenaryAlsoWins =
-    (gameState as WerewolfPlayerGameState).mercenaryAlsoWins ?? false;
+  const mercenaryAlsoWins = gameState.mercenaryAlsoWins ?? false;
   const victory = isVictory(
     winner,
     gameState.myRole,

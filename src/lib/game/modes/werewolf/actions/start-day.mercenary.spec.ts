@@ -95,7 +95,10 @@ describe("WerewolfAction.StartDay — Mercenary bribe tracking", () => {
       nightPhaseOrder: [WerewolfRole.Mercenary],
     });
     const game = makePlayingGame(
-      { ...baseState, roleState: { mercenary: { charged: true, bribedPlayerIds: [] } } },
+      {
+        ...baseState,
+        roleState: { mercenary: { charged: true, bribedPlayerIds: [] } },
+      },
       { roleAssignments: mercRoleAssignments },
     );
 
@@ -112,7 +115,10 @@ describe("WerewolfAction.StartDay — Mercenary bribe tracking", () => {
       nightPhaseOrder: [WerewolfRole.Mercenary],
     });
     const game = makePlayingGame(
-      { ...baseState, roleState: { mercenary: { charged: true, bribedPlayerIds: [] } } },
+      {
+        ...baseState,
+        roleState: { mercenary: { charged: true, bribedPlayerIds: [] } },
+      },
       { roleAssignments: mercRoleAssignments },
     );
 
@@ -237,7 +243,10 @@ describe("WerewolfAction.StartDay — Mercenary protect mode resolution", () => 
       nightPhaseOrder: [WerewolfRole.Werewolf, WerewolfRole.Mercenary],
     });
     const game = makePlayingGame(
-      { ...baseState, roleState: { mercenary: { charged: true, bribedPlayerIds: [] } } },
+      {
+        ...baseState,
+        roleState: { mercenary: { charged: true, bribedPlayerIds: [] } },
+      },
       { roleAssignments: mercRoleAssignments },
     );
 

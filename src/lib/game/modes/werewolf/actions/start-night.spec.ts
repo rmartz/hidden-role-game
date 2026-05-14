@@ -395,7 +395,9 @@ describe("StartNight — Mirrorcaster charge persistence", () => {
   it("carries mercenaryBribedPlayerIds forward to the next night", () => {
     const game = makePlayingGame({
       ...dayTurnState,
-      roleState: { mercenary: { charged: false, bribedPlayerIds: ["p3", "p4"] } },
+      roleState: {
+        mercenary: { charged: false, bribedPlayerIds: ["p3", "p4"] },
+      },
     });
     startNightAction.apply(game, null, "owner-1");
 
