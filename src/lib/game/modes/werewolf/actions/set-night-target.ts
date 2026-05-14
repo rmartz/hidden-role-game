@@ -23,9 +23,14 @@ export const setNightTargetAction: GameAction = {
 
     const phase = ts.phase;
     if (!payload || typeof payload !== "object") return false;
-    const { roleId: explicitPhaseKey, targetPlayerId } = payload as {
+    const {
+      roleId: explicitPhaseKey,
+      targetPlayerId,
+      isSecondTarget,
+    } = payload as {
       roleId?: unknown;
       targetPlayerId?: unknown;
+      isSecondTarget?: unknown;
     };
 
     // Determine the phase key.
@@ -103,6 +108,20 @@ export const setNightTargetAction: GameAction = {
       ts.lastTargets?.[phaseKey] === targetPlayerId
     )
       return false;
+
+    // Dual-target swap roles (e.g. Swapper) cannot select the same player for both targets.
+    if (typeof targetPlayerId === "string" && phaseRoleDef?.dualTargetSwap) {
+      const existing = phase.nightActions[phaseKey];
+      if (existing && !("votes" in existing) && !existing.skipped) {
+        if (
+          (isSecondTarget === true &&
+            existing.targetPlayerId === targetPlayerId) ||
+          (isSecondTarget !== true &&
+            existing.secondTargetPlayerId === targetPlayerId)
+        )
+          return false;
+      }
+    }
 
     // One-Eyed Seer cannot target when locked onto a living player.
     if (

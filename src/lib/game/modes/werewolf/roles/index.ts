@@ -34,6 +34,7 @@ import { SEER_ROLE } from "./seer";
 import { SENTINEL_ROLE } from "./sentinel";
 import { SPELLCASTER_ROLE } from "./spellcaster";
 import { SPOILER_ROLE } from "./spoiler";
+import { SWAPPER_ROLE } from "./swapper";
 import { TANNER_ROLE } from "./tanner";
 import { THE_THING_ROLE } from "./the-thing";
 import { TOUGH_GUY_ROLE } from "./tough-guy";
@@ -78,6 +79,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
   [WerewolfRole.Sentinel]: SENTINEL_ROLE,
   [WerewolfRole.Spellcaster]: SPELLCASTER_ROLE,
   [WerewolfRole.Spoiler]: SPOILER_ROLE,
+  [WerewolfRole.Swapper]: SWAPPER_ROLE,
   [WerewolfRole.Tanner]: TANNER_ROLE,
   [WerewolfRole.TheThing]: THE_THING_ROLE,
   [WerewolfRole.ToughGuy]: TOUGH_GUY_ROLE,
