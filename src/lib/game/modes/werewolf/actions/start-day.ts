@@ -375,6 +375,14 @@ export const startDayAction: GameAction = {
         ? [...existingInfected, zombieAction.targetPlayerId]
         : existingInfected;
 
+    // The Thing tap: record the tapped player ID so they see the notification
+    // during the following daytime.
+    const thingAction = nightPhase.nightActions[WerewolfRole.TheThing];
+    const thingTapped =
+      thingAction !== undefined && !isTeamNightAction(thingAction)
+        ? thingAction.targetPlayerId
+        : undefined;
+
     // Arsonist: update the doused player list.
     // If the Arsonist self-targeted (ignite), reset the doused list.
     // If the Arsonist targeted another player (douse), add them to the list.
@@ -449,6 +457,7 @@ export const startDayAction: GameAction = {
         ? { executioner: { targetId: rs.executioner.targetId } }
         : {}),
       ...(mirrorcasterCharged ? { mirrorcaster: { charged: true } } : {}),
+      ...(thingTapped ? { theThing: { tapped: thingTapped } } : {}),
       ...(draculaWives.length > 0 ? { dracula: { wives: draculaWives } } : {}),
       ...(zombieInfected.length > 0
         ? { zombie: { infected: zombieInfected } }

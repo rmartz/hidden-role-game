@@ -9,6 +9,7 @@ import type {
   MorticianTurnState,
   OneEyedSeerTurnState,
   PriestTurnState,
+  TheThingTurnState,
   ToughGuyTurnState,
   WitchTurnState,
   WolfCubTurnState,
@@ -26,6 +27,7 @@ export type {
   MorticianTurnState,
   OneEyedSeerTurnState,
   PriestTurnState,
+  TheThingTurnState,
   ToughGuyTurnState,
   WitchTurnState,
   WolfCubTurnState,
@@ -227,6 +229,7 @@ export interface WerewolfRoleTurnState {
   mortician?: MorticianTurnState;
   oneEyedSeer?: OneEyedSeerTurnState;
   priest?: PriestTurnState;
+  theThing?: TheThingTurnState;
   toughGuy?: ToughGuyTurnState;
   witch?: WitchTurnState;
   wolfCub?: WolfCubTurnState;

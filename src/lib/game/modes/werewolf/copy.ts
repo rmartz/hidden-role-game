@@ -273,11 +273,32 @@ export const WEREWOLF_COPY = {
     yourTarget: (name: string) =>
       `Your target: ${name}. Convince the village to put them on trial.`,
   },
+  count: {
+    resultHeading: "Werewolves by half:",
+    leftCount: (n: number) =>
+      `Left half: ${String(n)} werewolf${n === 1 ? "" : "s"}`,
+    rightCount: (n: number) =>
+      `Right half: ${String(n)} werewolf${n === 1 ? "" : "s"}`,
+  },
+  insomniac: {
+    leftActed: (name: string) => `Left neighbor (${name}): woke and acted`,
+    leftDidNotAct: (name: string) =>
+      `Left neighbor (${name}): did not wake or act`,
+    rightActed: (name: string) => `Right neighbor (${name}): woke and acted`,
+    rightDidNotAct: (name: string) =>
+      `Right neighbor (${name}): did not wake or act`,
+  },
   monarch: {
     choosePlayerToKnight: "Choose a player to Knight",
     knighthoodsRemaining: (remaining: number) =>
       `Knighthoods remaining: ${String(remaining)}`,
     outOfKnighthoods: "You have used all of your Knighthoods for the game.",
+  },
+  theThing: {
+    tappedNotification:
+      "You were tapped in the night. Someone knows your seat.",
+    narratorTapped: (playerName: string) =>
+      `The Thing tapped ${playerName} this night.`,
   },
   mason: {
     playerWarning:
