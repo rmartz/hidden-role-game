@@ -1,7 +1,8 @@
 import type { Game, GameAction } from "@/lib/types";
+
+import { getWerewolfRole,WerewolfRole } from "../roles";
 import { WerewolfPhase } from "../types";
 import { currentTurnState, isOwnerPlaying } from "../utils";
-import { WerewolfRole, getWerewolfRole } from "../roles";
 
 /**
  * Confirms the Evil Empath adjacency result for this night.

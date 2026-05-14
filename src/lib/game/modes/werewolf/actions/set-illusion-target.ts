@@ -1,7 +1,8 @@
 import type { Game, GameAction } from "@/lib/types";
+
+import { WerewolfRole } from "../roles";
 import { WerewolfPhase } from "../types";
 import { currentTurnState, validateActiveNightPlayer } from "../utils";
-import { WerewolfRole } from "../roles";
 
 /**
  * Illusion Artist night action: target one player whose Seer investigation
