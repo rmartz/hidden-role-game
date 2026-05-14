@@ -522,7 +522,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
     summary:
       "Goes on alert each night; repels werewolves and counter-kills any visiting player",
     description:
-      "Each night the Veteran may choose to go on Alert (up to 3 times). While Alerted, the Veteran repels any werewolf attack — one participating wolf dies instead — and counter-kills any other player who physically visits them (all non-Investigation roles). Investigation roles, which observe from afar using mystical powers, are not affected. If the Veteran does not Alert, they are treated as a normal Villager for that night.",
+      "Each night the Veteran may choose to go on Alert (up to 3 times). While Alerted, the Veteran repels any werewolf attack — one participating wolf dies instead — and counter-kills any other player who physically visits them (Protect and Attack category roles). Investigation and Special roles, which observe from afar or act non-physically, are not affected. If the Veteran does not Alert, they are treated as a normal Villager for that night.",
     team: Team.Good,
     unique: true,
     wakesAtNight: WakesAtNight.EveryNight,

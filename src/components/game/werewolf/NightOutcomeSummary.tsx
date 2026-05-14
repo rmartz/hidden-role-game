@@ -47,9 +47,7 @@ export function NightOutcomeSummary({
             re.type === "killed" &&
             re.targetPlayerId === e.counterkilledPlayerId,
         );
-        return killedEvent?.attackedBy.every(
-          (a) => a === WerewolfRole.Veteran,
-        );
+        return killedEvent?.attackedBy.every((a) => a === WerewolfRole.Veteran);
       })
       .map((e) => e.counterkilledPlayerId),
   );

@@ -269,7 +269,9 @@ describe("resolveNightActions", () => {
       expect(wolfEvent).toMatchObject({ died: true });
     });
 
-    it("alerts and a first-hit Tough Guy visits: counter-kill absorbed, died is false", () => {
+    it("alerts and Tough Guy has targetPlayerId pointing at Veteran: Tough Guy is NOT counter-killed (None category)", () => {
+      // ToughGuy has targetCategory: None — it does not physically visit and
+      // is therefore not a physical visitor from the Veteran's perspective.
       const toughGuyVisitorAssignments = [
         { playerId: "vet1", roleDefinitionId: WerewolfRole.Veteran },
         { playerId: "tg1", roleDefinitionId: WerewolfRole.ToughGuy },
@@ -286,21 +288,11 @@ describe("resolveNightActions", () => {
       );
 
       const tgKilled = findKilled(events, "tg1");
-      expect(tgKilled).toMatchObject({
-        died: false,
-        attackedBy: expect.arrayContaining([WerewolfRole.Veteran]),
-      });
+      expect(tgKilled).toBeUndefined();
 
-      const counterkilledEvent = events.find(
-        (e) => e.type === "veteran-counterkilled",
-      );
-      expect(counterkilledEvent).toMatchObject({
-        type: "veteran-counterkilled",
-        counterkilledPlayerId: "tg1",
-        veteranPlayerId: "vet1",
-        source: "visitor",
-        died: false,
-      });
+      expect(
+        events.find((e) => e.type === "veteran-counterkilled"),
+      ).toBeUndefined();
     });
 
     it("Altruist intercepts a wolf attack on alerted Veteran: wolf NOT counter-killed, Altruist dies", () => {
@@ -383,7 +375,9 @@ describe("resolveNightActions", () => {
       ).toBeUndefined();
     });
 
-    it("Altruist is counter-killed as a visitor when they target the alerted Veteran", () => {
+    it("alerts and Altruist targets the Veteran: Altruist is NOT counter-killed (Special category)", () => {
+      // Altruist has targetCategory: Special — its interception mechanic is
+      // not considered a physical visit, so it is not counter-killed.
       const altruistAssignments = [
         { playerId: "vet1", roleDefinitionId: WerewolfRole.Veteran },
         { playerId: "alt1", roleDefinitionId: WerewolfRole.Altruist },
@@ -399,26 +393,17 @@ describe("resolveNightActions", () => {
         [],
       );
 
-      // Altruist physically visits the Veteran and is counter-killed.
+      // Altruist is not counter-killed (Special category is not a physical visit).
       const altKilled = findKilled(events, "alt1");
-      expect(altKilled).toMatchObject({
-        died: true,
-        attackedBy: expect.arrayContaining([WerewolfRole.Veteran]),
-      });
+      expect(altKilled).toBeUndefined();
 
       // Veteran survives.
       const vetKilled = findKilled(events, "vet1");
       expect(vetKilled).toBeUndefined();
 
-      const counterkilledEvent = events.find(
-        (e) => e.type === "veteran-counterkilled",
-      );
-      expect(counterkilledEvent).toMatchObject({
-        counterkilledPlayerId: "alt1",
-        veteranPlayerId: "vet1",
-        source: "visitor",
-        died: true,
-      });
+      expect(
+        events.find((e) => e.type === "veteran-counterkilled"),
+      ).toBeUndefined();
     });
     it("alerts and Priest wards the Veteran: Priest is NOT counter-killed", () => {
       const priestAssignments = [

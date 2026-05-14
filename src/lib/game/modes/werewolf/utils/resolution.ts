@@ -381,17 +381,21 @@ export function resolveNightActions(
         }
       }
 
-      // Visitor counter-kill: any solo role (except Priest, which uses a ward
-      // rather than a direct visit, and Investigation roles, which use mystical
-      // powers without physically visiting) whose targetPlayerId is the Veteran
-      // is counter-killed and any protection they provide is discarded.
+      // Visitor counter-kill: only Protect- and Attack-category solo roles
+      // physically visit the Veteran; Investigation and Special roles (Seer,
+      // Exposer, Spellcaster, Mummy, Dracula, Zombie, …) use mystical powers
+      // or non-physical means and are not counter-killed.
       for (const [phaseKey, action] of Object.entries(nightActions)) {
         if (isGroupPhaseKey(phaseKey)) continue;
         if (isRoleActive(phaseKey, WerewolfRole.Priest)) continue;
         const soloAction = action as NightAction;
         if (soloAction.targetPlayerId !== veteranPlayerId) continue;
         const role = getWerewolfRole(phaseKey);
-        if (role?.targetCategory === TargetCategory.Investigate) continue;
+        if (
+          role?.targetCategory !== TargetCategory.Protect &&
+          role?.targetCategory !== TargetCategory.Attack
+        )
+          continue;
 
         const visitorPlayerId = roleAssignments.find(
           (a) => a.roleDefinitionId === phaseKey,
