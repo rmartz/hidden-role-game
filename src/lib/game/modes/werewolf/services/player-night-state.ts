@@ -52,8 +52,8 @@ function getNeighborIds(
 }
 
 function hasPriestActiveWard(ts: WerewolfTurnState | undefined): boolean {
-  if (!ts?.priestWards) return false;
-  return Object.keys(ts.priestWards).some(
+  if (!ts?.roleState?.priest?.wards) return false;
+  return Object.keys(ts.roleState.priest.wards).some(
     (wardedId) => !ts.deadPlayerIds.includes(wardedId),
   );
 }
@@ -190,7 +190,7 @@ function extractRoleSpecificState(
     return {
       myNightTarget: soloAction?.skipped ? null : soloAction?.targetPlayerId,
       myNightTargetConfirmed: soloAction?.confirmed ?? false,
-      exposerAbilityUsed: ts?.exposerAbilityUsed ?? false,
+      exposerAbilityUsed: ts?.roleState?.exposer?.abilityUsed ?? false,
     };
   }
 
@@ -203,7 +203,7 @@ function extractRoleSpecificState(
     return {
       myNightTarget: soloAction?.skipped ? null : soloAction?.targetPlayerId,
       myNightTargetConfirmed: soloAction?.confirmed ?? false,
-      morticianAbilityEnded: ts?.morticianAbilityEnded ?? false,
+      morticianAbilityEnded: ts?.roleState?.mortician?.abilityEnded ?? false,
     };
   }
 
@@ -229,7 +229,7 @@ function extractRoleSpecificState(
     return {
       myNightTarget: soloAction?.skipped ? null : soloAction?.targetPlayerId,
       myNightTargetConfirmed: soloAction?.confirmed ?? false,
-      mirrorcasterCharged: ts?.mirrorcasterCharged ?? false,
+      mirrorcasterCharged: ts?.roleState?.mirrorcaster?.charged ?? false,
     };
   }
 
@@ -237,8 +237,8 @@ function extractRoleSpecificState(
     return {
       myNightTarget: undefined,
       myNightTargetConfirmed: false,
-      ...(ts?.executionerTargetId
-        ? { executionerTargetId: ts.executionerTargetId }
+      ...(ts?.roleState?.executioner?.targetId
+        ? { executionerTargetId: ts.roleState.executioner.targetId }
         : {}),
     };
   }
@@ -264,21 +264,19 @@ function extractRoleSpecificState(
     return {
       myNightTarget: soloAction?.skipped ? null : soloAction?.targetPlayerId,
       myNightTargetConfirmed: soloAction?.confirmed ?? false,
-      ...(ts?.arsonistDousedPlayerIds?.length
-        ? { arsonistDousedPlayerIds: ts.arsonistDousedPlayerIds }
+      ...(ts?.roleState?.arsonist?.dousedPlayerIds.length
+        ? { arsonistDousedPlayerIds: ts.roleState.arsonist.dousedPlayerIds }
         : {}),
     };
   }
 
   if (myRole.id === WerewolfRole.OneEyedSeer) {
-    if (
-      ts?.oneEyedSeerLockedTargetId &&
-      !ts.deadPlayerIds.includes(ts.oneEyedSeerLockedTargetId)
-    ) {
+    const lockedTargetId = ts?.roleState?.oneEyedSeer?.lockedTargetId;
+    if (lockedTargetId && !ts.deadPlayerIds.includes(lockedTargetId)) {
       return {
         myNightTarget: undefined,
         myNightTargetConfirmed: false,
-        oneEyedSeerLockedTargetId: ts.oneEyedSeerLockedTargetId,
+        oneEyedSeerLockedTargetId: lockedTargetId,
       };
     }
   }
@@ -338,16 +336,16 @@ function extractWitchState(
   const result: Partial<WerewolfPlayerGameState> = {
     myNightTarget: soloAction?.skipped ? null : soloAction?.targetPlayerId,
     myNightTargetConfirmed: soloAction?.confirmed ?? false,
-    witchAbilityUsed: ts?.witchAbilityUsed ?? false,
+    witchAbilityUsed: ts?.roleState?.witch?.abilityUsed ?? false,
   };
-  if (!ts?.witchAbilityUsed) {
+  if (!ts?.roleState?.witch?.abilityUsed) {
     const attacked = getInterimAttackedPlayerIds(
       nightActions,
       game.roleAssignments,
       deadPlayerIds,
-      ts?.priestWards,
-      ts?.mirrorcasterCharged,
-      ts?.arsonistDousedPlayerIds,
+      ts?.roleState?.priest?.wards,
+      ts?.roleState?.mirrorcaster?.charged,
+      ts?.roleState?.arsonist?.dousedPlayerIds,
     );
     if (attacked.length > 0) {
       result.nightStatus = attacked.map(
@@ -382,9 +380,9 @@ function extractAltruistState(
     nightActions,
     game.roleAssignments,
     deadPlayerIds,
-    ts?.priestWards,
-    ts?.mirrorcasterCharged,
-    ts?.arsonistDousedPlayerIds,
+    ts?.roleState?.priest?.wards,
+    ts?.roleState?.mirrorcaster?.charged,
+    ts?.roleState?.arsonist?.dousedPlayerIds,
   ).filter((id) => id !== callerId && id !== witchProtectedId);
   const result: Partial<WerewolfPlayerGameState> = {
     myNightTarget: soloAction?.skipped ? null : soloAction?.targetPlayerId,
@@ -416,7 +414,7 @@ function extractTheThingState(
     myNightTarget: soloAction?.skipped ? null : soloAction?.targetPlayerId,
     myNightTargetConfirmed: soloAction?.confirmed ?? false,
     ...(adjacentPlayerIds.length > 0 ? { adjacentPlayerIds } : {}),
-    ...(ts?.thingTapped && ts.thingTapped === callerId
+    ...(ts?.roleState?.theThing?.tapped === callerId
       ? { thingTappedMe: true }
       : {}),
     ...(soloAction?.confirmed && soloAction.targetPlayerId

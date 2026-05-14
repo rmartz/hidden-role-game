@@ -23,15 +23,19 @@ export function applyTrialVerdict(
     (v) => v.vote === DaytimeVote.Innocent,
   ).length;
 
-  // Mayor's vote counts double (secret — extra vote added to their side)
+  // Extra trial vote weight: Mayor gets +1 and each Monarch-knighted voter gets +1.
   for (const v of activeTrial.votes) {
     const roleId = game.roleAssignments.find(
       (a) => a.playerId === v.playerId,
     )?.roleDefinitionId;
-    if (roleId === WerewolfRole.Mayor) {
-      if (v.vote === DaytimeVote.Guilty) guiltyCount++;
-      else innocentCount++;
-    }
+    const extraVoteWeight =
+      Number(roleId === WerewolfRole.Mayor) +
+      Number(
+        (ts.roleState?.monarch?.knightedPlayerIds ?? []).includes(v.playerId),
+      );
+    if (extraVoteWeight === 0) continue;
+    if (v.vote === DaytimeVote.Guilty) guiltyCount += extraVoteWeight;
+    else innocentCount += extraVoteWeight;
   }
 
   // Strictly more Guilty than Innocent → eliminated; ties/abstentions → innocent
@@ -52,7 +56,7 @@ export function applyTrialVerdict(
     if (!ts.deadPlayerIds.includes(defendantId)) {
       ts.deadPlayerIds = [...ts.deadPlayerIds, defendantId];
       if (didWolfCubDie([defendantId], game)) {
-        ts.wolfCubDied = true;
+        ts.roleState = { ...(ts.roleState ?? {}), wolfCub: { died: true } };
       }
       cleanupAfterDaytimeKill(defendantId, ts);
     }
@@ -82,7 +86,7 @@ export const resolveTrialAction: GameAction = {
 
       // Executioner wins if their target was eliminated and the Executioner is alive.
       // Check Executioner before Tanner (if target is also the Tanner, Executioner wins).
-      if (ts.executionerTargetId === defendantId) {
+      if (ts.roleState?.executioner?.targetId === defendantId) {
         const executionerAssignment = game.roleAssignments.find(
           (a) => a.roleDefinitionId === (WerewolfRole.Executioner as string),
         );
@@ -115,7 +119,10 @@ export const resolveTrialAction: GameAction = {
         (a) => a.playerId === defendantId,
       )?.roleDefinitionId;
       if (eliminatedRole === (WerewolfRole.Hunter as string)) {
-        ts.hunterRevengePlayerId = defendantId;
+        ts.roleState = {
+          ...(ts.roleState ?? {}),
+          hunter: { revengePlayerId: defendantId },
+        };
         return;
       }
     }
