@@ -16,5 +16,5 @@ export const HOME_PAGE_COPY = {
   creating: "Creating\u2026",
   createLobby: "Create lobby",
   joining: "Joining\u2026",
-  joinLobby: "Join Lobby",
+  joinLobby: "Join lobby",
 } as const;
