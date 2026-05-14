@@ -37,8 +37,103 @@ import { OwnerNightTargetPanel } from "./OwnerNightTargetPanel";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
 import { NightPhaseOrderList } from "./NightPhaseOrderList";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import type { AnyNightAction } from "@/lib/game/modes/werewolf";
 import { buildNarratorInstruction } from "@/lib/game/modes/werewolf";
+import { NightMarkerEffect } from "./NightActionMarker";
 import { NarratorNightInstruction } from "./NarratorNightInstruction";
+
+/**
+ * Derives per-player night action status markers from the narrator's night actions.
+ * A marker is added for any role action that has selected a target — including team
+ * votes' `suggestedTargetId` and standing priest wards — regardless of whether the
+ * action has been confirmed yet. Duplicate effects for the same player are deduped
+ * so each effect appears at most once.
+ */
+function buildNightMarkers(
+  nightActions: Record<string, AnyNightAction>,
+  priestWards?: Record<string, string>,
+  mirrorcasterCharged?: boolean,
+): Map<string, NightMarkerEffect[]> {
+  const markerSets = new Map<string, Set<NightMarkerEffect>>();
+
+  const addMarker = (playerId: string, effect: NightMarkerEffect) => {
+    const existing = markerSets.get(playerId);
+    if (existing) {
+      existing.add(effect);
+    } else {
+      markerSets.set(playerId, new Set([effect]));
+    }
+  };
+
+  for (const [phaseKey, action] of Object.entries(nightActions)) {
+    const targetId = isTeamNightAction(action)
+      ? action.suggestedTargetId
+      : action.targetPlayerId;
+    if (!targetId) continue;
+
+    if (isGroupPhaseKey(phaseKey)) {
+      addMarker(targetId, NightMarkerEffect.Attacked);
+      continue;
+    }
+
+    if (isRoleActive(phaseKey, WerewolfRole.Spellcaster)) {
+      addMarker(targetId, NightMarkerEffect.Silenced);
+      continue;
+    }
+
+    if (isRoleActive(phaseKey, WerewolfRole.Mummy)) {
+      addMarker(targetId, NightMarkerEffect.Hypnotized);
+      continue;
+    }
+
+    if (isRoleActive(phaseKey, WerewolfRole.Mirrorcaster)) {
+      addMarker(
+        targetId,
+        mirrorcasterCharged
+          ? NightMarkerEffect.Attacked
+          : NightMarkerEffect.Protected,
+      );
+      continue;
+    }
+
+    const roleDef = getWerewolfRole(phaseKey);
+    if (!roleDef) continue;
+
+    switch (roleDef.targetCategory) {
+      case TargetCategory.Attack:
+        addMarker(targetId, NightMarkerEffect.Attacked);
+        break;
+      case TargetCategory.Protect:
+        addMarker(targetId, NightMarkerEffect.Protected);
+        break;
+      case TargetCategory.Investigate:
+        addMarker(targetId, NightMarkerEffect.Investigated);
+        break;
+      default:
+        addMarker(targetId, NightMarkerEffect.Special);
+    }
+
+    // Mentalist investigates two players; mark the second target as well.
+    if (
+      isRoleActive(phaseKey, WerewolfRole.Mentalist) &&
+      !isTeamNightAction(action) &&
+      action.secondTargetPlayerId
+    ) {
+      addMarker(action.secondTargetPlayerId, NightMarkerEffect.Investigated);
+    }
+  }
+
+  // Priest wards: mark all warded players as Protected.
+  for (const wardedPlayerId of Object.keys(priestWards ?? {})) {
+    addMarker(wardedPlayerId, NightMarkerEffect.Protected);
+  }
+
+  const markers = new Map<string, NightMarkerEffect[]>();
+  for (const [playerId, effects] of markerSets) {
+    markers.set(playerId, [...effects]);
+  }
+  return markers;
+}
 
 interface OwnerGameNightScreenProps {
   gameId: string;
@@ -82,6 +177,22 @@ export function OwnerGameNightScreen({
   );
 
   const nightActions = phase.nightActions;
+  const nightStatusMarkers = useMemo(
+    () =>
+      isNighttime
+        ? buildNightMarkers(
+            nightActions,
+            turnState.priestWards,
+            turnState.mirrorcasterCharged,
+          )
+        : undefined,
+    [
+      isNighttime,
+      nightActions,
+      turnState.priestWards,
+      turnState.mirrorcasterCharged,
+    ],
+  );
   const activePhaseKey = nightPhaseOrder[currentPhaseIndex] ?? "";
   useEffect(() => {
     setAbilityBypass(false);
@@ -419,6 +530,7 @@ export function OwnerGameNightScreen({
         gameOwnerId={gameState.gameOwner?.id}
         smitedPlayerIds={phase.smitedPlayerIds}
         executionerTargetId={gameState.executionerTargetId}
+        nightStatusMarkers={nightStatusMarkers}
       />
     </div>
   );
