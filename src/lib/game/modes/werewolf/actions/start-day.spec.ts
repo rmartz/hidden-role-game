@@ -1,20 +1,22 @@
-import { describe, it, expect } from "vitest";
-import { GameMode, GameStatus } from "@/lib/types";
+import { describe, expect,it } from "vitest";
+
 import type { WerewolfGame } from "@/lib/types";
+import { GameMode, GameStatus } from "@/lib/types";
+
+import { WerewolfRole } from "../roles";
 import type {
-  WerewolfTurnState,
   WerewolfDaytimePhase,
   WerewolfNighttimePhase,
+  WerewolfTurnState,
 } from "../types";
 import { WerewolfPhase } from "../types";
-import { WerewolfRole } from "../roles";
-import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
 import { WerewolfWinner } from "../utils/win-condition";
+import { WEREWOLF_ACTIONS,WerewolfAction } from "./index";
 import {
-  makePlayingGame,
-  makeNightState,
-  nightTurnState,
   dayTurnState,
+  makeNightState,
+  makePlayingGame,
+  nightTurnState,
 } from "./test-helpers";
 
 // ---------------------------------------------------------------------------

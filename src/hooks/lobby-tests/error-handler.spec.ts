@@ -1,5 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
+import { beforeEach,describe, expect, it, vi } from "vitest";
+
 import { createWrapper } from "../test-utils";
 
 const mockPush = vi.fn();
@@ -12,6 +13,7 @@ vi.mock("@/lib/api", () => ({
 
 // Import after mocks are declared.
 import * as api from "@/lib/api";
+
 import { useLobbyErrorHandler } from "../lobby";
 
 beforeEach(() => {

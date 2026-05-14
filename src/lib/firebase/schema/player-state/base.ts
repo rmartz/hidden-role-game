@@ -1,11 +1,12 @@
-import type { TimerConfig, GameStatusState, Team } from "@/lib/types";
-import { parseTimerConfig } from "../lobby";
+import type { GameStatusState, Team,TimerConfig } from "@/lib/types";
 import type {
   PlayerGameState,
   RoleInPlay,
   VisibleTeammate,
 } from "@/server/types";
+
 import type { FirebaseLobbyPlayer } from "../lobby";
+import { parseTimerConfig } from "../lobby";
 
 export interface FirebaseBasePlayerState {
   statusJson: string;

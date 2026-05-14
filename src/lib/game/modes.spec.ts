@@ -1,5 +1,7 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect,it } from "vitest";
+
 import { GameMode } from "@/lib/types";
+
 import {
   ALL_GAME_MODES,
   DEFAULT_GAME_MODE,

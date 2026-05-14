@@ -1,12 +1,13 @@
 import type { Team } from "@/lib/types";
-import type { WerewolfTimerConfig } from "./timer-config";
 import { GameMode } from "@/lib/types";
 import type {
   BasePlayerGameState,
   NightStatusEntry,
 } from "@/server/types/game";
+
+import type { WerewolfTimerConfig } from "./timer-config";
 import type { AnyNightAction } from "./types";
-import { TrialVerdict, TrialPhase, DaytimeVote } from "./types";
+import { DaytimeVote,TrialPhase, TrialVerdict } from "./types";
 
 /**
  * Werewolf-specific extension of PlayerGameState. Includes all fields that

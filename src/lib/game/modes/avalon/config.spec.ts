@@ -1,8 +1,10 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect,it } from "vitest";
+
 import type { RoleBucket } from "@/lib/types";
 import { isSimpleRoleBucket } from "@/lib/types";
-import { AvalonRole } from "./roles";
+
 import { AVALON_CONFIG } from "./config";
+import { AvalonRole } from "./roles";
 
 /** Helper: convert simple role buckets to { roleId: playerCount } map */
 function bucketCounts(buckets: RoleBucket[]): Record<string, number> {

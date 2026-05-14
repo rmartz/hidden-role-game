@@ -1,11 +1,13 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect,it } from "vitest";
+
+import {
+  makeLobbyParams as makeParams,
+  postRequest,
+} from "@/app/api/test-utils";
+
 import { POST as createLobby } from "../../create/route";
 import { POST as joinLobby } from "../join/route";
 import { PUT as transferOwner } from "./route";
-import {
-  postRequest,
-  makeLobbyParams as makeParams,
-} from "@/app/api/test-utils";
 
 describe("PUT /api/lobby/[lobbyId]/owner", () => {
   it("should allow the owner to transfer ownership to another player", async () => {

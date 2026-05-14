@@ -1,14 +1,16 @@
-import { describe, it, expect } from "vitest";
-import { POST as createLobby } from "../../../lobby/create/route";
-import { POST as joinLobby } from "../../../lobby/[lobbyId]/join/route";
-import { PUT as updateConfig } from "../../../lobby/[lobbyId]/config/route";
-import { POST as startGame } from "./route";
-import type { RoleBucket } from "@/lib/types";
+import { describe, expect,it } from "vitest";
+
 import {
-  postRequest,
-  makeLobbyParams,
   makeCreateGameParams,
+  makeLobbyParams,
+  postRequest,
 } from "@/app/api/test-utils";
+import type { RoleBucket } from "@/lib/types";
+
+import { PUT as updateConfig } from "../../../lobby/[lobbyId]/config/route";
+import { POST as joinLobby } from "../../../lobby/[lobbyId]/join/route";
+import { POST as createLobby } from "../../../lobby/create/route";
+import { POST as startGame } from "./route";
 
 async function setupLobbyWithPlayers(gameMode?: string) {
   const createRes = await createLobby(

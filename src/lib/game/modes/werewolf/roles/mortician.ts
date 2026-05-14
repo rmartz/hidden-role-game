@@ -1,7 +1,8 @@
 import { Team } from "@/lib/types";
-import { WakesAtNight, TargetCategory } from "../types";
-import { WerewolfRole, WerewolfRoleCategory } from "./_types";
+
+import { TargetCategory,WakesAtNight } from "../types";
 import type { WerewolfRoleDefinition } from "./_types";
+import { WerewolfRole, WerewolfRoleCategory } from "./_types";
 
 export const MORTICIAN_ROLE: WerewolfRoleDefinition = {
   id: WerewolfRole.Mortician,

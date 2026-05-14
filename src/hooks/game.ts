@@ -1,30 +1,31 @@
 "use client";
 
-import { useEffect } from "react";
 import {
   useMutation,
   useQueries,
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { ref, onValue } from "firebase/database";
-import { getClientDatabase } from "@/lib/firebase/client";
+import { onValue,ref } from "firebase/database";
+import { useEffect } from "react";
+
+import { useFirebaseAuth } from "@/hooks/firebaseAuth";
+import { useGameModeContext } from "@/hooks/gameModeContext";
 import {
-  startGame,
   advanceGame,
   applyGameAction,
   getGameState,
+  startGame,
 } from "@/lib/api";
-import { ServerResponseStatus } from "@/server/types";
-import type { PlayerGameState, ServerResponse } from "@/server/types";
-import type { Game, GameMode } from "@/lib/types";
-import {
-  firebaseToPlayerState,
-  type FirebasePlayerState,
-} from "@/lib/firebase/schema";
 import { getSessionId } from "@/lib/api";
-import { useFirebaseAuth } from "@/hooks/firebaseAuth";
-import { useGameModeContext } from "@/hooks/gameModeContext";
+import { getClientDatabase } from "@/lib/firebase/client";
+import {
+  type FirebasePlayerState,
+  firebaseToPlayerState,
+} from "@/lib/firebase/schema";
+import type { Game, GameMode } from "@/lib/types";
+import type { PlayerGameState, ServerResponse } from "@/server/types";
+import { ServerResponseStatus } from "@/server/types";
 
 export function useStartGame(lobbyId: string) {
   const queryClient = useQueryClient();

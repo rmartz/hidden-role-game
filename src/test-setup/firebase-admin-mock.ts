@@ -4,7 +4,7 @@
  * the Firebase lobby and game modules.
  */
 
-import { vi, beforeEach } from "vitest";
+import { beforeEach,vi } from "vitest";
 
 // In-memory store — reset before each test
 let store: Record<string, unknown> = {};

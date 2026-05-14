@@ -1,16 +1,18 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect,it } from "vitest";
+
+import {
+  makeCreateGameParams,
+  makeGameParams,
+  makeLobbyParams,
+  postRequest,
+} from "@/app/api/test-utils";
+
+import { PUT as updateConfig } from "../../../lobby/[lobbyId]/config/route";
+import { POST as joinLobby } from "../../../lobby/[lobbyId]/join/route";
+import { POST as createLobby } from "../../../lobby/create/route";
+import { POST as startGame } from "../create/route";
 import { GET as getGameState } from "./route";
 import { setupStartedSecretVillainGame } from "./test-helpers";
-import {
-  postRequest,
-  makeGameParams,
-  makeCreateGameParams,
-  makeLobbyParams,
-} from "@/app/api/test-utils";
-import { POST as createLobby } from "../../../lobby/create/route";
-import { POST as joinLobby } from "../../../lobby/[lobbyId]/join/route";
-import { PUT as updateConfig } from "../../../lobby/[lobbyId]/config/route";
-import { POST as startGame } from "../create/route";
 
 describe("GET /api/game/[gameId]", () => {
   it("should return the player game state for a valid session", async () => {

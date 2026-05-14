@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { GameMode } from "@/lib/types";
-import { ENABLED_GAME_MODES, GAME_MODES } from "@/lib/game/modes";
-import { getLobbyId, getPlayerId } from "@/lib/api";
-import { getPlayerName } from "@/lib/player";
+
 import { useCreateLobby, useJoinLobby, useStoredLobbyQuery } from "@/hooks";
+import { getLobbyId, getPlayerId } from "@/lib/api";
+import { ENABLED_GAME_MODES, GAME_MODES } from "@/lib/game/modes";
+import { getPlayerName } from "@/lib/player";
+import { GameMode } from "@/lib/types";
+
 import { HomePageView } from "./HomePageView";
 
 const GAME_MODE_OPTIONS = ENABLED_GAME_MODES.map((mode) => ({

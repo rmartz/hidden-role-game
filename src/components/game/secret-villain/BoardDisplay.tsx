@@ -1,14 +1,14 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
-import { getSvThemeLabels } from "@/lib/game/modes/secret-villain/themes";
 import type { SvTheme } from "@/lib/game/modes/secret-villain/themes";
+import { getSvThemeLabels } from "@/lib/game/modes/secret-villain/themes";
 import type { SvPowerTable } from "@/lib/game/modes/secret-villain/types";
 import {
-  GOOD_CARDS_TO_WIN,
   BAD_CARDS_TO_WIN,
+  GOOD_CARDS_TO_WIN,
 } from "@/lib/game/modes/secret-villain/types";
 import { cn } from "@/lib/utils";
 

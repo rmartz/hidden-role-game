@@ -1,8 +1,10 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect,it } from "vitest";
+
 import { GameMode } from "@/lib/types";
-import { SpecialActionType, SvBoardPreset } from "./types";
-import { SvTheme } from "./themes";
+
 import { parseSecretVillainModeConfig } from "./lobby-config";
+import { SvTheme } from "./themes";
+import { SpecialActionType, SvBoardPreset } from "./types";
 
 describe("parseSecretVillainModeConfig", () => {
   it("returns default config for empty input", () => {

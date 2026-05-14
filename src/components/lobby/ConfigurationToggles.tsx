@@ -2,6 +2,7 @@
 
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+
 import { CONFIGURATION_TOGGLES_COPY } from "./ConfigurationToggles.copy";
 
 interface ConfigurationTogglesProps {

@@ -1,10 +1,12 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect,it } from "vitest";
+
+import {
+  makeLobbyParams as makeParams,
+  postRequest,
+} from "@/app/api/test-utils";
+
 import { POST as createLobby } from "../../create/route";
 import { POST as joinLobby } from "./route";
-import {
-  postRequest,
-  makeLobbyParams as makeParams,
-} from "@/app/api/test-utils";
 
 describe("POST /api/lobby/[lobbyId]/join — basic operations", () => {
   it("should allow a player to join a lobby and return sessionId", async () => {

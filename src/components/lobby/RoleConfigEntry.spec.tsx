@@ -1,10 +1,12 @@
-import { afterEach, describe, it, expect } from "vitest";
+import { configureStore } from "@reduxjs/toolkit";
 import { cleanup, render, screen } from "@testing-library/react";
 import { Provider } from "react-redux";
-import { configureStore } from "@reduxjs/toolkit";
-import gameConfigReducer, { setRoleCount } from "@/store/game-config-slice";
-import { GameMode, RoleConfigMode, Team } from "@/lib/types";
+import { afterEach, describe, expect,it } from "vitest";
+
 import type { RoleDefinition } from "@/lib/types";
+import { GameMode, RoleConfigMode, Team } from "@/lib/types";
+import gameConfigReducer, { setRoleCount } from "@/store/game-config-slice";
+
 import { RoleConfigEntry } from "./RoleConfigEntry";
 
 afterEach(cleanup);

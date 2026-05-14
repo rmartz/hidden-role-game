@@ -1,18 +1,20 @@
-import { describe, it, expect } from "vitest";
-import { POST as returnToLobby } from "./route";
-import { POST as createLobby } from "../../create/route";
-import { POST as joinLobby } from "../join/route";
-import { PUT as updateConfig } from "../config/route";
-import { PUT as renamePlayer } from "../players/[playerId]/route";
+import { describe, expect,it } from "vitest";
+
 import { POST as startGame } from "@/app/api/[gameMode]/game/create/route";
-import { updateGameStatus } from "@/services/game";
-import { GameStatus } from "@/lib/types";
 import {
-  postRequest,
+  makeCreateGameParams,
   makeLobbyParams as makeParams,
   makePlayerParams,
-  makeCreateGameParams,
+  postRequest,
 } from "@/app/api/test-utils";
+import { GameStatus } from "@/lib/types";
+import { updateGameStatus } from "@/services/game";
+
+import { POST as createLobby } from "../../create/route";
+import { PUT as updateConfig } from "../config/route";
+import { POST as joinLobby } from "../join/route";
+import { PUT as renamePlayer } from "../players/[playerId]/route";
+import { POST as returnToLobby } from "./route";
 
 async function setupFinishedGame() {
   const createRes = await createLobby(

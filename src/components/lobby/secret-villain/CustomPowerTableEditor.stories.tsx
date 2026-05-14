@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { fn } from "storybook/test";
+
 import { SpecialActionType } from "@/lib/game/modes/secret-villain/types";
+
 import { CustomPowerTableEditor } from "./CustomPowerTableEditor";
 
 const meta = {

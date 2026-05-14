@@ -1,6 +1,7 @@
 "use client";
 
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+
 import { WerewolfOwnerScreen } from "./WerewolfOwnerScreen";
 import { WerewolfPlayerScreen } from "./WerewolfPlayerScreen";
 

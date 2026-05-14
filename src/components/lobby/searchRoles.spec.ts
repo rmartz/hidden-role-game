@@ -1,7 +1,9 @@
-import { describe, it, expect } from "vitest";
-import { searchRoles } from "./searchRoles";
+import { describe, expect,it } from "vitest";
+
 import type { RoleDefinition } from "@/lib/types";
 import { Team } from "@/lib/types";
+
+import { searchRoles } from "./searchRoles";
 
 function makeRole(
   overrides: Partial<RoleDefinition<string, Team>>,

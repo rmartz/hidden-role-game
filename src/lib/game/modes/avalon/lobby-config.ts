@@ -1,5 +1,5 @@
-import { GameMode, DEFAULT_TIMER_CONFIG } from "@/lib/types";
 import type { BaseLobbyConfig, TimerConfig } from "@/lib/types";
+import { DEFAULT_TIMER_CONFIG,GameMode } from "@/lib/types";
 
 /** Avalon-specific mode configuration (currently empty). */
 export interface AvalonModeConfig {

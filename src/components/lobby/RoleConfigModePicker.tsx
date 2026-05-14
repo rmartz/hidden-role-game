@@ -1,10 +1,11 @@
 "use client";
 
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RoleConfigMode } from "@/lib/types";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { setRoleConfigMode } from "@/store/game-config-slice";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import { ROLE_CONFIG_MODE_PICKER_COPY } from "./RoleConfigModePicker.copy";
 
 interface RoleConfigModePickerProps {

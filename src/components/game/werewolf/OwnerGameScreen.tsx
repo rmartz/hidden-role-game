@@ -1,7 +1,8 @@
 "use client";
 
-import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { GameRolesList } from "@/components/game";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+
 import { NarratorPlayerRoleLists } from "./NarratorPlayerRoleLists";
 
 interface OwnerGameScreenProps {

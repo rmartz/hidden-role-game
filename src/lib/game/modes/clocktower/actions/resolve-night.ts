@@ -1,7 +1,8 @@
 import type { Game, GameAction, PlayerRoleAssignment } from "@/lib/types";
-import { getNightContext } from "./helpers";
-import type { ClocktowerNightPhase, ClocktowerTurnState } from "../types";
+
 import { ClocktowerRole } from "../roles";
+import type { ClocktowerNightPhase, ClocktowerTurnState } from "../types";
+import { getNightContext } from "./helpers";
 
 /**
  * Determines who the Imp kills this night, accounting for:

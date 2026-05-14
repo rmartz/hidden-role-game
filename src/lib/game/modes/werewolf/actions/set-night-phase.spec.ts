@@ -1,13 +1,14 @@
-import { describe, it, expect } from "vitest";
-import type { WerewolfTurnState, WerewolfNighttimePhase } from "../types";
+import { describe, expect,it } from "vitest";
+
 import { WerewolfRole } from "../roles";
-import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
+import type { WerewolfNighttimePhase,WerewolfTurnState } from "../types";
 import {
   buildNightPhaseOrder,
   computeSuggestedTarget,
   getGroupPhasePlayerIds,
 } from "../utils";
-import { makePlayingGame, nightTurnState, dayTurnState } from "./test-helpers";
+import { WEREWOLF_ACTIONS,WerewolfAction } from "./index";
+import { dayTurnState,makePlayingGame, nightTurnState } from "./test-helpers";
 
 // ---------------------------------------------------------------------------
 // SetNightPhase

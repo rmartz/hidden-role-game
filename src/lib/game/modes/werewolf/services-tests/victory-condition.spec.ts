@@ -1,13 +1,15 @@
-import { describe, it, expect } from "vitest";
-import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
-import type { Game } from "@/lib/types";
+import { describe, expect,it } from "vitest";
+
 import {
-  WerewolfRole,
   DEFAULT_WEREWOLF_TIMER_CONFIG,
+  WerewolfRole,
 } from "@/lib/game/modes/werewolf";
 import { WerewolfWinner } from "@/lib/game/modes/werewolf/utils/win-condition";
-import { werewolfServices } from "../services";
+import type { Game } from "@/lib/types";
+import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
+
 import { WEREWOLF_COPY } from "../copy";
+import { werewolfServices } from "../services";
 
 function makeFinishedGame(winner: WerewolfWinner): Game {
   return {

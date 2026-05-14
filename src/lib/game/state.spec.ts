@@ -1,14 +1,16 @@
-import { describe, it, expect } from "vitest";
-import { getPlayerGameState, buildGame } from "./state";
-import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
-import type { Game, GamePlayer, LobbyPlayer, RoleBucket } from "@/lib/types";
-import type { WerewolfGame } from "@/lib/types";
-import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
-import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
+import { describe, expect,it } from "vitest";
+
 import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-villain/lobby-config";
-import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
 import { WerewolfPhase, WerewolfRole } from "@/lib/game/modes/werewolf";
 import { DEFAULT_WEREWOLF_MODE_CONFIG } from "@/lib/game/modes/werewolf/lobby-config";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
+import type { Game, GamePlayer, LobbyPlayer, RoleBucket } from "@/lib/types";
+import type { WerewolfGame } from "@/lib/types";
+import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
+
+import { buildGame,getPlayerGameState } from "./state";
 
 const DEFAULT_BUCKETS: RoleBucket[] = [
   { playerCount: 1, roles: [{ roleId: "good" }] },

@@ -1,20 +1,22 @@
-import { describe, it, expect } from "vitest";
-import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
-import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "../timer-config";
+import { describe, expect,it } from "vitest";
+
 import type { Game } from "@/lib/types";
+import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
+
+import { SecretVillainRole } from "../roles";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "../timer-config";
+import type { PolicyChancellorPhase,SecretVillainTurnState } from "../types";
 import {
-  SecretVillainPhase,
-  PolicyCard,
-  GOOD_CARDS_TO_WIN,
   BAD_CARDS_TO_WIN,
+  GOOD_CARDS_TO_WIN,
+  PolicyCard,
+  SecretVillainPhase,
   SpecialActionType,
   SvBoardPreset,
 } from "../types";
-import type { SecretVillainTurnState, PolicyChancellorPhase } from "../types";
 import { BOARD_PRESETS, SvVictoryConditionKey } from "../utils";
-import { SecretVillainRole } from "../roles";
-import { presidentDiscardAction } from "./president-discard";
 import { chancellorPlayAction } from "./chancellor-play";
+import { presidentDiscardAction } from "./president-discard";
 
 function makePlayer(id: string) {
   return {

@@ -1,9 +1,11 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect,it } from "vitest";
+
 import { GameStatus } from "@/lib/types";
-import { WerewolfPhase, TrialVerdict, DaytimeVote, TrialPhase } from "../types";
-import type { WerewolfTurnState } from "../types";
+
 import { WerewolfRole } from "../roles";
-import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
+import type { WerewolfTurnState } from "../types";
+import { DaytimeVote, TrialPhase,TrialVerdict, WerewolfPhase } from "../types";
+import { WEREWOLF_ACTIONS,WerewolfAction } from "./index";
 import { makePlayingGame } from "./test-helpers";
 
 function makeDayStateWithDefenseTrial(

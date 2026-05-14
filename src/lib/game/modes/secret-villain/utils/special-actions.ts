@@ -1,5 +1,5 @@
-import { SpecialActionType, SvBoardPreset } from "../types";
 import type { SvCustomPowerConfig, SvPowerTable } from "../types";
+import { SpecialActionType, SvBoardPreset } from "../types";
 
 /** Concrete preset type — excludes virtual presets (Custom, Default). */
 export type SvConcretePreset = Exclude<

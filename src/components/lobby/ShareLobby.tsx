@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { QRCodeSVG } from "qrcode.react";
 import { CheckIcon, ClipboardIcon, ShareIcon } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
+import { useState } from "react";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -12,6 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+
 import { SHARE_LOBBY_COPY } from "./ShareLobby.copy";
 
 interface ShareLobbyProps {

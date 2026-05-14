@@ -1,15 +1,17 @@
-import { describe, it, expect } from "vitest";
-import { GameMode, RoleConfigMode } from "@/lib/types";
-import reducer, {
-  loadConfig,
-  updateModeConfigField,
-  setPlayerCount,
-} from "./game-config-slice";
-import type { GameConfigState } from "./game-config-slice";
-import { ShowRolesInPlay } from "@/lib/types";
+import { describe, expect,it } from "vitest";
+
+import { GAME_MODES } from "@/lib/game/modes";
 import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-villain/lobby-config";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
-import { GAME_MODES } from "@/lib/game/modes";
+import { GameMode, RoleConfigMode } from "@/lib/types";
+import { ShowRolesInPlay } from "@/lib/types";
+
+import type { GameConfigState } from "./game-config-slice";
+import reducer, {
+  loadConfig,
+  setPlayerCount,
+  updateModeConfigField,
+} from "./game-config-slice";
 
 function makeSecretVillainState(
   playerCount: number,

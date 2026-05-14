@@ -1,14 +1,16 @@
-import { describe, it, expect } from "vitest";
-import { POST as createLobby } from "../../create/route";
-import { POST as joinLobby } from "../join/route";
+import { describe, expect,it } from "vitest";
+
 import { POST as startGame } from "@/app/api/[gameMode]/game/create/route";
-import { PUT as updateConfig } from "../config/route";
-import { POST as createNoDevicePlayer } from "./route";
 import {
-  postRequest,
-  makeLobbyParams as makeParams,
   makeCreateGameParams,
+  makeLobbyParams as makeParams,
+  postRequest,
 } from "@/app/api/test-utils";
+
+import { POST as createLobby } from "../../create/route";
+import { PUT as updateConfig } from "../config/route";
+import { POST as joinLobby } from "../join/route";
+import { POST as createNoDevicePlayer } from "./route";
 
 describe("POST /api/lobby/[lobbyId]/players", () => {
   it("returns 401 when no session header is provided", async () => {

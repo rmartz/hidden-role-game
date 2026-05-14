@@ -1,4 +1,5 @@
 import type { NarratorInstruction } from "@/lib/game/modes/werewolf";
+
 import { NARRATOR_NIGHT_INSTRUCTION_COPY } from "./NarratorNightInstruction.copy";
 
 interface NarratorNightInstructionProps {

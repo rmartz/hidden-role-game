@@ -1,7 +1,9 @@
-import { describe, it, expect } from "vitest";
-import { POST as createLobby } from "./route";
+import { describe, expect,it } from "vitest";
+
 import { postRequest } from "@/app/api/test-utils";
 import { ShowRolesInPlay } from "@/lib/types";
+
+import { POST as createLobby } from "./route";
 
 describe("POST /api/lobby/create", () => {
   it("should reject an empty player name", async () => {

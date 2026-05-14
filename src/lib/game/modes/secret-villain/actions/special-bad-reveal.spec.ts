@@ -1,25 +1,27 @@
-import { describe, it, expect } from "vitest";
-import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
+import { describe, expect,it } from "vitest";
+
 import type { Game } from "@/lib/types";
-import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "../timer-config";
-import {
-  SecretVillainPhase,
-  PolicyCard,
-  SvBoardPreset,
-  BAD_CARDS_FOR_SPECIAL_BAD_WIN,
-} from "../types";
-import type { SecretVillainTurnState, SpecialBadRevealPhase } from "../types";
-import { BOARD_PRESETS } from "../utils";
+import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
+
 import { SecretVillainRole } from "../roles";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "../timer-config";
+import type { SecretVillainTurnState, SpecialBadRevealPhase } from "../types";
 import {
-  confirmSpecialBadAction,
-  revealSpecialBadAction,
-  advanceFromSpecialBadRevealAction,
-} from "./special-bad-reveal";
+  BAD_CARDS_FOR_SPECIAL_BAD_WIN,
+  PolicyCard,
+  SecretVillainPhase,
+  SvBoardPreset,
+} from "../types";
+import { BOARD_PRESETS } from "../utils";
 import {
   SecretVillainWinner,
   SvVictoryConditionKey,
 } from "../utils/win-condition";
+import {
+  advanceFromSpecialBadRevealAction,
+  confirmSpecialBadAction,
+  revealSpecialBadAction,
+} from "./special-bad-reveal";
 
 function makeRevealGame(
   revealPhaseOverrides: Partial<SpecialBadRevealPhase> = {},

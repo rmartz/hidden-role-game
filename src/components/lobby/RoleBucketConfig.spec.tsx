@@ -1,8 +1,10 @@
-import { afterEach, describe, it, expect, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
-import { RoleBucketConfigView } from "./RoleBucketConfig";
-import { GameMode, Team } from "@/lib/types";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import type { AdvancedRoleBucket, RoleDefinition } from "@/lib/types";
+import { GameMode, Team } from "@/lib/types";
+
+import { RoleBucketConfigView } from "./RoleBucketConfig";
 import { ROLE_BUCKET_CONFIG_COPY } from "./RoleBucketConfig.copy";
 
 afterEach(cleanup);

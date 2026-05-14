@@ -1,12 +1,14 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect,it } from "vitest";
+
+import {
+  makeLobbyParams as makeParams,
+  postRequest,
+} from "@/app/api/test-utils";
+import type { PublicLobby } from "@/server/types";
+
 import { POST as createLobby } from "../../create/route";
 import { POST as joinLobby } from "../join/route";
 import { PUT as reorderPlayers } from "./route";
-import {
-  postRequest,
-  makeLobbyParams as makeParams,
-} from "@/app/api/test-utils";
-import type { PublicLobby } from "@/server/types";
 
 function putRequest(url: string, sessionId: string, body: unknown): Request {
   return new Request(url, {

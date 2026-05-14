@@ -1,15 +1,17 @@
-import { describe, it, expect } from "vitest";
-import {
-  SecretVillainWinner,
-  checkBoardWinCondition,
-  checkShootWinCondition,
-  checkChancellorElectionWinCondition,
-} from "./win-condition";
-import type { SecretVillainTurnState } from "../types";
-import { SecretVillainPhase, PolicyCard, SvBoardPreset } from "../types";
-import { BOARD_PRESETS } from "./special-actions";
-import { SecretVillainRole } from "../roles";
+import { describe, expect,it } from "vitest";
+
 import type { PlayerRoleAssignment } from "@/lib/types";
+
+import { SecretVillainRole } from "../roles";
+import type { SecretVillainTurnState } from "../types";
+import { PolicyCard, SecretVillainPhase, SvBoardPreset } from "../types";
+import { BOARD_PRESETS } from "./special-actions";
+import {
+  checkBoardWinCondition,
+  checkChancellorElectionWinCondition,
+  checkShootWinCondition,
+  SecretVillainWinner,
+} from "./win-condition";
 
 const baseTurnState: SecretVillainTurnState = {
   turn: 1,

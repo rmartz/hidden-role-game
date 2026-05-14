@@ -1,7 +1,9 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect,it } from "vitest";
+
 import { WerewolfRole } from "@/lib/game/modes/werewolf";
+
 import { extractPlayerNightState } from "../services/player-night-state";
-import { mentalistRole, makeMentalistGame } from "./mentalist-helpers";
+import { makeMentalistGame,mentalistRole } from "./mentalist-helpers";
 
 describe("extractPlayerNightState (Mentalist targeting)", () => {
   it("returns myNightTarget and mySecondNightTarget when both are set", () => {

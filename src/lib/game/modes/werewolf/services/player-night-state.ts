@@ -1,18 +1,19 @@
-import { Team } from "@/lib/types";
 import type { Game } from "@/lib/types";
+import { Team } from "@/lib/types";
 import type { NighttimeNightStatusEntry } from "@/server/types";
+
+import { WEREWOLF_COPY } from "../copy";
 import type { WerewolfPlayerGameState } from "../player-state";
+import type { WerewolfRoleDefinition } from "../roles";
+import { getWerewolfRole,WerewolfRole } from "../roles";
+import type { AnyNightAction, WerewolfTurnState } from "../types";
+import { isTeamNightAction,TargetCategory, WerewolfPhase } from "../types";
 import {
+  baseGroupPhaseKey,
   currentTurnState,
   getGroupPhasePlayerIds,
   getInterimAttackedPlayerIds,
-  baseGroupPhaseKey,
 } from "../utils";
-import { WerewolfPhase, TargetCategory, isTeamNightAction } from "../types";
-import type { AnyNightAction, WerewolfTurnState } from "../types";
-import type { WerewolfRoleDefinition } from "../roles";
-import { WerewolfRole, getWerewolfRole } from "../roles";
-import { WEREWOLF_COPY } from "../copy";
 
 function hasPriestActiveWard(ts: WerewolfTurnState | undefined): boolean {
   if (!ts?.roleState?.priest?.wards) return false;

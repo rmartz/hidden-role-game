@@ -1,9 +1,11 @@
-import { describe, it, expect } from "vitest";
-import { isValidSession, toPublicLobby } from "./lobby-helpers";
-import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
-import type { Lobby, RoleBucket } from "@/lib/types";
-import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
+import { describe, expect,it } from "vitest";
+
 import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-villain/lobby-config";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
+import type { Lobby, RoleBucket } from "@/lib/types";
+import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
+
+import { isValidSession, toPublicLobby } from "./lobby-helpers";
 
 const DEFAULT_BUCKETS: RoleBucket[] = [
   { playerCount: 2, roles: [{ roleId: "good" }] },

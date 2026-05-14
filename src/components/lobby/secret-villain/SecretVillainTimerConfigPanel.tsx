@@ -1,7 +1,8 @@
 "use client";
 
-import type { TimerConfig } from "@/lib/types";
 import type { SecretVillainTimerConfig } from "@/lib/game/modes/secret-villain/timer-config";
+import type { TimerConfig } from "@/lib/types";
+
 import { TimerConfigPanel } from "../TimerConfigPanel";
 import type { TimerRow } from "../TimerConfigPanelRow";
 import { SECRET_VILLAIN_TIMER_CONFIG_PANEL_COPY } from "./SecretVillainTimerConfigPanel.copy";

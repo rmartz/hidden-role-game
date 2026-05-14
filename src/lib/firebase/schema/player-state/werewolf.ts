@@ -1,12 +1,14 @@
-import { GameMode } from "@/lib/types";
 import type { AnyNightAction, DaytimeVote } from "@/lib/game/modes/werewolf";
 import { TrialVerdict } from "@/lib/game/modes/werewolf";
-import type { NightStatusEntry } from "@/server/types";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import type { Team } from "@/lib/types";
+import { GameMode } from "@/lib/types";
+import type { NightStatusEntry } from "@/server/types";
+
 import {
-  type FirebaseBasePlayerState,
-  baseStateToFirebase,
   baseStateFromFirebase,
+  baseStateToFirebase,
+  type FirebaseBasePlayerState,
 } from "./base";
 import {
   type FirebaseWerewolfRoleState,

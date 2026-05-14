@@ -1,8 +1,10 @@
-import { describe, it, expect, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
-import { GameRolesList } from "./GameRolesList";
-import type { RoleInPlay } from "@/server/types";
+import { cleanup,render, screen } from "@testing-library/react";
+import { afterEach,describe, expect, it } from "vitest";
+
 import { Team } from "@/lib/types";
+import type { RoleInPlay } from "@/server/types";
+
+import { GameRolesList } from "./GameRolesList";
 
 afterEach(cleanup);
 

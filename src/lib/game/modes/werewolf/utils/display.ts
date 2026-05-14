@@ -1,15 +1,16 @@
-import { Team } from "@/lib/types";
-import { TargetCategory } from "../types";
-import type { AnyNightAction } from "../types";
-import { WerewolfRole, getWerewolfRole } from "../roles";
-import type { WerewolfRoleDefinition } from "../roles";
-import { WEREWOLF_COPY } from "../copy";
-import { isGroupPhaseKey, baseGroupPhaseKey, isRoleActive } from "./phase-keys";
-import { SMITE_PHASE_KEY, OLD_MAN_TIMER_KEY } from "./resolution";
-import type { PhaseKey } from "./phase-keys";
-import { targetPlayerIdOf } from "./targeting";
 import { getPlayerName } from "@/lib/player";
+import { Team } from "@/lib/types";
 import type { NightStatusEntry, VisibleTeammate } from "@/server/types";
+
+import { WEREWOLF_COPY } from "../copy";
+import type { WerewolfRoleDefinition } from "../roles";
+import { getWerewolfRole,WerewolfRole } from "../roles";
+import type { AnyNightAction } from "../types";
+import { TargetCategory } from "../types";
+import type { PhaseKey } from "./phase-keys";
+import { baseGroupPhaseKey, isGroupPhaseKey, isRoleActive } from "./phase-keys";
+import { OLD_MAN_TIMER_KEY,SMITE_PHASE_KEY } from "./resolution";
+import { targetPlayerIdOf } from "./targeting";
 
 export type { PhaseKey };
 

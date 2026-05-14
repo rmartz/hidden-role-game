@@ -1,20 +1,23 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GAME_MODES, getRoleSlotsRequired } from "@/lib/game/modes";
-import type { GameConfig } from "@/server/types";
-import {
-  GameMode,
-  isWerewolfModeConfig,
-  isSecretVillainModeConfig,
-} from "@/lib/types";
-import type { ModeConfigField, TimerConfig } from "@/lib/types";
-import type { WerewolfTimerConfig } from "@/lib/game/modes/werewolf/timer-config";
 import type { SecretVillainTimerConfig } from "@/lib/game/modes/secret-villain/timer-config";
 import {
   WEREWOLF_ROLE_CATEGORY_LABELS,
   WEREWOLF_ROLE_CATEGORY_ORDER,
 } from "@/lib/game/modes/werewolf/roles";
+import type { WerewolfTimerConfig } from "@/lib/game/modes/werewolf/timer-config";
+import type { ModeConfigField, TimerConfig } from "@/lib/types";
+import {
+  GameMode,
+  isSecretVillainModeConfig,
+  isWerewolfModeConfig,
+} from "@/lib/types";
+import type { GameConfig } from "@/server/types";
 import { useAppDispatch, useAppSelector } from "@/store";
 import {
   loadConfig,
@@ -25,14 +28,13 @@ import {
   setTimerConfig,
   updateModeConfigField,
 } from "@/store/game-config-slice";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { ConfigurationToggles } from "./ConfigurationToggles";
-import { RoleConfig } from "./RoleConfig";
 import { GameModePicker } from "./GameModePicker";
+import { RoleConfig } from "./RoleConfig";
+import { SecretVillainConfigPanel } from "./secret-villain";
 import { ShowRolesInPlayPicker } from "./ShowRolesInPlayPicker";
 import { WerewolfConfigPanel } from "./WerewolfConfigPanel";
-import { SecretVillainConfigPanel } from "./secret-villain";
 
 interface ReadOnlyProps {
   config: GameConfig;

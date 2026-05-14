@@ -1,10 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef, Fragment } from "react";
-import type { PublicLobby } from "@/server/types";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+import { Fragment,useEffect, useRef, useState } from "react";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,9 +13,14 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { PlayerRow } from "./PlayerRow";
+import type { PublicLobby } from "@/server/types";
+
 import { PLAYER_LIST_COPY } from "./PlayerList.copy";
+import { PlayerRow } from "./PlayerRow";
 
 interface PlayerListProps {
   lobby: PublicLobby;

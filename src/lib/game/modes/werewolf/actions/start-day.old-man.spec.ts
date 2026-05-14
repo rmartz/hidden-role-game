@@ -1,8 +1,9 @@
-import { describe, it, expect } from "vitest";
-import type { WerewolfTurnState, WerewolfDaytimePhase } from "../types";
+import { describe, expect,it } from "vitest";
+
 import { WerewolfRole } from "../roles";
-import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
-import { makePlayingGame, makeNightState } from "./test-helpers";
+import type { WerewolfDaytimePhase,WerewolfTurnState } from "../types";
+import { WEREWOLF_ACTIONS,WerewolfAction } from "./index";
+import { makeNightState,makePlayingGame } from "./test-helpers";
 
 // ---------------------------------------------------------------------------
 // StartDay — Old Man timer tests

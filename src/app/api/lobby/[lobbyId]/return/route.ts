@@ -1,7 +1,7 @@
 import { GameStatus } from "@/lib/types";
-import { ServerResponseStatus } from "@/server/types";
-import { clearGameId } from "@/server/lobby";
 import { getGame } from "@/server/game";
+import { clearGameId } from "@/server/lobby";
+import { ServerResponseStatus } from "@/server/types";
 import {
   authenticateLobby,
   errorResponse,

@@ -1,9 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
-import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
+import { beforeEach,describe, expect, it, vi } from "vitest";
+
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
-import { ServerResponseStatus } from "@/server/types";
+import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
 import type { PublicLobby } from "@/server/types";
+import { ServerResponseStatus } from "@/server/types";
+
 import { createWrapper } from "../test-utils";
 
 vi.mock("next/navigation", () => ({
@@ -19,10 +21,11 @@ vi.mock("@/lib/api", () => ({
 }));
 
 import * as api from "@/lib/api";
+
 import {
-  useStoredLobbyQuery,
-  useLobbyQuery,
   useLobbyExistsQuery,
+  useLobbyQuery,
+  useStoredLobbyQuery,
 } from "../lobby";
 
 const mockLobby: PublicLobby = {

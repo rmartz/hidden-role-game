@@ -1,9 +1,11 @@
-import { describe, it, expect } from "vitest";
-import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
-import type { Game, RoleBucket } from "@/lib/types";
+import { describe, expect,it } from "vitest";
+
 import { SecretVillainRole } from "@/lib/game/modes/secret-villain";
-import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
 import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-villain/lobby-config";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
+import type { Game, RoleBucket } from "@/lib/types";
+import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
+
 import { buildRolesInPlay } from "../initialization";
 
 const DEFAULT_BUCKETS: RoleBucket[] = [

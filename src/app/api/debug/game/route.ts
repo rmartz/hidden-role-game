@@ -1,19 +1,20 @@
 import { randomUUID } from "crypto";
-import { GameMode, ShowRolesInPlay } from "@/lib/types";
+
+import { GAME_MODES } from "@/lib/game/modes";
 import type {
   LobbyPlayer,
   ModeConfig,
   RoleBucket,
   TimerConfig,
 } from "@/lib/types";
+import { GameMode, ShowRolesInPlay } from "@/lib/types";
+import { createGame,getModeDefinition } from "@/server/game";
 import { ServerResponseStatus } from "@/server/types";
-import { getModeDefinition, createGame } from "@/server/game";
 import {
   errorResponse,
-  validateRoleBucketsForMode,
   validateRoleBucketsCoverPlayerCount,
+  validateRoleBucketsForMode,
 } from "@/server/utils";
-import { GAME_MODES } from "@/lib/game/modes";
 
 interface CreateDebugGameRequest {
   playerCount: number;

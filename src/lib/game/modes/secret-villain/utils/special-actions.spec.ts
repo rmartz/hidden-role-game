@@ -1,6 +1,7 @@
-import { describe, it, expect } from "vitest";
-import { SpecialActionType, SvBoardPreset } from "../types";
+import { describe, expect,it } from "vitest";
+
 import type { SvCustomPowerConfig } from "../types";
+import { SpecialActionType, SvBoardPreset } from "../types";
 import {
   BOARD_PRESETS,
   getSpecialAction,

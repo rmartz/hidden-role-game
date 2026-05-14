@@ -1,12 +1,13 @@
-import { describe, it, expect } from "vitest";
-import { TeamVote } from "../../types";
+import { describe, expect,it } from "vitest";
+
 import type { TeamVotePhase } from "../../types";
+import { TeamVote } from "../../types";
 import { castTeamVoteAction } from "../cast-team-vote";
 import {
+  getTurnState,
   makeGame,
   makeProposalTurnState,
   makeVoteTurnState,
-  getTurnState,
 } from "./helpers";
 
 describe("castTeamVoteAction", () => {

@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+
 import { WerewolfRole } from "@/lib/game/modes/werewolf";
+
 import { NightOutcomeSummary } from "./NightOutcomeSummary";
 
 const meta = {

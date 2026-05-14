@@ -1,15 +1,16 @@
-import { GameStatus } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
+import { GameStatus } from "@/lib/types";
+
+import { WerewolfRole } from "../roles";
 import type { ActiveTrial, WerewolfTurnState } from "../types";
-import { TrialVerdict, WerewolfPhase, TrialPhase, DaytimeVote } from "../types";
+import { DaytimeVote,TrialPhase, TrialVerdict, WerewolfPhase } from "../types";
 import {
+  checkWinCondition,
   currentTurnState,
   isOwnerPlaying,
-  checkWinCondition,
   WerewolfWinner,
 } from "../utils";
-import { WerewolfRole } from "../roles";
-import { didWolfCubDie, cleanupAfterDaytimeKill } from "./helpers";
+import { cleanupAfterDaytimeKill,didWolfCubDie } from "./helpers";
 
 export function applyTrialVerdict(
   activeTrial: ActiveTrial,

@@ -1,15 +1,17 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect,it } from "vitest";
+
+import type { Game } from "@/lib/types";
 import {
+  DEFAULT_TIMER_CONFIG,
   GameMode,
   GameStatus,
   ShowRolesInPlay,
-  DEFAULT_TIMER_CONFIG,
 } from "@/lib/types";
-import type { Game } from "@/lib/types";
-import { AvalonPhase, TeamVote, QuestCard } from "./types";
-import type { AvalonTurnState } from "./types";
+
 import { AvalonRole } from "./roles";
 import { avalonServices } from "./services";
+import type { AvalonTurnState } from "./types";
+import { AvalonPhase, QuestCard,TeamVote } from "./types";
 
 const assignments = [
   { playerId: "p1", roleDefinitionId: AvalonRole.Merlin },

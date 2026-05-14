@@ -1,16 +1,18 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect,it } from "vitest";
+
 import { GameStatus } from "@/lib/types";
-import { ClocktowerPhase } from "../types";
-import type { ClocktowerTurnState, ClocktowerNightPhase } from "../types";
+
 import { ClocktowerRole } from "../roles";
+import type { ClocktowerNightPhase,ClocktowerTurnState } from "../types";
+import { ClocktowerPhase } from "../types";
 import { CLOCKTOWER_ACTIONS, ClocktowerAction } from "./index";
 import {
-  makePlayingGame,
-  makeNightState,
-  OWNER_ID,
-  IMP_PLAYER_ID,
   EMPATH_PLAYER_ID,
   FORTUNE_TELLER_PLAYER_ID,
+  IMP_PLAYER_ID,
+  makeNightState,
+  makePlayingGame,
+  OWNER_ID,
 } from "./test-helpers";
 
 describe("ClocktowerAction.ConfirmNightTarget", () => {

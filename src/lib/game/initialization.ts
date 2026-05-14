@@ -1,4 +1,4 @@
-import { ShowRolesInPlay, Team, isSimpleRoleBucket } from "@/lib/types";
+import { GAME_MODES } from "@/lib/game/modes";
 import type {
   Game,
   GamePlayer,
@@ -7,8 +7,8 @@ import type {
   RoleDefinition,
   VisiblePlayer,
 } from "@/lib/types";
+import { isSimpleRoleBucket,ShowRolesInPlay, Team } from "@/lib/types";
 import type { RoleInPlay } from "@/server/types";
-import { GAME_MODES } from "@/lib/game/modes";
 
 /**
  * Extended role properties used by buildGamePlayers for wake-phase and

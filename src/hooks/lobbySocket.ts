@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { ref, onValue } from "firebase/database";
+import { onValue,ref } from "firebase/database";
+import { useEffect, useRef } from "react";
+
+import { useFirebaseAuth } from "@/hooks/firebaseAuth";
+import { getPlayerId } from "@/lib/api";
 import { getClientDatabase } from "@/lib/firebase/client";
-import type { PublicLobby } from "@/server/types";
 import type { FirebaseLobbyPublic } from "@/lib/firebase/schema";
 import { firebaseToPublicLobby } from "@/lib/firebase/schema";
-import { getPlayerId } from "@/lib/api";
-import { useFirebaseAuth } from "@/hooks/firebaseAuth";
+import type { PublicLobby } from "@/server/types";
 
 /**
  * Subscribes to the lobby's public Firebase RTDB node and updates the

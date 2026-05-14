@@ -1,12 +1,13 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect,it } from "vitest";
+
 import {
+  PolicyCard,
   SecretVillainPhase,
   type SecretVillainTurnState,
-  PolicyCard,
   SvBoardPreset,
 } from "../types";
 import { BOARD_PRESETS } from "./special-actions";
-import { getNextPresidentId, getEligibleChancellorIds } from "./turn-state";
+import { getEligibleChancellorIds,getNextPresidentId } from "./turn-state";
 
 function makeTurnState(
   overrides: Partial<SecretVillainTurnState> = {},

@@ -1,12 +1,12 @@
-import { createSlice, createSelector } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
+import { createSelector,createSlice } from "@reduxjs/toolkit";
 import { sum } from "lodash";
+
 import {
-  GameMode,
-  RoleConfigMode,
-  ShowRolesInPlay,
-  isSimpleRoleBucket,
-} from "@/lib/types";
+  DEFAULT_GAME_MODE,
+  GAME_MODES,
+  getAdvancedBucketMaxCapacity,
+} from "@/lib/game/modes";
 import type {
   AdvancedRoleBucket,
   ModeConfig,
@@ -15,12 +15,13 @@ import type {
   SimpleRoleBucket,
   TimerConfig,
 } from "@/lib/types";
-import type { GameConfig } from "@/server/types";
 import {
-  DEFAULT_GAME_MODE,
-  GAME_MODES,
-  getAdvancedBucketMaxCapacity,
-} from "@/lib/game/modes";
+  GameMode,
+  isSimpleRoleBucket,
+  RoleConfigMode,
+  ShowRolesInPlay,
+} from "@/lib/types";
+import type { GameConfig } from "@/server/types";
 
 function computeIsValid(
   gameMode: GameMode,
