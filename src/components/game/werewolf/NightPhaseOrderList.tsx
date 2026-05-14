@@ -32,6 +32,7 @@ export function NightPhaseOrderList({
                 render={<li />}
                 size="sm"
                 variant={isCurrent ? "muted" : "default"}
+                className={isPast ? "line-through" : undefined}
               >
                 <ItemContent>
                   <ItemTitle className={isPast ? "line-through" : undefined}>
