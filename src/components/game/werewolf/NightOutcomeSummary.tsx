@@ -1,8 +1,10 @@
 import type {
+  AttackNightResolutionEvent,
   AltruistInterceptedNightResolutionEvent,
   NightResolutionEvent,
   VeteranCounterkilledNightResolutionEvent,
 } from "@/lib/game/modes/werewolf";
+import { WerewolfRole } from "@/lib/game/modes/werewolf";
 import { NightOutcomeSummaryItem } from "./NightOutcomeSummaryItem";
 import { getPlayerName } from "@/lib/player";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
@@ -29,16 +31,27 @@ export function NightOutcomeSummary({
     (e): e is VeteranCounterkilledNightResolutionEvent =>
       e.type === "veteran-counterkilled",
   );
-  // Counter-killed player IDs that died (shown in the veteran-specific section)
-  // must be excluded from the generic killed list to avoid duplicate entries.
-  const veteranCounterkilledPlayerIds = new Set(
-    veteranCounterkills
-      .filter((e) => e.died)
-      .map((e) => e.counterkilledPlayerId),
-  );
   const regularEvents = events.filter(
     (e) =>
       e.type !== "altruist-intercepted" && e.type !== "veteran-counterkilled",
+  );
+  // Suppress the generic killed row for a veteran-counter-killed player only
+  // when the Veteran is the sole attacker. If the player was also attacked by
+  // another source, keep the generic row so the narrator sees all the details.
+  const veteranCounterkilledPlayerIds = new Set(
+    veteranCounterkills
+      .filter((e) => e.died)
+      .filter((e) => {
+        const killedEvent = regularEvents.find(
+          (re): re is AttackNightResolutionEvent =>
+            re.type === "killed" &&
+            re.targetPlayerId === e.counterkilledPlayerId,
+        );
+        return killedEvent?.attackedBy.every(
+          (a) => a === WerewolfRole.Veteran,
+        );
+      })
+      .map((e) => e.counterkilledPlayerId),
   );
 
   // Group events by targetPlayerId so a player attacked and silenced in the

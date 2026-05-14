@@ -465,10 +465,17 @@ export function resolveNightActions(
   }
 
   // Tough Guy: if unprotected and not already hit, absorb the attack.
+  // Smite and Old Man timer deaths are forced deaths that cannot be absorbed.
   const toughGuyHitIds = new Set(options?.toughGuyHitIds ?? []);
   const toughGuyEvents: NightResolutionEvent[] = [];
   for (const event of combatEvents) {
     if (event.type !== "killed" || !event.died) continue;
+    // Smite and Old Man timer deaths are unblockable — skip Tough Guy absorption.
+    if (
+      event.attackedBy.includes(SMITE_PHASE_KEY) ||
+      event.attackedBy.includes(OLD_MAN_TIMER_KEY)
+    )
+      continue;
     const assignment = roleAssignments.find(
       (a) => a.playerId === event.targetPlayerId,
     );

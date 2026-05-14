@@ -310,9 +310,9 @@ interface TeamNightAction {
 5. Applies Veteran counter-kill (after Altruist, so the Altruist cannot intercept the counter-kill): if the Veteran alerted this night (action has `alerted: true`):
    - **Wolf repel:** if any wolf group targeted the Veteran, the wolf attack on the Veteran is removed and one alive wolf-group participant is counter-killed instead. Emits `veteran-counterkilled (source: "wolf-repel")`.
    - **Visitor kill:** any solo role (except Priest wards and Investigation-category roles such as Seer, which observe from afar using mystical powers) that visited the Veteran is counter-killed and any attack or protection they provided to the Veteran is discarded. Emits `veteran-counterkilled (source: "visitor")` per killed visitor.
-6. Applies Smite: any smited player is killed regardless of protections. Applied before Tough Guy so that smited players cannot absorb the forced death.
-7. Checks Old Man timer (`oldManTimerPlayerId` option): if the timer has fired **and** the Old Man was not attacked this night, emits a killed event with `attackedBy: [OLD_MAN_TIMER_KEY]`, `died: true`. Applied before Tough Guy for the same reason as Smite.
-8. Applies Tough Guy absorption: if a Tough Guy is attacked (after Smite and the Old Man timer have been applied) for the first time, the attack is absorbed (survives this night, dies on the next attack).
+6. Applies Smite: any smited player is killed regardless of protections. Smite deaths cannot be absorbed by Tough Guy.
+7. Checks Old Man timer (`oldManTimerPlayerId` option): if the timer has fired **and** the Old Man was not attacked this night, emits a killed event with `attackedBy: [OLD_MAN_TIMER_KEY]`, `died: true`. Old Man timer deaths cannot be absorbed by Tough Guy.
+8. Applies Tough Guy absorption: if a Tough Guy is attacked (after Smite and the Old Man timer have been applied) for the first time, the attack is absorbed (survives this night, dies on the next attack). Smite and Old Man timer deaths bypass this step.
 9. Emits `veteran-counterkilled` events: emitted here (after Tough Guy absorption) so the `died` field reflects the actual combat outcome (e.g. `died: false` if the counter-killed visitor was a first-hit Tough Guy).
 10. Applies Spellcaster action: emits a `silenced` event.
 11. Applies Mummy action: emits a `hypnotized` event for the target.
@@ -345,8 +345,14 @@ flowchart TD
     NewAttack --> Altruist
     Altruist{Altruist target\nunder attack?}
     Altruist -->|yes| Intercept[Redirect attack onto Altruist\nemit altruist-intercepted]
-    Altruist -->|no| Resolve
-    Intercept --> Resolve
+    Altruist -->|no| Veteran
+    Intercept --> Veteran
+    Veteran{Veteran alerted\nthis night?}
+    Veteran -->|yes - wolf targeted Vet| WolfRepel[Remove wolf attack on Vet\ncounter-kill one wolf]
+    Veteran -->|yes - solo visitor| VisitorKill[Counter-kill visiting player\ndiscard visitor's attack/protect]
+    Veteran -->|no| Resolve
+    WolfRepel --> Resolve
+    VisitorKill --> Resolve
     Resolve[For each collected attack:\nif protected → died = false\nelse → died = true\nemit killed event]
     Resolve --> Smite
     Smite{Player smited?}
