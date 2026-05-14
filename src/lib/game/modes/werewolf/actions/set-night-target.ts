@@ -1,19 +1,20 @@
-import type { Game, GameAction } from "@/lib/types";
-import { WerewolfPhase, isTeamNightAction, TargetCategory } from "../types";
-import type { TeamNightAction } from "../types";
-import {
-  currentTurnState,
-  validateActiveNightPlayer,
-  isGroupPhaseKey,
-  baseGroupPhaseKey,
-  getGroupPhasePlayerIds,
-  getGroupPhaseMemberIds,
-  computeSuggestedTarget,
-  isRoleActive,
-  getInterimAttackedPlayerIds,
-} from "../utils";
-import { WerewolfRole, getWerewolfRole } from "../roles";
 import { getPlayer } from "@/lib/player";
+import type { Game, GameAction } from "@/lib/types";
+
+import { getWerewolfRole, WerewolfRole } from "../roles";
+import type { TeamNightAction } from "../types";
+import { isTeamNightAction, TargetCategory, WerewolfPhase } from "../types";
+import {
+  baseGroupPhaseKey,
+  computeSuggestedTarget,
+  currentTurnState,
+  getGroupPhaseMemberIds,
+  getGroupPhasePlayerIds,
+  getInterimAttackedPlayerIds,
+  isGroupPhaseKey,
+  isRoleActive,
+  validateActiveNightPlayer,
+} from "../utils";
 
 export const setNightTargetAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {

@@ -1,4 +1,3 @@
-import { afterEach, describe, it, expect, vi } from "vitest";
 import {
   cleanup,
   fireEvent,
@@ -6,9 +5,12 @@ import {
   screen,
   within,
 } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import type { PublicLobbyPlayer } from "@/server/types";
+
 import { PlayerRow } from "./PlayerRow";
 import { PLAYER_ROW_COPY } from "./PlayerRow.copy";
-import type { PublicLobbyPlayer } from "@/server/types";
 
 afterEach(cleanup);
 

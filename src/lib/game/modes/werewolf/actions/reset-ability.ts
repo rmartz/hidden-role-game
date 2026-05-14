@@ -1,6 +1,7 @@
 import type { Game, GameAction } from "@/lib/types";
-import { currentTurnState, isOwnerPlaying } from "../utils";
+
 import { WerewolfRole } from "../roles";
+import { currentTurnState, isOwnerPlaying } from "../utils";
 
 /** Role IDs whose once-per-game abilities the narrator can reset. */
 const RESETTABLE_ROLE_IDS = new Set<string>([

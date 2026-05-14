@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { PlayerNightSummary } from "./PlayerNightSummary";
+
 import type { DaytimeNightStatusEntry } from "@/server/types";
 import type { PublicLobbyPlayer } from "@/server/types";
+
+import { PlayerNightSummary } from "./PlayerNightSummary";
 
 const meta = {
   component: PlayerNightSummary,

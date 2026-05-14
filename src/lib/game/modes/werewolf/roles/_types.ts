@@ -1,6 +1,7 @@
-import { Team } from "@/lib/types";
 import type { RoleDefinition } from "@/lib/types";
-import { WakesAtNight, TargetCategory } from "../types";
+import { Team } from "@/lib/types";
+
+import { TargetCategory, WakesAtNight } from "../types";
 
 export enum WerewolfRoleCategory {
   EvilKilling = "evil-killing",

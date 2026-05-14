@@ -1,14 +1,15 @@
 import type { Game, PlayerRoleAssignment } from "@/lib/types";
-import { WakesAtNight, WerewolfPhase } from "../types";
-import type { WerewolfNighttimePhase } from "../types";
+
 import {
+  getWerewolfRole,
   WEREWOLF_ROLES,
   WerewolfRole,
   WerewolfRoleCategory,
-  getWerewolfRole,
 } from "../roles";
-import { isGroupPhaseKey, baseGroupPhaseKey, isRoleActive } from "./phase-keys";
+import type { WerewolfNighttimePhase } from "../types";
+import { WakesAtNight, WerewolfPhase } from "../types";
 import { currentTurnState } from "./game-state";
+import { baseGroupPhaseKey, isGroupPhaseKey, isRoleActive } from "./phase-keys";
 
 /**
  * Defines the order in which role categories wake during the night phase.

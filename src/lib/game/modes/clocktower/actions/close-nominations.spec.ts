@@ -1,9 +1,11 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
+import type { Game } from "@/lib/types";
+import { GameStatus } from "@/lib/types";
+
+import type { ClocktowerDayPhase, ClocktowerTurnState } from "../types";
 import { closeNominationsAction } from "./close-nominations";
 import { makeDayTurnState, makePlayingGame } from "./test-helpers";
-import type { ClocktowerDayPhase, ClocktowerTurnState } from "../types";
-import { GameStatus } from "@/lib/types";
-import type { Game } from "@/lib/types";
 
 function getDayPhase(game: Game): ClocktowerDayPhase {
   return (game.status as { turnState: ClocktowerTurnState }).turnState

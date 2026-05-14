@@ -1,13 +1,14 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { WerewolfPhase, TrialPhase } from "../types";
-import type {
-  WerewolfNighttimePhase,
-  WerewolfDaytimePhase,
-  WerewolfTurnState,
-  ActiveTrial,
-} from "../types";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { WerewolfRole } from "../roles";
-import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
+import type {
+  ActiveTrial,
+  WerewolfDaytimePhase,
+  WerewolfNighttimePhase,
+  WerewolfTurnState,
+} from "../types";
+import { TrialPhase, WerewolfPhase } from "../types";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "./index";
 import { makePlayingGame } from "./test-helpers";
 
 const pauseTimer = WEREWOLF_ACTIONS[WerewolfAction.PauseTimer];

@@ -1,8 +1,9 @@
 import type { Game, GameAction } from "@/lib/types";
 import { GameStatus } from "@/lib/types";
-import { AvalonPhase } from "../types";
-import type { AvalonTurnState } from "../types";
+
 import { AvalonRole } from "../roles";
+import type { AvalonTurnState } from "../types";
+import { AvalonPhase } from "../types";
 
 function currentTurnState(game: Game): AvalonTurnState | undefined {
   if (game.status.type !== GameStatus.Playing) return undefined;

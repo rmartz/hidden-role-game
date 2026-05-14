@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+
 import { NarratorNightInstruction } from "./NarratorNightInstruction";
 
 const meta: Meta<typeof NarratorNightInstruction> = {

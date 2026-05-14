@@ -1,11 +1,12 @@
 "use client";
 
-import { isPlayersTurn } from "@/lib/game/modes/werewolf";
 import type { WerewolfNighttimePhase } from "@/lib/game/modes/werewolf";
+import { isPlayersTurn } from "@/lib/game/modes/werewolf";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
-import { PlayerNightSnoozeScreen } from "./PlayerNightSnoozeScreen";
+
 import { PlayerNightActionScreen } from "./PlayerNightActionScreen";
+import { PlayerNightSnoozeScreen } from "./PlayerNightSnoozeScreen";
 
 interface PlayerGameNightScreenProps {
   gameId: string;

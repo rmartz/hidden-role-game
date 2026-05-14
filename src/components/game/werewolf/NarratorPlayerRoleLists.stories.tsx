@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+
 import { GameMode, Team } from "@/lib/types";
 import type { VisibleTeammate } from "@/server/types";
+
 import { NarratorPlayerRoleLists } from "./NarratorPlayerRoleLists";
 import { NightMarkerEffect } from "./NightActionMarker";
 

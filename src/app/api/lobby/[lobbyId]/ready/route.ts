@@ -1,5 +1,5 @@
-import { ServerResponseStatus } from "@/server/types";
 import { toggleReady } from "@/server/lobby";
+import { ServerResponseStatus } from "@/server/types";
 import {
   authenticateLobby,
   errorResponse,

@@ -1,9 +1,10 @@
-import { GameMode } from "@/lib/types";
 import type { ClocktowerPlayerGameState } from "@/lib/game/modes/clocktower/player-state";
+import { GameMode } from "@/lib/types";
+
 import {
-  type FirebaseBasePlayerState,
-  baseStateToFirebase,
   baseStateFromFirebase,
+  baseStateToFirebase,
+  type FirebaseBasePlayerState,
 } from "./base";
 
 // ---------------------------------------------------------------------------

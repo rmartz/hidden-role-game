@@ -1,13 +1,14 @@
-import { Team, DEFAULT_TIMER_CONFIG } from "@/lib/types";
 import type { GameModeConfig } from "@/lib/types";
-import { MIN_PLAYERS, defaultRoleCount, CLOCKTOWER_ROLES } from "./roles";
+import { DEFAULT_TIMER_CONFIG, Team } from "@/lib/types";
+
+import { CLOCKTOWER_ACTIONS } from "./actions";
 import {
-  DEFAULT_CLOCKTOWER_MODE_CONFIG,
   buildDefaultClocktowerLobbyConfig,
+  DEFAULT_CLOCKTOWER_MODE_CONFIG,
   parseClocktowerModeConfig,
 } from "./lobby-config";
+import { CLOCKTOWER_ROLES, defaultRoleCount, MIN_PLAYERS } from "./roles";
 import { clocktowerServices } from "./services";
-import { CLOCKTOWER_ACTIONS } from "./actions";
 
 export const CLOCKTOWER_CONFIG = {
   name: "Clocktower",

@@ -1,8 +1,5 @@
 "use client";
 
-import { WEREWOLF_COPY, WerewolfAction } from "@/lib/game/modes/werewolf";
-import { useGameAction } from "@/hooks";
-import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,6 +11,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+import { useGameAction } from "@/hooks";
+import { WEREWOLF_COPY, WerewolfAction } from "@/lib/game/modes/werewolf";
 
 interface OwnerPlayerActionItemProps {
   gameId: string;

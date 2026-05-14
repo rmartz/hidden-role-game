@@ -1,16 +1,18 @@
-import { describe, it, expect } from "vitest";
-import {
-  addLobby,
-  getLobby,
-  updateConfig,
-  toggleReady,
-  removePlayer,
-  addPlayer,
-} from "./lobby";
-import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
-import type { Lobby } from "@/lib/types";
+import { describe, expect, it } from "vitest";
+
 import type { WerewolfModeConfig } from "@/lib/game/modes/werewolf/lobby-config";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
+import type { Lobby } from "@/lib/types";
+import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
+
+import {
+  addLobby,
+  addPlayer,
+  getLobby,
+  removePlayer,
+  toggleReady,
+  updateConfig,
+} from "./lobby";
 
 function makeBaseLobby(overrides: Partial<Lobby["config"]> = {}): Lobby {
   return {

@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+
 import { pruneStaleRecords } from "@/services/prune";
 
 export async function GET(request: NextRequest) {

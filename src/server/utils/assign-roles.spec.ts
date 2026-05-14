@@ -1,11 +1,13 @@
-import { describe, it, expect } from "vitest";
-import { Team } from "@/lib/types";
+import { describe, expect, it } from "vitest";
+
 import type { RoleDefinition } from "@/lib/types";
+import type { LobbyPlayer, RoleBucket } from "@/lib/types";
+import { Team } from "@/lib/types";
+
 import {
   assignRolesFromBuckets,
   assignRolesFromBucketsWithHidden,
 } from "./assign-roles";
-import type { LobbyPlayer, RoleBucket } from "@/lib/types";
 
 function makePlayers(count: number): LobbyPlayer[] {
   return Array.from({ length: count }, (_, i) => ({

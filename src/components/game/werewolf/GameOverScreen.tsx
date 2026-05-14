@@ -1,7 +1,8 @@
 "use client";
 
-import type { PlayerGameState } from "@/server/types";
 import { useReturnToLobby } from "@/hooks";
+import type { PlayerGameState } from "@/server/types";
+
 import { GameOverScreenView } from "./GameOverScreenView";
 
 interface GameOverScreenProps {

@@ -1,25 +1,26 @@
+import { ServerValue } from "firebase-admin/database";
+
+import { getAdminDatabase } from "@/lib/firebase/admin";
+import {
+  type FirebaseLobbyPrivate,
+  type FirebaseLobbyPublic,
+  type FirebaseRoleBucket,
+  firebaseToLobby,
+  lobbyToFirebase,
+  modeConfigToFirebase,
+  roleBucketToFirebase,
+} from "@/lib/firebase/schema";
+import { resolvePlayerOrder } from "@/lib/player-order";
 import type {
+  GameMode,
   Lobby,
   LobbyPlayer,
-  GameMode,
   ModeConfig,
   RoleBucket,
   RoleConfigMode,
   ShowRolesInPlay,
   TimerConfig,
 } from "@/lib/types";
-import { getAdminDatabase } from "@/lib/firebase/admin";
-import { ServerValue } from "firebase-admin/database";
-import {
-  modeConfigToFirebase,
-  lobbyToFirebase,
-  firebaseToLobby,
-  roleBucketToFirebase,
-  type FirebaseLobbyPublic,
-  type FirebaseLobbyPrivate,
-  type FirebaseRoleBucket,
-} from "@/lib/firebase/schema";
-import { resolvePlayerOrder } from "@/lib/player-order";
 
 function lobbyRef(lobbyId: string) {
   return getAdminDatabase().ref(`lobbies/${lobbyId}`);

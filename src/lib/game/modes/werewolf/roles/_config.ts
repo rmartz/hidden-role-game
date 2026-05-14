@@ -1,4 +1,5 @@
 import type { RoleBucket } from "@/lib/types";
+
 import { WerewolfRole } from "./_types";
 
 export const MIN_PLAYERS = 7;

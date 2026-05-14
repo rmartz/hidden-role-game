@@ -1,13 +1,14 @@
+import type { Game } from "@/lib/types";
 import {
+  DEFAULT_TIMER_CONFIG,
   GameMode,
   GameStatus,
   ShowRolesInPlay,
-  DEFAULT_TIMER_CONFIG,
 } from "@/lib/types";
-import type { Game } from "@/lib/types";
-import { AvalonPhase, TeamVote, QuestCard } from "../../types";
-import type { AvalonTurnState, TeamVotePhase, QuestPhase } from "../../types";
+
 import { AvalonRole } from "../../roles";
+import type { AvalonTurnState, QuestPhase, TeamVotePhase } from "../../types";
+import { AvalonPhase, QuestCard, TeamVote } from "../../types";
 
 export const roleAssignments = [
   { playerId: "p1", roleDefinitionId: AvalonRole.Merlin },

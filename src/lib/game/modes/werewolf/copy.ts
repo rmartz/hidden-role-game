@@ -1,5 +1,5 @@
-import { WerewolfWinner } from "./utils/win-condition";
 import { NightOutcomeEffect } from "./services/night-outcome";
+import { WerewolfWinner } from "./utils/win-condition";
 
 /**
  * User-facing copy strings for the Werewolf game mode.

@@ -1,7 +1,8 @@
 import type { Game } from "@/lib/types";
 import { GameStatus } from "@/lib/types";
-import { ClocktowerPhase } from "../types";
+
 import type { ClocktowerNightPhase, ClocktowerTurnState } from "../types";
+import { ClocktowerPhase } from "../types";
 
 export interface NightContext {
   ts: ClocktowerTurnState;

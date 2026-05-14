@@ -1,17 +1,19 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { GameStatus } from "@/lib/types";
+
+import type { QuestPhase, TeamVotePhase } from "../../types";
 import { AvalonPhase, TeamVote } from "../../types";
-import type { TeamVotePhase, QuestPhase } from "../../types";
 import {
-  resolveTeamVoteAction,
   advanceFromTeamVoteAction,
+  resolveTeamVoteAction,
   tallyTeamVote,
 } from "../resolve-team-vote";
 import {
+  getTurnState,
   makeGame,
   makeProposalTurnState,
   makeVoteTurnState,
-  getTurnState,
 } from "./helpers";
 
 describe("resolveTeamVoteAction", () => {

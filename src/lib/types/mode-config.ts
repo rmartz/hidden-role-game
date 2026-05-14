@@ -1,8 +1,9 @@
-import type { WerewolfModeConfig } from "@/lib/game/modes/werewolf/lobby-config";
-import type { SecretVillainModeConfig } from "@/lib/game/modes/secret-villain/lobby-config";
 import type { AvalonModeConfig } from "@/lib/game/modes/avalon/lobby-config";
 import type { ClocktowerModeConfig } from "@/lib/game/modes/clocktower/lobby-config";
 import type { CodenamesModeConfig } from "@/lib/game/modes/codenames/lobby-config";
+import type { SecretVillainModeConfig } from "@/lib/game/modes/secret-villain/lobby-config";
+import type { WerewolfModeConfig } from "@/lib/game/modes/werewolf/lobby-config";
+
 import { GameMode } from "./game";
 
 /**

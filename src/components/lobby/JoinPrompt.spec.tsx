@@ -1,5 +1,6 @@
-import { afterEach, describe, it, expect, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { JoinPromptView } from "./JoinPrompt";
 import { JOIN_PROMPT_COPY } from "./JoinPrompt.copy";
 

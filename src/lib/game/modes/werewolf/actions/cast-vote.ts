@@ -1,13 +1,14 @@
 import type { Game, GameAction } from "@/lib/types";
+
+import { isWerewolfRole, WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import { DaytimeVote, TrialPhase } from "../types";
 import { WerewolfPhase } from "../types";
 import {
-  currentTurnState,
   checkWinCondition,
-  getSilencedPlayerIds,
+  currentTurnState,
   getHypnotizedPlayerId,
+  getSilencedPlayerIds,
 } from "../utils";
-import { WEREWOLF_ROLES, WerewolfRole, isWerewolfRole } from "../roles";
 import { applyTrialVerdict } from "./resolve-trial";
 
 const VALID_VOTES: DaytimeVote[] = [DaytimeVote.Guilty, DaytimeVote.Innocent];

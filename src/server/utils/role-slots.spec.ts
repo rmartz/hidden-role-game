@@ -1,12 +1,14 @@
-import { describe, it, expect } from "vitest";
-import {
-  validateRoleBucketsForMode,
-  validateRoleBucketsCoverPlayerCount,
-} from "./role-slots";
-import { GameMode } from "@/lib/types";
-import type { RoleBucket } from "@/lib/types";
+import { describe, expect, it } from "vitest";
+
 import { SecretVillainRole } from "@/lib/game/modes/secret-villain/roles";
 import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
+import type { RoleBucket } from "@/lib/types";
+import { GameMode } from "@/lib/types";
+
+import {
+  validateRoleBucketsCoverPlayerCount,
+  validateRoleBucketsForMode,
+} from "./role-slots";
 
 describe("validateRoleBucketsCoverPlayerCount", () => {
   // SecretVillain has no custom roleSlotsRequired, so required == playerCount
