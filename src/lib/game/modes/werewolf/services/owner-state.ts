@@ -118,27 +118,27 @@ export function extractDaytimeNightSummary(
     });
   }
 
-  const result: Partial<WerewolfPlayerGameState> = {
-    ...(nightStatus.length > 0 ? { nightStatus } : {}),
-  };
-
-  // Exposer reveal: show the publicly revealed role to all players.
-  if (ts.roleState?.exposer?.reveal) {
-    const exposerReveal = ts.roleState.exposer.reveal;
+  // Exposer reveal: emit an "exposed" entry visible to all players. The reveal
+  // lives on the daytime phase so it only surfaces on the day after the
+  // exposure, not on every subsequent day.
+  if (phase.exposerReveal) {
+    const exposerReveal = phase.exposerReveal;
     const revealedPlayer = game.players.find(
       (p) => p.id === exposerReveal.playerId,
     );
     const revealedRoleDef = getWerewolfRole(exposerReveal.roleId);
     if (revealedPlayer && revealedRoleDef) {
-      result.exposerReveal = {
-        playerName: revealedPlayer.name,
+      nightStatus.push({
+        targetPlayerId: exposerReveal.playerId,
+        effect: "exposed",
         roleName: revealedRoleDef.name,
-        team: revealedRoleDef.team,
-      };
+      });
     }
   }
 
-  return result;
+  return {
+    ...(nightStatus.length > 0 ? { nightStatus } : {}),
+  };
 }
 
 /**

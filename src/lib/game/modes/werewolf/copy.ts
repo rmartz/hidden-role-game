@@ -171,8 +171,8 @@ export const WEREWOLF_COPY = {
   },
   exposer: {
     abilityUsed: "You have already used your Exposer ability this game.",
-    publicReveal: (playerName: string, roleName: string) =>
-      `The Exposer has revealed ${playerName}'s role: ${roleName}`,
+    nightSummary: (playerName: string, roleName: string) =>
+      `${playerName} was exposed to be the ${roleName}.`,
   },
   elusiveSeer: {
     villagerListHeading: "You see the following Villagers:",
@@ -293,7 +293,6 @@ export const WEREWOLF_COPY = {
     knighthoodsRemaining: (remaining: number) =>
       `Knighthoods remaining: ${String(remaining)}`,
     outOfKnighthoods: "You have used all of your Knighthoods for the game.",
-    wasKnighted: (name: string) => `${name} was Knighted.`,
   },
   theThing: {
     tappedNotification:
