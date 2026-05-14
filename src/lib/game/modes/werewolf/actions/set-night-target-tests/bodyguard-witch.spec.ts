@@ -81,7 +81,9 @@ describe("SetNightTarget — Witch once-per-game restriction", () => {
         nightActions: {},
       },
       deadPlayerIds: [],
-      ...(witchAbilityUsed ? { witchAbilityUsed: true } : {}),
+      ...(witchAbilityUsed
+        ? { roleState: { witch: { abilityUsed: true } } }
+        : {}),
     };
     return makePlayingGame(ts, {
       players: [
@@ -231,7 +233,7 @@ describe("SetNightTarget — Witch cannot self-attack", () => {
       },
       deadPlayerIds: [],
       // p2 (Witch) is in the doused list
-      arsonistDousedPlayerIds: ["p2"],
+      roleState: { arsonist: { dousedPlayerIds: ["p2"] } },
     };
     const game = makePlayingGame(ts, {
       players: [

@@ -48,9 +48,9 @@ export function checkWinCondition(
   if (
     zombieAssignment &&
     !deadSet.has(zombieAssignment.playerId) &&
-    ts?.zombieInfected?.length
+    ts?.roleState?.zombie?.infected.length
   ) {
-    const infectedSet = new Set(ts.zombieInfected);
+    const infectedSet = new Set(ts.roleState.zombie.infected);
     const infectedAlive = aliveAssignments.filter((a) =>
       infectedSet.has(a.playerId),
     ).length;
@@ -207,7 +207,7 @@ export function withMercenaryCoWin(
     (a) => a.roleDefinitionId === (WerewolfRole.Mercenary as string),
   );
   if (mercenaryAssignment && !deadSet.has(mercenaryAssignment.playerId)) {
-    const bribedPlayerIds = ts?.mercenaryBribedPlayerIds ?? [];
+    const bribedPlayerIds = ts?.roleState?.mercenary?.bribedPlayerIds ?? [];
     const mercenaryWins = bribedPlayerIds.some((bribedId) =>
       isBribedPlayerOnWinningSide(bribedId, deadSet, game, result.winner),
     );

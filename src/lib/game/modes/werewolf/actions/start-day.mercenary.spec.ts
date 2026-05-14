@@ -39,7 +39,7 @@ describe("WerewolfAction.StartDay — Mercenary charge tracking", () => {
     action.apply(game, null, "owner-1");
 
     const ts = getTurnState(game);
-    expect(ts.mercenaryCharged).toBe(true);
+    expect(ts.roleState?.mercenary?.charged).toBe(true);
     expect(ts.deadPlayerIds).not.toContain("p3");
   });
 
@@ -61,7 +61,7 @@ describe("WerewolfAction.StartDay — Mercenary charge tracking", () => {
     action.apply(game, null, "owner-1");
 
     const ts = getTurnState(game);
-    expect(ts.mercenaryCharged).toBeUndefined();
+    expect(ts.roleState?.mercenary?.charged).toBeUndefined();
   });
 
   it("does not gain a charge when Mercenary has no target", () => {
@@ -81,7 +81,7 @@ describe("WerewolfAction.StartDay — Mercenary charge tracking", () => {
     action.apply(game, null, "owner-1");
 
     const ts = getTurnState(game);
-    expect(ts.mercenaryCharged).toBeUndefined();
+    expect(ts.roleState?.mercenary?.charged).toBeUndefined();
     expect(ts.deadPlayerIds).toContain("p3");
   });
 });
@@ -95,15 +95,15 @@ describe("WerewolfAction.StartDay — Mercenary bribe tracking", () => {
       nightPhaseOrder: [WerewolfRole.Mercenary],
     });
     const game = makePlayingGame(
-      { ...baseState, mercenaryCharged: true },
+      { ...baseState, roleState: { mercenary: { charged: true, bribedPlayerIds: [] } } },
       { roleAssignments: mercRoleAssignments },
     );
 
     action.apply(game, null, "owner-1");
 
     const ts = getTurnState(game);
-    expect(ts.mercenaryCharged).toBeUndefined();
-    expect(ts.mercenaryBribedPlayerIds).toContain("p4");
+    expect(ts.roleState?.mercenary?.charged).not.toBe(true);
+    expect(ts.roleState?.mercenary?.bribedPlayerIds).toContain("p4");
   });
 
   it("charge persists when charged but Mercenary skips bribe", () => {
@@ -112,15 +112,15 @@ describe("WerewolfAction.StartDay — Mercenary bribe tracking", () => {
       nightPhaseOrder: [WerewolfRole.Mercenary],
     });
     const game = makePlayingGame(
-      { ...baseState, mercenaryCharged: true },
+      { ...baseState, roleState: { mercenary: { charged: true, bribedPlayerIds: [] } } },
       { roleAssignments: mercRoleAssignments },
     );
 
     action.apply(game, null, "owner-1");
 
     const ts = getTurnState(game);
-    expect(ts.mercenaryCharged).toBe(true);
-    expect(ts.mercenaryBribedPlayerIds).toBeUndefined();
+    expect(ts.roleState?.mercenary?.charged).toBe(true);
+    expect(ts.roleState?.mercenary?.bribedPlayerIds).toEqual([]);
   });
 
   it("accumulates bribed player IDs across multiple nights", () => {
@@ -133,8 +133,7 @@ describe("WerewolfAction.StartDay — Mercenary bribe tracking", () => {
     const game = makePlayingGame(
       {
         ...baseState,
-        mercenaryCharged: true,
-        mercenaryBribedPlayerIds: ["p3"],
+        roleState: { mercenary: { charged: true, bribedPlayerIds: ["p3"] } },
       },
       { roleAssignments: mercRoleAssignments },
     );
@@ -142,9 +141,9 @@ describe("WerewolfAction.StartDay — Mercenary bribe tracking", () => {
     action.apply(game, null, "owner-1");
 
     const ts = getTurnState(game);
-    expect(ts.mercenaryBribedPlayerIds).toContain("p3");
-    expect(ts.mercenaryBribedPlayerIds).toContain("p5");
-    expect(ts.mercenaryCharged).toBeUndefined();
+    expect(ts.roleState?.mercenary?.bribedPlayerIds).toContain("p3");
+    expect(ts.roleState?.mercenary?.bribedPlayerIds).toContain("p5");
+    expect(ts.roleState?.mercenary?.charged).not.toBe(true);
   });
 
   it("does not duplicate bribed player IDs when same player is bribed again", () => {
@@ -157,8 +156,7 @@ describe("WerewolfAction.StartDay — Mercenary bribe tracking", () => {
     const game = makePlayingGame(
       {
         ...baseState,
-        mercenaryCharged: true,
-        mercenaryBribedPlayerIds: ["p3"],
+        roleState: { mercenary: { charged: true, bribedPlayerIds: ["p3"] } },
       },
       { roleAssignments: mercRoleAssignments },
     );
@@ -166,8 +164,8 @@ describe("WerewolfAction.StartDay — Mercenary bribe tracking", () => {
     action.apply(game, null, "owner-1");
 
     const ts = getTurnState(game);
-    expect(ts.mercenaryBribedPlayerIds).toEqual(["p3"]);
-    expect(ts.mercenaryCharged).toBeUndefined();
+    expect(ts.roleState?.mercenary?.bribedPlayerIds).toEqual(["p3"]);
+    expect(ts.roleState?.mercenary?.charged).not.toBe(true);
   });
 
   it("protect mode does not interact with bribed player IDs", () => {
@@ -188,8 +186,8 @@ describe("WerewolfAction.StartDay — Mercenary bribe tracking", () => {
 
     const ts = getTurnState(game);
     // Charge gained but bribed list stays empty (protect ≠ bribe)
-    expect(ts.mercenaryCharged).toBe(true);
-    expect(ts.mercenaryBribedPlayerIds).toBeUndefined();
+    expect(ts.roleState?.mercenary?.charged).toBe(true);
+    expect(ts.roleState?.mercenary?.bribedPlayerIds).toEqual([]);
   });
 });
 
@@ -239,7 +237,7 @@ describe("WerewolfAction.StartDay — Mercenary protect mode resolution", () => 
       nightPhaseOrder: [WerewolfRole.Werewolf, WerewolfRole.Mercenary],
     });
     const game = makePlayingGame(
-      { ...baseState, mercenaryCharged: true },
+      { ...baseState, roleState: { mercenary: { charged: true, bribedPlayerIds: [] } } },
       { roleAssignments: mercRoleAssignments },
     );
 
@@ -249,7 +247,7 @@ describe("WerewolfAction.StartDay — Mercenary protect mode resolution", () => 
     const ts = getTurnState(game);
     expect(ts.deadPlayerIds).toContain("p3");
     // p3 is bribed
-    expect(ts.mercenaryBribedPlayerIds).toContain("p3");
+    expect(ts.roleState?.mercenary?.bribedPlayerIds).toContain("p3");
   });
 });
 

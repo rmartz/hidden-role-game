@@ -338,12 +338,12 @@ describe("StartNight — Mirrorcaster charge persistence", () => {
   it("carries mirrorcasterCharged forward to the next night", () => {
     const game = makePlayingGame({
       ...dayTurnState,
-      mirrorcasterCharged: true,
+      roleState: { mirrorcaster: { charged: true } },
     });
     startNightAction.apply(game, null, "owner-1");
 
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.mirrorcasterCharged).toBe(true);
+    expect(ts.roleState?.mirrorcaster?.charged).toBe(true);
   });
 
   it("does not carry mirrorcasterCharged when it is false/undefined", () => {
@@ -351,18 +351,18 @@ describe("StartNight — Mirrorcaster charge persistence", () => {
     startNightAction.apply(game, null, "owner-1");
 
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.mirrorcasterCharged).toBeUndefined();
+    expect(ts.roleState?.mirrorcaster?.charged).toBeUndefined();
   });
 
   it("carries morticianAbilityEnded forward to next night", () => {
     const game = makePlayingGame({
       ...dayTurnState,
-      morticianAbilityEnded: true,
+      roleState: { mortician: { abilityEnded: true } },
     });
     startNightAction.apply(game, null, "owner-1");
 
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.morticianAbilityEnded).toBe(true);
+    expect(ts.roleState?.mortician?.abilityEnded).toBe(true);
   });
 
   it("does not carry morticianAbilityEnded when it is false/undefined", () => {
@@ -370,18 +370,18 @@ describe("StartNight — Mirrorcaster charge persistence", () => {
     startNightAction.apply(game, null, "owner-1");
 
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.morticianAbilityEnded).toBeUndefined();
+    expect(ts.roleState?.mortician?.abilityEnded).toBeUndefined();
   });
 
   it("carries mercenaryCharged forward to the next night", () => {
     const game = makePlayingGame({
       ...dayTurnState,
-      mercenaryCharged: true,
+      roleState: { mercenary: { charged: true, bribedPlayerIds: [] } },
     });
     startNightAction.apply(game, null, "owner-1");
 
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.mercenaryCharged).toBe(true);
+    expect(ts.roleState?.mercenary?.charged).toBe(true);
   });
 
   it("does not carry mercenaryCharged when it is false/undefined", () => {
@@ -389,18 +389,18 @@ describe("StartNight — Mirrorcaster charge persistence", () => {
     startNightAction.apply(game, null, "owner-1");
 
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.mercenaryCharged).toBeUndefined();
+    expect(ts.roleState?.mercenary?.charged).toBeUndefined();
   });
 
   it("carries mercenaryBribedPlayerIds forward to the next night", () => {
     const game = makePlayingGame({
       ...dayTurnState,
-      mercenaryBribedPlayerIds: ["p3", "p4"],
+      roleState: { mercenary: { charged: false, bribedPlayerIds: ["p3", "p4"] } },
     });
     startNightAction.apply(game, null, "owner-1");
 
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.mercenaryBribedPlayerIds).toEqual(["p3", "p4"]);
+    expect(ts.roleState?.mercenary?.bribedPlayerIds).toEqual(["p3", "p4"]);
   });
 
   it("does not carry mercenaryBribedPlayerIds when empty/undefined", () => {
@@ -408,20 +408,21 @@ describe("StartNight — Mirrorcaster charge persistence", () => {
     startNightAction.apply(game, null, "owner-1");
 
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.mercenaryBribedPlayerIds).toBeUndefined();
+    expect(ts.roleState?.mercenary).toBeUndefined();
   });
 
   it("carries Monarch knighting fields forward to next night", () => {
     const game = makePlayingGame({
       ...dayTurnState,
-      monarchKnightedPlayerIds: ["p2", "p3"],
-      monarchKnightingsUsed: 2,
+      roleState: {
+        monarch: { knightedPlayerIds: ["p2", "p3"], knightingsUsed: 2 },
+      },
     });
     startNightAction.apply(game, null, "owner-1");
 
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.monarchKnightedPlayerIds).toEqual(["p2", "p3"]);
-    expect(ts.monarchKnightingsUsed).toBe(2);
+    expect(ts.roleState?.monarch?.knightedPlayerIds).toEqual(["p2", "p3"]);
+    expect(ts.roleState?.monarch?.knightingsUsed).toBe(2);
   });
 
   it("does not carry Monarch knighting fields when absent", () => {
@@ -429,7 +430,7 @@ describe("StartNight — Mirrorcaster charge persistence", () => {
     startNightAction.apply(game, null, "owner-1");
 
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.monarchKnightedPlayerIds).toBeUndefined();
-    expect(ts.monarchKnightingsUsed).toBeUndefined();
+    expect(ts.roleState?.monarch?.knightedPlayerIds).toBeUndefined();
+    expect(ts.roleState?.monarch?.knightingsUsed).toBeUndefined();
   });
 });

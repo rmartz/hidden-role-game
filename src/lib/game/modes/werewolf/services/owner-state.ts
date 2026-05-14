@@ -45,7 +45,7 @@ function extractDeadPlayerIds(game: Game): string[] {
 /** Extracts the Hunter revenge player ID (narrator-only). */
 function extractHunterRevengePlayerId(game: Game): string | undefined {
   const ts = currentTurnState(game);
-  return ts?.hunterRevengePlayerId;
+  return ts?.roleState?.hunter?.revengePlayerId;
 }
 
 /**
@@ -123,8 +123,8 @@ export function extractDaytimeNightSummary(
   };
 
   // Exposer reveal: show the publicly revealed role to all players.
-  if (ts.exposerReveal) {
-    const exposerReveal = ts.exposerReveal;
+  if (ts.roleState?.exposer?.reveal) {
+    const exposerReveal = ts.roleState.exposer.reveal;
     const revealedPlayer = game.players.find(
       (p) => p.id === exposerReveal.playerId,
     );
@@ -184,8 +184,8 @@ export function extractDaytimePlayerState(
       a.playerId === callerId &&
       a.roleDefinitionId === (WerewolfRole.Executioner as string),
   );
-  if (callerExecutionerAssignment && ts.executionerTargetId) {
-    result.executionerTargetId = ts.executionerTargetId;
+  if (callerExecutionerAssignment && ts.roleState?.executioner?.targetId) {
+    result.executionerTargetId = ts.roleState.executioner.targetId;
   }
 
   // Silenced / hypnotized.
@@ -281,7 +281,7 @@ export function extractOwnerState(
   const nightActions = extractNightActions(game);
   const deadPlayerIds = extractDeadPlayerIds(game);
   const hunterRevengePlayerId = extractHunterRevengePlayerId(game);
-  const monarchKnightingsUsed = ts?.monarchKnightingsUsed;
+  const monarchKnightingsUsed = ts?.roleState?.monarch?.knightingsUsed;
   const callerId = game.ownerPlayerId ?? "";
   const daytimeNightState = extractDaytimeNightSummary(game, callerId);
 
@@ -293,8 +293,9 @@ export function extractOwnerState(
 
   // mercenaryBribedPlayerIds is narrator-only: lets the narrator track which
   // players have been bribed across nights when running a no-device Mercenary.
-  const mercenaryBribedPlayerIds = ts?.mercenaryBribedPlayerIds?.length
-    ? ts.mercenaryBribedPlayerIds
+  const mercenaryBribedPlayerIds = ts?.roleState?.mercenary?.bribedPlayerIds
+    ?.length
+    ? ts.roleState.mercenary.bribedPlayerIds
     : undefined;
 
   return {
@@ -305,8 +306,8 @@ export function extractOwnerState(
     ...(game.executionerTargetId
       ? { executionerTargetId: game.executionerTargetId }
       : {}),
-    ...(ts?.monarchKnightedPlayerIds?.length
-      ? { monarchKnightedPlayerIds: ts.monarchKnightedPlayerIds }
+    ...(ts?.roleState?.monarch?.knightedPlayerIds.length
+      ? { monarchKnightedPlayerIds: ts.roleState.monarch.knightedPlayerIds }
       : {}),
     ...((monarchKnightingsUsed ?? 0) > 0 ? { monarchKnightingsUsed } : {}),
     ...(hiddenRoleIds ? { hiddenRoleIds } : {}),

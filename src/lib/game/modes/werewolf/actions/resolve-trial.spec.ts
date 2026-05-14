@@ -199,9 +199,9 @@ describe("WerewolfAction.ResolveTrial", () => {
           ],
         },
       );
-      (
-        game.status as { turnState: WerewolfTurnState }
-      ).turnState.monarchKnightedPlayerIds = ["p2"];
+      (game.status as { turnState: WerewolfTurnState }).turnState.roleState = {
+        monarch: { knightedPlayerIds: ["p2"], knightingsUsed: 0 },
+      };
       action.apply(game, {}, "owner-1");
       const ts = (
         game.status as {
@@ -241,12 +241,12 @@ describe("WerewolfAction.ResolveTrial", () => {
         { playerId: "p4", vote: DaytimeVote.Guilty },
         { playerId: "p5", vote: DaytimeVote.Guilty },
       ]);
-      ts.oneEyedSeerLockedTargetId = "p3";
+      ts.roleState = { oneEyedSeer: { lockedTargetId: "p3" } };
       const game = makePlayingGame(ts);
       action.apply(game, {}, "owner-1");
       const result = (game.status as { turnState: WerewolfTurnState })
         .turnState;
-      expect(result.oneEyedSeerLockedTargetId).toBeUndefined();
+      expect(result.roleState?.oneEyedSeer?.lockedTargetId).toBeUndefined();
     });
 
     it("consumes priest ward when warded player is eliminated by trial", () => {
@@ -254,12 +254,12 @@ describe("WerewolfAction.ResolveTrial", () => {
         { playerId: "p4", vote: DaytimeVote.Guilty },
         { playerId: "p5", vote: DaytimeVote.Guilty },
       ]);
-      ts.priestWards = { p3: "p2", p4: "p2" };
+      ts.roleState = { priest: { wards: { p3: "p2", p4: "p2" } } };
       const game = makePlayingGame(ts);
       action.apply(game, {}, "owner-1");
       const result = (game.status as { turnState: WerewolfTurnState })
         .turnState;
-      expect(result.priestWards).toEqual({ p4: "p2" });
+      expect(result.roleState?.priest?.wards).toEqual({ p4: "p2" });
     });
 
     it("sets hunterRevengePlayerId when Hunter is eliminated by trial", () => {
@@ -281,7 +281,7 @@ describe("WerewolfAction.ResolveTrial", () => {
       action.apply(game, {}, "owner-1");
       expect(game.status.type).toBe(GameStatus.Playing);
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-      expect(ts.hunterRevengePlayerId).toBe("p2");
+      expect(ts.roleState?.hunter?.revengePlayerId).toBe("p2");
       expect(ts.deadPlayerIds).toContain("p2");
     });
 
@@ -309,7 +309,7 @@ describe("WerewolfAction.ResolveTrial", () => {
       // Game should still be playing — not finished
       expect(game.status.type).toBe(GameStatus.Playing);
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-      expect(ts.hunterRevengePlayerId).toBe("p2");
+      expect(ts.roleState?.hunter?.revengePlayerId).toBe("p2");
     });
 
     it("Tanner voted out at trial ends game with Tanner winner", () => {
@@ -340,7 +340,7 @@ describe("WerewolfAction.ResolveTrial", () => {
         { playerId: "p3", vote: DaytimeVote.Guilty },
         { playerId: "p4", vote: DaytimeVote.Guilty },
       ]);
-      ts.executionerTargetId = "p2";
+      ts.roleState = { executioner: { targetId: "p2" } };
       const game = makePlayingGame(ts, {
         roleAssignments: [
           { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -362,7 +362,7 @@ describe("WerewolfAction.ResolveTrial", () => {
         { playerId: "p2", vote: DaytimeVote.Guilty },
         { playerId: "p3", vote: DaytimeVote.Guilty },
       ]);
-      ts.executionerTargetId = "p2";
+      ts.roleState = { executioner: { targetId: "p2" } };
       const game = makePlayingGame(ts, {
         roleAssignments: [
           { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -381,8 +381,10 @@ describe("WerewolfAction.ResolveTrial", () => {
         { playerId: "p3", vote: DaytimeVote.Guilty },
         { playerId: "p4", vote: DaytimeVote.Guilty },
       ]);
-      ts.executionerTargetId = "p2";
-      ts.mercenaryBribedPlayerIds = ["p3"];
+      ts.roleState = {
+        executioner: { targetId: "p2" },
+        mercenary: { charged: false, bribedPlayerIds: ["p3"] },
+      };
       const game = makePlayingGame(ts, {
         roleAssignments: [
           { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
