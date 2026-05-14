@@ -25,6 +25,7 @@ Each player is secretly assigned one role. The Narrator has no role and runs the
 | Mentalist     | `werewolf-mentalist`     | Good    | Every Night               | Investigate (dual)     | Selects two players and learns whether they are on the same team (`dualTargetInvestigate`)                                                                                                                                                                                      |
 | Minion        | `werewolf-minion`        | Bad     | First Night Only          | —                      | Sees all werewolf players (`awareOf: werewolves`); werewolves do not know the Minion's identity                                                                                                                                                                                 |
 | Mirrorcaster  | `werewolf-mirrorcaster`  | Good    | Every Night               | Special (dual mode)    | Starts in Protect mode. When protection blocks an attack, gains a charge and switches to Attack mode. Attack is standard (blockable). Charge persists until used. `preventSelfTarget`.                                                                                          |
+| Monarch       | `werewolf-monarch`       | Good    | Every Night               | Special (knight)       | Knights one player per night (max 3 per game). Knighted players are public and get +1 trial vote while alive. Monarch is night-protected while any Knighted player is alive (with role-specific exceptions).                                                                    |
 | Mortician     | `werewolf-mortician`     | Good    | Every Night               | Attack                 | Attacks each night until they kill a Werewolf, then ability ends. If target is protected, receives "not a Werewolf" regardless of actual role. `preventSelfTarget`.                                                                                                             |
 | Mummy         | `werewolf-mummy`         | Good    | Every Night               | Special (hypnotize)    | Hypnotizes target's vote the following day — their vote mirrors the Mummy's vote                                                                                                                                                                                                |
 | Mystic Seer   | `werewolf-mystic-seer`   | Good    | Every Night               | Investigate            | Learns the target's exact role, not just their team (`revealsExactRole`)                                                                                                                                                                                                        |
@@ -105,6 +106,7 @@ Roles wake in a consistent order determined by their `category`, following the r
    - Priest
 8. `VillagerSupport` (Good — Special):
    - Mason
+   - Monarch
    - Mummy
    - Sentinel
    - Spellcaster

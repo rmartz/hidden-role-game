@@ -74,6 +74,10 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   exposerAbilityUsed?: boolean;
   /** Whether the Mortician has completed their mission. */
   morticianAbilityEnded?: boolean;
+  /** Public list of players knighted by the Monarch. */
+  monarchKnightedPlayerIds?: string[];
+  /** Number of times the Monarch has knighted a player (max 3). */
+  monarchKnightingsUsed?: number;
   /** Whether the Priest's ward is active this night. */
   priestWardActive?: boolean;
   /** Whether the Mirrorcaster is charged (Attack mode). */

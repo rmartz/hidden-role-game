@@ -46,6 +46,7 @@ export function PlayerNightSummary({
         ),
         savedPlayerName,
         protected: entries.some((e) => e.effect === "protected"),
+        knighted: entries.some((e) => e.effect === "knighted"),
         survived: entries.some((e) => e.effect === "survived"),
         silenced: entries.some((e) => e.effect === "silenced"),
         hypnotized: entries.some((e) => e.effect === "hypnotized"),
@@ -70,6 +71,7 @@ export function PlayerNightSummary({
             altruistSacrifice,
             savedPlayerName,
             protected: wasProtected,
+            knighted,
             survived,
             silenced,
             hypnotized,
@@ -84,6 +86,7 @@ export function PlayerNightSummary({
               altruistSacrifice={altruistSacrifice}
               savedPlayerName={savedPlayerName}
               protected={wasProtected}
+              knighted={knighted}
               survived={survived}
               silenced={silenced}
               hypnotized={hypnotized}

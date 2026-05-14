@@ -9,20 +9,31 @@ describe("WerewolfAction.ResetAbility", () => {
 
   it("resets witchAbilityUsed", () => {
     const ns = makeNightState({ turn: 2 });
-    ns.witchAbilityUsed = true;
+    ns.roleState = { witch: { abilityUsed: true } };
     const game = makePlayingGame(ns);
     action.apply(game, { roleId: WerewolfRole.Witch }, "owner-1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.witchAbilityUsed).toBeUndefined();
+    expect(ts.roleState?.witch?.abilityUsed).toBeUndefined();
   });
 
   it("resets exposerAbilityUsed", () => {
     const ns = makeNightState({ turn: 2 });
-    ns.exposerAbilityUsed = true;
+    ns.roleState = { exposer: { abilityUsed: true } };
     const game = makePlayingGame(ns);
     action.apply(game, { roleId: WerewolfRole.Exposer }, "owner-1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.exposerAbilityUsed).toBeUndefined();
+    expect(ts.roleState?.exposer?.abilityUsed).toBeUndefined();
+  });
+
+  it("preserves exposer reveal when resetting abilityUsed", () => {
+    const reveal = { playerId: "p2", roleId: WerewolfRole.Werewolf };
+    const ns = makeNightState({ turn: 2 });
+    ns.roleState = { exposer: { abilityUsed: true, reveal } };
+    const game = makePlayingGame(ns);
+    action.apply(game, { roleId: WerewolfRole.Exposer }, "owner-1");
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.roleState?.exposer?.abilityUsed).toBeUndefined();
+    expect(ts.roleState?.exposer?.reveal).toEqual(reveal);
   });
 
   it("isValid returns true for known ability role", () => {
@@ -55,7 +66,7 @@ describe("Narrator bypasses once-per-game restrictions in SetNightTarget", () =>
       turn: 2,
       nightPhaseOrder: [WerewolfRole.Witch],
     });
-    ns.witchAbilityUsed = true;
+    ns.roleState = { witch: { abilityUsed: true } };
     const game = makePlayingGame(ns, {
       roleAssignments: [
         { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -77,7 +88,7 @@ describe("Narrator bypasses once-per-game restrictions in SetNightTarget", () =>
       nightPhaseOrder: [WerewolfRole.Witch],
       currentPhaseIndex: 0,
     });
-    ns.witchAbilityUsed = true;
+    ns.roleState = { witch: { abilityUsed: true } };
     const game = makePlayingGame(ns, {
       roleAssignments: [
         { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },

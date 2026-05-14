@@ -269,7 +269,7 @@ describe("extractDaytimeNightSummary", () => {
   });
 
   it("nightStatus omits exposed entry on subsequent days after the exposure", () => {
-    // A prior exposure persists on turnState (so the narrator's night screen
+    // A prior exposure persists on roleState (so the narrator's night screen
     // can show it across nights), but the per-phase exposerReveal is only set
     // on the day after the exposure. Subsequent daytime phases must not
     // re-emit the "exposed" entry in the Last Night summary.
@@ -277,12 +277,22 @@ describe("extractDaytimeNightSummary", () => {
       // phase.exposerReveal is intentionally absent for this day.
     });
     const status = game.status as { turnState: WerewolfTurnState };
-    status.turnState.exposerReveal = {
-      playerId: "p2",
-      roleId: WerewolfRole.Seer,
+    status.turnState.roleState = {
+      exposer: { reveal: { playerId: "p2", roleId: WerewolfRole.Seer } },
     };
 
     const result = extractDaytimeState(game, "p1");
     expect(result.nightStatus).toBeUndefined();
+  });
+
+  it("includes monarch knighting in daytime night summary", () => {
+    const game = makeDaytimeGame({
+      knightedPlayerId: "p3",
+      nightResolution: [],
+    });
+    const result = extractDaytimeState(game, "p1");
+    expect(result.nightStatus).toEqual([
+      { targetPlayerId: "p3", effect: "knighted" },
+    ]);
   });
 });

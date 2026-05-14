@@ -7,6 +7,7 @@ interface PlayerNightSummaryItemProps {
   altruistSacrifice: boolean;
   savedPlayerName?: string;
   protected: boolean;
+  knighted: boolean;
   survived: boolean;
   silenced: boolean;
   hypnotized: boolean;
@@ -22,6 +23,7 @@ function renderPrimaryLine({
   altruistSacrifice,
   savedPlayerName,
   protected: wasProtected,
+  knighted,
   survived,
   silenced,
   hypnotized,
@@ -89,6 +91,7 @@ function renderPrimaryLine({
     [
       smited && WEREWOLF_COPY.smite.effect,
       killed && !smited && "eliminated",
+      knighted && "knighted",
       silenced && "silenced",
       hypnotized && "hypnotized",
     ] as (string | false)[]
