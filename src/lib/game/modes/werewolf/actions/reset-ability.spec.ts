@@ -25,6 +25,17 @@ describe("WerewolfAction.ResetAbility", () => {
     expect(ts.roleState?.exposer?.abilityUsed).toBeUndefined();
   });
 
+  it("preserves exposer reveal when resetting abilityUsed", () => {
+    const reveal = { playerId: "p2", roleId: WerewolfRole.Werewolf };
+    const ns = makeNightState({ turn: 2 });
+    ns.roleState = { exposer: { abilityUsed: true, reveal } };
+    const game = makePlayingGame(ns);
+    action.apply(game, { roleId: WerewolfRole.Exposer }, "owner-1");
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.roleState?.exposer?.abilityUsed).toBeUndefined();
+    expect(ts.roleState?.exposer?.reveal).toEqual(reveal);
+  });
+
   it("isValid returns true for known ability role", () => {
     const game = makePlayingGame(makeNightState({ turn: 2 }));
     expect(

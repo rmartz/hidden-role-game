@@ -5,8 +5,8 @@
  * avoid circular dependencies — types.ts imports from this file, and role
  * files import from types.ts.
  *
- * Each role file re-exports its own type from here so callers can import the
- * type directly from the role's module.
+ * All types are re-exported from types.ts so callers can import them from
+ * the main Werewolf types barrel.
  */
 
 export interface ArsonistTurnState {

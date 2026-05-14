@@ -251,11 +251,11 @@ The Witch sees `nightStatus` with `effect: "attacked"` entries **only** when her
 
 ## Wolf Cub Special Case
 
-When the Wolf Cub is killed (via `start-day` resolution or `mark-player-dead`), `wolfCubDied: true` is set on `WerewolfTurnState`. The next time `start-night` is called, an extra Werewolf group phase with key `"werewolf-werewolf:2"` is appended to `nightPhaseOrder`, giving Werewolves two separate attack phases that night.
+When the Wolf Cub is killed (via `start-day` resolution or `mark-player-dead`), `roleState.wolfCub.died: true` is set on `WerewolfTurnState`. The next time `start-night` is called, an extra Werewolf group phase with key `"werewolf-werewolf:2"` is appended to `nightPhaseOrder`, giving Werewolves two separate attack phases that night.
 
 The second phase cannot target the same player that was the `suggestedTargetId` of the first phase (within-night exclusion). This is distinct from the cross-night `preventRepeatTarget` mechanism used by Bodyguard and Spellcaster, which prevents targeting the same player on consecutive nights (tracked via `lastTargets` in `WerewolfTurnState`).
 
-The `wolfCubDied` flag is cleared when `start-night` consumes it to generate the bonus phase.
+The `roleState.wolfCub.died` flag is cleared when `start-night` consumes it to generate the bonus phase.
 
 ## Old Man Timer
 
