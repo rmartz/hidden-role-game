@@ -130,7 +130,7 @@ function buildNightMarkers(
 
   const markers = new Map<string, NightMarkerEffect[]>();
   for (const [playerId, effects] of markerSets) {
-    markers.set(playerId, [...effects]);
+    markers.set(playerId, [...effects].sort());
   }
   return markers;
 }
@@ -182,15 +182,15 @@ export function OwnerGameNightScreen({
       isNighttime
         ? buildNightMarkers(
             nightActions,
-            turnState.priestWards,
-            turnState.mirrorcasterCharged,
+            turnState.roleState?.priest?.wards,
+            turnState.roleState?.mirrorcaster?.charged,
           )
         : undefined,
     [
       isNighttime,
       nightActions,
-      turnState.priestWards,
-      turnState.mirrorcasterCharged,
+      turnState.roleState?.priest?.wards,
+      turnState.roleState?.mirrorcaster?.charged,
     ],
   );
   const activePhaseKey = nightPhaseOrder[currentPhaseIndex] ?? "";
