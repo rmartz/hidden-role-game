@@ -57,6 +57,7 @@ export const startNightAction: GameAction = {
     const aliveInfected = (ts.zombieInfected ?? []).filter(
       (id) => !ts.deadPlayerIds.includes(id),
     );
+    const monarchKnightingsUsed = ts.monarchKnightingsUsed;
 
     // Arsonist: carry forward doused list (filtering out the dead).
     const aliveDousedPlayerIds = (ts.arsonistDousedPlayerIds ?? []).filter(
@@ -89,6 +90,10 @@ export const startNightAction: GameAction = {
           : {}),
         ...(ts.exposerAbilityUsed ? { exposerAbilityUsed: true } : {}),
         ...(ts.morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),
+        ...(ts.monarchKnightedPlayerIds?.length
+          ? { monarchKnightedPlayerIds: ts.monarchKnightedPlayerIds }
+          : {}),
+        ...((monarchKnightingsUsed ?? 0) > 0 ? { monarchKnightingsUsed } : {}),
         ...(ts.exposerReveal ? { exposerReveal: ts.exposerReveal } : {}),
         ...(ts.executionerTargetId
           ? { executionerTargetId: ts.executionerTargetId }

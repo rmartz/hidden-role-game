@@ -183,6 +183,36 @@ describe("WerewolfAction.ResolveTrial", () => {
       expect(ts.activeTrial.verdict).toBe(TrialVerdict.Innocent);
     });
 
+    it("Monarch-knighted player's vote gets +1 weight", () => {
+      const game = makePlayingGame(
+        makeDayStateWithPendingTrial("p4", [
+          { playerId: "p2", vote: DaytimeVote.Guilty },
+          { playerId: "p3", vote: DaytimeVote.Innocent },
+        ]),
+        {
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p5", roleDefinitionId: WerewolfRole.Monarch },
+          ],
+        },
+      );
+      (
+        game.status as { turnState: WerewolfTurnState }
+      ).turnState.monarchKnightedPlayerIds = ["p2"];
+      action.apply(game, {}, "owner-1");
+      const ts = (
+        game.status as {
+          turnState: {
+            phase: { activeTrial: { verdict?: string } };
+          };
+        }
+      ).turnState.phase;
+      expect(ts.activeTrial.verdict).toBe(TrialVerdict.Eliminated);
+    });
+
     it("does not end game when defendant is found innocent", () => {
       // 1 bad (p1) + 2 good (p2=defendant, p3=voter) — p2 innocent, game continues
       const game = makePlayingGame(

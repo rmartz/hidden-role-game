@@ -142,6 +142,8 @@ export interface WerewolfDaytimePhase {
   nightActions: Record<string, AnyNightAction>;
   /** Resolved attack/protect outcomes, computed when transitioning to day. */
   nightResolution?: NightResolutionEvent[];
+  /** Player ID newly knighted by the Monarch during the preceding night, if any. */
+  knightedPlayerId?: string;
   /**
    * Player IDs whose night outcomes have been publicly revealed by the narrator.
    * Absent (or empty) when none have been revealed yet; populated via
@@ -203,6 +205,10 @@ export interface WerewolfTurnState {
   exposerReveal?: { playerId: string; roleId: string };
   /** True once the Mortician has successfully killed a Werewolf. */
   morticianAbilityEnded?: boolean;
+  /** Player IDs that have been knighted by the Monarch. Public information. */
+  monarchKnightedPlayerIds?: string[];
+  /** Number of times the Monarch has used their knighting ability (max 3). */
+  monarchKnightingsUsed?: number;
   /** The player ID that the Executioner must get eliminated at trial to win. */
   executionerTargetId?: string;
   /** True when the Mirrorcaster has gained a charge from a successful protection. */

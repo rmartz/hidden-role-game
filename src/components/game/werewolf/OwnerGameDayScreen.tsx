@@ -98,6 +98,7 @@ export function OwnerGameDayScreen({
     nextToReveal &&
     (gameState.players.find((p) => p.id === nextToReveal.playerId)?.name ??
       nextToReveal.playerId);
+  const knightedPlayerId = daytimePhase.knightedPlayerId;
 
   return (
     <div className="p-5 max-w-4xl mx-auto">
@@ -190,6 +191,7 @@ export function OwnerGameDayScreen({
           events={daytimePhase.nightResolution ?? []}
           players={gameState.players}
           roles={modeConfig.roles}
+          knightedPlayerId={knightedPlayerId}
         />
       </div>
       {gameState.hunterRevengePlayerId && (

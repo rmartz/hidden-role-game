@@ -111,6 +111,12 @@ export function extractDaytimeNightSummary(
       return [{ targetPlayerId: e.targetPlayerId, effect: "hypnotized" }];
     return [];
   });
+  if (phase.knightedPlayerId !== undefined) {
+    nightStatus.push({
+      targetPlayerId: phase.knightedPlayerId,
+      effect: "knighted",
+    });
+  }
 
   const result: Partial<WerewolfPlayerGameState> = {
     ...(nightStatus.length > 0 ? { nightStatus } : {}),
@@ -292,9 +298,11 @@ export function extractDaytimePlayerState(
 export function extractOwnerState(
   game: Game,
 ): Partial<WerewolfPlayerGameState> {
+  const ts = currentTurnState(game);
   const nightActions = extractNightActions(game);
   const deadPlayerIds = extractDeadPlayerIds(game);
   const hunterRevengePlayerId = extractHunterRevengePlayerId(game);
+  const monarchKnightingsUsed = ts?.monarchKnightingsUsed;
   const callerId = game.ownerPlayerId ?? "";
   const daytimeNightState = extractDaytimeNightSummary(game, callerId);
 
@@ -312,6 +320,10 @@ export function extractOwnerState(
     ...(game.executionerTargetId
       ? { executionerTargetId: game.executionerTargetId }
       : {}),
+    ...(ts?.monarchKnightedPlayerIds?.length
+      ? { monarchKnightedPlayerIds: ts.monarchKnightedPlayerIds }
+      : {}),
+    ...((monarchKnightingsUsed ?? 0) > 0 ? { monarchKnightingsUsed } : {}),
     ...(hiddenRoleIds ? { hiddenRoleIds } : {}),
   };
 }

@@ -31,6 +31,8 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
   investigationResult?: { targetPlayerId: string; isWerewolfTeam: boolean };
   witchAbilityUsed?: boolean;
   morticianAbilityEnded?: boolean;
+  monarchKnightedPlayerIds?: string[];
+  monarchKnightingsUsed?: number;
   priestWardActive?: boolean;
   isSilenced?: boolean;
   isHypnotized?: boolean;
@@ -86,6 +88,7 @@ export interface FirebaseWerewolfPlayerState extends FirebaseBasePlayerState {
 export function werewolfStateToFirebase(
   state: WerewolfPlayerGameState,
 ): FirebaseWerewolfPlayerState {
+  const monarchKnightingsUsed = state.monarchKnightingsUsed;
   return {
     ...baseStateToFirebase(state),
     ...(state.nightActions ? { nightActions: state.nightActions } : {}),
@@ -111,6 +114,10 @@ export function werewolfStateToFirebase(
       : {}),
     ...(state.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
     ...(state.morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),
+    ...(state.monarchKnightedPlayerIds?.length
+      ? { monarchKnightedPlayerIds: state.monarchKnightedPlayerIds }
+      : {}),
+    ...((monarchKnightingsUsed ?? 0) > 0 ? { monarchKnightingsUsed } : {}),
     ...(state.priestWardActive ? { priestWardActive: true } : {}),
     ...(state.isSilenced ? { isSilenced: true } : {}),
     ...(state.isHypnotized ? { isHypnotized: true } : {}),
@@ -166,6 +173,7 @@ export function werewolfStateToFirebase(
 export function werewolfStateFromFirebase(
   raw: FirebaseWerewolfPlayerState,
 ): WerewolfPlayerGameState {
+  const monarchKnightingsUsed = raw.monarchKnightingsUsed;
   return {
     ...baseStateFromFirebase(raw),
     gameMode: GameMode.Werewolf,
@@ -201,6 +209,10 @@ export function werewolfStateFromFirebase(
       : {}),
     ...(raw.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
     ...(raw.morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),
+    ...(raw.monarchKnightedPlayerIds?.length
+      ? { monarchKnightedPlayerIds: raw.monarchKnightedPlayerIds }
+      : {}),
+    ...((monarchKnightingsUsed ?? 0) > 0 ? { monarchKnightingsUsed } : {}),
     ...(raw.priestWardActive ? { priestWardActive: true } : {}),
     ...(raw.isSilenced ? { isSilenced: true } : {}),
     ...(raw.isHypnotized ? { isHypnotized: true } : {}),

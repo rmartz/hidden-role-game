@@ -16,15 +16,17 @@ export function applyTrialVerdict(
     (v) => v.vote === DaytimeVote.Innocent,
   ).length;
 
-  // Mayor's vote counts double (secret — extra vote added to their side)
+  // Extra trial vote weight: Mayor gets +1 and each Monarch-knighted voter gets +1.
   for (const v of activeTrial.votes) {
     const roleId = game.roleAssignments.find(
       (a) => a.playerId === v.playerId,
     )?.roleDefinitionId;
-    if (roleId === WerewolfRole.Mayor) {
-      if (v.vote === DaytimeVote.Guilty) guiltyCount++;
-      else innocentCount++;
-    }
+    const extraVoteWeight =
+      Number(roleId === WerewolfRole.Mayor) +
+      Number((ts.monarchKnightedPlayerIds ?? []).includes(v.playerId));
+    if (extraVoteWeight === 0) continue;
+    if (v.vote === DaytimeVote.Guilty) guiltyCount += extraVoteWeight;
+    else innocentCount += extraVoteWeight;
   }
 
   // Strictly more Guilty than Innocent → eliminated; ties/abstentions → innocent

@@ -267,6 +267,13 @@ export const WEREWOLF_COPY = {
     yourTarget: (name: string) =>
       `Your target: ${name}. Convince the village to put them on trial.`,
   },
+  monarch: {
+    choosePlayerToKnight: "Choose a player to Knight",
+    knighthoodsRemaining: (remaining: number) =>
+      `Knighthoods remaining: ${String(remaining)}`,
+    outOfKnighthoods: "You have used all of your Knighthoods for the game.",
+    wasKnighted: (name: string) => `${name} was Knighted.`,
+  },
   mason: {
     playerWarning:
       "Do not let anyone else know you are a Mason — mysterious threats lurk everywhere.",
