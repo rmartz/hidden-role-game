@@ -1,5 +1,5 @@
-import { Team } from "@/lib/types";
 import type { RoleBucket, RoleDefinition } from "@/lib/types";
+import { Team } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
 // Character type enum

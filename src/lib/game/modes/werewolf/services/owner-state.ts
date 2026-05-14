@@ -1,22 +1,23 @@
 import type { Game } from "@/lib/types";
 import { GameMode } from "@/lib/types";
 import type { DaytimeNightStatusEntry } from "@/server/types";
-import type { WerewolfPlayerGameState } from "../player-state";
+
 import { getWerewolfModeConfig } from "../lobby-config";
+import type { WerewolfPlayerGameState } from "../player-state";
+import {
+  getWerewolfRole,
+  isWerewolfRole,
+  WEREWOLF_ROLES,
+  WerewolfRole,
+} from "../roles";
 import type {
   AltruistInterceptedNightResolutionEvent,
   AnyNightAction,
 } from "../types";
 import { TrialVerdict, WerewolfPhase } from "../types";
-import { SMITE_PHASE_KEY, OLD_MAN_TIMER_KEY } from "../utils";
-import { getSilencedPlayerIds, getHypnotizedPlayerId } from "../utils";
+import { OLD_MAN_TIMER_KEY, SMITE_PHASE_KEY } from "../utils";
+import { getHypnotizedPlayerId, getSilencedPlayerIds } from "../utils";
 import { currentTurnState } from "../utils/game-state";
-import {
-  WerewolfRole,
-  WEREWOLF_ROLES,
-  isWerewolfRole,
-  getWerewolfRole,
-} from "../roles";
 
 /** Returns the set of player IDs whose night outcomes are publicly visible. */
 function resolveRevealedPlayerIds(game: Game): Set<string> {
@@ -310,7 +311,7 @@ export function extractOwnerState(
   };
 }
 
-export { extractNightActions, extractDeadPlayerIds };
+export { extractDeadPlayerIds, extractNightActions };
 
 /**
  * Returns dead players visible to a specific caller.

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+
 import { GameTimer } from "./GameTimer";
 
 const meta = {

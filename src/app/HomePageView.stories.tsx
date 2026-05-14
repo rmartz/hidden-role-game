@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { fn } from "storybook/test";
+
 import { GameMode } from "@/lib/types";
+
 import { HomePageView } from "./HomePageView";
 
 const noop = fn();

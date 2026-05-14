@@ -1,10 +1,11 @@
 import { GameMode } from "@/lib/types";
 import type { BasePlayerGameState } from "@/server/types/game";
+
 import type {
   BoardCard,
   Clue,
-  CodenamesTurnPhase,
   CodenamesTeam,
+  CodenamesTurnPhase,
 } from "./types";
 
 export interface CodenamesPlayerGameState extends BasePlayerGameState {

@@ -1,5 +1,5 @@
-import { isWerewolfRole, WEREWOLF_ROLES } from "../roles";
 import type { WerewolfRole } from "../roles";
+import { isWerewolfRole, WEREWOLF_ROLES } from "../roles";
 
 /** A valid night phase key: a role ID. Group phases use the primary role's ID. */
 export type PhaseKey = WerewolfRole | string;

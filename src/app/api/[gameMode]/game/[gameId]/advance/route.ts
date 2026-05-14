@@ -1,5 +1,5 @@
-import { ServerResponseStatus } from "@/server/types";
 import { advanceToPlaying } from "@/server/game";
+import { ServerResponseStatus } from "@/server/types";
 import { authenticateGame, errorResponse, parseGameMode } from "@/server/utils";
 
 export async function POST(

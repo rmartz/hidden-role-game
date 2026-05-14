@@ -1,10 +1,12 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { GameStatus } from "@/lib/types";
-import type { WerewolfTurnState } from "../types";
+
 import { WerewolfRole } from "../roles";
-import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
+import type { WerewolfTurnState } from "../types";
 import { WerewolfWinner } from "../utils/win-condition";
-import { makePlayingGame, makeNightState } from "./test-helpers";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "./index";
+import { makeNightState, makePlayingGame } from "./test-helpers";
 
 // ---------------------------------------------------------------------------
 // Shared helpers

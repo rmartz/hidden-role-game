@@ -1,6 +1,6 @@
 "use client";
 
-import type { GameMode, RoleDefinition, Team } from "@/lib/types";
+import { RoleLabel } from "@/components/RoleLabel";
 import {
   Accordion,
   AccordionContent,
@@ -15,8 +15,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { RoleLabel } from "@/components/RoleLabel";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import type { GameMode, RoleDefinition, Team } from "@/lib/types";
 
 interface RoleGlossaryDialogProps {
   roles: RoleDefinition<string, Team>[];

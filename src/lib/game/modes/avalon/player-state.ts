@@ -1,6 +1,7 @@
 import { GameMode } from "@/lib/types";
 import type { BasePlayerGameState } from "@/server/types/game";
-import type { AvalonPhase, QuestResult, TeamVote, QuestCard } from "./types";
+
+import type { AvalonPhase, QuestCard, QuestResult, TeamVote } from "./types";
 
 /** Current quest info visible to all players. */
 export interface AvalonCurrentQuest {

@@ -1,5 +1,6 @@
 import { GameMode } from "@/lib/types";
 import type { BasePlayerGameState } from "@/server/types/game";
+
 import type { ClocktowerNomination } from "./types";
 
 /**

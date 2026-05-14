@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
+
 import type { GameMode } from "@/lib/types";
 
 export const GameModeContext = createContext<GameMode | undefined>(undefined);

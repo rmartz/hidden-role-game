@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { GameMode } from "@/lib/types";
-import { useGameStateQuery, GameModeContext } from "@/hooks";
+import { useEffect } from "react";
+
 import { WerewolfGameScreen } from "@/components/game";
 import { SecretVillainGameScreen } from "@/components/game/secret-villain";
+import { GameModeContext, useGameStateQuery } from "@/hooks";
 import { parseGameMode } from "@/lib/game/modes";
-import { GAME_PAGE_COPY } from "./page.copy";
+import { GameMode } from "@/lib/types";
+
 import { UnsupportedGameMode } from "../UnsupportedGameMode";
+import { GAME_PAGE_COPY } from "./page.copy";
 
 export default function GameModePage() {
   const { gameId, gameMode: gameModeParam } = useParams<{

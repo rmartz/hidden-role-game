@@ -1,8 +1,9 @@
 import type { Game, GameAction } from "@/lib/types";
+
+import { getWerewolfModeConfig } from "../lobby-config";
 import { getOrderedAffectedPlayerIds } from "../services";
 import { WerewolfPhase } from "../types";
 import { currentTurnState, isOwnerPlaying } from "../utils";
-import { getWerewolfModeConfig } from "../lobby-config";
 
 export const revealNightOutcomeStepAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {

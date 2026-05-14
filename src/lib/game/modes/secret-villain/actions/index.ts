@@ -1,4 +1,5 @@
 import type { GameAction } from "@/lib/types";
+
 import { callSpecialElectionAction } from "./call-special-election";
 import { castElectionVoteAction } from "./cast-election-vote";
 import { chancellorPlayAction } from "./chancellor-play";
@@ -9,9 +10,8 @@ import {
 } from "./investigate-player";
 import { nominateChancellorAction } from "./nominate-chancellor";
 import { policyPeekAction, resolvePolicyPeekAction } from "./policy-peek";
-import { presidentDrawAction } from "./president-draw";
 import { presidentDiscardAction } from "./president-discard";
-import { proposeVetoAction, respondVetoAction } from "./veto";
+import { presidentDrawAction } from "./president-draw";
 import {
   advanceFromElectionAction,
   resolveElectionAction,
@@ -22,6 +22,7 @@ import {
   confirmSpecialBadAction,
   revealSpecialBadAction,
 } from "./special-bad-reveal";
+import { proposeVetoAction, respondVetoAction } from "./veto";
 
 export enum SecretVillainAction {
   AdvanceFromElection = "advance-from-election",

@@ -1,12 +1,5 @@
 "use client";
 
-import { SpecialActionType } from "@/lib/game/modes/secret-villain/types";
-import type {
-  SvCustomPowerConfig,
-  SvCustomPowerSlot,
-} from "@/lib/game/modes/secret-villain/types";
-import { getSvThemeLabels } from "@/lib/game/modes/secret-villain/themes";
-import type { SvTheme } from "@/lib/game/modes/secret-villain/themes";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -15,6 +8,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import type { SvTheme } from "@/lib/game/modes/secret-villain/themes";
+import { getSvThemeLabels } from "@/lib/game/modes/secret-villain/themes";
+import type {
+  SvCustomPowerConfig,
+  SvCustomPowerSlot,
+} from "@/lib/game/modes/secret-villain/types";
+import { SpecialActionType } from "@/lib/game/modes/secret-villain/types";
+
 import { SECRET_VILLAIN_CONFIG_PANEL_COPY } from "./SecretVillainConfigPanel.copy";
 
 /** Sentinel value for the "None" option in the power slot selector. */

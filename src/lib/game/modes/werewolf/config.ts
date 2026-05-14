@@ -1,22 +1,24 @@
 import { sum } from "lodash";
-import { Team } from "@/lib/types";
+
 import type { GameModeConfig, ModeConfig } from "@/lib/types";
+import { Team } from "@/lib/types";
 import { isWerewolfModeConfig } from "@/lib/types";
-import {
-  MIN_PLAYERS,
-  defaultRoleCount,
-  WEREWOLF_ROLES,
-  WerewolfRole,
-} from "./roles";
+
 import { WEREWOLF_ACTIONS } from "./actions";
-import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "./timer-config";
 import {
-  DEFAULT_WEREWOLF_MODE_CONFIG,
   buildDefaultWerewolfLobbyConfig,
+  DEFAULT_WEREWOLF_MODE_CONFIG,
   getWerewolfModeConfig,
   parseWerewolfModeConfig,
 } from "./lobby-config";
+import {
+  defaultRoleCount,
+  MIN_PLAYERS,
+  WEREWOLF_ROLES,
+  WerewolfRole,
+} from "./roles";
 import { werewolfServices } from "./services";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "./timer-config";
 
 function hiddenRoleCountFromConfig(modeConfig: ModeConfig): number {
   return isWerewolfModeConfig(modeConfig) ? modeConfig.hiddenRoleCount : 0;

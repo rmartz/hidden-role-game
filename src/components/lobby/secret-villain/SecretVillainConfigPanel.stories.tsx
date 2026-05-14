@@ -1,11 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { fn } from "storybook/test";
-import { GameMode } from "@/lib/types";
+
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
 import {
-  SvBoardPreset,
   SpecialActionType,
+  SvBoardPreset,
 } from "@/lib/game/modes/secret-villain/types";
+import { GameMode } from "@/lib/types";
+
 import { SecretVillainConfigPanel } from "./SecretVillainConfigPanel";
 
 const meta = {

@@ -1,11 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { GameMode, GameStatus } from "@/lib/types";
+
+import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
 import {
   SecretVillainPhase,
   SpecialActionType,
 } from "@/lib/game/modes/secret-villain/types";
-import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
+import { GameMode, GameStatus } from "@/lib/types";
+
 import { BoardScreen } from "./BoardScreen";
 
 const MEDIUM_POWER_TABLE = [

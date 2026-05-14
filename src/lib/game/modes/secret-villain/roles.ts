@@ -1,5 +1,5 @@
-import { Team } from "@/lib/types";
 import type { RoleBucket } from "@/lib/types";
+import { Team } from "@/lib/types";
 
 export enum SecretVillainRole {
   Good = "good",

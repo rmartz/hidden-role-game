@@ -1,7 +1,9 @@
-import { describe, it, expect } from "vitest";
-import { POST as doAction } from "./route";
-import { setupStartedSecretVillainGame } from "../test-helpers";
+import { describe, expect, it } from "vitest";
+
 import { makeGameParams } from "@/app/api/test-utils";
+
+import { setupStartedSecretVillainGame } from "../test-helpers";
+import { POST as doAction } from "./route";
 
 describe("POST /api/[gameMode]/game/[gameId]/action", () => {
   it("should return 400 for an unknown game mode", async () => {

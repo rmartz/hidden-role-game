@@ -1,4 +1,10 @@
-import { GameMode } from "@/lib/types";
+import type { AvalonModeConfig } from "@/lib/game/modes/avalon/lobby-config";
+import type { ClocktowerModeConfig } from "@/lib/game/modes/clocktower/lobby-config";
+import type { CodenamesModeConfig } from "@/lib/game/modes/codenames/lobby-config";
+import type { SecretVillainModeConfig } from "@/lib/game/modes/secret-villain/lobby-config";
+import type { SecretVillainTimerConfig } from "@/lib/game/modes/secret-villain/timer-config";
+import type { WerewolfModeConfig } from "@/lib/game/modes/werewolf/lobby-config";
+import type { WerewolfTimerConfig } from "@/lib/game/modes/werewolf/timer-config";
 import type {
   ModeConfig,
   RoleBucket,
@@ -6,13 +12,7 @@ import type {
   ShowRolesInPlay,
   TimerConfig,
 } from "@/lib/types";
-import type { WerewolfModeConfig } from "@/lib/game/modes/werewolf/lobby-config";
-import type { WerewolfTimerConfig } from "@/lib/game/modes/werewolf/timer-config";
-import type { SecretVillainModeConfig } from "@/lib/game/modes/secret-villain/lobby-config";
-import type { SecretVillainTimerConfig } from "@/lib/game/modes/secret-villain/timer-config";
-import type { AvalonModeConfig } from "@/lib/game/modes/avalon/lobby-config";
-import type { ClocktowerModeConfig } from "@/lib/game/modes/clocktower/lobby-config";
-import type { CodenamesModeConfig } from "@/lib/game/modes/codenames/lobby-config";
+import { GameMode } from "@/lib/types";
 
 export interface PublicLobbyPlayer {
   id: string;

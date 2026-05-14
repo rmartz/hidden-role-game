@@ -1,5 +1,6 @@
-import { GameStatus } from "@/lib/types";
 import type { Game } from "@/lib/types";
+import { GameStatus } from "@/lib/types";
+
 import type { SecretVillainTurnState } from "../types";
 
 /** Extracts the Secret Villain turn state from a playing game, or undefined. */

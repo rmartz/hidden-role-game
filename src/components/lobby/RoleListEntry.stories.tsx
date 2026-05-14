@@ -1,8 +1,10 @@
-import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { configureStore } from "@reduxjs/toolkit";
+import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { Provider } from "react-redux";
+
 import { GameMode, RoleConfigMode, Team } from "@/lib/types";
 import gameConfigReducer from "@/store/game-config-slice";
+
 import { RoleListEntry } from "./RoleListEntry";
 
 const meta = {

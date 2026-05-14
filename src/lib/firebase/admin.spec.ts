@@ -1,4 +1,4 @@
-import { afterEach, describe, it, expect, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 // Use the real admin.ts, not the global mock from firebase-admin-mock.ts setupFile
 vi.unmock("@/lib/firebase/admin");
