@@ -102,7 +102,7 @@ export function OwnerGameDayScreen({
   const knightedPlayerId = daytimePhase.knightedPlayerId;
 
   const martyrAssignment = gameState.visibleRoleAssignments.find(
-    (a) => a.role?.id === (WerewolfRole.Martyr as string),
+    (a) => a.role?.id === WerewolfRole.Martyr,
   );
   const martyrPlayer = martyrAssignment?.player;
   const noDeviceMartyrPlayerId =
