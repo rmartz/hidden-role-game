@@ -148,7 +148,11 @@ export const setNightTargetAction: GameAction = {
         ? getWerewolfRole(callerAssignment.roleDefinitionId)
         : undefined;
       if (callerRoleDef?.adjacentTargetOnly) {
-        const playerOrder = game.playerOrder ?? game.players.map((p) => p.id);
+        const rawOrder = game.playerOrder ?? game.players.map((p) => p.id);
+        // Exclude the narrator so a player seated next to the narrator still
+        // has two selectable neighbours, matching the pattern used by
+        // extractCountState and extractTheThingState.
+        const playerOrder = rawOrder.filter((id) => id !== game.ownerPlayerId);
         const idx = playerOrder.indexOf(callerId);
         if (idx === -1 || playerOrder.length < 2) return false;
         const left =

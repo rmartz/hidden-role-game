@@ -288,12 +288,14 @@ describe("buildNightPhaseOrder", () => {
     expect(turn2Order).not.toContain(WerewolfRole.Count);
   });
 
-  it("includes The Thing on every night", () => {
+  it("excludes The Thing on night 1 and includes it from night 2 onward", () => {
     const withThing = [
       { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
       { playerId: "t1", roleDefinitionId: WerewolfRole.TheThing },
     ];
-    expect(buildNightPhaseOrder(1, withThing)).toContain(WerewolfRole.TheThing);
+    expect(buildNightPhaseOrder(1, withThing)).not.toContain(
+      WerewolfRole.TheThing,
+    );
     expect(buildNightPhaseOrder(2, withThing)).toContain(WerewolfRole.TheThing);
   });
 });

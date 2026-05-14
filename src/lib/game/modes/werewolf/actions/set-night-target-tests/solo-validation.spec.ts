@@ -225,5 +225,17 @@ describe("WerewolfAction.SetNightTarget", () => {
         }),
       ).toBe(true);
     });
+
+    it("skips the narrator when computing adjacency so a player next to the narrator has two selectable neighbours", () => {
+      // playerOrder includes owner-1 between p1 and p2.
+      // Without filtering, p1's right neighbour would be owner-1 (untargetable),
+      // leaving p5 as the only selectable neighbour.
+      // With narrator filtered out, p1's neighbours are p5 (left) and p2 (right).
+      const game = makeThingGame(["p1", "owner-1", "p2", "p3", "p4", "p5"]);
+      expect(action.isValid(game, "p1", { targetPlayerId: "p2" })).toBe(true);
+      expect(action.isValid(game, "p1", { targetPlayerId: "p5" })).toBe(true);
+      // p3 is still not adjacent to p1 after narrator removal
+      expect(action.isValid(game, "p1", { targetPlayerId: "p3" })).toBe(false);
+    });
   });
 });
