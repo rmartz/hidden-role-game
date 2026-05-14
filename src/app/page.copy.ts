@@ -3,9 +3,9 @@ export const HOME_PAGE_COPY = {
   subtitle:
     "Host and play social deduction games with friends — no cards needed.",
   activeGame: "You have an active game in progress.",
-  rejoinGame: "Rejoin Game",
+  rejoinGame: "Rejoin game",
   activeLobby: (lobbyId: string) => `You are already in lobby: ${lobbyId}`,
-  rejoinLobby: "Rejoin Lobby",
+  rejoinLobby: "Rejoin lobby",
   orStartFresh: "or start fresh",
   errorPrefix: "Error: ",
   playerNameLabel: "Your name",
@@ -14,7 +14,7 @@ export const HOME_PAGE_COPY = {
   lobbyIdPlaceholder: "Enter a lobby ID",
   gameModeLabel: "Game",
   creating: "Creating\u2026",
-  createLobby: "Create Lobby",
+  createLobby: "Create lobby",
   joining: "Joining\u2026",
   joinLobby: "Join Lobby",
 } as const;
