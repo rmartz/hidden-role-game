@@ -155,7 +155,7 @@ export function OwnerGameNightScreen({
     : activeTargetConfirmed;
   const isWitchAbilitySkipped =
     isRoleActive(activePhaseKey, WerewolfRole.Witch) &&
-    turnState.witchAbilityUsed;
+    turnState.roleState?.witch?.abilityUsed;
 
   const activeRoleDef = modeConfig.roles[baseActivePhaseKey] as
     | WerewolfRoleDefinition
@@ -205,7 +205,7 @@ export function OwnerGameNightScreen({
     illusionTargetId,
   );
 
-  const exposerRevealData = turnState.exposerReveal;
+  const exposerRevealData = turnState.roleState?.exposer?.reveal;
   const exposerRevealText = exposerRevealData
     ? WEREWOLF_COPY.narrator.exposerRevealLabel(
         getPlayerName(gameState.players, exposerRevealData.playerId) ??
@@ -221,8 +221,9 @@ export function OwnerGameNightScreen({
     WerewolfRole.EvilEmpath,
   );
   const evilEmpathNightResult =
-    isEvilEmpathPhase && turnState.evilEmpathLastResult !== undefined
-      ? turnState.evilEmpathLastResult
+    isEvilEmpathPhase &&
+    turnState.roleState?.evilEmpath?.lastResult !== undefined
+      ? turnState.roleState.evilEmpath.lastResult
       : undefined;
 
   const unconfirmedWarning =
@@ -343,7 +344,7 @@ export function OwnerGameNightScreen({
           )}
           {isRoleActive(activePhaseKey, WerewolfRole.Mirrorcaster) && (
             <p className="mb-3 text-sm text-muted-foreground italic">
-              {turnState.mirrorcasterCharged
+              {turnState.roleState?.mirrorcaster?.charged
                 ? WEREWOLF_COPY.mirrorcaster.narratorAttackMode
                 : WEREWOLF_COPY.mirrorcaster.narratorProtectMode}
             </p>

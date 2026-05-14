@@ -18,8 +18,6 @@ function makeGame(
     playerOrder?: string[];
     turnState?: WerewolfTurnState;
     deadPlayerIds?: string[];
-    evilEmpathLastResult?: boolean;
-    evilEmpathRevealedResult?: boolean;
   } = {},
 ): Game {
   const deadPlayerIds = overrides.deadPlayerIds ?? [];
@@ -39,12 +37,6 @@ function makeGame(
       },
     },
     deadPlayerIds,
-    ...(overrides.evilEmpathLastResult !== undefined
-      ? { evilEmpathLastResult: overrides.evilEmpathLastResult }
-      : {}),
-    ...(overrides.evilEmpathRevealedResult !== undefined
-      ? { evilEmpathRevealedResult: overrides.evilEmpathRevealedResult }
-      : {}),
   };
 
   const roleAssignments = overrides.roleAssignments ?? [
@@ -253,7 +245,7 @@ describe("Evil Empath — extractPlayerNightState", () => {
     expect(result.evilEmpathNightResult).toBeUndefined();
   });
 
-  it("surfaces evilEmpathLastResult to the Evil Empath player as evilEmpathNightResult", () => {
+  it("surfaces roleState.evilEmpath.lastResult to the Evil Empath player as evilEmpathNightResult", () => {
     const game = makeGame({
       roleAssignments: [
         { playerId: "ee1", roleDefinitionId: WerewolfRole.EvilEmpath },
@@ -276,7 +268,7 @@ describe("Evil Empath — extractPlayerNightState", () => {
           },
         },
         deadPlayerIds: [],
-        evilEmpathLastResult: true,
+        roleState: { evilEmpath: { lastResult: true } },
       },
     });
     const result = extractPlayerNightState(game, "ee1", empathRole, []);
@@ -289,7 +281,7 @@ describe("Evil Empath — extractPlayerNightState", () => {
 // ---------------------------------------------------------------------------
 
 describe("Evil Empath — death reveal", () => {
-  it("sets evilEmpathRevealedResult when Evil Empath is killed via KillPlayer", () => {
+  it("sets roleState.evilEmpath.revealedResult when Evil Empath is killed via KillPlayer", () => {
     const killAction = WEREWOLF_ACTIONS[WerewolfAction.KillPlayer];
     const ts: WerewolfTurnState = {
       turn: 2,
@@ -299,16 +291,16 @@ describe("Evil Empath — death reveal", () => {
         nightActions: {},
       },
       deadPlayerIds: [],
-      evilEmpathLastResult: true,
+      roleState: { evilEmpath: { lastResult: true } },
     };
     const game = makeGame({ turnState: ts });
     killAction.apply(game, { playerId: "ee1" }, "owner-1");
     const updatedTs = (game.status as { turnState: WerewolfTurnState })
       .turnState;
-    expect(updatedTs.evilEmpathRevealedResult).toBe(true);
+    expect(updatedTs.roleState?.evilEmpath?.revealedResult).toBe(true);
   });
 
-  it("does not set evilEmpathRevealedResult when a non-Evil-Empath player is killed", () => {
+  it("does not set roleState.evilEmpath.revealedResult when a non-Evil-Empath player is killed", () => {
     const killAction = WEREWOLF_ACTIONS[WerewolfAction.KillPlayer];
     const ts: WerewolfTurnState = {
       turn: 2,
@@ -318,7 +310,7 @@ describe("Evil Empath — death reveal", () => {
         nightActions: {},
       },
       deadPlayerIds: [],
-      evilEmpathLastResult: true,
+      roleState: { evilEmpath: { lastResult: true } },
     };
     const game = makeGame({ turnState: ts });
     // Kill v2 — evil empath (bad) + wolf1 (bad) vs seer1+v1+v3+ee1 → not game over
@@ -327,10 +319,10 @@ describe("Evil Empath — death reveal", () => {
       game.status as { type: string; turnState?: WerewolfTurnState }
     ).turnState;
     expect(updatedTs).toBeDefined();
-    expect(updatedTs?.evilEmpathRevealedResult).toBeUndefined();
+    expect(updatedTs?.roleState?.evilEmpath?.revealedResult).toBeUndefined();
   });
 
-  it("does not overwrite evilEmpathRevealedResult if already set", () => {
+  it("does not overwrite roleState.evilEmpath.revealedResult if already set", () => {
     const killAction = WEREWOLF_ACTIONS[WerewolfAction.KillPlayer];
     const ts: WerewolfTurnState = {
       turn: 2,
@@ -340,16 +332,15 @@ describe("Evil Empath — death reveal", () => {
         nightActions: {},
       },
       deadPlayerIds: [],
-      evilEmpathLastResult: false,
-      evilEmpathRevealedResult: true, // already set from a night death
+      roleState: { evilEmpath: { lastResult: false, revealedResult: true } }, // already set from a night death
     };
     const game = makeGame({ turnState: ts });
-    // Kill v2 — game continues, evilEmpathRevealedResult should stay true
+    // Kill v2 — game continues, revealedResult should stay true
     killAction.apply(game, { playerId: "v2" }, "owner-1");
     const updatedTs = (
       game.status as { type: string; turnState?: WerewolfTurnState }
     ).turnState;
     expect(updatedTs).toBeDefined();
-    expect(updatedTs?.evilEmpathRevealedResult).toBe(true);
+    expect(updatedTs?.roleState?.evilEmpath?.revealedResult).toBe(true);
   });
 });

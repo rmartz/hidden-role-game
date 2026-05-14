@@ -20,25 +20,38 @@ export function cleanupAfterDaytimeKill(
   ts: WerewolfTurnState,
   game: Game,
 ): void {
-  if (ts.oneEyedSeerLockedTargetId === killedPlayerId) {
-    ts.oneEyedSeerLockedTargetId = undefined;
+  const rs = ts.roleState;
+  if (rs?.oneEyedSeer?.lockedTargetId === killedPlayerId) {
+    ts.roleState = { ...rs, oneEyedSeer: undefined };
   }
-  if (ts.priestWards && killedPlayerId in ts.priestWards) {
+  const wards = ts.roleState?.priest?.wards;
+  if (wards && killedPlayerId in wards) {
     const remaining = Object.fromEntries(
-      Object.entries(ts.priestWards).filter(([id]) => id !== killedPlayerId),
+      Object.entries(wards).filter(([id]) => id !== killedPlayerId),
     );
-    ts.priestWards = Object.keys(remaining).length > 0 ? remaining : undefined;
+    ts.roleState = {
+      ...(ts.roleState ?? {}),
+      priest:
+        Object.keys(remaining).length > 0 ? { wards: remaining } : undefined,
+    };
   }
   // Evil Empath: when the Evil Empath is killed during the day, reveal their
   // last adjacency result to Werewolves.
   const evilEmpathId = game.roleAssignments.find(
     (a) => a.roleDefinitionId === (WerewolfRole.EvilEmpath as string),
   )?.playerId;
+  const evilEmpathState = ts.roleState?.evilEmpath;
   if (
     evilEmpathId === killedPlayerId &&
-    ts.evilEmpathLastResult !== undefined &&
-    ts.evilEmpathRevealedResult === undefined
+    evilEmpathState?.lastResult !== undefined &&
+    evilEmpathState.revealedResult === undefined
   ) {
-    ts.evilEmpathRevealedResult = ts.evilEmpathLastResult;
+    ts.roleState = {
+      ...ts.roleState,
+      evilEmpath: {
+        ...evilEmpathState,
+        revealedResult: evilEmpathState.lastResult,
+      },
+    };
   }
 }

@@ -22,6 +22,20 @@ function makeEmpathGame(
     evilEmpathRevealedResult?: boolean;
   } = {},
 ): Game {
+  const evilEmpathRoleState =
+    overrides.evilEmpathLastResult !== undefined ||
+    overrides.evilEmpathRevealedResult !== undefined
+      ? {
+          evilEmpath: {
+            ...(overrides.evilEmpathLastResult !== undefined
+              ? { lastResult: overrides.evilEmpathLastResult }
+              : {}),
+            ...(overrides.evilEmpathRevealedResult !== undefined
+              ? { revealedResult: overrides.evilEmpathRevealedResult }
+              : {}),
+          },
+        }
+      : {};
   const turnState: WerewolfTurnState = {
     turn: 2,
     phase: {
@@ -32,11 +46,8 @@ function makeEmpathGame(
       nightActions: {},
     },
     deadPlayerIds: overrides.deadPlayerIds ?? [],
-    ...(overrides.evilEmpathLastResult !== undefined
-      ? { evilEmpathLastResult: overrides.evilEmpathLastResult }
-      : {}),
-    ...(overrides.evilEmpathRevealedResult !== undefined
-      ? { evilEmpathRevealedResult: overrides.evilEmpathRevealedResult }
+    ...(Object.keys(evilEmpathRoleState).length > 0
+      ? { roleState: evilEmpathRoleState }
       : {}),
   };
   return {
@@ -105,28 +116,28 @@ describe("WerewolfAction.ConfirmEvilEmpathResult — isValid", () => {
 });
 
 describe("WerewolfAction.ConfirmEvilEmpathResult — adjacency (apply)", () => {
-  it("sets evilEmpathLastResult=true when Seer is adjacent to a living Werewolf", () => {
+  it("sets evilEmpath.lastResult=true when Seer is adjacent to a living Werewolf", () => {
     // playerOrder: [w1, p2(Seer), p3, p4] → p2 neighbors are w1 (wolf) and p3 (villager)
     const game = makeEmpathGame();
     action.apply(game, null, "owner-1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.evilEmpathLastResult).toBe(true);
+    expect(ts.roleState?.evilEmpath?.lastResult).toBe(true);
   });
 
-  it("sets evilEmpathLastResult=false when Seer has no adjacent living Werewolf", () => {
+  it("sets evilEmpath.lastResult=false when Seer has no adjacent living Werewolf", () => {
     // Reorder so Seer is between two Villagers: [p3, p2(Seer), p4, w1]
     const game = makeEmpathGame({ playerOrder: ["p3", "p2", "p4", "w1"] });
     action.apply(game, null, "owner-1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.evilEmpathLastResult).toBe(false);
+    expect(ts.roleState?.evilEmpath?.lastResult).toBe(false);
   });
 
-  it("sets evilEmpathLastResult=false when the adjacent Werewolf is dead", () => {
+  it("sets evilEmpath.lastResult=false when the adjacent Werewolf is dead", () => {
     // Wolf is next to Seer but already dead.
     const game = makeEmpathGame({ deadPlayerIds: ["w1"] });
     action.apply(game, null, "owner-1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.evilEmpathLastResult).toBe(false);
+    expect(ts.roleState?.evilEmpath?.lastResult).toBe(false);
   });
 
   it("wraps around the seating ring for adjacency", () => {
@@ -134,7 +145,7 @@ describe("WerewolfAction.ConfirmEvilEmpathResult — adjacency (apply)", () => {
     const game = makeEmpathGame({ playerOrder: ["p2", "p3", "p4", "w1"] });
     action.apply(game, null, "owner-1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.evilEmpathLastResult).toBe(true);
+    expect(ts.roleState?.evilEmpath?.lastResult).toBe(true);
   });
 
   it("marks the night action as confirmed and resultRevealed", () => {
@@ -156,6 +167,6 @@ describe("WerewolfAction.ConfirmEvilEmpathResult — adjacency (apply)", () => {
     const game = makeEmpathGame({ playerOrder: [] });
     action.apply(game, null, "owner-1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.evilEmpathLastResult).toBe(false);
+    expect(ts.roleState?.evilEmpath?.lastResult).toBe(false);
   });
 });

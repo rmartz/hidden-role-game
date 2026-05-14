@@ -52,6 +52,8 @@ export function buildInitialTurnState(
     turn: 1,
     phase,
     deadPlayerIds: [],
-    ...(executionerTargetId ? { executionerTargetId } : {}),
+    ...(executionerTargetId
+      ? { roleState: { executioner: { targetId: executionerTargetId } } }
+      : {}),
   };
 }

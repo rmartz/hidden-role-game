@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import type { WerewolfTurnState } from "../../types";
 import { WerewolfRole } from "../../roles";
 import { WerewolfAction, WEREWOLF_ACTIONS } from "../index";
 import {
@@ -120,6 +121,60 @@ describe("WerewolfAction.SetNightTarget", () => {
           targetPlayerId: "p3",
         }),
       ).toBe(true);
+    });
+
+    it("returns false for Monarch after 3 knightings have been used", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightPhaseOrder: [WerewolfRole.Monarch],
+          currentPhaseIndex: 0,
+        }),
+        {
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Monarch },
+            { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p5", roleDefinitionId: WerewolfRole.Werewolf },
+          ],
+        },
+      );
+      (
+        game.status as {
+          turnState: WerewolfTurnState;
+        }
+      ).turnState.roleState = {
+        monarch: { knightedPlayerIds: [], knightingsUsed: 3 },
+      };
+      expect(action.isValid(game, "p2", { targetPlayerId: "p3" })).toBe(false);
+    });
+
+    it("returns false for Monarch when targeting an already knighted player", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightPhaseOrder: [WerewolfRole.Monarch],
+          currentPhaseIndex: 0,
+        }),
+        {
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Monarch },
+            { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p5", roleDefinitionId: WerewolfRole.Werewolf },
+          ],
+        },
+      );
+      (
+        game.status as {
+          turnState: WerewolfTurnState;
+        }
+      ).turnState.roleState = {
+        monarch: { knightedPlayerIds: ["p3"], knightingsUsed: 0 },
+      };
+      expect(action.isValid(game, "p2", { targetPlayerId: "p3" })).toBe(false);
     });
   });
 });

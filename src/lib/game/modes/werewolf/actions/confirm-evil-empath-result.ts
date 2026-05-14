@@ -33,7 +33,13 @@ export const confirmEvilEmpathResultAction: GameAction = {
       confirmed: true,
       resultRevealed: true,
     };
-    ts.evilEmpathLastResult = isAdjacent;
+    ts.roleState = {
+      ...ts.roleState,
+      evilEmpath: {
+        ...ts.roleState?.evilEmpath,
+        lastResult: isAdjacent,
+      },
+    };
   },
 };
 

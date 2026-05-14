@@ -23,7 +23,7 @@ export const killPlayerAction: GameAction = {
     const { playerId } = payload as { playerId: string };
     ts.deadPlayerIds = [...ts.deadPlayerIds, playerId];
     if (didWolfCubDie([playerId], game)) {
-      ts.wolfCubDied = true;
+      ts.roleState = { ...(ts.roleState ?? {}), wolfCub: { died: true } };
     }
     cleanupAfterDaytimeKill(playerId, ts, game);
     const winResult = checkWinCondition(game, ts.deadPlayerIds);

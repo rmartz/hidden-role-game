@@ -8,7 +8,7 @@ import { WerewolfRole } from "../roles";
  * result will be inverted for this night only.
  * The confirmation step is handled by the generic confirmNightTargetAction.
  * At start-day, the confirmed target is lifted out of nightActions into
- * illusionTargetId on the turn state for use in Seer result resolution.
+ * roleState.illusionArtist.illusionTargetId for use in Seer result resolution.
  */
 export const setIllusionTargetAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {
