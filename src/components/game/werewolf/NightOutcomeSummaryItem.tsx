@@ -5,12 +5,14 @@ interface NightOutcomeSummaryItemProps {
   playerName: string;
   events?: NightResolutionEvent[];
   roles: Record<string, { name: string }>;
+  knighted?: boolean;
 }
 
 export function NightOutcomeSummaryItem({
   playerName,
   events,
   roles,
+  knighted = false,
 }: NightOutcomeSummaryItemProps) {
   const silenced = events?.some((event) => event.type === "silenced");
   const killedEvent = events?.find((event) => event.type === "killed");
@@ -58,6 +60,9 @@ export function NightOutcomeSummaryItem({
       )}
       {silenced && (
         <span className="ml-1 text-yellow-600 font-medium">(silenced)</span>
+      )}
+      {knighted && (
+        <span className="ml-1 text-blue-600 font-medium">(knighted)</span>
       )}
     </>
   );

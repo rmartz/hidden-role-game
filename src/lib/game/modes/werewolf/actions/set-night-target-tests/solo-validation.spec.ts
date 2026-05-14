@@ -121,6 +121,56 @@ describe("WerewolfAction.SetNightTarget", () => {
         }),
       ).toBe(true);
     });
+
+    it("returns false for Monarch after 3 knightings have been used", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightPhaseOrder: [WerewolfRole.Monarch],
+          currentPhaseIndex: 0,
+        }),
+        {
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Monarch },
+            { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p5", roleDefinitionId: WerewolfRole.Werewolf },
+          ],
+        },
+      );
+      (
+        game.status as {
+          turnState: { monarchKnightingsUsed?: number };
+        }
+      ).turnState.monarchKnightingsUsed = 3;
+      expect(action.isValid(game, "p2", { targetPlayerId: "p3" })).toBe(false);
+    });
+
+    it("returns false for Monarch when targeting an already knighted player", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightPhaseOrder: [WerewolfRole.Monarch],
+          currentPhaseIndex: 0,
+        }),
+        {
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Monarch },
+            { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p5", roleDefinitionId: WerewolfRole.Werewolf },
+          ],
+        },
+      );
+      (
+        game.status as {
+          turnState: { monarchKnightedPlayerIds?: string[] };
+        }
+      ).turnState.monarchKnightedPlayerIds = ["p3"];
+      expect(action.isValid(game, "p2", { targetPlayerId: "p3" })).toBe(false);
+    });
   });
 
   describe("isValid — Veteran", () => {

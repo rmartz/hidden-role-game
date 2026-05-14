@@ -14,14 +14,16 @@ interface NightOutcomeSummaryProps {
   events: NightResolutionEvent[];
   players: { id: string; name: string }[];
   roles: Record<string, { name: string }>;
+  knightedPlayerId?: string;
 }
 
 export function NightOutcomeSummary({
   events,
   players,
   roles,
+  knightedPlayerId,
 }: NightOutcomeSummaryProps) {
-  if (events.length === 0) return null;
+  if (events.length === 0 && !knightedPlayerId) return null;
 
   const altruistIntercept = events.find(
     (e): e is AltruistInterceptedNightResolutionEvent =>
@@ -57,6 +59,13 @@ export function NightOutcomeSummary({
   // Group events by targetPlayerId so a player attacked and silenced in the
   // same night is represented by a single list item.
   const eventsPerPlayer = groupBy(regularEvents, "targetPlayerId");
+  const targetPlayerIds = Object.keys(eventsPerPlayer);
+  if (
+    knightedPlayerId !== undefined &&
+    eventsPerPlayer[knightedPlayerId] === undefined
+  ) {
+    targetPlayerIds.push(knightedPlayerId);
+  }
 
   return (
     <div className="mb-4 rounded-md border p-3">
@@ -98,19 +107,20 @@ export function NightOutcomeSummary({
               </li>
             );
           })}
-        {Object.entries(eventsPerPlayer)
+        {targetPlayerIds
           .filter(
-            ([targetPlayerId]) =>
+            (targetPlayerId) =>
               !veteranCounterkilledPlayerIds.has(targetPlayerId),
           )
-          .map(([targetPlayerId, events]) => (
+          .map((targetPlayerId) => (
             <li key={targetPlayerId}>
               <NightOutcomeSummaryItem
                 playerName={
                   getPlayerName(players, targetPlayerId) ?? targetPlayerId
                 }
-                events={events}
+                events={eventsPerPlayer[targetPlayerId]}
                 roles={roles}
+                knighted={targetPlayerId === knightedPlayerId}
               />
             </li>
           ))}

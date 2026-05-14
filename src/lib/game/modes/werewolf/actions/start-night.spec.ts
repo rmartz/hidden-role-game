@@ -372,6 +372,28 @@ describe("StartNight — Mirrorcaster charge persistence", () => {
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
     expect(ts.morticianAbilityEnded).toBeUndefined();
   });
+
+  it("carries Monarch knighting fields forward to next night", () => {
+    const game = makePlayingGame({
+      ...dayTurnState,
+      monarchKnightedPlayerIds: ["p2", "p3"],
+      monarchKnightingsUsed: 2,
+    });
+    startNightAction.apply(game, null, "owner-1");
+
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.monarchKnightedPlayerIds).toEqual(["p2", "p3"]);
+    expect(ts.monarchKnightingsUsed).toBe(2);
+  });
+
+  it("does not carry Monarch knighting fields when absent", () => {
+    const game = makePlayingGame(dayTurnState);
+    startNightAction.apply(game, null, "owner-1");
+
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.monarchKnightedPlayerIds).toBeUndefined();
+    expect(ts.monarchKnightingsUsed).toBeUndefined();
+  });
 });
 
 describe("StartNight — veteranAlertsUsed persistence", () => {

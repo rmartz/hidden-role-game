@@ -290,4 +290,15 @@ describe("extractDaytimeNightSummary", () => {
       { targetPlayerId: "p3", effect: "silenced" },
     ]);
   });
+
+  it("includes monarch knighting in daytime night summary", () => {
+    const game = makeDaytimeGame({
+      knightedPlayerId: "p3",
+      nightResolution: [],
+    });
+    const result = extractDaytimeState(game, "p1");
+    expect(result.nightStatus).toEqual([
+      { targetPlayerId: "p3", effect: "knighted" },
+    ]);
+  });
 });

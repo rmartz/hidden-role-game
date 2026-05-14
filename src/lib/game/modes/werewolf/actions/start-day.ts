@@ -63,6 +63,38 @@ export const startDayAction: GameAction = {
         ? oldManAssignment.playerId
         : undefined;
 
+    const monarchAction = nightPhase.nightActions[WerewolfRole.Monarch];
+    const targetKnightedTonight =
+      monarchAction &&
+      !isTeamNightAction(monarchAction) &&
+      monarchAction.targetPlayerId !== undefined
+        ? monarchAction.targetPlayerId
+        : undefined;
+    const previousMonarchKnightingsUsed = ts.monarchKnightingsUsed ?? 0;
+    const previousMonarchKnightedPlayerIds = ts.monarchKnightedPlayerIds ?? [];
+    const monarchCanKnight =
+      targetKnightedTonight !== undefined &&
+      previousMonarchKnightingsUsed < 3 &&
+      !previousMonarchKnightedPlayerIds.includes(targetKnightedTonight);
+    const monarchKnightedPlayerIds = monarchCanKnight
+      ? [
+          ...new Set([
+            ...previousMonarchKnightedPlayerIds,
+            targetKnightedTonight,
+          ]),
+        ]
+      : previousMonarchKnightedPlayerIds;
+    const monarchKnightingsUsed = monarchCanKnight
+      ? previousMonarchKnightingsUsed + 1
+      : previousMonarchKnightingsUsed;
+    const knightedPlayerId = monarchCanKnight
+      ? targetKnightedTonight
+      : undefined;
+    const monarchPlayerId = game.roleAssignments.find(
+      (assignment) =>
+        assignment.roleDefinitionId === (WerewolfRole.Monarch as string),
+    )?.playerId;
+
     const nightResolution = resolveNightActions(
       nightPhase.nightActions,
       game.roleAssignments,
@@ -73,11 +105,20 @@ export const startDayAction: GameAction = {
         toughGuyHitIds: ts.toughGuyHitIds,
         ...(oldManTimerPlayerId ? { oldManTimerPlayerId } : {}),
         ...(ts.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
+        ...(monarchPlayerId
+          ? {
+              monarchProtection: {
+                monarchPlayerId,
+                monarchKnightedPlayerIds,
+              },
+            }
+          : {}),
         ...(ts.arsonistDousedPlayerIds?.length
           ? { arsonistDousedPlayerIds: ts.arsonistDousedPlayerIds }
           : {}),
       },
     );
+
     const newDeadIds: string[] = nightResolution
       .filter(
         (e): e is AttackNightResolutionEvent => e.type === "killed" && e.died,
@@ -378,6 +419,7 @@ export const startDayAction: GameAction = {
           nightActions: nightPhase.nightActions,
           revealedPlayerIds,
           ...(nightResolution.length > 0 ? { nightResolution } : {}),
+          ...(knightedPlayerId !== undefined ? { knightedPlayerId } : {}),
           ...(nightPhase.smitedPlayerIds?.length
             ? { smitedPlayerIds: nightPhase.smitedPlayerIds }
             : {}),
@@ -395,6 +437,10 @@ export const startDayAction: GameAction = {
           ? { hunterRevengePlayerId: hunterAssignment.playerId }
           : {}),
         ...(morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),
+        ...(monarchKnightedPlayerIds.length > 0
+          ? { monarchKnightedPlayerIds }
+          : {}),
+        ...(monarchKnightingsUsed > 0 ? { monarchKnightingsUsed } : {}),
         ...(ts.executionerTargetId
           ? { executionerTargetId: ts.executionerTargetId }
           : {}),

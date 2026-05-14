@@ -63,6 +63,11 @@ export const setNightTargetAction: GameAction = {
         ts.morticianAbilityEnded
       )
         return false;
+      if (
+        isRoleActive(phaseKey, WerewolfRole.Monarch) &&
+        (ts.monarchKnightingsUsed ?? 0) >= 3
+      )
+        return false;
     }
 
     // Veteran: only alert (alerted: true) or skip/clear (null/undefined) are valid.
@@ -88,6 +93,11 @@ export const setNightTargetAction: GameAction = {
     if (targetPlayerId === game.ownerPlayerId) return false;
     if (!game.players.some((p) => p.id === targetPlayerId)) return false;
     if (ts.deadPlayerIds.includes(targetPlayerId)) return false;
+    if (
+      isRoleActive(phaseKey, WerewolfRole.Monarch) &&
+      (ts.monarchKnightedPlayerIds ?? []).includes(targetPlayerId)
+    )
+      return false;
 
     // Suffixed repeat group phases (e.g. Wolf Cub bonus attack) cannot pick the
     // same target as the base phase confirmed earlier this same night.
