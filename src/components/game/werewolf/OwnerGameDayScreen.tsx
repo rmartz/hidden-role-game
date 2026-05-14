@@ -6,6 +6,7 @@ import { GAME_MODES } from "@/lib/game/modes";
 import {
   WerewolfAction,
   WerewolfPhase,
+  WerewolfRole,
   getOrderedAffectedPlayers,
 } from "@/lib/game/modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
@@ -100,6 +101,16 @@ export function OwnerGameDayScreen({
       nextToReveal.playerId);
   const knightedPlayerId = daytimePhase.knightedPlayerId;
 
+  const martyrAssignment = gameState.visibleRoleAssignments.find(
+    (a) => a.role?.id === (WerewolfRole.Martyr as string),
+  );
+  const martyrPlayer = martyrAssignment?.player;
+  const noDeviceMartyrPlayerId =
+    martyrPlayer?.noDevice === true &&
+    !(gameState.deadPlayerIds ?? []).includes(martyrPlayer.id)
+      ? martyrPlayer.id
+      : undefined;
+
   return (
     <div className="p-5 max-w-4xl mx-auto">
       <div className="flex items-start justify-between mb-4">
@@ -170,6 +181,7 @@ export function OwnerGameDayScreen({
               autoAdvance={autoAdvance}
               pendingGuiltId={pendingGuiltId}
               martyrUsed={turnState.martyrUsed}
+              noDeviceMartyrPlayerId={noDeviceMartyrPlayerId}
             />
           )}
         </OwnerAdvanceCard>

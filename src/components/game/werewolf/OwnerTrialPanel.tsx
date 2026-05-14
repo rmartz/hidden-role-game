@@ -24,6 +24,8 @@ interface OwnerTrialPanelProps {
   autoAdvance: boolean;
   pendingGuiltId?: string;
   martyrUsed?: boolean;
+  /** ID of the Martyr player if they are a no-device player and still alive; undefined otherwise. */
+  noDeviceMartyrPlayerId?: string;
 }
 
 export function OwnerTrialPanel({
@@ -36,6 +38,7 @@ export function OwnerTrialPanel({
   autoAdvance,
   pendingGuiltId,
   martyrUsed,
+  noDeviceMartyrPlayerId,
 }: OwnerTrialPanelProps) {
   const action = useGameAction(gameId);
   const defendant = players.find((p) => p.id === activeTrial.defendantId);
@@ -118,7 +121,9 @@ export function OwnerTrialPanel({
               >
                 {trial.advanceToSentencing}
               </Button>
-              {!martyrUsed && (
+              {noDeviceMartyrPlayerId &&
+                !martyrUsed &&
+                noDeviceMartyrPlayerId !== pendingGuiltId && (
                 <Button
                   size="sm"
                   variant="destructive"

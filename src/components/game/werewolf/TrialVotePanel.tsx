@@ -92,6 +92,7 @@ export function TrialVotePanel({
   const trialPauseOffset = activeTrial.pauseOffset ?? 0;
   const canUseMartyrAbility =
     isMartyr &&
+    !amDead &&
     !martyrUsed &&
     !isDefendant &&
     pendingGuiltId === activeTrial.defendantId;
