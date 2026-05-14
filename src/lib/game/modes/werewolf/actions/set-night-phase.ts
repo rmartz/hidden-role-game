@@ -27,7 +27,9 @@ export const setNightPhaseAction: GameAction = {
     const phase = ts.phase as WerewolfNighttimePhase;
     const departingPhaseKey = phase.nightPhaseOrder[phase.currentPhaseIndex];
     // Auto-compute the Evil Empath adjacency result whenever departing the
-    // Evil Empath phase. We skip only if the action was already confirmed
+    // Evil Empath phase. The computation must happen BEFORE the phase index
+    // is advanced so the narrator can see the result while the Evil Empath
+    // phase is still active. We skip only if the action was already confirmed
     // via confirmEvilEmpathResultAction (indicated by resultRevealed being
     // set), because the generic set-night-target/confirm-night-target flow
     // can produce a confirmed action without computing the result.
@@ -44,12 +46,16 @@ export const setNightPhaseAction: GameAction = {
     ) {
       confirmEvilEmpathResultAction.apply(game, {}, "");
     }
+    // Re-read turnState after confirmEvilEmpathResultAction may have mutated it.
+    const updatedTs = currentTurnState(game);
+    if (!updatedTs) return;
+    const updatedPhase = updatedTs.phase as WerewolfNighttimePhase;
     game.status = {
       type: GameStatus.Playing,
       turnState: {
-        ...ts,
+        ...updatedTs,
         phase: {
-          ...phase,
+          ...updatedPhase,
           currentPhaseIndex: phaseIndex,
           startedAt: Date.now(),
           pausedAt: undefined,

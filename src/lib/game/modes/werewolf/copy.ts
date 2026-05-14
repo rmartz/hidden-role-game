@@ -304,6 +304,7 @@ export const WEREWOLF_COPY = {
   evilEmpath: {
     adjacentResult: "Yes — the Seer is adjacent to a Werewolf.",
     notAdjacentResult: "No — the Seer is not adjacent to a Werewolf.",
+    waitingForResult: "Waiting for the Narrator to reveal the result.",
     revealedToWerewolves: (result: boolean) =>
       result
         ? "The Evil Empath revealed: Seer was adjacent to a Werewolf."

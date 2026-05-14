@@ -86,6 +86,11 @@ export const startNightAction: GameAction = {
       ...(aliveDousedPlayerIds.length > 0
         ? { arsonist: { dousedPlayerIds: aliveDousedPlayerIds } }
         : {}),
+      // Evil Empath: carry revealedResult forward so Werewolves continue to see it
+      // after the death-reveal is set. lastResult is night-specific and not carried forward.
+      ...(rs.evilEmpath?.revealedResult !== undefined
+        ? { evilEmpath: { revealedResult: rs.evilEmpath.revealedResult } }
+        : {}),
       // wolfCub.died is intentionally NOT carried forward — consumed by this night's bonus phase
     };
 

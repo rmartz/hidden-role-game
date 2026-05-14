@@ -223,13 +223,21 @@ export const startDayAction: GameAction = {
         : undefined;
 
     // Evil Empath: if the Evil Empath was the last (active) night phase and the
-    // result was never computed (e.g. narrator advanced directly to start-day),
+    // result was never computed (e.g. narrator advanced directly to start-day,
+    // or the generic skip/confirm flow set confirmed without resultRevealed),
     // auto-compute it now — same guard used in setNightPhaseAction.
     const finalPhaseKey =
       nightPhase.nightPhaseOrder[nightPhase.currentPhaseIndex];
+    const finalPhaseAction = nightPhase.nightActions[finalPhaseKey ?? ""];
+    const evilEmpathAlreadyComputed =
+      finalPhaseKey === (WerewolfRole.EvilEmpath as string) &&
+      finalPhaseAction &&
+      !("votes" in finalPhaseAction) &&
+      finalPhaseAction.confirmed === true &&
+      finalPhaseAction.resultRevealed === true;
     if (
       finalPhaseKey === (WerewolfRole.EvilEmpath as string) &&
-      !nightPhase.nightActions[finalPhaseKey]?.confirmed
+      !evilEmpathAlreadyComputed
     ) {
       confirmEvilEmpathResultAction.apply(game, {}, "");
     }

@@ -201,7 +201,7 @@ Additional resolution steps:
 
 **Who:** Narrator only
 **When:** During Daytime
-**Effect:** Immediately kills a player (for in-person trials). Checks win condition. Clears One-Eyed Seer lock and Priest wards for the killed player. If the killed player is the Evil Empath and a `evilEmpathLastResult` is recorded, sets `evilEmpathRevealedResult` so Werewolves see the result.
+**Effect:** Immediately kills a player (for in-person trials). Checks win condition. Clears One-Eyed Seer lock and Priest wards for the killed player. If the killed player is the Evil Empath and `roleState.evilEmpath.lastResult` is recorded, sets `roleState.evilEmpath.revealedResult` so Werewolves see the result.
 
 **Payload:** `{ playerId: string }`
 
@@ -228,7 +228,7 @@ Additional resolution steps:
 
 **Who:** Narrator only
 **When:** During Nighttime, during the Evil Empath's phase
-**Effect:** Auto-computes whether the Seer is seated adjacent (circular seating order in `game.playerOrder`) to any living player with `roleDef.isWerewolf === true`. Stores the boolean result in `evilEmpathLastResult` on the turn state, marks the Evil Empath's night action as `confirmed` and `resultRevealed`. The result is surfaced to the Evil Empath player as `evilEmpathNightResult` in their player state (only while the action is confirmed, to prevent showing a stale result at the start of a new night). When the Evil Empath dies (night via `start-day`, or day via `kill-player`, `resolve-trial`, `resolve-hunter-revenge`), `evilEmpathRevealedResult` is set on the turn state so Werewolves see it in their group phase state.
+**Effect:** Auto-computes whether the Seer is seated adjacent (circular seating order in `game.playerOrder`) to any living player with `roleDef.isWerewolf === true`. Stores the boolean result in `roleState.evilEmpath.lastResult` on the turn state, marks the Evil Empath's night action as `confirmed` and `resultRevealed`. The result is surfaced to the Evil Empath player as `evilEmpathNightResult` in their player state (only while the action is confirmed, to prevent showing a stale result at the start of a new night). When the Evil Empath dies (night via `start-day`, or day via `kill-player`, `resolve-trial`, `resolve-hunter-revenge`), `roleState.evilEmpath.revealedResult` is set on the turn state so Werewolves see it in their group phase state.
 
 **Payload:** none
 

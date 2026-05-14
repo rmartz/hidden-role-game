@@ -9,6 +9,12 @@ import { WerewolfRole } from "../roles";
  * The confirmation step is handled by the generic confirmNightTargetAction.
  * At start-day, the confirmed target is lifted out of nightActions into
  * roleState.illusionArtist.illusionTargetId for use in Seer result resolution.
+ *
+ * Skip / deselect path: this action only accepts a valid targetPlayerId — it
+ * cannot clear an already-set target or represent a skip. To deselect or skip,
+ * the client must use the generic setNightTargetAction with `targetPlayerId:
+ * null` (skipped: true). The Illusion Artist phase is optional, so skipping via
+ * that path is always valid.
  */
 export const setIllusionTargetAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {

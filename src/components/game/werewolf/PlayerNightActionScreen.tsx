@@ -98,6 +98,9 @@ export function PlayerNightActionScreen({
 
   const isAltruist =
     !isGroupPhase && gameState.myRole?.id === WerewolfRole.Altruist;
+  const isEvilEmpath =
+    !isGroupPhase &&
+    gameState.myRole?.id === (WerewolfRole.EvilEmpath as string);
 
   const isExposerAbilityUsed =
     !isGroupPhase &&
@@ -169,7 +172,15 @@ export function PlayerNightActionScreen({
             {WEREWOLF_COPY.oneEyedSeer.locked(oesLockedTargetName)}
           </p>
         )}
-        {isAltruist ? (
+        {isEvilEmpath ? (
+          <p className="text-sm text-muted-foreground mb-3 italic">
+            {evilEmpathNightResult !== undefined
+              ? evilEmpathNightResult
+                ? WEREWOLF_COPY.evilEmpath.adjacentResult
+                : WEREWOLF_COPY.evilEmpath.notAdjacentResult
+              : WEREWOLF_COPY.evilEmpath.waitingForResult}
+          </p>
+        ) : isAltruist ? (
           <AltruistActionPanel
             gameId={gameId}
             players={gameState.players}
@@ -241,13 +252,6 @@ export function PlayerNightActionScreen({
             resultLabel={investigationResult.resultLabel}
             secondTargetName={investigationResult.secondTargetName}
           />
-        )}
-        {evilEmpathNightResult !== undefined && (
-          <p className="mt-3 text-sm font-medium">
-            {evilEmpathNightResult
-              ? WEREWOLF_COPY.evilEmpath.adjacentResult
-              : WEREWOLF_COPY.evilEmpath.notAdjacentResult}
-          </p>
         )}
         {evilEmpathRevealedResult !== undefined && (
           <p className="mt-3 text-sm font-medium">

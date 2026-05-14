@@ -17,7 +17,15 @@ export const confirmEvilEmpathResultAction: GameAction = {
     const phase = ts.phase;
     const activePhaseKey = phase.nightPhaseOrder[phase.currentPhaseIndex];
     if (activePhaseKey !== (WerewolfRole.EvilEmpath as string)) return false;
-    return !phase.nightActions[activePhaseKey]?.confirmed;
+    // Allow recomputing if the action was confirmed via the generic flow
+    // (confirmed but not resultRevealed — no adjacency result computed yet).
+    const existingAction = phase.nightActions[activePhaseKey];
+    const alreadyComputed =
+      existingAction &&
+      !("votes" in existingAction) &&
+      existingAction.confirmed === true &&
+      existingAction.resultRevealed === true;
+    return !alreadyComputed;
   },
   apply(game: Game) {
     const ts = currentTurnState(game);
