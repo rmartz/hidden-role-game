@@ -7,7 +7,7 @@ import {
 } from "@/lib/game/modes";
 import { GameMode } from "@/lib/types";
 import { addLobby } from "@/server/lobby";
-import { type CreateLobbyRequest,ServerResponseStatus } from "@/server/types";
+import { type CreateLobbyRequest, ServerResponseStatus } from "@/server/types";
 import {
   errorResponse,
   normalizeDisplayName,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect,useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { GameRolesList, PlayersRoleList } from "@/components/game";
 import { RoleLabel } from "@/components/RoleLabel";
@@ -9,7 +9,7 @@ import { GAME_MODES } from "@/lib/game/modes";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
-import { GameMode,GameStatus } from "@/lib/types";
+import { GameMode, GameStatus } from "@/lib/types";
 
 import { OwnerHeader } from "./OwnerHeader";
 import { OWNER_STARTING_SCREEN_COPY } from "./OwnerStartingScreen.copy";

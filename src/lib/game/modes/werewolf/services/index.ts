@@ -11,7 +11,7 @@ import { WEREWOLF_COPY } from "../copy";
 import { getWerewolfModeConfig } from "../lobby-config";
 import type { WerewolfPlayerGameState } from "../player-state";
 import type { WerewolfRoleDefinition } from "../roles";
-import { getWerewolfRole,WerewolfRole } from "../roles";
+import { getWerewolfRole, WerewolfRole } from "../roles";
 import { currentTurnState } from "../utils";
 import { WerewolfWinner } from "../utils/win-condition";
 import {

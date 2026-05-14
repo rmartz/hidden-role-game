@@ -1,12 +1,12 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { Game } from "@/lib/types";
 
 import { WerewolfRole } from "../../roles";
-import type { AnyNightAction,WerewolfTurnState } from "../../types";
+import type { AnyNightAction, WerewolfTurnState } from "../../types";
 import { WerewolfPhase } from "../../types";
 import { resolveNightActions } from "../../utils";
-import { WEREWOLF_ACTIONS,WerewolfAction } from "../index";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "../index";
 import { makeNightState, makePlayingGame, makeTeamGame } from "../test-helpers";
 
 // ---------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { POST as startGame } from "@/app/api/[gameMode]/game/create/route";
 import {

@@ -6,7 +6,7 @@ import { castVoteAction } from "./cast-vote";
 import { confirmNightTargetAction } from "./confirm-night-target";
 import { endGameAction } from "./end-game";
 import { killPlayerAction } from "./kill-player";
-import { markPlayerAliveAction,markPlayerDeadAction } from "./mark-player";
+import { markPlayerAliveAction, markPlayerDeadAction } from "./mark-player";
 import { nominatePlayerAction } from "./nominate-player";
 import { pauseTimerAction } from "./pause-timer";
 import { resetAbilityAction } from "./reset-ability";

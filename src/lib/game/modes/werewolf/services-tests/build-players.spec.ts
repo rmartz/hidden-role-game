@@ -1,4 +1,4 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { buildGamePlayers } from "@/lib/game/initialization";
 import type { LobbyPlayer, RoleDefinition } from "@/lib/types";

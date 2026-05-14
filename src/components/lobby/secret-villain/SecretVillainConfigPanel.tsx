@@ -12,7 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
 import type { SecretVillainModeConfig } from "@/lib/game/modes/secret-villain/lobby-config";
 import type { SecretVillainLobbyConfig } from "@/lib/game/modes/secret-villain/lobby-config";
-import { SV_THEMES,SvTheme } from "@/lib/game/modes/secret-villain/themes";
+import { SV_THEMES, SvTheme } from "@/lib/game/modes/secret-villain/themes";
 import type { SecretVillainTimerConfig } from "@/lib/game/modes/secret-villain/timer-config";
 import type { SvCustomPowerConfig } from "@/lib/game/modes/secret-villain/types";
 import { SvBoardPreset } from "@/lib/game/modes/secret-villain/types";

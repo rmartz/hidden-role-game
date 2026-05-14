@@ -3,7 +3,7 @@ import type { PlayerRoleAssignment } from "@/lib/types";
 import { getWerewolfRole } from "../roles";
 import type { AnyNightAction, TargetablePlayer, TeamNightVote } from "../types";
 import { TargetCategory } from "../types";
-import { baseGroupPhaseKey,isGroupPhaseKey } from "./phase-keys";
+import { baseGroupPhaseKey, isGroupPhaseKey } from "./phase-keys";
 
 /**
  * Returns the list of players eligible to be targeted during a night phase.

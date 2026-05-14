@@ -2,7 +2,7 @@ import type { Game, GameAction } from "@/lib/types";
 import { GameStatus, Team } from "@/lib/types";
 
 import { getWerewolfModeConfig } from "../lobby-config";
-import { getWerewolfRole,WerewolfRole } from "../roles";
+import { getWerewolfRole, WerewolfRole } from "../roles";
 import { getOrderedAffectedPlayerIds } from "../services";
 import type {
   AttackNightResolutionEvent,
@@ -10,7 +10,7 @@ import type {
   WerewolfNighttimePhase,
   WerewolfRoleTurnState,
 } from "../types";
-import { isTeamNightAction,WerewolfPhase } from "../types";
+import { isTeamNightAction, WerewolfPhase } from "../types";
 import {
   checkWinCondition,
   currentTurnState,

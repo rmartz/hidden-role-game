@@ -1,7 +1,7 @@
 import type { Game, GameAction } from "@/lib/types";
 
 import { getWerewolfRole } from "../roles";
-import { isTeamNightAction,WerewolfPhase } from "../types";
+import { isTeamNightAction, WerewolfPhase } from "../types";
 import {
   currentTurnState,
   getGroupPhasePlayerIds,

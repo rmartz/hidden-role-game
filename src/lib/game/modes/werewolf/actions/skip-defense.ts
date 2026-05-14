@@ -1,7 +1,7 @@
 import type { Game, GameAction } from "@/lib/types";
 
-import { TrialPhase,WerewolfPhase } from "../types";
-import { checkWinCondition,currentTurnState, isOwnerPlaying } from "../utils";
+import { TrialPhase, WerewolfPhase } from "../types";
+import { checkWinCondition, currentTurnState, isOwnerPlaying } from "../utils";
 import { applyTrialVerdict } from "./resolve-trial";
 
 export const skipDefenseAction: GameAction = {

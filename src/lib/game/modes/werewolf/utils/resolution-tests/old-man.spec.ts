@@ -1,7 +1,7 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { WerewolfRole } from "../../roles";
-import { OLD_MAN_TIMER_KEY,resolveNightActions } from "../resolution";
+import { OLD_MAN_TIMER_KEY, resolveNightActions } from "../resolution";
 import { findKilled } from "./helpers";
 
 describe("resolveNightActions", () => {

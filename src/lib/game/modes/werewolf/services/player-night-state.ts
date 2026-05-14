@@ -5,9 +5,9 @@ import type { NighttimeNightStatusEntry } from "@/server/types";
 import { WEREWOLF_COPY } from "../copy";
 import type { WerewolfPlayerGameState } from "../player-state";
 import type { WerewolfRoleDefinition } from "../roles";
-import { getWerewolfRole,WerewolfRole } from "../roles";
+import { getWerewolfRole, WerewolfRole } from "../roles";
 import type { AnyNightAction, WerewolfTurnState } from "../types";
-import { isTeamNightAction,TargetCategory, WerewolfPhase } from "../types";
+import { isTeamNightAction, TargetCategory, WerewolfPhase } from "../types";
 import {
   baseGroupPhaseKey,
   currentTurnState,

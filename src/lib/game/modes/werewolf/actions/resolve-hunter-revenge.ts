@@ -1,8 +1,8 @@
 import type { Game, GameAction } from "@/lib/types";
 
 import { WerewolfPhase } from "../types";
-import { checkWinCondition,currentTurnState, isOwnerPlaying } from "../utils";
-import { cleanupAfterDaytimeKill,didWolfCubDie } from "./helpers";
+import { checkWinCondition, currentTurnState, isOwnerPlaying } from "../utils";
+import { cleanupAfterDaytimeKill, didWolfCubDie } from "./helpers";
 
 export const resolveHunterRevengeAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {

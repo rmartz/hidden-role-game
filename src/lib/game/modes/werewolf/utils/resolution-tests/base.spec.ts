@@ -1,8 +1,8 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { WerewolfRole } from "../../roles";
 import { resolveNightActions } from "../resolution";
-import { assignments,findKilled } from "./helpers";
+import { assignments, findKilled } from "./helpers";
 
 describe("resolveNightActions", () => {
   it("marks an attacked player as died", () => {

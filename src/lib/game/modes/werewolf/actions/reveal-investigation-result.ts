@@ -1,7 +1,7 @@
 import type { Game, GameAction } from "@/lib/types";
 
 import { getWerewolfRole } from "../roles";
-import { isTeamNightAction, TargetCategory,WerewolfPhase } from "../types";
+import { isTeamNightAction, TargetCategory, WerewolfPhase } from "../types";
 import { currentTurnState, isOwnerPlaying } from "../utils";
 
 export const revealInvestigationResultAction: GameAction = {

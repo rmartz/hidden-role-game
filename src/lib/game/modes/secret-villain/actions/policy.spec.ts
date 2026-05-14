@@ -1,11 +1,11 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { Game } from "@/lib/types";
 import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 
 import { SecretVillainRole } from "../roles";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "../timer-config";
-import type { PolicyChancellorPhase,SecretVillainTurnState } from "../types";
+import type { PolicyChancellorPhase, SecretVillainTurnState } from "../types";
 import {
   BAD_CARDS_TO_WIN,
   GOOD_CARDS_TO_WIN,

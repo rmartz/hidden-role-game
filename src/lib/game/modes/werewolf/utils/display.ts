@@ -4,12 +4,12 @@ import type { NightStatusEntry, VisibleTeammate } from "@/server/types";
 
 import { WEREWOLF_COPY } from "../copy";
 import type { WerewolfRoleDefinition } from "../roles";
-import { getWerewolfRole,WerewolfRole } from "../roles";
+import { getWerewolfRole, WerewolfRole } from "../roles";
 import type { AnyNightAction } from "../types";
 import { TargetCategory } from "../types";
 import type { PhaseKey } from "./phase-keys";
 import { baseGroupPhaseKey, isGroupPhaseKey, isRoleActive } from "./phase-keys";
-import { OLD_MAN_TIMER_KEY,SMITE_PHASE_KEY } from "./resolution";
+import { OLD_MAN_TIMER_KEY, SMITE_PHASE_KEY } from "./resolution";
 import { targetPlayerIdOf } from "./targeting";
 
 export type { PhaseKey };

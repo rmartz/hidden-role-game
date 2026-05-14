@@ -1,4 +1,4 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { AvalonPlayerGameState } from "@/lib/game/modes/avalon/player-state";
 import {
@@ -15,7 +15,7 @@ import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-c
 import { GameMode, GameStatus, Team } from "@/lib/types";
 import { DEFAULT_TIMER_CONFIG } from "@/lib/types";
 
-import { firebaseToPlayerState,playerStateToFirebase } from "./index";
+import { firebaseToPlayerState, playerStateToFirebase } from "./index";
 
 const BASE_FIELDS = {
   lobbyId: "lobby-1",

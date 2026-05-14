@@ -6,7 +6,7 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { onValue,ref } from "firebase/database";
+import { onValue, ref } from "firebase/database";
 import { useEffect } from "react";
 
 import { useFirebaseAuth } from "@/hooks/firebaseAuth";

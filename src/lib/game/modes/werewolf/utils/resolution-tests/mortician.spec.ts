@@ -1,6 +1,6 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import { WEREWOLF_ROLES,WerewolfRole } from "../../roles";
+import { WEREWOLF_ROLES, WerewolfRole } from "../../roles";
 import { resolveNightActions } from "../resolution";
 import { findKilled } from "./helpers";
 

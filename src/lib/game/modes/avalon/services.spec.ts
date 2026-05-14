@@ -1,4 +1,4 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { Game } from "@/lib/types";
 import {
@@ -11,7 +11,7 @@ import {
 import { AvalonRole } from "./roles";
 import { avalonServices } from "./services";
 import type { AvalonTurnState } from "./types";
-import { AvalonPhase, QuestCard,TeamVote } from "./types";
+import { AvalonPhase, QuestCard, TeamVote } from "./types";
 
 const assignments = [
   { playerId: "p1", roleDefinitionId: AvalonRole.Merlin },

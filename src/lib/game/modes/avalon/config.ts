@@ -1,5 +1,5 @@
 import type { GameModeConfig } from "@/lib/types";
-import { DEFAULT_TIMER_CONFIG,Team } from "@/lib/types";
+import { DEFAULT_TIMER_CONFIG, Team } from "@/lib/types";
 
 import {
   advanceFromQuestAction,
@@ -18,7 +18,7 @@ import {
   DEFAULT_AVALON_MODE_CONFIG,
   parseAvalonModeConfig,
 } from "./lobby-config";
-import { AVALON_ROLES,defaultRoleCount, MIN_PLAYERS } from "./roles";
+import { AVALON_ROLES, defaultRoleCount, MIN_PLAYERS } from "./roles";
 import { avalonServices } from "./services";
 
 export const AVALON_CONFIG = {

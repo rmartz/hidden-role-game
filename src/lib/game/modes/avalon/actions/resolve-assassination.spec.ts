@@ -1,4 +1,4 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { Game } from "@/lib/types";
 import {
@@ -9,7 +9,7 @@ import {
 } from "@/lib/types";
 
 import { AvalonRole } from "../roles";
-import type { AssassinationPhase,AvalonTurnState } from "../types";
+import type { AssassinationPhase, AvalonTurnState } from "../types";
 import { AvalonPhase } from "../types";
 import { resolveAssassinationAction } from "./resolve-assassination";
 

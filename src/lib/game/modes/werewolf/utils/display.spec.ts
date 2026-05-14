@@ -1,4 +1,4 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { WerewolfRole } from "../roles";
 import {
@@ -8,7 +8,7 @@ import {
   isPlayersTurn,
 } from "./display";
 import { SMITE_PHASE_KEY } from "./resolution";
-import { getSoloTarget,targetPlayerIdOf } from "./targeting";
+import { getSoloTarget, targetPlayerIdOf } from "./targeting";
 
 const players = [
   { id: "p1", name: "Alice" },

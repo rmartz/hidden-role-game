@@ -5,8 +5,8 @@ import { GameMode, GameStatus } from "@/lib/types";
 
 import type { WerewolfDaytimePhase, WerewolfTurnState } from "../types";
 import { WerewolfPhase } from "../types";
-import { WEREWOLF_ACTIONS,WerewolfAction } from "./index";
-import { dayTurnState,makePlayingGame } from "./test-helpers";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "./index";
+import { dayTurnState, makePlayingGame } from "./test-helpers";
 
 function makeDaytimeTurnState(
   nightResolution: NonNullable<WerewolfDaytimePhase["nightResolution"]>,

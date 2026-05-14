@@ -1,4 +1,4 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { WerewolfRole } from "../../roles";
 import { resolveNightActions, SMITE_PHASE_KEY } from "../resolution";

@@ -1,4 +1,4 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { Game } from "@/lib/types";
 
@@ -10,7 +10,7 @@ import type {
   WerewolfTurnState,
 } from "../../types";
 import { WerewolfPhase } from "../../types";
-import { WEREWOLF_ACTIONS,WerewolfAction } from "../index";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "../index";
 import {
   makeTeamGame,
   makeTeamNightState,

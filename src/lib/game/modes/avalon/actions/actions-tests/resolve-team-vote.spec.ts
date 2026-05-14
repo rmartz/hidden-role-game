@@ -1,8 +1,8 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { GameStatus } from "@/lib/types";
 
-import type { QuestPhase,TeamVotePhase } from "../../types";
+import type { QuestPhase, TeamVotePhase } from "../../types";
 import { AvalonPhase, TeamVote } from "../../types";
 import {
   advanceFromTeamVoteAction,

@@ -1,5 +1,5 @@
 import { parseGameMode } from "@/lib/game/modes";
-import type { Game, GamePlayer,Lobby } from "@/lib/types";
+import type { Game, GamePlayer, Lobby } from "@/lib/types";
 import { getGame } from "@/server/game";
 import { ServerResponseStatus } from "@/server/types";
 import { getLobby } from "@/services/lobby";

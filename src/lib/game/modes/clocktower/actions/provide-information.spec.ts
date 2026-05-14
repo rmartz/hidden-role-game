@@ -1,9 +1,9 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { GameStatus } from "@/lib/types";
 
 import { ClocktowerRole } from "../roles";
-import type { ClocktowerNightPhase,ClocktowerTurnState } from "../types";
+import type { ClocktowerNightPhase, ClocktowerTurnState } from "../types";
 import { ClocktowerPhase } from "../types";
 import { CLOCKTOWER_ACTIONS, ClocktowerAction } from "./index";
 import {

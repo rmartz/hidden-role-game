@@ -1,9 +1,9 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { Team } from "@/lib/types";
 
 import { WerewolfRole } from "../roles";
-import { getGroupPhaseMemberIds,getTargetablePlayers } from "./targeting";
+import { getGroupPhaseMemberIds, getTargetablePlayers } from "./targeting";
 
 const players = [
   { id: "owner", name: "Owner" },

@@ -7,7 +7,7 @@ import type {
 
 import type { WerewolfTimerConfig } from "./timer-config";
 import type { AnyNightAction } from "./types";
-import { DaytimeVote,TrialPhase, TrialVerdict } from "./types";
+import { DaytimeVote, TrialPhase, TrialVerdict } from "./types";
 
 /**
  * Werewolf-specific extension of PlayerGameState. Includes all fields that

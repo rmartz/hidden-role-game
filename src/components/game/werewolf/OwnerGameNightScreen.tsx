@@ -32,7 +32,7 @@ import { isRoleActive } from "@/lib/game/modes/werewolf";
 import { buildNarratorInstruction } from "@/lib/game/modes/werewolf";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
-import { getWerewolfRole,WerewolfRole } from "@/lib/game/modes/werewolf/roles";
+import { getWerewolfRole, WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import { getPlayerName } from "@/lib/player";
 
 import { NarratorNightInstruction } from "./NarratorNightInstruction";

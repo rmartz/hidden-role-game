@@ -1,8 +1,8 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { WerewolfRole } from "../../roles";
-import type { WerewolfNighttimePhase,WerewolfTurnState } from "../../types";
-import { WEREWOLF_ACTIONS,WerewolfAction } from "../index";
+import type { WerewolfNighttimePhase, WerewolfTurnState } from "../../types";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "../index";
 import {
   makeNightState,
   makePlayingGame,

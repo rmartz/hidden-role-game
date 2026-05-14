@@ -8,7 +8,7 @@ import type {
   TimerConfig,
 } from "@/lib/types";
 import { GameMode, ShowRolesInPlay } from "@/lib/types";
-import { createGame,getModeDefinition } from "@/server/game";
+import { createGame, getModeDefinition } from "@/server/game";
 import { ServerResponseStatus } from "@/server/types";
 import {
   errorResponse,

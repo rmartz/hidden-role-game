@@ -1,4 +1,4 @@
-import type { GameStatusState, Team,TimerConfig } from "@/lib/types";
+import type { GameStatusState, Team, TimerConfig } from "@/lib/types";
 import type {
   PlayerGameState,
   RoleInPlay,

@@ -1,4 +1,4 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { Game } from "@/lib/types";
 import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
@@ -6,7 +6,7 @@ import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
 import { SECRET_VILLAIN_COPY } from "../copy";
 import { SecretVillainRole } from "../roles";
 import { secretVillainServices } from "../services";
-import { getSvThemeLabels,SvTheme } from "../themes";
+import { getSvThemeLabels, SvTheme } from "../themes";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "../timer-config";
 import type { SecretVillainTurnState } from "../types";
 import { SvBoardPreset } from "../types";

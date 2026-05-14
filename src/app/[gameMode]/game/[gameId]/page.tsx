@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 import { WerewolfGameScreen } from "@/components/game";
 import { SecretVillainGameScreen } from "@/components/game/secret-villain";
-import { GameModeContext,useGameStateQuery } from "@/hooks";
+import { GameModeContext, useGameStateQuery } from "@/hooks";
 import { parseGameMode } from "@/lib/game/modes";
 import { GameMode } from "@/lib/types";
 

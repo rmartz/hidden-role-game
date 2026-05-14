@@ -1,4 +1,4 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { SecretVillainRole } from "@/lib/game/modes/secret-villain/roles";
 import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";

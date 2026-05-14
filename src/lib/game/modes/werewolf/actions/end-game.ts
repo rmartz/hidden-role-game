@@ -1,7 +1,7 @@
 import type { Game, GameAction } from "@/lib/types";
 import { GameStatus } from "@/lib/types";
 
-import { checkWinCondition,currentTurnState, isOwnerPlaying } from "../utils";
+import { checkWinCondition, currentTurnState, isOwnerPlaying } from "../utils";
 
 export const endGameAction: GameAction = {
   isValid(game: Game, callerId: string) {

@@ -1,8 +1,8 @@
 import type { PlayerRoleAssignment } from "@/lib/types";
 import { Team } from "@/lib/types";
 
-import { getWerewolfRole,WerewolfRole } from "../roles";
-import type { WerewolfNighttimePhase,WerewolfTurnState } from "../types";
+import { getWerewolfRole, WerewolfRole } from "../roles";
+import type { WerewolfNighttimePhase, WerewolfTurnState } from "../types";
 import { WerewolfPhase } from "../types";
 import { buildNightPhaseOrder } from "../utils";
 

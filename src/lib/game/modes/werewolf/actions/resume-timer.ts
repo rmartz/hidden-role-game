@@ -1,7 +1,7 @@
 import type { Game, GameAction } from "@/lib/types";
 
 import type { ActiveTrial } from "../types";
-import { TrialPhase,WerewolfPhase } from "../types";
+import { TrialPhase, WerewolfPhase } from "../types";
 import { currentTurnState, isOwnerPlaying } from "../utils";
 
 function resumeTrialTimer(activeTrial: ActiveTrial): void {

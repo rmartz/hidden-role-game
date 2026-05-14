@@ -7,8 +7,8 @@ import {
 } from "@/lib/types";
 
 import { AvalonRole } from "../../roles";
-import type { AvalonTurnState, QuestPhase,TeamVotePhase } from "../../types";
-import { AvalonPhase, QuestCard,TeamVote } from "../../types";
+import type { AvalonTurnState, QuestPhase, TeamVotePhase } from "../../types";
+import { AvalonPhase, QuestCard, TeamVote } from "../../types";
 
 export const roleAssignments = [
   { playerId: "p1", roleDefinitionId: AvalonRole.Merlin },

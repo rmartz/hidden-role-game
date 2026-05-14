@@ -1,7 +1,7 @@
 "use client";
 
 import { InfoIcon } from "lucide-react";
-import { useEffect,useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {

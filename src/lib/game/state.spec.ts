@@ -1,4 +1,4 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-villain/lobby-config";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
@@ -10,7 +10,7 @@ import type { Game, GamePlayer, LobbyPlayer, RoleBucket } from "@/lib/types";
 import type { WerewolfGame } from "@/lib/types";
 import { GameMode, GameStatus, ShowRolesInPlay, Team } from "@/lib/types";
 
-import { buildGame,getPlayerGameState } from "./state";
+import { buildGame, getPlayerGameState } from "./state";
 
 const DEFAULT_BUCKETS: RoleBucket[] = [
   { playerCount: 1, roles: [{ roleId: "good" }] },

@@ -1,4 +1,4 @@
-import { buildGamePlayers,buildRolesInPlay } from "@/lib/game/initialization";
+import { buildGamePlayers, buildRolesInPlay } from "@/lib/game/initialization";
 import { GAME_MODES } from "@/lib/game/modes";
 import { getPlayer } from "@/lib/player";
 import type {

@@ -1,6 +1,6 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import { RoleConfigMode, ShowRolesInPlay,Team } from "@/lib/types";
+import { RoleConfigMode, ShowRolesInPlay, Team } from "@/lib/types";
 
 import {
   CODENAMES_CONFIG,

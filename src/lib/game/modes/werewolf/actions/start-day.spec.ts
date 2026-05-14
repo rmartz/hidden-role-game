@@ -1,4 +1,4 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { WerewolfGame } from "@/lib/types";
 import { GameMode, GameStatus } from "@/lib/types";
@@ -11,7 +11,7 @@ import type {
 } from "../types";
 import { WerewolfPhase } from "../types";
 import { WerewolfWinner } from "../utils/win-condition";
-import { WEREWOLF_ACTIONS,WerewolfAction } from "./index";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "./index";
 import {
   dayTurnState,
   makeNightState,

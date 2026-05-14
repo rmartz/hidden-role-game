@@ -1,4 +1,4 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { AvalonRole } from "../roles";
 import type { QuestResult } from "../types";

@@ -1,12 +1,12 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { Game } from "@/lib/types";
 import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 import { DEFAULT_TIMER_CONFIG } from "@/lib/types";
 
 import { ClocktowerRole } from "../roles";
-import { CLOCKTOWER_ACTIONS,ClocktowerAction } from "./index";
-import { makeNightTurnState,makePlayingGame } from "./test-helpers";
+import { CLOCKTOWER_ACTIONS, ClocktowerAction } from "./index";
+import { makeNightTurnState, makePlayingGame } from "./test-helpers";
 
 const action = CLOCKTOWER_ACTIONS[ClocktowerAction.ResolveNight];
 

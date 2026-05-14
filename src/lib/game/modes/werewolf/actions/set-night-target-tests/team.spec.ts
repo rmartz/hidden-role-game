@@ -1,11 +1,11 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type {
   TeamNightAction,
   WerewolfNighttimePhase,
   WerewolfTurnState,
 } from "../../types";
-import { WEREWOLF_ACTIONS,WerewolfAction } from "../index";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "../index";
 import {
   makeTeamGame,
   makeTeamNightState,

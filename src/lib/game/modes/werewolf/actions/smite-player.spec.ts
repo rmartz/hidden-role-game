@@ -1,4 +1,4 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type {
   WerewolfDaytimePhase,
@@ -6,8 +6,8 @@ import type {
   WerewolfTurnState,
 } from "../types";
 import { TrialPhase, WerewolfPhase } from "../types";
-import { WEREWOLF_ACTIONS,WerewolfAction } from "./index";
-import { makeNightState,makePlayingGame } from "./test-helpers";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "./index";
+import { makeNightState, makePlayingGame } from "./test-helpers";
 
 function makeDayState(): WerewolfTurnState {
   return {

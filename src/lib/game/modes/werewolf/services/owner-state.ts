@@ -15,8 +15,8 @@ import type {
   AnyNightAction,
 } from "../types";
 import { TrialVerdict, WerewolfPhase } from "../types";
-import { OLD_MAN_TIMER_KEY,SMITE_PHASE_KEY } from "../utils";
-import { getHypnotizedPlayerId,getSilencedPlayerIds } from "../utils";
+import { OLD_MAN_TIMER_KEY, SMITE_PHASE_KEY } from "../utils";
+import { getHypnotizedPlayerId, getSilencedPlayerIds } from "../utils";
 import { currentTurnState } from "../utils/game-state";
 
 /** Returns the set of player IDs whose night outcomes are publicly visible. */
@@ -308,7 +308,7 @@ export function extractOwnerState(
   };
 }
 
-export { extractDeadPlayerIds,extractNightActions };
+export { extractDeadPlayerIds, extractNightActions };
 
 /**
  * Returns dead players visible to a specific caller.

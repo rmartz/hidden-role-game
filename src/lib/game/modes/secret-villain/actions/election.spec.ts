@@ -1,11 +1,11 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { Game } from "@/lib/types";
 import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 
 import { SecretVillainRole } from "../roles";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "../timer-config";
-import type { ElectionVotePhase,SecretVillainTurnState } from "../types";
+import type { ElectionVotePhase, SecretVillainTurnState } from "../types";
 import {
   BAD_CARDS_FOR_SPECIAL_BAD_WIN,
   FAILED_ELECTION_THRESHOLD,

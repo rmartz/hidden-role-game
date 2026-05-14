@@ -3,7 +3,7 @@ import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 
 import { WerewolfRole } from "../roles";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "../timer-config";
-import type { AnyNightAction,WerewolfTurnState } from "../types";
+import type { AnyNightAction, WerewolfTurnState } from "../types";
 import { WerewolfPhase } from "../types";
 
 export function makePlayingGame(

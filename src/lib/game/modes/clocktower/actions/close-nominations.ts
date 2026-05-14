@@ -1,7 +1,7 @@
 import type { Game, GameAction } from "@/lib/types";
 import { GameStatus } from "@/lib/types";
 
-import type { ClocktowerNomination,ClocktowerTurnState } from "../types";
+import type { ClocktowerNomination, ClocktowerTurnState } from "../types";
 import { ClocktowerPhase } from "../types";
 
 function currentTurnState(game: Game): ClocktowerTurnState | undefined {

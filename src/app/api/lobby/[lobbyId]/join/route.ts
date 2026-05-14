@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 
 import { addPlayer, getLobby, validatePlayerJoin } from "@/server/lobby";
-import { type JoinLobbyRequest,ServerResponseStatus } from "@/server/types";
+import { type JoinLobbyRequest, ServerResponseStatus } from "@/server/types";
 import {
   errorResponse,
   normalizeDisplayName,

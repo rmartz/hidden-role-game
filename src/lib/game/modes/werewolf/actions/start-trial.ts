@@ -1,8 +1,8 @@
 import type { Game, GameAction } from "@/lib/types";
 
 import { getWerewolfModeConfig } from "../lobby-config";
-import { isWerewolfRole,WEREWOLF_ROLES } from "../roles";
-import { DaytimeVote,TrialPhase, WerewolfPhase } from "../types";
+import { isWerewolfRole, WEREWOLF_ROLES } from "../roles";
+import { DaytimeVote, TrialPhase, WerewolfPhase } from "../types";
 import {
   currentTurnState,
   getHypnotizedPlayerId,

@@ -1,4 +1,4 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { LobbyPlayer } from "@/lib/types";
 import { Team } from "@/lib/types";

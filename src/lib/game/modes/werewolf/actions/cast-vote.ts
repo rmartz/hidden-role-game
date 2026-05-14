@@ -1,6 +1,6 @@
 import type { Game, GameAction } from "@/lib/types";
 
-import { isWerewolfRole,WEREWOLF_ROLES, WerewolfRole } from "../roles";
+import { isWerewolfRole, WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import { DaytimeVote, TrialPhase } from "../types";
 import { WerewolfPhase } from "../types";
 import {

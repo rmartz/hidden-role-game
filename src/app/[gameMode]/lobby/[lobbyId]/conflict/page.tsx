@@ -9,7 +9,7 @@ import {
   useLobbyExistsQuery,
   useStoredLobbyQuery,
 } from "@/hooks";
-import { getLobbyId,getPlayerId } from "@/lib/api";
+import { getLobbyId, getPlayerId } from "@/lib/api";
 import { parseGameMode } from "@/lib/game/modes";
 import { getPlayerName } from "@/lib/player";
 

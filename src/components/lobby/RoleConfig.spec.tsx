@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { cleanup, fireEvent,render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { Provider } from "react-redux";
-import { afterEach, describe, expect,it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
 import type { RoleDefinition } from "@/lib/types";
 import { GameMode, RoleConfigMode, Team } from "@/lib/types";

@@ -1,5 +1,5 @@
 import type { BaseLobbyConfig, TimerConfig } from "@/lib/types";
-import { DEFAULT_TIMER_CONFIG,GameMode } from "@/lib/types";
+import { DEFAULT_TIMER_CONFIG, GameMode } from "@/lib/types";
 
 /** Clocktower-specific mode configuration. */
 export interface ClocktowerModeConfig {

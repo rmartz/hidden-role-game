@@ -11,7 +11,7 @@ import type {
   RoleDefinition,
   Team,
 } from "@/lib/types";
-import { isSimpleRoleBucket,RoleConfigMode } from "@/lib/types";
+import { isSimpleRoleBucket, RoleConfigMode } from "@/lib/types";
 import { useAppSelector } from "@/store";
 
 import type { CategoryGroup } from "./ExpandedRoleList";

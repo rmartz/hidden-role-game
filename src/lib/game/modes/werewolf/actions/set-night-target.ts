@@ -1,9 +1,9 @@
 import { getPlayer } from "@/lib/player";
 import type { Game, GameAction } from "@/lib/types";
 
-import { getWerewolfRole,WerewolfRole } from "../roles";
+import { getWerewolfRole, WerewolfRole } from "../roles";
 import type { TeamNightAction } from "../types";
-import { isTeamNightAction, TargetCategory,WerewolfPhase } from "../types";
+import { isTeamNightAction, TargetCategory, WerewolfPhase } from "../types";
 import {
   baseGroupPhaseKey,
   computeSuggestedTarget,

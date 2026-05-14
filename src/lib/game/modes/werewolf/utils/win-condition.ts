@@ -1,7 +1,7 @@
 import type { Game } from "@/lib/types";
 import { GameStatus, Team } from "@/lib/types";
 
-import { getWerewolfRole,WerewolfRole } from "../roles";
+import { getWerewolfRole, WerewolfRole } from "../roles";
 import { currentTurnState } from "./game-state";
 
 /**

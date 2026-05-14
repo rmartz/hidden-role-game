@@ -1,4 +1,4 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { RoleBucket } from "@/lib/types";
 import { GameMode, isSimpleRoleBucket } from "@/lib/types";

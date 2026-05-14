@@ -1,5 +1,5 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
-import { beforeEach,describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-villain/lobby-config";
 import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
@@ -38,7 +38,7 @@ vi.mock("@/hooks/firebaseAuth", () => ({
 
 import * as api from "@/lib/api";
 
-import { useGameStateQuery,useStartGame } from "./game";
+import { useGameStateQuery, useStartGame } from "./game";
 
 const mockGameState: SecretVillainPlayerGameState = {
   status: { type: GameStatus.Playing },

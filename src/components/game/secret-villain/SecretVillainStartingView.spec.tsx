@@ -1,5 +1,5 @@
 import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect,it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
 import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
