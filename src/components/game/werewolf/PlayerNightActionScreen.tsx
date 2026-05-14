@@ -65,6 +65,9 @@ export function PlayerNightActionScreen({
   const isSwapper =
     !isGroupPhase && gameState.myRole?.id === WerewolfRole.Swapper;
   const requiresDualTarget = isMentalist || isSwapper;
+  const isMonarch =
+    !isGroupPhase && gameState.myRole?.id === (WerewolfRole.Monarch as string);
+  const monarchKnightedPlayerIds = gameState.monarchKnightedPlayerIds ?? [];
 
   const allTargets = getTargetablePlayers(
     gameState.players,
@@ -74,14 +77,19 @@ export function PlayerNightActionScreen({
     gameState.myPlayerId,
     gameState.visibleRoleAssignments,
   ).map((player) => [player, gameState.myNightTarget === player.id] as const);
+  const selectableTargets = isMonarch
+    ? allTargets.filter(
+        ([player]) => !monarchKnightedPlayerIds.includes(player.id),
+      )
+    : allTargets;
 
   const targets = isConfirmed
-    ? allTargets.filter(
+    ? selectableTargets.filter(
         ([player, isSelected]) =>
           isSelected ||
           (requiresDualTarget && player.id === gameState.mySecondNightTarget),
       )
-    : allTargets;
+    : selectableTargets;
 
   // For group phases (Werewolf, Wolf Cub waking together), use the phase key;
   // solo phases use the player's own role ID.
@@ -98,6 +106,11 @@ export function PlayerNightActionScreen({
     !isGroupPhase &&
     gameState.myRole?.id === (WerewolfRole.Exposer as string) &&
     (gameState.exposerAbilityUsed ?? false);
+  const monarchKnightingsRemaining = Math.max(
+    0,
+    3 - (gameState.monarchKnightingsUsed ?? 0),
+  );
+  const monarchOutOfKnightings = isMonarch && monarchKnightingsRemaining === 0;
 
   const oesLockedTargetName = gameState.oneEyedSeerLockedTargetId
     ? (getPlayerName(gameState.players, gameState.oneEyedSeerLockedTargetId) ??
@@ -187,6 +200,10 @@ export function PlayerNightActionScreen({
               isConfirmed={isConfirmed}
             />
           </>
+        ) : monarchOutOfKnightings ? (
+          <p className="text-sm text-muted-foreground mb-3 italic">
+            {WEREWOLF_COPY.monarch.outOfKnighthoods}
+          </p>
         ) : (
           <PlayerTargetSelection
             gameId={gameId}
@@ -208,6 +225,9 @@ export function PlayerNightActionScreen({
             mySecondNightTarget={gameState.mySecondNightTarget}
             requiresSecondTarget={requiresDualTarget}
             mirrorcasterCharged={gameState.mirrorcasterCharged}
+            monarchKnightingsRemaining={
+              isMonarch ? monarchKnightingsRemaining : undefined
+            }
           />
         )}
         {investigationResult && (

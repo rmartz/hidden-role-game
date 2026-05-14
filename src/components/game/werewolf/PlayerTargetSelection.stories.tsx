@@ -127,3 +127,17 @@ export const MentalistConfirmed: Story = {
     confirmPhaseKey: WerewolfRole.Mentalist,
   },
 };
+
+export const MonarchTargetSelected: Story = {
+  args: {
+    targets: [
+      [{ id: "p1", name: "Alice" }, false],
+      [{ id: "p2", name: "Bob" }, true],
+      [{ id: "p3", name: "Carol" }, false],
+    ],
+    myNightTarget: "p2",
+    hasTarget: true,
+    confirmPhaseKey: WerewolfRole.Monarch,
+    monarchKnightingsRemaining: 2,
+  },
+};

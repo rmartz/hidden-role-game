@@ -1,3 +1,4 @@
+import { Team } from "@/lib/types";
 import type { PlayerRoleAssignment } from "@/lib/types";
 import { TargetCategory } from "../types";
 import type {
@@ -8,6 +9,7 @@ import type {
 } from "../types";
 import { WerewolfRole, getWerewolfRole } from "../roles";
 import { isGroupPhaseKey, isRoleActive } from "./phase-keys";
+import { getGroupPhasePlayerIds } from "./targeting";
 
 export const SMITE_PHASE_KEY = "__narrator_smite__";
 export const OLD_MAN_TIMER_KEY = "__old_man_timer__";
@@ -232,6 +234,98 @@ export interface NightResolutionOptions {
    * self-targets (ignite), all of these players are simultaneously attacked.
    */
   arsonistDousedPlayerIds?: string[];
+  /** Monarch protection metadata evaluated before Altruist interception. */
+  monarchProtection?: {
+    monarchPlayerId: string;
+    monarchKnightedPlayerIds: string[];
+  };
+}
+
+function getAttackerIds(
+  attackedBy: string[],
+  roleAssignments: PlayerRoleAssignment[],
+  deadPlayerIds: string[],
+): string[] {
+  const attackerIds = new Set<string>();
+  for (const phaseKey of attackedBy) {
+    if (isGroupPhaseKey(phaseKey)) {
+      for (const playerId of getGroupPhasePlayerIds(
+        roleAssignments,
+        phaseKey,
+        deadPlayerIds,
+      )) {
+        attackerIds.add(playerId);
+      }
+      continue;
+    }
+    const attacker = roleAssignments.find(
+      (assignment) =>
+        assignment.roleDefinitionId === phaseKey &&
+        !deadPlayerIds.includes(assignment.playerId),
+    );
+    if (attacker) attackerIds.add(attacker.playerId);
+  }
+  return [...attackerIds];
+}
+
+function applyMonarchProtection(
+  attacks: Map<string, string[]>,
+  protections: Map<string, string[]>,
+  roleAssignments: PlayerRoleAssignment[],
+  deadPlayerIds: string[],
+  monarchProtection: {
+    monarchPlayerId: string;
+    monarchKnightedPlayerIds: string[];
+  },
+): void {
+  const { monarchPlayerId, monarchKnightedPlayerIds } = monarchProtection;
+  if (!attacks.has(monarchPlayerId)) return;
+
+  const livingKnightedPlayerIds = monarchKnightedPlayerIds.filter(
+    (playerId) => !deadPlayerIds.includes(playerId),
+  );
+  if (livingKnightedPlayerIds.length === 0) return;
+
+  const attackerIds = getAttackerIds(
+    attacks.get(monarchPlayerId) ?? [],
+    roleAssignments,
+    deadPlayerIds,
+  );
+  const getRoleForPlayer = (playerId: string) => {
+    const roleDefinitionId = roleAssignments.find(
+      (assignment) => assignment.playerId === playerId,
+    )?.roleDefinitionId;
+    return roleDefinitionId ? getWerewolfRole(roleDefinitionId) : undefined;
+  };
+  const livingKnightedRoleDefs = livingKnightedPlayerIds
+    .map((playerId) => getRoleForPlayer(playerId))
+    .filter((roleDef) => roleDef !== undefined);
+  const allLivingKnightedPlayersAreBad = livingKnightedRoleDefs.every(
+    (roleDef) => roleDef.team === Team.Bad,
+  );
+  const badAttackerExists = attackerIds.some((playerId) => {
+    const attackerRole = getRoleForPlayer(playerId);
+    return attackerRole?.team === Team.Bad;
+  });
+  const onlyLivingKnightedPlayerId =
+    livingKnightedPlayerIds.length === 1
+      ? livingKnightedPlayerIds[0]
+      : undefined;
+  const attackerIsOnlyLivingKnightedPlayer =
+    onlyLivingKnightedPlayerId !== undefined &&
+    attackerIds.includes(onlyLivingKnightedPlayerId);
+
+  if (
+    (badAttackerExists && allLivingKnightedPlayersAreBad) ||
+    attackerIsOnlyLivingKnightedPlayer
+  ) {
+    return;
+  }
+
+  protections.set(monarchPlayerId, [
+    ...(protections.get(monarchPlayerId) ?? []),
+    WerewolfRole.Monarch,
+  ]);
 }
 
 export function resolveNightActions(
@@ -276,6 +370,16 @@ export function resolveNightActions(
     } else {
       attacks.set(tid, [...(attacks.get(tid) ?? []), WerewolfRole.Witch]);
     }
+  }
+
+  if (options?.monarchProtection) {
+    applyMonarchProtection(
+      attacks,
+      protections,
+      roleAssignments,
+      deadPlayerIds,
+      options.monarchProtection,
+    );
   }
 
   // Altruist intercept: if the Altruist chose a target that is under attack and

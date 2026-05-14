@@ -18,13 +18,19 @@ export function cleanupAfterDaytimeKill(
   killedPlayerId: string,
   ts: WerewolfTurnState,
 ): void {
-  if (ts.oneEyedSeerLockedTargetId === killedPlayerId) {
-    ts.oneEyedSeerLockedTargetId = undefined;
+  const rs = ts.roleState;
+  if (rs?.oneEyedSeer?.lockedTargetId === killedPlayerId) {
+    ts.roleState = { ...rs, oneEyedSeer: undefined };
   }
-  if (ts.priestWards && killedPlayerId in ts.priestWards) {
+  const wards = ts.roleState?.priest?.wards;
+  if (wards && killedPlayerId in wards) {
     const remaining = Object.fromEntries(
-      Object.entries(ts.priestWards).filter(([id]) => id !== killedPlayerId),
+      Object.entries(wards).filter(([id]) => id !== killedPlayerId),
     );
-    ts.priestWards = Object.keys(remaining).length > 0 ? remaining : undefined;
+    ts.roleState = {
+      ...(ts.roleState ?? {}),
+      priest:
+        Object.keys(remaining).length > 0 ? { wards: remaining } : undefined,
+    };
   }
 }

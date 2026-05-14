@@ -81,7 +81,7 @@ describe("Dracula night action", () => {
     const game = makeGameWithDracula(ts);
     startDay.apply(game, undefined, "owner-1");
     const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(newTs.draculaWives).toContain("p2");
+    expect(newTs.roleState?.dracula?.wives).toContain("p2");
   });
 
   it("accumulates wives across multiple nights", () => {
@@ -92,12 +92,12 @@ describe("Dracula night action", () => {
       },
     });
     // p2 was already a wife from the previous turn
-    ts.draculaWives = ["p2"];
+    ts.roleState = { dracula: { wives: ["p2"] } };
     const game = makeGameWithDracula(ts);
     startDay.apply(game, undefined, "owner-1");
     const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(newTs.draculaWives).toContain("p2");
-    expect(newTs.draculaWives).toContain("p3");
+    expect(newTs.roleState?.dracula?.wives).toContain("p2");
+    expect(newTs.roleState?.dracula?.wives).toContain("p3");
   });
 
   it("does not duplicate a wife if targeted again", () => {
@@ -107,11 +107,13 @@ describe("Dracula night action", () => {
         [WerewolfRole.Dracula]: { targetPlayerId: "p2", confirmed: true },
       },
     });
-    ts.draculaWives = ["p2"];
+    ts.roleState = { dracula: { wives: ["p2"] } };
     const game = makeGameWithDracula(ts);
     startDay.apply(game, undefined, "owner-1");
     const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(newTs.draculaWives?.filter((id) => id === "p2").length).toBe(1);
+    expect(
+      newTs.roleState?.dracula?.wives.filter((id) => id === "p2").length,
+    ).toBe(1);
   });
 
   it("removes a wife who died in the same night from draculaWives", () => {
@@ -127,11 +129,11 @@ describe("Dracula night action", () => {
       },
     });
     // p2 was a wife from before
-    ts.draculaWives = ["p2"];
+    ts.roleState = { dracula: { wives: ["p2"] } };
     const game = makeGameWithDracula(ts);
     startDay.apply(game, undefined, "owner-1");
     const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(newTs.draculaWives).not.toContain("p2");
+    expect(newTs.roleState?.dracula?.wives).not.toContain("p2");
   });
 });
 
@@ -151,7 +153,7 @@ describe("Dracula win condition at start of night", () => {
         nightActions: {},
       },
       deadPlayerIds: [],
-      draculaWives: ["p2", "p3", "p4"],
+      roleState: { dracula: { wives: ["p2", "p3", "p4"] } },
     };
     const game = makeGameWithDracula(ts);
     startNight.apply(game, undefined, "owner-1");
@@ -170,7 +172,7 @@ describe("Dracula win condition at start of night", () => {
         nightActions: {},
       },
       deadPlayerIds: [],
-      draculaWives: ["p2", "p3"],
+      roleState: { dracula: { wives: ["p2", "p3"] } },
     };
     const game = makeGameWithDracula(ts);
     startNight.apply(game, undefined, "owner-1");
@@ -186,7 +188,7 @@ describe("Dracula win condition at start of night", () => {
         nightActions: {},
       },
       deadPlayerIds: ["p2"],
-      draculaWives: ["p2", "p3", "p4"],
+      roleState: { dracula: { wives: ["p2", "p3", "p4"] } },
     };
     const game = makeGameWithDracula(ts);
     startNight.apply(game, undefined, "owner-1");
@@ -202,7 +204,7 @@ describe("Dracula win condition at start of night", () => {
         nightActions: {},
       },
       deadPlayerIds: ["dracula"],
-      draculaWives: ["p2", "p3", "p4"],
+      roleState: { dracula: { wives: ["p2", "p3", "p4"] } },
     };
     const game = makeGameWithDracula(ts);
     startNight.apply(game, undefined, "owner-1");
@@ -218,7 +220,7 @@ describe("Dracula win condition at start of night", () => {
         nightActions: {},
       },
       deadPlayerIds: [],
-      draculaWives: ["p2", "p3", "p4"],
+      roleState: { dracula: { wives: ["p2", "p3", "p4"] } },
     };
     const game = makeGameWithDracula(ts);
     startNight.apply(game, undefined, "owner-1");
@@ -251,7 +253,7 @@ describe("Zombie night action", () => {
     const game = makeGameWithZombie(ts);
     startDay.apply(game, undefined, "owner-1");
     const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(newTs.zombieInfected).toContain("p2");
+    expect(newTs.roleState?.zombie?.infected).toContain("p2");
   });
 
   it("accumulates infections across multiple nights", () => {
@@ -261,12 +263,12 @@ describe("Zombie night action", () => {
         [WerewolfRole.Zombie]: { targetPlayerId: "p3", confirmed: true },
       },
     });
-    ts.zombieInfected = ["p2"];
+    ts.roleState = { zombie: { infected: ["p2"] } };
     const game = makeGameWithZombie(ts);
     startDay.apply(game, undefined, "owner-1");
     const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(newTs.zombieInfected).toContain("p2");
-    expect(newTs.zombieInfected).toContain("p3");
+    expect(newTs.roleState?.zombie?.infected).toContain("p2");
+    expect(newTs.roleState?.zombie?.infected).toContain("p3");
   });
 
   it("removes infected player who died this night from zombieInfected", () => {
@@ -281,12 +283,12 @@ describe("Zombie night action", () => {
         },
       },
     });
-    ts.zombieInfected = ["p2"];
+    ts.roleState = { zombie: { infected: ["p2"] } };
     const game = makeGameWithZombie(ts);
     startDay.apply(game, undefined, "owner-1");
     const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(newTs.zombieInfected).not.toContain("p2");
-    expect(newTs.zombieInfected).toContain("p3");
+    expect(newTs.roleState?.zombie?.infected).not.toContain("p2");
+    expect(newTs.roleState?.zombie?.infected).toContain("p3");
   });
 });
 
@@ -303,7 +305,7 @@ describe("Zombie setNightTarget validation", () => {
       nightPhaseOrder: [WerewolfRole.Zombie],
       currentPhaseIndex: 0,
     });
-    ts.zombieInfected = ["p2"];
+    ts.roleState = { zombie: { infected: ["p2"] } };
     const game = makeGameWithZombie(ts);
     expect(
       setTarget.isValid(game, "owner-1", {
@@ -319,7 +321,7 @@ describe("Zombie setNightTarget validation", () => {
       nightPhaseOrder: [WerewolfRole.Zombie],
       currentPhaseIndex: 0,
     });
-    ts.zombieInfected = ["p2"];
+    ts.roleState = { zombie: { infected: ["p2"] } };
     const game = makeGameWithZombie(ts);
     expect(
       setTarget.isValid(game, "owner-1", {
@@ -349,7 +351,7 @@ describe("Zombie win condition after deaths", () => {
         nightActions: {},
       },
       deadPlayerIds: ["p1", "p3"],
-      zombieInfected: ["p2"],
+      roleState: { zombie: { infected: ["p2"] } },
     };
     const game = makeGameWithZombie(ts);
     killPlayer.apply(game, { playerId: "p4" }, "owner-1");
@@ -370,7 +372,7 @@ describe("Zombie win condition after deaths", () => {
         nightActions: {},
       },
       deadPlayerIds: ["p3", "p4"],
-      zombieInfected: ["p1"],
+      roleState: { zombie: { infected: ["p1"] } },
     };
     const smallGame = makePlayingGame(smallTs, {
       players: [
@@ -406,7 +408,7 @@ describe("Zombie win condition after deaths", () => {
         nightActions: {},
       },
       deadPlayerIds: ["zombie"],
-      zombieInfected: ["p1", "p2"],
+      roleState: { zombie: { infected: ["p1", "p2"] } },
     };
     const game = makeGameWithZombie(ts);
     killPlayer.apply(game, { playerId: "p3" }, "owner-1");
@@ -432,14 +434,14 @@ describe("start-night state carry-forward", () => {
         nightActions: {},
       },
       deadPlayerIds: ["p2"],
-      draculaWives: ["p2", "p3"],
+      roleState: { dracula: { wives: ["p2", "p3"] } },
     };
     const game = makeGameWithDracula(ts);
     startNight.apply(game, undefined, "owner-1");
     if (game.status.type !== GameStatus.Playing) return; // guard for type safety
     const newTs = game.status.turnState as WerewolfTurnState;
-    expect(newTs.draculaWives).not.toContain("p2");
-    expect(newTs.draculaWives).toContain("p3");
+    expect(newTs.roleState?.dracula?.wives).not.toContain("p2");
+    expect(newTs.roleState?.dracula?.wives).toContain("p3");
   });
 
   it("carries zombieInfected forward into the next night turn state (pruning dead)", () => {
@@ -451,13 +453,13 @@ describe("start-night state carry-forward", () => {
         nightActions: {},
       },
       deadPlayerIds: ["p2"],
-      zombieInfected: ["p2", "p3"],
+      roleState: { zombie: { infected: ["p2", "p3"] } },
     };
     const game = makeGameWithZombie(ts);
     startNight.apply(game, undefined, "owner-1");
     if (game.status.type !== GameStatus.Playing) return;
     const newTs = game.status.turnState as WerewolfTurnState;
-    expect(newTs.zombieInfected).not.toContain("p2");
-    expect(newTs.zombieInfected).toContain("p3");
+    expect(newTs.roleState?.zombie?.infected).not.toContain("p2");
+    expect(newTs.roleState?.zombie?.infected).toContain("p3");
   });
 });

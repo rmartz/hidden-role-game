@@ -29,9 +29,10 @@ export function NightPhaseOrderList({
             return (
               <Item
                 key={`${phaseKey}-${String(index)}`}
+                render={<li />}
                 size="sm"
                 variant={isCurrent ? "muted" : "default"}
-                className={isPast ? "opacity-40" : undefined}
+                className={isPast ? "line-through" : undefined}
               >
                 <ItemContent>
                   <ItemTitle>
