@@ -184,6 +184,16 @@ describe("buildNightPhaseOrder", () => {
     expect(seerIdx).toBeLessThan(bodyguardIdx);
   });
 
+  it("includes Monarch in night phase order when assigned and alive", () => {
+    const withMonarch = [
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "m1", roleDefinitionId: WerewolfRole.Monarch },
+      { playerId: "s1", roleDefinitionId: WerewolfRole.Seer },
+    ];
+    const order = buildNightPhaseOrder(2, withMonarch);
+    expect(order).toContain(WerewolfRole.Monarch);
+  });
+
   it("places Wolf Cub bonus phase immediately after the first Werewolf phase", () => {
     const BONUS_PHASE_KEY = `${WerewolfRole.Werewolf}${GROUP_PHASE_KEY_SEPARATOR}2`;
     const withSeer = [

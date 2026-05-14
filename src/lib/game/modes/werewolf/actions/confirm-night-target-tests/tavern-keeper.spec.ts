@@ -29,8 +29,12 @@ function makeTavernKeeperGame(
     deadPlayerIds: overrides.deadPlayerIds ?? [],
   });
   if (overrides.tavernKeeperBlockedPlayerId) {
-    turnState.tavernKeeperBlockedPlayerId =
-      overrides.tavernKeeperBlockedPlayerId;
+    turnState.roleState = {
+      ...turnState.roleState,
+      tavernKeeper: {
+        blockedPlayerId: overrides.tavernKeeperBlockedPlayerId,
+      },
+    };
   }
   return {
     id: "game-1",
@@ -87,7 +91,7 @@ describe("ConfirmNightTarget — Tavern Keeper", () => {
   });
 
   describe("apply — TK confirm stores blocked player ID", () => {
-    it("sets tavernKeeperBlockedPlayerId on confirm", () => {
+    it("sets roleState.tavernKeeper.blockedPlayerId on confirm", () => {
       const game = makeTavernKeeperGame({
         nightActions: {
           [WerewolfRole.TavernKeeper]: { targetPlayerId: "p3" },
@@ -95,9 +99,13 @@ describe("ConfirmNightTarget — Tavern Keeper", () => {
       });
       action.apply(game, {}, "tk1");
       const ts = (
-        game.status as { turnState: { tavernKeeperBlockedPlayerId?: string } }
+        game.status as {
+          turnState: {
+            roleState?: { tavernKeeper?: { blockedPlayerId?: string } };
+          };
+        }
       ).turnState;
-      expect(ts.tavernKeeperBlockedPlayerId).toBe("p3");
+      expect(ts.roleState?.tavernKeeper?.blockedPlayerId).toBe("p3");
     });
 
     it("removes the blocked solo role's phase from nightPhaseOrder", () => {

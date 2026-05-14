@@ -1,3 +1,39 @@
+import type {
+  ArsonistTurnState,
+  DraculaTurnState,
+  ExecutionerTurnState,
+  ExposerTurnState,
+  HunterTurnState,
+  MirrorcasterTurnState,
+  MonarchTurnState,
+  MorticianTurnState,
+  OneEyedSeerTurnState,
+  PriestTurnState,
+  TavernKeeperTurnState,
+  ToughGuyTurnState,
+  WitchTurnState,
+  WolfCubTurnState,
+  ZombieTurnState,
+} from "./roles/turn-state-types";
+
+export type {
+  ArsonistTurnState,
+  DraculaTurnState,
+  ExecutionerTurnState,
+  ExposerTurnState,
+  HunterTurnState,
+  MirrorcasterTurnState,
+  MonarchTurnState,
+  MorticianTurnState,
+  OneEyedSeerTurnState,
+  PriestTurnState,
+  TavernKeeperTurnState,
+  ToughGuyTurnState,
+  WitchTurnState,
+  WolfCubTurnState,
+  ZombieTurnState,
+};
+
 export enum WerewolfPhase {
   Nighttime = "nighttime",
   Daytime = "daytime",
@@ -142,6 +178,8 @@ export interface WerewolfDaytimePhase {
   nightActions: Record<string, AnyNightAction>;
   /** Resolved attack/protect outcomes, computed when transitioning to day. */
   nightResolution?: NightResolutionEvent[];
+  /** Player ID newly knighted by the Monarch during the preceding night, if any. */
+  knightedPlayerId?: string;
   /**
    * Player IDs whose night outcomes have been publicly revealed by the narrator.
    * Absent (or empty) when none have been revealed yet; populated via
@@ -164,54 +202,42 @@ export interface WerewolfDaytimePhase {
 
 export type WerewolfTurnPhase = WerewolfNighttimePhase | WerewolfDaytimePhase;
 
+/**
+ * Namespaced per-role persistent state stored within WerewolfTurnState.
+ * Adding a new role adds one optional key here; no other turn-state field changes.
+ * Each role's state type is defined in roles/turn-state-types.ts.
+ */
+export interface WerewolfRoleTurnState {
+  arsonist?: ArsonistTurnState;
+  dracula?: DraculaTurnState;
+  executioner?: ExecutionerTurnState;
+  exposer?: ExposerTurnState;
+  hunter?: HunterTurnState;
+  mirrorcaster?: MirrorcasterTurnState;
+  monarch?: MonarchTurnState;
+  mortician?: MorticianTurnState;
+  oneEyedSeer?: OneEyedSeerTurnState;
+  priest?: PriestTurnState;
+  tavernKeeper?: TavernKeeperTurnState;
+  toughGuy?: ToughGuyTurnState;
+  witch?: WitchTurnState;
+  wolfCub?: WolfCubTurnState;
+  zombie?: ZombieTurnState;
+}
+
 export interface WerewolfTurnState {
   turn: number;
   phase: WerewolfTurnPhase;
   /** Player IDs that have been marked as dead by the narrator. */
   deadPlayerIds: string[];
-  /** True once the Witch has used her once-per-game special ability. */
-  witchAbilityUsed?: boolean;
   /**
    * Maps phase key → player ID that was targeted last night.
    * Used to prevent roles with preventRepeatTarget from targeting the same
    * player on consecutive nights.
    */
   lastTargets?: Record<string, string>;
-  /** True if a Wolf Cub died this turn — Werewolves get two phases the following night. */
-  wolfCubDied?: boolean;
-  /** Maps warded player ID → Priest player ID. Ward persists until the warded player is attacked. */
-  priestWards?: Record<string, string>;
-  /** Player IDs of Tough Guys who have already survived one attack. */
-  toughGuyHitIds?: string[];
-  /**
-   * One-Eyed Seer is locked onto this player ID after detecting a Werewolf.
-   * Cleared when the locked target is eliminated.
-   */
-  oneEyedSeerLockedTargetId?: string;
-  /** Set when the Hunter dies — blocks win-condition checks and game advancement until resolved. */
-  hunterRevengePlayerId?: string;
-  /** True once the Exposer has used their once-per-game ability. */
-  exposerAbilityUsed?: boolean;
-  /** The role publicly revealed by the Exposer. Persists for the rest of the game. */
-  exposerReveal?: { playerId: string; roleId: string };
-  /** True once the Mortician has successfully killed a Werewolf. */
-  morticianAbilityEnded?: boolean;
-  /** The player ID that the Executioner must get eliminated at trial to win. */
-  executionerTargetId?: string;
-  /** True when the Mirrorcaster has gained a charge from a successful protection. */
-  mirrorcasterCharged?: boolean;
-  /** Player IDs that Dracula has claimed as wives. Accumulated across nights. */
-  draculaWives?: string[];
-  /** Player IDs that the Zombie has infected. Accumulated across nights. */
-  zombieInfected?: string[];
-  /** Player IDs that the Arsonist has doused. Accumulated across nights; reset after an ignite. */
-  arsonistDousedPlayerIds?: string[];
-  /**
-   * The player ID blocked by the Tavern Keeper this night.
-   * That player cannot submit a night action; their phase is removed from
-   * nightPhaseOrder if they are a solo role or the last alive member of a team.
-   */
-  tavernKeeperBlockedPlayerId?: string;
+  /** Namespaced per-role persistent state. One optional key per role. */
+  roleState?: WerewolfRoleTurnState;
 }
 
 export interface TargetablePlayer {

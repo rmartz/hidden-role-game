@@ -54,7 +54,7 @@ describe("Arsonist — dousing", () => {
     const game = makeGameWithArsonist(ts);
     startDay.apply(game, null, "owner-1");
     const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(newTs.arsonistDousedPlayerIds).toEqual(["p2"]);
+    expect(newTs.roleState?.arsonist?.dousedPlayerIds).toEqual(["p2"]);
   });
 
   it("accumulates doused players across nights", () => {
@@ -64,12 +64,12 @@ describe("Arsonist — dousing", () => {
       },
     });
     // p2 was doused on a previous night
-    ts.arsonistDousedPlayerIds = ["p2"];
+    ts.roleState = { arsonist: { dousedPlayerIds: ["p2"] } };
     const game = makeGameWithArsonist(ts);
     startDay.apply(game, null, "owner-1");
     const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(newTs.arsonistDousedPlayerIds).toContain("p2");
-    expect(newTs.arsonistDousedPlayerIds).toContain("p3");
+    expect(newTs.roleState?.arsonist?.dousedPlayerIds).toContain("p2");
+    expect(newTs.roleState?.arsonist?.dousedPlayerIds).toContain("p3");
   });
 
   it("does not duplicate already-doused player", () => {
@@ -78,12 +78,12 @@ describe("Arsonist — dousing", () => {
         [WerewolfRole.Arsonist]: { targetPlayerId: "p2", confirmed: true },
       },
     });
-    ts.arsonistDousedPlayerIds = ["p2"];
+    ts.roleState = { arsonist: { dousedPlayerIds: ["p2"] } };
     const game = makeGameWithArsonist(ts);
     startDay.apply(game, null, "owner-1");
     const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
     expect(
-      newTs.arsonistDousedPlayerIds?.filter((id) => id === "p2"),
+      newTs.roleState?.arsonist?.dousedPlayerIds.filter((id) => id === "p2"),
     ).toHaveLength(1);
   });
 
@@ -101,7 +101,9 @@ describe("Arsonist — dousing", () => {
     const game = makeGameWithArsonist(ts);
     startDay.apply(game, null, "owner-1");
     const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(newTs.arsonistDousedPlayerIds ?? []).not.toContain("p2");
+    expect(newTs.roleState?.arsonist?.dousedPlayerIds ?? []).not.toContain(
+      "p2",
+    );
   });
 
   it("carries doused list forward through start-night", () => {
@@ -117,7 +119,7 @@ describe("Arsonist — dousing", () => {
     const startNight = WEREWOLF_ACTIONS[WerewolfAction.StartNight];
     startNight.apply(game, null, "owner-1");
     const nightTs = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(nightTs.arsonistDousedPlayerIds).toContain("p2");
+    expect(nightTs.roleState?.arsonist?.dousedPlayerIds).toContain("p2");
   });
 });
 
@@ -137,7 +139,7 @@ describe("Arsonist — ignite", () => {
         },
       },
     });
-    ts.arsonistDousedPlayerIds = ["p2", "p3"];
+    ts.roleState = { arsonist: { dousedPlayerIds: ["p2", "p3"] } };
     const game = makeGameWithArsonist(ts);
     startDay.apply(game, null, "owner-1");
     const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
@@ -154,11 +156,11 @@ describe("Arsonist — ignite", () => {
         },
       },
     });
-    ts.arsonistDousedPlayerIds = ["p2", "p3"];
+    ts.roleState = { arsonist: { dousedPlayerIds: ["p2", "p3"] } };
     const game = makeGameWithArsonist(ts);
     startDay.apply(game, null, "owner-1");
     const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(newTs.arsonistDousedPlayerIds ?? []).toHaveLength(0);
+    expect(newTs.roleState?.arsonist?.dousedPlayerIds ?? []).toHaveLength(0);
   });
 
   it("ignite with no doused players kills nobody", () => {
@@ -188,7 +190,7 @@ describe("Arsonist — ignite", () => {
         [WerewolfRole.Bodyguard]: { targetPlayerId: "p2", confirmed: true },
       },
     });
-    ts.arsonistDousedPlayerIds = ["p2"];
+    ts.roleState = { arsonist: { dousedPlayerIds: ["p2"] } };
     const game = makeGameWithArsonist(ts, [
       { playerId: "p5", roleDefinitionId: WerewolfRole.Bodyguard },
     ]);
@@ -213,9 +215,11 @@ describe("Arsonist — ignite", () => {
         },
       },
     });
-    ts.arsonistDousedPlayerIds = ["p2"];
-    // Priest has previously warded p2
-    ts.priestWards = { p2: "p5" };
+    ts.roleState = {
+      arsonist: { dousedPlayerIds: ["p2"] },
+      // Priest has previously warded p2
+      priest: { wards: { p2: "p5" } },
+    };
     const game = makeGameWithArsonist(ts, [
       { playerId: "p5", roleDefinitionId: WerewolfRole.Priest },
     ]);
@@ -241,7 +245,7 @@ describe("Arsonist — ignite", () => {
         [WerewolfRole.Witch]: { targetPlayerId: "p2", confirmed: true },
       },
     });
-    ts.arsonistDousedPlayerIds = ["p2"];
+    ts.roleState = { arsonist: { dousedPlayerIds: ["p2"] } };
     const game = makeGameWithArsonist(ts, [
       { playerId: "p5", roleDefinitionId: WerewolfRole.Witch },
     ]);
@@ -273,7 +277,7 @@ describe("Arsonist — ignite", () => {
         },
       },
     });
-    ts.arsonistDousedPlayerIds = ["p2"];
+    ts.roleState = { arsonist: { dousedPlayerIds: ["p2"] } };
     // Use a game with many Good players so wolves don't win after arsonist dies
     const game = makePlayingGame(ts, {
       players: [
@@ -305,7 +309,7 @@ describe("Arsonist — ignite", () => {
     // Arsonist died this night (killed by wolves) and ignited — list should still reset
     expect(newTs.deadPlayerIds).toContain("arsonist");
     expect(newTs.deadPlayerIds).toContain("p2");
-    expect(newTs.arsonistDousedPlayerIds ?? []).toHaveLength(0);
+    expect(newTs.roleState?.arsonist?.dousedPlayerIds ?? []).toHaveLength(0);
   });
 });
 
@@ -327,7 +331,7 @@ describe("Arsonist — win condition", () => {
       },
       deadPlayerIds: ["p1"], // werewolf already dead
     });
-    ts.arsonistDousedPlayerIds = ["p3", "p4"]; // kill p3 and p4 via ignite
+    ts.roleState = { arsonist: { dousedPlayerIds: ["p3", "p4"] } }; // kill p3 and p4 via ignite
     const game = makeGameWithArsonist(ts);
     startDay.apply(game, null, "owner-1");
     // p3 and p4 killed by ignite; only p2 (Good) and arsonist remain
@@ -348,7 +352,7 @@ describe("Arsonist — win condition", () => {
       deadPlayerIds: ["p1"], // werewolf already dead
     });
     // Douse p2, p3, p4 (all Good)
-    ts.arsonistDousedPlayerIds = ["p2", "p3", "p4"];
+    ts.roleState = { arsonist: { dousedPlayerIds: ["p2", "p3", "p4"] } };
     const game = makeGameWithArsonist(ts);
     startDay.apply(game, null, "owner-1");
     expect(game.status.type).toBe(GameStatus.Finished);
@@ -448,8 +452,8 @@ describe("Arsonist — win condition", () => {
     WEREWOLF_ACTIONS[WerewolfAction.StartNight].apply(game, null, "owner-1");
     const nightTs = (game.status as { turnState: WerewolfTurnState }).turnState;
     // Doused list from previous day should be in the next night's turn state
-    expect(nightTs.arsonistDousedPlayerIds).toEqual(
-      dayTs.arsonistDousedPlayerIds,
+    expect(nightTs.roleState?.arsonist?.dousedPlayerIds).toEqual(
+      dayTs.roleState?.arsonist?.dousedPlayerIds,
     );
   });
 });
@@ -471,11 +475,13 @@ describe("Arsonist — dead players removed from doused list", () => {
         },
       },
     });
-    ts.arsonistDousedPlayerIds = ["p2"];
+    ts.roleState = { arsonist: { dousedPlayerIds: ["p2"] } };
     const game = makeGameWithArsonist(ts);
     startDay.apply(game, null, "owner-1");
     const newTs = (game.status as { turnState: WerewolfTurnState }).turnState;
     // p2 died via wolves — should be removed from doused list
-    expect(newTs.arsonistDousedPlayerIds ?? []).not.toContain("p2");
+    expect(newTs.roleState?.arsonist?.dousedPlayerIds ?? []).not.toContain(
+      "p2",
+    );
   });
 });

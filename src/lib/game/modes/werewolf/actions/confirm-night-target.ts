@@ -20,7 +20,7 @@ export const confirmNightTargetAction: GameAction = {
       // Group phase: all alive participants must agree (same target or all skip).
       if (!isTeamNightAction(action)) return false;
       const ts = currentTurnState(game);
-      const blockedPlayerId = ts?.tavernKeeperBlockedPlayerId;
+      const blockedPlayerId = ts?.roleState?.tavernKeeper?.blockedPlayerId;
       const aliveParticipantIds = getGroupPhasePlayerIds(
         game.roleAssignments,
         result.activePhaseKey,
@@ -73,7 +73,10 @@ export const confirmNightTargetAction: GameAction = {
       const tkAction = phase.nightActions[activePhaseKey];
       if (tkAction && !isTeamNightAction(tkAction) && tkAction.targetPlayerId) {
         const blockedId = tkAction.targetPlayerId;
-        ts.tavernKeeperBlockedPlayerId = blockedId;
+        ts.roleState = {
+          ...ts.roleState,
+          tavernKeeper: { blockedPlayerId: blockedId },
+        };
 
         const blockedAssignment = game.roleAssignments.find(
           (a) => a.playerId === blockedId,

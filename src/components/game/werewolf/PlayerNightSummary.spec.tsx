@@ -36,6 +36,14 @@ describe("PlayerNightSummary", () => {
     expect(screen.getByText(expectedText)).toBeDefined();
   });
 
+  it("renders knighted player text", () => {
+    const nightStatus: DaytimeNightStatusEntry[] = [
+      { targetPlayerId: "p2", effect: "knighted" },
+    ];
+    render(<PlayerNightSummary players={players} nightStatus={nightStatus} />);
+    expect(screen.getByText("Bob was knighted.")).toBeDefined();
+  });
+
   it("renders nothing when nightStatus is empty", () => {
     const { container } = render(
       <PlayerNightSummary players={players} nightStatus={[]} />,

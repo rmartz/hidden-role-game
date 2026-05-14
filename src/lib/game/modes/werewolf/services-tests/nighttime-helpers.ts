@@ -28,8 +28,14 @@ export function makeNighttimeGame(
       nightActions: nightActions as Record<string, AnyNightAction>,
     },
     deadPlayerIds: [],
-    ...(witchAbilityUsed ? { witchAbilityUsed: true } : {}),
-    ...(tavernKeeperBlockedPlayerId ? { tavernKeeperBlockedPlayerId } : {}),
+    ...((witchAbilityUsed || tavernKeeperBlockedPlayerId) && {
+      roleState: {
+        ...(witchAbilityUsed ? { witch: { abilityUsed: true } } : {}),
+        ...(tavernKeeperBlockedPlayerId
+          ? { tavernKeeper: { blockedPlayerId: tavernKeeperBlockedPlayerId } }
+          : {}),
+      },
+    }),
   };
   return {
     id: "game-1",

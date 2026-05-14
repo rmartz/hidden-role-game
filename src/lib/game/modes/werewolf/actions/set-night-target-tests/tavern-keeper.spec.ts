@@ -16,7 +16,7 @@ describe("WerewolfAction.SetNightTarget — Tavern Keeper block", () => {
       nightPhaseOrder: [WerewolfRole.Werewolf, WerewolfRole.Seer],
       currentPhaseIndex: 1, // Seer's turn
     });
-    ts.tavernKeeperBlockedPlayerId = "p2"; // p2 is the Seer
+    ts.roleState = { tavernKeeper: { blockedPlayerId: "p2" } }; // p2 is the Seer
     const game = makePlayingGame(ts);
     expect(action.isValid(game, "p2", { targetPlayerId: "p1" })).toBe(false);
   });
@@ -27,7 +27,7 @@ describe("WerewolfAction.SetNightTarget — Tavern Keeper block", () => {
       nightPhaseOrder: [WerewolfRole.Seer],
       currentPhaseIndex: 0,
     });
-    ts.tavernKeeperBlockedPlayerId = "p2"; // p2 is the Seer
+    ts.roleState = { tavernKeeper: { blockedPlayerId: "p2" } }; // p2 is the Seer
     const game = makePlayingGame(ts);
     // Owner can still override on behalf of a blocked player
     expect(
@@ -44,7 +44,7 @@ describe("WerewolfAction.SetNightTarget — Tavern Keeper block", () => {
       nightPhaseOrder: [WerewolfRole.Werewolf, WerewolfRole.Seer],
       currentPhaseIndex: 0, // Werewolf's turn
     });
-    ts.tavernKeeperBlockedPlayerId = "p2"; // p2 (Seer) is blocked, not p1 (Wolf)
+    ts.roleState = { tavernKeeper: { blockedPlayerId: "p2" } }; // p2 (Seer) is blocked, not p1 (Wolf)
     const game = makePlayingGame(ts);
     expect(action.isValid(game, "p1", { targetPlayerId: "p3" })).toBe(true);
   });
