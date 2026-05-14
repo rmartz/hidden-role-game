@@ -91,7 +91,7 @@ describe("SubmitGhostClue action", () => {
   it("is invalid when the Ghost has already submitted a clue this turn", () => {
     const stateWithClue: WerewolfTurnState = {
       ...dayTurnState,
-      ghostClues: [{ turn: 2, clue: "wolf" }],
+      roleState: { ghost: { clues: [{ turn: 2, clue: "wolf" }] } },
     };
     const game = makeGhostGame(stateWithClue);
     expect(action.isValid(game, "p2", { clue: "moon" })).toBe(false);
@@ -100,28 +100,28 @@ describe("SubmitGhostClue action", () => {
   it("is valid when the Ghost submitted a clue on a previous turn but not this turn", () => {
     const stateWithOldClue: WerewolfTurnState = {
       ...dayTurnState,
-      ghostClues: [{ turn: 1, clue: "moon" }],
+      roleState: { ghost: { clues: [{ turn: 1, clue: "moon" }] } },
     };
     const game = makeGhostGame(stateWithOldClue);
     expect(action.isValid(game, "p2", { clue: "wolf" })).toBe(true);
   });
 
-  it("stores the clue in ghostClues after apply", () => {
+  it("stores the clue in roleState.ghost.clues after apply", () => {
     const game = makeGhostGame(dayTurnState);
     action.apply(game, { clue: "wolf" }, "p2");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.ghostClues).toEqual([{ turn: 2, clue: "wolf" }]);
+    expect(ts.roleState?.ghost?.clues).toEqual([{ turn: 2, clue: "wolf" }]);
   });
 
-  it("appends to existing ghostClues from previous turns", () => {
+  it("appends to existing clues from previous turns", () => {
     const stateWithOldClue: WerewolfTurnState = {
       ...dayTurnState,
-      ghostClues: [{ turn: 1, clue: "moon" }],
+      roleState: { ghost: { clues: [{ turn: 1, clue: "moon" }] } },
     };
     const game = makeGhostGame(stateWithOldClue);
     action.apply(game, { clue: "wolf" }, "p2");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.ghostClues).toEqual([
+    expect(ts.roleState?.ghost?.clues).toEqual([
       { turn: 1, clue: "moon" },
       { turn: 2, clue: "wolf" },
     ]);

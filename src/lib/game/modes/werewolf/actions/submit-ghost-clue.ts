@@ -24,7 +24,7 @@ export const submitGhostClueAction: GameAction = {
     if (normalized.length === 0 || normalized.length > GHOST_CLUE_MAX_LENGTH)
       return false;
 
-    const alreadySubmittedThisTurn = (ts.ghostClues ?? []).some(
+    const alreadySubmittedThisTurn = (ts.roleState?.ghost?.clues ?? []).some(
       (c) => c.turn === ts.turn,
     );
     if (alreadySubmittedThisTurn) return false;
@@ -36,9 +36,10 @@ export const submitGhostClueAction: GameAction = {
     if (!ts) return;
     const { clue } = payload as { clue: string };
     const normalized = clue.trim();
-    ts.ghostClues = [
-      ...(ts.ghostClues ?? []),
-      { turn: ts.turn, clue: normalized },
-    ];
+    const existingClues = ts.roleState?.ghost?.clues ?? [];
+    ts.roleState = {
+      ...ts.roleState,
+      ghost: { clues: [...existingClues, { turn: ts.turn, clue: normalized }] },
+    };
   },
 };
