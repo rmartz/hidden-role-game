@@ -48,18 +48,24 @@ export const setNightTargetAction: GameAction = {
 
     // Once-per-game ability restrictions — narrator can bypass these.
     if (!isOwner) {
-      if (isRoleActive(phaseKey, WerewolfRole.Witch) && ts.witchAbilityUsed)
+      if (
+        isRoleActive(phaseKey, WerewolfRole.Witch) &&
+        ts.roleState?.witch?.abilityUsed
+      )
         return false;
-      if (isRoleActive(phaseKey, WerewolfRole.Exposer) && ts.exposerAbilityUsed)
+      if (
+        isRoleActive(phaseKey, WerewolfRole.Exposer) &&
+        ts.roleState?.exposer?.abilityUsed
+      )
         return false;
       if (
         isRoleActive(phaseKey, WerewolfRole.Mortician) &&
-        ts.morticianAbilityEnded
+        ts.roleState?.mortician?.abilityEnded
       )
         return false;
       if (
         isRoleActive(phaseKey, WerewolfRole.Monarch) &&
-        (ts.monarchKnightingsUsed ?? 0) >= 3
+        (ts.roleState?.monarch?.knightingsUsed ?? 0) >= 3
       )
         return false;
     }
@@ -73,7 +79,7 @@ export const setNightTargetAction: GameAction = {
     if (ts.deadPlayerIds.includes(targetPlayerId)) return false;
     if (
       isRoleActive(phaseKey, WerewolfRole.Monarch) &&
-      (ts.monarchKnightedPlayerIds ?? []).includes(targetPlayerId)
+      (ts.roleState?.monarch?.knightedPlayerIds ?? []).includes(targetPlayerId)
     )
       return false;
 
@@ -101,14 +107,17 @@ export const setNightTargetAction: GameAction = {
     // One-Eyed Seer cannot target when locked onto a living player.
     if (
       isRoleActive(phaseKey, WerewolfRole.OneEyedSeer) &&
-      ts.oneEyedSeerLockedTargetId &&
-      !ts.deadPlayerIds.includes(ts.oneEyedSeerLockedTargetId)
+      ts.roleState?.oneEyedSeer?.lockedTargetId &&
+      !ts.deadPlayerIds.includes(ts.roleState.oneEyedSeer.lockedTargetId)
     )
       return false;
 
     // Priest cannot target when they have an active ward on a living player.
-    if (isRoleActive(phaseKey, WerewolfRole.Priest) && ts.priestWards) {
-      const hasActiveWard = Object.keys(ts.priestWards).some(
+    if (
+      isRoleActive(phaseKey, WerewolfRole.Priest) &&
+      ts.roleState?.priest?.wards
+    ) {
+      const hasActiveWard = Object.keys(ts.roleState.priest.wards).some(
         (wardedId) => !ts.deadPlayerIds.includes(wardedId),
       );
       if (hasActiveWard) return false;
@@ -132,7 +141,7 @@ export const setNightTargetAction: GameAction = {
 
     // Zombie cannot infect an already-infected player.
     if (isRoleActive(phaseKey, WerewolfRole.Zombie)) {
-      if (ts.zombieInfected?.includes(targetPlayerId)) return false;
+      if (ts.roleState?.zombie?.infected.includes(targetPlayerId)) return false;
     }
 
     // Witch cannot self-target unless under attack (self-protect is OK,
@@ -145,9 +154,9 @@ export const setNightTargetAction: GameAction = {
         phase.nightActions,
         game.roleAssignments,
         ts.deadPlayerIds,
-        ts.priestWards,
-        ts.mirrorcasterCharged,
-        ts.arsonistDousedPlayerIds,
+        ts.roleState?.priest?.wards,
+        ts.roleState?.mirrorcaster?.charged,
+        ts.roleState?.arsonist?.dousedPlayerIds,
       );
       if (!attacked.includes(callerId)) return false;
     }
