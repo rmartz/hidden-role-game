@@ -32,7 +32,6 @@ export type {
   WitchTurnState,
   WolfCubTurnState,
   ZombieTurnState,
-  MercenaryTurnState,
 };
 
 export enum WerewolfPhase {
