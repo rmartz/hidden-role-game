@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { fn } from "storybook/test";
+
 import { VeteranActionPanelView } from "./VeteranActionPanelView";
 
 const meta = {

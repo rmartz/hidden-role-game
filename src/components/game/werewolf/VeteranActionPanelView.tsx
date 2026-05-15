@@ -1,8 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import { VETERAN_ALERTS_LIMIT } from "@/lib/game/modes/werewolf/constants";
+import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 
 export interface VeteranActionPanelViewProps {
   alertsUsed: number;

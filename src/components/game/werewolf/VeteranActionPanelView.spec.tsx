@@ -1,8 +1,10 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { VeteranActionPanelView } from "./VeteranActionPanelView";
-import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { VETERAN_ALERTS_LIMIT } from "@/lib/game/modes/werewolf/constants";
+import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+
+import { VeteranActionPanelView } from "./VeteranActionPanelView";
 
 afterEach(cleanup);
 

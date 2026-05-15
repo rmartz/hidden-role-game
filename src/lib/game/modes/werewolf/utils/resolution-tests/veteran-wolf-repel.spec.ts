@@ -1,4 +1,5 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { WerewolfRole } from "../../roles";
 import { resolveNightActions } from "../resolution";
 import { findKilled } from "./helpers";
@@ -110,6 +111,40 @@ describe("resolveNightActions", () => {
 
       const wolfEvent = findKilled(events, "w1");
       expect(wolfEvent).toMatchObject({ died: true });
+    });
+
+    it("alerts, wolves attack, Doctor protects counter-killed wolf: died is false on both events", () => {
+      // The wolf is counter-killed by the Veteran, but the Doctor protects the
+      // wolf, so the counter-kill is absorbed. Both the killed event and the
+      // veteran-counterkilled event should have died: false.
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Werewolf]: {
+            votes: [{ playerId: "w1", targetPlayerId: "vet1" }],
+            suggestedTargetId: "vet1",
+          },
+          [WerewolfRole.Doctor]: { targetPlayerId: "w1" },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        veteranAssignments,
+        [],
+      );
+
+      const vetEvent = findKilled(events, "vet1");
+      expect(vetEvent).toBeUndefined();
+
+      const wolfKilled = findKilled(events, "w1");
+      expect(wolfKilled).toMatchObject({ died: false });
+
+      const counterkilledEvent = events.find(
+        (e) => e.type === "veteran-counterkilled",
+      );
+      expect(counterkilledEvent).toMatchObject({
+        counterkilledPlayerId: "w1",
+        veteranPlayerId: "vet1",
+        source: "wolf-repel",
+        died: false,
+      });
     });
   });
 });

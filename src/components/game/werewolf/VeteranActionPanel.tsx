@@ -1,7 +1,8 @@
 "use client";
 
-import { WerewolfAction } from "@/lib/game/modes/werewolf";
 import { useGameAction } from "@/hooks";
+import { WerewolfAction } from "@/lib/game/modes/werewolf";
+
 import { VeteranActionPanelView } from "./VeteranActionPanelView";
 
 interface VeteranActionPanelProps {

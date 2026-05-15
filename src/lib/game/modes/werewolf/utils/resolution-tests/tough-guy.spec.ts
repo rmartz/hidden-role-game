@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import { WerewolfRole } from "../../roles";
 import {
+  OLD_MAN_TIMER_KEY,
   resolveNightActions,
   SMITE_PHASE_KEY,
-  OLD_MAN_TIMER_KEY,
 } from "../resolution";
 import { findKilled } from "./helpers";
 
