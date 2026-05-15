@@ -1,7 +1,7 @@
 import type { Game, GameAction } from "@/lib/types";
 
 import { currentTurnState, isOwnerPlaying } from "../utils";
-import { didWolfCubDie, cleanupAfterDaytimeKill } from "./helpers";
+import { cleanupAfterDaytimeKill, didWolfCubDie } from "./helpers";
 
 export const markPlayerDeadAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {

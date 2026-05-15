@@ -1,10 +1,10 @@
 import type { Game, GameAction } from "@/lib/types";
 import { GameStatus } from "@/lib/types";
 
+import { WerewolfRole } from "../roles";
 import type { WerewolfNighttimePhase } from "../types";
 import { WerewolfPhase } from "../types";
 import { currentTurnState, isOwnerPlaying } from "../utils";
-import { WerewolfRole } from "../roles";
 import { confirmEvilEmpathResultAction } from "./confirm-evil-empath-result";
 
 export const setNightPhaseAction: GameAction = {

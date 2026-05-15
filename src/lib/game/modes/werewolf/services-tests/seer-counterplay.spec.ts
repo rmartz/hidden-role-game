@@ -1,10 +1,10 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { Game } from "@/lib/types";
 import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 
-import { WEREWOLF_ACTIONS,WerewolfAction } from "../actions";
-import { WEREWOLF_ROLES,WerewolfRole } from "../roles";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "../actions";
+import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import { extractPlayerNightState } from "../services/player-night-state";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "../timer-config";
 import type { WerewolfTurnState } from "../types";

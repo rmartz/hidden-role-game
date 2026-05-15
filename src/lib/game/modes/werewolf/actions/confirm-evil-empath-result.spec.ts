@@ -1,4 +1,4 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { Game } from "@/lib/types";
 import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
@@ -7,7 +7,7 @@ import { WerewolfRole } from "../roles";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "../timer-config";
 import type { WerewolfTurnState } from "../types";
 import { WerewolfPhase } from "../types";
-import { WEREWOLF_ACTIONS,WerewolfAction } from "./index";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "./index";
 
 const action = WEREWOLF_ACTIONS[WerewolfAction.ConfirmEvilEmpathResult];
 
