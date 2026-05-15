@@ -321,7 +321,7 @@ interface TeamNightAction {
 12. Applies Spellcaster action: emits a `silenced` event.
 13. Applies Mummy action: emits a `hypnotized` event for the target.
 14. Applies Swapper to silenced and hypnotized events: swaps the `targetPlayerId` of any silenced or hypnotized event between the two Swapper targets, then emits a `swapper-swapped` event.
-12. Returns `NightResolutionEvent[]`:
+15. Returns `NightResolutionEvent[]`:
 
 - `{ type: "killed", targetPlayerId, attackedBy, protectedBy, died }`
 - `{ type: "silenced", targetPlayerId }`
