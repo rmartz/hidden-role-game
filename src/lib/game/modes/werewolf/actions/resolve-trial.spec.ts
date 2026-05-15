@@ -377,5 +377,33 @@ describe("WerewolfAction.ResolveTrial", () => {
       action.apply(game, {}, "owner-1");
       expect(game.status.type).toBe(GameStatus.Playing);
     });
+
+    it("Mercenary co-wins with Executioner when the Executioner is bribed", () => {
+      const ts = makeDayStateWithPendingTrial("p2", [
+        { playerId: "p3", vote: DaytimeVote.Guilty },
+        { playerId: "p4", vote: DaytimeVote.Guilty },
+      ]);
+      ts.roleState = {
+        executioner: { targetId: "p2" },
+        mercenary: { charged: false, bribedPlayerIds: ["p3"] },
+      };
+      const game = makePlayingGame(ts, {
+        roleAssignments: [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Executioner },
+          { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p5", roleDefinitionId: WerewolfRole.Mercenary },
+        ],
+      });
+      action.apply(game, {}, "owner-1");
+      expect(game.status.type).toBe(GameStatus.Finished);
+      expect((game.status as { winner?: string }).winner).toBe(
+        WerewolfWinner.Executioner,
+      );
+      expect(
+        (game.status as { victoryConditionKey?: string }).victoryConditionKey,
+      ).toBe(WerewolfWinner.Mercenary);
+    });
   });
 });

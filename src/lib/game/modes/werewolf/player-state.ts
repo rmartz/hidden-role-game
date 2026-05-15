@@ -83,6 +83,12 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   priestWardActive?: boolean;
   /** Whether the Mirrorcaster is charged (Attack mode). */
   mirrorcasterCharged?: boolean;
+  /** Whether the Mercenary is charged (Bribe mode). */
+  mercenaryCharged?: boolean;
+  /** Player IDs that the Mercenary has bribed. Narrator-only. */
+  mercenaryBribedPlayerIds?: string[];
+  /** Whether the Mercenary also won alongside the main winner. */
+  mercenaryAlsoWins?: boolean;
   /** True when this player has been blocked by the Tavern Keeper tonight. */
   tavernKeeperBlocked?: boolean;
   /** Executioner: target player ID. */
