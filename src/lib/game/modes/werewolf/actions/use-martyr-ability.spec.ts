@@ -304,7 +304,8 @@ describe("WerewolfAction.UseMartyrAbility", () => {
         ],
       });
       action.apply(game, {}, "owner-1");
-      const result = (game.status as { turnState: WerewolfTurnState }).turnState;
+      const result = (game.status as { turnState: WerewolfTurnState })
+        .turnState;
       expect(result.deadPlayerIds).not.toContain("owner-1");
       expect(result.phase).toMatchObject({ pendingGuiltId: "p3" });
     });
