@@ -27,13 +27,11 @@ export const setNightPhaseAction: GameAction = {
     const { phaseIndex } = payload as { phaseIndex: number };
     const phase = ts.phase as WerewolfNighttimePhase;
     const departingPhaseKey = phase.nightPhaseOrder[phase.currentPhaseIndex];
-    // Auto-compute the Evil Empath adjacency result whenever departing the
-    // Evil Empath phase. The computation must happen BEFORE the phase index
-    // is advanced so the narrator can see the result while the Evil Empath
-    // phase is still active. We skip only if the action was already confirmed
-    // via confirmEvilEmpathResultAction (indicated by resultRevealed being
-    // set), because the generic set-night-target/confirm-night-target flow
-    // can produce a confirmed action without computing the result.
+    const arrivingPhaseKey = phase.nightPhaseOrder[phaseIndex];
+    // Departure fallback: auto-compute the Evil Empath result when leaving their
+    // phase, in case entry computation could not run (e.g. Evil Empath is the
+    // first phase and the night started at index 0 without an explicit entry).
+    // Skip if already computed via confirmEvilEmpathResultAction or start-night.
     const departingAction = phase.nightActions[departingPhaseKey ?? ""];
     const alreadyComputedByEvilEmpathAction =
       departingPhaseKey === (WerewolfRole.EvilEmpath as string) &&
@@ -64,5 +62,12 @@ export const setNightPhaseAction: GameAction = {
         },
       },
     };
+    // Entry compute: auto-compute the Evil Empath adjacency result when entering
+    // their phase so the result is immediately visible to the player during
+    // their active phase. This is the primary compute path; departure above is
+    // a fallback for when the phase starts at index 0 (no prior entry call).
+    if (arrivingPhaseKey === (WerewolfRole.EvilEmpath as string)) {
+      confirmEvilEmpathResultAction.apply(game, {}, "");
+    }
   },
 };

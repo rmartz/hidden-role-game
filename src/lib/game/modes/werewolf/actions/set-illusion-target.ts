@@ -29,6 +29,9 @@ export const setIllusionTargetAction: GameAction = {
     const { targetPlayerId } = payload as { targetPlayerId?: unknown };
     if (typeof targetPlayerId !== "string") return false;
     if (targetPlayerId === callerId) return false;
+    // Narrator cannot be targeted — they have no role assignment and cannot
+    // be an investigation target, matching the restriction in set-night-target.ts.
+    if (targetPlayerId === game.ownerPlayerId) return false;
     const ts = currentTurnState(game);
     if (ts?.phase.type !== WerewolfPhase.Nighttime) return false;
     const existing =

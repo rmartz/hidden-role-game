@@ -171,4 +171,16 @@ describe("WerewolfAction.ConfirmEvilEmpathResult — adjacency (apply)", () => {
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
     expect(ts.roleState?.evilEmpath?.lastResult).toBe(false);
   });
+
+  it("excludes narrator from the seating ring so adjacent players across the narrator seat are still neighbours", () => {
+    // Layout with narrator interspersed: [w1(wolf), owner-1(narrator), p2(seer), p3, p4]
+    // Without narrator filtering: w1's right neighbour is owner-1 (narrator), not p2 → not adjacent.
+    // With narrator filtering: ring is [w1, p2, p3, p4] → w1 and p2 ARE adjacent.
+    const game = makeEmpathGame({
+      playerOrder: ["w1", "owner-1", "p2", "p3", "p4"],
+    });
+    action.apply(game, null, "owner-1");
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.roleState?.evilEmpath?.lastResult).toBe(true);
+  });
 });

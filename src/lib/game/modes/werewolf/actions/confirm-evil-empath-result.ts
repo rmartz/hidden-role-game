@@ -55,14 +55,21 @@ export const confirmEvilEmpathResultAction: GameAction = {
 /**
  * Returns true if the Seer is seated immediately adjacent (one seat left or right,
  * wrapping around) to any living Werewolf player, using game.playerOrder as seating.
+ * The narrator (ownerPlayerId) is excluded from the ring so a player seated next
+ * to the narrator still has two selectable neighbours, matching the pattern used
+ * in set-night-target.ts and extractCountState.
  * Returns false if seating order is unavailable or if either role is dead.
  */
 function computeSeerAdjacentToWerewolf(
   game: Game,
   deadPlayerIds: string[],
 ): boolean {
-  const playerOrder = game.playerOrder;
-  if (!playerOrder || playerOrder.length < 2) return false;
+  const rawOrder = game.playerOrder;
+  if (!rawOrder || rawOrder.length < 2) return false;
+  // Exclude the narrator from the seating ring so their seat does not break
+  // adjacency between players on either side.
+  const playerOrder = rawOrder.filter((id) => id !== game.ownerPlayerId);
+  if (playerOrder.length < 2) return false;
 
   const seerAssignment = game.roleAssignments.find(
     (a) => a.roleDefinitionId === (WerewolfRole.Seer as string),
