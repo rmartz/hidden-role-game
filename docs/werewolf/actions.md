@@ -208,7 +208,7 @@ Additional resolution steps:
 
 **Who:** Ghost player only (dead player with Ghost role)
 **When:** During Daytime
-**Effect:** Records a clue from the Ghost player into `ghostClues` on the turn state. The clue is visible to all living players for the rest of the game.
+**Effect:** Records a clue from the Ghost player into `WerewolfTurnState.roleState.ghost.clues`. The clue is visible to all living players for the rest of the game.
 
 **Payload:** `{ clue: string }`
 
