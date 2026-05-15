@@ -1,15 +1,16 @@
-import { GameStatus } from "@/lib/types";
-import type { Game, GameModeServices, PlayerRoleAssignment } from "@/lib/types";
 import { resolvePlayerOrder } from "@/lib/player-order";
-import { ClocktowerPhase } from "./types";
-import type { ClocktowerTurnState } from "./types";
+import type { Game, GameModeServices, PlayerRoleAssignment } from "@/lib/types";
+import { GameStatus } from "@/lib/types";
+import type { ClocktowerGame } from "@/lib/types/game";
+
+import type { ClocktowerRoleDefinition } from "./roles";
 import {
   ClocktowerCharacterType,
   ClocktowerRole,
   getClocktowerRole,
 } from "./roles";
-import type { ClocktowerRoleDefinition } from "./roles";
-import type { ClocktowerGame } from "@/lib/types/game";
+import type { ClocktowerTurnState } from "./types";
+import { ClocktowerPhase } from "./types";
 
 // ---------------------------------------------------------------------------
 // Helpers

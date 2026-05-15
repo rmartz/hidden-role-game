@@ -1,15 +1,17 @@
-import { describe, it, expect, afterEach } from "vitest";
 import {
-  render,
-  screen,
+  act,
   cleanup,
   fireEvent,
-  act,
+  render,
+  screen,
 } from "@testing-library/react";
-import { PlayerRoleDisplay } from "./PlayerRoleDisplay";
-import type { PublicRoleInfo } from "@/server/types";
-import { GameMode, Team } from "@/lib/types";
+import { afterEach, describe, expect, it } from "vitest";
+
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import { GameMode, Team } from "@/lib/types";
+import type { PublicRoleInfo } from "@/server/types";
+
+import { PlayerRoleDisplay } from "./PlayerRoleDisplay";
 
 afterEach(cleanup);
 

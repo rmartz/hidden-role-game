@@ -1,13 +1,14 @@
 import { GameMode } from "@/lib/types";
 import type { BasePlayerGameState } from "@/server/types/game";
+
+import type { SvTheme } from "./themes";
+import type { SecretVillainTimerConfig } from "./timer-config";
 import type {
+  ElectionVote,
   SecretVillainPhase,
   SpecialActionType,
   SvPowerTable,
-  ElectionVote,
 } from "./types";
-import type { SecretVillainTimerConfig } from "./timer-config";
-import type { SvTheme } from "./themes";
 
 /** Current Secret Villain phase info visible to all players. */
 export interface SvPhaseInfo {

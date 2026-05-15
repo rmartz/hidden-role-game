@@ -1,10 +1,11 @@
-import { ServerResponseStatus } from "@/server/types";
 import { reorderPlayers } from "@/server/lobby";
+import { ServerResponseStatus } from "@/server/types";
 import {
   authenticateLobby,
   errorResponse,
   toPublicLobby,
 } from "@/server/utils";
+
 import { validatePlayerOrder } from "./validate-order";
 
 export async function PUT(

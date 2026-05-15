@@ -1,13 +1,14 @@
-import { Team } from "@/lib/types";
 import type { PlayerRoleAssignment } from "@/lib/types";
-import { TargetCategory } from "../types";
+import { Team } from "@/lib/types";
+
+import { getWerewolfRole, WerewolfRole } from "../roles";
 import type {
   AnyNightAction,
+  HypnotizedNightResolutionEvent,
   NightResolutionEvent,
   SilencedNightResolutionEvent,
-  HypnotizedNightResolutionEvent,
 } from "../types";
-import { WerewolfRole, getWerewolfRole } from "../roles";
+import { TargetCategory } from "../types";
 import { isGroupPhaseKey, isRoleActive } from "./phase-keys";
 import { getGroupPhasePlayerIds } from "./targeting";
 

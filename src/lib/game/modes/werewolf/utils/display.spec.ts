@@ -1,13 +1,14 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { WerewolfRole } from "../roles";
 import {
   buildNightSummary,
+  getConfirmLabel,
   getPhaseLabel,
   isPlayersTurn,
-  getConfirmLabel,
 } from "./display";
 import { SMITE_PHASE_KEY } from "./resolution";
-import { targetPlayerIdOf, getSoloTarget } from "./targeting";
+import { getSoloTarget, targetPlayerIdOf } from "./targeting";
 
 const players = [
   { id: "p1", name: "Alice" },

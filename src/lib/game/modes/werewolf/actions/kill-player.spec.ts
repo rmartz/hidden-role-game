@@ -1,11 +1,13 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { GameStatus } from "@/lib/types";
-import { WerewolfPhase, TrialPhase } from "../types";
-import type { WerewolfTurnState } from "../types";
+
 import { WerewolfRole } from "../roles";
-import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
+import type { WerewolfTurnState } from "../types";
+import { TrialPhase, WerewolfPhase } from "../types";
 import { WerewolfWinner } from "../utils/win-condition";
-import { makePlayingGame, dayTurnState, nightTurnState } from "./test-helpers";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "./index";
+import { dayTurnState, makePlayingGame, nightTurnState } from "./test-helpers";
 
 function freshDayState(): WerewolfTurnState {
   return {

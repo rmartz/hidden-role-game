@@ -1,16 +1,18 @@
 "use client";
 
 import { useMemo } from "react";
+
+import { GameTimer } from "@/components/game";
+import type { WerewolfNighttimePhase } from "@/lib/game/modes/werewolf";
 import {
   getTargetablePlayers,
   isGroupPhaseKey,
 } from "@/lib/game/modes/werewolf";
-import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
-import type { WerewolfNighttimePhase } from "@/lib/game/modes/werewolf";
-import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
-import { getPlayerName } from "@/lib/player";
-import { GameTimer } from "@/components/game";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
+import { getPlayerName } from "@/lib/player";
+
 import { AltruistActionPanel } from "./AltruistActionPanel";
 import { ConfirmTargetButton } from "./ConfirmTargetButton";
 import { PlayerFirstTurnScreen } from "./PlayerFirstTurnScreen";

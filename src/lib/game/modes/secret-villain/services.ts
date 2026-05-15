@@ -1,14 +1,19 @@
-import { isSecretVillainModeConfig, GameStatus, Team } from "@/lib/types";
-import type { Game, GameModeServices, PlayerRoleAssignment } from "@/lib/types";
 import { resolvePlayerOrder } from "@/lib/player-order";
+import type { Game, GameModeServices, PlayerRoleAssignment } from "@/lib/types";
+import { GameStatus, isSecretVillainModeConfig, Team } from "@/lib/types";
+import type { VictoryCondition } from "@/server/types/game";
+
+import { SECRET_VILLAIN_COPY } from "./copy";
 import { SecretVillainRole } from "./roles";
+import type { SvTheme } from "./themes";
+import { getSvThemeLabels } from "./themes";
+import type { SecretVillainTurnState, SvCustomPowerConfig } from "./types";
 import {
   SecretVillainPhase,
   SpecialActionType,
   SvBoardPreset,
   VETO_UNLOCK_THRESHOLD,
 } from "./types";
-import type { SecretVillainTurnState, SvCustomPowerConfig } from "./types";
 import {
   createDeck,
   currentTurnState,
@@ -18,10 +23,6 @@ import {
   SecretVillainWinner,
   SvVictoryConditionKey,
 } from "./utils";
-import { getSvThemeLabels } from "./themes";
-import type { SvTheme } from "./themes";
-import { SECRET_VILLAIN_COPY } from "./copy";
-import type { VictoryCondition } from "@/server/types/game";
 
 function shuffle<T>(array: T[]): T[] {
   const result = [...array];

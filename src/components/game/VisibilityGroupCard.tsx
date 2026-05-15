@@ -1,9 +1,16 @@
 "use client";
 
-import type { ReactNode } from "react";
 import { TargetRegular } from "@fluentui/react-icons";
-import type { GameMode } from "@/lib/types";
-import type { VisibilityReason, VisibleTeammate } from "@/server/types";
+import type { ReactNode } from "react";
+
+import {
+  LONE_WOLF_WARNING,
+  LONE_WOLF_WARNING_ROLES,
+  PLAYER_VISIBILITY_COPY,
+  ROLE_VISIBILITY_OVERRIDES,
+} from "@/components/game/PlayersRoleList.copy";
+import { RoleLabel } from "@/components/RoleLabel";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Item,
   ItemActions,
@@ -11,15 +18,9 @@ import {
   ItemGroup,
   ItemTitle,
 } from "@/components/ui/item";
-import { Card, CardContent } from "@/components/ui/card";
-import { RoleLabel } from "@/components/RoleLabel";
 import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
-import {
-  PLAYER_VISIBILITY_COPY,
-  ROLE_VISIBILITY_OVERRIDES,
-  LONE_WOLF_WARNING,
-  LONE_WOLF_WARNING_ROLES,
-} from "@/components/game/PlayersRoleList.copy";
+import type { GameMode } from "@/lib/types";
+import type { VisibilityReason, VisibleTeammate } from "@/server/types";
 
 export const REASON_CONFIG: Record<
   VisibilityReason,

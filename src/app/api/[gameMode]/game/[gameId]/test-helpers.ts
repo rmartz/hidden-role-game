@@ -1,12 +1,13 @@
-import { POST as createLobby } from "../../../lobby/create/route";
-import { POST as joinLobby } from "../../../lobby/[lobbyId]/join/route";
-import { PUT as updateConfig } from "../../../lobby/[lobbyId]/config/route";
-import { POST as startGame } from "../create/route";
 import {
-  postRequest,
-  makeLobbyParams,
   makeCreateGameParams,
+  makeLobbyParams,
+  postRequest,
 } from "@/app/api/test-utils";
+
+import { PUT as updateConfig } from "../../../lobby/[lobbyId]/config/route";
+import { POST as joinLobby } from "../../../lobby/[lobbyId]/join/route";
+import { POST as createLobby } from "../../../lobby/create/route";
+import { POST as startGame } from "../create/route";
 
 export async function setupStartedSecretVillainGame() {
   const createRes = await createLobby(

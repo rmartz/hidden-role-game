@@ -1,15 +1,17 @@
-import { describe, it, expect } from "vitest";
-import { POST as createLobby } from "../../../create/route";
-import { POST as joinLobby } from "../../join/route";
-import { PUT as updateConfig } from "../../config/route";
+import { describe, expect, it } from "vitest";
+
 import { POST as startGame } from "@/app/api/[gameMode]/game/create/route";
-import { DELETE as removePlayer, PUT as renamePlayer } from "./route";
 import {
-  postRequest,
+  makeCreateGameParams,
   makeLobbyParams as makeParams,
   makePlayerParams,
-  makeCreateGameParams,
+  postRequest,
 } from "@/app/api/test-utils";
+
+import { POST as createLobby } from "../../../create/route";
+import { PUT as updateConfig } from "../../config/route";
+import { POST as joinLobby } from "../../join/route";
+import { DELETE as removePlayer, PUT as renamePlayer } from "./route";
 
 describe("DELETE /api/lobby/[lobbyId]/players/[playerId]", () => {
   it("should allow a player to remove themselves", async () => {

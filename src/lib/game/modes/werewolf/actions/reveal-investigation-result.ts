@@ -1,7 +1,8 @@
 import type { Game, GameAction } from "@/lib/types";
-import { WerewolfPhase, isTeamNightAction, TargetCategory } from "../types";
-import { currentTurnState, isOwnerPlaying } from "../utils";
+
 import { getWerewolfRole } from "../roles";
+import { isTeamNightAction, TargetCategory, WerewolfPhase } from "../types";
+import { currentTurnState, isOwnerPlaying } from "../utils";
 
 export const revealInvestigationResultAction: GameAction = {
   isValid(game: Game, callerId: string) {

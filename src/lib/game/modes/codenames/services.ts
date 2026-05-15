@@ -1,7 +1,8 @@
-import { GameStatus } from "@/lib/types";
 import type { Game, GameModeServices, RoleDefinition } from "@/lib/types";
-import type { CodenamesTurnState } from "./types";
+import { GameStatus } from "@/lib/types";
+
 import { CodenamesRole } from "./roles";
+import type { CodenamesTurnState } from "./types";
 
 function currentTurnState(game: Game): CodenamesTurnState | undefined {
   if (game.status.type !== GameStatus.Playing) return undefined;

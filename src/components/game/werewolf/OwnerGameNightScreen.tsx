@@ -1,46 +1,48 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   BedRegular,
   ClockWarningRegular,
   WeatherSunnyLowRegular,
 } from "@fluentui/react-icons";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+import { GameTimer } from "@/components/game";
+import { Button } from "@/components/ui/button";
+import { useGameAction } from "@/hooks";
 import { GAME_MODES } from "@/lib/game/modes";
+import type {
+  AnyNightAction,
+  WerewolfRoleDefinition,
+  WerewolfTurnState,
+} from "@/lib/game/modes/werewolf";
 import {
-  WerewolfPhase,
-  WerewolfAction,
-  isTeamNightAction,
-  isGroupPhaseKey,
   baseGroupPhaseKey,
-  getTargetablePlayers,
+  getInvestigationResultForNarrator,
   getPhaseLabel,
   getSoloTarget,
+  getTargetablePlayers,
+  isGroupPhaseKey,
+  isTeamNightAction,
   TargetCategory,
-  getInvestigationResultForNarrator,
+  WerewolfAction,
+  WerewolfPhase,
 } from "@/lib/game/modes/werewolf";
-import { WerewolfRole, getWerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import { isRoleActive } from "@/lib/game/modes/werewolf";
-import type {
-  WerewolfTurnState,
-  WerewolfRoleDefinition,
-} from "@/lib/game/modes/werewolf";
+import { buildNarratorInstruction } from "@/lib/game/modes/werewolf";
+import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
-import { Button } from "@/components/ui/button";
+import { getWerewolfRole, WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import { getPlayerName } from "@/lib/player";
-import { useGameAction } from "@/hooks";
-import { GameTimer } from "@/components/game";
+
+import { NarratorNightInstruction } from "./NarratorNightInstruction";
+import { NightMarkerEffect } from "./NightActionMarker";
+import { NightPhaseOrderList } from "./NightPhaseOrderList";
 import { OwnerAdvanceCard } from "./OwnerAdvanceCard";
-import { OwnerInvestigationConfirm } from "./OwnerInvestigationConfirm";
 import { OwnerIlluminatiRevealPanel } from "./OwnerIlluminatiRevealPanel";
+import { OwnerInvestigationConfirm } from "./OwnerInvestigationConfirm";
 import { OwnerNightTargetPanel } from "./OwnerNightTargetPanel";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
-import { NightPhaseOrderList } from "./NightPhaseOrderList";
-import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
-import type { AnyNightAction } from "@/lib/game/modes/werewolf";
-import { buildNarratorInstruction } from "@/lib/game/modes/werewolf";
-import { NightMarkerEffect } from "./NightActionMarker";
-import { NarratorNightInstruction } from "./NarratorNightInstruction";
 
 /**
  * Derives per-player night action status markers from the narrator's night actions.

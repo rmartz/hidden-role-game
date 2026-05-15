@@ -1,19 +1,21 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
+import type { Game } from "@/lib/types";
+
+import { WerewolfRole } from "../../roles";
 import type {
-  WerewolfTurnState,
-  WerewolfNighttimePhase,
   AnyNightAction,
   TeamNightAction,
+  WerewolfNighttimePhase,
+  WerewolfTurnState,
 } from "../../types";
 import { WerewolfPhase } from "../../types";
-import { WerewolfRole } from "../../roles";
-import { WerewolfAction, WEREWOLF_ACTIONS } from "../index";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "../index";
 import {
   makeTeamGame,
   makeTeamNightState,
   TEAM_BAD_KEY,
 } from "../test-helpers";
-import type { Game } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
 // ConfirmNightTarget — team phase

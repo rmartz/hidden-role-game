@@ -1,9 +1,10 @@
 "use client";
 
-import type { ReactNode } from "react";
-import type { GameMode } from "@/lib/types";
-import type { VisibleTeammate } from "@/server/types";
 import { TargetRegular } from "@fluentui/react-icons";
+import type { ReactNode } from "react";
+
+import { RoleLabel } from "@/components/RoleLabel";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Item,
   ItemActions,
@@ -11,11 +12,12 @@ import {
   ItemGroup,
   ItemTitle,
 } from "@/components/ui/item";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RoleLabel } from "@/components/RoleLabel";
+import type { GameMode } from "@/lib/types";
+import type { VisibleTeammate } from "@/server/types";
+
 import { NARRATOR_PLAYER_ROLE_LISTS_COPY } from "./NarratorPlayerRoleLists.copy";
-import { NightActionMarker } from "./NightActionMarker";
 import type { NightMarkerEffect } from "./NightActionMarker";
+import { NightActionMarker } from "./NightActionMarker";
 
 interface NarratorPlayerRoleListsProps {
   assignments: VisibleTeammate[];

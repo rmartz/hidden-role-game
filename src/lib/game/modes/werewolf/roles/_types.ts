@@ -1,6 +1,7 @@
-import { Team } from "@/lib/types";
 import type { RoleDefinition } from "@/lib/types";
-import { WakesAtNight, TargetCategory } from "../types";
+import { Team } from "@/lib/types";
+
+import { TargetCategory, WakesAtNight } from "../types";
 
 export enum WerewolfRoleCategory {
   EvilKilling = "evil-killing",
@@ -46,6 +47,7 @@ export enum WerewolfRole {
   Arsonist = "werewolf-arsonist",
   Bodyguard = "werewolf-bodyguard",
   Chupacabra = "werewolf-chupacabra",
+  Count = "werewolf-count",
   Doctor = "werewolf-doctor",
   Dracula = "werewolf-dracula",
   ElusiveSeer = "werewolf-elusive-seer",
@@ -53,6 +55,7 @@ export enum WerewolfRole {
   Exposer = "werewolf-exposer",
   Hunter = "werewolf-hunter",
   Illuminati = "werewolf-illuminati",
+  Insomniac = "werewolf-insomniac",
   LoneWolf = "werewolf-lone-wolf",
   Mason = "werewolf-mason",
   Mayor = "werewolf-mayor",
@@ -74,6 +77,7 @@ export enum WerewolfRole {
   Spoiler = "werewolf-spoiler",
   Swapper = "werewolf-swapper",
   Tanner = "werewolf-tanner",
+  TheThing = "werewolf-the-thing",
   ToughGuy = "werewolf-tough-guy",
   Vigilante = "werewolf-vigilante",
   VillageIdiot = "werewolf-village-idiot",
@@ -120,6 +124,12 @@ export interface WerewolfRoleDefinition extends RoleDefinition<
   dualTargetSwap?: boolean;
   /** Exposer only: ability can only be used once per game. */
   oncePerGame?: boolean;
+  /**
+   * True for roles whose night action targets are restricted to adjacent seats.
+   * The Thing may only tap immediate neighbors; the player list from
+   * `game.playerOrder` is used to determine adjacency.
+   */
+  adjacentTargetOnly?: boolean;
   /** Illuminati only: on night 1, the narrator reveals all role assignments to this player. */
   revealsFullRoleList?: boolean;
   /** Used for grouping in the role config UI. */

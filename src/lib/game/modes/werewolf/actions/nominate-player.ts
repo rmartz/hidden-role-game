@@ -1,8 +1,9 @@
 import type { Game, GameAction } from "@/lib/types";
-import { WerewolfPhase } from "../types";
-import { getWerewolfModeConfig } from "../lobby-config";
-import { currentTurnState, getSilencedPlayerIds } from "../utils";
+
 import { NOMINATION_VOTE_THRESHOLD } from "../constants";
+import { getWerewolfModeConfig } from "../lobby-config";
+import { WerewolfPhase } from "../types";
+import { currentTurnState, getSilencedPlayerIds } from "../utils";
 import { startTrialAction } from "./start-trial";
 
 export const nominatePlayerAction: GameAction = {

@@ -1,7 +1,9 @@
-import { afterEach, describe, it, expect, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
-import { PlayerSelectionView } from "./PlayerSelectionView";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
+
+import { PlayerSelectionView } from "./PlayerSelectionView";
 
 afterEach(cleanup);
 

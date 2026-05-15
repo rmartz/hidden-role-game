@@ -1,8 +1,10 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import type { RoleBucket } from "@/lib/types";
 import { GameMode, isSimpleRoleBucket } from "@/lib/types";
-import { SecretVillainRole } from "./roles";
+
 import { SECRET_VILLAIN_CONFIG } from "./config";
+import { SecretVillainRole } from "./roles";
 
 const noBoard = { gameMode: GameMode.SecretVillain } as const;
 const withBoard = {

@@ -1,9 +1,9 @@
 import type { GameMode } from "@/lib/types";
 import type {
-  ServerResponse,
-  PublicLobby,
   LobbyJoinResponse,
   PlayerGameState,
+  PublicLobby,
+  ServerResponse,
   UpdateLobbyConfigRequest,
 } from "@/server/types";
 import { ServerResponseStatus } from "@/server/types";

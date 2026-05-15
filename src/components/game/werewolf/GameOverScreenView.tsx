@@ -1,14 +1,14 @@
 "use client";
 
-import { Team } from "@/lib/types";
-import type { FinishedGameStatus } from "@/lib/types";
-import { WerewolfWinner } from "@/lib/game/modes/werewolf/utils/win-condition";
-import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
-import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
-import type { VisibleTeammate } from "@/server/types";
-import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
+import { WerewolfWinner } from "@/lib/game/modes/werewolf/utils/win-condition";
+import type { FinishedGameStatus } from "@/lib/types";
+import { Team } from "@/lib/types";
+import type { VisibleTeammate } from "@/server/types";
 
 export interface GameOverScreenViewProps {
   gameState: WerewolfPlayerGameState;
