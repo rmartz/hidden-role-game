@@ -291,6 +291,24 @@ describe("WerewolfAction.UseMartyrAbility", () => {
       expect(result.deadPlayerIds).not.toContain("p3");
     });
 
+    it("narrator apply with no Martyr in game is a no-op (does not kill narrator)", () => {
+      // isValid would return false in this case, but we verify apply is safe
+      // on its own too — no ?fallback that could kill the narrator.
+      const ts = makeDayStateWithMartyrWindow("p3");
+      const game = makePlayingGame(ts, {
+        roleAssignments: [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+        ],
+      });
+      action.apply(game, {}, "owner-1");
+      const result = (game.status as { turnState: WerewolfTurnState }).turnState;
+      expect(result.deadPlayerIds).not.toContain("owner-1");
+      expect(result.phase).toMatchObject({ pendingGuiltId: "p3" });
+    });
+
     it("Executioner does not win when they are dead when Martyr self-sacrifices", () => {
       const ts: WerewolfTurnState = {
         ...makeDayStateWithMartyrWindow("p3", ["p4"]),

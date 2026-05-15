@@ -51,10 +51,9 @@ export const useMartyrAbilityAction: GameAction = {
     const martyrAssignment = game.roleAssignments.find(
       (a) => a.roleDefinitionId === (WerewolfRole.Martyr as string),
     );
+    if (!martyrAssignment) return;
     const martyrId =
-      callerId === game.ownerPlayerId
-        ? (martyrAssignment?.playerId ?? callerId)
-        : callerId;
+      callerId === game.ownerPlayerId ? martyrAssignment.playerId : callerId;
 
     // Convicted player is spared; Martyr dies instead.
     ts.phase.pendingGuiltId = undefined;
