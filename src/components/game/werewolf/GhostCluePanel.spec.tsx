@@ -1,7 +1,9 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { GhostCluePanelView } from "./GhostCluePanel";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+
+import { GhostCluePanelView } from "./GhostCluePanel";
 
 afterEach(cleanup);
 

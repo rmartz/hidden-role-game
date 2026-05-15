@@ -1,14 +1,15 @@
 "use client";
 
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GAME_MODES } from "@/lib/game/modes";
-import { getPhaseLabel } from "@/lib/game/modes/werewolf";
 import type { WerewolfNighttimePhase } from "@/lib/game/modes/werewolf";
-import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { getPhaseLabel } from "@/lib/game/modes/werewolf";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { isTeamNightAction } from "@/lib/game/modes/werewolf/types";
 import { getPlayerName } from "@/lib/player";
+
 import { NightPhaseOrderList } from "./NightPhaseOrderList";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface GhostNightObserverScreenProps {
   gameState: WerewolfPlayerGameState;

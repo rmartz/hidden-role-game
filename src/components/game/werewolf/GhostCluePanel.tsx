@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { WerewolfAction } from "@/lib/game/modes/werewolf";
-import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
-import { GHOST_CLUE_MAX_LENGTH } from "@/lib/game/modes/werewolf/actions/submit-ghost-clue";
-import { useGameAction } from "@/hooks";
+
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { useGameAction } from "@/hooks";
+import { WerewolfAction } from "@/lib/game/modes/werewolf";
+import { GHOST_CLUE_MAX_LENGTH } from "@/lib/game/modes/werewolf/actions/submit-ghost-clue";
+import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 
 export interface GhostCluePanelViewProps {
   ghostClues: { turn: number; clue: string }[];

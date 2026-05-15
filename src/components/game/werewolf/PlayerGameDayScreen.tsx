@@ -16,12 +16,12 @@ import {
 } from "@/lib/game/modes/werewolf/roles";
 import { getPlayerName } from "@/lib/player";
 
+import { GhostCluePanel } from "./GhostCluePanel";
 import { NominationPanel } from "./NominationPanel";
 import { PlayerNightSummary } from "./PlayerNightSummary";
 import { PlayerRoleDisplay } from "./PlayerRoleDisplay";
 import { PlayerStatusLists } from "./PlayerStatusLists";
 import { TrialVotePanel } from "./TrialVotePanel";
-import { GhostCluePanel } from "./GhostCluePanel";
 
 interface PlayerGameDayScreenProps {
   gameId: string;

@@ -1,6 +1,7 @@
 import type { Game, GameAction } from "@/lib/types";
-import { WerewolfPhase } from "../types";
+
 import { WerewolfRole } from "../roles";
+import { WerewolfPhase } from "../types";
 import { currentTurnState } from "../utils";
 
 export const GHOST_CLUE_MAX_LENGTH = 20;

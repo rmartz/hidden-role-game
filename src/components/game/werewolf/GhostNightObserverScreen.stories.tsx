@@ -1,10 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { GameMode, GameStatus } from "@/lib/types";
-import { WerewolfPhase } from "@/lib/game/modes/werewolf";
+
 import type { WerewolfNighttimePhase } from "@/lib/game/modes/werewolf";
+import { WerewolfPhase } from "@/lib/game/modes/werewolf";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
-import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { GameMode, GameStatus } from "@/lib/types";
+
 import { GhostNightObserverScreen } from "./GhostNightObserverScreen";
 
 const meta = {

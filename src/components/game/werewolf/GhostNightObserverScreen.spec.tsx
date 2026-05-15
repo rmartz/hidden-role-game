@@ -1,13 +1,15 @@
-import { afterEach, describe, expect, it } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
-import { GameMode, GameStatus } from "@/lib/types";
-import { WerewolfPhase } from "@/lib/game/modes/werewolf";
+import { afterEach, describe, expect, it } from "vitest";
+
 import type { WerewolfNighttimePhase } from "@/lib/game/modes/werewolf";
+import { WerewolfPhase } from "@/lib/game/modes/werewolf";
+import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
-import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { GameMode, GameStatus } from "@/lib/types";
+
 import { GhostNightObserverScreen } from "./GhostNightObserverScreen";
-import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 
 afterEach(cleanup);
 
