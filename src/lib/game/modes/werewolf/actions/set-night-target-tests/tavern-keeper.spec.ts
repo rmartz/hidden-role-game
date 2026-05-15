@@ -1,8 +1,8 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import { WerewolfRole } from "../../roles";
-import { WEREWOLF_ACTIONS,WerewolfAction } from "../index";
-import { makeNightState,makePlayingGame } from "../test-helpers";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "../index";
+import { makeNightState, makePlayingGame } from "../test-helpers";
 
 const action = WEREWOLF_ACTIONS[WerewolfAction.SetNightTarget];
 

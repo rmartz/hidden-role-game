@@ -1,11 +1,11 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { Game } from "@/lib/types";
 import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 
 import { WerewolfRole } from "../../roles";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "../../timer-config";
-import { WEREWOLF_ACTIONS,WerewolfAction } from "../index";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "../index";
 import { makeNightState } from "../test-helpers";
 
 const action = WEREWOLF_ACTIONS[WerewolfAction.ConfirmNightTarget];

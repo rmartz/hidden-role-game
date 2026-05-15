@@ -2,8 +2,8 @@
 
 import type { WerewolfNighttimePhase } from "@/lib/game/modes/werewolf";
 import { isPlayersTurn } from "@/lib/game/modes/werewolf";
-import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 
 import { PlayerNightActionScreen } from "./PlayerNightActionScreen";
 import { PlayerNightSnoozeScreen } from "./PlayerNightSnoozeScreen";
