@@ -153,16 +153,18 @@ The Martyr window is always inserted after a Guilty verdict, even when no Martyr
 
 ### `use-martyr-ability`
 
-**Who:** Martyr player only
+**Who:** Martyr player, or Narrator (narrator-first: no-device Martyr support)
 **When:** During Daytime, when `pendingGuiltId` is set (Guilty verdict pending)
 **Effect:** The Martyr intercepts the conviction — the convicted player is spared, and the Martyr dies instead. Checks win condition after the Martyr's death. Sets `martyrUsed: true` (once-per-game ability).
 
+**Payload:** none — the Martyr is unique, so the action resolves the Martyr's identity automatically by scanning `roleAssignments`.
+
 **Validation:**
 
-- Caller must be the Martyr and must be alive.
+- Caller must be the Martyr player, or the Narrator (narrator-first bypass for no-device tables). The Martyr must be alive.
 - `pendingGuiltId` must be set.
 - `martyrUsed` must be `false`.
-- The Martyr cannot use this ability to save themselves (`pendingGuiltId !== callerId`).
+- The Martyr cannot use this ability to save themselves (`pendingGuiltId !== martyrId`).
 
 ---
 
@@ -290,7 +292,7 @@ The Martyr window is always inserted after a Guilty verdict, even when no Martyr
 | `resolve-hunter-revenge`      | Narrator                  | `{ targetPlayerId: string }`                           |
 | `resolve-trial`               | Narrator                  | none                                                   |
 | `advance-martyr-window`       | Narrator                  | none                                                   |
-| `use-martyr-ability`          | Martyr player             | none                                                   |
+| `use-martyr-ability`          | Martyr player or Narrator | none                                                   |
 | `end-game`                    | Narrator                  | none                                                   |
 | `smite-player`                | Narrator                  | `{ playerId: string }`                                 |
 | `unsmite-player`              | Narrator                  | `{ playerId: string }`                                 |

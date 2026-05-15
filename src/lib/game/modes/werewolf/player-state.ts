@@ -146,6 +146,12 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
     mustVoteInnocent?: boolean;
     voteResults?: { playerName: string; vote: DaytimeVote }[];
     eliminatedRole?: { id: string; name: string; team: Team };
+    /**
+     * True when the defendant was actually eliminated (added to `deadPlayerIds`).
+     * False when the defendant survived (e.g. Martyr intercept).
+     * Only set when `verdict` is present.
+     */
+    defendantEliminated?: boolean;
   };
 }
 

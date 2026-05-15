@@ -216,10 +216,7 @@ describe("WerewolfAction.AdvanceMartyrWindow", () => {
       );
     });
 
-    it("Tanner win is blocked when Martyr takes Tanner's elimination", () => {
-      // The Martyr uses their ability (UseMartyrAbility) before this action runs,
-      // clearing pendingGuiltId so this action never fires for the Tanner.
-      // This test verifies Tanner does NOT win when pendingGuiltId is a different player.
+    it("Tanner does not win when a non-Tanner player is eliminated", () => {
       const game = makePlayingGame(makeDayStateWithPendingGuilt("p2"), {
         roleAssignments: [
           { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },

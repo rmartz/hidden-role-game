@@ -70,7 +70,7 @@ export function TrialVotePanel({
   const defendantSpared =
     activeTrial.verdict === TrialVerdict.Eliminated &&
     !pendingGuiltId &&
-    !activeTrial.eliminatedRole;
+    activeTrial.defendantEliminated === false;
   const verdictLabel = activeTrial.verdict
     ? defendantSpared
       ? trial.verdictLabelSpared

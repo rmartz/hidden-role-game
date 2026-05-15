@@ -50,6 +50,7 @@ export interface FirebaseWerewolfPlayerState
     mustVoteInnocent?: boolean;
     voteResults?: { playerName: string; vote: DaytimeVote }[];
     eliminatedRole?: { id: string; name: string; team: string };
+    defendantEliminated?: boolean;
   };
   nominationsEnabled: boolean;
   trialsPerDay?: number;
