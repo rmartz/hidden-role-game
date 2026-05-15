@@ -75,6 +75,7 @@ interface WerewolfRoleDefinition {
   checksForSeer?: boolean; // True = investigates whether target is the Seer (Wizard)
   revealsExactRole?: boolean; // True = investigation reveals the exact role, not just team (Mystic Seer)
   dualTargetInvestigate?: boolean; // True = selects two targets and learns if they share a team (Mentalist)
+  dualTargetSwap?: boolean; // True = selects two targets and swaps their final night effects (Swapper)
   oncePerGame?: boolean; // True = ability can only be used once (Exposer)
   revealsFullRoleList?: boolean; // True = on night 1 narrator reveals all role assignments to this player (Illuminati)
 }
