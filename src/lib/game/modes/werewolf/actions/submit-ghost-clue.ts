@@ -18,6 +18,7 @@ export const submitGhostClueAction: GameAction = {
     if (callerAssignment?.roleDefinitionId !== (WerewolfRole.Ghost as string))
       return false;
 
+    if (!payload || typeof payload !== "object") return false;
     const { clue } = payload as { clue?: unknown };
     if (typeof clue !== "string") return false;
     const normalized = clue.trim();
@@ -34,6 +35,7 @@ export const submitGhostClueAction: GameAction = {
   apply(game: Game, payload: unknown) {
     const ts = currentTurnState(game);
     if (!ts) return;
+    if (!payload || typeof payload !== "object") return;
     const { clue } = payload as { clue: string };
     const normalized = clue.trim();
     const existingClues = ts.roleState?.ghost?.clues ?? [];

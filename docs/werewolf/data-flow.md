@@ -311,7 +311,7 @@ The `WerewolfWinner` enum determines the outcome of the game. In addition to the
 
 The Ghost is a Good-team role that becomes meaningful after death. When the Ghost dies, they gain narrator-level visibility into all nighttime actions. During each day phase, they may submit a single short clue (up to 20 characters) visible to all living players.
 
-**`WerewolfTurnState.ghostClues`**: `{ turn: number; clue: string }[]`
-Persists all submitted clues across turns. The Ghost may submit at most one clue per `turn` value (enforced by the `submit-ghost-clue` action). During daytime, all players receive the full `ghostClues` array in their `PlayerGameState`. The Ghost's own state additionally includes `ghostClueSubmittedThisTurn: true` once they have submitted for the current turn.
+**`WerewolfTurnState.roleState.ghost.clues`**: `{ turn: number; clue: string }[]`
+Persists all submitted clues across turns. The Ghost may submit at most one clue per `turn` value (enforced by the `submit-ghost-clue` action). During daytime, all players receive the full clue history as `ghostClues` in their `PlayerGameState`. The Ghost's own state additionally includes `ghostClueSubmittedThisTurn: true` once they have submitted for the current turn.
 
 **Nighttime observer view**: When the Ghost is dead and the game is in the nighttime phase, `extractNonOwnerState` sets `ghostVisible: true` and fully populates `nightActions` for the Ghost's session (identical to the narrator's view). The Ghost client renders a read-only observer screen instead of the normal "snoozing" screen.

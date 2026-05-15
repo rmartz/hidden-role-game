@@ -20,7 +20,8 @@ export function GhostNightObserverScreen({
   phase,
 }: GhostNightObserverScreenProps) {
   const modeConfig = GAME_MODES[gameState.gameMode];
-  const { nightPhaseOrder, currentPhaseIndex, nightActions } = phase;
+  const { nightPhaseOrder, currentPhaseIndex } = phase;
+  const nightActions = gameState.nightActions ?? phase.nightActions;
   const activePhaseKey = nightPhaseOrder[currentPhaseIndex] ?? "";
   const activePhaseLabel = getPhaseLabel(activePhaseKey, modeConfig.roles);
   const playerById = new Map(gameState.players.map((p) => [p.id, p]));

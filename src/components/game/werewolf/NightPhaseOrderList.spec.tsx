@@ -70,8 +70,8 @@ describe("NightPhaseOrderList", () => {
     expect(screen.queryByText("(current)")).toBeNull();
   });
 
-  it("applies line-through class to past phases", () => {
-    const { container } = render(
+  it("applies line-through class to past phases only", () => {
+    render(
       <NightPhaseOrderList
         nightPhaseOrder={nightPhaseOrder}
         currentPhaseIndex={2}
@@ -79,8 +79,18 @@ describe("NightPhaseOrderList", () => {
       />,
     );
 
-    const items = container.querySelectorAll("[class*='line-through']");
-    expect(items.length).toBe(4);
+    expect(
+      screen.getByText("Seer").closest("[class*='line-through']"),
+    ).not.toBeNull();
+    expect(
+      screen.getByText("Werewolf").closest("[class*='line-through']"),
+    ).not.toBeNull();
+    expect(
+      screen.getByText("Bodyguard").closest("[class*='line-through']"),
+    ).toBeNull();
+    expect(
+      screen.getByText("Witch").closest("[class*='line-through']"),
+    ).toBeNull();
   });
 
   it("does not apply line-through class to future phases", () => {
