@@ -16,7 +16,6 @@ function makeTavernKeeperGame(
     nightPhaseOrder: string[];
     currentPhaseIndex: number;
     deadPlayerIds: string[];
-    tavernKeeperBlockedPlayerId: string;
   }> = {},
 ) {
   const turnState = makeNightState({
@@ -30,14 +29,6 @@ function makeTavernKeeperGame(
     nightActions: (overrides.nightActions ?? {}) as Record<string, never>,
     deadPlayerIds: overrides.deadPlayerIds ?? [],
   });
-  if (overrides.tavernKeeperBlockedPlayerId) {
-    turnState.roleState = {
-      ...turnState.roleState,
-      tavernKeeper: {
-        blockedPlayerId: overrides.tavernKeeperBlockedPlayerId,
-      },
-    };
-  }
   return {
     id: "game-1",
     lobbyId: "lobby-1",
@@ -72,7 +63,7 @@ function makeTavernKeeperGame(
 }
 
 // ---------------------------------------------------------------------------
-// ConfirmNightTarget — Tavern Keeper block logic
+// ConfirmNightTarget — Tavern Keeper (retroactive-undo mechanic)
 // ---------------------------------------------------------------------------
 
 describe("ConfirmNightTarget — Tavern Keeper", () => {
@@ -92,8 +83,8 @@ describe("ConfirmNightTarget — Tavern Keeper", () => {
     });
   });
 
-  describe("apply — TK confirm stores blocked player ID", () => {
-    it("sets roleState.tavernKeeper.blockedPlayerId on confirm", () => {
+  describe("apply — TK confirm marks action as confirmed only", () => {
+    it("sets confirmed on the TK action without storing roleState.tavernKeeper", () => {
       const game = makeTavernKeeperGame({
         nightActions: {
           [WerewolfRole.TavernKeeper]: { targetPlayerId: "p3" },
@@ -103,14 +94,18 @@ describe("ConfirmNightTarget — Tavern Keeper", () => {
       const ts = (
         game.status as {
           turnState: {
-            roleState?: { tavernKeeper?: { blockedPlayerId?: string } };
+            phase: { nightActions: Record<string, { confirmed?: boolean }> };
+            roleState?: { tavernKeeper?: unknown };
           };
         }
       ).turnState;
-      expect(ts.roleState?.tavernKeeper?.blockedPlayerId).toBe("p3");
+      expect(ts.phase.nightActions[WerewolfRole.TavernKeeper]?.confirmed).toBe(
+        true,
+      );
+      expect(ts.roleState?.tavernKeeper).toBeUndefined();
     });
 
-    it("removes the blocked solo role's phase from nightPhaseOrder", () => {
+    it("does not remove the blocked player's phase from nightPhaseOrder", () => {
       const game = makeTavernKeeperGame({
         nightActions: {
           [WerewolfRole.TavernKeeper]: { targetPlayerId: "p3" },
@@ -125,65 +120,14 @@ describe("ConfirmNightTarget — Tavern Keeper", () => {
       const ts = (
         game.status as { turnState: { phase: { nightPhaseOrder: string[] } } }
       ).turnState;
-      expect(ts.phase.nightPhaseOrder).not.toContain(WerewolfRole.Seer);
+      // Seer phase is kept — the undo happens at resolution, not at confirm time
+      expect(ts.phase.nightPhaseOrder).toContain(WerewolfRole.Seer);
       expect(ts.phase.nightPhaseOrder).toContain(WerewolfRole.Werewolf);
-    });
-
-    it("keeps the werewolf group phase when multiple wolves are alive", () => {
-      const game = {
-        ...makeTavernKeeperGame({
-          nightActions: {
-            [WerewolfRole.TavernKeeper]: { targetPlayerId: "w1" },
-          },
-          nightPhaseOrder: [
-            WerewolfRole.TavernKeeper,
-            WerewolfRole.Werewolf,
-            WerewolfRole.Seer,
-          ],
-        }),
-        players: [
-          { id: "tk1", name: "TK", sessionId: "stk1", visiblePlayers: [] },
-          { id: "w1", name: "Wolf1", sessionId: "sw1", visiblePlayers: [] },
-          { id: "w2", name: "Wolf2", sessionId: "sw2", visiblePlayers: [] },
-          { id: "p3", name: "Seer", sessionId: "s3", visiblePlayers: [] },
-        ],
-        roleAssignments: [
-          { playerId: "tk1", roleDefinitionId: WerewolfRole.TavernKeeper },
-          { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
-          { playerId: "w2", roleDefinitionId: WerewolfRole.Werewolf },
-          { playerId: "p3", roleDefinitionId: WerewolfRole.Seer },
-        ],
-      };
-      action.apply(game, {}, "tk1");
-      const ts = (
-        game.status as { turnState: { phase: { nightPhaseOrder: string[] } } }
-      ).turnState;
-      // Wolf phase is kept because w2 is still alive and unblocked
-      expect(ts.phase.nightPhaseOrder).toContain(WerewolfRole.Werewolf);
-    });
-
-    it("removes the werewolf group phase when the lone wolf is blocked", () => {
-      // Only one wolf — blocking them removes the wolf phase entirely
-      const game = makeTavernKeeperGame({
-        nightActions: {
-          [WerewolfRole.TavernKeeper]: { targetPlayerId: "w1" },
-        },
-        nightPhaseOrder: [
-          WerewolfRole.TavernKeeper,
-          WerewolfRole.Werewolf,
-          WerewolfRole.Seer,
-        ],
-      });
-      action.apply(game, {}, "tk1");
-      const ts = (
-        game.status as { turnState: { phase: { nightPhaseOrder: string[] } } }
-      ).turnState;
-      expect(ts.phase.nightPhaseOrder).not.toContain(WerewolfRole.Werewolf);
     });
   });
 
-  describe("isValid — group phase with blocked participant", () => {
-    it("allows group phase confirm when only unblocked wolves have voted", () => {
+  describe("isValid — group phase confirm (no TK block filter)", () => {
+    it("requires all alive group participants to have voted", () => {
       const game = {
         ...makeTavernKeeperGame({
           nightPhaseOrder: [WerewolfRole.Werewolf, WerewolfRole.Seer],
@@ -193,7 +137,6 @@ describe("ConfirmNightTarget — Tavern Keeper", () => {
               votes: [{ playerId: "w2", targetPlayerId: "p3" }],
             },
           },
-          tavernKeeperBlockedPlayerId: "w1",
         }),
         players: [
           { id: "tk1", name: "TK", sessionId: "stk1", visiblePlayers: [] },
@@ -222,17 +165,23 @@ describe("ConfirmNightTarget — Tavern Keeper", () => {
           { playerId: "p3", roleDefinitionId: WerewolfRole.Seer },
         ],
       };
-      // w2 (unblocked) has voted — should be valid to confirm
-      expect(action.isValid(game, "w2", undefined)).toBe(true);
+      // w2 voted but w1 has not — requires both to agree now (no TK block filter)
+      expect(action.isValid(game, "w2", undefined)).toBe(false);
     });
 
-    it("rejects group confirm when the only unblocked wolf has not voted", () => {
+    it("allows group confirm when all alive participants have voted the same target", () => {
       const game = {
         ...makeTavernKeeperGame({
           nightPhaseOrder: [WerewolfRole.Werewolf, WerewolfRole.Seer],
           currentPhaseIndex: 0,
-          nightActions: {},
-          tavernKeeperBlockedPlayerId: "w1",
+          nightActions: {
+            [WerewolfRole.Werewolf]: {
+              votes: [
+                { playerId: "w1", targetPlayerId: "p3" },
+                { playerId: "w2", targetPlayerId: "p3" },
+              ],
+            },
+          },
         }),
         players: [
           { id: "tk1", name: "TK", sessionId: "stk1", visiblePlayers: [] },
@@ -261,7 +210,7 @@ describe("ConfirmNightTarget — Tavern Keeper", () => {
           { playerId: "p3", roleDefinitionId: WerewolfRole.Seer },
         ],
       };
-      expect(action.isValid(game, "w2", undefined)).toBe(false);
+      expect(action.isValid(game, "w2", undefined)).toBe(true);
     });
   });
 });

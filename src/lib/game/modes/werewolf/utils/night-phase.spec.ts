@@ -249,16 +249,16 @@ describe("buildNightPhaseOrder", () => {
     expect(vigilanteIdx).toBeLessThan(seerIdx);
   });
 
-  it("places TavernKeeper first before Werewolf when present", () => {
+  it("places TavernKeeper after Werewolf (sorts by category — VillagerSupport after EvilKilling)", () => {
     const withTK = [
       { playerId: "tk1", roleDefinitionId: WerewolfRole.TavernKeeper },
       { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
       { playerId: "s1", roleDefinitionId: WerewolfRole.Seer },
     ];
     const order = buildNightPhaseOrder(2, withTK);
-    expect(order[0]).toBe(WerewolfRole.TavernKeeper);
     const werewolfIdx = order.indexOf(WerewolfRole.Werewolf);
-    expect(werewolfIdx).toBeGreaterThan(0);
+    const tkIdx = order.indexOf(WerewolfRole.TavernKeeper);
+    expect(werewolfIdx).toBeLessThan(tkIdx);
   });
 
   it("excludes TavernKeeper when they are dead", () => {

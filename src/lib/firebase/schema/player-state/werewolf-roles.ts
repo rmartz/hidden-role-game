@@ -36,8 +36,6 @@ export interface FirebaseWerewolfRoleState {
   hiddenRoleIds?: string[];
   arsonistDousedPlayerIds?: string[];
   pendingSmitePlayerIds?: string[];
-  /** True when this player has been blocked by the Tavern Keeper tonight. */
-  tavernKeeperBlocked?: boolean;
   thingTappedMe?: boolean;
   thingTappedPlayerId?: string;
   insomniacResult?: { leftActed: boolean; rightActed: boolean };
@@ -97,7 +95,6 @@ export function werewolfRoleStateToFirebase(
     ...(state.pendingSmitePlayerIds?.length
       ? { pendingSmitePlayerIds: state.pendingSmitePlayerIds }
       : {}),
-    ...(state.tavernKeeperBlocked ? { tavernKeeperBlocked: true } : {}),
     ...(state.thingTappedMe ? { thingTappedMe: true } : {}),
     ...(state.thingTappedPlayerId
       ? { thingTappedPlayerId: state.thingTappedPlayerId }
@@ -163,7 +160,6 @@ export function werewolfRoleStateFromFirebase(
     ...(raw.pendingSmitePlayerIds?.length
       ? { pendingSmitePlayerIds: raw.pendingSmitePlayerIds }
       : {}),
-    ...(raw.tavernKeeperBlocked ? { tavernKeeperBlocked: true } : {}),
     ...(raw.thingTappedMe ? { thingTappedMe: true } : {}),
     ...(raw.thingTappedPlayerId
       ? { thingTappedPlayerId: raw.thingTappedPlayerId }

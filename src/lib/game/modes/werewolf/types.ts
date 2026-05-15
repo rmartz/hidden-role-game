@@ -10,7 +10,6 @@ import type {
   MorticianTurnState,
   OneEyedSeerTurnState,
   PriestTurnState,
-  TavernKeeperTurnState,
   TheThingTurnState,
   ToughGuyTurnState,
   WitchTurnState,
@@ -30,7 +29,6 @@ export type {
   MorticianTurnState,
   OneEyedSeerTurnState,
   PriestTurnState,
-  TavernKeeperTurnState,
   TheThingTurnState,
   ToughGuyTurnState,
   WitchTurnState,
@@ -135,13 +133,19 @@ export interface SwapperSwappedNightResolutionEvent {
   secondPlayerId: string;
 }
 
+export interface HangoverNightResolutionEvent {
+  type: "hangover";
+  targetPlayerId: string;
+}
+
 export type NightResolutionEvent =
   | AttackNightResolutionEvent
   | SilencedNightResolutionEvent
   | HypnotizedNightResolutionEvent
   | ToughGuyAbsorbedNightResolutionEvent
   | AltruistInterceptedNightResolutionEvent
-  | SwapperSwappedNightResolutionEvent;
+  | SwapperSwappedNightResolutionEvent
+  | HangoverNightResolutionEvent;
 
 export enum DaytimeVote {
   Guilty = "guilty",
@@ -234,7 +238,6 @@ export interface WerewolfRoleTurnState {
   mortician?: MorticianTurnState;
   oneEyedSeer?: OneEyedSeerTurnState;
   priest?: PriestTurnState;
-  tavernKeeper?: TavernKeeperTurnState;
   theThing?: TheThingTurnState;
   toughGuy?: ToughGuyTurnState;
   witch?: WitchTurnState;

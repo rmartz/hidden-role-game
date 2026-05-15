@@ -2,7 +2,6 @@
 
 import type { WerewolfNighttimePhase } from "@/lib/game/modes/werewolf";
 import { isPlayersTurn } from "@/lib/game/modes/werewolf";
-import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 
 import { PlayerNightActionScreen } from "./PlayerNightActionScreen";
@@ -27,16 +26,6 @@ export function PlayerGameNightScreen({
   const isMyTurn = isPlayersTurn(gameState.myRole, activePhaseKey);
 
   const isSnoozing = (gameState.amDead ?? false) || !isMyTurn;
-
-  if (gameState.tavernKeeperBlocked) {
-    return (
-      <div className="p-5 max-w-lg mx-auto">
-        <p className="text-muted-foreground italic">
-          {WEREWOLF_COPY.tavernKeeper.blocked}
-        </p>
-      </div>
-    );
-  }
 
   return isSnoozing ? (
     <PlayerNightSnoozeScreen amDead={gameState.amDead ?? false} />

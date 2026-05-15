@@ -52,10 +52,6 @@ export const setNightTargetAction: GameAction = {
       if (existing?.confirmed) return false;
     }
 
-    // Tavern Keeper block: blocked player (non-owner) may not submit a night action.
-    if (!isOwner && ts.roleState?.tavernKeeper?.blockedPlayerId === callerId)
-      return false;
-
     // Once-per-game ability restrictions — narrator can bypass these.
     if (!isOwner) {
       if (

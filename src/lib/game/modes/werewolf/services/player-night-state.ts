@@ -73,11 +73,6 @@ export function extractPlayerNightState(
   const ts = currentTurnState(game);
   const nightActions = ts?.phase.nightActions ?? {};
 
-  // Tavern Keeper block: show blocked message, skip all other night state.
-  if (ts?.roleState?.tavernKeeper?.blockedPlayerId === callerId) {
-    return { tavernKeeperBlocked: true };
-  }
-
   // Group phase handling.
   const groupPhaseKey = myRole.teamTargeting ? myRole.id : myRole.wakesWith;
 
@@ -143,12 +138,11 @@ function extractGroupPhaseState(
 
   const myVote = action.votes.find((v) => v.playerId === callerId);
   const playerById = new Map(game.players.map((p) => [p.id, p]));
-  const blockedPlayerId = ts?.roleState?.tavernKeeper?.blockedPlayerId;
   const aliveParticipantIds = getGroupPhasePlayerIds(
     game.roleAssignments,
     groupPhaseKey,
     deadPlayerIds,
-  ).filter((id) => id !== blockedPlayerId);
+  );
 
   const teamVotes = action.votes
     .filter((v) => aliveParticipantIds.includes(v.playerId))

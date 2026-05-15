@@ -19,6 +19,7 @@ export function NightOutcomeSummaryItem({
   const toughGuyAbsorbed = events?.some(
     (event) => event.type === "tough-guy-absorbed",
   );
+  const hangover = events?.some((event) => event.type === "hangover");
 
   return (
     <>
@@ -60,6 +61,11 @@ export function NightOutcomeSummaryItem({
       )}
       {silenced && (
         <span className="ml-1 text-yellow-600 font-medium">(silenced)</span>
+      )}
+      {hangover && (
+        <span className="ml-1 text-amber-600 font-medium">
+          (awakes with a hangover)
+        </span>
       )}
       {knighted && (
         <span className="ml-1 text-blue-600 font-medium">(knighted)</span>

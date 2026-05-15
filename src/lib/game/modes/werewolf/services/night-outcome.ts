@@ -1,9 +1,10 @@
 import type { NightResolutionEvent, WerewolfDaytimePhase } from "../types";
 
 export enum NightOutcomeEffect {
+  Hangover = "hangover",
+  Hypnotized = "hypnotized",
   Killed = "killed",
   Silenced = "silenced",
-  Hypnotized = "hypnotized",
 }
 
 export interface AffectedPlayerOutcome {
@@ -38,6 +39,11 @@ export function getOrderedAffectedPlayers(
       outcome = {
         playerId: event.targetPlayerId,
         effect: NightOutcomeEffect.Hypnotized,
+      };
+    } else if (event.type === "hangover") {
+      outcome = {
+        playerId: event.targetPlayerId,
+        effect: NightOutcomeEffect.Hangover,
       };
     }
     if (outcome && !seen.has(outcome.playerId)) {

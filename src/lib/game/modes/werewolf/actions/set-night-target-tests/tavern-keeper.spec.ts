@@ -7,30 +7,30 @@ import { makeNightState, makePlayingGame } from "../test-helpers";
 const action = WEREWOLF_ACTIONS[WerewolfAction.SetNightTarget];
 
 // ---------------------------------------------------------------------------
-// SetNightTarget — Tavern Keeper block
+// SetNightTarget — Tavern Keeper (retroactive-undo mechanic)
+// There is no longer a block guard at submit time. Players submit normally;
+// the TK's target is undone retroactively during resolution.
 // ---------------------------------------------------------------------------
 
-describe("WerewolfAction.SetNightTarget — Tavern Keeper block", () => {
-  it("blocks the targeted player from submitting a night action", () => {
+describe("WerewolfAction.SetNightTarget — Tavern Keeper", () => {
+  it("allows a player to submit a night action during the Seer phase (no TK block at submit time)", () => {
     const ts = makeNightState({
       turn: 2,
-      nightPhaseOrder: [WerewolfRole.Werewolf, WerewolfRole.Seer],
-      currentPhaseIndex: 1, // Seer's turn
+      nightPhaseOrder: [WerewolfRole.Seer],
+      currentPhaseIndex: 0, // Seer's turn
     });
-    ts.roleState = { tavernKeeper: { blockedPlayerId: "p2" } }; // p2 is the Seer
     const game = makePlayingGame(ts);
-    expect(action.isValid(game, "p2", { targetPlayerId: "p1" })).toBe(false);
+    // p2 is the Seer — previously would be blocked if TK targeted them, now they can act freely
+    expect(action.isValid(game, "p2", { targetPlayerId: "p1" })).toBe(true);
   });
 
-  it("allows the owner to set a target for a blocked player's phase", () => {
+  it("allows the owner to set a target for the TK phase", () => {
     const ts = makeNightState({
       turn: 2,
       nightPhaseOrder: [WerewolfRole.Seer],
       currentPhaseIndex: 0,
     });
-    ts.roleState = { tavernKeeper: { blockedPlayerId: "p2" } }; // p2 is the Seer
     const game = makePlayingGame(ts);
-    // Owner can still override on behalf of a blocked player
     expect(
       action.isValid(game, "owner-1", {
         roleId: WerewolfRole.Seer,
@@ -39,14 +39,17 @@ describe("WerewolfAction.SetNightTarget — Tavern Keeper block", () => {
     ).toBe(true);
   });
 
-  it("does not block an unblocked player from acting", () => {
+  it("does not block any player from submitting a night action", () => {
+    // With the old mechanic, setting roleState.tavernKeeper.blockedPlayerId
+    // would prevent the blocked player from calling SetNightTarget. Verify
+    // that this guard is gone — no roleState.tavernKeeper entry exists anymore.
     const ts = makeNightState({
       turn: 2,
       nightPhaseOrder: [WerewolfRole.Werewolf, WerewolfRole.Seer],
       currentPhaseIndex: 0, // Werewolf's turn
     });
-    ts.roleState = { tavernKeeper: { blockedPlayerId: "p2" } }; // p2 (Seer) is blocked, not p1 (Wolf)
     const game = makePlayingGame(ts);
+    // p1 (Werewolf) can submit their action unimpeded
     expect(action.isValid(game, "p1", { targetPlayerId: "p3" })).toBe(true);
   });
 });

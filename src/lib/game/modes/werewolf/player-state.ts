@@ -89,8 +89,6 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   mercenaryBribedPlayerIds?: string[];
   /** Whether the Mercenary also won alongside the main winner. */
   mercenaryAlsoWins?: boolean;
-  /** True when this player has been blocked by the Tavern Keeper tonight. */
-  tavernKeeperBlocked?: boolean;
   /** Executioner: target player ID. */
   executionerTargetId?: string;
   /**

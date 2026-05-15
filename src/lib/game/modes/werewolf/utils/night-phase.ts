@@ -92,7 +92,6 @@ export function buildNightPhaseOrder(
   const emittedGroupPhases = new Set<string>();
 
   let altruistPhaseKey: string | undefined;
-  let tavernKeeperPhaseKey: string | undefined;
   let witchPhaseKey: string | undefined;
   let insomniacPhaseKey: string | undefined;
 
@@ -127,10 +126,6 @@ export function buildNightPhaseOrder(
         if (!hasAliveGroupParticipants(key, roleAssignments, dead)) continue;
         phaseKeys.push(key);
       }
-    } else if (role.id === WerewolfRole.TavernKeeper) {
-      // Tavern Keeper acts first — before all other roles.
-      if (!hasAlivePlayers(role.id, roleAssignments, dead)) continue;
-      tavernKeeperPhaseKey = role.id;
     } else if (role.id === WerewolfRole.Witch) {
       if (!hasAlivePlayers(role.id, roleAssignments, dead)) continue;
       witchPhaseKey = role.id;
@@ -154,9 +149,6 @@ export function buildNightPhaseOrder(
   if (witchPhaseKey !== undefined) phaseKeys.push(witchPhaseKey);
   // Altruist acts after the Witch — so they only see players still unprotected.
   if (altruistPhaseKey !== undefined) phaseKeys.push(altruistPhaseKey);
-  // Tavern Keeper acts first — unshift to the front after all others are collected.
-  if (tavernKeeperPhaseKey !== undefined)
-    phaseKeys.unshift(tavernKeeperPhaseKey);
   // Insomniac acts absolutely last — after all other roles have acted — so they
   // can determine which neighbors woke and performed a non-skip action.
   if (insomniacPhaseKey !== undefined) phaseKeys.push(insomniacPhaseKey);

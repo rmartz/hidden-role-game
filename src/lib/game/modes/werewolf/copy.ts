@@ -240,9 +240,10 @@ export const WEREWOLF_COPY = {
     nextOutcomeHint: (name: string, effect: string) =>
       `Next: ${name} (${effect})`,
     revealEffect: {
+      [NightOutcomeEffect.Hangover]: "hangover",
+      [NightOutcomeEffect.Hypnotized]: "hypnotized",
       [NightOutcomeEffect.Killed]: "killed",
       [NightOutcomeEffect.Silenced]: "silenced",
-      [NightOutcomeEffect.Hypnotized]: "hypnotized",
     },
   },
   mirrorcaster: {
@@ -318,8 +319,8 @@ export const WEREWOLF_COPY = {
       "There are Mason characters in this game. If any player mentions Masons or implies they are one, smite them during the night.",
   },
   tavernKeeper: {
-    blocked:
-      "You had too much to drink at the tavern. You cannot stay awake tonight.",
+    hangover: (playerName: string) =>
+      `${playerName} awakes with a hangover.`,
   },
   kill: {
     button: "Kill",

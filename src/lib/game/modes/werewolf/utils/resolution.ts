@@ -4,11 +4,12 @@ import { Team } from "@/lib/types";
 import { getWerewolfRole, WerewolfRole } from "../roles";
 import type {
   AnyNightAction,
+  HangoverNightResolutionEvent,
   HypnotizedNightResolutionEvent,
   NightResolutionEvent,
   SilencedNightResolutionEvent,
 } from "../types";
-import { TargetCategory } from "../types";
+import { isTeamNightAction, TargetCategory } from "../types";
 import { isGroupPhaseKey, isRoleActive } from "./phase-keys";
 import { getGroupPhasePlayerIds } from "./targeting";
 
@@ -350,8 +351,29 @@ export function resolveNightActions(
   smitedPlayerIds?: string[],
   options?: NightResolutionOptions,
 ): NightResolutionEvent[] {
+  // Tavern Keeper: retroactively undo the target's night action.
+  // If TK confirmed a target and that target's role is not Investigative,
+  // remove the target's phase key from night actions before resolving.
+  let resolvedNightActions = nightActions;
+  const hangoverEvents: HangoverNightResolutionEvent[] = [];
+  const tkAction = nightActions[WerewolfRole.TavernKeeper];
+  if (tkAction && !isTeamNightAction(tkAction) && tkAction.targetPlayerId) {
+    const tkTarget = tkAction.targetPlayerId;
+    const targetAssignment = roleAssignments.find((a) => a.playerId === tkTarget);
+    const targetRole = targetAssignment
+      ? getWerewolfRole(targetAssignment.roleDefinitionId)
+      : undefined;
+    if (targetRole && targetRole.targetCategory !== TargetCategory.Investigate) {
+      const blockedPhaseKey = (targetRole.wakesWith ?? targetRole.id) as string;
+      resolvedNightActions = Object.fromEntries(
+        Object.entries(nightActions).filter(([k]) => k !== blockedPhaseKey),
+      );
+      hangoverEvents.push({ type: "hangover", targetPlayerId: tkTarget });
+    }
+  }
+
   const { attacks, protections } = collectBaseAttacksAndProtections(
-    nightActions,
+    resolvedNightActions,
     roleAssignments,
     deadPlayerIds,
     options?.mirrorcasterCharged,
@@ -362,7 +384,7 @@ export function resolveNightActions(
   // Applied before Priest wards and the Witch so that wards/protections can apply to ignite targets.
   applyArsonistIgnite(
     attacks,
-    nightActions,
+    resolvedNightActions,
     roleAssignments,
     options?.arsonistDousedPlayerIds,
   );
@@ -373,7 +395,7 @@ export function resolveNightActions(
   }
 
   // Witch: if target is already attacked → protect; otherwise → attack.
-  const witchAction = nightActions[WerewolfRole.Witch] as
+  const witchAction = resolvedNightActions[WerewolfRole.Witch] as
     | { targetPlayerId?: string }
     | undefined;
   if (witchAction?.targetPlayerId) {
@@ -402,7 +424,7 @@ export function resolveNightActions(
   // not already protected (including by the Witch), redirect the attack onto the
   // Altruist instead. Ignored if the Altruist is themselves already under attack
   // or if the target is the Altruist themselves.
-  const altruistAction = nightActions[WerewolfRole.Altruist] as
+  const altruistAction = resolvedNightActions[WerewolfRole.Altruist] as
     | { targetPlayerId?: string }
     | undefined;
   let altruistInterceptEvent: NightResolutionEvent | undefined;
@@ -432,7 +454,7 @@ export function resolveNightActions(
   // Swapper: swap the attacks and protections between the two selected players.
   // Runs after all other attack/protect modifiers so it operates on the final
   // attack and protection state. Silenced and hypnotized events are swapped later.
-  const swapperAction = nightActions[WerewolfRole.Swapper] as
+  const swapperAction = resolvedNightActions[WerewolfRole.Swapper] as
     | {
         targetPlayerId?: string;
         secondTargetPlayerId?: string;
@@ -551,7 +573,7 @@ export function resolveNightActions(
   }
 
   // Spellcaster: emit a silenced event for their target.
-  const spellcasterAction = nightActions[WerewolfRole.Spellcaster] as
+  const spellcasterAction = resolvedNightActions[WerewolfRole.Spellcaster] as
     | { targetPlayerId?: string }
     | undefined;
   const silencedEvents: SilencedNightResolutionEvent[] =
@@ -560,7 +582,7 @@ export function resolveNightActions(
       : [];
 
   // Mummy: emit a hypnotized event for their target.
-  const mummyAction = nightActions[WerewolfRole.Mummy] as
+  const mummyAction = resolvedNightActions[WerewolfRole.Mummy] as
     | { targetPlayerId?: string }
     | undefined;
   const mummyPlayerId = roleAssignments.find(
@@ -614,5 +636,6 @@ export function resolveNightActions(
     ...finalSilencedEvents,
     ...finalHypnotizedEvents,
     ...swapperEvents,
+    ...hangoverEvents,
   ];
 }

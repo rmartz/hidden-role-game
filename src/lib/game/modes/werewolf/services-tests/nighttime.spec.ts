@@ -12,14 +12,19 @@ import {
 } from "./nighttime-helpers";
 
 // ---------------------------------------------------------------------------
-// extractPlayerNightState — Tavern Keeper block
+// extractPlayerNightState — Tavern Keeper (retroactive-undo mechanic)
+// Players are no longer blocked at night-state extraction time. They proceed
+// normally; the TK's target's action is undone retroactively at resolution.
 // ---------------------------------------------------------------------------
 
-describe("extractPlayerNightState (Tavern Keeper block)", () => {
-  it("returns { tavernKeeperBlocked: true } when the caller is the blocked player", () => {
-    const game = makeNighttimeGame({}, false, "p1");
+describe("extractPlayerNightState (Tavern Keeper mechanic)", () => {
+  it("returns normal night state for a player even when TK would have targeted them", () => {
+    // With the old mechanic, p1 would get { tavernKeeperBlocked: true }.
+    // With the new mechanic, p1 receives their normal night state.
+    const game = makeNighttimeGame({});
     const result = extractPlayerNightState(game, "p1", werewolfRole, []);
-    expect(result).toEqual({ tavernKeeperBlocked: true });
+    expect(result).toHaveProperty("myNightTarget");
+    expect(result).not.toHaveProperty("tavernKeeperBlocked");
   });
 });
 
