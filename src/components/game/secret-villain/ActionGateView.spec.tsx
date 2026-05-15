@@ -1,7 +1,9 @@
-import { afterEach, describe, it, expect, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
-import { ActionGateView } from "./ActionGateView";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
+
+import { ActionGateView } from "./ActionGateView";
 
 afterEach(cleanup);
 

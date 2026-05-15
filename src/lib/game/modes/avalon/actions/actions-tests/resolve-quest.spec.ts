@@ -1,18 +1,20 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { GameStatus } from "@/lib/types";
-import { AvalonPhase, QuestCard } from "../../types";
+
 import type { QuestPhase } from "../../types";
+import { AvalonPhase, QuestCard } from "../../types";
 import {
-  resolveQuestAction,
   advanceFromQuestAction,
+  resolveQuestAction,
   tallyQuestCards,
 } from "../resolve-quest";
 import {
+  getTurnState,
   makeGame,
   makeProposalTurnState,
-  makeVoteTurnState,
   makeQuestTurnState,
-  getTurnState,
+  makeVoteTurnState,
 } from "./helpers";
 
 describe("resolveQuestAction", () => {

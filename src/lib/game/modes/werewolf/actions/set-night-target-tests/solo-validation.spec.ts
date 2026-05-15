@@ -1,13 +1,14 @@
-import { describe, it, expect } from "vitest";
-import type { WerewolfTurnState } from "../../types";
+import { describe, expect, it } from "vitest";
+
 import { WerewolfRole } from "../../roles";
-import { WerewolfAction, WEREWOLF_ACTIONS } from "../index";
+import type { WerewolfTurnState } from "../../types";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "../index";
 import {
-  makePlayingGame,
+  dayTurnState,
   makeNightState,
+  makePlayingGame,
   nightTurn2State,
   nightTurnState,
-  dayTurnState,
 } from "../test-helpers";
 
 // ---------------------------------------------------------------------------
@@ -175,6 +176,67 @@ describe("WerewolfAction.SetNightTarget", () => {
         monarch: { knightedPlayerIds: ["p3"], knightingsUsed: 0 },
       };
       expect(action.isValid(game, "p2", { targetPlayerId: "p3" })).toBe(false);
+    });
+  });
+
+  describe("isValid — adjacentTargetOnly (The Thing)", () => {
+    function makeThingGame(playerOrder: string[]) {
+      const thingTurnState = makeNightState({
+        turn: 2,
+        nightPhaseOrder: [WerewolfRole.TheThing],
+        currentPhaseIndex: 0,
+      });
+      return makePlayingGame(thingTurnState, {
+        roleAssignments: [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.TheThing },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+        ],
+        playerOrder,
+      });
+    }
+
+    it("allows The Thing to target the left neighbor", () => {
+      const game = makeThingGame(["p1", "p2", "p3", "p4", "p5"]);
+      // p1's left neighbor wraps to p5
+      expect(action.isValid(game, "p1", { targetPlayerId: "p5" })).toBe(true);
+    });
+
+    it("allows The Thing to target the right neighbor", () => {
+      const game = makeThingGame(["p1", "p2", "p3", "p4", "p5"]);
+      // p1's right neighbor is p2
+      expect(action.isValid(game, "p1", { targetPlayerId: "p2" })).toBe(true);
+    });
+
+    it("rejects a non-adjacent target for The Thing", () => {
+      const game = makeThingGame(["p1", "p2", "p3", "p4", "p5"]);
+      // p3 is not adjacent to p1
+      expect(action.isValid(game, "p1", { targetPlayerId: "p3" })).toBe(false);
+    });
+
+    it("allows owner to bypass adjacentTargetOnly restriction", () => {
+      const game = makeThingGame(["p1", "p2", "p3", "p4", "p5"]);
+      // Owner can assign any valid target even for adjacentTargetOnly roles
+      expect(
+        action.isValid(game, "owner-1", {
+          roleId: WerewolfRole.TheThing,
+          targetPlayerId: "p3",
+        }),
+      ).toBe(true);
+    });
+
+    it("skips the narrator when computing adjacency so a player next to the narrator has two selectable neighbours", () => {
+      // playerOrder includes owner-1 between p1 and p2.
+      // Without filtering, p1's right neighbour would be owner-1 (untargetable),
+      // leaving p5 as the only selectable neighbour.
+      // With narrator filtered out, p1's neighbours are p5 (left) and p2 (right).
+      const game = makeThingGame(["p1", "owner-1", "p2", "p3", "p4", "p5"]);
+      expect(action.isValid(game, "p1", { targetPlayerId: "p2" })).toBe(true);
+      expect(action.isValid(game, "p1", { targetPlayerId: "p5" })).toBe(true);
+      // p3 is still not adjacent to p1 after narrator removal
+      expect(action.isValid(game, "p1", { targetPlayerId: "p3" })).toBe(false);
     });
   });
 });

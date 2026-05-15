@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { fn } from "storybook/test";
-import { PlayerTargetSelectionView } from "./PlayerTargetSelection";
+
 import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
+
+import { PlayerTargetSelectionView } from "./PlayerTargetSelection";
 
 const meta = {
   component: PlayerTargetSelectionView,

@@ -1,8 +1,9 @@
 "use client";
 
-import { WerewolfAction } from "@/lib/game/modes/werewolf";
-import type { PhaseKey, WitchConfirmContext } from "@/lib/game/modes/werewolf";
 import { useGameAction } from "@/hooks";
+import type { PhaseKey, WitchConfirmContext } from "@/lib/game/modes/werewolf";
+import { WerewolfAction } from "@/lib/game/modes/werewolf";
+
 import { ConfirmTargetButtonView } from "./ConfirmTargetButtonView";
 
 interface ConfirmTargetButtonProps {

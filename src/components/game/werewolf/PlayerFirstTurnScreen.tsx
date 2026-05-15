@@ -1,7 +1,7 @@
 "use client";
 
-import type { Team } from "@/lib/types";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import type { Team } from "@/lib/types";
 
 interface PlayerFirstTurnScreenProps {
   roleName?: string;

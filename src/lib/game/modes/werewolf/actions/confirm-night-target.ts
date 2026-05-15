@@ -1,11 +1,12 @@
 import type { Game, GameAction } from "@/lib/types";
-import { WerewolfPhase, isTeamNightAction } from "../types";
+
+import { getWerewolfRole } from "../roles";
+import { isTeamNightAction, WerewolfPhase } from "../types";
 import {
   currentTurnState,
-  validateActiveNightPlayer,
   getGroupPhasePlayerIds,
+  validateActiveNightPlayer,
 } from "../utils";
-import { getWerewolfRole } from "../roles";
 
 export const confirmNightTargetAction: GameAction = {
   isValid(game: Game, callerId: string) {

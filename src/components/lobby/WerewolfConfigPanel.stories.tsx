@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { expect, fn, userEvent, within } from "storybook/test";
+
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
+
 import { WerewolfConfigPanel } from "./WerewolfConfigPanel";
 import { WEREWOLF_CONFIG_PANEL_COPY } from "./WerewolfConfigPanel.copy";
 

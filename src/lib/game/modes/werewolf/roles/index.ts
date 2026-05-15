@@ -1,12 +1,13 @@
-export * from "./_types";
 export * from "./_config";
+export * from "./_types";
 
-import { WerewolfRole } from "./_types";
 import type { WerewolfRoleDefinition } from "./_types";
+import { WerewolfRole } from "./_types";
 import { ALTRUIST_ROLE } from "./altruist";
 import { ARSONIST_ROLE } from "./arsonist";
 import { BODYGUARD_ROLE } from "./bodyguard";
 import { CHUPACABRA_ROLE } from "./chupacabra";
+import { COUNT_ROLE } from "./count";
 import { DOCTOR_ROLE } from "./doctor";
 import { DRACULA_ROLE } from "./dracula";
 import { ELUSIVE_SEER_ROLE } from "./elusive-seer";
@@ -15,6 +16,7 @@ import { EXPOSER_ROLE } from "./exposer";
 import { GHOST_ROLE } from "./ghost";
 import { HUNTER_ROLE } from "./hunter";
 import { ILLUMINATI_ROLE } from "./illuminati";
+import { INSOMNIAC_ROLE } from "./insomniac";
 import { LONE_WOLF_ROLE } from "./lone-wolf";
 import { MASON_ROLE } from "./mason";
 import { MAYOR_ROLE } from "./mayor";
@@ -35,6 +37,7 @@ import { SPELLCASTER_ROLE } from "./spellcaster";
 import { SPOILER_ROLE } from "./spoiler";
 import { SWAPPER_ROLE } from "./swapper";
 import { TANNER_ROLE } from "./tanner";
+import { THE_THING_ROLE } from "./the-thing";
 import { TOUGH_GUY_ROLE } from "./tough-guy";
 import { VIGILANTE_ROLE } from "./vigilante";
 import { VILLAGE_IDIOT_ROLE } from "./village-idiot";
@@ -50,6 +53,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
   [WerewolfRole.Arsonist]: ARSONIST_ROLE,
   [WerewolfRole.Bodyguard]: BODYGUARD_ROLE,
   [WerewolfRole.Chupacabra]: CHUPACABRA_ROLE,
+  [WerewolfRole.Count]: COUNT_ROLE,
   [WerewolfRole.Doctor]: DOCTOR_ROLE,
   [WerewolfRole.Dracula]: DRACULA_ROLE,
   [WerewolfRole.ElusiveSeer]: ELUSIVE_SEER_ROLE,
@@ -58,6 +62,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
   [WerewolfRole.Ghost]: GHOST_ROLE,
   [WerewolfRole.Hunter]: HUNTER_ROLE,
   [WerewolfRole.Illuminati]: ILLUMINATI_ROLE,
+  [WerewolfRole.Insomniac]: INSOMNIAC_ROLE,
   [WerewolfRole.LoneWolf]: LONE_WOLF_ROLE,
   [WerewolfRole.Mason]: MASON_ROLE,
   [WerewolfRole.Mayor]: MAYOR_ROLE,
@@ -78,6 +83,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
   [WerewolfRole.Spoiler]: SPOILER_ROLE,
   [WerewolfRole.Swapper]: SWAPPER_ROLE,
   [WerewolfRole.Tanner]: TANNER_ROLE,
+  [WerewolfRole.TheThing]: THE_THING_ROLE,
   [WerewolfRole.ToughGuy]: TOUGH_GUY_ROLE,
   [WerewolfRole.Vigilante]: VIGILANTE_ROLE,
   [WerewolfRole.VillageIdiot]: VILLAGE_IDIOT_ROLE,

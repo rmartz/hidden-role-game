@@ -1,20 +1,21 @@
-import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
-import type { Game } from "@/lib/types";
-import {
-  WerewolfPhase,
-  WerewolfRole,
-  DEFAULT_WEREWOLF_TIMER_CONFIG,
-  TrialPhase,
-  DaytimeVote,
-} from "@/lib/game/modes/werewolf";
 import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
 import type { WerewolfModeConfig } from "@/lib/game/modes/werewolf";
+import {
+  DaytimeVote,
+  DEFAULT_WEREWOLF_TIMER_CONFIG,
+  TrialPhase,
+  WerewolfPhase,
+  WerewolfRole,
+} from "@/lib/game/modes/werewolf";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import type { Game } from "@/lib/types";
+import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
+
+import { getOrderedAffectedPlayerIds } from "../services/night-outcome";
 import {
   extractDaytimeNightSummary,
   extractDaytimePlayerState,
 } from "../services/owner-state";
-import { getOrderedAffectedPlayerIds } from "../services/night-outcome";
 
 // ---------------------------------------------------------------------------
 // extractDaytimeState — combines the two new functions for test convenience
@@ -45,6 +46,10 @@ export function makeDaytimeGame(
     revealedPlayerIds: string[];
     deadPlayerIds: string[];
     modeConfig: Partial<WerewolfModeConfig>;
+    exposerReveal: Extract<
+      WerewolfTurnState["phase"],
+      { type: WerewolfPhase.Daytime }
+    >["exposerReveal"];
   }> = {},
 ): Game {
   const modeConfig: WerewolfModeConfig = {
@@ -71,6 +76,9 @@ export function makeDaytimeGame(
       ...(revealedPlayerIds !== undefined ? { revealedPlayerIds } : {}),
       ...(overrides.nightResolution !== undefined
         ? { nightResolution: overrides.nightResolution }
+        : {}),
+      ...(overrides.exposerReveal
+        ? { exposerReveal: overrides.exposerReveal }
         : {}),
       ...(overrides.knightedPlayerId !== undefined
         ? { knightedPlayerId: overrides.knightedPlayerId }

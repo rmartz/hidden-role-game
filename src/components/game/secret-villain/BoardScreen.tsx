@@ -1,11 +1,12 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
-import { FAILED_ELECTION_THRESHOLD } from "@/lib/game/modes/secret-villain/types";
 import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
+import { FAILED_ELECTION_THRESHOLD } from "@/lib/game/modes/secret-villain/types";
 import type { PublicLobbyPlayer } from "@/server/types/lobby";
+
 import { BoardDisplay } from "./BoardDisplay";
 
 function getPlayerName(players: PublicLobbyPlayer[], playerId: string): string {

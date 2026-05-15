@@ -1,11 +1,12 @@
 "use client";
 
-import type { TimerConfig } from "@/lib/types";
-import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import type { TimerConfig } from "@/lib/types";
+
 import { TIMER_CONFIG_COPY } from "./TimerConfigPanel.copy";
-import { TimerConfigPanelRow } from "./TimerConfigPanelRow";
 import type { TimerRow } from "./TimerConfigPanelRow";
+import { TimerConfigPanelRow } from "./TimerConfigPanelRow";
 
 interface TimerConfigPanelProps {
   timerConfig: TimerConfig;

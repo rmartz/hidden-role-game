@@ -1,6 +1,7 @@
-import { describe, it, expect } from "vitest";
-import { buildNarratorInstruction } from "./narrator-instructions";
+import { describe, expect, it } from "vitest";
+
 import { WerewolfRole } from "../roles";
+import { buildNarratorInstruction } from "./narrator-instructions";
 import { GROUP_PHASE_KEY_SEPARATOR } from "./phase-keys";
 
 describe("buildNarratorInstruction", () => {

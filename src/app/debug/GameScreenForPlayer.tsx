@@ -1,9 +1,9 @@
 "use client";
 
-import { GameMode } from "@/lib/types";
-import { useGameStateQuery, GameModeContext } from "@/hooks";
 import { WerewolfGameScreen } from "@/components/game";
 import { SecretVillainGameScreen } from "@/components/game/secret-villain";
+import { GameModeContext, useGameStateQuery } from "@/hooks";
+import { GameMode } from "@/lib/types";
 
 export interface GameScreenForPlayerProps {
   gameId: string;

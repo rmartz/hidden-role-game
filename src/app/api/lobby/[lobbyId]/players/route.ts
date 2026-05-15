@@ -1,7 +1,8 @@
 import { randomUUID } from "crypto";
-import { ServerResponseStatus } from "@/server/types";
-import type { CreateNoDevicePlayerRequest } from "@/server/types";
+
 import { addPlayer, validatePlayerJoin } from "@/server/lobby";
+import type { CreateNoDevicePlayerRequest } from "@/server/types";
+import { ServerResponseStatus } from "@/server/types";
 import {
   authenticateLobby,
   errorResponse,

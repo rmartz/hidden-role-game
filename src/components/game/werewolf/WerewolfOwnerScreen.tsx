@@ -1,15 +1,16 @@
 "use client";
 
-import { GameStatus } from "@/lib/types";
-import { WerewolfPhase } from "@/lib/game/modes/werewolf";
-import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
-import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { useAdvanceGame } from "@/hooks";
-import { OwnerStartingScreen } from "./OwnerStartingScreen";
-import { OwnerGameNightScreen } from "./OwnerGameNightScreen";
-import { OwnerGameDayScreen } from "./OwnerGameDayScreen";
-import { OwnerGameScreen } from "./OwnerGameScreen";
+import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
+import { WerewolfPhase } from "@/lib/game/modes/werewolf";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { GameStatus } from "@/lib/types";
+
 import { GameOverScreen } from "./GameOverScreen";
+import { OwnerGameDayScreen } from "./OwnerGameDayScreen";
+import { OwnerGameNightScreen } from "./OwnerGameNightScreen";
+import { OwnerGameScreen } from "./OwnerGameScreen";
+import { OwnerStartingScreen } from "./OwnerStartingScreen";
 
 interface WerewolfOwnerScreenProps {
   gameId: string;

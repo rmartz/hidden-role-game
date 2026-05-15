@@ -1,11 +1,7 @@
-import { useState } from "react";
-import type { PublicLobbyPlayer } from "@/server/types";
-import { GripVerticalIcon } from "lucide-react";
 import { CheckmarkCircleRegular } from "@fluentui/react-icons";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+import { GripVerticalIcon } from "lucide-react";
+import { useState } from "react";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,6 +13,12 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import type { PublicLobbyPlayer } from "@/server/types";
+
 import { PLAYER_ROW_COPY } from "./PlayerRow.copy";
 
 interface PlayerRowProps {

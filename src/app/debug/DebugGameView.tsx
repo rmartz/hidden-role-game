@@ -1,12 +1,14 @@
 "use client";
 
-import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import type { GameMode } from "@/lib/types";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
+
 import type { DebugPlayer } from "@/app/api/debug/game/route";
-import { GameScreenForPlayer } from "./GameScreenForPlayer";
+import { Button } from "@/components/ui/button";
+import type { GameMode } from "@/lib/types";
+
 import { DebugAllStatesButton } from "./DebugAllStatesButton";
+import { GameScreenForPlayer } from "./GameScreenForPlayer";
 
 export interface GameInfo {
   gameId: string;

@@ -1,12 +1,13 @@
-import { describe, it, expect } from "vitest";
-import { AvalonPhase } from "../../types";
+import { describe, expect, it } from "vitest";
+
 import type { TeamVotePhase } from "../../types";
+import { AvalonPhase } from "../../types";
 import { proposeTeamAction } from "../propose-team";
 import {
+  getTurnState,
   makeGame,
   makeProposalTurnState,
   makeVoteTurnState,
-  getTurnState,
 } from "./helpers";
 
 describe("proposeTeamAction", () => {

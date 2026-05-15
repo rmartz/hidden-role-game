@@ -1,5 +1,6 @@
-import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
-import { render, screen, cleanup, act } from "@testing-library/react";
+import { act, cleanup, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { GameTimer } from "./GameTimer";
 import { GAME_TIMER_COPY } from "./GameTimer.copy";
 

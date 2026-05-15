@@ -1,20 +1,20 @@
-import { GameMode } from "@/lib/types";
+import { AVALON_CONFIG } from "@/lib/game/modes/avalon";
+import { CLOCKTOWER_CONFIG } from "@/lib/game/modes/clocktower";
+import { CODENAMES_CONFIG } from "@/lib/game/modes/codenames";
+import { SECRET_VILLAIN_CONFIG } from "@/lib/game/modes/secret-villain";
+import { WEREWOLF_CONFIG } from "@/lib/game/modes/werewolf";
 import type {
   AdvancedRoleBucket,
   GameModeConfig,
   ModeConfig,
   RoleBucket,
 } from "@/lib/types";
-import { SECRET_VILLAIN_CONFIG } from "@/lib/game/modes/secret-villain";
-import { AVALON_CONFIG } from "@/lib/game/modes/avalon";
-import { CLOCKTOWER_CONFIG } from "@/lib/game/modes/clocktower";
-import { CODENAMES_CONFIG } from "@/lib/game/modes/codenames";
-import { WEREWOLF_CONFIG } from "@/lib/game/modes/werewolf";
+import { GameMode } from "@/lib/types";
 
-export { SecretVillainRole } from "@/lib/game/modes/secret-villain";
 export { AvalonRole } from "@/lib/game/modes/avalon";
 export { ClocktowerRole } from "@/lib/game/modes/clocktower";
 export { CodenamesRole } from "@/lib/game/modes/codenames";
+export { SecretVillainRole } from "@/lib/game/modes/secret-villain";
 export { WerewolfRole } from "@/lib/game/modes/werewolf";
 
 export function parseGameMode(value: string): GameMode | undefined {

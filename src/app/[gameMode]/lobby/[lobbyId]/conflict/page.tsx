@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { getPlayerId, getLobbyId } from "@/lib/api";
-import { getPlayerName } from "@/lib/player";
-import { parseGameMode } from "@/lib/game/modes";
+import { useEffect, useState } from "react";
+
+import { LobbyConflictResolution } from "@/components/lobby";
 import {
   useLeaveAndJoinLobby,
-  useStoredLobbyQuery,
   useLobbyExistsQuery,
+  useStoredLobbyQuery,
 } from "@/hooks";
-import { LobbyConflictResolution } from "@/components/lobby";
+import { getLobbyId, getPlayerId } from "@/lib/api";
+import { parseGameMode } from "@/lib/game/modes";
+import { getPlayerName } from "@/lib/player";
+
 import { LOBBY_CONFLICT_PAGE_COPY } from "./page.copy";
 
 export default function LobbyConflictPage() {

@@ -1,11 +1,12 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { AvalonRole } from "../roles";
 import type { QuestResult } from "../types";
 import {
   AvalonWinner,
+  checkAssassinationResult,
   checkQuestWinCondition,
   checkRejectionWinCondition,
-  checkAssassinationResult,
 } from "./win-condition";
 
 // ---------------------------------------------------------------------------

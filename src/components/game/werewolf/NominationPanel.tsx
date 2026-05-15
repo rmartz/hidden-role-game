@@ -1,12 +1,14 @@
 "use client";
 
 import { useCallback } from "react";
-import { WEREWOLF_COPY, WerewolfAction } from "@/lib/game/modes/werewolf";
-import type { PlayerGameState } from "@/server/types";
-import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
-import { useGameAction } from "@/hooks";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useGameAction } from "@/hooks";
+import { WEREWOLF_COPY, WerewolfAction } from "@/lib/game/modes/werewolf";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import type { PlayerGameState } from "@/server/types";
+
 import { NominationRow } from "./NominationRow";
 
 interface NominationPanelProps {

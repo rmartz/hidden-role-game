@@ -1,16 +1,18 @@
-import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
 import {
+  act,
   cleanup,
+  fireEvent,
   render,
   screen,
-  act,
-  fireEvent,
 } from "@testing-library/react";
-import { OwnerStartingScreen } from "./OwnerStartingScreen";
-import { GameStatus, GameMode, Team } from "@/lib/types";
-import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
-import { OWNER_STARTING_SCREEN_COPY } from "./OwnerStartingScreen.copy";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
+import { GameMode, GameStatus, Team } from "@/lib/types";
+
+import { OwnerStartingScreen } from "./OwnerStartingScreen";
+import { OWNER_STARTING_SCREEN_COPY } from "./OwnerStartingScreen.copy";
 
 afterEach(cleanup);
 

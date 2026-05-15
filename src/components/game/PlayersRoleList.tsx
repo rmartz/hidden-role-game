@@ -1,8 +1,11 @@
 "use client";
 
 import type { ReactNode } from "react";
-import type { GameMode } from "@/lib/types";
-import type { VisibilityReason, VisibleTeammate } from "@/server/types";
+
+import { PLAYER_VISIBILITY_COPY } from "@/components/game/PlayersRoleList.copy";
+import { VisibilityGroupCard } from "@/components/game/VisibilityGroupCard";
+import { RoleLabel } from "@/components/RoleLabel";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Item,
   ItemActions,
@@ -10,10 +13,8 @@ import {
   ItemGroup,
   ItemTitle,
 } from "@/components/ui/item";
-import { Card, CardContent } from "@/components/ui/card";
-import { RoleLabel } from "@/components/RoleLabel";
-import { PLAYER_VISIBILITY_COPY } from "@/components/game/PlayersRoleList.copy";
-import { VisibilityGroupCard } from "@/components/game/VisibilityGroupCard";
+import type { GameMode } from "@/lib/types";
+import type { VisibilityReason, VisibleTeammate } from "@/server/types";
 
 interface PlayersRoleListProps {
   assignments: VisibleTeammate[];

@@ -1,11 +1,13 @@
+import { groupBy } from "lodash";
+
 import type {
   AltruistInterceptedNightResolutionEvent,
   NightResolutionEvent,
 } from "@/lib/game/modes/werewolf";
-import { NightOutcomeSummaryItem } from "./NightOutcomeSummaryItem";
-import { getPlayerName } from "@/lib/player";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
-import { groupBy } from "lodash";
+import { getPlayerName } from "@/lib/player";
+
+import { NightOutcomeSummaryItem } from "./NightOutcomeSummaryItem";
 
 interface NightOutcomeSummaryProps {
   events: NightResolutionEvent[];
