@@ -1,12 +1,12 @@
 "use client";
 
 import { useReturnToLobby } from "@/hooks";
-import type { PlayerGameState } from "@/server/types";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 
 import { GameOverScreenView } from "./GameOverScreenView";
 
 interface GameOverScreenProps {
-  gameState: PlayerGameState;
+  gameState: WerewolfPlayerGameState;
 }
 
 export function GameOverScreen({ gameState }: GameOverScreenProps) {

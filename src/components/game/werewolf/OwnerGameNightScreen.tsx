@@ -480,6 +480,13 @@ export function OwnerGameNightScreen({
           {isFirstTurn && narratorInstruction && (
             <NarratorNightInstruction instruction={narratorInstruction} />
           )}
+          {isRoleActive(activePhaseKey, WerewolfRole.Mercenary) && (
+            <p className="mb-3 text-sm text-muted-foreground italic">
+              {turnState.roleState?.mercenary?.charged
+                ? WEREWOLF_COPY.mercenary.narratorBribeMode
+                : WEREWOLF_COPY.mercenary.narratorProtectMode}
+            </p>
+          )}
           {isRoleActive(activePhaseKey, WerewolfRole.Mirrorcaster) && (
             <p className="mb-3 text-sm text-muted-foreground italic">
               {turnState.roleState?.mirrorcaster?.charged

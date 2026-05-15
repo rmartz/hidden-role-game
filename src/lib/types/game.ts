@@ -78,6 +78,7 @@ export type GameWinner =
   | "Dracula"
   | "Illuminati"
   | "LoneWolf"
+  | "Mercenary"
   | "Tanner"
   | "Spoiler"
   | "Executioner"

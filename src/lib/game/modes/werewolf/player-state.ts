@@ -93,6 +93,12 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
    * True = Seer is adjacent to a Werewolf this night.
    */
   evilEmpathNightResult?: boolean;
+  /** Whether the Mercenary is charged (Bribe mode). */
+  mercenaryCharged?: boolean;
+  /** Player IDs that the Mercenary has bribed. Narrator-only. */
+  mercenaryBribedPlayerIds?: string[];
+  /** Whether the Mercenary also won alongside the main winner. */
+  mercenaryAlsoWins?: boolean;
   /** Executioner: target player ID. */
   executionerTargetId?: string;
   /**

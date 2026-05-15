@@ -6,6 +6,7 @@ import type {
   ExposerTurnState,
   HunterTurnState,
   IllusionArtistTurnState,
+  MercenaryTurnState,
   MirrorcasterTurnState,
   MonarchTurnState,
   MorticianTurnState,
@@ -26,6 +27,7 @@ export type {
   ExposerTurnState,
   HunterTurnState,
   IllusionArtistTurnState,
+  MercenaryTurnState,
   MirrorcasterTurnState,
   MonarchTurnState,
   MorticianTurnState,
@@ -230,6 +232,7 @@ export interface WerewolfRoleTurnState {
   exposer?: ExposerTurnState;
   hunter?: HunterTurnState;
   illusionArtist?: IllusionArtistTurnState;
+  mercenary?: MercenaryTurnState;
   mirrorcaster?: MirrorcasterTurnState;
   monarch?: MonarchTurnState;
   mortician?: MorticianTurnState;

@@ -36,6 +36,13 @@ export interface HunterTurnState {
   revengePlayerId: string;
 }
 
+export interface MercenaryTurnState {
+  /** True when the Mercenary has earned a coin from a successful protection (Bribe mode active). */
+  charged: boolean;
+  /** Player IDs that the Mercenary has bribed. Accumulated across nights; deduplicated. */
+  bribedPlayerIds: string[];
+}
+
 export interface MirrorcasterTurnState {
   /** True when charged from a successful protection (Attack mode active). */
   charged: boolean;

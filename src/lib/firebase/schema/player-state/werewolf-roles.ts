@@ -20,6 +20,9 @@ export interface FirebaseWerewolfRoleState {
   isHypnotized?: boolean;
   executionerTargetId?: string;
   mirrorcasterCharged?: boolean;
+  mercenaryCharged?: boolean;
+  mercenaryBribedPlayerIds?: string[];
+  mercenaryAlsoWins?: boolean;
   oneEyedSeerLockedTargetId?: string;
   elusiveSeerVillagerIds?: string[];
   illuminatiRoleAssignments?: {
@@ -64,6 +67,11 @@ export function werewolfRoleStateToFirebase(
       ? { executionerTargetId: state.executionerTargetId }
       : {}),
     ...(state.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
+    ...(state.mercenaryCharged ? { mercenaryCharged: true } : {}),
+    ...(state.mercenaryBribedPlayerIds?.length
+      ? { mercenaryBribedPlayerIds: state.mercenaryBribedPlayerIds }
+      : {}),
+    ...(state.mercenaryAlsoWins ? { mercenaryAlsoWins: true } : {}),
     ...(state.oneEyedSeerLockedTargetId
       ? { oneEyedSeerLockedTargetId: state.oneEyedSeerLockedTargetId }
       : {}),
@@ -127,6 +135,11 @@ export function werewolfRoleStateFromFirebase(
       ? { executionerTargetId: raw.executionerTargetId }
       : {}),
     ...(raw.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
+    ...(raw.mercenaryCharged ? { mercenaryCharged: true } : {}),
+    ...(raw.mercenaryBribedPlayerIds?.length
+      ? { mercenaryBribedPlayerIds: raw.mercenaryBribedPlayerIds }
+      : {}),
+    ...(raw.mercenaryAlsoWins ? { mercenaryAlsoWins: true } : {}),
     ...(raw.oneEyedSeerLockedTargetId
       ? { oneEyedSeerLockedTargetId: raw.oneEyedSeerLockedTargetId }
       : {}),

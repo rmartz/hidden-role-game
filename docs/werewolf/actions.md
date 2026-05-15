@@ -432,5 +432,6 @@ Win conditions are evaluated after each death (night resolution or trial). The c
    - **Werewolves win** — If Bad team count ≥ non-Bad count (Good + Neutral + Chupacabra), the Werewolves win.
 4. **Illuminati override** (after standard win determined) — If a standard win condition fires and the Illuminati is alive and ≤ 3 total players remain, the Illuminati wins instead.
 5. **Spoiler override** (after team win determined) — If a standard win condition fires and the Spoiler is still alive (and Illuminati did not already override), the Spoiler wins instead of the winning team.
-6. **Executioner win** — Evaluated independently at trial: if the Executioner's assigned target is voted out, the Executioner wins regardless of overall game state.
-7. **Dracula win** — Checked separately in `startNightAction`, not in `checkWinCondition`.
+6. **Mercenary co-win** (after all overrides) — If any win condition fires, the Mercenary is alive, and at least one bribed player is alive on the winning side, the Mercenary also wins alongside the main winner (displayed as e.g. "Village Won (Mercenary also wins)"). The co-win applies to all winners — team wins (Village → bribed player on `Team.Good`; Werewolves → bribed player on `Team.Bad`) and individual-role wins (Spoiler, Illuminati, Lone Wolf, Chupacabra, Executioner, Zombie, Dracula → the bribed player must be the specific winning role-holder).
+7. **Executioner win** — Evaluated independently at trial: if the Executioner's assigned target is voted out, the Executioner wins regardless of overall game state.
+8. **Dracula win** — Checked separately in `startNightAction`, not in `checkWinCondition`.
