@@ -237,6 +237,19 @@ export const WerewolfWinner = {
 export type WerewolfWinner =
   (typeof WerewolfWinner)[keyof typeof WerewolfWinner];
 
+// Individual-role wins: maps WerewolfWinner values to the role that must be
+// held by the bribed player. Hoisted to module scope to avoid per-call allocation.
+const WINNER_TO_ROLE: Partial<Record<string, string>> = {
+  [WerewolfWinner.Arsonist]: WerewolfRole.Arsonist,
+  [WerewolfWinner.Chupacabra]: WerewolfRole.Chupacabra,
+  [WerewolfWinner.Dracula]: WerewolfRole.Dracula,
+  [WerewolfWinner.Executioner]: WerewolfRole.Executioner,
+  [WerewolfWinner.Illuminati]: WerewolfRole.Illuminati,
+  [WerewolfWinner.LoneWolf]: WerewolfRole.LoneWolf,
+  [WerewolfWinner.Spoiler]: WerewolfRole.Spoiler,
+  [WerewolfWinner.Zombie]: WerewolfRole.Zombie,
+};
+
 /**
  * Checks whether a bribed player is on the winning side for the given winner.
  * For team wins (Village, Werewolves), the bribed player must be alive
@@ -263,18 +276,7 @@ function isBribedPlayerOnWinningSide(
     return role?.team === Team.Bad;
   }
 
-  // Individual-role wins: bribed player must be that specific winning role.
-  const winnerToRole: Partial<Record<string, string>> = {
-    [WerewolfWinner.Arsonist]: WerewolfRole.Arsonist,
-    [WerewolfWinner.Chupacabra]: WerewolfRole.Chupacabra,
-    [WerewolfWinner.Dracula]: WerewolfRole.Dracula,
-    [WerewolfWinner.Executioner]: WerewolfRole.Executioner,
-    [WerewolfWinner.Illuminati]: WerewolfRole.Illuminati,
-    [WerewolfWinner.LoneWolf]: WerewolfRole.LoneWolf,
-    [WerewolfWinner.Spoiler]: WerewolfRole.Spoiler,
-    [WerewolfWinner.Zombie]: WerewolfRole.Zombie,
-  };
-  const winningRoleId = winnerToRole[winner];
+  const winningRoleId = WINNER_TO_ROLE[winner];
   if (!winningRoleId) return false;
   return assignment.roleDefinitionId === winningRoleId;
 }

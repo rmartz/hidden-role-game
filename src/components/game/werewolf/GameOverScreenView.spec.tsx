@@ -3,9 +3,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
 import { WerewolfWinner } from "@/lib/game/modes/werewolf/utils/win-condition";
-import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import { GameMode, GameStatus, Team } from "@/lib/types";
 
 import { GameOverScreenView } from "./GameOverScreenView";
