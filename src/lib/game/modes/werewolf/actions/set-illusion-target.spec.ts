@@ -104,9 +104,9 @@ describe("WerewolfAction.SetIllusionTarget — isValid", () => {
 
   it("returns false when targeting the narrator (ownerPlayerId)", () => {
     const game = makeIllusionGame();
-    expect(
-      action.isValid(game, "ia1", { targetPlayerId: "owner-1" }),
-    ).toBe(false);
+    expect(action.isValid(game, "ia1", { targetPlayerId: "owner-1" })).toBe(
+      false,
+    );
   });
 
   it("returns false when active phase is not Illusion Artist", () => {
