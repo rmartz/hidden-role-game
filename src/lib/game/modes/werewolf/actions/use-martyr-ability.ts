@@ -25,9 +25,7 @@ export const useMartyrAbilityAction: GameAction = {
     if (!ts) return false;
     if (ts.phase.type !== WerewolfPhase.Daytime) return false;
     if (!ts.phase.pendingGuiltId) return false;
-    const martyrState = ts.roleState?.martyr as
-      | { abilityUsed: boolean }
-      | undefined;
+    const martyrState = ts.roleState?.martyr;
     if (martyrState?.abilityUsed) return false;
     const isOwner = callerId === game.ownerPlayerId;
     // Find the Martyr assignment — needed for both owner and player callers.

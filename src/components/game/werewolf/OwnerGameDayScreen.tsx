@@ -112,9 +112,7 @@ export function OwnerGameDayScreen({
     !(gameState.deadPlayerIds ?? []).includes(martyrPlayer.id)
       ? martyrPlayer.id
       : undefined;
-  const martyrAbilityUsed = (
-    turnState.roleState?.martyr as { abilityUsed: boolean } | undefined
-  )?.abilityUsed;
+  const martyrAbilityUsed = turnState.roleState?.martyr?.abilityUsed;
 
   return (
     <div className="p-5 max-w-4xl mx-auto">
