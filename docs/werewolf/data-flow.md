@@ -171,15 +171,17 @@ Narrator starts day (start-day)
     3. Apply Priest wards (ward absorbs attack, ward is consumed)
     4. Apply Witch action (protect or attack)
     5. Apply Altruist intercept (redirects attack onto self)
-    6. Apply Veteran counter-kill (after Altruist, so Altruist cannot intercept the counter-kill):
+    6. Apply Swapper action (swaps attacks/protections between two targets; cancels stale Altruist intercept)
+    7. Apply Veteran counter-kill (after Altruist and Swapper, so neither can intercept the counter-kill):
        - Wolf repel: wolf attack on alerted Veteran removed, one wolf counter-killed
        - Visitor kill: Protect/Attack roles and Mirrorcaster that physically visited the Veteran are counter-killed
-    7. Apply Smite (forced death regardless of protections)
-    8. Check Old Man timer
-    9. Apply Tough Guy absorption (survives first attack; Smite and Old Man timer deaths are forced and bypass this)
-   10. Emit veteran-counterkilled events (after Tough Guy absorption, so died reflects actual outcome)
-   11. Apply Spellcaster silence and Mummy hypnotize
-   12. Resolve remaining attacks (protected → survived, else → killed)
+    8. Build kill events from the final attack/protect state (protected → survived, else → killed)
+    9. Apply Smite (forced death regardless of protections)
+   10. Check Old Man timer
+   11. Apply Tough Guy absorption (survives first attack; Smite and Old Man timer deaths are forced and bypass this)
+   12. Emit veteran-counterkilled events (after Tough Guy absorption, so died reflects actual outcome)
+   13. Apply Spellcaster silence and Mummy hypnotize
+   14. Apply Swapper to silenced/hypnotized events (swaps targetPlayerId between Swapper targets)
   → Arsonist doused list updated:
     - Self-target (ignite): list reset to empty after attacks resolved
     - Other-target (douse): target appended to arsonistDousedPlayerIds (dead targets skipped)
