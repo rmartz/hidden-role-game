@@ -1,6 +1,8 @@
-import { afterEach, describe, it, expect, vi } from "vitest";
 import { cleanup, render } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { GameMode } from "@/lib/types";
+
 import { HomePageView } from "./HomePageView";
 import { HOME_PAGE_COPY } from "./page.copy";
 

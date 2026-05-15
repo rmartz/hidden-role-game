@@ -1,8 +1,10 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import type { TargetablePlayer } from "@/lib/game/modes/werewolf";
 import { WerewolfAction, WerewolfRole } from "@/lib/game/modes/werewolf";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+
 import { PlayerTargetSelection } from "./PlayerTargetSelection";
 
 type TargetSelectionTuple = readonly [TargetablePlayer, boolean];

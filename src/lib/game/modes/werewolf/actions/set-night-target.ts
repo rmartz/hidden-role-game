@@ -1,20 +1,21 @@
-import type { Game, GameAction } from "@/lib/types";
-import { WerewolfPhase, isTeamNightAction, TargetCategory } from "../types";
-import type { TeamNightAction } from "../types";
-import { VETERAN_ALERTS_LIMIT } from "../constants";
-import {
-  currentTurnState,
-  validateActiveNightPlayer,
-  isGroupPhaseKey,
-  baseGroupPhaseKey,
-  getGroupPhasePlayerIds,
-  getGroupPhaseMemberIds,
-  computeSuggestedTarget,
-  isRoleActive,
-  getInterimAttackedPlayerIds,
-} from "../utils";
-import { WerewolfRole, getWerewolfRole } from "../roles";
 import { getPlayer } from "@/lib/player";
+import type { Game, GameAction } from "@/lib/types";
+
+import { VETERAN_ALERTS_LIMIT } from "../constants";
+import { getWerewolfRole, WerewolfRole } from "../roles";
+import type { TeamNightAction } from "../types";
+import { isTeamNightAction, TargetCategory, WerewolfPhase } from "../types";
+import {
+  baseGroupPhaseKey,
+  computeSuggestedTarget,
+  currentTurnState,
+  getGroupPhaseMemberIds,
+  getGroupPhasePlayerIds,
+  getInterimAttackedPlayerIds,
+  isGroupPhaseKey,
+  isRoleActive,
+  validateActiveNightPlayer,
+} from "../utils";
 
 export const setNightTargetAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {
@@ -176,6 +177,29 @@ export const setNightTargetAction: GameAction = {
         callerRoleDef?.preventSelfTarget === true
       )
         return false;
+    }
+
+    // Roles with adjacentTargetOnly may only target immediate seating neighbours.
+    if (!isOwner) {
+      const callerAssignment = game.roleAssignments.find(
+        (a) => a.playerId === callerId,
+      );
+      const callerRoleDef = callerAssignment
+        ? getWerewolfRole(callerAssignment.roleDefinitionId)
+        : undefined;
+      if (callerRoleDef?.adjacentTargetOnly) {
+        const rawOrder = game.playerOrder ?? game.players.map((p) => p.id);
+        // Exclude the narrator so a player seated next to the narrator still
+        // has two selectable neighbours, matching the pattern used by
+        // extractCountState and extractTheThingState.
+        const playerOrder = rawOrder.filter((id) => id !== game.ownerPlayerId);
+        const idx = playerOrder.indexOf(callerId);
+        if (idx === -1 || playerOrder.length < 2) return false;
+        const left =
+          playerOrder[(idx - 1 + playerOrder.length) % playerOrder.length];
+        const right = playerOrder[(idx + 1) % playerOrder.length];
+        if (targetPlayerId !== left && targetPlayerId !== right) return false;
+      }
     }
 
     // Zombie cannot infect an already-infected player.

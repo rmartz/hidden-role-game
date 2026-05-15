@@ -1,10 +1,12 @@
 "use client";
 
 import groupBy from "lodash/groupBy";
+
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { getPlayerName } from "@/lib/player";
 import type { PlayerGameState } from "@/server/types";
 import type { DaytimeNightStatusEntry } from "@/server/types";
-import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+
 import { PlayerNightSummaryItem } from "./PlayerNightSummaryItem";
 
 interface PlayerNightSummaryProps {
@@ -47,6 +49,12 @@ export function PlayerNightSummary({
           "The Veteran")
         : undefined;
 
+      const exposedEntry = entries.find((e) => e.effect === "exposed");
+      const exposedRoleName =
+        exposedEntry && "roleName" in exposedEntry
+          ? exposedEntry.roleName
+          : undefined;
+
       return {
         targetPlayerId,
         playerName: getPlayerName(players, targetPlayerId) ?? targetPlayerId,
@@ -65,6 +73,7 @@ export function PlayerNightSummary({
         veteranCounterkillSource:
           veteranCounterkillEntry?.veteranCounterkillSource,
         veteranName,
+        exposedRoleName,
       };
     },
   );
@@ -91,6 +100,7 @@ export function PlayerNightSummary({
             peaceful,
             veteranCounterkillSource,
             veteranName,
+            exposedRoleName,
           }) => (
             <PlayerNightSummaryItem
               key={targetPlayerId}
@@ -105,6 +115,7 @@ export function PlayerNightSummary({
               hypnotized={hypnotized}
               smited={smited}
               peaceful={peaceful}
+              exposedRoleName={exposedRoleName}
               isMe={myPlayerId === targetPlayerId}
               veteranCounterkillSource={veteranCounterkillSource}
               veteranName={veteranName}

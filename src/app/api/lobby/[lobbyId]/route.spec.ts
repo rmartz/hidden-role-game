@@ -1,10 +1,12 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
+import {
+  makeLobbyParams as makeParams,
+  postRequest,
+} from "@/app/api/test-utils";
+
 import { POST as createLobby } from "../create/route";
 import { GET as getLobby } from "./route";
-import {
-  postRequest,
-  makeLobbyParams as makeParams,
-} from "@/app/api/test-utils";
 
 describe("GET /api/lobby/[lobbyId]", () => {
   it("should return 401 with no session header", async () => {

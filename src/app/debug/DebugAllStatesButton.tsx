@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+
+import type { DebugPlayer } from "@/app/api/debug/game/route";
+import { JsonTree } from "@/components/debug";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,10 +13,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { JsonTree } from "@/components/debug";
 import { useAllPlayersGameStates, useDebugFullGameState } from "@/hooks";
 import type { GameMode } from "@/lib/types";
-import type { DebugPlayer } from "@/app/api/debug/game/route";
+
 import { DEBUG_VIEW_COPY } from "./DebugAllStatesButton.copy";
 
 const SERVER_TAB = "server";

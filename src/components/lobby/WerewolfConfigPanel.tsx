@@ -1,12 +1,13 @@
 "use client";
 
-import type { WerewolfTimerConfig } from "@/lib/game/modes/werewolf/timer-config";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import type { WerewolfTimerConfig } from "@/lib/game/modes/werewolf/timer-config";
+
+import type { IncrementDirection } from "./Incrementer";
+import { Incrementer } from "./Incrementer";
 import { WEREWOLF_CONFIG_PANEL_COPY } from "./WerewolfConfigPanel.copy";
 import { WerewolfTimerConfigPanel } from "./WerewolfTimerConfigPanel";
-import { Incrementer } from "./Incrementer";
-import type { IncrementDirection } from "./Incrementer";
 
 interface WerewolfConfigPanelProps {
   timerConfig: WerewolfTimerConfig;

@@ -1,7 +1,8 @@
 "use client";
 
-import type { ReactNode } from "react";
 import { ChartPersonRegular } from "@fluentui/react-icons";
+import type { ReactNode } from "react";
+
 import { GameTimer } from "@/components/game/GameTimer";
 import { Button } from "@/components/ui/button";
 

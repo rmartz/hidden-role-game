@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { fn } from "storybook/test";
-import { SpecialActionView } from "./SpecialActionView";
+
 import { SpecialActionType } from "@/lib/game/modes/secret-villain/types";
+
+import { SpecialActionView } from "./SpecialActionView";
 
 const players = [
   { id: "p1", name: "Alice" },

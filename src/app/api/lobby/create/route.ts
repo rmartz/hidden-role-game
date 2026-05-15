@@ -1,12 +1,13 @@
 import { randomUUID } from "crypto";
-import { GameMode } from "@/lib/types";
+
 import {
   DEFAULT_GAME_MODE,
   isGameModeEnabled,
   parseGameMode,
 } from "@/lib/game/modes";
-import { ServerResponseStatus, type CreateLobbyRequest } from "@/server/types";
+import { GameMode } from "@/lib/types";
 import { addLobby } from "@/server/lobby";
+import { type CreateLobbyRequest, ServerResponseStatus } from "@/server/types";
 import {
   errorResponse,
   normalizeDisplayName,

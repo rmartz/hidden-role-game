@@ -1,10 +1,11 @@
-import type { GameStatusState, Team, TimerConfig } from "@/lib/types";
-import type { PublicLobbyPlayer } from "./lobby";
-import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
-import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
 import type { AvalonPlayerGameState } from "@/lib/game/modes/avalon/player-state";
 import type { ClocktowerPlayerGameState } from "@/lib/game/modes/clocktower/player-state";
 import type { CodenamesPlayerGameState } from "@/lib/game/modes/codenames/player-state";
+import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import type { GameStatusState, Team, TimerConfig } from "@/lib/types";
+
+import type { PublicLobbyPlayer } from "./lobby";
 
 export interface CreateGameRequest {
   lobbyId: string;
@@ -50,9 +51,12 @@ export interface DaytimeNightStatusEntry {
     | "survived"
     | "peaceful"
     | "altruist-sacrifice"
+    | "exposed"
     | "veteran-counterkill";
   /** For altruist-sacrifice: the player who was saved. */
   savedPlayerId?: string;
+  /** For exposed: the name of the publicly revealed role. */
+  roleName?: string;
   /** For veteran-counterkill: the Veteran player who performed the counter-kill. */
   veteranPlayerId?: string;
   /** For veteran-counterkill: whether the kill came from repelling a wolf attack or a player visiting. */

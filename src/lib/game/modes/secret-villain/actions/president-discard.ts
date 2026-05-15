@@ -1,5 +1,6 @@
 import type { Game, GameAction } from "@/lib/types";
-import { SecretVillainPhase, PolicyCard } from "../types";
+
+import { PolicyCard, SecretVillainPhase } from "../types";
 import { currentTurnState } from "../utils";
 
 export const presidentDiscardAction: GameAction = {

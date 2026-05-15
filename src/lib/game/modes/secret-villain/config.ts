@@ -1,15 +1,16 @@
-import { Team } from "@/lib/types";
 import type { GameModeConfig, ModeConfig } from "@/lib/types";
+import { Team } from "@/lib/types";
 import { isSecretVillainModeConfig } from "@/lib/types";
-import { MIN_PLAYERS, defaultRoleCount, SECRET_VILLAIN_ROLES } from "./roles";
+
 import { SECRET_VILLAIN_ACTIONS } from "./actions";
-import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "./timer-config";
 import {
-  DEFAULT_SECRET_VILLAIN_MODE_CONFIG,
   buildDefaultSecretVillainLobbyConfig,
+  DEFAULT_SECRET_VILLAIN_MODE_CONFIG,
   parseSecretVillainModeConfig,
 } from "./lobby-config";
+import { defaultRoleCount, MIN_PLAYERS, SECRET_VILLAIN_ROLES } from "./roles";
 import { secretVillainServices } from "./services";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "./timer-config";
 
 function hasBoard(modeConfig: ModeConfig): boolean {
   return (

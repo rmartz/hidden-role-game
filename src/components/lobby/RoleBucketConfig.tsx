@@ -1,24 +1,8 @@
 "use client";
 
-import type {
-  AdvancedRoleBucket,
-  RoleDefinition,
-  Team,
-  GameMode,
-} from "@/lib/types";
-import { isSimpleRoleBucket } from "@/lib/types";
-import { useAppDispatch, useAppSelector } from "@/store";
-import {
-  addBucket,
-  removeBucket,
-  setBucketPlayerCount,
-  setBucketName,
-  addRoleToBucket,
-  removeRoleFromBucket,
-  setBucketUnique,
-} from "@/store/game-config-slice";
-import { Button } from "@/components/ui/button";
+import { RoleLabel } from "@/components/RoleLabel";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
@@ -28,10 +12,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { RoleLabel } from "@/components/RoleLabel";
+import { getAdvancedBucketMaxCapacity } from "@/lib/game/modes";
+import type {
+  AdvancedRoleBucket,
+  GameMode,
+  RoleDefinition,
+  Team,
+} from "@/lib/types";
+import { isSimpleRoleBucket } from "@/lib/types";
+import { useAppDispatch, useAppSelector } from "@/store";
+import {
+  addBucket,
+  addRoleToBucket,
+  removeBucket,
+  removeRoleFromBucket,
+  setBucketName,
+  setBucketPlayerCount,
+  setBucketUnique,
+} from "@/store/game-config-slice";
+
 import { Incrementer } from "./Incrementer";
 import { ROLE_BUCKET_CONFIG_COPY } from "./RoleBucketConfig.copy";
-import { getAdvancedBucketMaxCapacity } from "@/lib/game/modes";
 
 interface RoleBucketConfigProps {
   roleDefinitions: Record<string, RoleDefinition<string, Team>>;

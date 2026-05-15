@@ -1,6 +1,8 @@
-import { describe, it, expect } from "vitest";
-import { Team } from "@/lib/types";
+import { describe, expect, it } from "vitest";
+
 import type { LobbyPlayer } from "@/lib/types";
+import { Team } from "@/lib/types";
+
 import { buildGamePlayers } from "../initialization";
 
 function makeLobbyPlayer(id: string): LobbyPlayer {

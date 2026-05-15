@@ -1,13 +1,15 @@
-import { describe, it, expect } from "vitest";
-import { Team, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
+import { describe, expect, it } from "vitest";
+
+import { RoleConfigMode, ShowRolesInPlay, Team } from "@/lib/types";
+
 import {
-  CodenamesRole,
+  CODENAMES_CONFIG,
   CODENAMES_ROLES,
+  CodenamesRole,
   defaultRoleCount,
   getCodenamesRole,
   isCodenamesRole,
   MIN_PLAYERS,
-  CODENAMES_CONFIG,
 } from "./index";
 
 describe("CodenamesRole enum", () => {

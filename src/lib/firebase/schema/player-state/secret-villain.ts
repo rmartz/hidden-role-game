@@ -1,9 +1,10 @@
-import { GameMode } from "@/lib/types";
 import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
+import { GameMode } from "@/lib/types";
+
 import {
-  type FirebaseBasePlayerState,
-  baseStateToFirebase,
   baseStateFromFirebase,
+  baseStateToFirebase,
+  type FirebaseBasePlayerState,
 } from "./base";
 
 // ---------------------------------------------------------------------------

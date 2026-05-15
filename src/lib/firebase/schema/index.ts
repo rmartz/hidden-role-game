@@ -9,6 +9,6 @@
  * Arrays (roleSlots, players, roleAssignments) are stored as Firebase objects
  * (Record keyed by a stable key) to avoid Firebase array-reindexing issues.
  */
-export * from "./lobby";
 export * from "./game";
+export * from "./lobby";
 export * from "./player-state";

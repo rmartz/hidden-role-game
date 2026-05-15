@@ -1,3 +1,10 @@
+import {
+  authorizePlayerRemoval,
+  removePlayer,
+  renamePlayer,
+  validatePlayerRename,
+} from "@/server/lobby";
+import type { UpdatePlayerNameRequest } from "@/server/types";
 import { ServerResponseStatus } from "@/server/types";
 import {
   authenticateLobby,
@@ -6,13 +13,6 @@ import {
   toPublicLobby,
   validatePlayerName,
 } from "@/server/utils";
-import type { UpdatePlayerNameRequest } from "@/server/types";
-import {
-  removePlayer,
-  authorizePlayerRemoval,
-  renamePlayer,
-  validatePlayerRename,
-} from "@/server/lobby";
 
 export async function DELETE(
   request: Request,

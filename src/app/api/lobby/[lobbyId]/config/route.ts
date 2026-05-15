@@ -1,7 +1,7 @@
 import { GameMode } from "@/lib/types";
-import { ServerResponseStatus } from "@/server/types";
-import type { UpdateLobbyConfigRequest } from "@/server/types";
 import { updateConfig } from "@/server/lobby";
+import type { UpdateLobbyConfigRequest } from "@/server/types";
+import { ServerResponseStatus } from "@/server/types";
 import {
   authenticateLobby,
   errorResponse,

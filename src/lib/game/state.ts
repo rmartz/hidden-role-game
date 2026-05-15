@@ -1,4 +1,6 @@
-import { GameStatus, ShowRolesInPlay } from "@/lib/types";
+import { buildGamePlayers, buildRolesInPlay } from "@/lib/game/initialization";
+import { GAME_MODES } from "@/lib/game/modes";
+import { getPlayer } from "@/lib/player";
 import type {
   Game,
   GameModeConfig,
@@ -9,15 +11,13 @@ import type {
   RoleBucket,
   TimerConfig,
 } from "@/lib/types";
+import { GameStatus, ShowRolesInPlay } from "@/lib/types";
+import { GameMode } from "@/lib/types";
 import type { PlayerGameState, VisibleTeammate } from "@/server/types";
-import { GAME_MODES } from "@/lib/game/modes";
-import { getPlayer } from "@/lib/player";
 import {
   assignRolesFromBuckets,
   assignRolesFromBucketsWithHidden,
 } from "@/server/utils";
-import { buildRolesInPlay, buildGamePlayers } from "@/lib/game/initialization";
-import { GameMode } from "@/lib/types";
 
 export function getModeDefinition(gameMode: GameMode): GameModeConfig {
   return GAME_MODES[gameMode];

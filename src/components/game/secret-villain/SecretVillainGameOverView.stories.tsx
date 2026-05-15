@@ -1,11 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import { SecretVillainGameOverView } from "./SecretVillainGameOverView";
-import { GameMode, GameStatus, Team } from "@/lib/types";
+import { fn } from "storybook/test";
+
+import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
+import { SvTheme } from "@/lib/game/modes/secret-villain/themes";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
 import { SecretVillainWinner } from "@/lib/game/modes/secret-villain/utils/win-condition";
-import { SvTheme } from "@/lib/game/modes/secret-villain/themes";
-import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
-import { fn } from "storybook/test";
+import { GameMode, GameStatus, Team } from "@/lib/types";
+
+import { SecretVillainGameOverView } from "./SecretVillainGameOverView";
 
 const meta = {
   component: SecretVillainGameOverView,

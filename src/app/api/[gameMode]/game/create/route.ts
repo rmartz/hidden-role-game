@@ -1,7 +1,8 @@
-import { ServerResponseStatus } from "@/server/types";
-import type { CreateGameRequest } from "@/server/types";
-import { startLobbyGame } from "@/server/lobby";
+import { isGameModeEnabled } from "@/lib/game/modes";
 import { createGame, validateGameStartPrerequisites } from "@/server/game";
+import { startLobbyGame } from "@/server/lobby";
+import type { CreateGameRequest } from "@/server/types";
+import { ServerResponseStatus } from "@/server/types";
 import {
   authenticateLobby,
   errorResponse,
@@ -10,7 +11,6 @@ import {
   validateRoleBucketsCoverPlayerCount,
   validateRoleBucketsForMode,
 } from "@/server/utils";
-import { isGameModeEnabled } from "@/lib/game/modes";
 
 export async function POST(
   request: Request,

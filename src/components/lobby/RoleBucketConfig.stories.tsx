@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { fn } from "storybook/test";
-import { RoleBucketConfigView } from "./RoleBucketConfig";
-import { GameMode, Team } from "@/lib/types";
+
 import type { AdvancedRoleBucket, RoleDefinition } from "@/lib/types";
+import { GameMode, Team } from "@/lib/types";
+
+import { RoleBucketConfigView } from "./RoleBucketConfig";
 
 const mockRoles: RoleDefinition<string, Team>[] = [
   { id: "villager", name: "Villager", team: Team.Good },

@@ -1,23 +1,24 @@
 "use client";
 
-import { GameStatus } from "@/lib/types";
-import { SecretVillainPhase } from "@/lib/game/modes/secret-villain/types";
-import { FAILED_ELECTION_THRESHOLD } from "@/lib/game/modes/secret-villain/types";
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
-import type { PlayerGameState } from "@/server/types";
 import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
 import { getSvThemeLabels } from "@/lib/game/modes/secret-villain/themes";
+import { SecretVillainPhase } from "@/lib/game/modes/secret-villain/types";
+import { FAILED_ELECTION_THRESHOLD } from "@/lib/game/modes/secret-villain/types";
+import { GameStatus } from "@/lib/types";
+import type { PlayerGameState } from "@/server/types";
+
 import { BoardDisplay } from "./BoardDisplay";
 import { ElectionNominationView } from "./ElectionNominationView";
-import { ElectionVoteView } from "./ElectionVoteView";
 import { ElectionResultView } from "./ElectionResultView";
-import { PolicyPresidentView } from "./PolicyPresidentView";
+import { ElectionVoteView } from "./ElectionVoteView";
 import { PolicyChancellorView } from "./PolicyChancellorView";
-import { VetoPromptView } from "./VetoPromptView";
-import { SpecialActionView } from "./SpecialActionView";
+import { PolicyPresidentView } from "./PolicyPresidentView";
 import { SecretVillainGameOverView } from "./SecretVillainGameOverView";
 import { SecretVillainStartingView } from "./SecretVillainStartingView";
+import { SpecialActionView } from "./SpecialActionView";
 import { SpecialBadRevealView } from "./SpecialBadRevealView";
+import { VetoPromptView } from "./VetoPromptView";
 
 function getPlayerName(
   players: PlayerGameState["players"],

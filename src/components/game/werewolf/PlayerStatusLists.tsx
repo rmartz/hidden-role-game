@@ -1,6 +1,6 @@
-import type { PublicLobbyPlayer, VisibleTeammate } from "@/server/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import type { PublicLobbyPlayer, VisibleTeammate } from "@/server/types";
 
 interface PlayerStatusListsProps {
   players: PublicLobbyPlayer[];

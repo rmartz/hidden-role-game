@@ -1,22 +1,24 @@
-import { describe, it, expect } from "vitest";
-import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
-import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "../timer-config";
+import { describe, expect, it } from "vitest";
+
 import type { Game } from "@/lib/types";
+import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
+
+import { SecretVillainRole } from "../roles";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "../timer-config";
+import type { SecretVillainTurnState, SpecialActionPhase } from "../types";
 import {
+  PolicyCard,
   SecretVillainPhase,
   SpecialActionType,
-  PolicyCard,
   SvBoardPreset,
 } from "../types";
-import type { SecretVillainTurnState, SpecialActionPhase } from "../types";
 import { BOARD_PRESETS, SvVictoryConditionKey } from "../utils";
-import { SecretVillainRole } from "../roles";
+import { callSpecialElectionAction } from "./call-special-election";
 import {
-  selectInvestigationTargetAction,
   consentInvestigationAction,
   resolveInvestigationAction,
+  selectInvestigationTargetAction,
 } from "./investigate-player";
-import { callSpecialElectionAction } from "./call-special-election";
 import { shootPlayerAction } from "./shoot-player";
 
 function makePlayer(id: string) {

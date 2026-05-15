@@ -1,7 +1,5 @@
 "use client";
 
-import { ShowRolesInPlay } from "@/lib/types";
-import { Label } from "@/components/ui/label";
 import {
   Field,
   FieldContent,
@@ -10,7 +8,10 @@ import {
   FieldLabel,
   FieldTitle,
 } from "@/components/ui/field";
+import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ShowRolesInPlay } from "@/lib/types";
+
 import {
   SHOW_ROLES_IN_PLAY_PICKER_COPY,
   SHOW_ROLES_OPTIONS,

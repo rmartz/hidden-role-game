@@ -1,9 +1,11 @@
-import { describe, it, expect, afterEach } from "vitest";
-import { render, screen, cleanup } from "@testing-library/react";
-import { PlayerNightSummary } from "./PlayerNightSummary";
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
+
+import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import type { DaytimeNightStatusEntry } from "@/server/types";
 import type { PublicLobbyPlayer } from "@/server/types/lobby";
-import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+
+import { PlayerNightSummary } from "./PlayerNightSummary";
 
 afterEach(cleanup);
 
@@ -56,6 +58,32 @@ describe("PlayerNightSummary", () => {
     const { container } = render(<PlayerNightSummary players={players} />);
 
     expect(container.querySelector("h2")).toBeNull();
+  });
+
+  it("renders exposed player text", () => {
+    const nightStatus: DaytimeNightStatusEntry[] = [
+      { targetPlayerId: "p1", effect: "exposed", roleName: "Werewolf" },
+    ];
+
+    render(<PlayerNightSummary players={players} nightStatus={nightStatus} />);
+
+    expect(
+      screen.getByText(WEREWOLF_COPY.exposer.nightSummary("Alice", "Werewolf")),
+    ).toBeDefined();
+  });
+
+  it("renders exposed message alongside kill when both apply to the same player", () => {
+    const nightStatus: DaytimeNightStatusEntry[] = [
+      { targetPlayerId: "p1", effect: "killed" },
+      { targetPlayerId: "p1", effect: "exposed", roleName: "Altruist" },
+    ];
+
+    render(<PlayerNightSummary players={players} nightStatus={nightStatus} />);
+
+    expect(screen.getByText("Alice was eliminated.")).toBeDefined();
+    expect(
+      screen.getByText(WEREWOLF_COPY.exposer.nightSummary("Alice", "Altruist")),
+    ).toBeDefined();
   });
 
   it("renders multiple effects", () => {

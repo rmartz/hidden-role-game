@@ -1,12 +1,14 @@
-import { describe, it, expect } from "vitest";
-import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
+import { describe, expect, it } from "vitest";
+
 import type { Game } from "@/lib/types";
-import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "../timer-config";
-import { WerewolfPhase, TrialVerdict, TrialPhase } from "../types";
-import type { WerewolfTurnState, WerewolfNighttimePhase } from "../types";
+import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
+
 import { WerewolfRole } from "../roles";
-import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
-import { makePlayingGame, nightTurnState, dayTurnState } from "./test-helpers";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "../timer-config";
+import type { WerewolfNighttimePhase, WerewolfTurnState } from "../types";
+import { TrialPhase, TrialVerdict, WerewolfPhase } from "../types";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "./index";
+import { dayTurnState, makePlayingGame, nightTurnState } from "./test-helpers";
 
 // ---------------------------------------------------------------------------
 // StartNight

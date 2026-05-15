@@ -1,18 +1,5 @@
 "use client";
 
-import type { ModeConfigField } from "@/lib/types";
-import type { SecretVillainTimerConfig } from "@/lib/game/modes/secret-villain/timer-config";
-import type { SecretVillainModeConfig } from "@/lib/game/modes/secret-villain/lobby-config";
-import type { SecretVillainLobbyConfig } from "@/lib/game/modes/secret-villain/lobby-config";
-import { SvBoardPreset } from "@/lib/game/modes/secret-villain/types";
-import { SvTheme, SV_THEMES } from "@/lib/game/modes/secret-villain/themes";
-import type { SvCustomPowerConfig } from "@/lib/game/modes/secret-villain/types";
-import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
-import {
-  getDefaultBoardPreset,
-  presetToCustomConfig,
-  type SvConcretePreset,
-} from "@/lib/game/modes/secret-villain/utils";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -22,9 +9,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { SecretVillainTimerConfigPanel } from "./SecretVillainTimerConfigPanel";
-import { SECRET_VILLAIN_CONFIG_PANEL_COPY } from "./SecretVillainConfigPanel.copy";
+import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
+import type { SecretVillainModeConfig } from "@/lib/game/modes/secret-villain/lobby-config";
+import type { SecretVillainLobbyConfig } from "@/lib/game/modes/secret-villain/lobby-config";
+import { SV_THEMES, SvTheme } from "@/lib/game/modes/secret-villain/themes";
+import type { SecretVillainTimerConfig } from "@/lib/game/modes/secret-villain/timer-config";
+import type { SvCustomPowerConfig } from "@/lib/game/modes/secret-villain/types";
+import { SvBoardPreset } from "@/lib/game/modes/secret-villain/types";
+import {
+  getDefaultBoardPreset,
+  presetToCustomConfig,
+  type SvConcretePreset,
+} from "@/lib/game/modes/secret-villain/utils";
+import type { ModeConfigField } from "@/lib/types";
+
 import { CustomPowerTableEditor } from "./CustomPowerTableEditor";
+import { SECRET_VILLAIN_CONFIG_PANEL_COPY } from "./SecretVillainConfigPanel.copy";
+import { SecretVillainTimerConfigPanel } from "./SecretVillainTimerConfigPanel";
 
 /** Display order for the board preset dropdown. */
 const PRESET_DISPLAY_ORDER: SvBoardPreset[] = [

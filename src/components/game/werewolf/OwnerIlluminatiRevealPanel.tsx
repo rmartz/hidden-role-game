@@ -1,11 +1,11 @@
 "use client";
 
-import { WerewolfAction } from "@/lib/game/modes/werewolf";
 import { Button } from "@/components/ui/button";
 import { useGameAction } from "@/hooks";
+import { WerewolfAction } from "@/lib/game/modes/werewolf";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
-import type { VisibleTeammate } from "@/server/types";
 import { getPlayerName } from "@/lib/player";
+import type { VisibleTeammate } from "@/server/types";
 
 interface OwnerIlluminatiRevealPanelProps {
   gameId: string;
