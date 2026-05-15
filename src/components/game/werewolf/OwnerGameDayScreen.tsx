@@ -1,35 +1,37 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
 import { WeatherMoonRegular } from "@fluentui/react-icons";
-import { GAME_MODES } from "@/lib/game/modes";
-import {
-  WerewolfAction,
-  WerewolfPhase,
-  WerewolfRole,
-  getOrderedAffectedPlayers,
-} from "@/lib/game/modes/werewolf";
-import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
-import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
-import {
-  WEREWOLF_ROLE_CATEGORY_LABELS,
-  WEREWOLF_ROLE_CATEGORY_ORDER,
-} from "@/lib/game/modes/werewolf/roles";
-import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
-import { isNominationsBlocked } from "@/lib/game/modes/werewolf/player-state";
-import { useGameAction } from "@/hooks";
+import { useCallback, useMemo } from "react";
+
 import {
   GameRolesList,
   GameTimer,
   RoleGlossaryDialog,
 } from "@/components/game";
 import { Button } from "@/components/ui/button";
-import { OwnerAdvanceCard } from "./OwnerAdvanceCard";
+import { useGameAction } from "@/hooks";
+import { GAME_MODES } from "@/lib/game/modes";
+import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
+import {
+  getOrderedAffectedPlayers,
+  WerewolfAction,
+  WerewolfPhase,
+  WerewolfRole,
+} from "@/lib/game/modes/werewolf";
+import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { isNominationsBlocked } from "@/lib/game/modes/werewolf/player-state";
+import {
+  WEREWOLF_ROLE_CATEGORY_LABELS,
+  WEREWOLF_ROLE_CATEGORY_ORDER,
+} from "@/lib/game/modes/werewolf/roles";
+
+import { HunterRevengePanel } from "./HunterRevengePanel";
 import { NightOutcomeSummary } from "./NightOutcomeSummary";
 import { NominationPanel } from "./NominationPanel";
+import { OwnerAdvanceCard } from "./OwnerAdvanceCard";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
 import { OwnerTrialPanel } from "./OwnerTrialPanel";
-import { HunterRevengePanel } from "./HunterRevengePanel";
 
 interface OwnerGameDayScreenProps {
   gameId: string;
@@ -110,6 +112,9 @@ export function OwnerGameDayScreen({
     !(gameState.deadPlayerIds ?? []).includes(martyrPlayer.id)
       ? martyrPlayer.id
       : undefined;
+  const martyrAbilityUsed = (
+    turnState.roleState?.martyr as { abilityUsed: boolean } | undefined
+  )?.abilityUsed;
 
   return (
     <div className="p-5 max-w-4xl mx-auto">
@@ -180,7 +185,7 @@ export function OwnerGameDayScreen({
               defensePhaseSeconds={defensePhaseSeconds}
               autoAdvance={autoAdvance}
               pendingGuiltId={pendingGuiltId}
-              martyrUsed={turnState.martyrUsed}
+              martyrUsed={martyrAbilityUsed}
               noDeviceMartyrPlayerId={noDeviceMartyrPlayerId}
             />
           )}

@@ -1,8 +1,9 @@
 import type { Game, GameAction } from "@/lib/types";
-import type { ActiveTrial, WerewolfTurnState } from "../types";
-import { TrialVerdict, WerewolfPhase, TrialPhase, DaytimeVote } from "../types";
-import { currentTurnState, isOwnerPlaying, checkWinCondition } from "../utils";
+
 import { WerewolfRole } from "../roles";
+import type { ActiveTrial, WerewolfTurnState } from "../types";
+import { DaytimeVote, TrialPhase, TrialVerdict, WerewolfPhase } from "../types";
+import { checkWinCondition, currentTurnState, isOwnerPlaying } from "../utils";
 
 export function applyTrialVerdict(
   activeTrial: ActiveTrial,
@@ -23,7 +24,9 @@ export function applyTrialVerdict(
     )?.roleDefinitionId;
     const extraVoteWeight =
       Number(roleId === WerewolfRole.Mayor) +
-      Number((ts.monarchKnightedPlayerIds ?? []).includes(v.playerId));
+      Number(
+        (ts.roleState?.monarch?.knightedPlayerIds ?? []).includes(v.playerId),
+      );
     if (extraVoteWeight === 0) continue;
     if (v.vote === DaytimeVote.Guilty) guiltyCount += extraVoteWeight;
     else innocentCount += extraVoteWeight;

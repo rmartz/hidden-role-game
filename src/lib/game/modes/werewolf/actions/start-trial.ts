@@ -1,13 +1,14 @@
 import type { Game, GameAction } from "@/lib/types";
-import { WerewolfPhase, TrialPhase, DaytimeVote } from "../types";
+
 import { getWerewolfModeConfig } from "../lobby-config";
+import { isWerewolfRole, WEREWOLF_ROLES } from "../roles";
+import { DaytimeVote, TrialPhase, WerewolfPhase } from "../types";
 import {
   currentTurnState,
-  isOwnerPlaying,
-  getSilencedPlayerIds,
   getHypnotizedPlayerId,
+  getSilencedPlayerIds,
+  isOwnerPlaying,
 } from "../utils";
-import { WEREWOLF_ROLES, isWerewolfRole } from "../roles";
 
 export const startTrialAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {

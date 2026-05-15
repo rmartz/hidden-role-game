@@ -1,10 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import type { PublicLobby } from "@/server/types";
+
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import type { PublicLobby } from "@/server/types";
+
 import { LOBBY_CONFLICT_RESOLUTION_COPY } from "./LobbyConflictResolution.copy";
 
 interface LobbyConflictResolutionProps {

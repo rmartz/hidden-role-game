@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
+
 import { ActionGateView } from "./ActionGateView";
 
 const meta = {

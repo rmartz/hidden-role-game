@@ -1,9 +1,10 @@
-import { Team } from "@/lib/types";
 import type { PlayerRoleAssignment } from "@/lib/types";
+import { Team } from "@/lib/types";
+
+import { getWerewolfRole, WerewolfRole } from "../roles";
+import type { WerewolfNighttimePhase, WerewolfTurnState } from "../types";
 import { WerewolfPhase } from "../types";
-import type { WerewolfTurnState, WerewolfNighttimePhase } from "../types";
 import { buildNightPhaseOrder } from "../utils";
-import { WerewolfRole, getWerewolfRole } from "../roles";
 
 /**
  * Selects the Executioner's target from the Good team players.
@@ -52,6 +53,8 @@ export function buildInitialTurnState(
     turn: 1,
     phase,
     deadPlayerIds: [],
-    ...(executionerTargetId ? { executionerTargetId } : {}),
+    ...(executionerTargetId
+      ? { roleState: { executioner: { targetId: executionerTargetId } } }
+      : {}),
   };
 }

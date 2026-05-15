@@ -1,19 +1,20 @@
-import type { Game, GameAction } from "@/lib/types";
-import { WerewolfPhase, isTeamNightAction, TargetCategory } from "../types";
-import type { TeamNightAction } from "../types";
-import {
-  currentTurnState,
-  validateActiveNightPlayer,
-  isGroupPhaseKey,
-  baseGroupPhaseKey,
-  getGroupPhasePlayerIds,
-  getGroupPhaseMemberIds,
-  computeSuggestedTarget,
-  isRoleActive,
-  getInterimAttackedPlayerIds,
-} from "../utils";
-import { WerewolfRole, getWerewolfRole } from "../roles";
 import { getPlayer } from "@/lib/player";
+import type { Game, GameAction } from "@/lib/types";
+
+import { getWerewolfRole, WerewolfRole } from "../roles";
+import type { TeamNightAction } from "../types";
+import { isTeamNightAction, TargetCategory, WerewolfPhase } from "../types";
+import {
+  baseGroupPhaseKey,
+  computeSuggestedTarget,
+  currentTurnState,
+  getGroupPhaseMemberIds,
+  getGroupPhasePlayerIds,
+  getInterimAttackedPlayerIds,
+  isGroupPhaseKey,
+  isRoleActive,
+  validateActiveNightPlayer,
+} from "../utils";
 
 export const setNightTargetAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {
@@ -23,9 +24,14 @@ export const setNightTargetAction: GameAction = {
 
     const phase = ts.phase;
     if (!payload || typeof payload !== "object") return false;
-    const { roleId: explicitPhaseKey, targetPlayerId } = payload as {
+    const {
+      roleId: explicitPhaseKey,
+      targetPlayerId,
+      isSecondTarget,
+    } = payload as {
       roleId?: unknown;
       targetPlayerId?: unknown;
+      isSecondTarget?: unknown;
     };
 
     // Determine the phase key.
@@ -48,18 +54,24 @@ export const setNightTargetAction: GameAction = {
 
     // Once-per-game ability restrictions — narrator can bypass these.
     if (!isOwner) {
-      if (isRoleActive(phaseKey, WerewolfRole.Witch) && ts.witchAbilityUsed)
+      if (
+        isRoleActive(phaseKey, WerewolfRole.Witch) &&
+        ts.roleState?.witch?.abilityUsed
+      )
         return false;
-      if (isRoleActive(phaseKey, WerewolfRole.Exposer) && ts.exposerAbilityUsed)
+      if (
+        isRoleActive(phaseKey, WerewolfRole.Exposer) &&
+        ts.roleState?.exposer?.abilityUsed
+      )
         return false;
       if (
         isRoleActive(phaseKey, WerewolfRole.Mortician) &&
-        ts.morticianAbilityEnded
+        ts.roleState?.mortician?.abilityEnded
       )
         return false;
       if (
         isRoleActive(phaseKey, WerewolfRole.Monarch) &&
-        (ts.monarchKnightingsUsed ?? 0) >= 3
+        (ts.roleState?.monarch?.knightingsUsed ?? 0) >= 3
       )
         return false;
     }
@@ -73,7 +85,7 @@ export const setNightTargetAction: GameAction = {
     if (ts.deadPlayerIds.includes(targetPlayerId)) return false;
     if (
       isRoleActive(phaseKey, WerewolfRole.Monarch) &&
-      (ts.monarchKnightedPlayerIds ?? []).includes(targetPlayerId)
+      (ts.roleState?.monarch?.knightedPlayerIds ?? []).includes(targetPlayerId)
     )
       return false;
 
@@ -98,17 +110,34 @@ export const setNightTargetAction: GameAction = {
     )
       return false;
 
+    // Dual-target swap roles (e.g. Swapper) cannot select the same player for both targets.
+    if (typeof targetPlayerId === "string" && phaseRoleDef?.dualTargetSwap) {
+      const existing = phase.nightActions[phaseKey];
+      if (existing && !("votes" in existing) && !existing.skipped) {
+        if (
+          (isSecondTarget === true &&
+            existing.targetPlayerId === targetPlayerId) ||
+          (isSecondTarget !== true &&
+            existing.secondTargetPlayerId === targetPlayerId)
+        )
+          return false;
+      }
+    }
+
     // One-Eyed Seer cannot target when locked onto a living player.
     if (
       isRoleActive(phaseKey, WerewolfRole.OneEyedSeer) &&
-      ts.oneEyedSeerLockedTargetId &&
-      !ts.deadPlayerIds.includes(ts.oneEyedSeerLockedTargetId)
+      ts.roleState?.oneEyedSeer?.lockedTargetId &&
+      !ts.deadPlayerIds.includes(ts.roleState.oneEyedSeer.lockedTargetId)
     )
       return false;
 
     // Priest cannot target when they have an active ward on a living player.
-    if (isRoleActive(phaseKey, WerewolfRole.Priest) && ts.priestWards) {
-      const hasActiveWard = Object.keys(ts.priestWards).some(
+    if (
+      isRoleActive(phaseKey, WerewolfRole.Priest) &&
+      ts.roleState?.priest?.wards
+    ) {
+      const hasActiveWard = Object.keys(ts.roleState.priest.wards).some(
         (wardedId) => !ts.deadPlayerIds.includes(wardedId),
       );
       if (hasActiveWard) return false;
@@ -130,9 +159,32 @@ export const setNightTargetAction: GameAction = {
         return false;
     }
 
+    // Roles with adjacentTargetOnly may only target immediate seating neighbours.
+    if (!isOwner) {
+      const callerAssignment = game.roleAssignments.find(
+        (a) => a.playerId === callerId,
+      );
+      const callerRoleDef = callerAssignment
+        ? getWerewolfRole(callerAssignment.roleDefinitionId)
+        : undefined;
+      if (callerRoleDef?.adjacentTargetOnly) {
+        const rawOrder = game.playerOrder ?? game.players.map((p) => p.id);
+        // Exclude the narrator so a player seated next to the narrator still
+        // has two selectable neighbours, matching the pattern used by
+        // extractCountState and extractTheThingState.
+        const playerOrder = rawOrder.filter((id) => id !== game.ownerPlayerId);
+        const idx = playerOrder.indexOf(callerId);
+        if (idx === -1 || playerOrder.length < 2) return false;
+        const left =
+          playerOrder[(idx - 1 + playerOrder.length) % playerOrder.length];
+        const right = playerOrder[(idx + 1) % playerOrder.length];
+        if (targetPlayerId !== left && targetPlayerId !== right) return false;
+      }
+    }
+
     // Zombie cannot infect an already-infected player.
     if (isRoleActive(phaseKey, WerewolfRole.Zombie)) {
-      if (ts.zombieInfected?.includes(targetPlayerId)) return false;
+      if (ts.roleState?.zombie?.infected.includes(targetPlayerId)) return false;
     }
 
     // Witch cannot self-target unless under attack (self-protect is OK,
@@ -145,9 +197,9 @@ export const setNightTargetAction: GameAction = {
         phase.nightActions,
         game.roleAssignments,
         ts.deadPlayerIds,
-        ts.priestWards,
-        ts.mirrorcasterCharged,
-        ts.arsonistDousedPlayerIds,
+        ts.roleState?.priest?.wards,
+        ts.roleState?.mirrorcaster?.charged,
+        ts.roleState?.arsonist?.dousedPlayerIds,
       );
       if (!attacked.includes(callerId)) return false;
     }

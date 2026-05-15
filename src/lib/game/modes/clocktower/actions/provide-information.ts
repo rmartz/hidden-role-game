@@ -1,8 +1,9 @@
 import type { Game, GameAction } from "@/lib/types";
 import { GameStatus } from "@/lib/types";
-import { ClocktowerPhase } from "../types";
-import type { ClocktowerNightInformation, ClocktowerTurnState } from "../types";
+
 import { isClocktowerRole } from "../roles";
+import type { ClocktowerNightInformation, ClocktowerTurnState } from "../types";
+import { ClocktowerPhase } from "../types";
 
 function currentTurnState(game: Game): ClocktowerTurnState | undefined {
   if (game.status.type !== GameStatus.Playing) return undefined;

@@ -1,14 +1,15 @@
 "use client";
 
-import { WerewolfAction, WerewolfRole } from "@/lib/game/modes/werewolf";
-import type { PhaseKey, TargetablePlayer } from "@/lib/game/modes/werewolf";
-import { useGameAction } from "@/hooks";
 import { Button } from "@/components/ui/button";
-import type { PublicLobbyPlayer } from "@/server/types";
-import { ConfirmTargetButtonView } from "./ConfirmTargetButtonView";
-import { WitchInformationPanel } from "./WitchInformationPanel";
+import { useGameAction } from "@/hooks";
+import type { PhaseKey, TargetablePlayer } from "@/lib/game/modes/werewolf";
+import { WerewolfAction, WerewolfRole } from "@/lib/game/modes/werewolf";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import { getPlayerName } from "@/lib/player";
+import type { PublicLobbyPlayer } from "@/server/types";
+
+import { ConfirmTargetButtonView } from "./ConfirmTargetButtonView";
+import { WitchInformationPanel } from "./WitchInformationPanel";
 
 interface TeamVoteDisplay {
   playerName: string;

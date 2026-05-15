@@ -1,14 +1,16 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
+import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-villain/lobby-config";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
+import type { Lobby } from "@/lib/types";
+import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
+
 import {
-  validatePlayerJoin,
-  validatePlayerRename,
   authorizePlayerRemoval,
   MAX_LOBBY_PLAYERS,
+  validatePlayerJoin,
+  validatePlayerRename,
 } from "./lobby";
-import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
-import type { Lobby } from "@/lib/types";
-import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
-import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-villain/lobby-config";
 
 function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
   return {

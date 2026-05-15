@@ -1,14 +1,16 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
-import { GameMode, GameStatus, Team } from "@/lib/types";
-import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
-import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import {
-  WerewolfPhase,
   type WerewolfNighttimePhase,
+  WerewolfPhase,
 } from "@/lib/game/modes/werewolf";
-import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
+import { GameMode, GameStatus, Team } from "@/lib/types";
+
 import { PlayerNightActionScreen } from "./PlayerNightActionScreen";
 import type { PlayerTargetSelectionProps } from "./PlayerTargetSelection";
 
@@ -101,6 +103,113 @@ describe("PlayerNightActionScreen", () => {
     const targetIds = props.targets.map(([player]) => player.id);
 
     expect(targetIds).toEqual(["p2", "p3"]);
+  });
+
+  it("keeps both Swapper selected targets visible after confirmation", () => {
+    const gameState: WerewolfPlayerGameState = {
+      gameMode: GameMode.Werewolf,
+      status: { type: GameStatus.Playing },
+      lobbyId: "lobby-1",
+      players: [
+        { id: "p1", name: "Alice" },
+        { id: "p2", name: "Bob" },
+        { id: "p3", name: "Charlie" },
+      ],
+      visibleRoleAssignments: [],
+      timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
+      nominationsEnabled: true,
+      trialsPerDay: 1,
+      revealProtections: true,
+      autoRevealNightOutcome: true,
+      myPlayerId: "p1",
+      myRole: {
+        id: WerewolfRole.Swapper,
+        name: "Swapper",
+        team: Team.Good,
+      },
+      myNightTarget: "p2",
+      mySecondNightTarget: "p3",
+      myNightTargetConfirmed: true,
+    };
+
+    const phase: WerewolfNighttimePhase = {
+      type: WerewolfPhase.Nighttime,
+      startedAt: Date.now(),
+      nightPhaseOrder: [WerewolfRole.Swapper],
+      currentPhaseIndex: 0,
+      nightActions: {},
+    };
+
+    render(
+      <PlayerNightActionScreen
+        gameId="game-1"
+        gameState={gameState}
+        phase={phase}
+        turn={2}
+        deadPlayerIds={[]}
+      />,
+    );
+
+    const firstCall = playerTargetSelectionMock.mock.calls[0];
+    expect(firstCall).toBeDefined();
+    if (firstCall === undefined) return;
+    const props = firstCall[0] as PlayerTargetSelectionProps;
+    const targetIds = props.targets.map(([player]) => player.id);
+
+    expect(targetIds).toEqual(["p2", "p3"]);
+  });
+
+  it("passes requiresSecondTarget as true for the Swapper role", () => {
+    const gameState: WerewolfPlayerGameState = {
+      gameMode: GameMode.Werewolf,
+      status: { type: GameStatus.Playing },
+      lobbyId: "lobby-1",
+      players: [
+        { id: "p1", name: "Alice" },
+        { id: "p2", name: "Bob" },
+        { id: "p3", name: "Charlie" },
+      ],
+      visibleRoleAssignments: [],
+      timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
+      nominationsEnabled: true,
+      trialsPerDay: 1,
+      revealProtections: true,
+      autoRevealNightOutcome: true,
+      myPlayerId: "p1",
+      myRole: {
+        id: WerewolfRole.Swapper,
+        name: "Swapper",
+        team: Team.Good,
+      },
+      myNightTarget: undefined,
+      mySecondNightTarget: undefined,
+      myNightTargetConfirmed: false,
+    };
+
+    const phase: WerewolfNighttimePhase = {
+      type: WerewolfPhase.Nighttime,
+      startedAt: Date.now(),
+      nightPhaseOrder: [WerewolfRole.Swapper],
+      currentPhaseIndex: 0,
+      nightActions: {},
+    };
+
+    render(
+      <PlayerNightActionScreen
+        gameId="game-1"
+        gameState={gameState}
+        phase={phase}
+        turn={2}
+        deadPlayerIds={[]}
+      />,
+    );
+
+    const firstCall = playerTargetSelectionMock.mock.calls[0];
+    expect(firstCall).toBeDefined();
+    if (firstCall === undefined) return;
+    const props = firstCall[0] as PlayerTargetSelectionProps;
+
+    expect(props.requiresSecondTarget).toBe(true);
   });
 
   it("keeps only the selected target visible for confirmed non-Mentalist roles", () => {

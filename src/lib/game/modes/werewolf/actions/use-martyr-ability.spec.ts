@@ -1,10 +1,12 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { GameStatus } from "@/lib/types";
-import { WerewolfPhase, TrialVerdict, TrialPhase } from "../types";
-import type { WerewolfTurnState } from "../types";
+
 import { WerewolfRole } from "../roles";
-import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
+import type { WerewolfTurnState } from "../types";
+import { TrialPhase, TrialVerdict, WerewolfPhase } from "../types";
 import { WerewolfWinner } from "../utils/win-condition";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "./index";
 import { makePlayingGame } from "./test-helpers";
 
 // ---------------------------------------------------------------------------
@@ -32,7 +34,7 @@ function makeDayStateWithMartyrWindow(
       pendingGuiltId,
     },
     deadPlayerIds,
-    ...(martyrUsed && { martyrUsed: true }),
+    ...(martyrUsed && { roleState: { martyr: { abilityUsed: true } } }),
   };
 }
 
@@ -159,7 +161,7 @@ describe("WerewolfAction.UseMartyrAbility", () => {
       action.apply(game, {}, "p2");
       const result = (game.status as { turnState: WerewolfTurnState })
         .turnState;
-      expect(result.martyrUsed).toBe(true);
+      expect(result.roleState?.martyr?.abilityUsed).toBe(true);
     });
 
     it("convicted player survives with original role unchanged", () => {
@@ -239,7 +241,7 @@ describe("WerewolfAction.UseMartyrAbility", () => {
       startNight.apply(game, {}, "owner-1");
       const nightTs = (game.status as { turnState: WerewolfTurnState })
         .turnState;
-      expect(nightTs.martyrUsed).toBe(true);
+      expect(nightTs.roleState?.martyr?.abilityUsed).toBe(true);
     });
 
     it("martyrUsed is carried forward night to day", () => {
@@ -254,13 +256,13 @@ describe("WerewolfAction.UseMartyrAbility", () => {
       const startDay = WEREWOLF_ACTIONS[WerewolfAction.StartDay];
       startDay.apply(game, {}, "owner-1");
       const dayTs = (game.status as { turnState: WerewolfTurnState }).turnState;
-      expect(dayTs.martyrUsed).toBe(true);
+      expect(dayTs.roleState?.martyr?.abilityUsed).toBe(true);
     });
 
     it("Executioner wins when Martyr is their target and Martyr self-sacrifices", () => {
       const ts: WerewolfTurnState = {
         ...makeDayStateWithMartyrWindow("p3"),
-        executionerTargetId: "p2",
+        roleState: { executioner: { targetId: "p2" } },
       };
       const game = makePlayingGame(ts, {
         roleAssignments: [
@@ -292,7 +294,7 @@ describe("WerewolfAction.UseMartyrAbility", () => {
     it("Executioner does not win when they are dead when Martyr self-sacrifices", () => {
       const ts: WerewolfTurnState = {
         ...makeDayStateWithMartyrWindow("p3", ["p4"]),
-        executionerTargetId: "p2",
+        roleState: { executioner: { targetId: "p2" } },
       };
       const game = makePlayingGame(ts, {
         roleAssignments: [

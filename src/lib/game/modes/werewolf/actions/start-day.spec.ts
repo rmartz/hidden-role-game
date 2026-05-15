@@ -1,20 +1,22 @@
-import { describe, it, expect } from "vitest";
-import { GameMode, GameStatus } from "@/lib/types";
+import { describe, expect, it } from "vitest";
+
 import type { WerewolfGame } from "@/lib/types";
+import { GameMode, GameStatus } from "@/lib/types";
+
+import { WerewolfRole } from "../roles";
 import type {
-  WerewolfTurnState,
   WerewolfDaytimePhase,
   WerewolfNighttimePhase,
+  WerewolfTurnState,
 } from "../types";
 import { WerewolfPhase } from "../types";
-import { WerewolfRole } from "../roles";
-import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
 import { WerewolfWinner } from "../utils/win-condition";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "./index";
 import {
-  makePlayingGame,
-  makeNightState,
-  nightTurnState,
   dayTurnState,
+  makeNightState,
+  makePlayingGame,
+  nightTurnState,
 } from "./test-helpers";
 
 // ---------------------------------------------------------------------------
@@ -287,7 +289,7 @@ describe("WerewolfAction.StartDay — protection roles", () => {
     );
     action.apply(game, null, "owner-1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.priestWards).toEqual({ p2: "p3" });
+    expect(ts.roleState?.priest?.wards).toEqual({ p2: "p3" });
   });
 
   it("Priest ward is consumed when warded player IS attacked", () => {
@@ -314,7 +316,7 @@ describe("WerewolfAction.StartDay — protection roles", () => {
     );
     action.apply(game, null, "owner-1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.priestWards).toBeUndefined();
+    expect(ts.roleState?.priest?.wards).toBeUndefined();
     expect(ts.deadPlayerIds).not.toContain("p2");
   });
 
@@ -341,7 +343,7 @@ describe("WerewolfAction.StartDay — protection roles", () => {
     action.apply(game, null, "owner-1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
     expect(ts.deadPlayerIds).not.toContain("p2");
-    expect(ts.toughGuyHitIds).toContain("p2");
+    expect(ts.roleState?.toughGuy?.hitIds).toContain("p2");
   });
 
   it("Tough Guy dies on second attack when toughGuyHitIds already contains them", () => {
@@ -353,7 +355,7 @@ describe("WerewolfAction.StartDay — protection roles", () => {
         },
       },
     });
-    nightState.toughGuyHitIds = ["p2"];
+    nightState.roleState = { toughGuy: { hitIds: ["p2"] } };
     const game = makePlayingGame(nightState, {
       roleAssignments: [
         { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -399,7 +401,7 @@ describe("WerewolfAction.StartDay — Hunter and Vigilante", () => {
       );
       action.apply(game, null, "owner-1");
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-      expect(ts.hunterRevengePlayerId).toBe("p2");
+      expect(ts.roleState?.hunter?.revengePlayerId).toBe("p2");
       expect(ts.deadPlayerIds).toContain("p2");
     });
 
@@ -437,7 +439,7 @@ describe("WerewolfAction.StartDay — Hunter and Vigilante", () => {
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
       // Game should still be playing (not finished), pending Hunter revenge
       expect(ts.phase.type).toBe(WerewolfPhase.Daytime);
-      expect(ts.hunterRevengePlayerId).toBe("p2");
+      expect(ts.roleState?.hunter?.revengePlayerId).toBe("p2");
     });
 
     it("does not set hunterRevengePlayerId when Hunter is not killed", () => {
@@ -454,7 +456,7 @@ describe("WerewolfAction.StartDay — Hunter and Vigilante", () => {
       );
       action.apply(game, null, "owner-1");
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-      expect(ts.hunterRevengePlayerId).toBeUndefined();
+      expect(ts.roleState?.hunter?.revengePlayerId).toBeUndefined();
     });
   });
 

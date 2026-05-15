@@ -1,22 +1,24 @@
-import { GameStatus, Team } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
-import { WerewolfPhase, isTeamNightAction } from "../types";
+import { GameStatus, Team } from "@/lib/types";
+
+import { getWerewolfModeConfig } from "../lobby-config";
+import { getWerewolfRole, WerewolfRole } from "../roles";
+import { getOrderedAffectedPlayerIds } from "../services";
 import type {
   AttackNightResolutionEvent,
   ToughGuyAbsorbedNightResolutionEvent,
   WerewolfNighttimePhase,
+  WerewolfRoleTurnState,
 } from "../types";
+import { isTeamNightAction, WerewolfPhase } from "../types";
 import {
+  checkWinCondition,
   currentTurnState,
   isOwnerPlaying,
   resolveNightActions,
-  checkWinCondition,
   WerewolfWinner,
 } from "../utils";
-import { WerewolfRole, getWerewolfRole } from "../roles";
 import { didWolfCubDie } from "./helpers";
-import { getWerewolfModeConfig } from "../lobby-config";
-import { getOrderedAffectedPlayerIds } from "../services";
 
 export const startDayAction: GameAction = {
   isValid(game: Game, callerId: string) {
@@ -28,11 +30,12 @@ export const startDayAction: GameAction = {
     if (!ts) return;
     const nightPhase = ts.phase as WerewolfNighttimePhase;
 
+    const rs = ts.roleState ?? {};
     // Build priest wards: carry forward existing wards and add any new ward
     // from this night's Priest action BEFORE resolution so the ward protects
     // the target on the same night it is placed.
     const priestWardsForResolution: Record<string, string> = {
-      ...(ts.priestWards ?? {}),
+      ...(rs.priest?.wards ?? {}),
     };
     const priestAction = nightPhase.nightActions[WerewolfRole.Priest];
     if (
@@ -70,8 +73,9 @@ export const startDayAction: GameAction = {
       monarchAction.targetPlayerId !== undefined
         ? monarchAction.targetPlayerId
         : undefined;
-    const previousMonarchKnightingsUsed = ts.monarchKnightingsUsed ?? 0;
-    const previousMonarchKnightedPlayerIds = ts.monarchKnightedPlayerIds ?? [];
+    const previousMonarchKnightingsUsed = rs.monarch?.knightingsUsed ?? 0;
+    const previousMonarchKnightedPlayerIds =
+      rs.monarch?.knightedPlayerIds ?? [];
     const monarchCanKnight =
       targetKnightedTonight !== undefined &&
       previousMonarchKnightingsUsed < 3 &&
@@ -102,9 +106,9 @@ export const startDayAction: GameAction = {
       nightPhase.smitedPlayerIds,
       {
         priestWards: priestWardsForResolution,
-        toughGuyHitIds: ts.toughGuyHitIds,
+        toughGuyHitIds: rs.toughGuy?.hitIds,
         ...(oldManTimerPlayerId ? { oldManTimerPlayerId } : {}),
-        ...(ts.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
+        ...(rs.mirrorcaster?.charged ? { mirrorcasterCharged: true } : {}),
         ...(monarchPlayerId
           ? {
               monarchProtection: {
@@ -113,8 +117,8 @@ export const startDayAction: GameAction = {
               },
             }
           : {}),
-        ...(ts.arsonistDousedPlayerIds?.length
-          ? { arsonistDousedPlayerIds: ts.arsonistDousedPlayerIds }
+        ...(rs.arsonist?.dousedPlayerIds.length
+          ? { arsonistDousedPlayerIds: rs.arsonist.dousedPlayerIds }
           : {}),
       },
     );
@@ -132,7 +136,10 @@ export const startDayAction: GameAction = {
           e.type === "tough-guy-absorbed",
       )
       .map((e) => e.targetPlayerId);
-    const toughGuyHitIds = [...(ts.toughGuyHitIds ?? []), ...newToughGuyHitIds];
+    const toughGuyHitIds = [
+      ...(rs.toughGuy?.hitIds ?? []),
+      ...newToughGuyHitIds,
+    ];
 
     // Consume priest wards for any warded player who was attacked this night,
     // regardless of whether other protections also saved them.
@@ -152,7 +159,7 @@ export const startDayAction: GameAction = {
 
     // One-Eyed Seer lock: if the OES investigated a werewolf this night, lock them on.
     // If the OES's locked target died this night, the lock is cleared (handled below).
-    let oneEyedSeerLockedTargetId = ts.oneEyedSeerLockedTargetId;
+    let oneEyedSeerLockedTargetId = rs.oneEyedSeer?.lockedTargetId;
     const oesAction =
       nightPhase.nightActions[WerewolfRole.OneEyedSeer as string];
     if (
@@ -179,8 +186,11 @@ export const startDayAction: GameAction = {
       oneEyedSeerLockedTargetId = undefined;
     }
 
-    // Exposer reveal: if the Exposer confirmed a target this night, store the reveal.
-    let exposerReveal = ts.exposerReveal;
+    // Exposer reveal: if the Exposer confirmed a target this night, capture the
+    // new reveal for this day's summary on the daytime phase. The persistent
+    // roleState field carries it forward for the narrator night screen.
+    let exposerReveal = rs.exposer?.reveal;
+    let newExposerReveal: { playerId: string; roleId: string } | undefined;
     const exposerAction =
       nightPhase.nightActions[WerewolfRole.Exposer as string];
     if (
@@ -194,10 +204,11 @@ export const startDayAction: GameAction = {
         (a) => a.playerId === exposerAction.targetPlayerId,
       );
       if (exposerTargetAssignment) {
-        exposerReveal = {
+        newExposerReveal = {
           playerId: exposerAction.targetPlayerId,
           roleId: exposerTargetAssignment.roleDefinitionId,
         };
+        exposerReveal = newExposerReveal;
       }
     }
 
@@ -242,7 +253,7 @@ export const startDayAction: GameAction = {
     }
 
     // Mortician ability: check if the Mortician killed a Werewolf this night.
-    let morticianAbilityEnded = ts.morticianAbilityEnded === true;
+    let morticianAbilityEnded = rs.mortician?.abilityEnded === true;
     if (!morticianAbilityEnded) {
       const morticianAction = nightPhase.nightActions[WerewolfRole.Mortician];
       if (
@@ -281,7 +292,7 @@ export const startDayAction: GameAction = {
     // (player confirm, narrator override) in one place.
     const witchAction = nightPhase.nightActions[WerewolfRole.Witch as string];
     const witchAbilityUsed =
-      ts.witchAbilityUsed === true ||
+      rs.witch?.abilityUsed === true ||
       (witchAction !== undefined &&
         !isTeamNightAction(witchAction) &&
         witchAction.targetPlayerId !== undefined);
@@ -289,7 +300,7 @@ export const startDayAction: GameAction = {
     const exposerNightAction =
       nightPhase.nightActions[WerewolfRole.Exposer as string];
     const exposerAbilityUsed =
-      ts.exposerAbilityUsed === true ||
+      rs.exposer?.abilityUsed === true ||
       (exposerNightAction !== undefined &&
         !isTeamNightAction(exposerNightAction) &&
         exposerNightAction.targetPlayerId !== undefined);
@@ -298,7 +309,7 @@ export const startDayAction: GameAction = {
     // - If uncharged and the protected target was attacked → gain charge
     // - If charged → charge is consumed (attack was used this night)
     let mirrorcasterCharged = false;
-    if (ts.mirrorcasterCharged) {
+    if (rs.mirrorcaster?.charged) {
       // Charge is consumed by attacking this night.
       const mcAction =
         nightPhase.nightActions[WerewolfRole.Mirrorcaster as string];
@@ -339,19 +350,21 @@ export const startDayAction: GameAction = {
       draculaAction.targetPlayerId &&
       !updatedDeadIds.includes(draculaAction.targetPlayerId)
         ? [
-            ...(ts.draculaWives ?? []).filter(
+            ...(rs.dracula?.wives ?? []).filter(
               (id) => !updatedDeadIds.includes(id),
             ),
-            ...(ts.draculaWives?.includes(draculaAction.targetPlayerId)
+            ...(rs.dracula?.wives.includes(draculaAction.targetPlayerId)
               ? []
               : [draculaAction.targetPlayerId]),
           ]
-        : (ts.draculaWives ?? []).filter((id) => !updatedDeadIds.includes(id));
+        : (rs.dracula?.wives ?? []).filter(
+            (id) => !updatedDeadIds.includes(id),
+          );
 
     // Zombie: add the night's infection target to the accumulated list (if not already infected).
     // Exclude the target if they died the same night they were infected.
     const zombieAction = nightPhase.nightActions[WerewolfRole.Zombie];
-    const existingInfected = (ts.zombieInfected ?? []).filter(
+    const existingInfected = (rs.zombie?.infected ?? []).filter(
       (id) => !updatedDeadIds.includes(id),
     );
     const zombieInfected =
@@ -363,6 +376,14 @@ export const startDayAction: GameAction = {
         ? [...existingInfected, zombieAction.targetPlayerId]
         : existingInfected;
 
+    // The Thing tap: record the tapped player ID so they see the notification
+    // during the following daytime.
+    const thingAction = nightPhase.nightActions[WerewolfRole.TheThing];
+    const thingTapped =
+      thingAction !== undefined && !isTeamNightAction(thingAction)
+        ? thingAction.targetPlayerId
+        : undefined;
+
     // Arsonist: update the doused player list.
     // If the Arsonist self-targeted (ignite), reset the doused list.
     // If the Arsonist targeted another player (douse), add them to the list.
@@ -370,7 +391,7 @@ export const startDayAction: GameAction = {
       (a) => a.roleDefinitionId === (WerewolfRole.Arsonist as string),
     );
     const arsonistAction = nightPhase.nightActions[WerewolfRole.Arsonist];
-    let arsonistDousedPlayerIds = (ts.arsonistDousedPlayerIds ?? []).filter(
+    let arsonistDousedPlayerIds = (rs.arsonist?.dousedPlayerIds ?? []).filter(
       (id) => !updatedDeadIds.includes(id),
     );
     if (
@@ -396,10 +417,58 @@ export const startDayAction: GameAction = {
     }
 
     const wolfCubDied =
-      ts.wolfCubDied === true || didWolfCubDie(newDeadIds, game);
+      rs.wolfCub?.died === true || didWolfCubDie(newDeadIds, game);
     const revealedPlayerIds = getWerewolfModeConfig(game).autoRevealNightOutcome
       ? getOrderedAffectedPlayerIds(nightResolution)
       : [];
+
+    const newRoleState: WerewolfRoleTurnState = {
+      ...(witchAbilityUsed ? { witch: { abilityUsed: true } } : {}),
+      ...(wolfCubDied ? { wolfCub: { died: true } } : {}),
+      ...(Object.keys(priestWards).length > 0
+        ? { priest: { wards: priestWards } }
+        : {}),
+      ...(toughGuyHitIds.length > 0
+        ? { toughGuy: { hitIds: toughGuyHitIds } }
+        : {}),
+      ...(oneEyedSeerLockedTargetId
+        ? { oneEyedSeer: { lockedTargetId: oneEyedSeerLockedTargetId } }
+        : {}),
+      ...(exposerAbilityUsed || exposerReveal
+        ? {
+            exposer: {
+              ...(exposerAbilityUsed ? { abilityUsed: true as const } : {}),
+              ...(exposerReveal ? { reveal: exposerReveal } : {}),
+            },
+          }
+        : {}),
+      ...(hunterDiedThisNight
+        ? { hunter: { revengePlayerId: hunterAssignment.playerId } }
+        : {}),
+      ...(rs.martyr?.abilityUsed ? { martyr: rs.martyr } : {}),
+      ...(morticianAbilityEnded ? { mortician: { abilityEnded: true } } : {}),
+      ...(monarchKnightedPlayerIds.length > 0 || monarchKnightingsUsed > 0
+        ? {
+            monarch: {
+              knightedPlayerIds: monarchKnightedPlayerIds,
+              knightingsUsed: monarchKnightingsUsed,
+            },
+          }
+        : {}),
+      ...(rs.executioner?.targetId
+        ? { executioner: { targetId: rs.executioner.targetId } }
+        : {}),
+      ...(mirrorcasterCharged ? { mirrorcaster: { charged: true } } : {}),
+      ...(thingTapped ? { theThing: { tapped: thingTapped } } : {}),
+      ...(draculaWives.length > 0 ? { dracula: { wives: draculaWives } } : {}),
+      ...(zombieInfected.length > 0
+        ? { zombie: { infected: zombieInfected } }
+        : {}),
+      ...(arsonistDousedPlayerIds.length > 0
+        ? { arsonist: { dousedPlayerIds: arsonistDousedPlayerIds } }
+        : {}),
+    };
+
     game.status = {
       type: GameStatus.Playing,
       turnState: {
@@ -410,38 +479,17 @@ export const startDayAction: GameAction = {
           nightActions: nightPhase.nightActions,
           revealedPlayerIds,
           ...(nightResolution.length > 0 ? { nightResolution } : {}),
+          ...(newExposerReveal ? { exposerReveal: newExposerReveal } : {}),
           ...(knightedPlayerId !== undefined ? { knightedPlayerId } : {}),
           ...(nightPhase.smitedPlayerIds?.length
             ? { smitedPlayerIds: nightPhase.smitedPlayerIds }
             : {}),
         },
         deadPlayerIds: updatedDeadIds,
-        ...(witchAbilityUsed ? { witchAbilityUsed: true } : {}),
         ...(Object.keys(lastTargets).length > 0 ? { lastTargets } : {}),
-        ...(wolfCubDied ? { wolfCubDied: true } : {}),
-        ...(Object.keys(priestWards).length > 0 ? { priestWards } : {}),
-        ...(toughGuyHitIds.length > 0 ? { toughGuyHitIds } : {}),
-        ...(oneEyedSeerLockedTargetId ? { oneEyedSeerLockedTargetId } : {}),
-        ...(exposerAbilityUsed ? { exposerAbilityUsed: true } : {}),
-        ...(exposerReveal ? { exposerReveal } : {}),
-        ...(hunterDiedThisNight
-          ? { hunterRevengePlayerId: hunterAssignment.playerId }
+        ...(Object.keys(newRoleState).length > 0
+          ? { roleState: newRoleState }
           : {}),
-        ...(morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),
-        ...(monarchKnightedPlayerIds.length > 0
-          ? { monarchKnightedPlayerIds }
-          : {}),
-        ...(monarchKnightingsUsed > 0 ? { monarchKnightingsUsed } : {}),
-        ...(ts.executionerTargetId
-          ? { executionerTargetId: ts.executionerTargetId }
-          : {}),
-        ...(mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
-        ...(draculaWives.length > 0 ? { draculaWives } : {}),
-        ...(zombieInfected.length > 0 ? { zombieInfected } : {}),
-        ...(arsonistDousedPlayerIds.length > 0
-          ? { arsonistDousedPlayerIds }
-          : {}),
-        ...(ts.martyrUsed ? { martyrUsed: true } : {}),
       },
     };
 

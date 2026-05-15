@@ -1,31 +1,32 @@
-import { GameStatus, Team } from "@/lib/types";
 import type {
   Game,
   GameModeServices,
   PlayerRoleAssignment,
   RoleDefinition,
 } from "@/lib/types";
-import type { WerewolfPlayerGameState } from "../player-state";
+import { GameStatus, Team } from "@/lib/types";
+import type { VictoryCondition } from "@/server/types/game";
+
+import { WEREWOLF_COPY } from "../copy";
 import { getWerewolfModeConfig } from "../lobby-config";
-import { WerewolfRole, getWerewolfRole } from "../roles";
+import type { WerewolfPlayerGameState } from "../player-state";
 import type { WerewolfRoleDefinition } from "../roles";
+import { getWerewolfRole, WerewolfRole } from "../roles";
 import { currentTurnState } from "../utils";
+import { WerewolfWinner } from "../utils/win-condition";
 import {
-  selectExecutionerTarget,
   buildInitialTurnState,
+  selectExecutionerTarget,
 } from "./initialization";
 import {
-  extractOwnerState,
-  extractNightActions,
-  extractDeadPlayerIds,
-  extractVisibleDeadPlayerIds,
   extractDaytimeNightSummary,
   extractDaytimePlayerState,
+  extractDeadPlayerIds,
+  extractNightActions,
+  extractOwnerState,
+  extractVisibleDeadPlayerIds,
 } from "./owner-state";
 import { extractPlayerNightState } from "./player-night-state";
-import { WerewolfWinner } from "../utils/win-condition";
-import { WEREWOLF_COPY } from "../copy";
-import type { VictoryCondition } from "@/server/types/game";
 
 const WEREWOLF_WINNER_TEAMS = {
   [WerewolfWinner.Arsonist]: Team.Neutral,
@@ -66,7 +67,7 @@ function extractNonOwnerState(
   const daytimeNightState = extractDaytimeNightSummary(game, callerId);
   const daytimePlayerState = extractDaytimePlayerState(game, callerId);
   const ts = currentTurnState(game);
-  const monarchKnightingsUsed = ts?.monarchKnightingsUsed;
+  const monarchKnightingsUsed = ts?.roleState?.monarch?.knightingsUsed;
 
   const amDead = deadPlayerIds.includes(callerId);
   const visibleDeadPlayerIds = extractVisibleDeadPlayerIds(game, callerId);
@@ -92,8 +93,8 @@ function extractNonOwnerState(
     ...(visibleDeadPlayerIds.length > 0
       ? { deadPlayerIds: visibleDeadPlayerIds }
       : {}),
-    ...(ts?.monarchKnightedPlayerIds?.length
-      ? { monarchKnightedPlayerIds: ts.monarchKnightedPlayerIds }
+    ...(ts?.roleState?.monarch?.knightedPlayerIds.length
+      ? { monarchKnightedPlayerIds: ts.roleState.monarch.knightedPlayerIds }
       : {}),
     ...((monarchKnightingsUsed ?? 0) > 0 ? { monarchKnightingsUsed } : {}),
     ...executionerState,
@@ -146,21 +147,21 @@ export const werewolfServices: GameModeServices = {
 };
 
 export {
-  extractOwnerState,
-  extractNightActions,
-  extractDeadPlayerIds,
-  extractVisibleDeadPlayerIds,
+  buildInitialTurnState,
+  selectExecutionerTarget,
+} from "./initialization";
+export type { AffectedPlayerOutcome } from "./night-outcome";
+export {
+  getOrderedAffectedPlayerIds,
+  getOrderedAffectedPlayers,
+} from "./night-outcome";
+export { NightOutcomeEffect } from "./night-outcome";
+export {
   extractDaytimeNightSummary,
   extractDaytimePlayerState,
+  extractDeadPlayerIds,
+  extractNightActions,
+  extractOwnerState,
+  extractVisibleDeadPlayerIds,
 } from "./owner-state";
 export { extractPlayerNightState } from "./player-night-state";
-export {
-  selectExecutionerTarget,
-  buildInitialTurnState,
-} from "./initialization";
-export {
-  getOrderedAffectedPlayers,
-  getOrderedAffectedPlayerIds,
-} from "./night-outcome";
-export type { AffectedPlayerOutcome } from "./night-outcome";
-export { NightOutcomeEffect } from "./night-outcome";

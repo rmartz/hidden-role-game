@@ -1,9 +1,11 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { GameStatus } from "@/lib/types";
-import { WerewolfPhase, TrialVerdict, DaytimeVote, TrialPhase } from "../types";
-import type { WerewolfTurnState } from "../types";
+
 import { WerewolfRole } from "../roles";
-import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
+import type { WerewolfTurnState } from "../types";
+import { DaytimeVote, TrialPhase, TrialVerdict, WerewolfPhase } from "../types";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "./index";
 import { makePlayingGame } from "./test-helpers";
 
 // ---------------------------------------------------------------------------
@@ -199,9 +201,9 @@ describe("WerewolfAction.ResolveTrial", () => {
           ],
         },
       );
-      (
-        game.status as { turnState: WerewolfTurnState }
-      ).turnState.monarchKnightedPlayerIds = ["p2"];
+      (game.status as { turnState: WerewolfTurnState }).turnState.roleState = {
+        monarch: { knightedPlayerIds: ["p2"], knightingsUsed: 0 },
+      };
       action.apply(game, {}, "owner-1");
       const ts = (
         game.status as {
@@ -242,7 +244,7 @@ describe("WerewolfAction.ResolveTrial", () => {
         { playerId: "p4", vote: DaytimeVote.Guilty },
         { playerId: "p5", vote: DaytimeVote.Guilty },
       ]);
-      ts.oneEyedSeerLockedTargetId = "p3";
+      ts.roleState = { oneEyedSeer: { lockedTargetId: "p3" } };
       const game = makePlayingGame(ts);
       action.apply(game, {}, "owner-1");
       const result = (game.status as { turnState: WerewolfTurnState })
@@ -250,7 +252,7 @@ describe("WerewolfAction.ResolveTrial", () => {
       const phase = result.phase as { pendingGuiltId?: string };
       expect(phase.pendingGuiltId).toBe("p3");
       // Lock is not cleared yet — cleared by AdvanceMartyrWindow
-      expect(result.oneEyedSeerLockedTargetId).toBe("p3");
+      expect(result.roleState?.oneEyedSeer?.lockedTargetId).toBe("p3");
     });
 
     it("sets pendingGuiltId (does not yet consume priest ward) when convicted player receives guilty verdict", () => {
@@ -259,7 +261,7 @@ describe("WerewolfAction.ResolveTrial", () => {
         { playerId: "p4", vote: DaytimeVote.Guilty },
         { playerId: "p5", vote: DaytimeVote.Guilty },
       ]);
-      ts.priestWards = { p3: "p2", p4: "p2" };
+      ts.roleState = { priest: { wards: { p3: "p2", p4: "p2" } } };
       const game = makePlayingGame(ts);
       action.apply(game, {}, "owner-1");
       const result = (game.status as { turnState: WerewolfTurnState })
@@ -267,7 +269,7 @@ describe("WerewolfAction.ResolveTrial", () => {
       const phase = result.phase as { pendingGuiltId?: string };
       expect(phase.pendingGuiltId).toBe("p3");
       // Ward not consumed yet — consumed by AdvanceMartyrWindow
-      expect(result.priestWards).toEqual({ p3: "p2", p4: "p2" });
+      expect(result.roleState?.priest?.wards).toEqual({ p3: "p2", p4: "p2" });
     });
 
     it("sets pendingGuiltId when Hunter receives guilty verdict", () => {
@@ -294,7 +296,7 @@ describe("WerewolfAction.ResolveTrial", () => {
       expect(phase.pendingGuiltId).toBe("p2");
       // Death not applied yet — happens in AdvanceMartyrWindow
       expect(ts.deadPlayerIds).not.toContain("p2");
-      expect(ts.hunterRevengePlayerId).toBeUndefined();
+      expect(ts.roleState?.hunter?.revengePlayerId).toBeUndefined();
     });
 
     it("sets pendingGuiltId when Hunter receives guilty verdict (would otherwise trigger win)", () => {
@@ -353,7 +355,7 @@ describe("WerewolfAction.ResolveTrial", () => {
         { playerId: "p3", vote: DaytimeVote.Guilty },
         { playerId: "p4", vote: DaytimeVote.Guilty },
       ]);
-      ts.executionerTargetId = "p2";
+      ts.roleState = { executioner: { targetId: "p2" } };
       const game = makePlayingGame(ts, {
         roleAssignments: [
           { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -375,7 +377,7 @@ describe("WerewolfAction.ResolveTrial", () => {
         { playerId: "p2", vote: DaytimeVote.Guilty },
         { playerId: "p3", vote: DaytimeVote.Guilty },
       ]);
-      ts.executionerTargetId = "p2";
+      ts.roleState = { executioner: { targetId: "p2" } };
       const game = makePlayingGame(ts, {
         roleAssignments: [
           { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },

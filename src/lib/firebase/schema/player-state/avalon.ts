@@ -1,9 +1,10 @@
-import { GameMode } from "@/lib/types";
 import type { AvalonPlayerGameState } from "@/lib/game/modes/avalon/player-state";
+import { GameMode } from "@/lib/types";
+
 import {
-  type FirebaseBasePlayerState,
-  baseStateToFirebase,
   baseStateFromFirebase,
+  baseStateToFirebase,
+  type FirebaseBasePlayerState,
 } from "./base";
 
 // ---------------------------------------------------------------------------

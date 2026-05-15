@@ -1,8 +1,10 @@
-import { afterEach, describe, it, expect, vi } from "vitest";
 import { cleanup, render } from "@testing-library/react";
-import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
+import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
 import type { PublicLobby } from "@/server/types";
+
 import { PlayerList } from "./PlayerList";
 import { PLAYER_LIST_COPY } from "./PlayerList.copy";
 

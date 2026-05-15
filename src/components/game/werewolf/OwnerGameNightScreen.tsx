@@ -1,44 +1,141 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   BedRegular,
   ClockWarningRegular,
   WeatherSunnyLowRegular,
 } from "@fluentui/react-icons";
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+import { GameTimer } from "@/components/game";
+import { Button } from "@/components/ui/button";
+import { useGameAction } from "@/hooks";
 import { GAME_MODES } from "@/lib/game/modes";
+import type {
+  AnyNightAction,
+  WerewolfRoleDefinition,
+  WerewolfTurnState,
+} from "@/lib/game/modes/werewolf";
 import {
-  WerewolfPhase,
-  WerewolfAction,
-  isTeamNightAction,
-  isGroupPhaseKey,
   baseGroupPhaseKey,
-  getTargetablePlayers,
+  getInvestigationResultForNarrator,
   getPhaseLabel,
   getSoloTarget,
+  getTargetablePlayers,
+  isGroupPhaseKey,
+  isTeamNightAction,
   TargetCategory,
-  getInvestigationResultForNarrator,
+  WerewolfAction,
+  WerewolfPhase,
 } from "@/lib/game/modes/werewolf";
-import { WerewolfRole, getWerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import { isRoleActive } from "@/lib/game/modes/werewolf";
-import type {
-  WerewolfTurnState,
-  WerewolfRoleDefinition,
-} from "@/lib/game/modes/werewolf";
+import { buildNarratorInstruction } from "@/lib/game/modes/werewolf";
+import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
-import { Button } from "@/components/ui/button";
+import { getWerewolfRole, WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import { getPlayerName } from "@/lib/player";
-import { useGameAction } from "@/hooks";
-import { GameTimer } from "@/components/game";
+
+import { NarratorNightInstruction } from "./NarratorNightInstruction";
+import { NightMarkerEffect } from "./NightActionMarker";
+import { NightPhaseOrderList } from "./NightPhaseOrderList";
 import { OwnerAdvanceCard } from "./OwnerAdvanceCard";
-import { OwnerInvestigationConfirm } from "./OwnerInvestigationConfirm";
 import { OwnerIlluminatiRevealPanel } from "./OwnerIlluminatiRevealPanel";
+import { OwnerInvestigationConfirm } from "./OwnerInvestigationConfirm";
 import { OwnerNightTargetPanel } from "./OwnerNightTargetPanel";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
-import { NightPhaseOrderList } from "./NightPhaseOrderList";
-import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
-import { buildNarratorInstruction } from "@/lib/game/modes/werewolf";
-import { NarratorNightInstruction } from "./NarratorNightInstruction";
+
+/**
+ * Derives per-player night action status markers from the narrator's night actions.
+ * A marker is added for any role action that has selected a target — including team
+ * votes' `suggestedTargetId` and standing priest wards — regardless of whether the
+ * action has been confirmed yet. Duplicate effects for the same player are deduped
+ * so each effect appears at most once.
+ */
+function buildNightMarkers(
+  nightActions: Record<string, AnyNightAction>,
+  priestWards?: Record<string, string>,
+  mirrorcasterCharged?: boolean,
+): Map<string, NightMarkerEffect[]> {
+  const markerSets = new Map<string, Set<NightMarkerEffect>>();
+
+  const addMarker = (playerId: string, effect: NightMarkerEffect) => {
+    const existing = markerSets.get(playerId);
+    if (existing) {
+      existing.add(effect);
+    } else {
+      markerSets.set(playerId, new Set([effect]));
+    }
+  };
+
+  for (const [phaseKey, action] of Object.entries(nightActions)) {
+    const targetId = isTeamNightAction(action)
+      ? action.suggestedTargetId
+      : action.targetPlayerId;
+    if (!targetId) continue;
+
+    if (isGroupPhaseKey(phaseKey)) {
+      addMarker(targetId, NightMarkerEffect.Attacked);
+      continue;
+    }
+
+    if (isRoleActive(phaseKey, WerewolfRole.Spellcaster)) {
+      addMarker(targetId, NightMarkerEffect.Silenced);
+      continue;
+    }
+
+    if (isRoleActive(phaseKey, WerewolfRole.Mummy)) {
+      addMarker(targetId, NightMarkerEffect.Hypnotized);
+      continue;
+    }
+
+    if (isRoleActive(phaseKey, WerewolfRole.Mirrorcaster)) {
+      addMarker(
+        targetId,
+        mirrorcasterCharged
+          ? NightMarkerEffect.Attacked
+          : NightMarkerEffect.Protected,
+      );
+      continue;
+    }
+
+    const roleDef = getWerewolfRole(phaseKey);
+    if (!roleDef) continue;
+
+    switch (roleDef.targetCategory) {
+      case TargetCategory.Attack:
+        addMarker(targetId, NightMarkerEffect.Attacked);
+        break;
+      case TargetCategory.Protect:
+        addMarker(targetId, NightMarkerEffect.Protected);
+        break;
+      case TargetCategory.Investigate:
+        addMarker(targetId, NightMarkerEffect.Investigated);
+        break;
+      default:
+        addMarker(targetId, NightMarkerEffect.Special);
+    }
+
+    // Mentalist investigates two players; mark the second target as well.
+    if (
+      isRoleActive(phaseKey, WerewolfRole.Mentalist) &&
+      !isTeamNightAction(action) &&
+      action.secondTargetPlayerId
+    ) {
+      addMarker(action.secondTargetPlayerId, NightMarkerEffect.Investigated);
+    }
+  }
+
+  // Priest wards: mark all warded players as Protected.
+  for (const wardedPlayerId of Object.keys(priestWards ?? {})) {
+    addMarker(wardedPlayerId, NightMarkerEffect.Protected);
+  }
+
+  const markers = new Map<string, NightMarkerEffect[]>();
+  for (const [playerId, effects] of markerSets) {
+    markers.set(playerId, [...effects].sort());
+  }
+  return markers;
+}
 
 interface OwnerGameNightScreenProps {
   gameId: string;
@@ -82,6 +179,22 @@ export function OwnerGameNightScreen({
   );
 
   const nightActions = phase.nightActions;
+  const nightStatusMarkers = useMemo(
+    () =>
+      isNighttime
+        ? buildNightMarkers(
+            nightActions,
+            turnState.roleState?.priest?.wards,
+            turnState.roleState?.mirrorcaster?.charged,
+          )
+        : undefined,
+    [
+      isNighttime,
+      nightActions,
+      turnState.roleState?.priest?.wards,
+      turnState.roleState?.mirrorcaster?.charged,
+    ],
+  );
   const activePhaseKey = nightPhaseOrder[currentPhaseIndex] ?? "";
   useEffect(() => {
     setAbilityBypass(false);
@@ -91,12 +204,13 @@ export function OwnerGameNightScreen({
     getSoloTarget(activeAction);
 
   const handleTargetClick = useCallback(
-    (playerId: string | undefined) => {
+    (playerId: string | null | undefined, isSecondTarget?: boolean) => {
       action.mutate({
         actionId: WerewolfAction.SetNightTarget,
         payload: {
           roleId: activePhaseKey,
           targetPlayerId: playerId,
+          isSecondTarget: isSecondTarget ?? false,
         },
       });
     },
@@ -155,7 +269,7 @@ export function OwnerGameNightScreen({
     : activeTargetConfirmed;
   const isWitchAbilitySkipped =
     isRoleActive(activePhaseKey, WerewolfRole.Witch) &&
-    turnState.witchAbilityUsed;
+    turnState.roleState?.witch?.abilityUsed;
 
   const activeRoleDef = modeConfig.roles[baseActivePhaseKey] as
     | WerewolfRoleDefinition
@@ -185,6 +299,30 @@ export function OwnerGameNightScreen({
     ? (getPlayerName(gameState.players, secondTargetId) ?? secondTargetId)
     : undefined;
 
+  const requiresDualTarget =
+    activeRoleDef?.dualTargetSwap === true ||
+    activeRoleDef?.dualTargetInvestigate === true;
+
+  const dualTargetPrompt = activeRoleDef?.dualTargetSwap
+    ? activeTarget !== undefined && secondTargetId !== undefined
+      ? WEREWOLF_COPY.swapper.narratorTwoTargets(
+          activeTargetName ?? activeTarget,
+          secondTargetName ?? secondTargetId,
+        )
+      : activeTarget !== undefined
+        ? WEREWOLF_COPY.swapper.narratorOneTarget
+        : WEREWOLF_COPY.swapper.narratorNoTargets
+    : activeRoleDef?.dualTargetInvestigate
+      ? activeTarget !== undefined && secondTargetId !== undefined
+        ? WEREWOLF_COPY.mentalist.narratorTwoTargets(
+            activeTargetName ?? activeTarget,
+            secondTargetName ?? secondTargetId,
+          )
+        : activeTarget !== undefined
+          ? WEREWOLF_COPY.mentalist.narratorOneTarget
+          : WEREWOLF_COPY.mentalist.narratorNoTargets
+      : undefined;
+
   const investigationResult = getInvestigationResultForNarrator(
     isInvestigatePhase,
     activeTarget,
@@ -196,7 +334,7 @@ export function OwnerGameNightScreen({
     secondTargetName,
   );
 
-  const exposerRevealData = turnState.exposerReveal;
+  const exposerRevealData = turnState.roleState?.exposer?.reveal;
   const exposerRevealText = exposerRevealData
     ? WEREWOLF_COPY.narrator.exposerRevealLabel(
         getPlayerName(gameState.players, exposerRevealData.playerId) ??
@@ -325,7 +463,7 @@ export function OwnerGameNightScreen({
           )}
           {isRoleActive(activePhaseKey, WerewolfRole.Mirrorcaster) && (
             <p className="mb-3 text-sm text-muted-foreground italic">
-              {turnState.mirrorcasterCharged
+              {turnState.roleState?.mirrorcaster?.charged
                 ? WEREWOLF_COPY.mirrorcaster.narratorAttackMode
                 : WEREWOLF_COPY.mirrorcaster.narratorProtectMode}
             </p>
@@ -377,6 +515,9 @@ export function OwnerGameNightScreen({
                   onTargetClick={handleTargetClick}
                   isPending={action.isPending}
                   previousTargetId={previousTargetId}
+                  requiresDualTarget={requiresDualTarget}
+                  secondTarget={secondTargetId}
+                  dualTargetPrompt={dualTargetPrompt}
                 />
               )}
             </>
@@ -419,6 +560,7 @@ export function OwnerGameNightScreen({
         gameOwnerId={gameState.gameOwner?.id}
         smitedPlayerIds={phase.smitedPlayerIds}
         executionerTargetId={gameState.executionerTargetId}
+        nightStatusMarkers={nightStatusMarkers}
       />
     </div>
   );

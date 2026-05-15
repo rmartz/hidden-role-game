@@ -1,10 +1,12 @@
-import { describe, it, expect } from "vitest";
-import { validateGameStartPrerequisites } from "./game";
-import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
-import type { Lobby } from "@/lib/types";
-import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
+import { describe, expect, it } from "vitest";
+
 import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-villain/lobby-config";
+import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
+import type { Lobby } from "@/lib/types";
+import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
+
+import { validateGameStartPrerequisites } from "./game";
 
 function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
   return {

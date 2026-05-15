@@ -1,9 +1,10 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
+import { WerewolfRole } from "../roles";
 import type { WerewolfTurnState } from "../types";
 import { WerewolfPhase } from "../types";
-import { WerewolfRole } from "../roles";
-import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
-import { makePlayingGame, makeNightState } from "./test-helpers";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "./index";
+import { makeNightState, makePlayingGame } from "./test-helpers";
 
 // ---------------------------------------------------------------------------
 // StartDay — Protection role integration tests
@@ -90,7 +91,7 @@ describe("WerewolfAction.StartDay — protections", () => {
     );
     action.apply(game, null, "owner-1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.priestWards).toEqual({ p2: "p3" });
+    expect(ts.roleState?.priest?.wards).toEqual({ p2: "p3" });
   });
 
   it("Priest ward is consumed when warded player IS attacked", () => {
@@ -117,7 +118,7 @@ describe("WerewolfAction.StartDay — protections", () => {
     );
     action.apply(game, null, "owner-1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.priestWards).toBeUndefined();
+    expect(ts.roleState?.priest?.wards).toBeUndefined();
     expect(ts.deadPlayerIds).not.toContain("p2");
   });
 
@@ -144,7 +145,7 @@ describe("WerewolfAction.StartDay — protections", () => {
     action.apply(game, null, "owner-1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
     expect(ts.deadPlayerIds).not.toContain("p2");
-    expect(ts.toughGuyHitIds).toContain("p2");
+    expect(ts.roleState?.toughGuy?.hitIds).toContain("p2");
   });
 
   it("Tough Guy dies on second attack when toughGuyHitIds already contains them", () => {
@@ -156,7 +157,7 @@ describe("WerewolfAction.StartDay — protections", () => {
         },
       },
     });
-    nightState.toughGuyHitIds = ["p2"];
+    nightState.roleState = { toughGuy: { hitIds: ["p2"] } };
     const game = makePlayingGame(nightState, {
       roleAssignments: [
         { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -181,8 +182,9 @@ describe("WerewolfAction.StartDay — protections", () => {
       },
       nightPhaseOrder: [WerewolfRole.Werewolf],
     });
-    nightState.monarchKnightedPlayerIds = ["p3"];
-    nightState.monarchKnightingsUsed = 1;
+    nightState.roleState = {
+      monarch: { knightedPlayerIds: ["p3"], knightingsUsed: 1 },
+    };
     const game = makePlayingGame(nightState, {
       roleAssignments: [
         { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -208,8 +210,9 @@ describe("WerewolfAction.StartDay — protections", () => {
       },
       nightPhaseOrder: [WerewolfRole.Werewolf, WerewolfRole.Altruist],
     });
-    nightState.monarchKnightedPlayerIds = ["p4"];
-    nightState.monarchKnightingsUsed = 1;
+    nightState.roleState = {
+      monarch: { knightedPlayerIds: ["p4"], knightingsUsed: 1 },
+    };
     const game = makePlayingGame(nightState, {
       roleAssignments: [
         { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -242,8 +245,9 @@ describe("WerewolfAction.StartDay — protections", () => {
       },
       nightPhaseOrder: [WerewolfRole.Werewolf],
     });
-    nightState.monarchKnightedPlayerIds = ["p1"];
-    nightState.monarchKnightingsUsed = 1;
+    nightState.roleState = {
+      monarch: { knightedPlayerIds: ["p1"], knightingsUsed: 1 },
+    };
     const game = makePlayingGame(nightState, {
       roleAssignments: [
         { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -271,8 +275,9 @@ describe("WerewolfAction.StartDay — protections", () => {
       },
       nightPhaseOrder: [WerewolfRole.Werewolf],
     });
-    nightState.monarchKnightedPlayerIds = ["p3"];
-    nightState.monarchKnightingsUsed = 1;
+    nightState.roleState = {
+      monarch: { knightedPlayerIds: ["p3"], knightingsUsed: 1 },
+    };
     const game = makePlayingGame(nightState, {
       roleAssignments: [
         { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -294,8 +299,9 @@ describe("WerewolfAction.StartDay — protections", () => {
       },
       nightPhaseOrder: [WerewolfRole.Mortician],
     });
-    nightState.monarchKnightedPlayerIds = ["p3"];
-    nightState.monarchKnightingsUsed = 1;
+    nightState.roleState = {
+      monarch: { knightedPlayerIds: ["p3"], knightingsUsed: 1 },
+    };
     const game = makePlayingGame(nightState, {
       roleAssignments: [
         { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -334,8 +340,8 @@ describe("WerewolfAction.StartDay — protections", () => {
     );
     action.apply(game, null, "owner-1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.monarchKnightedPlayerIds).toContain("p3");
-    expect(ts.monarchKnightingsUsed).toBe(1);
+    expect(ts.roleState?.monarch?.knightedPlayerIds).toContain("p3");
+    expect(ts.roleState?.monarch?.knightingsUsed).toBe(1);
     expect(ts.deadPlayerIds).toContain("p3");
   });
 
@@ -350,8 +356,9 @@ describe("WerewolfAction.StartDay — protections", () => {
       },
       nightPhaseOrder: [WerewolfRole.Werewolf, WerewolfRole.Monarch],
     });
-    nightState.monarchKnightedPlayerIds = ["p3"];
-    nightState.monarchKnightingsUsed = 1;
+    nightState.roleState = {
+      monarch: { knightedPlayerIds: ["p3"], knightingsUsed: 1 },
+    };
 
     const game = makePlayingGame(nightState, {
       roleAssignments: [
@@ -365,8 +372,8 @@ describe("WerewolfAction.StartDay — protections", () => {
 
     action.apply(game, null, "owner-1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.monarchKnightedPlayerIds).toEqual(["p3"]);
-    expect(ts.monarchKnightingsUsed).toBe(1);
+    expect(ts.roleState?.monarch?.knightedPlayerIds).toEqual(["p3"]);
+    expect(ts.roleState?.monarch?.knightingsUsed).toBe(1);
     expect(ts.phase.type).toBe(WerewolfPhase.Daytime);
     if (ts.phase.type === WerewolfPhase.Daytime) {
       expect(ts.phase.knightedPlayerId).toBeUndefined();

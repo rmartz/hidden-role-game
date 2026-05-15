@@ -1,11 +1,13 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import type { Game } from "@/lib/types";
-import type { WerewolfTurnState, AnyNightAction } from "../../types";
-import { WerewolfPhase } from "../../types";
+
 import { WerewolfRole } from "../../roles";
-import { WerewolfAction, WEREWOLF_ACTIONS } from "../index";
+import type { AnyNightAction, WerewolfTurnState } from "../../types";
+import { WerewolfPhase } from "../../types";
 import { resolveNightActions } from "../../utils";
-import { makePlayingGame, makeNightState, makeTeamGame } from "../test-helpers";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "../index";
+import { makeNightState, makePlayingGame, makeTeamGame } from "../test-helpers";
 
 // ---------------------------------------------------------------------------
 // Bodyguard self-targeting
@@ -81,7 +83,9 @@ describe("SetNightTarget — Witch once-per-game restriction", () => {
         nightActions: {},
       },
       deadPlayerIds: [],
-      ...(witchAbilityUsed ? { witchAbilityUsed: true } : {}),
+      ...(witchAbilityUsed
+        ? { roleState: { witch: { abilityUsed: true } } }
+        : {}),
     };
     return makePlayingGame(ts, {
       players: [
@@ -231,7 +235,7 @@ describe("SetNightTarget — Witch cannot self-attack", () => {
       },
       deadPlayerIds: [],
       // p2 (Witch) is in the doused list
-      arsonistDousedPlayerIds: ["p2"],
+      roleState: { arsonist: { dousedPlayerIds: ["p2"] } },
     };
     const game = makePlayingGame(ts, {
       players: [

@@ -1,10 +1,12 @@
-import { describe, it, expect } from "vitest";
-import { GameStatus, GameMode, ShowRolesInPlay } from "@/lib/types";
+import { describe, expect, it } from "vitest";
+
 import type { Game } from "@/lib/types";
-import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "../timer-config";
+import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
+
 import { WerewolfRole } from "../roles";
-import { WerewolfPhase } from "../types";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "../timer-config";
 import type { WerewolfTurnState } from "../types";
+import { WerewolfPhase } from "../types";
 import { checkWinCondition, WerewolfWinner } from "./win-condition";
 
 function makeGame(
@@ -330,7 +332,9 @@ describe("checkWinCondition", () => {
   describe("Zombie", () => {
     it("Zombie wins when infected alive outnumber healthy alive", () => {
       // zombie + p1 (infected) + p2 (infected) + p3 (healthy): 2 infected > 1 healthy
-      const ts = makeDayTurnState({ zombieInfected: ["p1", "p2"] });
+      const ts = makeDayTurnState({
+        roleState: { zombie: { infected: ["p1", "p2"] } },
+      });
       const game = makeGame(
         [
           { playerId: "zombie", roleDefinitionId: WerewolfRole.Zombie },
@@ -345,7 +349,9 @@ describe("checkWinCondition", () => {
     });
 
     it("game continues when infected equals healthy", () => {
-      const ts = makeDayTurnState({ zombieInfected: ["p1"] });
+      const ts = makeDayTurnState({
+        roleState: { zombie: { infected: ["p1"] } },
+      });
       const game = makeGame(
         [
           { playerId: "zombie", roleDefinitionId: WerewolfRole.Zombie },
@@ -359,7 +365,9 @@ describe("checkWinCondition", () => {
     });
 
     it("Zombie does not win when dead", () => {
-      const ts = makeDayTurnState({ zombieInfected: ["p1", "p2"] });
+      const ts = makeDayTurnState({
+        roleState: { zombie: { infected: ["p1", "p2"] } },
+      });
       const game = makeGame(
         [
           { playerId: "zombie", roleDefinitionId: WerewolfRole.Zombie },
@@ -376,7 +384,9 @@ describe("checkWinCondition", () => {
     it("dead infected players are not counted for Zombie win", () => {
       // zombie + p1 (infected, dead) + p2 (infected) + p3 (healthy)
       // alive: 1 infected vs 1 healthy → no win
-      const ts = makeDayTurnState({ zombieInfected: ["p1", "p2"] });
+      const ts = makeDayTurnState({
+        roleState: { zombie: { infected: ["p1", "p2"] } },
+      });
       const game = makeGame(
         [
           { playerId: "zombie", roleDefinitionId: WerewolfRole.Zombie },

@@ -1,14 +1,15 @@
-import { GameStatus } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
+import { GameStatus } from "@/lib/types";
+
+import { WerewolfRole } from "../roles";
 import { WerewolfPhase } from "../types";
 import {
+  checkWinCondition,
   currentTurnState,
   isOwnerPlaying,
-  checkWinCondition,
   WerewolfWinner,
 } from "../utils";
-import { WerewolfRole } from "../roles";
-import { didWolfCubDie, cleanupAfterDaytimeKill } from "./helpers";
+import { cleanupAfterDaytimeKill, didWolfCubDie } from "./helpers";
 
 /**
  * Advances past the post-trial Martyr window, applying the pending guilty
@@ -37,14 +38,14 @@ export const advanceMartyrWindowAction: GameAction = {
     if (!ts.deadPlayerIds.includes(pendingGuiltId)) {
       ts.deadPlayerIds = [...ts.deadPlayerIds, pendingGuiltId];
       if (didWolfCubDie([pendingGuiltId], game)) {
-        ts.wolfCubDied = true;
+        ts.roleState = { ...(ts.roleState ?? {}), wolfCub: { died: true } };
       }
       cleanupAfterDaytimeKill(pendingGuiltId, ts);
     }
 
     // Executioner wins if their target was eliminated and the Executioner is alive.
     // Check Executioner before Tanner (if target is also the Tanner, Executioner wins).
-    if (ts.executionerTargetId === pendingGuiltId) {
+    if (ts.roleState?.executioner?.targetId === pendingGuiltId) {
       const executionerAssignment = game.roleAssignments.find(
         (a) => a.roleDefinitionId === (WerewolfRole.Executioner as string),
       );
@@ -77,7 +78,10 @@ export const advanceMartyrWindowAction: GameAction = {
       (a) => a.playerId === pendingGuiltId,
     )?.roleDefinitionId;
     if (eliminatedRole === (WerewolfRole.Hunter as string)) {
-      ts.hunterRevengePlayerId = pendingGuiltId;
+      ts.roleState = {
+        ...(ts.roleState ?? {}),
+        hunter: { revengePlayerId: pendingGuiltId },
+      };
       return;
     }
 

@@ -1,10 +1,12 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { GameStatus } from "@/lib/types";
-import { WerewolfPhase, TrialVerdict, TrialPhase } from "../types";
-import type { WerewolfTurnState } from "../types";
+
 import { WerewolfRole } from "../roles";
-import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
+import type { WerewolfTurnState } from "../types";
+import { TrialPhase, TrialVerdict, WerewolfPhase } from "../types";
 import { WerewolfWinner } from "../utils/win-condition";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "./index";
 import { makePlayingGame } from "./test-helpers";
 
 // ---------------------------------------------------------------------------
@@ -143,22 +145,22 @@ describe("WerewolfAction.AdvanceMartyrWindow", () => {
 
     it("clears One-Eyed Seer lock when locked target is eliminated", () => {
       const ts = makeDayStateWithPendingGuilt("p3");
-      ts.oneEyedSeerLockedTargetId = "p3";
+      ts.roleState = { oneEyedSeer: { lockedTargetId: "p3" } };
       const game = makePlayingGame(ts);
       action.apply(game, {}, "owner-1");
       const result = (game.status as { turnState: WerewolfTurnState })
         .turnState;
-      expect(result.oneEyedSeerLockedTargetId).toBeUndefined();
+      expect(result.roleState?.oneEyedSeer?.lockedTargetId).toBeUndefined();
     });
 
     it("consumes priest ward when warded player is eliminated", () => {
       const ts = makeDayStateWithPendingGuilt("p3");
-      ts.priestWards = { p3: "p2", p4: "p2" };
+      ts.roleState = { priest: { wards: { p3: "p2", p4: "p2" } } };
       const game = makePlayingGame(ts);
       action.apply(game, {}, "owner-1");
       const result = (game.status as { turnState: WerewolfTurnState })
         .turnState;
-      expect(result.priestWards).toEqual({ p4: "p2" });
+      expect(result.roleState?.priest?.wards).toEqual({ p4: "p2" });
     });
 
     it("sets hunterRevengePlayerId when Hunter is eliminated", () => {
@@ -174,7 +176,7 @@ describe("WerewolfAction.AdvanceMartyrWindow", () => {
       action.apply(game, {}, "owner-1");
       expect(game.status.type).toBe(GameStatus.Playing);
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-      expect(ts.hunterRevengePlayerId).toBe("p2");
+      expect(ts.roleState?.hunter?.revengePlayerId).toBe("p2");
       expect(ts.deadPlayerIds).toContain("p2");
     });
 
@@ -194,7 +196,7 @@ describe("WerewolfAction.AdvanceMartyrWindow", () => {
       action.apply(game, {}, "owner-1");
       expect(game.status.type).toBe(GameStatus.Playing);
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-      expect(ts.hunterRevengePlayerId).toBe("p2");
+      expect(ts.roleState?.hunter?.revengePlayerId).toBe("p2");
     });
 
     it("Tanner wins when eliminated via AdvanceMartyrWindow", () => {
@@ -233,7 +235,7 @@ describe("WerewolfAction.AdvanceMartyrWindow", () => {
 
     it("Executioner wins when their target is eliminated", () => {
       const ts = makeDayStateWithPendingGuilt("p2");
-      ts.executionerTargetId = "p2";
+      ts.roleState = { executioner: { targetId: "p2" } };
       const game = makePlayingGame(ts, {
         roleAssignments: [
           { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -252,7 +254,7 @@ describe("WerewolfAction.AdvanceMartyrWindow", () => {
 
     it("non-target player eliminated does not trigger Executioner win", () => {
       const ts = makeDayStateWithPendingGuilt("p4");
-      ts.executionerTargetId = "p2";
+      ts.roleState = { executioner: { targetId: "p2" } };
       const game = makePlayingGame(ts, {
         roleAssignments: [
           { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
@@ -280,7 +282,7 @@ describe("WerewolfAction.AdvanceMartyrWindow", () => {
       action.apply(game, {}, "owner-1");
       const result = (game.status as { turnState: WerewolfTurnState })
         .turnState;
-      expect(result.wolfCubDied).toBe(true);
+      expect(result.roleState?.wolfCub?.died).toBe(true);
     });
   });
 });

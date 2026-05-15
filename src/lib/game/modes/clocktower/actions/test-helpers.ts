@@ -1,15 +1,16 @@
-import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 import type { Game } from "@/lib/types";
+import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 import { DEFAULT_TIMER_CONFIG } from "@/lib/types";
-import { ClocktowerPhase } from "../types";
+
+import { DEFAULT_CLOCKTOWER_MODE_CONFIG } from "../lobby-config";
+import { ClocktowerRole } from "../roles";
 import type {
   ClocktowerDayPhase,
+  ClocktowerNightAction,
   ClocktowerNightPhase,
   ClocktowerTurnState,
-  ClocktowerNightAction,
 } from "../types";
-import { ClocktowerRole } from "../roles";
-import { DEFAULT_CLOCKTOWER_MODE_CONFIG } from "../lobby-config";
+import { ClocktowerPhase } from "../types";
 
 export const OWNER_ID = "owner-1";
 export const IMP_PLAYER_ID = "p1";

@@ -1,15 +1,15 @@
-import type {
-  AdvancedRoleBucket,
-  ModeConfig,
-  RoleBucket,
-  GameMode,
-} from "@/lib/types";
-import { isSimpleRoleBucket } from "@/lib/types";
-import { getModeDefinition } from "@/lib/game/state";
 import {
   getAdvancedBucketMaxCapacity,
   getRoleSlotsRequired,
 } from "@/lib/game/modes";
+import { getModeDefinition } from "@/lib/game/state";
+import type {
+  AdvancedRoleBucket,
+  GameMode,
+  ModeConfig,
+  RoleBucket,
+} from "@/lib/types";
+import { isSimpleRoleBucket } from "@/lib/types";
 
 /**
  * Validates that an advanced bucket's role pool can fill its playerCount.

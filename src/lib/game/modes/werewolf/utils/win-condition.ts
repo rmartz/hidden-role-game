@@ -1,6 +1,7 @@
-import { GameStatus, Team } from "@/lib/types";
 import type { Game } from "@/lib/types";
-import { WerewolfRole, getWerewolfRole } from "../roles";
+import { GameStatus, Team } from "@/lib/types";
+
+import { getWerewolfRole, WerewolfRole } from "../roles";
 import { currentTurnState } from "./game-state";
 
 /**
@@ -42,9 +43,9 @@ export function checkWinCondition(
   if (
     zombieAssignment &&
     !deadSet.has(zombieAssignment.playerId) &&
-    ts?.zombieInfected?.length
+    ts?.roleState?.zombie?.infected.length
   ) {
-    const infectedSet = new Set(ts.zombieInfected);
+    const infectedSet = new Set(ts.roleState.zombie.infected);
     const infectedAlive = aliveAssignments.filter((a) =>
       infectedSet.has(a.playerId),
     ).length;

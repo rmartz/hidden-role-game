@@ -17,9 +17,21 @@ interface OwnerNightTargetPanelProps {
   activeTargetConfirmed: boolean;
   targetablePlayers: TargetablePlayer[];
   activeTarget?: string;
-  onTargetClick: (playerId: string | undefined) => void;
+  onTargetClick: (
+    playerId: string | null | undefined,
+    isSecondTarget?: boolean,
+  ) => void;
   isPending: boolean;
   previousTargetId?: string;
+  /** When true, enables dual-target selection mode (Swapper, Mentalist). */
+  requiresDualTarget?: boolean;
+  /** The current second selected target ID in dual-target mode. */
+  secondTarget?: string;
+  /**
+   * State-aware prompt shown above the target buttons in dual-target mode.
+   * Computed by the parent based on role and current selection state.
+   */
+  dualTargetPrompt?: string;
 }
 
 export function OwnerNightTargetPanel({
@@ -33,7 +45,37 @@ export function OwnerNightTargetPanel({
   onTargetClick,
   isPending,
   previousTargetId,
+  requiresDualTarget = false,
+  secondTarget,
+  dualTargetPrompt,
 }: OwnerNightTargetPanelProps) {
+  const bothTargetsSet =
+    requiresDualTarget &&
+    activeTarget !== undefined &&
+    secondTarget !== undefined;
+
+  const handlePlayerClick = (playerId: string) => {
+    if (!requiresDualTarget) {
+      onTargetClick(activeTarget === playerId ? undefined : playerId);
+      return;
+    }
+
+    if (playerId === activeTarget) {
+      // Deselect first target.
+      onTargetClick(undefined);
+    } else if (playerId === secondTarget) {
+      // Deselect second target.
+      onTargetClick(undefined, true);
+    } else if (activeTarget === undefined) {
+      // No first target — set as first.
+      onTargetClick(playerId);
+    } else if (secondTarget === undefined) {
+      // First target set, no second — set as second.
+      onTargetClick(playerId, true);
+    }
+    // Both targets already set and this player is neither: button is disabled.
+  };
+
   return (
     <div className="mb-4 rounded-md border p-3">
       {groupAction &&
@@ -57,31 +99,46 @@ export function OwnerNightTargetPanel({
             )}
           </div>
         )}
-      <p className="text-sm font-medium mb-2">
-        {groupAction && groupMemberCount !== undefined && groupMemberCount > 1
-          ? "Suggested target: "
-          : "Target: "}
-        {activeTargetName ? (
-          <>
-            <strong className="text-foreground">{activeTargetName}</strong>
-            {activeTargetConfirmed && (
-              <span className="ml-1 text-xs text-green-600">(confirmed)</span>
-            )}
-          </>
-        ) : (
-          <span className="text-muted-foreground italic">none</span>
-        )}
-      </p>
+      {requiresDualTarget ? (
+        <p className="text-sm font-medium mb-2">{dualTargetPrompt}</p>
+      ) : (
+        <p className="text-sm font-medium mb-2">
+          {groupAction && groupMemberCount !== undefined && groupMemberCount > 1
+            ? "Suggested target: "
+            : "Target: "}
+          {activeTargetName ? (
+            <>
+              <strong className="text-foreground">{activeTargetName}</strong>
+              {activeTargetConfirmed && (
+                <span className="ml-1 text-xs text-green-600">(confirmed)</span>
+              )}
+            </>
+          ) : (
+            <span className="text-muted-foreground italic">none</span>
+          )}
+        </p>
+      )}
       <div className="flex flex-wrap gap-2">
         {targetablePlayers.map((player) => (
           <Button
             key={player.id}
             size="sm"
-            variant={activeTarget === player.id ? "default" : "outline"}
+            variant={
+              player.id === activeTarget || player.id === secondTarget
+                ? "default"
+                : "outline"
+            }
             onClick={() => {
-              onTargetClick(activeTarget === player.id ? undefined : player.id);
+              handlePlayerClick(player.id);
             }}
-            disabled={isPending || player.id === previousTargetId}
+            disabled={
+              isPending ||
+              player.id === previousTargetId ||
+              (requiresDualTarget &&
+                bothTargetsSet &&
+                player.id !== activeTarget &&
+                player.id !== secondTarget)
+            }
           >
             {player.name}
             {player.id === previousTargetId && " (unavailable)"}
@@ -89,13 +146,23 @@ export function OwnerNightTargetPanel({
         ))}
         <Button
           size="sm"
-          variant={activeTarget === undefined ? "default" : "outline"}
+          variant={
+            requiresDualTarget
+              ? activeTarget === undefined && secondTarget === undefined
+                ? "default"
+                : "outline"
+              : activeTarget === undefined
+                ? "default"
+                : "outline"
+          }
           onClick={() => {
-            onTargetClick(undefined);
+            // For dual-target: No Target clears all selections (sets skipped=true).
+            // For single-target: Skip deselects the current target.
+            onTargetClick(requiresDualTarget ? null : undefined);
           }}
           disabled={isPending}
         >
-          Skip
+          {requiresDualTarget ? "No Target" : "Skip"}
         </Button>
       </div>
     </div>

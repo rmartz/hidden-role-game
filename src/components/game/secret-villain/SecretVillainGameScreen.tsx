@@ -1,14 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { GameStatus } from "@/lib/types";
-import type { StartingGameStatus } from "@/lib/types";
-import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
+
 import { useAdvanceGame, useGameAction, useReturnToLobby } from "@/hooks";
 import { SecretVillainAction } from "@/lib/game/modes/secret-villain/actions";
+import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
 import { SpecialActionType } from "@/lib/game/modes/secret-villain/types";
-import { SecretVillainGameScreenView } from "./SecretVillainGameScreenView";
+import type { StartingGameStatus } from "@/lib/types";
+import { GameStatus } from "@/lib/types";
+
 import { BoardScreen } from "./BoardScreen";
+import { SecretVillainGameScreenView } from "./SecretVillainGameScreenView";
 
 /** How long the Starting phase lasts before auto-advancing to Playing (seconds). */
 const STARTING_DURATION_SECONDS = 15;

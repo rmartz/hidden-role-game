@@ -1,16 +1,18 @@
 "use client";
 
 import { useMemo } from "react";
+
+import { GameTimer } from "@/components/game";
+import type { WerewolfNighttimePhase } from "@/lib/game/modes/werewolf";
 import {
   getTargetablePlayers,
   isGroupPhaseKey,
 } from "@/lib/game/modes/werewolf";
-import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
-import type { WerewolfNighttimePhase } from "@/lib/game/modes/werewolf";
-import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
-import { getPlayerName } from "@/lib/player";
-import { GameTimer } from "@/components/game";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
+import { getPlayerName } from "@/lib/player";
+
 import { AltruistActionPanel } from "./AltruistActionPanel";
 import { ConfirmTargetButton } from "./ConfirmTargetButton";
 import { PlayerFirstTurnScreen } from "./PlayerFirstTurnScreen";
@@ -62,6 +64,9 @@ export function PlayerNightActionScreen({
   const allAgreed = gameState.allAgreed ?? false;
   const isMentalist =
     !isGroupPhase && gameState.myRole?.id === WerewolfRole.Mentalist;
+  const isSwapper =
+    !isGroupPhase && gameState.myRole?.id === WerewolfRole.Swapper;
+  const requiresDualTarget = isMentalist || isSwapper;
   const isMonarch =
     !isGroupPhase && gameState.myRole?.id === (WerewolfRole.Monarch as string);
   const monarchKnightedPlayerIds = gameState.monarchKnightedPlayerIds ?? [];
@@ -84,7 +89,7 @@ export function PlayerNightActionScreen({
     ? selectableTargets.filter(
         ([player, isSelected]) =>
           isSelected ||
-          (isMentalist && player.id === gameState.mySecondNightTarget),
+          (requiresDualTarget && player.id === gameState.mySecondNightTarget),
       )
     : selectableTargets;
 
@@ -220,7 +225,7 @@ export function PlayerNightActionScreen({
             myPlayerId={gameState.myPlayerId}
             previousNightTargetId={gameState.previousNightTargetId}
             mySecondNightTarget={gameState.mySecondNightTarget}
-            requiresSecondTarget={isMentalist}
+            requiresSecondTarget={requiresDualTarget}
             mirrorcasterCharged={gameState.mirrorcasterCharged}
             monarchKnightingsRemaining={
               isMonarch ? monarchKnightingsRemaining : undefined

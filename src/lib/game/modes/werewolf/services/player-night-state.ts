@@ -1,22 +1,60 @@
-import { Team } from "@/lib/types";
 import type { Game } from "@/lib/types";
+import { Team } from "@/lib/types";
 import type { NighttimeNightStatusEntry } from "@/server/types";
+
+import { WEREWOLF_COPY } from "../copy";
 import type { WerewolfPlayerGameState } from "../player-state";
+import type { WerewolfRoleDefinition } from "../roles";
+import { getWerewolfRole, WerewolfRole } from "../roles";
+import type { AnyNightAction, WerewolfTurnState } from "../types";
+import { isTeamNightAction, TargetCategory, WerewolfPhase } from "../types";
 import {
+  baseGroupPhaseKey,
   currentTurnState,
   getGroupPhasePlayerIds,
   getInterimAttackedPlayerIds,
-  baseGroupPhaseKey,
 } from "../utils";
-import { WerewolfPhase, TargetCategory, isTeamNightAction } from "../types";
-import type { AnyNightAction, WerewolfTurnState } from "../types";
-import type { WerewolfRoleDefinition } from "../roles";
-import { WerewolfRole, getWerewolfRole } from "../roles";
-import { WEREWOLF_COPY } from "../copy";
+
+/**
+ * Returns the player IDs immediately adjacent to `playerId` in the given
+ * seating order. Returns up to two IDs (left and right neighbours), wrapping
+ * around the ends of the list. If the player is not found, returns [].
+ */
+function getAdjacentPlayerIds(
+  playerOrder: string[],
+  playerId: string,
+): string[] {
+  const idx = playerOrder.indexOf(playerId);
+  if (idx === -1 || playerOrder.length < 2) return [];
+  const left = playerOrder[(idx - 1 + playerOrder.length) % playerOrder.length];
+  const right = playerOrder[(idx + 1) % playerOrder.length];
+  if (!left || !right) return [];
+  if (left === right) return [left];
+  return [left, right];
+}
+
+/**
+ * Returns the ID of the left neighbor (seat before) and right neighbor
+ * (seat after) for `playerId` in `playerOrder`. Returns undefined for either
+ * if the player list is too short.
+ */
+function getNeighborIds(
+  playerOrder: string[],
+  playerId: string,
+): { left: string | undefined; right: string | undefined } {
+  const idx = playerOrder.indexOf(playerId);
+  if (idx === -1 || playerOrder.length < 2) {
+    return { left: undefined, right: undefined };
+  }
+  return {
+    left: playerOrder[(idx - 1 + playerOrder.length) % playerOrder.length],
+    right: playerOrder[(idx + 1) % playerOrder.length],
+  };
+}
 
 function hasPriestActiveWard(ts: WerewolfTurnState | undefined): boolean {
-  if (!ts?.priestWards) return false;
-  return Object.keys(ts.priestWards).some(
+  if (!ts?.roleState?.priest?.wards) return false;
+  return Object.keys(ts.roleState.priest.wards).some(
     (wardedId) => !ts.deadPlayerIds.includes(wardedId),
   );
 }
@@ -153,7 +191,7 @@ function extractRoleSpecificState(
     return {
       myNightTarget: soloAction?.skipped ? null : soloAction?.targetPlayerId,
       myNightTargetConfirmed: soloAction?.confirmed ?? false,
-      exposerAbilityUsed: ts?.exposerAbilityUsed ?? false,
+      exposerAbilityUsed: ts?.roleState?.exposer?.abilityUsed ?? false,
     };
   }
 
@@ -166,7 +204,7 @@ function extractRoleSpecificState(
     return {
       myNightTarget: soloAction?.skipped ? null : soloAction?.targetPlayerId,
       myNightTargetConfirmed: soloAction?.confirmed ?? false,
-      morticianAbilityEnded: ts?.morticianAbilityEnded ?? false,
+      morticianAbilityEnded: ts?.roleState?.mortician?.abilityEnded ?? false,
     };
   }
 
@@ -192,7 +230,7 @@ function extractRoleSpecificState(
     return {
       myNightTarget: soloAction?.skipped ? null : soloAction?.targetPlayerId,
       myNightTargetConfirmed: soloAction?.confirmed ?? false,
-      mirrorcasterCharged: ts?.mirrorcasterCharged ?? false,
+      mirrorcasterCharged: ts?.roleState?.mirrorcaster?.charged ?? false,
     };
   }
 
@@ -200,10 +238,22 @@ function extractRoleSpecificState(
     return {
       myNightTarget: undefined,
       myNightTargetConfirmed: false,
-      ...(ts?.executionerTargetId
-        ? { executionerTargetId: ts.executionerTargetId }
+      ...(ts?.roleState?.executioner?.targetId
+        ? { executionerTargetId: ts.roleState.executioner.targetId }
         : {}),
     };
+  }
+
+  if (myRole.id === WerewolfRole.TheThing) {
+    return extractTheThingState(game, callerId, nightActions, ts);
+  }
+
+  if (myRole.id === WerewolfRole.Insomniac) {
+    return extractInsomniacState(game, callerId, nightActions);
+  }
+
+  if (myRole.id === WerewolfRole.Count) {
+    return extractCountState(game, ts);
   }
 
   if (myRole.id === WerewolfRole.Arsonist) {
@@ -215,21 +265,19 @@ function extractRoleSpecificState(
     return {
       myNightTarget: soloAction?.skipped ? null : soloAction?.targetPlayerId,
       myNightTargetConfirmed: soloAction?.confirmed ?? false,
-      ...(ts?.arsonistDousedPlayerIds?.length
-        ? { arsonistDousedPlayerIds: ts.arsonistDousedPlayerIds }
+      ...(ts?.roleState?.arsonist?.dousedPlayerIds.length
+        ? { arsonistDousedPlayerIds: ts.roleState.arsonist.dousedPlayerIds }
         : {}),
     };
   }
 
   if (myRole.id === WerewolfRole.OneEyedSeer) {
-    if (
-      ts?.oneEyedSeerLockedTargetId &&
-      !ts.deadPlayerIds.includes(ts.oneEyedSeerLockedTargetId)
-    ) {
+    const lockedTargetId = ts?.roleState?.oneEyedSeer?.lockedTargetId;
+    if (lockedTargetId && !ts.deadPlayerIds.includes(lockedTargetId)) {
       return {
         myNightTarget: undefined,
         myNightTargetConfirmed: false,
-        oneEyedSeerLockedTargetId: ts.oneEyedSeerLockedTargetId,
+        oneEyedSeerLockedTargetId: lockedTargetId,
       };
     }
   }
@@ -289,16 +337,16 @@ function extractWitchState(
   const result: Partial<WerewolfPlayerGameState> = {
     myNightTarget: soloAction?.skipped ? null : soloAction?.targetPlayerId,
     myNightTargetConfirmed: soloAction?.confirmed ?? false,
-    witchAbilityUsed: ts?.witchAbilityUsed ?? false,
+    witchAbilityUsed: ts?.roleState?.witch?.abilityUsed ?? false,
   };
-  if (!ts?.witchAbilityUsed) {
+  if (!ts?.roleState?.witch?.abilityUsed) {
     const attacked = getInterimAttackedPlayerIds(
       nightActions,
       game.roleAssignments,
       deadPlayerIds,
-      ts?.priestWards,
-      ts?.mirrorcasterCharged,
-      ts?.arsonistDousedPlayerIds,
+      ts?.roleState?.priest?.wards,
+      ts?.roleState?.mirrorcaster?.charged,
+      ts?.roleState?.arsonist?.dousedPlayerIds,
     );
     if (attacked.length > 0) {
       result.nightStatus = attacked.map(
@@ -333,9 +381,9 @@ function extractAltruistState(
     nightActions,
     game.roleAssignments,
     deadPlayerIds,
-    ts?.priestWards,
-    ts?.mirrorcasterCharged,
-    ts?.arsonistDousedPlayerIds,
+    ts?.roleState?.priest?.wards,
+    ts?.roleState?.mirrorcaster?.charged,
+    ts?.roleState?.arsonist?.dousedPlayerIds,
   ).filter((id) => id !== callerId && id !== witchProtectedId);
   const result: Partial<WerewolfPlayerGameState> = {
     myNightTarget: soloAction?.skipped ? null : soloAction?.targetPlayerId,
@@ -350,6 +398,110 @@ function extractAltruistState(
     );
   }
   return result;
+}
+
+function extractTheThingState(
+  game: Game,
+  callerId: string,
+  nightActions: Record<string, AnyNightAction>,
+  ts: WerewolfTurnState | undefined,
+): Partial<WerewolfPlayerGameState> {
+  const thingAction = nightActions[WerewolfRole.TheThing];
+  const soloAction =
+    thingAction && !isTeamNightAction(thingAction) ? thingAction : undefined;
+  const playerOrder = game.playerOrder ?? game.players.map((p) => p.id);
+  const adjacentPlayerIds = getAdjacentPlayerIds(playerOrder, callerId);
+  return {
+    myNightTarget: soloAction?.skipped ? null : soloAction?.targetPlayerId,
+    myNightTargetConfirmed: soloAction?.confirmed ?? false,
+    ...(adjacentPlayerIds.length > 0 ? { adjacentPlayerIds } : {}),
+    ...(ts?.roleState?.theThing?.tapped === callerId
+      ? { thingTappedMe: true }
+      : {}),
+    ...(soloAction?.confirmed && soloAction.targetPlayerId
+      ? { thingTappedPlayerId: soloAction.targetPlayerId }
+      : {}),
+  };
+}
+
+function extractInsomniacState(
+  game: Game,
+  callerId: string,
+  nightActions: Record<string, AnyNightAction>,
+): Partial<WerewolfPlayerGameState> {
+  const playerOrder = game.playerOrder ?? game.players.map((p) => p.id);
+  const { left, right } = getNeighborIds(playerOrder, callerId);
+
+  // Derive "woke and acted" purely from nightActions — nightPhaseOrder is empty
+  // during Daytime, so we cannot use it here. Any non-skip entry in nightActions
+  // for the neighbor's phase key means they woke and acted this night.
+  const neighborActed = (neighborId: string | undefined): boolean => {
+    if (!neighborId) return false;
+    const assignment = game.roleAssignments.find(
+      (a) => a.playerId === neighborId,
+    );
+    if (!assignment) return false;
+    const roleDef = getWerewolfRole(assignment.roleDefinitionId);
+    if (!roleDef) return false;
+    // Roles that wake with another role use that role's phase key.
+    const phaseKey = (roleDef.wakesWith ?? roleDef.id) as string;
+    const action = nightActions[phaseKey];
+    if (!action) return false;
+    if (isTeamNightAction(action)) {
+      // Group phase: check if the neighbor cast a non-skip vote.
+      const vote = action.votes.find((v) => v.playerId === neighborId);
+      return vote !== undefined && !vote.skipped;
+    }
+    return !action.skipped && action.targetPlayerId !== undefined;
+  };
+
+  return {
+    myNightTarget: undefined,
+    myNightTargetConfirmed: false,
+    insomniacResult: {
+      leftActed: neighborActed(left),
+      rightActed: neighborActed(right),
+    },
+  };
+}
+
+function extractCountState(
+  game: Game,
+  ts: WerewolfTurnState | undefined,
+): Partial<WerewolfPlayerGameState> {
+  // The Count only acts on night 1.
+  if (ts?.turn !== 1) {
+    return {
+      myNightTarget: undefined,
+      myNightTargetConfirmed: false,
+    };
+  }
+
+  const playerOrder = game.playerOrder ?? game.players.map((p) => p.id);
+  // Exclude the narrator (ownerPlayerId) from the seating list.
+  const seatOrder = playerOrder.filter((id) => id !== game.ownerPlayerId);
+  const mid = Math.ceil(seatOrder.length / 2);
+  const leftHalf = seatOrder.slice(0, mid);
+  const rightHalf = seatOrder.slice(mid);
+
+  const isWerewolfPlayer = (playerId: string): boolean => {
+    const assignment = game.roleAssignments.find(
+      (a) => a.playerId === playerId,
+    );
+    const roleDef = assignment
+      ? getWerewolfRole(assignment.roleDefinitionId)
+      : undefined;
+    return roleDef?.isWerewolf === true;
+  };
+
+  return {
+    myNightTarget: undefined,
+    myNightTargetConfirmed: false,
+    countResult: {
+      leftCount: leftHalf.filter(isWerewolfPlayer).length,
+      rightCount: rightHalf.filter(isWerewolfPlayer).length,
+    },
+  };
 }
 
 function extractGenericSoloState(

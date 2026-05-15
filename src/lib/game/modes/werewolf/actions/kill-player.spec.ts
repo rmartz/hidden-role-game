@@ -1,11 +1,13 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+
 import { GameStatus } from "@/lib/types";
-import { WerewolfPhase, TrialPhase } from "../types";
-import type { WerewolfTurnState } from "../types";
+
 import { WerewolfRole } from "../roles";
-import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
+import type { WerewolfTurnState } from "../types";
+import { TrialPhase, WerewolfPhase } from "../types";
 import { WerewolfWinner } from "../utils/win-condition";
-import { makePlayingGame, dayTurnState, nightTurnState } from "./test-helpers";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "./index";
+import { dayTurnState, makePlayingGame, nightTurnState } from "./test-helpers";
 
 function freshDayState(): WerewolfTurnState {
   return {
@@ -128,43 +130,43 @@ describe("WerewolfAction.KillPlayer", () => {
       });
       action.apply(game, { playerId: "p2" }, "owner-1");
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-      expect(ts.wolfCubDied).toBe(true);
+      expect(ts.roleState?.wolfCub?.died).toBe(true);
     });
 
     it("clears One-Eyed Seer lock when locked target is killed", () => {
       const ds = freshDayState();
-      ds.oneEyedSeerLockedTargetId = "p3";
+      ds.roleState = { oneEyedSeer: { lockedTargetId: "p3" } };
       const game = makePlayingGame(ds);
       action.apply(game, { playerId: "p3" }, "owner-1");
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-      expect(ts.oneEyedSeerLockedTargetId).toBeUndefined();
+      expect(ts.roleState?.oneEyedSeer?.lockedTargetId).toBeUndefined();
     });
 
     it("preserves One-Eyed Seer lock when a different player is killed", () => {
       const ds = freshDayState();
-      ds.oneEyedSeerLockedTargetId = "p4";
+      ds.roleState = { oneEyedSeer: { lockedTargetId: "p4" } };
       const game = makePlayingGame(ds);
       action.apply(game, { playerId: "p3" }, "owner-1");
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-      expect(ts.oneEyedSeerLockedTargetId).toBe("p4");
+      expect(ts.roleState?.oneEyedSeer?.lockedTargetId).toBe("p4");
     });
 
     it("consumes priest ward when warded player is killed", () => {
       const ds = freshDayState();
-      ds.priestWards = { p3: "priest1", p4: "priest1" };
+      ds.roleState = { priest: { wards: { p3: "priest1", p4: "priest1" } } };
       const game = makePlayingGame(ds);
       action.apply(game, { playerId: "p3" }, "owner-1");
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-      expect(ts.priestWards).toEqual({ p4: "priest1" });
+      expect(ts.roleState?.priest?.wards).toEqual({ p4: "priest1" });
     });
 
     it("clears priestWards entirely when last ward is consumed", () => {
       const ds = freshDayState();
-      ds.priestWards = { p3: "priest1" };
+      ds.roleState = { priest: { wards: { p3: "priest1" } } };
       const game = makePlayingGame(ds);
       action.apply(game, { playerId: "p3" }, "owner-1");
       const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-      expect(ts.priestWards).toBeUndefined();
+      expect(ts.roleState?.priest?.wards).toBeUndefined();
     });
   });
 

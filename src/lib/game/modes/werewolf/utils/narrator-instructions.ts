@@ -1,4 +1,4 @@
-import { WerewolfRole, WEREWOLF_ROLES, getWerewolfRole } from "../roles";
+import { getWerewolfRole, WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import { TargetCategory } from "../types";
 import { baseGroupPhaseKey, isGroupPhaseKey } from "./phase-keys";
 

@@ -1,11 +1,13 @@
+import { groupBy } from "lodash";
+
 import type {
   AltruistInterceptedNightResolutionEvent,
   NightResolutionEvent,
 } from "@/lib/game/modes/werewolf";
-import { NightOutcomeSummaryItem } from "./NightOutcomeSummaryItem";
-import { getPlayerName } from "@/lib/player";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
-import { groupBy } from "lodash";
+import { getPlayerName } from "@/lib/player";
+
+import { NightOutcomeSummaryItem } from "./NightOutcomeSummaryItem";
 
 interface NightOutcomeSummaryProps {
   events: NightResolutionEvent[];
@@ -26,7 +28,9 @@ export function NightOutcomeSummary({
     (e): e is AltruistInterceptedNightResolutionEvent =>
       e.type === "altruist-intercepted",
   );
-  const regularEvents = events.filter((e) => e.type !== "altruist-intercepted");
+  const regularEvents = events.filter(
+    (e) => e.type !== "altruist-intercepted" && e.type !== "swapper-swapped",
+  );
 
   // Group events by targetPlayerId so a player attacked and silenced in the
   // same night is represented by a single list item.

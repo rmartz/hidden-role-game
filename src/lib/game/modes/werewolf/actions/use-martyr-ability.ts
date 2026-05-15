@@ -1,9 +1,10 @@
-import { GameStatus } from "@/lib/types";
 import type { Game, GameAction } from "@/lib/types";
-import { WerewolfPhase } from "../types";
-import { currentTurnState, checkWinCondition, WerewolfWinner } from "../utils";
+import { GameStatus } from "@/lib/types";
+
 import { WerewolfRole } from "../roles";
-import { didWolfCubDie, cleanupAfterDaytimeKill } from "./helpers";
+import { WerewolfPhase } from "../types";
+import { checkWinCondition, currentTurnState, WerewolfWinner } from "../utils";
+import { cleanupAfterDaytimeKill, didWolfCubDie } from "./helpers";
 
 /**
  * Allows the Martyr to intercept a Guilty verdict, dying in place of the
@@ -24,7 +25,10 @@ export const useMartyrAbilityAction: GameAction = {
     if (!ts) return false;
     if (ts.phase.type !== WerewolfPhase.Daytime) return false;
     if (!ts.phase.pendingGuiltId) return false;
-    if (ts.martyrUsed) return false;
+    const martyrState = ts.roleState?.martyr as
+      | { abilityUsed: boolean }
+      | undefined;
+    if (martyrState?.abilityUsed) return false;
     const isOwner = callerId === game.ownerPlayerId;
     // Find the Martyr assignment — needed for both owner and player callers.
     const martyrAssignment = game.roleAssignments.find(
@@ -56,18 +60,21 @@ export const useMartyrAbilityAction: GameAction = {
 
     // Convicted player is spared; Martyr dies instead.
     ts.phase.pendingGuiltId = undefined;
-    ts.martyrUsed = true;
+    ts.roleState = {
+      ...(ts.roleState ?? {}),
+      martyr: { abilityUsed: true },
+    };
 
     if (!ts.deadPlayerIds.includes(martyrId)) {
       ts.deadPlayerIds = [...ts.deadPlayerIds, martyrId];
       if (didWolfCubDie([martyrId], game)) {
-        ts.wolfCubDied = true;
+        ts.roleState = { ...(ts.roleState ?? {}), wolfCub: { died: true } };
       }
       cleanupAfterDaytimeKill(martyrId, ts);
     }
 
     // Executioner wins if their target was the Martyr (who voluntarily died).
-    if (ts.executionerTargetId === martyrId) {
+    if (ts.roleState.executioner?.targetId === martyrId) {
       const executionerAssignment = game.roleAssignments.find(
         (a) => a.roleDefinitionId === (WerewolfRole.Executioner as string),
       );

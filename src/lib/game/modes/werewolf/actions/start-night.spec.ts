@@ -1,12 +1,14 @@
-import { describe, it, expect } from "vitest";
-import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
+import { describe, expect, it } from "vitest";
+
 import type { Game } from "@/lib/types";
-import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "../timer-config";
-import { WerewolfPhase, TrialVerdict, TrialPhase } from "../types";
-import type { WerewolfTurnState, WerewolfNighttimePhase } from "../types";
+import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
+
 import { WerewolfRole } from "../roles";
-import { WerewolfAction, WEREWOLF_ACTIONS } from "./index";
-import { makePlayingGame, nightTurnState, dayTurnState } from "./test-helpers";
+import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "../timer-config";
+import type { WerewolfNighttimePhase, WerewolfTurnState } from "../types";
+import { TrialPhase, TrialVerdict, WerewolfPhase } from "../types";
+import { WEREWOLF_ACTIONS, WerewolfAction } from "./index";
+import { dayTurnState, makePlayingGame, nightTurnState } from "./test-helpers";
 
 // ---------------------------------------------------------------------------
 // StartNight
@@ -338,12 +340,12 @@ describe("StartNight — Mirrorcaster charge persistence", () => {
   it("carries mirrorcasterCharged forward to the next night", () => {
     const game = makePlayingGame({
       ...dayTurnState,
-      mirrorcasterCharged: true,
+      roleState: { mirrorcaster: { charged: true } },
     });
     startNightAction.apply(game, null, "owner-1");
 
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.mirrorcasterCharged).toBe(true);
+    expect(ts.roleState?.mirrorcaster?.charged).toBe(true);
   });
 
   it("does not carry mirrorcasterCharged when it is false/undefined", () => {
@@ -351,18 +353,18 @@ describe("StartNight — Mirrorcaster charge persistence", () => {
     startNightAction.apply(game, null, "owner-1");
 
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.mirrorcasterCharged).toBeUndefined();
+    expect(ts.roleState?.mirrorcaster?.charged).toBeUndefined();
   });
 
   it("carries morticianAbilityEnded forward to next night", () => {
     const game = makePlayingGame({
       ...dayTurnState,
-      morticianAbilityEnded: true,
+      roleState: { mortician: { abilityEnded: true } },
     });
     startNightAction.apply(game, null, "owner-1");
 
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.morticianAbilityEnded).toBe(true);
+    expect(ts.roleState?.mortician?.abilityEnded).toBe(true);
   });
 
   it("does not carry morticianAbilityEnded when it is false/undefined", () => {
@@ -370,20 +372,21 @@ describe("StartNight — Mirrorcaster charge persistence", () => {
     startNightAction.apply(game, null, "owner-1");
 
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.morticianAbilityEnded).toBeUndefined();
+    expect(ts.roleState?.mortician?.abilityEnded).toBeUndefined();
   });
 
   it("carries Monarch knighting fields forward to next night", () => {
     const game = makePlayingGame({
       ...dayTurnState,
-      monarchKnightedPlayerIds: ["p2", "p3"],
-      monarchKnightingsUsed: 2,
+      roleState: {
+        monarch: { knightedPlayerIds: ["p2", "p3"], knightingsUsed: 2 },
+      },
     });
     startNightAction.apply(game, null, "owner-1");
 
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.monarchKnightedPlayerIds).toEqual(["p2", "p3"]);
-    expect(ts.monarchKnightingsUsed).toBe(2);
+    expect(ts.roleState?.monarch?.knightedPlayerIds).toEqual(["p2", "p3"]);
+    expect(ts.roleState?.monarch?.knightingsUsed).toBe(2);
   });
 
   it("does not carry Monarch knighting fields when absent", () => {
@@ -391,7 +394,7 @@ describe("StartNight — Mirrorcaster charge persistence", () => {
     startNightAction.apply(game, null, "owner-1");
 
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(ts.monarchKnightedPlayerIds).toBeUndefined();
-    expect(ts.monarchKnightingsUsed).toBeUndefined();
+    expect(ts.roleState?.monarch?.knightedPlayerIds).toBeUndefined();
+    expect(ts.roleState?.monarch?.knightingsUsed).toBeUndefined();
   });
 });

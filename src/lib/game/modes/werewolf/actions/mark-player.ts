@@ -1,4 +1,5 @@
 import type { Game, GameAction } from "@/lib/types";
+
 import { currentTurnState, isOwnerPlaying } from "../utils";
 import { didWolfCubDie } from "./helpers";
 
@@ -21,7 +22,7 @@ export const markPlayerDeadAction: GameAction = {
     const { playerId } = payload as { playerId: string };
     ts.deadPlayerIds = [...ts.deadPlayerIds, playerId];
     if (didWolfCubDie([playerId], game)) {
-      ts.wolfCubDied = true;
+      ts.roleState = { ...(ts.roleState ?? {}), wolfCub: { died: true } };
     }
   },
 };

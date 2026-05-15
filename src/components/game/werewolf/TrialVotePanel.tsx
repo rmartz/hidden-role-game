@@ -1,19 +1,20 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import {
-  WEREWOLF_COPY,
-  WerewolfAction,
-  TrialVerdict,
-  TrialPhase,
-  DaytimeVote,
-} from "@/lib/game/modes/werewolf";
-import type { PlayerGameState } from "@/server/types";
-import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
-import { useGameAction } from "@/hooks";
+
 import { GameTimer } from "@/components/game";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useGameAction } from "@/hooks";
+import {
+  DaytimeVote,
+  TrialPhase,
+  TrialVerdict,
+  WEREWOLF_COPY,
+  WerewolfAction,
+} from "@/lib/game/modes/werewolf";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import type { PlayerGameState } from "@/server/types";
 
 interface TrialVotePanelProps {
   gameId: string;

@@ -1,32 +1,35 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { getPlayerId, getLobbyId, getSessionId, saveGameId } from "@/lib/api";
-import { GameMode } from "@/lib/types";
-import { parseGameMode } from "@/lib/game/modes";
-import {
-  useLobbyErrorHandler,
-  useLobbyQuery,
-  useLobbyWebSocket,
-  useRemovePlayer,
-  useRenamePlayer,
-  useOwnerRenamePlayer,
-  useAddNoDevicePlayer,
-  useReorderPlayers,
-  useStartGame,
-  useToggleReady,
-  useTransferOwner,
-  useConfigSync,
-} from "@/hooks";
+import { useParams, useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
+
 import {
   GameConfigurationPanel,
   JoinPrompt,
+  LobbyLayout,
   PlayerList,
   ShareLobby,
   WerewolfLobbyGlossary,
 } from "@/components/lobby";
+import {
+  useAddNoDevicePlayer,
+  useConfigSync,
+  useLobbyErrorHandler,
+  useLobbyQuery,
+  useLobbyWebSocket,
+  useOwnerRenamePlayer,
+  useRemovePlayer,
+  useRenamePlayer,
+  useReorderPlayers,
+  useStartGame,
+  useToggleReady,
+  useTransferOwner,
+} from "@/hooks";
+import { getLobbyId, getPlayerId, getSessionId, saveGameId } from "@/lib/api";
+import { parseGameMode } from "@/lib/game/modes";
+import { GameMode } from "@/lib/types";
+
 import { LOBBY_PAGE_COPY } from "./page.copy";
 
 const LOBBY_COUNTDOWN_SECONDS = 5;
@@ -193,7 +196,7 @@ export default function LobbyPage() {
     ) : null;
 
   return (
-    <div className="p-5 max-w-4xl mx-auto">
+    <LobbyLayout>
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">{LOBBY_PAGE_COPY.title}</h1>
         <ShareLobby lobbyId={lobbyId} gameMode={validatedGameMode} />
@@ -286,6 +289,6 @@ export default function LobbyPage() {
           }}
         />
       )}
-    </div>
+    </LobbyLayout>
   );
 }

@@ -1,31 +1,32 @@
 export { WerewolfAction } from "./types";
 import type { GameAction } from "@/lib/types";
-import { WerewolfAction } from "./types";
-import { startNightAction } from "./start-night";
-import { startDayAction } from "./start-day";
-import { setNightPhaseAction } from "./set-night-phase";
-import { setNightTargetAction } from "./set-night-target";
+
+import { advanceMartyrWindowAction } from "./advance-martyr-window";
+import { cancelTrialAction } from "./cancel-trial";
+import { castVoteAction } from "./cast-vote";
 import { confirmNightTargetAction } from "./confirm-night-target";
+import { endGameAction } from "./end-game";
+import { killPlayerAction } from "./kill-player";
+import { markPlayerAliveAction, markPlayerDeadAction } from "./mark-player";
+import { nominatePlayerAction } from "./nominate-player";
+import { pauseTimerAction } from "./pause-timer";
+import { resetAbilityAction } from "./reset-ability";
+import { resolveHunterRevengeAction } from "./resolve-hunter-revenge";
+import { resolveTrialAction } from "./resolve-trial";
+import { resumeTimerAction } from "./resume-timer";
 import { revealInvestigationResultAction } from "./reveal-investigation-result";
 import { revealNightOutcomeStepAction } from "./reveal-night-outcome-step";
-import { markPlayerDeadAction, markPlayerAliveAction } from "./mark-player";
-import { startTrialAction } from "./start-trial";
-import { castVoteAction } from "./cast-vote";
-import { resolveTrialAction } from "./resolve-trial";
-import { endGameAction } from "./end-game";
-import { pauseTimerAction } from "./pause-timer";
-import { resumeTimerAction } from "./resume-timer";
-import { smitePlayerAction } from "./smite-player";
-import { unsmitePlayerAction } from "./unsmite-player";
-import { nominatePlayerAction } from "./nominate-player";
-import { withdrawNominationAction } from "./withdraw-nomination";
+import { setNightPhaseAction } from "./set-night-phase";
+import { setNightTargetAction } from "./set-night-target";
 import { skipDefenseAction } from "./skip-defense";
-import { killPlayerAction } from "./kill-player";
-import { resolveHunterRevengeAction } from "./resolve-hunter-revenge";
-import { cancelTrialAction } from "./cancel-trial";
-import { resetAbilityAction } from "./reset-ability";
-import { advanceMartyrWindowAction } from "./advance-martyr-window";
+import { smitePlayerAction } from "./smite-player";
+import { startDayAction } from "./start-day";
+import { startNightAction } from "./start-night";
+import { startTrialAction } from "./start-trial";
+import { WerewolfAction } from "./types";
+import { unsmitePlayerAction } from "./unsmite-player";
 import { useMartyrAbilityAction } from "./use-martyr-ability";
+import { withdrawNominationAction } from "./withdraw-nomination";
 
 export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.AdvanceMartyrWindow]: advanceMartyrWindowAction,

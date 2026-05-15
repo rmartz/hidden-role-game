@@ -1,10 +1,11 @@
-import type { GameStatusState, Team, TimerConfig } from "@/lib/types";
-import type { PublicLobbyPlayer } from "./lobby";
-import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
-import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
 import type { AvalonPlayerGameState } from "@/lib/game/modes/avalon/player-state";
 import type { ClocktowerPlayerGameState } from "@/lib/game/modes/clocktower/player-state";
 import type { CodenamesPlayerGameState } from "@/lib/game/modes/codenames/player-state";
+import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import type { GameStatusState, Team, TimerConfig } from "@/lib/types";
+
+import type { PublicLobbyPlayer } from "./lobby";
 
 export interface CreateGameRequest {
   lobbyId: string;
@@ -49,9 +50,12 @@ export interface DaytimeNightStatusEntry {
     | "smited"
     | "survived"
     | "peaceful"
-    | "altruist-sacrifice";
+    | "altruist-sacrifice"
+    | "exposed";
   /** For altruist-sacrifice: the player who was saved. */
   savedPlayerId?: string;
+  /** For exposed: the name of the publicly revealed role. */
+  roleName?: string;
 }
 
 /** Night effects visible to the Witch during their nighttime phase only. */

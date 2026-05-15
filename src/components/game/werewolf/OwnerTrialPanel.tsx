@@ -1,18 +1,19 @@
 "use client";
 
 import { useCallback } from "react";
-import type { ActiveTrial } from "@/lib/game/modes/werewolf";
-import {
-  WEREWOLF_COPY,
-  WerewolfAction,
-  TrialVerdict,
-  TrialPhase,
-  DaytimeVote,
-} from "@/lib/game/modes/werewolf";
-import type { PublicLobbyPlayer } from "@/server/types/lobby";
-import { useGameAction } from "@/hooks";
+
 import { GameTimer } from "@/components/game";
 import { Button } from "@/components/ui/button";
+import { useGameAction } from "@/hooks";
+import type { ActiveTrial } from "@/lib/game/modes/werewolf";
+import {
+  DaytimeVote,
+  TrialPhase,
+  TrialVerdict,
+  WEREWOLF_COPY,
+  WerewolfAction,
+} from "@/lib/game/modes/werewolf";
+import type { PublicLobbyPlayer } from "@/server/types/lobby";
 
 interface OwnerTrialPanelProps {
   gameId: string;
@@ -124,15 +125,15 @@ export function OwnerTrialPanel({
               {noDeviceMartyrPlayerId &&
                 !martyrUsed &&
                 noDeviceMartyrPlayerId !== pendingGuiltId && (
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={handleUseMartyrAbility}
-                  disabled={action.isPending}
-                >
-                  {trial.narratorMartyrSacrificeButton}
-                </Button>
-              )}
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={handleUseMartyrAbility}
+                    disabled={action.isPending}
+                  >
+                    {trial.narratorMartyrSacrificeButton}
+                  </Button>
+                )}
             </div>
           )}
         </>

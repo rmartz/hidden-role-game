@@ -1,7 +1,8 @@
 import type { Game, GameAction } from "@/lib/types";
+
 import { WerewolfPhase } from "../types";
-import { currentTurnState, isOwnerPlaying, checkWinCondition } from "../utils";
-import { didWolfCubDie, cleanupAfterDaytimeKill } from "./helpers";
+import { checkWinCondition, currentTurnState, isOwnerPlaying } from "../utils";
+import { cleanupAfterDaytimeKill, didWolfCubDie } from "./helpers";
 
 export const resolveHunterRevengeAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {
@@ -9,7 +10,7 @@ export const resolveHunterRevengeAction: GameAction = {
     const ts = currentTurnState(game);
     if (!ts) return false;
     if (ts.phase.type !== WerewolfPhase.Daytime) return false;
-    if (!ts.hunterRevengePlayerId) return false;
+    if (!ts.roleState?.hunter?.revengePlayerId) return false;
     if (!payload || typeof payload !== "object") return false;
     const { targetPlayerId } = payload as { targetPlayerId?: unknown };
     if (typeof targetPlayerId !== "string") return false;
@@ -24,11 +25,11 @@ export const resolveHunterRevengeAction: GameAction = {
     ts.deadPlayerIds = [...ts.deadPlayerIds, targetPlayerId];
 
     if (didWolfCubDie([targetPlayerId], game)) {
-      ts.wolfCubDied = true;
+      ts.roleState = { ...(ts.roleState ?? {}), wolfCub: { died: true } };
     }
     cleanupAfterDaytimeKill(targetPlayerId, ts);
 
-    ts.hunterRevengePlayerId = undefined;
+    ts.roleState = { ...(ts.roleState ?? {}), hunter: undefined };
 
     const winResult = checkWinCondition(game, ts.deadPlayerIds);
     if (winResult) {
