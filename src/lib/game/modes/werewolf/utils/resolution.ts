@@ -4,6 +4,7 @@ import { Team } from "@/lib/types";
 import { getWerewolfRole, WerewolfRole } from "../roles";
 import type {
   AnyNightAction,
+  AttackNightResolutionEvent,
   HangoverNightResolutionEvent,
   HypnotizedNightResolutionEvent,
   NightResolutionEvent,
@@ -359,11 +360,16 @@ export function resolveNightActions(
   const tkAction = nightActions[WerewolfRole.TavernKeeper];
   if (tkAction && !isTeamNightAction(tkAction) && tkAction.targetPlayerId) {
     const tkTarget = tkAction.targetPlayerId;
-    const targetAssignment = roleAssignments.find((a) => a.playerId === tkTarget);
+    const targetAssignment = roleAssignments.find(
+      (a) => a.playerId === tkTarget,
+    );
     const targetRole = targetAssignment
       ? getWerewolfRole(targetAssignment.roleDefinitionId)
       : undefined;
-    if (targetRole && targetRole.targetCategory !== TargetCategory.Investigate) {
+    if (
+      targetRole &&
+      targetRole.targetCategory !== TargetCategory.Investigate
+    ) {
       const blockedPhaseKey = (targetRole.wakesWith ?? targetRole.id) as string;
       resolvedNightActions = Object.fromEntries(
         Object.entries(nightActions).filter(([k]) => k !== blockedPhaseKey),
@@ -629,6 +635,19 @@ export function resolveNightActions(
     });
   }
 
+  // Suppress hangover for any target who was killed that night — they did not
+  // awake, so the hangover narrative does not apply.
+  const killedPlayerIds = new Set(
+    combatEvents
+      .filter(
+        (e): e is AttackNightResolutionEvent => e.type === "killed" && e.died,
+      )
+      .map((e) => e.targetPlayerId),
+  );
+  const filteredHangoverEvents = hangoverEvents.filter(
+    (e) => !killedPlayerIds.has(e.targetPlayerId),
+  );
+
   return [
     ...combatEvents,
     ...toughGuyEvents,
@@ -636,6 +655,6 @@ export function resolveNightActions(
     ...finalSilencedEvents,
     ...finalHypnotizedEvents,
     ...swapperEvents,
-    ...hangoverEvents,
+    ...filteredHangoverEvents,
   ];
 }

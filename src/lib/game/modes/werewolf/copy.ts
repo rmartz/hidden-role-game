@@ -319,8 +319,7 @@ export const WEREWOLF_COPY = {
       "There are Mason characters in this game. If any player mentions Masons or implies they are one, smite them during the night.",
   },
   tavernKeeper: {
-    hangover: (playerName: string) =>
-      `${playerName} awakes with a hangover.`,
+    hangover: (playerName: string) => `${playerName} awakes with a hangover.`,
   },
   kill: {
     button: "Kill",

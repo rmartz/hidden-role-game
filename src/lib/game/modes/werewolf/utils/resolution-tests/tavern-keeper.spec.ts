@@ -113,4 +113,59 @@ describe("resolveNightActions — Tavern Keeper hangover mechanic", () => {
     const hangover = events.find((e) => e.type === "hangover");
     expect(hangover).toBeUndefined();
   });
+
+  it("TK can target themselves — emits hangover for TK player", () => {
+    const events = resolveNightActions(
+      {
+        [WerewolfRole.TavernKeeper]: { targetPlayerId: "tk1", confirmed: true },
+      },
+      assignments,
+      [],
+    );
+    const hangover = events.find(
+      (e) => e.type === "hangover" && e.targetPlayerId === "tk1",
+    );
+    expect(hangover).toBeDefined();
+  });
+
+  it("suppresses hangover when the TK's target was killed that night", () => {
+    // Werewolf attacks bg1; TK also targets bg1 → bg1 dies, no hangover shown.
+    const events = resolveNightActions(
+      {
+        [WerewolfRole.TavernKeeper]: { targetPlayerId: "bg1", confirmed: true },
+        [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "bg1" },
+      },
+      assignments,
+      [],
+    );
+    const killed = events.find(
+      (e) => e.type === "killed" && e.targetPlayerId === "bg1",
+    );
+    expect(killed?.type === "killed" && killed.died).toBe(true);
+    const hangover = events.find(
+      (e) => e.type === "hangover" && e.targetPlayerId === "bg1",
+    );
+    expect(hangover).toBeUndefined();
+  });
+
+  it("does not protect the target from attacks — wolf kill still applies", () => {
+    // TK targets p1; wolves also attack p1 → p1 dies (TK undo only removes p1's OWN action).
+    const events = resolveNightActions(
+      {
+        [WerewolfRole.TavernKeeper]: { targetPlayerId: "p1", confirmed: true },
+        [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
+      },
+      assignments,
+      [],
+    );
+    const killed = events.find(
+      (e) => e.type === "killed" && e.targetPlayerId === "p1",
+    );
+    expect(killed?.type === "killed" && killed.died).toBe(true);
+    // No hangover since p1 was killed
+    const hangover = events.find(
+      (e) => e.type === "hangover" && e.targetPlayerId === "p1",
+    );
+    expect(hangover).toBeUndefined();
+  });
 });
