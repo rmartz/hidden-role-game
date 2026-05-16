@@ -21,6 +21,7 @@ export interface ConfirmTargetButtonViewProps {
   allAgreed?: boolean;
   witchContext?: WitchConfirmContext;
   mirrorcasterCharged?: boolean;
+  mercenaryCharged?: boolean;
   isPending?: boolean;
   onConfirm: () => void;
 }
@@ -35,6 +36,7 @@ export function ConfirmTargetButtonView({
   allAgreed,
   witchContext,
   mirrorcasterCharged,
+  mercenaryCharged,
   isPending,
   onConfirm,
 }: ConfirmTargetButtonViewProps) {
@@ -48,7 +50,12 @@ export function ConfirmTargetButtonView({
   const label = !hasDecided
     ? WEREWOLF_COPY.confirmButton.confirm
     : hasTarget
-      ? getConfirmLabel(roleId, witchContext, mirrorcasterCharged)
+      ? getConfirmLabel(
+          roleId,
+          witchContext,
+          mirrorcasterCharged,
+          mercenaryCharged,
+        )
       : WEREWOLF_COPY.confirmButton.skip;
 
   return isConfirmed ? (

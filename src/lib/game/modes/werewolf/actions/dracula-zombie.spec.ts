@@ -231,6 +231,33 @@ describe("Dracula win condition at start of night", () => {
       WerewolfWinner.Dracula,
     );
   });
+
+  it("Mercenary co-wins with Dracula when the Dracula is bribed and wins", () => {
+    const ts: WerewolfTurnState = {
+      turn: 1,
+      phase: {
+        type: WerewolfPhase.Daytime,
+        startedAt: 1000,
+        nightActions: {},
+      },
+      deadPlayerIds: [],
+      roleState: {
+        dracula: { wives: ["p2", "p3", "p4"] },
+        mercenary: { charged: false, bribedPlayerIds: ["dracula"] },
+      },
+    };
+    const game = makeGameWithDracula(ts, [
+      { playerId: "mercenary", roleDefinitionId: WerewolfRole.Mercenary },
+    ]);
+    startNight.apply(game, undefined, "owner-1");
+    expect(game.status.type).toBe(GameStatus.Finished);
+    expect((game.status as { winner?: string }).winner).toBe(
+      WerewolfWinner.Dracula,
+    );
+    expect(
+      (game.status as { victoryConditionKey?: string }).victoryConditionKey,
+    ).toBe(WerewolfWinner.Mercenary);
+  });
 });
 
 // ---------------------------------------------------------------------------

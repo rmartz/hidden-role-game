@@ -9,6 +9,7 @@ import {
   currentTurnState,
   isOwnerPlaying,
   WerewolfWinner,
+  withMercenaryCoWin,
 } from "../utils";
 import { cleanupAfterDaytimeKill, didWolfCubDie } from "./helpers";
 
@@ -95,10 +96,11 @@ export const resolveTrialAction: GameAction = {
           executionerAssignment !== undefined &&
           !ts.deadPlayerIds.includes(executionerAssignment.playerId);
         if (executionerAlive) {
-          game.status = {
-            type: GameStatus.Finished,
-            winner: WerewolfWinner.Executioner,
-          };
+          game.status = withMercenaryCoWin(
+            { type: GameStatus.Finished, winner: WerewolfWinner.Executioner },
+            game,
+            ts.deadPlayerIds,
+          );
           return;
         }
       }
