@@ -3,14 +3,15 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import { WerewolfWinner } from "@/lib/game/modes/werewolf/utils/win-condition";
 import type { FinishedGameStatus } from "@/lib/types";
 import { Team } from "@/lib/types";
-import type { PlayerGameState, VisibleTeammate } from "@/server/types";
+import type { VisibleTeammate } from "@/server/types";
 
 export interface GameOverScreenViewProps {
-  gameState: PlayerGameState;
+  gameState: WerewolfPlayerGameState;
   onReturnToLobby: () => void;
   isReturning?: boolean;
   returnError?: boolean;
@@ -18,10 +19,17 @@ export interface GameOverScreenViewProps {
 
 function isVictory(
   winner: string | undefined,
-  myRole: PlayerGameState["myRole"],
+  myRole: WerewolfPlayerGameState["myRole"],
   amDead?: boolean,
+  mercenaryAlsoWins?: boolean,
 ): boolean {
   if (!winner || !myRole) return false;
+  if (
+    myRole.id === (WerewolfRole.Mercenary as string) &&
+    !amDead &&
+    mercenaryAlsoWins
+  )
+    return true;
   if (winner === WerewolfWinner.Village) return myRole.team === Team.Good;
   if (winner === WerewolfWinner.Werewolves) return myRole.team === Team.Bad;
   if (winner === WerewolfWinner.Chupacabra)
@@ -65,15 +73,24 @@ export function GameOverScreenView({
 }: GameOverScreenViewProps) {
   const finishedStatus = gameState.status as FinishedGameStatus;
   const { winner } = finishedStatus;
-  const victory = isVictory(winner, gameState.myRole, gameState.amDead);
+  const mercenaryAlsoWins = gameState.mercenaryAlsoWins ?? false;
+  const victory = isVictory(
+    winner,
+    gameState.myRole,
+    gameState.amDead,
+    mercenaryAlsoWins,
+  );
 
   const isDraw = winner === WerewolfWinner.Draw;
+  const winnerLabel = mercenaryAlsoWins
+    ? WEREWOLF_COPY.gameOver.winnerLabelWithMercenary
+    : WEREWOLF_COPY.gameOver.winnerLabel;
   const heading =
     gameState.myRole === undefined
       ? winner
         ? isDraw
           ? WEREWOLF_COPY.gameOver.draw
-          : WEREWOLF_COPY.gameOver.winnerLabel(winner)
+          : winnerLabel(winner)
         : WEREWOLF_COPY.gameOver.defeat
       : isDraw
         ? WEREWOLF_COPY.gameOver.draw
@@ -83,7 +100,7 @@ export function GameOverScreenView({
 
   const subheading =
     winner && !isDraw && gameState.myRole !== undefined
-      ? WEREWOLF_COPY.gameOver.winnerLabel(winner)
+      ? winnerLabel(winner)
       : undefined;
 
   return (

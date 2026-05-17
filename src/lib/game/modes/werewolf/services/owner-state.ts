@@ -299,6 +299,24 @@ export function extractDaytimePlayerState(
     result.martyrUsed = true;
   }
 
+  // Ghost clues — visible to all players during daytime.
+  const ghostClues =
+    ts.roleState?.ghost?.clues.filter((c) => c.turn <= ts.turn) ?? [];
+  if (ghostClues.length > 0) {
+    result.ghostClues = ghostClues;
+  }
+
+  // Ghost clue submission status — only relevant for the Ghost player.
+  const callerAssignment = game.roleAssignments.find(
+    (a) => a.playerId === callerId,
+  );
+  if (callerAssignment?.roleDefinitionId === (WerewolfRole.Ghost as string)) {
+    const submittedThisTurn = (ts.roleState?.ghost?.clues ?? []).some(
+      (c) => c.turn === ts.turn,
+    );
+    result.ghostClueSubmittedThisTurn = submittedThisTurn;
+  }
+
   return result;
 }
 
@@ -322,6 +340,13 @@ export function extractOwnerState(
       ? game.hiddenRoleIds
       : undefined;
 
+  // mercenaryBribedPlayerIds is narrator-only: lets the narrator track which
+  // players have been bribed across nights when running a no-device Mercenary.
+  const mercenaryBribedPlayerIds = ts?.roleState?.mercenary?.bribedPlayerIds
+    .length
+    ? ts.roleState.mercenary.bribedPlayerIds
+    : undefined;
+
   return {
     ...(nightActions ? { nightActions } : {}),
     ...daytimeNightState,
@@ -335,6 +360,7 @@ export function extractOwnerState(
       : {}),
     ...((monarchKnightingsUsed ?? 0) > 0 ? { monarchKnightingsUsed } : {}),
     ...(hiddenRoleIds ? { hiddenRoleIds } : {}),
+    ...(mercenaryBribedPlayerIds ? { mercenaryBribedPlayerIds } : {}),
   };
 }
 

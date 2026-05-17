@@ -102,6 +102,9 @@ describe("Werewolf player state round-trip", () => {
       nightStatus: [{ targetPlayerId: "p2", effect: "killed" }],
       isSilenced: true,
       mirrorcasterCharged: true,
+      mercenaryCharged: true,
+      mercenaryBribedPlayerIds: ["p3", "p4"],
+      mercenaryAlsoWins: true,
       monarchKnightedPlayerIds: ["p2", "p3"],
       monarchKnightingsUsed: 2,
       hunterRevengePlayerId: "p1",
@@ -118,6 +121,9 @@ describe("Werewolf player state round-trip", () => {
     ]);
     expect(result.isSilenced).toBe(true);
     expect(result.mirrorcasterCharged).toBe(true);
+    expect(result.mercenaryCharged).toBe(true);
+    expect(result.mercenaryBribedPlayerIds).toEqual(["p3", "p4"]);
+    expect(result.mercenaryAlsoWins).toBe(true);
     expect(result.monarchKnightedPlayerIds).toEqual(["p2", "p3"]);
     expect(result.monarchKnightingsUsed).toBe(2);
     expect(result.hunterRevengePlayerId).toBe("p1");
@@ -305,6 +311,62 @@ describe("Werewolf player state round-trip", () => {
       playerStateToFirebase(state),
     ) as WerewolfPlayerGameState;
     expect(result.arsonistDousedPlayerIds).toBeUndefined();
+  });
+
+  it("round-trips ghostClues when present", () => {
+    const state = makeWerewolfState({
+      ghostClues: [
+        { turn: 1, clue: "abc" },
+        { turn: 2, clue: "xyz" },
+      ],
+    });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.ghostClues).toEqual([
+      { turn: 1, clue: "abc" },
+      { turn: 2, clue: "xyz" },
+    ]);
+  });
+
+  it("omits ghostClues when absent", () => {
+    const state = makeWerewolfState();
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.ghostClues).toBeUndefined();
+  });
+
+  it("round-trips ghostClueSubmittedThisTurn when true", () => {
+    const state = makeWerewolfState({ ghostClueSubmittedThisTurn: true });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.ghostClueSubmittedThisTurn).toBe(true);
+  });
+
+  it("omits ghostClueSubmittedThisTurn when absent", () => {
+    const state = makeWerewolfState();
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.ghostClueSubmittedThisTurn).toBeUndefined();
+  });
+
+  it("round-trips ghostVisible when true", () => {
+    const state = makeWerewolfState({ ghostVisible: true });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.ghostVisible).toBe(true);
+  });
+
+  it("omits ghostVisible when absent", () => {
+    const state = makeWerewolfState();
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.ghostVisible).toBeUndefined();
   });
 });
 

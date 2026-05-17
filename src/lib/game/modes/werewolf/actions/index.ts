@@ -23,6 +23,7 @@ import { smitePlayerAction } from "./smite-player";
 import { startDayAction } from "./start-day";
 import { startNightAction } from "./start-night";
 import { startTrialAction } from "./start-trial";
+import { submitGhostClueAction } from "./submit-ghost-clue";
 import { WerewolfAction } from "./types";
 import { unsmitePlayerAction } from "./unsmite-player";
 import { useMartyrAbilityAction } from "./use-martyr-ability";
@@ -52,6 +53,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.StartDay]: startDayAction,
   [WerewolfAction.StartNight]: startNightAction,
   [WerewolfAction.StartTrial]: startTrialAction,
+  [WerewolfAction.SubmitGhostClue]: submitGhostClueAction,
   [WerewolfAction.UnsmitePlayer]: unsmitePlayerAction,
   [WerewolfAction.UseMartyrAbility]: useMartyrAbilityAction,
   [WerewolfAction.WithdrawNomination]: withdrawNominationAction,

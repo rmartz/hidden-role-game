@@ -12,6 +12,7 @@ import { getWerewolfModeConfig } from "../lobby-config";
 import type { WerewolfPlayerGameState } from "../player-state";
 import type { WerewolfRoleDefinition } from "../roles";
 import { getWerewolfRole, WerewolfRole } from "../roles";
+import { WerewolfPhase } from "../types";
 import { currentTurnState } from "../utils";
 import { WerewolfWinner } from "../utils/win-condition";
 import {
@@ -37,6 +38,7 @@ const WEREWOLF_WINNER_TEAMS = {
   [WerewolfWinner.Chupacabra]: Team.Neutral,
   [WerewolfWinner.Dracula]: Team.Neutral,
   [WerewolfWinner.LoneWolf]: Team.Neutral,
+  [WerewolfWinner.Mercenary]: Team.Neutral,
   [WerewolfWinner.Spoiler]: Team.Neutral,
   [WerewolfWinner.Executioner]: Team.Neutral,
   [WerewolfWinner.Zombie]: Team.Neutral,
@@ -52,6 +54,13 @@ function extractVictoryCondition(game: Game): VictoryCondition | undefined {
   return { label, winner: WEREWOLF_WINNER_TEAMS[winner] };
 }
 
+function extractMercenaryAlsoWins(game: Game): boolean {
+  if (game.status.type !== GameStatus.Finished) return false;
+  return (
+    game.status.victoryConditionKey === (WerewolfWinner.Mercenary as string)
+  );
+}
+
 function extractNonOwnerState(
   game: Game,
   callerId: string,
@@ -60,16 +69,26 @@ function extractNonOwnerState(
   const deadPlayerIds = extractDeadPlayerIds(game);
   const nightActions = extractNightActions(game);
 
-  const nightTargetState = nightActions
-    ? extractPlayerNightState(game, callerId, myRole, deadPlayerIds)
-    : {};
+  const amDead = deadPlayerIds.includes(callerId);
+
+  // Ghost: when dead and it's nighttime, grant narrator-level visibility.
+  const isGhost = myRole.id === WerewolfRole.Ghost;
+  const isNighttime =
+    currentTurnState(game)?.phase.type === WerewolfPhase.Nighttime;
+  const ghostVisible = isGhost && amDead && isNighttime;
+  const ghostNightState =
+    ghostVisible && nightActions ? { ghostVisible: true, nightActions } : {};
+
+  const nightTargetState =
+    nightActions && !ghostVisible
+      ? extractPlayerNightState(game, callerId, myRole, deadPlayerIds)
+      : {};
 
   const daytimeNightState = extractDaytimeNightSummary(game, callerId);
   const daytimePlayerState = extractDaytimePlayerState(game, callerId);
   const ts = currentTurnState(game);
   const monarchKnightingsUsed = ts?.roleState?.monarch?.knightingsUsed;
 
-  const amDead = deadPlayerIds.includes(callerId);
   const visibleDeadPlayerIds = extractVisibleDeadPlayerIds(game, callerId);
 
   // Executioner: surface the target so the player knows who to get eliminated,
@@ -87,6 +106,7 @@ function extractNonOwnerState(
 
   return {
     ...nightTargetState,
+    ...ghostNightState,
     ...daytimeNightState,
     ...daytimePlayerState,
     ...(amDead ? { amDead: true } : {}),
@@ -135,6 +155,7 @@ export const werewolfServices: GameModeServices = {
 
     // Include Werewolf-specific game settings in the player state.
     const wwConfig = getWerewolfModeConfig(game);
+    const mercenaryAlsoWins = extractMercenaryAlsoWins(game);
     return {
       ...modeState,
       nominationsEnabled: wwConfig.nominationsEnabled,
@@ -142,6 +163,7 @@ export const werewolfServices: GameModeServices = {
       revealProtections: wwConfig.revealProtections,
       autoRevealNightOutcome: wwConfig.autoRevealNightOutcome,
       victoryCondition: extractVictoryCondition(game),
+      ...(mercenaryAlsoWins ? { mercenaryAlsoWins: true } : {}),
     };
   },
 };

@@ -3,8 +3,10 @@ import type {
   DraculaTurnState,
   ExecutionerTurnState,
   ExposerTurnState,
+  GhostTurnState,
   HunterTurnState,
   MartyrTurnState,
+  MercenaryTurnState,
   MirrorcasterTurnState,
   MonarchTurnState,
   MorticianTurnState,
@@ -22,8 +24,10 @@ export type {
   DraculaTurnState,
   ExecutionerTurnState,
   ExposerTurnState,
+  GhostTurnState,
   HunterTurnState,
   MartyrTurnState,
+  MercenaryTurnState,
   MirrorcasterTurnState,
   MonarchTurnState,
   MorticianTurnState,
@@ -232,8 +236,10 @@ export interface WerewolfRoleTurnState {
   dracula?: DraculaTurnState;
   executioner?: ExecutionerTurnState;
   exposer?: ExposerTurnState;
+  ghost?: GhostTurnState;
   hunter?: HunterTurnState;
   martyr?: MartyrTurnState;
+  mercenary?: MercenaryTurnState;
   mirrorcaster?: MirrorcasterTurnState;
   monarch?: MonarchTurnState;
   mortician?: MorticianTurnState;

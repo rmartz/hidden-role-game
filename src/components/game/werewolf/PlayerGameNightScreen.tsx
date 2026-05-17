@@ -4,6 +4,7 @@ import type { WerewolfNighttimePhase } from "@/lib/game/modes/werewolf";
 import { isPlayersTurn } from "@/lib/game/modes/werewolf";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 
+import { GhostNightObserverScreen } from "./GhostNightObserverScreen";
 import { PlayerNightActionScreen } from "./PlayerNightActionScreen";
 import { PlayerNightSnoozeScreen } from "./PlayerNightSnoozeScreen";
 
@@ -24,6 +25,10 @@ export function PlayerGameNightScreen({
 }: PlayerGameNightScreenProps) {
   const activePhaseKey = phase.nightPhaseOrder[phase.currentPhaseIndex];
   const isMyTurn = isPlayersTurn(gameState.myRole, activePhaseKey);
+
+  if (gameState.ghostVisible) {
+    return <GhostNightObserverScreen gameState={gameState} phase={phase} />;
+  }
 
   const isSnoozing = (gameState.amDead ?? false) || !isMyTurn;
 

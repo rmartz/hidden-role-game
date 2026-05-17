@@ -21,6 +21,9 @@ export interface FirebaseWerewolfRoleState {
   isHypnotized?: boolean;
   executionerTargetId?: string;
   mirrorcasterCharged?: boolean;
+  mercenaryCharged?: boolean;
+  mercenaryBribedPlayerIds?: string[];
+  mercenaryAlsoWins?: boolean;
   oneEyedSeerLockedTargetId?: string;
   elusiveSeerVillagerIds?: string[];
   illuminatiRoleAssignments?: {
@@ -34,6 +37,9 @@ export interface FirebaseWerewolfRoleState {
   hiddenRoleIds?: string[];
   arsonistDousedPlayerIds?: string[];
   pendingSmitePlayerIds?: string[];
+  ghostClues?: { turn: number; clue: string }[];
+  ghostClueSubmittedThisTurn?: boolean;
+  ghostVisible?: boolean;
   thingTappedMe?: boolean;
   thingTappedPlayerId?: string;
   insomniacResult?: { leftActed: boolean; rightActed: boolean };
@@ -64,6 +70,11 @@ export function werewolfRoleStateToFirebase(
       ? { executionerTargetId: state.executionerTargetId }
       : {}),
     ...(state.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
+    ...(state.mercenaryCharged ? { mercenaryCharged: true } : {}),
+    ...(state.mercenaryBribedPlayerIds?.length
+      ? { mercenaryBribedPlayerIds: state.mercenaryBribedPlayerIds }
+      : {}),
+    ...(state.mercenaryAlsoWins ? { mercenaryAlsoWins: true } : {}),
     ...(state.oneEyedSeerLockedTargetId
       ? { oneEyedSeerLockedTargetId: state.oneEyedSeerLockedTargetId }
       : {}),
@@ -89,6 +100,11 @@ export function werewolfRoleStateToFirebase(
     ...(state.pendingSmitePlayerIds?.length
       ? { pendingSmitePlayerIds: state.pendingSmitePlayerIds }
       : {}),
+    ...(state.ghostClues?.length ? { ghostClues: state.ghostClues } : {}),
+    ...(state.ghostClueSubmittedThisTurn
+      ? { ghostClueSubmittedThisTurn: true }
+      : {}),
+    ...(state.ghostVisible ? { ghostVisible: true } : {}),
     ...(state.thingTappedMe ? { thingTappedMe: true } : {}),
     ...(state.thingTappedPlayerId
       ? { thingTappedPlayerId: state.thingTappedPlayerId }
@@ -122,6 +138,11 @@ export function werewolfRoleStateFromFirebase(
       ? { executionerTargetId: raw.executionerTargetId }
       : {}),
     ...(raw.mirrorcasterCharged ? { mirrorcasterCharged: true } : {}),
+    ...(raw.mercenaryCharged ? { mercenaryCharged: true } : {}),
+    ...(raw.mercenaryBribedPlayerIds?.length
+      ? { mercenaryBribedPlayerIds: raw.mercenaryBribedPlayerIds }
+      : {}),
+    ...(raw.mercenaryAlsoWins ? { mercenaryAlsoWins: true } : {}),
     ...(raw.oneEyedSeerLockedTargetId
       ? { oneEyedSeerLockedTargetId: raw.oneEyedSeerLockedTargetId }
       : {}),
@@ -150,6 +171,11 @@ export function werewolfRoleStateFromFirebase(
     ...(raw.pendingSmitePlayerIds?.length
       ? { pendingSmitePlayerIds: raw.pendingSmitePlayerIds }
       : {}),
+    ...(raw.ghostClues?.length ? { ghostClues: raw.ghostClues } : {}),
+    ...(raw.ghostClueSubmittedThisTurn
+      ? { ghostClueSubmittedThisTurn: true }
+      : {}),
+    ...(raw.ghostVisible ? { ghostVisible: true } : {}),
     ...(raw.thingTappedMe ? { thingTappedMe: true } : {}),
     ...(raw.thingTappedPlayerId
       ? { thingTappedPlayerId: raw.thingTappedPlayerId }

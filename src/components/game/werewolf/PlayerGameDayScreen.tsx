@@ -15,6 +15,7 @@ import {
 } from "@/lib/game/modes/werewolf/roles";
 import { getPlayerName } from "@/lib/player";
 
+import { GhostCluePanel } from "./GhostCluePanel";
 import { NominationPanel } from "./NominationPanel";
 import { PlayerNightSummary } from "./PlayerNightSummary";
 import { PlayerRoleDisplay } from "./PlayerRoleDisplay";
@@ -105,6 +106,31 @@ export function PlayerGameDayScreen({
         <p className="mb-4 font-semibold text-muted-foreground italic">
           {WEREWOLF_COPY.day.youAreEliminated}
         </p>
+      )}
+
+      {gameState.amDead && gameState.myRole?.id === WerewolfRole.Ghost && (
+        <GhostCluePanel
+          gameId={gameId}
+          ghostClues={gameState.ghostClues ?? []}
+          alreadySubmittedThisTurn={
+            gameState.ghostClueSubmittedThisTurn ?? false
+          }
+        />
+      )}
+
+      {!gameState.amDead && (gameState.ghostClues?.length ?? 0) > 0 && (
+        <div className="mb-4">
+          <p className="text-sm font-semibold mb-1">
+            {WEREWOLF_COPY.ghost.clueListHeading}
+          </p>
+          <ul className="space-y-1 text-sm text-muted-foreground">
+            {(gameState.ghostClues ?? []).map((c) => (
+              <li key={c.turn}>
+                {WEREWOLF_COPY.ghost.clueTurn(c.turn, c.clue)}
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       {gameState.activeTrial && (

@@ -22,6 +22,7 @@ export enum WerewolfAction {
   StartDay = "start-day",
   StartNight = "start-night",
   StartTrial = "start-trial",
+  SubmitGhostClue = "submit-ghost-clue",
   UnsmitePlayer = "unsmite-player",
   UseMartyrAbility = "use-martyr-ability",
   WithdrawNomination = "withdraw-nomination",

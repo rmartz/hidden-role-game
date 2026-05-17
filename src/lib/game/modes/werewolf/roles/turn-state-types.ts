@@ -31,6 +31,11 @@ export interface ExposerTurnState {
   reveal?: { playerId: string; roleId: string };
 }
 
+export interface GhostTurnState {
+  /** Ghost clues submitted during daytime. Each entry records the turn number and clue text. */
+  clues: { turn: number; clue: string }[];
+}
+
 export interface HunterTurnState {
   /** Set when the Hunter dies — blocks win-condition checks until resolved. */
   revengePlayerId: string;
@@ -39,6 +44,13 @@ export interface HunterTurnState {
 export interface MartyrTurnState {
   /** True once the Martyr has used their once-per-game substitution ability. */
   abilityUsed: boolean;
+}
+
+export interface MercenaryTurnState {
+  /** True when the Mercenary has earned a coin from a successful protection (Bribe mode active). */
+  charged: boolean;
+  /** Player IDs that the Mercenary has bribed. Accumulated across nights; deduplicated. */
+  bribedPlayerIds: string[];
 }
 
 export interface MirrorcasterTurnState {

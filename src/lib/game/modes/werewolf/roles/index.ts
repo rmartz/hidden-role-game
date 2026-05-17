@@ -13,6 +13,7 @@ import { DRACULA_ROLE } from "./dracula";
 import { ELUSIVE_SEER_ROLE } from "./elusive-seer";
 import { EXECUTIONER_ROLE } from "./executioner";
 import { EXPOSER_ROLE } from "./exposer";
+import { GHOST_ROLE } from "./ghost";
 import { HUNTER_ROLE } from "./hunter";
 import { ILLUMINATI_ROLE } from "./illuminati";
 import { INSOMNIAC_ROLE } from "./insomniac";
@@ -21,6 +22,7 @@ import { MARTYR_ROLE } from "./martyr";
 import { MASON_ROLE } from "./mason";
 import { MAYOR_ROLE } from "./mayor";
 import { MENTALIST_ROLE } from "./mentalist";
+import { MERCENARY_ROLE } from "./mercenary";
 import { MINION_ROLE } from "./minion";
 import { MIRRORCASTER_ROLE } from "./mirrorcaster";
 import { MONARCH_ROLE } from "./monarch";
@@ -59,6 +61,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
   [WerewolfRole.ElusiveSeer]: ELUSIVE_SEER_ROLE,
   [WerewolfRole.Executioner]: EXECUTIONER_ROLE,
   [WerewolfRole.Exposer]: EXPOSER_ROLE,
+  [WerewolfRole.Ghost]: GHOST_ROLE,
   [WerewolfRole.Hunter]: HUNTER_ROLE,
   [WerewolfRole.Illuminati]: ILLUMINATI_ROLE,
   [WerewolfRole.Insomniac]: INSOMNIAC_ROLE,
@@ -67,6 +70,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
   [WerewolfRole.Mason]: MASON_ROLE,
   [WerewolfRole.Mayor]: MAYOR_ROLE,
   [WerewolfRole.Mentalist]: MENTALIST_ROLE,
+  [WerewolfRole.Mercenary]: MERCENARY_ROLE,
   [WerewolfRole.Minion]: MINION_ROLE,
   [WerewolfRole.Mirrorcaster]: MIRRORCASTER_ROLE,
   [WerewolfRole.Monarch]: MONARCH_ROLE,

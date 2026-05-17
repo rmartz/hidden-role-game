@@ -232,6 +232,24 @@ The Martyr window is always inserted after a Guilty verdict, even when no Martyr
 
 ---
 
+### `submit-ghost-clue`
+
+**Who:** Ghost player only (dead player with Ghost role)
+**When:** During Daytime
+**Effect:** Records a clue from the Ghost player into `WerewolfTurnState.roleState.ghost.clues`. The clue is visible to all living players for the rest of the game.
+
+**Payload:** `{ clue: string }`
+
+**Validation:**
+
+- Caller must be dead.
+- Caller must have the Ghost role.
+- Game must be in Daytime phase.
+- Clue must be a non-empty string of at most 20 characters.
+- Caller may only submit one clue per turn.
+
+---
+
 ### `pause-timer`
 
 **Who:** Narrator only
@@ -300,6 +318,7 @@ The Martyr window is always inserted after a Guilty verdict, even when no Martyr
 | `withdraw-nomination`         | Player                    | none                                                   |
 | `skip-defense`                | Narrator                  | none                                                   |
 | `kill-player`                 | Narrator                  | `{ playerId: string }`                                 |
+| `submit-ghost-clue`           | Ghost (dead player)       | `{ clue: string }`                                     |
 | `pause-timer`                 | Narrator                  | none                                                   |
 | `resume-timer`                | Narrator                  | none                                                   |
 
@@ -439,4 +458,5 @@ Win conditions are evaluated after each death (night resolution or trial). The c
    - **Werewolves win** — If Bad team count ≥ non-Bad count (Good + Neutral + Chupacabra), the Werewolves win.
 5. **Illuminati override** (after standard win determined) — If a standard win condition fires and the Illuminati is alive and ≤ 3 total players remain, the Illuminati wins instead.
 6. **Spoiler override** (after team win determined) — If a standard win condition fires and the Spoiler is still alive (and Illuminati did not already override), the Spoiler wins instead of the winning team.
-7. **Dracula win** — Checked separately in `startNightAction`, not in `checkWinCondition`.
+7. **Mercenary co-win** (after all overrides) — If any win condition fires, the Mercenary is alive, and at least one bribed player is alive on the winning side, the Mercenary also wins alongside the main winner (displayed as e.g. "Village Won (Mercenary also wins)"). The co-win applies to all winners — team wins (Village → bribed player on `Team.Good`; Werewolves → bribed player on `Team.Bad`) and individual-role wins (Spoiler, Illuminati, Lone Wolf, Chupacabra, Executioner, Zombie, Dracula → the bribed player must be the specific winning role-holder).
+8. **Dracula win** — Checked separately in `startNightAction`, not in `checkWinCondition`.
