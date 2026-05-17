@@ -43,6 +43,7 @@ export const WEREWOLF_ROLE_CATEGORY_LABELS: Record<
 };
 
 export enum WerewolfRole {
+  AlphaWolf = "werewolf-alpha-wolf",
   Altruist = "werewolf-altruist",
   Arsonist = "werewolf-arsonist",
   Bodyguard = "werewolf-bodyguard",
@@ -53,6 +54,7 @@ export enum WerewolfRole {
   ElusiveSeer = "werewolf-elusive-seer",
   Executioner = "werewolf-executioner",
   Exposer = "werewolf-exposer",
+  Ghost = "werewolf-ghost",
   Hunter = "werewolf-hunter",
   Illuminati = "werewolf-illuminati",
   Insomniac = "werewolf-insomniac",
@@ -81,6 +83,7 @@ export enum WerewolfRole {
   ToughGuy = "werewolf-tough-guy",
   Veteran = "werewolf-veteran",
   Vigilante = "werewolf-vigilante",
+  VillageDrunk = "werewolf-village-drunk",
   VillageIdiot = "werewolf-village-idiot",
   Villager = "werewolf-villager",
   Werewolf = "werewolf-werewolf",
