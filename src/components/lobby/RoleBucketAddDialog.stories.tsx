@@ -34,17 +34,17 @@ const categorizedRoles = [
   {
     category: "evil-killing",
     label: "Werewolf — Killing",
-    roles: [mockRoles[2]],
+    roles: mockRoles.filter((r) => r.category === "evil-killing"),
   },
   {
     category: "villager-investigation",
     label: "Villager — Investigation",
-    roles: [mockRoles[1]],
+    roles: mockRoles.filter((r) => r.category === "villager-investigation"),
   },
   {
     category: "villager-support",
     label: "Villager — Support",
-    roles: [mockRoles[0]],
+    roles: mockRoles.filter((r) => r.category === "villager-support"),
   },
 ];
 

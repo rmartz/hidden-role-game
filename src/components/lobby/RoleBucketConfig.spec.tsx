@@ -136,7 +136,7 @@ describe("RoleBucketConfigView", () => {
     );
     fireEvent.click(screen.getByText(ROLE_BUCKET_ADD_DIALOG_COPY.addRole));
     fireEvent.click(
-      screen.getAllByText(ROLE_BUCKET_ADD_DIALOG_COPY.addRoleButton)[0],
+      screen.getAllByText(ROLE_BUCKET_ADD_DIALOG_COPY.addRoleButton)[0]!,
     );
     expect(onAddRole).toHaveBeenCalledWith(0, "villager", false);
     expect(screen.queryByText(ROLE_BUCKET_ADD_DIALOG_COPY.title)).toBeNull();
