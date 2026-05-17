@@ -59,7 +59,11 @@ export function RoleBucketAddDialog({
     }
 
     return categoryOrder.reduce<
-      { category: string; label: string; roles: RoleDefinition<string, Team>[] }[]
+      {
+        category: string;
+        label: string;
+        roles: RoleDefinition<string, Team>[];
+      }[]
     >((acc, category) => {
       const roles = allRoles.filter((role) => role.category === category);
       if (roles.length > 0) {
@@ -165,7 +169,9 @@ export function RoleBucketAddDialogView({
                 <p className="text-xs font-semibold text-muted-foreground">
                   {label}
                 </p>
-                <ul className="space-y-2 list-none p-0">{roles.map(renderRole)}</ul>
+                <ul className="space-y-2 list-none p-0">
+                  {roles.map(renderRole)}
+                </ul>
               </div>
             ))}
             {uncategorizedRoles.length > 0 && (
