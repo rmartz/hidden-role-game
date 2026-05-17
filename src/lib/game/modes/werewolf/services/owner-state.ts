@@ -251,9 +251,12 @@ export function extractDaytimePlayerState(
 
       // Expose whether the defendant was actually eliminated so both player
       // and narrator panels can derive "spared" from the same source of truth.
-      result.activeTrial.defendantEliminated = ts.deadPlayerIds.includes(
-        activeTrial.defendantId,
-      );
+      // Only meaningful for Eliminated verdicts; leave undefined for Innocent.
+      if (activeTrial.verdict === TrialVerdict.Eliminated) {
+        result.activeTrial.defendantEliminated = ts.deadPlayerIds.includes(
+          activeTrial.defendantId,
+        );
+      }
 
       // Suppress eliminatedRole if the defendant survived (e.g. Martyr intercept).
       // Only reveal when the defendant is actually dead.

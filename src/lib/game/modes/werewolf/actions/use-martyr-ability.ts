@@ -22,8 +22,8 @@ import { cleanupAfterDaytimeKill, didWolfCubDie } from "./helpers";
  * - The Martyr is alive and has not previously used this ability.
  * - The Martyr is not the convicted player (cannot save themselves).
  *
- * The narrator (owner) may call this action on behalf of a no-device Martyr
- * player, bypassing the caller-identity check.
+ * The narrator (owner) may call this action on behalf of any Martyr player,
+ * bypassing the caller-identity check.
  */
 export const useMartyrAbilityAction: GameAction = {
   isValid(game: Game, callerId: string) {

@@ -92,11 +92,13 @@ export function OwnerTrialPanel({
     !pendingGuiltId &&
     !deadPlayerIds.includes(activeTrial.defendantId);
   const verdictLabel = activeTrial.verdict
-    ? defendantSpared
-      ? trial.verdictLabelSpared
-      : activeTrial.verdict === TrialVerdict.Eliminated
-        ? trial.verdictLabelEliminated
-        : trial.verdictLabelInnocent
+    ? pendingGuiltId
+      ? trial.verdictLabelPending
+      : defendantSpared
+        ? trial.verdictLabelSpared
+        : activeTrial.verdict === TrialVerdict.Eliminated
+          ? trial.verdictLabelEliminated
+          : trial.verdictLabelInnocent
     : undefined;
   const trialStartedAt = new Date(activeTrial.startedAt);
   const voteTimerStartedAt = activeTrial.voteStartedAt
