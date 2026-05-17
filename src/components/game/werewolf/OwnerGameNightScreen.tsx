@@ -529,23 +529,24 @@ export function OwnerGameNightScreen({
                   </div>
                 </div>
               )}
-              {(!isWitchAbilitySkipped || abilityBypass) && !isEvilEmpathPhase && (
-                <OwnerNightTargetPanel
-                  groupAction={!!groupAction}
-                  groupMemberCount={activePlayerNames.length}
-                  resolvedVotes={resolvedVotes}
-                  activeTargetName={activeTargetName}
-                  activeTargetConfirmed={activeTargetConfirmed}
-                  targetablePlayers={targetablePlayers}
-                  activeTarget={activeTarget}
-                  onTargetClick={handleTargetClick}
-                  isPending={action.isPending}
-                  previousTargetId={previousTargetId}
-                  requiresDualTarget={requiresDualTarget}
-                  secondTarget={secondTargetId}
-                  dualTargetPrompt={dualTargetPrompt}
-                />
-              )}
+              {(!isWitchAbilitySkipped || abilityBypass) &&
+                !isEvilEmpathPhase && (
+                  <OwnerNightTargetPanel
+                    groupAction={!!groupAction}
+                    groupMemberCount={activePlayerNames.length}
+                    resolvedVotes={resolvedVotes}
+                    activeTargetName={activeTargetName}
+                    activeTargetConfirmed={activeTargetConfirmed}
+                    targetablePlayers={targetablePlayers}
+                    activeTarget={activeTarget}
+                    onTargetClick={handleTargetClick}
+                    isPending={action.isPending}
+                    previousTargetId={previousTargetId}
+                    requiresDualTarget={requiresDualTarget}
+                    secondTarget={secondTargetId}
+                    dualTargetPrompt={dualTargetPrompt}
+                  />
+                )}
             </>
           )}
           {investigationResult && (

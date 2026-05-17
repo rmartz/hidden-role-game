@@ -131,4 +131,3 @@ export interface ZombieTurnState {
   /** Player IDs that have been infected. Accumulated across nights. */
   infected: string[];
 }
-
