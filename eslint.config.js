@@ -68,6 +68,17 @@ export default tseslint.config(
       "@typescript-eslint/no-non-null-assertion": "off",
     },
   },
+  // CI scripts under .github/ run in Node.js; register node globals so `process`
+  // and `console` are recognised without typed linting (scripts are not in the
+  // app tsconfig project).
+  {
+    files: [".github/**/*.ts"],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
+    },
+  },
   // Storybook stories use loose patterns; skip strict type checking
   {
     files: ["src/**/*.stories.tsx"],
