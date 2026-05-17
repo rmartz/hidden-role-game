@@ -1,4 +1,5 @@
 import type {
+  AlphaWolfTurnState,
   ArsonistTurnState,
   DraculaTurnState,
   EvilEmpathTurnState,
@@ -21,6 +22,7 @@ import type {
 } from "./roles/turn-state-types";
 
 export type {
+  AlphaWolfTurnState,
   ArsonistTurnState,
   DraculaTurnState,
   EvilEmpathTurnState,
@@ -227,6 +229,7 @@ export type WerewolfTurnPhase = WerewolfNighttimePhase | WerewolfDaytimePhase;
  * Each role's state type is defined in roles/turn-state-types.ts.
  */
 export interface WerewolfRoleTurnState {
+  alphaWolf?: AlphaWolfTurnState;
   arsonist?: ArsonistTurnState;
   dracula?: DraculaTurnState;
   evilEmpath?: EvilEmpathTurnState;
@@ -259,6 +262,13 @@ export interface WerewolfTurnState {
    * player on consecutive nights.
    */
   lastTargets?: Record<string, string>;
+  /**
+   * Mid-game role overrides: maps playerId → roleDefinitionId.
+   * Overlays roleAssignments for roles that can change during play
+   * (Alpha Wolf bite converts a villager; Village Drunk sobering up).
+   * Use resolveRoleId() to get the effective role for a player.
+   */
+  roleOverrides?: Record<string, string>;
   /** Namespaced per-role persistent state. One optional key per role. */
   roleState?: WerewolfRoleTurnState;
 }
