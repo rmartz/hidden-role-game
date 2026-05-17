@@ -11,6 +11,7 @@ import {
   GROUP_PHASE_KEY_SEPARATOR,
   isOwnerPlaying,
   WerewolfWinner,
+  withMercenaryCoWin,
 } from "../utils";
 
 /** Night at which the Village Drunk sobers up and gains their alternate role. */
@@ -123,6 +124,9 @@ export const startNightAction: GameAction = {
       ...(rs.monarch ? { monarch: rs.monarch } : {}),
       ...(rs.executioner?.targetId ? { executioner: rs.executioner } : {}),
       ...(rs.mirrorcaster?.charged ? { mirrorcaster: rs.mirrorcaster } : {}),
+      ...(rs.mercenary?.charged || rs.mercenary?.bribedPlayerIds.length
+        ? { mercenary: rs.mercenary }
+        : {}),
       ...(aliveWives.length > 0 ? { dracula: { wives: aliveWives } } : {}),
       ...(aliveInfected.length > 0
         ? { zombie: { infected: aliveInfected } }
@@ -164,10 +168,11 @@ export const startNightAction: GameAction = {
         draculaAssignment &&
         !ts.deadPlayerIds.includes(draculaAssignment.playerId)
       ) {
-        game.status = {
-          type: GameStatus.Finished,
-          winner: WerewolfWinner.Dracula,
-        };
+        game.status = withMercenaryCoWin(
+          { type: GameStatus.Finished, winner: WerewolfWinner.Dracula },
+          game,
+          ts.deadPlayerIds,
+        );
         return;
       }
     }

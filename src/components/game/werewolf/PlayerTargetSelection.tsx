@@ -35,6 +35,7 @@ export interface PlayerTargetSelectionViewProps {
   mySecondNightTarget?: string;
   requiresSecondTarget?: boolean;
   mirrorcasterCharged?: boolean;
+  mercenaryCharged?: boolean;
   monarchKnightingsRemaining?: number;
   isPending: boolean;
   onMutate: (params: { actionId: string; payload?: unknown }) => void;
@@ -67,6 +68,7 @@ export function PlayerTargetSelectionView({
   mySecondNightTarget,
   requiresSecondTarget = false,
   mirrorcasterCharged,
+  mercenaryCharged,
   monarchKnightingsRemaining,
   isPending,
   onMutate,
@@ -209,11 +211,15 @@ export function PlayerTargetSelectionView({
               ? WEREWOLF_COPY.targetSelection.noAction
               : isConfirmed
                 ? WEREWOLF_COPY.targetSelection.yourTarget
-                : shouldShowMentalistSecondTargetHeading
-                  ? WEREWOLF_COPY.mentalist.chooseSecondTarget
-                  : isMonarch
-                    ? WEREWOLF_COPY.monarch.choosePlayerToKnight
-                    : WEREWOLF_COPY.targetSelection.chooseTarget}
+                : confirmPhaseKey === WerewolfRole.Mercenary
+                  ? mercenaryCharged
+                    ? WEREWOLF_COPY.mercenary.chooseBribeTarget
+                    : WEREWOLF_COPY.mercenary.chooseProtectTarget
+                  : shouldShowMentalistSecondTargetHeading
+                    ? WEREWOLF_COPY.mentalist.chooseSecondTarget
+                    : isMonarch
+                      ? WEREWOLF_COPY.monarch.choosePlayerToKnight
+                      : WEREWOLF_COPY.targetSelection.chooseTarget}
           </h2>
           {isMonarch &&
             monarchKnightingsRemaining !== undefined &&
@@ -299,6 +305,7 @@ export function PlayerTargetSelectionView({
                 : undefined
             }
             mirrorcasterCharged={mirrorcasterCharged}
+            mercenaryCharged={mercenaryCharged}
             isPending={isPending}
             onConfirm={onConfirm}
           />

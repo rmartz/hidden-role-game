@@ -21,6 +21,7 @@ import { LONE_WOLF_ROLE } from "./lone-wolf";
 import { MASON_ROLE } from "./mason";
 import { MAYOR_ROLE } from "./mayor";
 import { MENTALIST_ROLE } from "./mentalist";
+import { MERCENARY_ROLE } from "./mercenary";
 import { MINION_ROLE } from "./minion";
 import { MIRRORCASTER_ROLE } from "./mirrorcaster";
 import { MONARCH_ROLE } from "./monarch";
@@ -68,6 +69,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
   [WerewolfRole.Mason]: MASON_ROLE,
   [WerewolfRole.Mayor]: MAYOR_ROLE,
   [WerewolfRole.Mentalist]: MENTALIST_ROLE,
+  [WerewolfRole.Mercenary]: MERCENARY_ROLE,
   [WerewolfRole.Minion]: MINION_ROLE,
   [WerewolfRole.Mirrorcaster]: MIRRORCASTER_ROLE,
   [WerewolfRole.Monarch]: MONARCH_ROLE,
