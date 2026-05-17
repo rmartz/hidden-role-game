@@ -35,8 +35,8 @@ export function NightPhaseOrderList({
                 className={isPast ? "line-through" : undefined}
               >
                 <ItemContent>
-                  <ItemTitle>
-                    <span className="text-muted-foreground mr-2 tabular-nums">
+                  <ItemTitle className={isPast ? "line-through" : undefined}>
+                    <span className="mr-2 tabular-nums">
                       {String(index + 1)}.
                     </span>
                     {label}

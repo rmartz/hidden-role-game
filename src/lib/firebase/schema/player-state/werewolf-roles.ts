@@ -40,6 +40,9 @@ export interface FirebaseWerewolfRoleState {
   hiddenRoleIds?: string[];
   arsonistDousedPlayerIds?: string[];
   pendingSmitePlayerIds?: string[];
+  ghostClues?: { turn: number; clue: string }[];
+  ghostClueSubmittedThisTurn?: boolean;
+  ghostVisible?: boolean;
   thingTappedMe?: boolean;
   thingTappedPlayerId?: string;
   insomniacResult?: { leftActed: boolean; rightActed: boolean };
@@ -103,6 +106,11 @@ export function werewolfRoleStateToFirebase(
     ...(state.pendingSmitePlayerIds?.length
       ? { pendingSmitePlayerIds: state.pendingSmitePlayerIds }
       : {}),
+    ...(state.ghostClues?.length ? { ghostClues: state.ghostClues } : {}),
+    ...(state.ghostClueSubmittedThisTurn
+      ? { ghostClueSubmittedThisTurn: true }
+      : {}),
+    ...(state.ghostVisible ? { ghostVisible: true } : {}),
     ...(state.thingTappedMe ? { thingTappedMe: true } : {}),
     ...(state.thingTappedPlayerId
       ? { thingTappedPlayerId: state.thingTappedPlayerId }
@@ -172,6 +180,11 @@ export function werewolfRoleStateFromFirebase(
     ...(raw.pendingSmitePlayerIds?.length
       ? { pendingSmitePlayerIds: raw.pendingSmitePlayerIds }
       : {}),
+    ...(raw.ghostClues?.length ? { ghostClues: raw.ghostClues } : {}),
+    ...(raw.ghostClueSubmittedThisTurn
+      ? { ghostClueSubmittedThisTurn: true }
+      : {}),
+    ...(raw.ghostVisible ? { ghostVisible: true } : {}),
     ...(raw.thingTappedMe ? { thingTappedMe: true } : {}),
     ...(raw.thingTappedPlayerId
       ? { thingTappedPlayerId: raw.thingTappedPlayerId }
