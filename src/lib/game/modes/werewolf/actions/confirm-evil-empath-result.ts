@@ -36,7 +36,11 @@ export const confirmEvilEmpathResultAction: GameAction = {
     if (!activePhaseKey) return;
 
     // Auto-compute adjacency from seating order.
-    const isAdjacent = computeSeerAdjacentToWerewolf(game, ts.deadPlayerIds);
+    const isAdjacent = computeSeerAdjacentToWerewolf(
+      game,
+      ts.deadPlayerIds,
+      ts.roleOverrides,
+    );
 
     phase.nightActions[activePhaseKey] = {
       confirmed: true,
@@ -63,6 +67,7 @@ export const confirmEvilEmpathResultAction: GameAction = {
 function computeSeerAdjacentToWerewolf(
   game: Game,
   deadPlayerIds: string[],
+  roleOverrides?: Record<string, string>,
 ): boolean {
   const rawOrder = game.playerOrder;
   if (!rawOrder || rawOrder.length < 2) return false;
@@ -88,7 +93,8 @@ function computeSeerAdjacentToWerewolf(
   return game.roleAssignments.some((a) => {
     if (!neighbourIds.has(a.playerId)) return false;
     if (deadPlayerIds.includes(a.playerId)) return false;
-    const roleDef = getWerewolfRole(a.roleDefinitionId);
+    const effectiveRoleId = roleOverrides?.[a.playerId] ?? a.roleDefinitionId;
+    const roleDef = getWerewolfRole(effectiveRoleId);
     return roleDef?.isWerewolf === true;
   });
 }

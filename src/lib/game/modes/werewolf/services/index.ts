@@ -142,10 +142,11 @@ function extractNonOwnerState(
       : {}),
     ...((monarchKnightingsUsed ?? 0) > 0 ? { monarchKnightingsUsed } : {}),
     ...executionerState,
-    // Evil Empath revealed result: surface to Werewolf-team players even when
-    // nightActions is absent (e.g. narrator advances to day without recording
-    // night actions and the Evil Empath dies during the day phase).
-    ...(isWerewolfTeam &&
+    // Evil Empath revealed result: surface to actual Werewolf roles only
+    // (not all bad-team roles like Minion/Wizard), even when nightActions is
+    // absent (e.g. narrator advances to day without recording night actions
+    // and the Evil Empath dies during the day phase).
+    ...(myRole.isWerewolf === true &&
     ts?.roleState?.evilEmpath?.revealedResult !== undefined
       ? { evilEmpathRevealedResult: ts.roleState.evilEmpath.revealedResult }
       : {}),
