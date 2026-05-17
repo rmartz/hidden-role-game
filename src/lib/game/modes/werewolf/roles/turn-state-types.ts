@@ -31,6 +31,11 @@ export interface ExposerTurnState {
   reveal?: { playerId: string; roleId: string };
 }
 
+export interface GhostTurnState {
+  /** Ghost clues submitted during daytime. Each entry records the turn number and clue text. */
+  clues: { turn: number; clue: string }[];
+}
+
 export interface HunterTurnState {
   /** Set when the Hunter dies — blocks win-condition checks until resolved. */
   revengePlayerId: string;

@@ -12,6 +12,7 @@ import { getWerewolfModeConfig } from "../lobby-config";
 import type { WerewolfPlayerGameState } from "../player-state";
 import type { WerewolfRoleDefinition } from "../roles";
 import { getWerewolfRole, WerewolfRole } from "../roles";
+import { WerewolfPhase } from "../types";
 import { currentTurnState } from "../utils";
 import { WerewolfWinner } from "../utils/win-condition";
 import {
@@ -68,16 +69,26 @@ function extractNonOwnerState(
   const deadPlayerIds = extractDeadPlayerIds(game);
   const nightActions = extractNightActions(game);
 
-  const nightTargetState = nightActions
-    ? extractPlayerNightState(game, callerId, myRole, deadPlayerIds)
-    : {};
+  const amDead = deadPlayerIds.includes(callerId);
+
+  // Ghost: when dead and it's nighttime, grant narrator-level visibility.
+  const isGhost = myRole.id === WerewolfRole.Ghost;
+  const isNighttime =
+    currentTurnState(game)?.phase.type === WerewolfPhase.Nighttime;
+  const ghostVisible = isGhost && amDead && isNighttime;
+  const ghostNightState =
+    ghostVisible && nightActions ? { ghostVisible: true, nightActions } : {};
+
+  const nightTargetState =
+    nightActions && !ghostVisible
+      ? extractPlayerNightState(game, callerId, myRole, deadPlayerIds)
+      : {};
 
   const daytimeNightState = extractDaytimeNightSummary(game, callerId);
   const daytimePlayerState = extractDaytimePlayerState(game, callerId);
   const ts = currentTurnState(game);
   const monarchKnightingsUsed = ts?.roleState?.monarch?.knightingsUsed;
 
-  const amDead = deadPlayerIds.includes(callerId);
   const visibleDeadPlayerIds = extractVisibleDeadPlayerIds(game, callerId);
 
   // Executioner: surface the target so the player knows who to get eliminated,
@@ -95,6 +106,7 @@ function extractNonOwnerState(
 
   return {
     ...nightTargetState,
+    ...ghostNightState,
     ...daytimeNightState,
     ...daytimePlayerState,
     ...(amDead ? { amDead: true } : {}),

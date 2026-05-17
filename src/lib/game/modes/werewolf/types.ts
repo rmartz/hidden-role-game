@@ -3,6 +3,7 @@ import type {
   DraculaTurnState,
   ExecutionerTurnState,
   ExposerTurnState,
+  GhostTurnState,
   HunterTurnState,
   MercenaryTurnState,
   MirrorcasterTurnState,
@@ -22,6 +23,7 @@ export type {
   DraculaTurnState,
   ExecutionerTurnState,
   ExposerTurnState,
+  GhostTurnState,
   HunterTurnState,
   MercenaryTurnState,
   MirrorcasterTurnState,
@@ -225,6 +227,7 @@ export interface WerewolfRoleTurnState {
   dracula?: DraculaTurnState;
   executioner?: ExecutionerTurnState;
   exposer?: ExposerTurnState;
+  ghost?: GhostTurnState;
   hunter?: HunterTurnState;
   mercenary?: MercenaryTurnState;
   mirrorcaster?: MirrorcasterTurnState;

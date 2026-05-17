@@ -53,6 +53,7 @@ export enum WerewolfRole {
   ElusiveSeer = "werewolf-elusive-seer",
   Executioner = "werewolf-executioner",
   Exposer = "werewolf-exposer",
+  Ghost = "werewolf-ghost",
   Hunter = "werewolf-hunter",
   Illuminati = "werewolf-illuminati",
   Insomniac = "werewolf-insomniac",

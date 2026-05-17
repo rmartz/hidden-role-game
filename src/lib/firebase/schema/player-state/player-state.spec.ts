@@ -308,6 +308,62 @@ describe("Werewolf player state round-trip", () => {
     ) as WerewolfPlayerGameState;
     expect(result.arsonistDousedPlayerIds).toBeUndefined();
   });
+
+  it("round-trips ghostClues when present", () => {
+    const state = makeWerewolfState({
+      ghostClues: [
+        { turn: 1, clue: "abc" },
+        { turn: 2, clue: "xyz" },
+      ],
+    });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.ghostClues).toEqual([
+      { turn: 1, clue: "abc" },
+      { turn: 2, clue: "xyz" },
+    ]);
+  });
+
+  it("omits ghostClues when absent", () => {
+    const state = makeWerewolfState();
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.ghostClues).toBeUndefined();
+  });
+
+  it("round-trips ghostClueSubmittedThisTurn when true", () => {
+    const state = makeWerewolfState({ ghostClueSubmittedThisTurn: true });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.ghostClueSubmittedThisTurn).toBe(true);
+  });
+
+  it("omits ghostClueSubmittedThisTurn when absent", () => {
+    const state = makeWerewolfState();
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.ghostClueSubmittedThisTurn).toBeUndefined();
+  });
+
+  it("round-trips ghostVisible when true", () => {
+    const state = makeWerewolfState({ ghostVisible: true });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.ghostVisible).toBe(true);
+  });
+
+  it("omits ghostVisible when absent", () => {
+    const state = makeWerewolfState();
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.ghostVisible).toBeUndefined();
+  });
 });
 
 describe("Secret Villain player state round-trip", () => {
