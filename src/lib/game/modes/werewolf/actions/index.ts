@@ -1,6 +1,7 @@
 export { WerewolfAction } from "./types";
 import type { GameAction } from "@/lib/types";
 
+import { alphaWolfBiteAction } from "./alpha-wolf-bite";
 import { cancelTrialAction } from "./cancel-trial";
 import { castVoteAction } from "./cast-vote";
 import { confirmNightTargetAction } from "./confirm-night-target";
@@ -28,6 +29,7 @@ import { unsmitePlayerAction } from "./unsmite-player";
 import { withdrawNominationAction } from "./withdraw-nomination";
 
 export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
+  [WerewolfAction.AlphaWolfBite]: alphaWolfBiteAction,
   [WerewolfAction.CancelTrial]: cancelTrialAction,
   [WerewolfAction.CastVote]: castVoteAction,
   [WerewolfAction.ConfirmNightTarget]: confirmNightTargetAction,

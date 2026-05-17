@@ -9,6 +9,11 @@
  * the main Werewolf types barrel.
  */
 
+export interface AlphaWolfTurnState {
+  /** True once the Alpha Wolf has used their once-per-game bite ability. */
+  biteUsed: boolean;
+}
+
 export interface ArsonistTurnState {
   /** Player IDs that have been doused. Accumulated across nights; reset after an ignite. */
   dousedPlayerIds: string[];

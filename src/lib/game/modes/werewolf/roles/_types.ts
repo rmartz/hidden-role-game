@@ -43,6 +43,7 @@ export const WEREWOLF_ROLE_CATEGORY_LABELS: Record<
 };
 
 export enum WerewolfRole {
+  AlphaWolf = "werewolf-alpha-wolf",
   Altruist = "werewolf-altruist",
   Arsonist = "werewolf-arsonist",
   Bodyguard = "werewolf-bodyguard",
@@ -81,6 +82,7 @@ export enum WerewolfRole {
   TheThing = "werewolf-the-thing",
   ToughGuy = "werewolf-tough-guy",
   Vigilante = "werewolf-vigilante",
+  VillageDrunk = "werewolf-village-drunk",
   VillageIdiot = "werewolf-village-idiot",
   Villager = "werewolf-villager",
   Werewolf = "werewolf-werewolf",

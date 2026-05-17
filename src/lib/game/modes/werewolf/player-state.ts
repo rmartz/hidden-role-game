@@ -91,6 +91,13 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   mercenaryAlsoWins?: boolean;
   /** Executioner: target player ID. */
   executionerTargetId?: string;
+  /** Whether the Alpha Wolf has used their once-per-game bite ability. */
+  alphaWolfBiteUsed?: boolean;
+  /**
+   * Players whose roles have been changed mid-game (Alpha Wolf bite).
+   * Visible to Werewolf-team players so they know who was converted.
+   */
+  roleConversions?: { playerId: string; newRoleDefinitionId: string }[];
   /**
    * True when the player was tapped by The Thing this night.
    * Present only for the tapped player; cleared each night.

@@ -1,4 +1,5 @@
 export enum WerewolfAction {
+  AlphaWolfBite = "alpha-wolf-bite",
   CancelTrial = "cancel-trial",
   CastVote = "cast-vote",
   ConfirmNightTarget = "confirm-night-target",

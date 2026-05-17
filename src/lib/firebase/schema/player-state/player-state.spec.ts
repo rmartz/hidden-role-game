@@ -11,6 +11,7 @@ import { SvTheme } from "@/lib/game/modes/secret-villain/themes";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
 import { SecretVillainPhase } from "@/lib/game/modes/secret-villain/types";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
 import { GameMode, GameStatus, Team } from "@/lib/types";
 import { DEFAULT_TIMER_CONFIG } from "@/lib/types";
@@ -125,6 +126,34 @@ describe("Werewolf player state round-trip", () => {
     expect(result.monarchKnightedPlayerIds).toEqual(["p2", "p3"]);
     expect(result.monarchKnightingsUsed).toBe(2);
     expect(result.hunterRevengePlayerId).toBe("p1");
+  });
+
+  it("round-trips alphaWolfBiteUsed", () => {
+    const state = makeWerewolfState({ alphaWolfBiteUsed: true });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.alphaWolfBiteUsed).toBe(true);
+  });
+
+  it("round-trips roleConversions", () => {
+    const conversions = [
+      { playerId: "p3", newRoleDefinitionId: WerewolfRole.Werewolf },
+    ];
+    const state = makeWerewolfState({ roleConversions: conversions });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.roleConversions).toEqual(conversions);
+  });
+
+  it("omits alphaWolfBiteUsed and roleConversions when absent", () => {
+    const state = makeWerewolfState();
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.alphaWolfBiteUsed).toBeUndefined();
+    expect(result.roleConversions).toBeUndefined();
   });
 
   it("omits optional fields when absent", () => {
