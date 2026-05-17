@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { WerewolfRole } from "../../roles";
+import { VeteranCounterkillSource } from "../../types";
 import { resolveNightActions } from "../resolution";
 import { findKilled } from "./helpers";
 
@@ -40,7 +41,7 @@ describe("resolveNightActions", () => {
         type: "veteran-counterkilled",
         counterkilledPlayerId: "bg1",
         veteranPlayerId: "vet1",
-        source: "visitor",
+        source: VeteranCounterkillSource.Visitor,
       });
     });
 
@@ -62,7 +63,7 @@ describe("resolveNightActions", () => {
       );
       expect(counterkilledEvent).toMatchObject({
         counterkilledPlayerId: "doc1",
-        source: "visitor",
+        source: VeteranCounterkillSource.Visitor,
       });
     });
 
@@ -98,7 +99,7 @@ describe("resolveNightActions", () => {
       expect(counterkilledEvent).toMatchObject({
         counterkilledPlayerId: "vig1",
         veteranPlayerId: "vet1",
-        source: "visitor",
+        source: VeteranCounterkillSource.Visitor,
       });
     });
 
@@ -125,7 +126,7 @@ describe("resolveNightActions", () => {
       expect(counterkilledEvent).toMatchObject({
         counterkilledPlayerId: "bg1",
         veteranPlayerId: "vet1",
-        source: "visitor",
+        source: VeteranCounterkillSource.Visitor,
         died: false,
       });
     });
@@ -164,7 +165,7 @@ describe("resolveNightActions", () => {
       ).toMatchObject({
         counterkilledPlayerId: "mc1",
         veteranPlayerId: "vet1",
-        source: "visitor",
+        source: VeteranCounterkillSource.Visitor,
       });
     });
 
@@ -201,7 +202,7 @@ describe("resolveNightActions", () => {
       ).toMatchObject({
         counterkilledPlayerId: "mc1",
         veteranPlayerId: "vet1",
-        source: "visitor",
+        source: VeteranCounterkillSource.Visitor,
       });
     });
     it("alerts and uncharged Mercenary targets Veteran: Mercenary is counter-killed", () => {
@@ -238,7 +239,35 @@ describe("resolveNightActions", () => {
       ).toMatchObject({
         counterkilledPlayerId: "merc1",
         veteranPlayerId: "vet1",
-        source: "visitor",
+        source: VeteranCounterkillSource.Visitor,
+      });
+    });
+
+    it("alerts and Bodyguard targets Veteran, Priest ward covers Bodyguard: Bodyguard survives", () => {
+      // The Veteran counter-kills the visiting Bodyguard, but the Bodyguard
+      // has an active Priest ward. The ward absorbs the counter-kill (died: false).
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Bodyguard]: { targetPlayerId: "vet1" },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        veteranAssignments,
+        [],
+        undefined,
+        { priestWards: { bg1: "priest1" } },
+      );
+
+      const bgKilled = findKilled(events, "bg1");
+      expect(bgKilled).toMatchObject({ died: false });
+
+      const counterkilledEvent = events.find(
+        (e) => e.type === "veteran-counterkilled",
+      );
+      expect(counterkilledEvent).toMatchObject({
+        counterkilledPlayerId: "bg1",
+        veteranPlayerId: "vet1",
+        source: VeteranCounterkillSource.Visitor,
+        died: false,
       });
     });
 

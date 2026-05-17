@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 
+import { VeteranCounterkillSource } from "@/lib/game/modes/werewolf";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 
 interface PlayerNightSummaryItemProps {
@@ -16,7 +17,7 @@ interface PlayerNightSummaryItemProps {
   peaceful: boolean;
   exposedRoleName?: string;
   isMe: boolean;
-  veteranCounterkillSource?: "wolf-repel" | "visitor";
+  veteranCounterkillSource?: VeteranCounterkillSource;
   veteranName?: string;
 }
 
@@ -78,7 +79,7 @@ function renderPrimaryLine({
 
   if (veteranCounterkillSource && veteranName) {
     const message =
-      veteranCounterkillSource === "wolf-repel"
+      veteranCounterkillSource === VeteranCounterkillSource.WolfRepel
         ? WEREWOLF_COPY.veteran.dayAnnouncementWolfRepel(
             veteranName,
             playerName,

@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import { WerewolfRole } from "@/lib/game/modes/werewolf";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import { VeteranCounterkillSource } from "@/lib/game/modes/werewolf/types";
 
 import { NightOutcomeSummary } from "./NightOutcomeSummary";
 
@@ -55,7 +56,7 @@ describe("NightOutcomeSummary", () => {
             type: "veteran-counterkilled",
             counterkilledPlayerId: "p2",
             veteranPlayerId: "p1",
-            source: "visitor",
+            source: VeteranCounterkillSource.Visitor,
             died: true,
           },
           {
@@ -88,7 +89,7 @@ describe("NightOutcomeSummary", () => {
             type: "veteran-counterkilled",
             counterkilledPlayerId: "p2",
             veteranPlayerId: "p1",
-            source: "visitor",
+            source: VeteranCounterkillSource.Visitor,
             died: true,
           },
           {
@@ -129,7 +130,7 @@ describe("NightOutcomeSummary", () => {
             type: "veteran-counterkilled",
             counterkilledPlayerId: "p2",
             veteranPlayerId: "p1",
-            source: "visitor",
+            source: VeteranCounterkillSource.Visitor,
             died: true,
           },
           {

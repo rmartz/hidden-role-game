@@ -3,6 +3,7 @@ import type { ClocktowerPlayerGameState } from "@/lib/game/modes/clocktower/play
 import type { CodenamesPlayerGameState } from "@/lib/game/modes/codenames/player-state";
 import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import type { VeteranCounterkillSource } from "@/lib/game/modes/werewolf/types";
 import type { GameStatusState, Team, TimerConfig } from "@/lib/types";
 
 import type { PublicLobbyPlayer } from "./lobby";
@@ -60,7 +61,7 @@ export interface DaytimeNightStatusEntry {
   /** For veteran-counterkill: the Veteran player who performed the counter-kill. */
   veteranPlayerId?: string;
   /** For veteran-counterkill: whether the kill came from repelling a wolf attack or a player visiting. */
-  veteranCounterkillSource?: "wolf-repel" | "visitor";
+  veteranCounterkillSource?: VeteranCounterkillSource;
 }
 
 /** Night effects visible to the Witch during their nighttime phase only. */

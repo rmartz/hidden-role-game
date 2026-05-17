@@ -6,6 +6,7 @@ import {
   WerewolfPhase,
   WerewolfRole,
 } from "@/lib/game/modes/werewolf";
+import { VeteranCounterkillSource } from "@/lib/game/modes/werewolf/types";
 import type { Game } from "@/lib/types";
 import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 
@@ -206,7 +207,7 @@ describe("extractDaytimeNightSummary", () => {
           type: "veteran-counterkilled" as const,
           counterkilledPlayerId: "p2",
           veteranPlayerId: "p1",
-          source: "visitor" as const,
+          source: VeteranCounterkillSource.Visitor,
           died: true,
         },
       ],
@@ -218,7 +219,7 @@ describe("extractDaytimeNightSummary", () => {
         targetPlayerId: "p2",
         effect: "veteran-counterkill",
         veteranPlayerId: "p1",
-        veteranCounterkillSource: "visitor",
+        veteranCounterkillSource: VeteranCounterkillSource.Visitor,
       },
     ]);
   });
@@ -230,7 +231,7 @@ describe("extractDaytimeNightSummary", () => {
           type: "veteran-counterkilled" as const,
           counterkilledPlayerId: "p2",
           veteranPlayerId: "p1",
-          source: "visitor" as const,
+          source: VeteranCounterkillSource.Visitor,
           died: false,
         },
       ],
@@ -249,7 +250,7 @@ describe("extractDaytimeNightSummary", () => {
           type: "veteran-counterkilled" as const,
           counterkilledPlayerId: "p2",
           veteranPlayerId: "p1",
-          source: "wolf-repel" as const,
+          source: VeteranCounterkillSource.WolfRepel,
           died: true,
         },
       ],
@@ -264,7 +265,7 @@ describe("extractDaytimeNightSummary", () => {
         targetPlayerId: "p2",
         effect: "veteran-counterkill",
         veteranPlayerId: "p1",
-        veteranCounterkillSource: "wolf-repel",
+        veteranCounterkillSource: VeteranCounterkillSource.WolfRepel,
       },
     ]);
   });

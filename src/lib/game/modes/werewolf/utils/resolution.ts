@@ -7,7 +7,11 @@ import type {
   NightAction,
   NightResolutionEvent,
 } from "../types";
-import { isTeamNightAction, TargetCategory } from "../types";
+import {
+  isTeamNightAction,
+  TargetCategory,
+  VeteranCounterkillSource,
+} from "../types";
 import { baseGroupPhaseKey, isGroupPhaseKey, isRoleActive } from "./phase-keys";
 import { getGroupPhasePlayerIds } from "./targeting";
 
@@ -508,7 +512,7 @@ export function resolveNightActions(
   const pendingVeteranKills: {
     counterkilledPlayerId: string;
     veteranPlayerId: string;
-    source: "wolf-repel" | "visitor";
+    source: VeteranCounterkillSource;
   }[] = [];
 
   if (veteranAlerted) {
@@ -549,10 +553,20 @@ export function resolveNightActions(
             ...(attacks.get(wolfVictimId) ?? []),
             WerewolfRole.Veteran,
           ]);
+          // If the wolf victim has an active Priest ward, apply the protection
+          // now so the ward absorbs this newly-queued counter-kill attack.
+          // (applyPriestWards ran before Veteran resolution and only covers
+          // attacks that existed at that point.)
+          if (options?.priestWards?.[wolfVictimId]) {
+            protections.set(wolfVictimId, [
+              ...(protections.get(wolfVictimId) ?? []),
+              WerewolfRole.Priest,
+            ]);
+          }
           pendingVeteranKills.push({
             counterkilledPlayerId: wolfVictimId,
             veteranPlayerId,
-            source: "wolf-repel",
+            source: VeteranCounterkillSource.WolfRepel,
           });
         }
       }
@@ -600,10 +614,20 @@ export function resolveNightActions(
           ...(attacks.get(visitorPlayerId) ?? []),
           WerewolfRole.Veteran,
         ]);
+        // If the visitor has an active Priest ward, apply the protection now so
+        // the ward absorbs this newly-queued counter-kill attack.
+        // (applyPriestWards ran before Veteran resolution and only covers
+        // attacks that existed at that point.)
+        if (options?.priestWards?.[visitorPlayerId]) {
+          protections.set(visitorPlayerId, [
+            ...(protections.get(visitorPlayerId) ?? []),
+            WerewolfRole.Priest,
+          ]);
+        }
         pendingVeteranKills.push({
           counterkilledPlayerId: visitorPlayerId,
           veteranPlayerId,
-          source: "visitor",
+          source: VeteranCounterkillSource.Visitor,
         });
       }
     }

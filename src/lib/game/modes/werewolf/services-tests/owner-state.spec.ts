@@ -7,7 +7,7 @@ import { WerewolfRole } from "../roles";
 import { extractDaytimeNightSummary } from "../services/owner-state";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "../timer-config";
 import type { NightResolutionEvent, WerewolfTurnState } from "../types";
-import { WerewolfPhase } from "../types";
+import { VeteranCounterkillSource, WerewolfPhase } from "../types";
 
 function makeDaytimeGame(
   nightResolution: NightResolutionEvent[],
@@ -64,7 +64,7 @@ describe("extractDaytimeNightSummary — veteran-counterkill mapping", () => {
     type: "veteran-counterkilled" as const,
     counterkilledPlayerId: "p2",
     veteranPlayerId: "p1",
-    source: "visitor" as const,
+    source: VeteranCounterkillSource.Visitor,
     died: true,
   };
 
@@ -72,7 +72,7 @@ describe("extractDaytimeNightSummary — veteran-counterkill mapping", () => {
     type: "veteran-counterkilled" as const,
     counterkilledPlayerId: "p2",
     veteranPlayerId: "p1",
-    source: "wolf-repel" as const,
+    source: VeteranCounterkillSource.WolfRepel,
     died: true,
   };
 
@@ -88,7 +88,7 @@ describe("extractDaytimeNightSummary — veteran-counterkill mapping", () => {
       targetPlayerId: "p2",
       effect: "veteran-counterkill",
       veteranPlayerId: "p1",
-      veteranCounterkillSource: "visitor",
+      veteranCounterkillSource: VeteranCounterkillSource.Visitor,
     });
   });
 
@@ -101,7 +101,7 @@ describe("extractDaytimeNightSummary — veteran-counterkill mapping", () => {
       (e) => e.effect === "veteran-counterkill",
     );
     expect(entry).toMatchObject({
-      veteranCounterkillSource: "wolf-repel",
+      veteranCounterkillSource: VeteranCounterkillSource.WolfRepel,
     });
   });
 
@@ -135,7 +135,7 @@ describe("extractDaytimeNightSummary — veteran-counterkill mapping", () => {
       type: "veteran-counterkilled" as const,
       counterkilledPlayerId: "p2",
       veteranPlayerId: "p1",
-      source: "visitor" as const,
+      source: VeteranCounterkillSource.Visitor,
       died: false,
     };
     const game = makeDaytimeGame([absorbedEvent]);

@@ -141,6 +141,11 @@ export interface SwapperSwappedNightResolutionEvent {
   secondPlayerId: string;
 }
 
+export enum VeteranCounterkillSource {
+  Visitor = "visitor",
+  WolfRepel = "wolf-repel",
+}
+
 export interface VeteranCounterkilledNightResolutionEvent {
   type: "veteran-counterkilled";
   /** The player targeted by the Veteran's counter-kill. */
@@ -148,7 +153,7 @@ export interface VeteranCounterkilledNightResolutionEvent {
   /** The Veteran player who counter-killed. */
   veteranPlayerId: string;
   /** Whether the counter-kill was from repelling a wolf attack or killing a visiting player. */
-  source: "wolf-repel" | "visitor";
+  source: VeteranCounterkillSource;
   /** Whether the counter-killed player actually died (false if saved by a protection or Tough Guy absorption). */
   died: boolean;
 }

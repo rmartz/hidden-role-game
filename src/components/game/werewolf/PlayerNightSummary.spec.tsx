@@ -2,6 +2,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import { VeteranCounterkillSource } from "@/lib/game/modes/werewolf/types";
 import type { DaytimeNightStatusEntry } from "@/server/types";
 import type { PublicLobbyPlayer } from "@/server/types/lobby";
 
@@ -108,7 +109,7 @@ describe("PlayerNightSummary", () => {
         targetPlayerId: "p1",
         effect: "veteran-counterkill",
         veteranPlayerId: "p2",
-        veteranCounterkillSource: "wolf-repel",
+        veteranCounterkillSource: VeteranCounterkillSource.WolfRepel,
       },
     ];
 
@@ -127,7 +128,7 @@ describe("PlayerNightSummary", () => {
         targetPlayerId: "p1",
         effect: "veteran-counterkill",
         veteranPlayerId: "p3",
-        veteranCounterkillSource: "visitor",
+        veteranCounterkillSource: VeteranCounterkillSource.Visitor,
       },
     ];
 

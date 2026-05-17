@@ -6,7 +6,10 @@ import type {
   NightResolutionEvent,
   VeteranCounterkilledNightResolutionEvent,
 } from "@/lib/game/modes/werewolf";
-import { WerewolfRole } from "@/lib/game/modes/werewolf";
+import {
+  VeteranCounterkillSource,
+  WerewolfRole,
+} from "@/lib/game/modes/werewolf";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import { getPlayerName } from "@/lib/player";
 
@@ -107,7 +110,7 @@ export function NightOutcomeSummary({
             const counterkilledName =
               getPlayerName(players, e.counterkilledPlayerId) ?? "a player";
             const message =
-              e.source === "wolf-repel"
+              e.source === VeteranCounterkillSource.WolfRepel
                 ? WEREWOLF_COPY.veteran.dayAnnouncementWolfRepel(
                     veteranName,
                     counterkilledName,

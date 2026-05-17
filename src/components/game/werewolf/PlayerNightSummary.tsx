@@ -3,6 +3,7 @@
 import groupBy from "lodash/groupBy";
 
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { VeteranCounterkillSource } from "@/lib/game/modes/werewolf/types";
 import { getPlayerName } from "@/lib/player";
 import type { PlayerGameState } from "@/server/types";
 import type { DaytimeNightStatusEntry } from "@/server/types";
@@ -38,7 +39,7 @@ export function PlayerNightSummary({
           e,
         ): e is DaytimeNightStatusEntry & {
           veteranPlayerId: string;
-          veteranCounterkillSource: "wolf-repel" | "visitor";
+          veteranCounterkillSource: VeteranCounterkillSource;
         } =>
           e.effect === "veteran-counterkill" &&
           "veteranPlayerId" in e &&

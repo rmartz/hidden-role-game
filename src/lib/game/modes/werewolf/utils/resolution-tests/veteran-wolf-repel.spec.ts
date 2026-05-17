@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { WerewolfRole } from "../../roles";
+import { VeteranCounterkillSource } from "../../types";
 import { resolveNightActions } from "../resolution";
 import { findKilled } from "./helpers";
 
@@ -43,7 +44,7 @@ describe("resolveNightActions", () => {
         type: "veteran-counterkilled",
         counterkilledPlayerId: "w1",
         veteranPlayerId: "vet1",
-        source: "wolf-repel",
+        source: VeteranCounterkillSource.WolfRepel,
       });
     });
 
@@ -142,10 +143,44 @@ describe("resolveNightActions", () => {
       expect(counterkilledEvent).toMatchObject({
         counterkilledPlayerId: "w1",
         veteranPlayerId: "vet1",
-        source: "wolf-repel",
+        source: VeteranCounterkillSource.WolfRepel,
         died: false,
       });
     });
+    it("alerts, wolves attack, Priest ward covers counter-killed wolf: wolf survives", () => {
+      // The Veteran counter-kills the wolf, but the wolf has an active Priest ward.
+      // The ward should absorb the counter-kill attack (died: false on both events).
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Werewolf]: {
+            votes: [{ playerId: "w1", targetPlayerId: "vet1" }],
+            suggestedTargetId: "vet1",
+          },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        veteranAssignments,
+        [],
+        undefined,
+        { priestWards: { w1: "priest1" } },
+      );
+
+      const vetEvent = findKilled(events, "vet1");
+      expect(vetEvent).toBeUndefined();
+
+      const wolfKilled = findKilled(events, "w1");
+      expect(wolfKilled).toMatchObject({ died: false });
+
+      const counterkilledEvent = events.find(
+        (e) => e.type === "veteran-counterkilled",
+      );
+      expect(counterkilledEvent).toMatchObject({
+        counterkilledPlayerId: "w1",
+        veteranPlayerId: "vet1",
+        source: VeteranCounterkillSource.WolfRepel,
+        died: false,
+      });
+    });
+
     it("Swapper redirects wolf attack onto alerted Veteran: wolf is counter-killed, Veteran survives", () => {
       // The wolves target p1, but Swapper swaps p1 and vet1, so the wolf attack
       // ends up on the Veteran. Since Veteran resolution runs after Swapper,
@@ -191,7 +226,7 @@ describe("resolveNightActions", () => {
         type: "veteran-counterkilled",
         counterkilledPlayerId: "w1",
         veteranPlayerId: "vet1",
-        source: "wolf-repel",
+        source: VeteranCounterkillSource.WolfRepel,
       });
 
       // p1 is not killed (attack was swapped away).
