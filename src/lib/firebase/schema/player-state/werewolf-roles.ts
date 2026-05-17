@@ -11,6 +11,10 @@ import type { Team } from "@/lib/types";
  * Adding a new role adds fields only to this interface and the two helpers below.
  */
 export interface FirebaseWerewolfRoleState {
+  /** Whether the Alpha Wolf has used their once-per-game bite ability. */
+  alphaWolfBiteUsed?: boolean;
+  /** Players whose roles have been changed mid-game (Alpha Wolf bite). */
+  roleConversions?: { playerId: string; newRoleDefinitionId: string }[];
   martyrUsed?: boolean;
   witchAbilityUsed?: boolean;
   morticianAbilityEnded?: boolean;
@@ -56,6 +60,10 @@ export function werewolfRoleStateToFirebase(
 ): FirebaseWerewolfRoleState {
   const monarchKnightingsUsed = state.monarchKnightingsUsed;
   return {
+    ...(state.alphaWolfBiteUsed ? { alphaWolfBiteUsed: true } : {}),
+    ...(state.roleConversions?.length
+      ? { roleConversions: state.roleConversions }
+      : {}),
     ...(state.martyrUsed ? { martyrUsed: true } : {}),
     ...(state.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
     ...(state.morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),
@@ -124,6 +132,10 @@ export function werewolfRoleStateFromFirebase(
 ): Partial<WerewolfPlayerGameState> {
   const monarchKnightingsUsed = raw.monarchKnightingsUsed;
   return {
+    ...(raw.alphaWolfBiteUsed ? { alphaWolfBiteUsed: true } : {}),
+    ...(raw.roleConversions?.length
+      ? { roleConversions: raw.roleConversions }
+      : {}),
     ...(raw.martyrUsed ? { martyrUsed: true } : {}),
     ...(raw.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
     ...(raw.morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),

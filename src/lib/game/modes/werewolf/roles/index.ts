@@ -3,6 +3,7 @@ export * from "./_types";
 
 import type { WerewolfRoleDefinition } from "./_types";
 import { WerewolfRole } from "./_types";
+import { ALPHA_WOLF_ROLE } from "./alpha-wolf";
 import { ALTRUIST_ROLE } from "./altruist";
 import { ARSONIST_ROLE } from "./arsonist";
 import { BODYGUARD_ROLE } from "./bodyguard";
@@ -42,6 +43,7 @@ import { TANNER_ROLE } from "./tanner";
 import { THE_THING_ROLE } from "./the-thing";
 import { TOUGH_GUY_ROLE } from "./tough-guy";
 import { VIGILANTE_ROLE } from "./vigilante";
+import { VILLAGE_DRUNK_ROLE } from "./village-drunk";
 import { VILLAGE_IDIOT_ROLE } from "./village-idiot";
 import { VILLAGER_ROLE } from "./villager";
 import { WEREWOLF_ROLE } from "./werewolf-role";
@@ -51,6 +53,7 @@ import { WOLF_CUB_ROLE } from "./wolf-cub";
 import { ZOMBIE_ROLE } from "./zombie";
 
 export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
+  [WerewolfRole.AlphaWolf]: ALPHA_WOLF_ROLE,
   [WerewolfRole.Altruist]: ALTRUIST_ROLE,
   [WerewolfRole.Arsonist]: ARSONIST_ROLE,
   [WerewolfRole.Bodyguard]: BODYGUARD_ROLE,
@@ -90,6 +93,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
   [WerewolfRole.TheThing]: THE_THING_ROLE,
   [WerewolfRole.ToughGuy]: TOUGH_GUY_ROLE,
   [WerewolfRole.Vigilante]: VIGILANTE_ROLE,
+  [WerewolfRole.VillageDrunk]: VILLAGE_DRUNK_ROLE,
   [WerewolfRole.VillageIdiot]: VILLAGE_IDIOT_ROLE,
   [WerewolfRole.Villager]: VILLAGER_ROLE,
   [WerewolfRole.Werewolf]: WEREWOLF_ROLE,

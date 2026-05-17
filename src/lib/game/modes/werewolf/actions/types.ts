@@ -1,5 +1,6 @@
 export enum WerewolfAction {
   AdvanceMartyrWindow = "advance-martyr-window",
+  AlphaWolfBite = "alpha-wolf-bite",
   CancelTrial = "cancel-trial",
   CastVote = "cast-vote",
   ConfirmNightTarget = "confirm-night-target",

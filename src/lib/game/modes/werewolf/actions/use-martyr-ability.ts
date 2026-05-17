@@ -6,6 +6,7 @@ import { WerewolfPhase } from "../types";
 import {
   checkWinCondition,
   currentTurnState,
+  isOwnerPlaying,
   WerewolfWinner,
   withMercenaryCoWin,
 } from "../utils";
@@ -32,7 +33,7 @@ export const useMartyrAbilityAction: GameAction = {
     if (!ts.phase.pendingGuiltId) return false;
     const martyrState = ts.roleState?.martyr;
     if (martyrState?.abilityUsed) return false;
-    const isOwner = callerId === game.ownerPlayerId;
+    const isOwner = isOwnerPlaying(game, callerId);
     // Find the Martyr assignment — needed for both owner and player callers.
     const martyrAssignment = game.roleAssignments.find(
       (a) => a.roleDefinitionId === (WerewolfRole.Martyr as string),
