@@ -358,7 +358,12 @@ export function resolveNightActions(
   let resolvedNightActions = nightActions;
   const hangoverEvents: HangoverNightResolutionEvent[] = [];
   const tkAction = nightActions[WerewolfRole.TavernKeeper];
-  if (tkAction && !isTeamNightAction(tkAction) && tkAction.targetPlayerId) {
+  if (
+    tkAction &&
+    !isTeamNightAction(tkAction) &&
+    tkAction.confirmed &&
+    tkAction.targetPlayerId
+  ) {
     const tkTarget = tkAction.targetPlayerId;
     const targetAssignment = roleAssignments.find(
       (a) => a.playerId === tkTarget,

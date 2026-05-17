@@ -50,7 +50,7 @@ describe("resolveNightActions — Tavern Keeper hangover mechanic", () => {
 
   it("does not undo an investigative role action (Seer is exempt)", () => {
     // TK targets the Seer — Seer's action should NOT be removed.
-    // Spellcaster targets p1 (non-investigative) — also tested to confirm non-exempt still blocked.
+    // Spellcaster also has an action in this scenario, but TK only targets the Seer.
     const events = resolveNightActions(
       {
         [WerewolfRole.TavernKeeper]: {

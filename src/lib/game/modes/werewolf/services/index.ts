@@ -12,6 +12,7 @@ import { getWerewolfModeConfig } from "../lobby-config";
 import type { WerewolfPlayerGameState } from "../player-state";
 import type { WerewolfRoleDefinition } from "../roles";
 import { getWerewolfRole, WerewolfRole } from "../roles";
+import { WerewolfPhase } from "../types";
 import { currentTurnState } from "../utils";
 import { WerewolfWinner } from "../utils/win-condition";
 import {
@@ -68,16 +69,26 @@ function extractNonOwnerState(
   const deadPlayerIds = extractDeadPlayerIds(game);
   const nightActions = extractNightActions(game);
 
-  const nightTargetState = nightActions
-    ? extractPlayerNightState(game, callerId, myRole, deadPlayerIds)
-    : {};
+  const amDead = deadPlayerIds.includes(callerId);
+
+  // Ghost: when dead and it's nighttime, grant narrator-level visibility.
+  const isGhost = myRole.id === WerewolfRole.Ghost;
+  const isNighttime =
+    currentTurnState(game)?.phase.type === WerewolfPhase.Nighttime;
+  const ghostVisible = isGhost && amDead && isNighttime;
+  const ghostNightState =
+    ghostVisible && nightActions ? { ghostVisible: true, nightActions } : {};
+
+  const nightTargetState =
+    nightActions && !ghostVisible
+      ? extractPlayerNightState(game, callerId, myRole, deadPlayerIds)
+      : {};
 
   const daytimeNightState = extractDaytimeNightSummary(game, callerId);
   const daytimePlayerState = extractDaytimePlayerState(game, callerId);
   const ts = currentTurnState(game);
   const monarchKnightingsUsed = ts?.roleState?.monarch?.knightingsUsed;
 
-  const amDead = deadPlayerIds.includes(callerId);
   const visibleDeadPlayerIds = extractVisibleDeadPlayerIds(game, callerId);
 
   // Executioner: surface the target so the player knows who to get eliminated,
@@ -93,8 +104,33 @@ function extractNonOwnerState(
       }
     : {};
 
+  // Alpha Wolf: surface bite status and role conversions to werewolf-team players.
+  // Only include entries where the override is WerewolfRole.Werewolf (Alpha Wolf bites);
+  // Village Drunk sober transitions must not be visible to other players.
+  const isWerewolfTeam = myRole.isWerewolf === true || myRole.team === Team.Bad;
+  const wolfTeamState: Partial<WerewolfPlayerGameState> = {};
+  if (isWerewolfTeam && ts) {
+    if (ts.roleState?.alphaWolf?.biteUsed)
+      wolfTeamState.alphaWolfBiteUsed = true;
+    const biteConversions = ts.roleOverrides
+      ? Object.entries(ts.roleOverrides).filter(
+          ([, newRoleDefinitionId]) =>
+            newRoleDefinitionId === (WerewolfRole.Werewolf as string),
+        )
+      : [];
+    if (biteConversions.length > 0) {
+      wolfTeamState.roleConversions = biteConversions.map(
+        ([playerId, newRoleDefinitionId]) => ({
+          playerId,
+          newRoleDefinitionId,
+        }),
+      );
+    }
+  }
+
   return {
     ...nightTargetState,
+    ...ghostNightState,
     ...daytimeNightState,
     ...daytimePlayerState,
     ...(amDead ? { amDead: true } : {}),
@@ -106,6 +142,7 @@ function extractNonOwnerState(
       : {}),
     ...((monarchKnightingsUsed ?? 0) > 0 ? { monarchKnightingsUsed } : {}),
     ...executionerState,
+    ...wolfTeamState,
   };
 }
 

@@ -1,4 +1,5 @@
 export enum WerewolfAction {
+  AlphaWolfBite = "alpha-wolf-bite",
   CancelTrial = "cancel-trial",
   CastVote = "cast-vote",
   ConfirmNightTarget = "confirm-night-target",
@@ -21,6 +22,7 @@ export enum WerewolfAction {
   StartDay = "start-day",
   StartNight = "start-night",
   StartTrial = "start-trial",
+  SubmitGhostClue = "submit-ghost-clue",
   UnsmitePlayer = "unsmite-player",
   WithdrawNomination = "withdraw-nomination",
 }

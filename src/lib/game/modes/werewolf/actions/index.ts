@@ -1,6 +1,7 @@
 export { WerewolfAction } from "./types";
 import type { GameAction } from "@/lib/types";
 
+import { alphaWolfBiteAction } from "./alpha-wolf-bite";
 import { cancelTrialAction } from "./cancel-trial";
 import { castVoteAction } from "./cast-vote";
 import { confirmNightTargetAction } from "./confirm-night-target";
@@ -22,11 +23,13 @@ import { smitePlayerAction } from "./smite-player";
 import { startDayAction } from "./start-day";
 import { startNightAction } from "./start-night";
 import { startTrialAction } from "./start-trial";
+import { submitGhostClueAction } from "./submit-ghost-clue";
 import { WerewolfAction } from "./types";
 import { unsmitePlayerAction } from "./unsmite-player";
 import { withdrawNominationAction } from "./withdraw-nomination";
 
 export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
+  [WerewolfAction.AlphaWolfBite]: alphaWolfBiteAction,
   [WerewolfAction.CancelTrial]: cancelTrialAction,
   [WerewolfAction.CastVote]: castVoteAction,
   [WerewolfAction.ConfirmNightTarget]: confirmNightTargetAction,
@@ -49,6 +52,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.StartDay]: startDayAction,
   [WerewolfAction.StartNight]: startNightAction,
   [WerewolfAction.StartTrial]: startTrialAction,
+  [WerewolfAction.SubmitGhostClue]: submitGhostClueAction,
   [WerewolfAction.UnsmitePlayer]: unsmitePlayerAction,
   [WerewolfAction.WithdrawNomination]: withdrawNominationAction,
 };

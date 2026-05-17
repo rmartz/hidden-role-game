@@ -9,6 +9,11 @@
  * the main Werewolf types barrel.
  */
 
+export interface AlphaWolfTurnState {
+  /** True once the Alpha Wolf has used their once-per-game bite ability. */
+  biteUsed: boolean;
+}
+
 export interface ArsonistTurnState {
   /** Player IDs that have been doused. Accumulated across nights; reset after an ignite. */
   dousedPlayerIds: string[];
@@ -29,6 +34,11 @@ export interface ExposerTurnState {
   abilityUsed?: true;
   /** The role publicly revealed by the Exposer. */
   reveal?: { playerId: string; roleId: string };
+}
+
+export interface GhostTurnState {
+  /** Ghost clues submitted during daytime. Each entry records the turn number and clue text. */
+  clues: { turn: number; clue: string }[];
 }
 
 export interface HunterTurnState {

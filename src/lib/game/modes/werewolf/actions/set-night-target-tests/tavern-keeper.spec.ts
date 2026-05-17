@@ -24,7 +24,7 @@ describe("WerewolfAction.SetNightTarget — Tavern Keeper", () => {
     expect(action.isValid(game, "p2", { targetPlayerId: "p1" })).toBe(true);
   });
 
-  it("allows the owner to set a target for the TK phase", () => {
+  it("allows the owner to set a target for the Seer phase", () => {
     const ts = makeNightState({
       turn: 2,
       nightPhaseOrder: [WerewolfRole.Seer],

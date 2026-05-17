@@ -91,6 +91,13 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   mercenaryAlsoWins?: boolean;
   /** Executioner: target player ID. */
   executionerTargetId?: string;
+  /** Whether the Alpha Wolf has used their once-per-game bite ability. */
+  alphaWolfBiteUsed?: boolean;
+  /**
+   * Players whose roles have been changed mid-game (Alpha Wolf bite).
+   * Visible to Werewolf-team players so they know who was converted.
+   */
+  roleConversions?: { playerId: string; newRoleDefinitionId: string }[];
   /**
    * True when the player was tapped by The Thing this night.
    * Present only for the tapped player; cleared each night.
@@ -109,6 +116,21 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   adjacentPlayerIds?: string[];
   /** Hunter revenge pending: the Hunter's player ID. Narrator-only. */
   hunterRevengePlayerId?: string;
+  /**
+   * Ghost clues submitted by the Ghost player, visible to all during daytime.
+   * Each entry records the turn number and clue text.
+   */
+  ghostClues?: { turn: number; clue: string }[];
+  /**
+   * True when the player is the Ghost and has already submitted a clue this turn.
+   * Used to disable the clue submission UI.
+   */
+  ghostClueSubmittedThisTurn?: boolean;
+  /**
+   * True when this player is the Ghost — enables the nighttime observer view
+   * with narrator-level visibility into all night actions.
+   */
+  ghostVisible?: boolean;
   /**
    * Role IDs that were randomly removed from the game at start (Narrator-only).
    * Present only when hiddenRoleCount > 0 in modeConfig.
