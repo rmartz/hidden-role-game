@@ -349,6 +349,20 @@ export const WEREWOLF_COPY = {
         ? "The Evil Empath revealed: Seer was adjacent to a Werewolf."
         : "The Evil Empath revealed: Seer was not adjacent to a Werewolf.",
   },
+  ghost: {
+    clueHeading: "Leave a clue for the living",
+    clueInputPlaceholder: "Enter a word or letter…",
+    clueInputLabel: "Clue (max 20 characters)",
+    clueSubmitButton: "Submit Clue",
+    clueAlreadySubmitted: "You have already left a clue this turn.",
+    clueListHeading: "Ghost Clues",
+    clueTurn: (turn: number, clue: string) => `Turn ${String(turn)}: ${clue}`,
+    nightObserverHeading: "Observing the night…",
+    nightObserverSubtext:
+      "As a Ghost you can watch all activity, but cannot act.",
+    targetSkipped: "skipped",
+    targetNone: "—",
+  },
   illusionArtist: {
     targetLabel: "Illusion target",
     narratorTargetLabel: (name: string) => `Illusion Artist targeted: ${name}`,

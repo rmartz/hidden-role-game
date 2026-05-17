@@ -235,6 +235,24 @@ Additional resolution steps:
 
 ---
 
+### `submit-ghost-clue`
+
+**Who:** Ghost player only (dead player with Ghost role)
+**When:** During Daytime
+**Effect:** Records a clue from the Ghost player into `WerewolfTurnState.roleState.ghost.clues`. The clue is visible to all living players for the rest of the game.
+
+**Payload:** `{ clue: string }`
+
+**Validation:**
+
+- Caller must be dead.
+- Caller must have the Ghost role.
+- Game must be in Daytime phase.
+- Clue must be a non-empty string of at most 20 characters.
+- Caller may only submit one clue per turn.
+
+---
+
 ### `pause-timer`
 
 **Who:** Narrator only
@@ -303,6 +321,7 @@ Additional resolution steps:
 | `kill-player`                 | Narrator                  | `{ playerId: string }`                                 |
 | `set-illusion-target`         | Illusion Artist player    | `{ targetPlayerId: string }`                           |
 | `confirm-evil-empath-result`  | Narrator                  | none                                                   |
+| `submit-ghost-clue`           | Ghost (dead player)       | `{ clue: string }`                                     |
 | `pause-timer`                 | Narrator                  | none                                                   |
 | `resume-timer`                | Narrator                  | none                                                   |
 

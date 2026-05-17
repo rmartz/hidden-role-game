@@ -529,7 +529,7 @@ export function OwnerGameNightScreen({
                   </div>
                 </div>
               )}
-              {(!isWitchAbilitySkipped || abilityBypass) && (
+              {(!isWitchAbilitySkipped || abilityBypass) && !isEvilEmpathPhase && (
                 <OwnerNightTargetPanel
                   groupAction={!!groupAction}
                   groupMemberCount={activePlayerNames.length}

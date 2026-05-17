@@ -14,6 +14,7 @@ import { ELUSIVE_SEER_ROLE } from "./elusive-seer";
 import { EVIL_EMPATH_ROLE } from "./evil-empath";
 import { EXECUTIONER_ROLE } from "./executioner";
 import { EXPOSER_ROLE } from "./exposer";
+import { GHOST_ROLE } from "./ghost";
 import { HUNTER_ROLE } from "./hunter";
 import { ILLUMINATI_ROLE } from "./illuminati";
 import { ILLUSION_ARTIST_ROLE } from "./illusion-artist";
@@ -62,6 +63,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
   [WerewolfRole.EvilEmpath]: EVIL_EMPATH_ROLE,
   [WerewolfRole.Executioner]: EXECUTIONER_ROLE,
   [WerewolfRole.Exposer]: EXPOSER_ROLE,
+  [WerewolfRole.Ghost]: GHOST_ROLE,
   [WerewolfRole.Hunter]: HUNTER_ROLE,
   [WerewolfRole.Illuminati]: ILLUMINATI_ROLE,
   [WerewolfRole.IllusionArtist]: ILLUSION_ARTIST_ROLE,

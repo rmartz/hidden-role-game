@@ -4,6 +4,7 @@ import type {
   EvilEmpathTurnState,
   ExecutionerTurnState,
   ExposerTurnState,
+  GhostTurnState,
   HunterTurnState,
   IllusionArtistTurnState,
   MercenaryTurnState,
@@ -25,6 +26,7 @@ export type {
   EvilEmpathTurnState,
   ExecutionerTurnState,
   ExposerTurnState,
+  GhostTurnState,
   HunterTurnState,
   IllusionArtistTurnState,
   MercenaryTurnState,
@@ -230,6 +232,7 @@ export interface WerewolfRoleTurnState {
   evilEmpath?: EvilEmpathTurnState;
   executioner?: ExecutionerTurnState;
   exposer?: ExposerTurnState;
+  ghost?: GhostTurnState;
   hunter?: HunterTurnState;
   illusionArtist?: IllusionArtistTurnState;
   mercenary?: MercenaryTurnState;
