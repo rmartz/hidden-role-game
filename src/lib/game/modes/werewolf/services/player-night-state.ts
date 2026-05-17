@@ -477,7 +477,12 @@ function extractInsomniacState(
       const vote = action.votes.find((v) => v.playerId === neighborId);
       return vote !== undefined && !vote.skipped;
     }
-    return !action.skipped && action.targetPlayerId !== undefined;
+    // alerted: true (Veteran alert action) counts as acting even though it
+    // has no targetPlayerId.
+    return (
+      !action.skipped &&
+      (action.targetPlayerId !== undefined || action.alerted === true)
+    );
   };
 
   return {

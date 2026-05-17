@@ -146,5 +146,57 @@ describe("resolveNightActions", () => {
         died: false,
       });
     });
+    it("Swapper redirects wolf attack onto alerted Veteran: wolf is counter-killed, Veteran survives", () => {
+      // The wolves target p1, but Swapper swaps p1 and vet1, so the wolf attack
+      // ends up on the Veteran. Since Veteran resolution runs after Swapper,
+      // the post-swap attacks map is used — the wolf is counter-killed correctly.
+      const swapperAssignments = [
+        { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "vet1", roleDefinitionId: WerewolfRole.Veteran },
+        { playerId: "swap1", roleDefinitionId: WerewolfRole.Swapper },
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+      ];
+
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Werewolf]: {
+            votes: [{ playerId: "w1", targetPlayerId: "p1" }],
+            suggestedTargetId: "p1",
+          },
+          // Swapper swaps p1 and vet1, so the wolf attack moves to vet1.
+          [WerewolfRole.Swapper]: {
+            targetPlayerId: "p1",
+            secondTargetPlayerId: "vet1",
+          },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        swapperAssignments,
+        [],
+      );
+
+      // Veteran was targeted via Swapper and is alerted — wolf counter-killed.
+      const vetEvent = findKilled(events, "vet1");
+      expect(vetEvent).toBeUndefined();
+
+      const wolfEvent = findKilled(events, "w1");
+      expect(wolfEvent).toMatchObject({
+        died: true,
+        attackedBy: expect.arrayContaining([WerewolfRole.Veteran]),
+      });
+
+      const counterkilledEvent = events.find(
+        (e) => e.type === "veteran-counterkilled",
+      );
+      expect(counterkilledEvent).toMatchObject({
+        type: "veteran-counterkilled",
+        counterkilledPlayerId: "w1",
+        veteranPlayerId: "vet1",
+        source: "wolf-repel",
+      });
+
+      // p1 is not killed (attack was swapped away).
+      const p1Event = findKilled(events, "p1");
+      expect(p1Event).toBeUndefined();
+    });
   });
 });

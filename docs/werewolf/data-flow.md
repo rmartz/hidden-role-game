@@ -179,7 +179,7 @@ Narrator starts day (start-day)
     6. Apply Swapper action (swaps attacks/protections between two targets; cancels stale Altruist intercept)
     7. Apply Veteran counter-kill (after Altruist and Swapper, so neither can intercept the counter-kill):
        - Wolf repel: wolf attack on alerted Veteran removed, one wolf counter-killed
-       - Visitor kill: Protect/Attack roles and Mirrorcaster that physically visited the Veteran are counter-killed
+       - Visitor kill: Protect/Attack roles, Mirrorcaster, and uncharged Mercenary (Protect mode) that physically visited the Veteran are counter-killed; charged Mercenary is exempt
     8. Build kill events from the final attack/protect state (protected → survived, else → killed)
     9. Apply Smite (forced death regardless of protections)
    10. Check Old Man timer

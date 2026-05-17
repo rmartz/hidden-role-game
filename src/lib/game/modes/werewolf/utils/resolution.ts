@@ -6,7 +6,6 @@ import type {
   AnyNightAction,
   NightAction,
   NightResolutionEvent,
-  TeamNightAction,
 } from "../types";
 import { isTeamNightAction, TargetCategory } from "../types";
 import { baseGroupPhaseKey, isGroupPhaseKey, isRoleActive } from "./phase-keys";
@@ -518,20 +517,18 @@ export function resolveNightActions(
     )?.playerId;
 
     if (veteranPlayerId) {
-      // Werewolf attack repel: if a wolf group targeted the Veteran, remove
-      // that attack and counterkill one alive wolf participant instead.
+      // Werewolf attack repel: if a wolf group's attack is currently on the
+      // Veteran (post-Swapper), remove it and counter-kill one alive wolf
+      // participant instead. Iterating over the attacks map (rather than
+      // nightActions.suggestedTargetId) ensures Swapper-redirected wolf
+      // attacks are caught as well as directly-targeted ones.
       // Track already-selected victims so multiple wolf-group phases don't
       // select the same wolf when there are bonus attack keys (e.g. Wolf Cub).
       const selectedWolfVictimIds = new Set<string>();
-      for (const [phaseKey, action] of Object.entries(nightActions)) {
-        if (!isGroupPhaseKey(phaseKey)) continue;
-        const groupAction = action as TeamNightAction;
-        if (groupAction.suggestedTargetId !== veteranPlayerId) continue;
-
-        // If the attack was already redirected away from the Veteran (e.g. by the
-        // Altruist), it is no longer in the attacks map — skip the counter-kill.
-        if (!attacks.get(veteranPlayerId)?.includes(phaseKey)) continue;
-
+      const wolfPhaseKeysOnVeteran = [
+        ...(attacks.get(veteranPlayerId) ?? []),
+      ].filter(isGroupPhaseKey);
+      for (const phaseKey of wolfPhaseKeysOnVeteran) {
         // Remove this wolf-group's attack entry from the Veteran.
         removeFromMapSet(attacks, veteranPlayerId, phaseKey);
 

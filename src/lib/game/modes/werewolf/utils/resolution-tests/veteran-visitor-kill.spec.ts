@@ -204,5 +204,69 @@ describe("resolveNightActions", () => {
         source: "visitor",
       });
     });
+    it("alerts and uncharged Mercenary targets Veteran: Mercenary is counter-killed", () => {
+      // Uncharged Mercenary acts as a physical Protect visit — it should be
+      // counter-killed like a Bodyguard.
+      const mercenaryAssignments = [
+        { playerId: "vet1", roleDefinitionId: WerewolfRole.Veteran },
+        { playerId: "merc1", roleDefinitionId: WerewolfRole.Mercenary },
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+      ];
+
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Mercenary]: { targetPlayerId: "vet1" },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        mercenaryAssignments,
+        [],
+        undefined,
+        { mercenaryCharged: false },
+      );
+
+      const mercKilled = findKilled(events, "merc1");
+      expect(mercKilled).toMatchObject({
+        died: true,
+        attackedBy: expect.arrayContaining([WerewolfRole.Veteran]),
+      });
+
+      const vetKilled = findKilled(events, "vet1");
+      expect(vetKilled).toBeUndefined();
+
+      expect(
+        events.find((e) => e.type === "veteran-counterkilled"),
+      ).toMatchObject({
+        counterkilledPlayerId: "merc1",
+        veteranPlayerId: "vet1",
+        source: "visitor",
+      });
+    });
+
+    it("alerts and charged Mercenary targets Veteran: Mercenary is NOT counter-killed", () => {
+      // Charged Mercenary acts as Bribe — no physical visit, so exempt.
+      const mercenaryAssignments = [
+        { playerId: "vet1", roleDefinitionId: WerewolfRole.Veteran },
+        { playerId: "merc1", roleDefinitionId: WerewolfRole.Mercenary },
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+      ];
+
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Mercenary]: { targetPlayerId: "vet1" },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        mercenaryAssignments,
+        [],
+        undefined,
+        { mercenaryCharged: true },
+      );
+
+      const mercKilled = findKilled(events, "merc1");
+      expect(mercKilled).toBeUndefined();
+
+      expect(
+        events.find((e) => e.type === "veteran-counterkilled"),
+      ).toBeUndefined();
+    });
   });
 });
