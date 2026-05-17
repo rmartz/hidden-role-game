@@ -52,7 +52,7 @@ export const useMartyrAbilityAction: GameAction = {
     if (ts?.phase.type !== WerewolfPhase.Daytime) return;
     if (!ts.phase.pendingGuiltId) return;
 
-    // Resolve the Martyr player ID.
+    // Resolve the Martyr player ID — always from roleAssignments since Martyr is unique.
     const martyrAssignment = game.roleAssignments.find(
       (a) => a.roleDefinitionId === (WerewolfRole.Martyr as string),
     );
