@@ -566,6 +566,8 @@ export function resolveNightActions(
       // or non-physical means and are not counter-killed.
       // Mirrorcaster is classified as Special but effectively acts as Protect
       // (uncharged) or Attack (charged) — treat it as a physical visitor.
+      // Mercenary is classified as Special but acts as Protect when uncharged
+      // (Protect mode) — treat it as a physical visitor in that mode.
       for (const [phaseKey, action] of Object.entries(nightActions)) {
         if (isGroupPhaseKey(phaseKey)) continue;
         if (isRoleActive(phaseKey, WerewolfRole.Priest)) continue;
@@ -575,7 +577,11 @@ export function resolveNightActions(
         if (
           role?.targetCategory !== TargetCategory.Protect &&
           role?.targetCategory !== TargetCategory.Attack &&
-          !isRoleActive(phaseKey, WerewolfRole.Mirrorcaster)
+          !isRoleActive(phaseKey, WerewolfRole.Mirrorcaster) &&
+          !(
+            isRoleActive(phaseKey, WerewolfRole.Mercenary) &&
+            !options?.mercenaryCharged
+          )
         )
           continue;
 

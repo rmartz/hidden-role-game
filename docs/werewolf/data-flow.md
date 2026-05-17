@@ -78,6 +78,8 @@ These fields are only populated when the active phase matches the player's role.
 | `monarchKnightedPlayerIds`  | All players                                         | Public list of knighted players                                                                                                                                                           |
 | `monarchKnightingsUsed`     | All players                                         | Number of knightings used by the Monarch (0-3)                                                                                                                                            |
 | `arsonistDousedPlayerIds`   | Arsonist                                            | List of player IDs currently doused by the Arsonist; shown to the Arsonist at night. Reset after an ignite (self-target).                                                                 |
+| `veteranAlertsUsed`         | Veteran                                             | Number of nights the Veteran has chosen to Alert so far this game (0–3 max)                                                                                                               |
+| `myNightAlerted`            | Veteran                                             | Whether the Veteran has toggled Alert on for this night (`true` when alerted, `undefined` when not)                                                                                       |
 
 ### Player Fields — Daytime (day start)
 
