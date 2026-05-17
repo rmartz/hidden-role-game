@@ -3,7 +3,12 @@ import { GameStatus } from "@/lib/types";
 
 import { WerewolfRole } from "../roles";
 import { WerewolfPhase } from "../types";
-import { checkWinCondition, currentTurnState, WerewolfWinner } from "../utils";
+import {
+  checkWinCondition,
+  currentTurnState,
+  WerewolfWinner,
+  withMercenaryCoWin,
+} from "../utils";
 import { cleanupAfterDaytimeKill, didWolfCubDie } from "./helpers";
 
 /**
@@ -42,18 +47,17 @@ export const useMartyrAbilityAction: GameAction = {
     if (ts.phase.pendingGuiltId === martyrId) return false;
     return true;
   },
-  apply(game: Game, _payload: unknown, callerId: string) {
+  apply(game: Game) {
     const ts = currentTurnState(game);
     if (ts?.phase.type !== WerewolfPhase.Daytime) return;
     if (!ts.phase.pendingGuiltId) return;
 
-    // Resolve the Martyr player ID (narrator acts on their behalf when isOwner).
+    // Resolve the Martyr player ID.
     const martyrAssignment = game.roleAssignments.find(
       (a) => a.roleDefinitionId === (WerewolfRole.Martyr as string),
     );
     if (!martyrAssignment) return;
-    const martyrId =
-      callerId === game.ownerPlayerId ? martyrAssignment.playerId : callerId;
+    const martyrId = martyrAssignment.playerId;
 
     // Convicted player is spared; Martyr dies instead.
     ts.phase.pendingGuiltId = undefined;
@@ -79,10 +83,11 @@ export const useMartyrAbilityAction: GameAction = {
         executionerAssignment !== undefined &&
         !ts.deadPlayerIds.includes(executionerAssignment.playerId);
       if (executionerAlive) {
-        game.status = {
-          type: GameStatus.Finished,
-          winner: WerewolfWinner.Executioner,
-        };
+        game.status = withMercenaryCoWin(
+          { type: GameStatus.Finished, winner: WerewolfWinner.Executioner },
+          game,
+          ts.deadPlayerIds,
+        );
         return;
       }
     }

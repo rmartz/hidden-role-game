@@ -280,6 +280,33 @@ describe("WerewolfAction.UseMartyrAbility", () => {
       );
     });
 
+    it("Mercenary co-wins with Executioner when Martyr is the Executioner's target and self-sacrifices", () => {
+      const ts: WerewolfTurnState = {
+        ...makeDayStateWithMartyrWindow("p3"),
+        roleState: {
+          executioner: { targetId: "p2" },
+          mercenary: { charged: false, bribedPlayerIds: ["p4"] },
+        },
+      };
+      const game = makePlayingGame(ts, {
+        roleAssignments: [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Martyr },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p4", roleDefinitionId: WerewolfRole.Executioner },
+          { playerId: "p5", roleDefinitionId: WerewolfRole.Mercenary },
+        ],
+      });
+      action.apply(game, {}, "p2");
+      expect(game.status.type).toBe(GameStatus.Finished);
+      expect((game.status as { winner?: string }).winner).toBe(
+        WerewolfWinner.Executioner,
+      );
+      expect(
+        (game.status as { victoryConditionKey?: string }).victoryConditionKey,
+      ).toBe(WerewolfWinner.Mercenary);
+    });
+
     it("narrator (owner) acting on behalf of Martyr kills the Martyr, not the narrator", () => {
       const ts = makeDayStateWithMartyrWindow("p3");
       const game = makeGameWithMartyr(ts, "p2");
