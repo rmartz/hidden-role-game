@@ -11,7 +11,7 @@ import type {
   SilencedNightResolutionEvent,
 } from "../types";
 import { isTeamNightAction, TargetCategory } from "../types";
-import { isGroupPhaseKey, isRoleActive } from "./phase-keys";
+import { baseGroupPhaseKey, isGroupPhaseKey, isRoleActive } from "./phase-keys";
 import { getGroupPhasePlayerIds } from "./targeting";
 
 export const SMITE_PHASE_KEY = "__narrator_smite__";
@@ -375,10 +375,18 @@ export function resolveNightActions(
       targetRole &&
       targetRole.targetCategory !== TargetCategory.Investigate
     ) {
-      const blockedPhaseKey = (targetRole.wakesWith ?? targetRole.id) as string;
-      resolvedNightActions = Object.fromEntries(
-        Object.entries(nightActions).filter(([k]) => k !== blockedPhaseKey),
-      );
+      if (!targetRole.wakesWith) {
+        // Target has a solo phase — remove it (including any suffixed repeat keys).
+        const blockedPhaseKey = targetRole.id as string;
+        resolvedNightActions = Object.fromEntries(
+          Object.entries(nightActions).filter(
+            ([k]) => baseGroupPhaseKey(k) !== blockedPhaseKey,
+          ),
+        );
+      }
+      // If the target wakes with a group phase (wakesWith is set), removing
+      // that group phase would cancel all teammates' actions. Skip phase removal
+      // and emit the hangover only.
       hangoverEvents.push({ type: "hangover", targetPlayerId: tkTarget });
     }
   }

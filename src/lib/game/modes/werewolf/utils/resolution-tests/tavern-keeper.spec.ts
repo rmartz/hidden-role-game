@@ -6,6 +6,7 @@ import { resolveNightActions } from "../resolution";
 const assignments = [
   { playerId: "tk1", roleDefinitionId: WerewolfRole.TavernKeeper },
   { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+  { playerId: "wc1", roleDefinitionId: WerewolfRole.WolfCub },
   { playerId: "bg1", roleDefinitionId: WerewolfRole.Bodyguard },
   { playerId: "sc1", roleDefinitionId: WerewolfRole.Spellcaster },
   { playerId: "seer1", roleDefinitionId: WerewolfRole.Seer },
@@ -167,5 +168,28 @@ describe("resolveNightActions — Tavern Keeper hangover mechanic", () => {
       (e) => e.type === "hangover" && e.targetPlayerId === "p1",
     );
     expect(hangover).toBeUndefined();
+  });
+
+  it("emits hangover but does not cancel the group attack when TK targets a wakesWith role (Wolf Cub)", () => {
+    // Wolf Cub wakes with Werewolf — TK targets Wolf Cub.
+    // The Werewolf group phase must NOT be removed (would cancel all wolves' attack).
+    // A hangover event should still be emitted for the Wolf Cub.
+    const events = resolveNightActions(
+      {
+        [WerewolfRole.TavernKeeper]: { targetPlayerId: "wc1", confirmed: true },
+        [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
+      },
+      assignments,
+      [],
+    );
+    const hangover = events.find(
+      (e) => e.type === "hangover" && e.targetPlayerId === "wc1",
+    );
+    expect(hangover).toBeDefined();
+    // Wolves' attack on p1 must still resolve
+    const killed = events.find(
+      (e) => e.type === "killed" && e.targetPlayerId === "p1",
+    );
+    expect(killed?.type === "killed" && killed.died).toBe(true);
   });
 });

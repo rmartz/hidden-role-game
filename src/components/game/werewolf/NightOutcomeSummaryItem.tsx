@@ -1,6 +1,8 @@
 import type { NightResolutionEvent } from "@/lib/game/modes/werewolf";
 import { getPhaseLabel } from "@/lib/game/modes/werewolf";
 
+import { NIGHT_OUTCOME_SUMMARY_ITEM_COPY } from "./NightOutcomeSummaryItem.copy";
+
 interface NightOutcomeSummaryItemProps {
   playerName: string;
   events?: NightResolutionEvent[];
@@ -47,7 +49,7 @@ export function NightOutcomeSummaryItem({
             className={
               killedEvent.died
                 ? "ml-1 text-destructive font-medium"
-                : "ml-1 text-green-600 font-medium"
+                : "ml-1 text-green-800 font-medium"
             }
           >
             {killedEvent.died ? "(killed)" : "(survived)"}
@@ -55,16 +57,16 @@ export function NightOutcomeSummaryItem({
         </>
       )}
       {toughGuyAbsorbed && (
-        <span className="ml-1 text-orange-600 font-medium">
+        <span className="ml-1 text-orange-800 font-medium">
           (Tough Guy absorbed)
         </span>
       )}
       {silenced && (
-        <span className="ml-1 text-yellow-600 font-medium">(silenced)</span>
+        <span className="ml-1 text-yellow-800 font-medium">(silenced)</span>
       )}
       {hangover && (
-        <span className="ml-1 text-amber-600 font-medium">
-          (awakes with a hangover)
+        <span className="ml-1 text-amber-800 font-medium">
+          {NIGHT_OUTCOME_SUMMARY_ITEM_COPY.hangover}
         </span>
       )}
       {knighted && (
