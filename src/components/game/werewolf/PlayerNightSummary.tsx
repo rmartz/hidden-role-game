@@ -3,6 +3,7 @@
 import groupBy from "lodash/groupBy";
 
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
+import { VeteranCounterkillSource } from "@/lib/game/modes/werewolf/types";
 import { getPlayerName } from "@/lib/player";
 import type { PlayerGameState } from "@/server/types";
 import type { DaytimeNightStatusEntry } from "@/server/types";
@@ -33,6 +34,22 @@ export function PlayerNightSummary({
         ? (getPlayerName(players, altruistEntry.savedPlayerId) ?? "a player")
         : undefined;
 
+      const veteranCounterkillEntry = entries.find(
+        (
+          e,
+        ): e is DaytimeNightStatusEntry & {
+          veteranPlayerId: string;
+          veteranCounterkillSource: VeteranCounterkillSource;
+        } =>
+          e.effect === "veteran-counterkill" &&
+          "veteranPlayerId" in e &&
+          typeof e.veteranPlayerId === "string",
+      );
+      const veteranName = veteranCounterkillEntry
+        ? (getPlayerName(players, veteranCounterkillEntry.veteranPlayerId) ??
+          "The Veteran")
+        : undefined;
+
       const exposedEntry = entries.find((e) => e.effect === "exposed");
       const exposedRoleName =
         exposedEntry && "roleName" in exposedEntry
@@ -54,6 +71,9 @@ export function PlayerNightSummary({
         hypnotized: entries.some((e) => e.effect === "hypnotized"),
         smited: entries.some((e) => e.effect === "smited"),
         peaceful: entries.some((e) => e.effect === "peaceful"),
+        veteranCounterkillSource:
+          veteranCounterkillEntry?.veteranCounterkillSource,
+        veteranName,
         exposedRoleName,
       };
     },
@@ -79,6 +99,8 @@ export function PlayerNightSummary({
             hypnotized,
             smited,
             peaceful,
+            veteranCounterkillSource,
+            veteranName,
             exposedRoleName,
           }) => (
             <PlayerNightSummaryItem
@@ -96,6 +118,8 @@ export function PlayerNightSummary({
               peaceful={peaceful}
               exposedRoleName={exposedRoleName}
               isMe={myPlayerId === targetPlayerId}
+              veteranCounterkillSource={veteranCounterkillSource}
+              veteranName={veteranName}
             />
           ),
         )}
