@@ -1,6 +1,7 @@
 import { getPlayer } from "@/lib/player";
 import type { Game, GameAction } from "@/lib/types";
 
+import { VETERAN_ALERTS_LIMIT } from "../constants";
 import { getWerewolfRole, WerewolfRole } from "../roles";
 import type { TeamNightAction } from "../types";
 import { isTeamNightAction, TargetCategory, WerewolfPhase } from "../types";
@@ -27,10 +28,12 @@ export const setNightTargetAction: GameAction = {
     const {
       roleId: explicitPhaseKey,
       targetPlayerId,
+      alerted,
       isSecondTarget,
     } = payload as {
       roleId?: unknown;
       targetPlayerId?: unknown;
+      alerted?: unknown;
       isSecondTarget?: unknown;
     };
 
@@ -75,6 +78,23 @@ export const setNightTargetAction: GameAction = {
       )
         return false;
     }
+
+    // Veteran: only alert (alerted: true) or skip/clear (null/undefined) are valid.
+    // A targetPlayerId string is rejected to prevent inadvertent alert triggering.
+    // Alerting is blocked once the Veteran has used all 3 of their alerts.
+    if (isRoleActive(phaseKey, WerewolfRole.Veteran)) {
+      if (alerted === true) {
+        if (targetPlayerId !== undefined && targetPlayerId !== null)
+          return false;
+        if ((ts.roleState?.veteran?.alertsUsed ?? 0) >= VETERAN_ALERTS_LIMIT)
+          return false;
+        return true;
+      }
+      if (targetPlayerId === undefined) return true;
+      if (targetPlayerId === null) return true;
+      return false;
+    }
+    if (alerted === true) return false;
 
     // targetPlayerId undefined = clear; null = intentional skip; string = set target.
     if (targetPlayerId === undefined) return true;
@@ -230,15 +250,24 @@ export const setNightTargetAction: GameAction = {
       roleId: explicitPhaseKey,
       targetPlayerId,
       isSecondTarget,
+      alerted,
     } = payload as {
       roleId?: string;
       targetPlayerId?: string | null;
       isSecondTarget?: boolean;
+      alerted?: boolean;
     };
 
     const phaseKey =
       explicitPhaseKey ?? phase.nightPhaseOrder[phase.currentPhaseIndex];
     if (!phaseKey) return;
+
+    // Veteran Alert: store an explicit alerted flag so resolution can distinguish
+    // alerting from other empty solo actions.
+    if (alerted === true) {
+      phase.nightActions[phaseKey] = { alerted: true };
+      return;
+    }
 
     if (isGroupPhaseKey(phaseKey)) {
       // Group phase: upsert a player's vote.

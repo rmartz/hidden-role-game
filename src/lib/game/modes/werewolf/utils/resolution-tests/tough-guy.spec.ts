@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 
 import { WerewolfRole } from "../../roles";
-import { resolveNightActions } from "../resolution";
+import {
+  OLD_MAN_TIMER_KEY,
+  resolveNightActions,
+  SMITE_PHASE_KEY,
+} from "../resolution";
+import { findKilled } from "./helpers";
 
 describe("resolveNightActions", () => {
   describe("Tough Guy", () => {
@@ -63,6 +68,40 @@ describe("resolveNightActions", () => {
       expect(killedEvent).toMatchObject({ died: false });
       const absorbedEvent = events.find((e) => e.type === "tough-guy-absorbed");
       expect(absorbedEvent).toBeUndefined();
+    });
+
+    it("Smite death cannot be absorbed by Tough Guy", () => {
+      const events = resolveNightActions({}, toughGuyAssignments, [], ["tg1"]);
+      const killedEvent = findKilled(events, "tg1");
+      expect(killedEvent).toMatchObject({
+        attackedBy: [SMITE_PHASE_KEY],
+        died: true,
+      });
+      expect(
+        events.find((e) => e.type === "tough-guy-absorbed"),
+      ).toBeUndefined();
+    });
+
+    it("Old Man timer death cannot be absorbed by Tough Guy", () => {
+      const toughGuyOldManAssignments = [
+        { playerId: "tg1", roleDefinitionId: WerewolfRole.ToughGuy },
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+      ];
+      const events = resolveNightActions(
+        {},
+        toughGuyOldManAssignments,
+        [],
+        undefined,
+        { oldManTimerPlayerId: "tg1" },
+      );
+      const killedEvent = findKilled(events, "tg1");
+      expect(killedEvent).toMatchObject({
+        attackedBy: [OLD_MAN_TIMER_KEY],
+        died: true,
+      });
+      expect(
+        events.find((e) => e.type === "tough-guy-absorbed"),
+      ).toBeUndefined();
     });
   });
 });

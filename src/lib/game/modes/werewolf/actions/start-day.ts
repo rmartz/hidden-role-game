@@ -432,6 +432,16 @@ export const startDayAction: GameAction = {
         ? [...existingInfected, zombieAction.targetPlayerId]
         : existingInfected;
 
+    // Veteran alert usage tracking: increment once per night the Veteran alerts.
+    const veteranNightAction = nightPhase.nightActions[WerewolfRole.Veteran];
+    const veteranAlertedThisNight =
+      veteranNightAction !== undefined &&
+      !isTeamNightAction(veteranNightAction) &&
+      veteranNightAction.alerted === true;
+    const veteranAlertsUsed =
+      (ts.roleState?.veteran?.alertsUsed ?? 0) +
+      (veteranAlertedThisNight ? 1 : 0);
+
     // The Thing tap: record the tapped player ID so they see the notification
     // during the following daytime.
     const thingAction = nightPhase.nightActions[WerewolfRole.TheThing];
@@ -530,6 +540,9 @@ export const startDayAction: GameAction = {
         : {}),
       ...(arsonistDousedPlayerIds.length > 0
         ? { arsonist: { dousedPlayerIds: arsonistDousedPlayerIds } }
+        : {}),
+      ...(veteranAlertsUsed > 0
+        ? { veteran: { alertsUsed: veteranAlertsUsed } }
         : {}),
     };
 

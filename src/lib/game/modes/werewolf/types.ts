@@ -14,6 +14,7 @@ import type {
   PriestTurnState,
   TheThingTurnState,
   ToughGuyTurnState,
+  VeteranTurnState,
   WitchTurnState,
   WolfCubTurnState,
   ZombieTurnState,
@@ -35,6 +36,7 @@ export type {
   PriestTurnState,
   TheThingTurnState,
   ToughGuyTurnState,
+  VeteranTurnState,
   WitchTurnState,
   WolfCubTurnState,
   ZombieTurnState,
@@ -51,6 +53,8 @@ export type NightAction = {
   resultRevealed?: boolean;
   /** For Mentalist only: the second target player ID. */
   secondTargetPlayerId?: string;
+  /** True when the Veteran has chosen to be on alert this night. */
+  alerted?: boolean;
 } & (
   | { targetPlayerId: string; skipped?: never }
   | { skipped: true; targetPlayerId?: never }
@@ -137,13 +141,31 @@ export interface SwapperSwappedNightResolutionEvent {
   secondPlayerId: string;
 }
 
+export enum VeteranCounterkillSource {
+  Visitor = "visitor",
+  WolfRepel = "wolf-repel",
+}
+
+export interface VeteranCounterkilledNightResolutionEvent {
+  type: "veteran-counterkilled";
+  /** The player targeted by the Veteran's counter-kill. */
+  counterkilledPlayerId: string;
+  /** The Veteran player who counter-killed. */
+  veteranPlayerId: string;
+  /** Whether the counter-kill was from repelling a wolf attack or killing a visiting player. */
+  source: VeteranCounterkillSource;
+  /** Whether the counter-killed player actually died (false if saved by a protection or Tough Guy absorption). */
+  died: boolean;
+}
+
 export type NightResolutionEvent =
   | AttackNightResolutionEvent
   | SilencedNightResolutionEvent
   | HypnotizedNightResolutionEvent
   | ToughGuyAbsorbedNightResolutionEvent
   | AltruistInterceptedNightResolutionEvent
-  | SwapperSwappedNightResolutionEvent;
+  | SwapperSwappedNightResolutionEvent
+  | VeteranCounterkilledNightResolutionEvent;
 
 export enum DaytimeVote {
   Guilty = "guilty",
@@ -240,6 +262,7 @@ export interface WerewolfRoleTurnState {
   priest?: PriestTurnState;
   theThing?: TheThingTurnState;
   toughGuy?: ToughGuyTurnState;
+  veteran?: VeteranTurnState;
   witch?: WitchTurnState;
   wolfCub?: WolfCubTurnState;
   zombie?: ZombieTurnState;

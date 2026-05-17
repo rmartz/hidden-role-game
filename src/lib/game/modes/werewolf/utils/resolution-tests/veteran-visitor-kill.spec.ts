@@ -1,0 +1,301 @@
+import { describe, expect, it } from "vitest";
+
+import { WerewolfRole } from "../../roles";
+import { VeteranCounterkillSource } from "../../types";
+import { resolveNightActions } from "../resolution";
+import { findKilled } from "./helpers";
+
+describe("resolveNightActions", () => {
+  describe("Veteran — visitor counter-kill", () => {
+    const veteranAssignments = [
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "vet1", roleDefinitionId: WerewolfRole.Veteran },
+      { playerId: "bg1", roleDefinitionId: WerewolfRole.Bodyguard },
+      { playerId: "doc1", roleDefinitionId: WerewolfRole.Doctor },
+      { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+    ];
+
+    it("alerts and Bodyguard visits: Bodyguard dies, Veteran survives unprotected", () => {
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Bodyguard]: { targetPlayerId: "vet1" },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        veteranAssignments,
+        [],
+      );
+
+      const bgEvent = findKilled(events, "bg1");
+      expect(bgEvent).toMatchObject({
+        died: true,
+        attackedBy: expect.arrayContaining([WerewolfRole.Veteran]),
+      });
+
+      const vetEvent = findKilled(events, "vet1");
+      expect(vetEvent).toBeUndefined();
+
+      const counterkilledEvent = events.find(
+        (e) => e.type === "veteran-counterkilled",
+      );
+      expect(counterkilledEvent).toMatchObject({
+        type: "veteran-counterkilled",
+        counterkilledPlayerId: "bg1",
+        veteranPlayerId: "vet1",
+        source: VeteranCounterkillSource.Visitor,
+      });
+    });
+
+    it("alerts and Doctor visits: Doctor dies", () => {
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Doctor]: { targetPlayerId: "vet1" },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        veteranAssignments,
+        [],
+      );
+
+      const docEvent = findKilled(events, "doc1");
+      expect(docEvent).toMatchObject({ died: true });
+
+      const counterkilledEvent = events.find(
+        (e) => e.type === "veteran-counterkilled",
+      );
+      expect(counterkilledEvent).toMatchObject({
+        counterkilledPlayerId: "doc1",
+        source: VeteranCounterkillSource.Visitor,
+      });
+    });
+
+    it("alerts and Vigilante targets Veteran: Vigilante dies", () => {
+      const vigilanteAssignments = [
+        { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "vet1", roleDefinitionId: WerewolfRole.Veteran },
+        { playerId: "vig1", roleDefinitionId: WerewolfRole.Vigilante },
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+      ];
+
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Vigilante]: { targetPlayerId: "vet1" },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        vigilanteAssignments,
+        [],
+      );
+
+      const vigEvent = findKilled(events, "vig1");
+      expect(vigEvent).toMatchObject({
+        died: true,
+        attackedBy: expect.arrayContaining([WerewolfRole.Veteran]),
+      });
+
+      const vetEvent = findKilled(events, "vet1");
+      expect(vetEvent).toBeUndefined();
+
+      const counterkilledEvent = events.find(
+        (e) => e.type === "veteran-counterkilled",
+      );
+      expect(counterkilledEvent).toMatchObject({
+        counterkilledPlayerId: "vig1",
+        veteranPlayerId: "vet1",
+        source: VeteranCounterkillSource.Visitor,
+      });
+    });
+
+    it("alerts and Bodyguard visits while Doctor protects Bodyguard: counter-kill absorbed, died is false", () => {
+      // The Doctor protects the Bodyguard, so the Veteran's counter-kill is
+      // absorbed and the Bodyguard survives. The veteran-counterkilled event
+      // should reflect died: false (matching the killed event outcome).
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Bodyguard]: { targetPlayerId: "vet1" },
+          [WerewolfRole.Doctor]: { targetPlayerId: "bg1" },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        veteranAssignments,
+        [],
+      );
+
+      const bgKilled = findKilled(events, "bg1");
+      expect(bgKilled).toMatchObject({ died: false });
+
+      const counterkilledEvent = events.find(
+        (e) => e.type === "veteran-counterkilled",
+      );
+      expect(counterkilledEvent).toMatchObject({
+        counterkilledPlayerId: "bg1",
+        veteranPlayerId: "vet1",
+        source: VeteranCounterkillSource.Visitor,
+        died: false,
+      });
+    });
+
+    it("alerts and uncharged Mirrorcaster targets Veteran: Mirrorcaster is counter-killed", () => {
+      // Mirrorcaster is TargetCategory.Special but acts as a physical Protect
+      // visit when uncharged — it should be counter-killed like a Bodyguard.
+      const mirrorcasterAssignments = [
+        { playerId: "vet1", roleDefinitionId: WerewolfRole.Veteran },
+        { playerId: "mc1", roleDefinitionId: WerewolfRole.Mirrorcaster },
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+      ];
+
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Mirrorcaster]: { targetPlayerId: "vet1" },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        mirrorcasterAssignments,
+        [],
+        undefined,
+        { mirrorcasterCharged: false },
+      );
+
+      const mcKilled = findKilled(events, "mc1");
+      expect(mcKilled).toMatchObject({
+        died: true,
+        attackedBy: expect.arrayContaining([WerewolfRole.Veteran]),
+      });
+
+      const vetKilled = findKilled(events, "vet1");
+      expect(vetKilled).toBeUndefined();
+
+      expect(
+        events.find((e) => e.type === "veteran-counterkilled"),
+      ).toMatchObject({
+        counterkilledPlayerId: "mc1",
+        veteranPlayerId: "vet1",
+        source: VeteranCounterkillSource.Visitor,
+      });
+    });
+
+    it("alerts and charged Mirrorcaster targets Veteran: Mirrorcaster is counter-killed", () => {
+      // Charged Mirrorcaster acts as an Attack visit — should be counter-killed.
+      const mirrorcasterAssignments = [
+        { playerId: "vet1", roleDefinitionId: WerewolfRole.Veteran },
+        { playerId: "mc1", roleDefinitionId: WerewolfRole.Mirrorcaster },
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+      ];
+
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Mirrorcaster]: { targetPlayerId: "vet1" },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        mirrorcasterAssignments,
+        [],
+        undefined,
+        { mirrorcasterCharged: true },
+      );
+
+      const mcKilled = findKilled(events, "mc1");
+      expect(mcKilled).toMatchObject({
+        died: true,
+        attackedBy: expect.arrayContaining([WerewolfRole.Veteran]),
+      });
+
+      const vetKilled = findKilled(events, "vet1");
+      expect(vetKilled).toBeUndefined();
+
+      expect(
+        events.find((e) => e.type === "veteran-counterkilled"),
+      ).toMatchObject({
+        counterkilledPlayerId: "mc1",
+        veteranPlayerId: "vet1",
+        source: VeteranCounterkillSource.Visitor,
+      });
+    });
+    it("alerts and uncharged Mercenary targets Veteran: Mercenary is counter-killed", () => {
+      // Uncharged Mercenary acts as a physical Protect visit — it should be
+      // counter-killed like a Bodyguard.
+      const mercenaryAssignments = [
+        { playerId: "vet1", roleDefinitionId: WerewolfRole.Veteran },
+        { playerId: "merc1", roleDefinitionId: WerewolfRole.Mercenary },
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+      ];
+
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Mercenary]: { targetPlayerId: "vet1" },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        mercenaryAssignments,
+        [],
+        undefined,
+        { mercenaryCharged: false },
+      );
+
+      const mercKilled = findKilled(events, "merc1");
+      expect(mercKilled).toMatchObject({
+        died: true,
+        attackedBy: expect.arrayContaining([WerewolfRole.Veteran]),
+      });
+
+      const vetKilled = findKilled(events, "vet1");
+      expect(vetKilled).toBeUndefined();
+
+      expect(
+        events.find((e) => e.type === "veteran-counterkilled"),
+      ).toMatchObject({
+        counterkilledPlayerId: "merc1",
+        veteranPlayerId: "vet1",
+        source: VeteranCounterkillSource.Visitor,
+      });
+    });
+
+    it("alerts and Bodyguard targets Veteran, Priest ward covers Bodyguard: Bodyguard survives", () => {
+      // The Veteran counter-kills the visiting Bodyguard, but the Bodyguard
+      // has an active Priest ward. The ward absorbs the counter-kill (died: false).
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Bodyguard]: { targetPlayerId: "vet1" },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        veteranAssignments,
+        [],
+        undefined,
+        { priestWards: { bg1: "priest1" } },
+      );
+
+      const bgKilled = findKilled(events, "bg1");
+      expect(bgKilled).toMatchObject({ died: false });
+
+      const counterkilledEvent = events.find(
+        (e) => e.type === "veteran-counterkilled",
+      );
+      expect(counterkilledEvent).toMatchObject({
+        counterkilledPlayerId: "bg1",
+        veteranPlayerId: "vet1",
+        source: VeteranCounterkillSource.Visitor,
+        died: false,
+      });
+    });
+
+    it("alerts and charged Mercenary targets Veteran: Mercenary is NOT counter-killed", () => {
+      // Charged Mercenary acts as Bribe — no physical visit, so exempt.
+      const mercenaryAssignments = [
+        { playerId: "vet1", roleDefinitionId: WerewolfRole.Veteran },
+        { playerId: "merc1", roleDefinitionId: WerewolfRole.Mercenary },
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+      ];
+
+      const events = resolveNightActions(
+        {
+          [WerewolfRole.Mercenary]: { targetPlayerId: "vet1" },
+          [WerewolfRole.Veteran]: { alerted: true },
+        },
+        mercenaryAssignments,
+        [],
+        undefined,
+        { mercenaryCharged: true },
+      );
+
+      const mercKilled = findKilled(events, "merc1");
+      expect(mercKilled).toBeUndefined();
+
+      expect(
+        events.find((e) => e.type === "veteran-counterkilled"),
+      ).toBeUndefined();
+    });
+  });
+});

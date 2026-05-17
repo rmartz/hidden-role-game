@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 
+import { VeteranCounterkillSource } from "@/lib/game/modes/werewolf";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 
 interface PlayerNightSummaryItemProps {
@@ -16,6 +17,8 @@ interface PlayerNightSummaryItemProps {
   peaceful: boolean;
   exposedRoleName?: string;
   isMe: boolean;
+  veteranCounterkillSource?: VeteranCounterkillSource;
+  veteranName?: string;
 }
 
 function renderPrimaryLine({
@@ -31,6 +34,8 @@ function renderPrimaryLine({
   smited,
   peaceful,
   isMe,
+  veteranCounterkillSource,
+  veteranName,
 }: Omit<PlayerNightSummaryItemProps, "exposedRoleName">) {
   // Personal messages for silenced/hypnotized player (only visible to themselves).
   if (isMe && silenced) {
@@ -70,6 +75,20 @@ function renderPrimaryLine({
         )}
       </li>
     );
+  }
+
+  if (veteranCounterkillSource && veteranName) {
+    const message =
+      veteranCounterkillSource === VeteranCounterkillSource.WolfRepel
+        ? WEREWOLF_COPY.veteran.dayAnnouncementWolfRepel(
+            veteranName,
+            playerName,
+          )
+        : WEREWOLF_COPY.veteran.dayAnnouncementVisitorKilled(
+            veteranName,
+            playerName,
+          );
+    return <li className="text-sm font-medium text-orange-600">{message}</li>;
   }
 
   if (wasProtected) {

@@ -110,6 +110,21 @@ export function extractDaytimeNightSummary(
       return [{ targetPlayerId: e.targetPlayerId, effect: "silenced" }];
     if (e.type === "hypnotized" && canSeeOutcomeFor(e.targetPlayerId))
       return [{ targetPlayerId: e.targetPlayerId, effect: "hypnotized" }];
+    // Veteran counter-kill: emit when visible and the counter-killed player died.
+    if (
+      e.type === "veteran-counterkilled" &&
+      e.died &&
+      canSeeOutcomeFor(e.counterkilledPlayerId)
+    ) {
+      return [
+        {
+          targetPlayerId: e.counterkilledPlayerId,
+          effect: "veteran-counterkill",
+          veteranPlayerId: e.veteranPlayerId,
+          veteranCounterkillSource: e.source,
+        },
+      ];
+    }
     return [];
   });
   if (phase.knightedPlayerId !== undefined) {

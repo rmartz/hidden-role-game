@@ -4,12 +4,15 @@ import { Team } from "@/lib/types";
 import { getWerewolfRole, WerewolfRole } from "../roles";
 import type {
   AnyNightAction,
-  HypnotizedNightResolutionEvent,
+  NightAction,
   NightResolutionEvent,
-  SilencedNightResolutionEvent,
 } from "../types";
-import { TargetCategory } from "../types";
-import { isGroupPhaseKey, isRoleActive } from "./phase-keys";
+import {
+  isTeamNightAction,
+  TargetCategory,
+  VeteranCounterkillSource,
+} from "../types";
+import { baseGroupPhaseKey, isGroupPhaseKey, isRoleActive } from "./phase-keys";
 import { getGroupPhasePlayerIds } from "./targeting";
 
 export const SMITE_PHASE_KEY = "__narrator_smite__";
@@ -42,6 +45,21 @@ function chupacabraAttackApplies(
     targetRole?.isWerewolf === true ||
     allWerewolvesAreDead(roleAssignments, deadPlayerIds)
   );
+}
+
+/** Removes all occurrences of `value` from `map[key]`, deleting the key if it becomes empty. */
+function removeFromMapSet(
+  map: Map<string, string[]>,
+  key: string,
+  value: string,
+): void {
+  const existing = map.get(key) ?? [];
+  const filtered = existing.filter((v) => v !== value);
+  if (filtered.length === 0) {
+    map.delete(key);
+  } else {
+    map.set(key, filtered);
+  }
 }
 
 /**
@@ -482,9 +500,140 @@ export function resolveNightActions(
     }
   }
 
-  let combatEvents = buildKilledEvents(attacks, protections);
+  // Veteran alert: if the Veteran alerted this night, resolve counter-kills.
+  // Counter-kills happen after the Altruist and Swapper so both cannot intercept them.
+  const veteranAction = nightActions[WerewolfRole.Veteran];
+  const veteranAlerted =
+    veteranAction !== undefined &&
+    !isTeamNightAction(veteranAction) &&
+    veteranAction.alerted === true;
+  // Pending counter-kill entries; events are emitted after Tough Guy so the
+  // `died` field reflects the actual outcome rather than the initial attack.
+  const pendingVeteranKills: {
+    counterkilledPlayerId: string;
+    veteranPlayerId: string;
+    source: VeteranCounterkillSource;
+  }[] = [];
 
-  // Narrator smites: force death regardless of protections.
+  if (veteranAlerted) {
+    const veteranPlayerId = roleAssignments.find(
+      (a) => a.roleDefinitionId === (WerewolfRole.Veteran as string),
+    )?.playerId;
+
+    if (veteranPlayerId) {
+      // Werewolf attack repel: if a wolf group's attack is currently on the
+      // Veteran (post-Swapper), remove it and counter-kill one alive wolf
+      // participant instead. Iterating over the attacks map (rather than
+      // nightActions.suggestedTargetId) ensures Swapper-redirected wolf
+      // attacks are caught as well as directly-targeted ones.
+      // Track already-selected victims so multiple wolf-group phases don't
+      // select the same wolf when there are bonus attack keys (e.g. Wolf Cub).
+      const selectedWolfVictimIds = new Set<string>();
+      const wolfPhaseKeysOnVeteran = (
+        attacks.get(veteranPlayerId) ?? []
+      ).filter(isGroupPhaseKey);
+      for (const phaseKey of wolfPhaseKeysOnVeteran) {
+        // Remove this wolf-group's attack entry from the Veteran.
+        removeFromMapSet(attacks, veteranPlayerId, phaseKey);
+
+        // Find the first alive participant in this wolf group not already
+        // selected as a victim this resolution pass.
+        const baseKey = baseGroupPhaseKey(phaseKey);
+        const wolfVictimId = roleAssignments.find((a) => {
+          if (deadPlayerIds.includes(a.playerId)) return false;
+          if (selectedWolfVictimIds.has(a.playerId)) return false;
+          if (a.roleDefinitionId === baseKey) return true;
+          const role = getWerewolfRole(a.roleDefinitionId);
+          return (role?.wakesWith as string | undefined) === baseKey;
+        })?.playerId;
+
+        if (wolfVictimId) {
+          selectedWolfVictimIds.add(wolfVictimId);
+          attacks.set(wolfVictimId, [
+            ...(attacks.get(wolfVictimId) ?? []),
+            WerewolfRole.Veteran,
+          ]);
+          // If the wolf victim has an active Priest ward, apply the protection
+          // now so the ward absorbs this newly-queued counter-kill attack.
+          // (applyPriestWards ran before Veteran resolution and only covers
+          // attacks that existed at that point.)
+          if (options?.priestWards?.[wolfVictimId]) {
+            protections.set(wolfVictimId, [
+              ...(protections.get(wolfVictimId) ?? []),
+              WerewolfRole.Priest,
+            ]);
+          }
+          pendingVeteranKills.push({
+            counterkilledPlayerId: wolfVictimId,
+            veteranPlayerId,
+            source: VeteranCounterkillSource.WolfRepel,
+          });
+        }
+      }
+
+      // Visitor counter-kill: only Protect- and Attack-category solo roles
+      // physically visit the Veteran; Investigation and Special roles (Seer,
+      // Exposer, Spellcaster, Mummy, Dracula, Zombie, …) use mystical powers
+      // or non-physical means and are not counter-killed.
+      // Mirrorcaster is classified as Special but effectively acts as Protect
+      // (uncharged) or Attack (charged) — treat it as a physical visitor.
+      // Mercenary is classified as Special but acts as Protect when uncharged
+      // (Protect mode) — treat it as a physical visitor in that mode.
+      for (const [phaseKey, action] of Object.entries(nightActions)) {
+        if (isGroupPhaseKey(phaseKey)) continue;
+        if (isRoleActive(phaseKey, WerewolfRole.Priest)) continue;
+        const soloAction = action as NightAction;
+        if (soloAction.targetPlayerId !== veteranPlayerId) continue;
+        const role = getWerewolfRole(phaseKey);
+        if (
+          role?.targetCategory !== TargetCategory.Protect &&
+          role?.targetCategory !== TargetCategory.Attack &&
+          !isRoleActive(phaseKey, WerewolfRole.Mirrorcaster) &&
+          !(
+            isRoleActive(phaseKey, WerewolfRole.Mercenary) &&
+            !options?.mercenaryCharged
+          )
+        )
+          continue;
+
+        const visitorPlayerId = roleAssignments.find(
+          (a) => a.roleDefinitionId === phaseKey,
+        )?.playerId;
+        if (!visitorPlayerId || deadPlayerIds.includes(visitorPlayerId))
+          continue;
+
+        // Discard any protection the visitor provided to the Veteran.
+        removeFromMapSet(protections, veteranPlayerId, phaseKey);
+
+        // Remove any attack the visitor had on the Veteran (attack roles that
+        // targeted the Veteran are repelled, not just protectors).
+        removeFromMapSet(attacks, veteranPlayerId, phaseKey);
+
+        // Queue the counter-kill attack.
+        attacks.set(visitorPlayerId, [
+          ...(attacks.get(visitorPlayerId) ?? []),
+          WerewolfRole.Veteran,
+        ]);
+        // If the visitor has an active Priest ward, apply the protection now so
+        // the ward absorbs this newly-queued counter-kill attack.
+        // (applyPriestWards ran before Veteran resolution and only covers
+        // attacks that existed at that point.)
+        if (options?.priestWards?.[visitorPlayerId]) {
+          protections.set(visitorPlayerId, [
+            ...(protections.get(visitorPlayerId) ?? []),
+            WerewolfRole.Priest,
+          ]);
+        }
+        pendingVeteranKills.push({
+          counterkilledPlayerId: visitorPlayerId,
+          veteranPlayerId,
+          source: VeteranCounterkillSource.Visitor,
+        });
+      }
+    }
+  }
+
+  let combatEvents = buildKilledEvents(attacks, protections);
   for (const smitedId of smitedPlayerIds ?? []) {
     const existing = combatEvents.find(
       (e) => e.type === "killed" && e.targetPlayerId === smitedId,
@@ -529,10 +678,17 @@ export function resolveNightActions(
   }
 
   // Tough Guy: if unprotected and not already hit, absorb the attack.
+  // Smite and Old Man timer deaths are forced deaths that cannot be absorbed.
   const toughGuyHitIds = new Set(options?.toughGuyHitIds ?? []);
   const toughGuyEvents: NightResolutionEvent[] = [];
   for (const event of combatEvents) {
     if (event.type !== "killed" || !event.died) continue;
+    // Smite and Old Man timer deaths are unblockable — skip Tough Guy absorption.
+    if (
+      event.attackedBy.includes(SMITE_PHASE_KEY) ||
+      event.attackedBy.includes(OLD_MAN_TIMER_KEY)
+    )
+      continue;
     const assignment = roleAssignments.find(
       (a) => a.playerId === event.targetPlayerId,
     );
@@ -548,11 +704,29 @@ export function resolveNightActions(
     }
   }
 
+  // Veteran counter-kill events: emitted here so `died` reflects the actual
+  // outcome after Tough Guy absorption.
+  const veteranCounterkilledEvents: NightResolutionEvent[] =
+    pendingVeteranKills.map((kill) => {
+      const combatEvent = combatEvents.find(
+        (e) =>
+          e.type === "killed" &&
+          e.targetPlayerId === kill.counterkilledPlayerId,
+      );
+      return {
+        type: "veteran-counterkilled" as const,
+        counterkilledPlayerId: kill.counterkilledPlayerId,
+        veteranPlayerId: kill.veteranPlayerId,
+        source: kill.source,
+        died: combatEvent?.type === "killed" ? combatEvent.died : true,
+      };
+    });
+
   // Spellcaster: emit a silenced event for their target.
   const spellcasterAction = nightActions[WerewolfRole.Spellcaster] as
     | { targetPlayerId?: string }
     | undefined;
-  const silencedEvents: SilencedNightResolutionEvent[] =
+  const silencedEvents: NightResolutionEvent[] =
     spellcasterAction?.targetPlayerId
       ? [{ type: "silenced", targetPlayerId: spellcasterAction.targetPlayerId }]
       : [];
@@ -564,7 +738,7 @@ export function resolveNightActions(
   const mummyPlayerId = roleAssignments.find(
     (a) => a.roleDefinitionId === (WerewolfRole.Mummy as string),
   )?.playerId;
-  const hypnotizedEvents: HypnotizedNightResolutionEvent[] =
+  const hypnotizedEvents: NightResolutionEvent[] =
     mummyAction?.targetPlayerId && mummyPlayerId
       ? [
           {
@@ -589,13 +763,17 @@ export function resolveNightActions(
     const aId = swapperAId;
     const bId = swapperBId;
     finalSilencedEvents = silencedEvents.map((e) => {
-      if (e.targetPlayerId === aId) return { ...e, targetPlayerId: bId };
-      if (e.targetPlayerId === bId) return { ...e, targetPlayerId: aId };
+      if (e.type === "silenced" && e.targetPlayerId === aId)
+        return { ...e, targetPlayerId: bId };
+      if (e.type === "silenced" && e.targetPlayerId === bId)
+        return { ...e, targetPlayerId: aId };
       return e;
     });
     finalHypnotizedEvents = hypnotizedEvents.map((e) => {
-      if (e.targetPlayerId === aId) return { ...e, targetPlayerId: bId };
-      if (e.targetPlayerId === bId) return { ...e, targetPlayerId: aId };
+      if (e.type === "hypnotized" && e.targetPlayerId === aId)
+        return { ...e, targetPlayerId: bId };
+      if (e.type === "hypnotized" && e.targetPlayerId === bId)
+        return { ...e, targetPlayerId: aId };
       return e;
     });
     swapperEvents.push({
@@ -609,6 +787,7 @@ export function resolveNightActions(
     ...combatEvents,
     ...toughGuyEvents,
     ...(altruistInterceptEvent ? [altruistInterceptEvent] : []),
+    ...veteranCounterkilledEvents,
     ...finalSilencedEvents,
     ...finalHypnotizedEvents,
     ...swapperEvents,

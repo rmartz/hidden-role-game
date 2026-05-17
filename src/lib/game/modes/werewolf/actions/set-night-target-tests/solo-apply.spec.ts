@@ -221,4 +221,58 @@ describe("WerewolfAction.SetNightTarget", () => {
       });
     });
   });
+
+  describe("apply — Veteran alert", () => {
+    const veteranActiveState = makeNightState({
+      turn: 2,
+      nightPhaseOrder: [WerewolfRole.Veteran, WerewolfRole.Werewolf],
+      currentPhaseIndex: 0,
+    });
+
+    it("persists alerted: true when player sends alerted flag", () => {
+      const game = makePlayingGame(veteranActiveState, {
+        roleAssignments: [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Veteran },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Werewolf },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+        ],
+      });
+      action.apply(game, { alerted: true }, "p1");
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      const phase = ts.phase as WerewolfNighttimePhase;
+      expect(phase.nightActions[WerewolfRole.Veteran]).toEqual({
+        alerted: true,
+      });
+    });
+
+    it("subsequent Stay Home replaces alerted action with skipped", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightPhaseOrder: [WerewolfRole.Veteran, WerewolfRole.Werewolf],
+          currentPhaseIndex: 0,
+          nightActions: {
+            [WerewolfRole.Veteran]: { alerted: true },
+          },
+        }),
+        {
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Veteran },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Werewolf },
+            { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+          ],
+        },
+      );
+      action.apply(game, { targetPlayerId: null }, "p1");
+      const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+      const phase = ts.phase as WerewolfNighttimePhase;
+      expect(phase.nightActions[WerewolfRole.Veteran]).toEqual({
+        skipped: true,
+      });
+    });
+  });
 });
