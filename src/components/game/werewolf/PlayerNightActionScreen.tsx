@@ -241,6 +241,7 @@ export function PlayerNightActionScreen({
             mySecondNightTarget={gameState.mySecondNightTarget}
             requiresSecondTarget={requiresDualTarget}
             mirrorcasterCharged={gameState.mirrorcasterCharged}
+            mercenaryCharged={gameState.mercenaryCharged}
             monarchKnightingsRemaining={
               isMonarch ? monarchKnightingsRemaining : undefined
             }

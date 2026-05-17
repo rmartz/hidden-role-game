@@ -133,6 +133,8 @@ export const WEREWOLF_COPY = {
     draw: "Draw",
     winnerLabel: (winner: string) =>
       `${winner === (WerewolfWinner.Werewolves as string) ? "Evil" : winner} Won`,
+    winnerLabelWithMercenary: (winner: string) =>
+      `${winner === (WerewolfWinner.Werewolves as string) ? "Evil" : winner} Won (Mercenary also wins)`,
     endGame: "End Game",
     rolesRevealHeading: "Final Roles",
     returnToLobby: "Return to Lobby",
@@ -147,6 +149,7 @@ export const WEREWOLF_COPY = {
       [WerewolfWinner.Dracula]: "3 wives survived a full cycle",
       [WerewolfWinner.Illuminati]: "Survived to the final 3",
       [WerewolfWinner.LoneWolf]: "By elimination",
+      [WerewolfWinner.Mercenary]: "Bribed player on winning team",
       [WerewolfWinner.Spoiler]: "Spoiler stole the victory",
       [WerewolfWinner.Executioner]: "Executioner's target eliminated",
       [WerewolfWinner.Zombie]: "Infected outnumber the healthy",
@@ -248,6 +251,12 @@ export const WEREWOLF_COPY = {
       "Attack Mode — Your charge is ready. Choose a player to attack.",
     narratorProtectMode: "Mirrorcaster is in Protect mode.",
     narratorAttackMode: "Mirrorcaster is charged — Attack mode.",
+  },
+  mercenary: {
+    chooseProtectTarget: "Select a player to protect",
+    chooseBribeTarget: "Select a player to bribe",
+    narratorProtectMode: "Mercenary is in Protect mode.",
+    narratorBribeMode: "Mercenary is charged — Bribe mode.",
   },
   veteran: {
     alertButton: "Go on Alert",

@@ -60,6 +60,7 @@ export enum WerewolfRole {
   Mason = "werewolf-mason",
   Mayor = "werewolf-mayor",
   Mentalist = "werewolf-mentalist",
+  Mercenary = "werewolf-mercenary",
   Minion = "werewolf-minion",
   Mirrorcaster = "werewolf-mirrorcaster",
   Monarch = "werewolf-monarch",

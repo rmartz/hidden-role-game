@@ -310,6 +310,13 @@ export function extractOwnerState(
       ? game.hiddenRoleIds
       : undefined;
 
+  // mercenaryBribedPlayerIds is narrator-only: lets the narrator track which
+  // players have been bribed across nights when running a no-device Mercenary.
+  const mercenaryBribedPlayerIds = ts?.roleState?.mercenary?.bribedPlayerIds
+    .length
+    ? ts.roleState.mercenary.bribedPlayerIds
+    : undefined;
+
   return {
     ...(nightActions ? { nightActions } : {}),
     ...daytimeNightState,
@@ -323,6 +330,7 @@ export function extractOwnerState(
       : {}),
     ...((monarchKnightingsUsed ?? 0) > 0 ? { monarchKnightingsUsed } : {}),
     ...(hiddenRoleIds ? { hiddenRoleIds } : {}),
+    ...(mercenaryBribedPlayerIds ? { mercenaryBribedPlayerIds } : {}),
   };
 }
 

@@ -234,6 +234,17 @@ function extractRoleSpecificState(
     };
   }
 
+  if (myRole.id === WerewolfRole.Mercenary) {
+    const mercAction = nightActions[myRole.id];
+    const soloAction =
+      mercAction && !isTeamNightAction(mercAction) ? mercAction : undefined;
+    return {
+      myNightTarget: soloAction?.skipped ? null : soloAction?.targetPlayerId,
+      myNightTargetConfirmed: soloAction?.confirmed ?? false,
+      mercenaryCharged: ts?.roleState?.mercenary?.charged ?? false,
+    };
+  }
+
   if (myRole.id === WerewolfRole.Veteran) {
     const vetAction = nightActions[myRole.id];
     const soloAction =
@@ -358,6 +369,7 @@ function extractWitchState(
       deadPlayerIds,
       ts?.roleState?.priest?.wards,
       ts?.roleState?.mirrorcaster?.charged,
+      ts?.roleState?.mercenary?.charged,
       ts?.roleState?.arsonist?.dousedPlayerIds,
     );
     if (attacked.length > 0) {
@@ -395,6 +407,7 @@ function extractAltruistState(
     deadPlayerIds,
     ts?.roleState?.priest?.wards,
     ts?.roleState?.mirrorcaster?.charged,
+    ts?.roleState?.mercenary?.charged,
     ts?.roleState?.arsonist?.dousedPlayerIds,
   ).filter((id) => id !== callerId && id !== witchProtectedId);
   const result: Partial<WerewolfPlayerGameState> = {
