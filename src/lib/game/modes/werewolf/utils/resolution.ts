@@ -525,9 +525,9 @@ export function resolveNightActions(
       // Track already-selected victims so multiple wolf-group phases don't
       // select the same wolf when there are bonus attack keys (e.g. Wolf Cub).
       const selectedWolfVictimIds = new Set<string>();
-      const wolfPhaseKeysOnVeteran = [
-        ...(attacks.get(veteranPlayerId) ?? []),
-      ].filter(isGroupPhaseKey);
+      const wolfPhaseKeysOnVeteran = (
+        attacks.get(veteranPlayerId) ?? []
+      ).filter(isGroupPhaseKey);
       for (const phaseKey of wolfPhaseKeysOnVeteran) {
         // Remove this wolf-group's attack entry from the Veteran.
         removeFromMapSet(attacks, veteranPlayerId, phaseKey);
