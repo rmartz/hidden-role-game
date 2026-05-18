@@ -44,37 +44,40 @@ describe("buildInitialTurnState (Werewolf)", () => {
 // ---------------------------------------------------------------------------
 
 describe("werewolfServices.postInitialize (Evil Empath night 1 auto-compute)", () => {
-  /**
-   * Builds a Playing game whose initial turn state has Evil Empath at index 0
-   * of the nightPhaseOrder, mimicking what advanceToPlaying does after
-   * buildPlayingStatus sets game.status.
-   */
-  function makeNight1EvilEmpathGame(playerOrder: string[]): Game {
+  it("auto-computes Evil Empath adjacency on night 1 when EvilEmpath is the first phase", () => {
+    // Omit Werewolf from roleAssignments so EvilSupport (Evil Empath) is at
+    // index 0 of nightPhaseOrder — a Villager is overridden to Werewolf via
+    // roleOverrides so the adjacency check still produces a meaningful result.
+    // playerOrder: [ee1, seer1, v1, v2] — v1 is adjacent to seer1 (right neighbour)
     const roleAssignments = [
-      { playerId: "wolf1", roleDefinitionId: WerewolfRole.Werewolf },
-      { playerId: "seer1", roleDefinitionId: WerewolfRole.Seer },
       { playerId: "ee1", roleDefinitionId: WerewolfRole.EvilEmpath },
+      { playerId: "seer1", roleDefinitionId: WerewolfRole.Seer },
       { playerId: "v1", roleDefinitionId: WerewolfRole.Villager },
+      { playerId: "v2", roleDefinitionId: WerewolfRole.Villager },
     ];
     const turnState = buildInitialTurnState(roleAssignments, {
-      playerOrder,
+      playerOrder: ["ee1", "seer1", "v1", "v2"],
     });
-    return {
+
+    // Override v1 (adjacent to seer1) to Werewolf so adjacency = true
+    turnState.roleOverrides = { v1: WerewolfRole.Werewolf };
+
+    const game: Game = {
       id: "g1",
       lobbyId: "l1",
       gameMode: GameMode.Werewolf,
       status: { type: GameStatus.Playing, turnState },
       players: [
-        { id: "wolf1", name: "Wolf", sessionId: "s1", visiblePlayers: [] },
+        { id: "ee1", name: "EvilEmpath", sessionId: "s1", visiblePlayers: [] },
         { id: "seer1", name: "Seer", sessionId: "s2", visiblePlayers: [] },
-        { id: "ee1", name: "EvilEmpath", sessionId: "s3", visiblePlayers: [] },
-        { id: "v1", name: "Villager", sessionId: "s4", visiblePlayers: [] },
+        { id: "v1", name: "V1", sessionId: "s3", visiblePlayers: [] },
+        { id: "v2", name: "V2", sessionId: "s4", visiblePlayers: [] },
       ],
       roleAssignments,
       configuredRoleBuckets: [],
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner1",
-      playerOrder,
+      playerOrder: ["ee1", "seer1", "v1", "v2"],
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: false,
@@ -86,23 +89,18 @@ describe("werewolfServices.postInitialize (Evil Empath night 1 auto-compute)", (
       },
       timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
     };
-  }
 
-  it("auto-computes Evil Empath adjacency on night 1 when EvilEmpath is the first phase", () => {
-    // Seer (seer1) is adjacent to Werewolf (wolf1): [wolf1, seer1, ee1, v1]
-    const game = makeNight1EvilEmpathGame(["wolf1", "seer1", "ee1", "v1"]);
+    // Verify that EvilEmpath is actually at index 0 (no EvilKilling roles present)
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-
-    // Only run postInitialize if EvilEmpath is actually first in phase order
-    // (depends on buildNightPhaseOrder placing it at index 0).
-    const phaseOrder =
-      ts.phase.type === WerewolfPhase.Nighttime ? ts.phase.nightPhaseOrder : [];
-    if (phaseOrder[0] !== (WerewolfRole.EvilEmpath as string)) return;
+    expect(
+      ts.phase.type === WerewolfPhase.Nighttime && ts.phase.nightPhaseOrder[0],
+    ).toBe(WerewolfRole.EvilEmpath);
 
     werewolfServices.postInitialize?.(game);
 
     const updatedTs = (game.status as { turnState: WerewolfTurnState })
       .turnState;
+    // v1 (adjacent to seer1) is overridden to Werewolf → adjacency = true
     expect(updatedTs.roleState?.evilEmpath?.lastResult).toBe(true);
   });
 
