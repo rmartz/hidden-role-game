@@ -37,9 +37,12 @@ export function cleanupAfterDaytimeKill(
     };
   }
   // Evil Empath: when the Evil Empath is killed during the day, reveal their
-  // last adjacency result to Werewolves.
+  // last adjacency result to Werewolves. Resolve effective role via roleOverrides
+  // so mid-game role changes are respected.
   const evilEmpathId = game.roleAssignments.find(
-    (a) => a.roleDefinitionId === (WerewolfRole.EvilEmpath as string),
+    (a) =>
+      (ts.roleOverrides?.[a.playerId] ?? a.roleDefinitionId) ===
+      (WerewolfRole.EvilEmpath as string),
   )?.playerId;
   const evilEmpathState = ts.roleState?.evilEmpath;
   if (

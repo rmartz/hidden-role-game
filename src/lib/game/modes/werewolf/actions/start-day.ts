@@ -265,8 +265,9 @@ export const startDayAction: GameAction = {
     const evilEmpathLastResult = ts.roleState?.evilEmpath?.lastResult;
 
     // Evil Empath death trigger: if the Evil Empath died this night and there is
-    // a last result, set revealedResult so Werewolves see it.
-    const evilEmpathAssignment = game.roleAssignments.find(
+    // a last result, set revealedResult so Werewolves see it. Use
+    // effectiveAssignments so mid-game roleOverrides are respected.
+    const evilEmpathAssignment = effectiveAssignments.find(
       (a) => a.roleDefinitionId === (WerewolfRole.EvilEmpath as string),
     );
     const evilEmpathRevealedResult =

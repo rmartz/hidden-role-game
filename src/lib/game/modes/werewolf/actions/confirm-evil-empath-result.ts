@@ -76,8 +76,12 @@ function computeSeerAdjacentToWerewolf(
   const playerOrder = rawOrder.filter((id) => id !== game.ownerPlayerId);
   if (playerOrder.length < 2) return false;
 
+  // Resolve effective role for each player so we find the Seer even when
+  // a roleOverride has assigned or removed the Seer role mid-game.
   const seerAssignment = game.roleAssignments.find(
-    (a) => a.roleDefinitionId === (WerewolfRole.Seer as string),
+    (a) =>
+      (roleOverrides?.[a.playerId] ?? a.roleDefinitionId) ===
+      (WerewolfRole.Seer as string),
   );
   if (!seerAssignment || deadPlayerIds.includes(seerAssignment.playerId))
     return false;
