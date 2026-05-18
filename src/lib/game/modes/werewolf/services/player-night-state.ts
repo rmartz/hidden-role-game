@@ -642,8 +642,12 @@ function appendInvestigationResult(
     const secondAssignment = game.roleAssignments.find(
       (a) => a.playerId === myAction.secondTargetPlayerId,
     );
-    const secondRoleDef = secondAssignment
-      ? getWerewolfRole(secondAssignment.roleDefinitionId)
+    const effectiveSecondRoleId = secondAssignment
+      ? (ts?.roleOverrides?.[secondAssignment.playerId] ??
+        secondAssignment.roleDefinitionId)
+      : undefined;
+    const secondRoleDef = effectiveSecondRoleId
+      ? getWerewolfRole(effectiveSecondRoleId)
       : undefined;
     const sameTeam =
       targetRoleDef?.team !== Team.Neutral &&

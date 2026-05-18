@@ -9,7 +9,7 @@ export const ILLUSION_ARTIST_ROLE: WerewolfRoleDefinition = {
   name: "Illusion Artist",
   summary: "Makes the Seer see one player as the opposite alignment",
   description:
-    "Each night the Illusion Artist targets one player. If the Seer investigates that player the same night, the Seer receives an inverted result — a Werewolf appears innocent and a non-Werewolf appears guilty. The illusion lasts only for that night.",
+    "Starting on the second night, the Illusion Artist targets one player. If the Seer investigates that player the same night, the Seer receives an inverted result — a Werewolf appears innocent and a non-Werewolf appears guilty. The illusion lasts only for that night.",
   team: Team.Bad,
   unique: true,
   wakesAtNight: WakesAtNight.AfterFirstNight,

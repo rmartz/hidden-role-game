@@ -176,7 +176,9 @@ export function getInvestigationResultForNarrator(
       (a) => a.player.id === secondTargetId,
     );
     if (!secondAssignment?.role) return undefined;
-    const secondRoleDef = getWerewolfRole(secondAssignment.role.id);
+    const effectiveSecondRoleId =
+      roleOverrides?.[secondAssignment.player.id] ?? secondAssignment.role.id;
+    const secondRoleDef = getWerewolfRole(effectiveSecondRoleId);
     // Neutral players win individually, so treat them as never sharing a team.
     const sameTeam =
       roleDef?.team !== Team.Neutral &&
