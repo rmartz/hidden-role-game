@@ -52,7 +52,9 @@ function makeEmpathGame(
     ...(Object.keys(evilEmpathRoleState).length > 0
       ? { roleState: evilEmpathRoleState }
       : {}),
-    ...(overrides.roleOverrides ? { roleOverrides: overrides.roleOverrides } : {}),
+    ...(overrides.roleOverrides
+      ? { roleOverrides: overrides.roleOverrides }
+      : {}),
   };
   return {
     id: "game-1",
