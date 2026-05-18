@@ -381,7 +381,7 @@ export function resolveNightActions(
         // Target has a solo phase — remove it (including any suffixed repeat keys).
         const blockedPhaseKey = targetRole.id as string;
         resolvedNightActions = Object.fromEntries(
-          Object.entries(resolvedNightActions).filter(
+          Object.entries(nightActions).filter(
             ([k]) => baseGroupPhaseKey(k) !== blockedPhaseKey,
           ),
         );
