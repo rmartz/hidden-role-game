@@ -130,6 +130,14 @@ export const setNightTargetAction: GameAction = {
     )
       return false;
 
+    // Narrator path: roles with preventSelfTarget cannot target themselves.
+    if (isOwner && phaseRoleDef?.preventSelfTarget) {
+      const actingPlayerAssignment = game.roleAssignments.find(
+        (a) => a.roleDefinitionId === phaseKey,
+      );
+      if (actingPlayerAssignment?.playerId === targetPlayerId) return false;
+    }
+
     // Dual-target swap roles (e.g. Swapper) cannot select the same player for both targets.
     if (typeof targetPlayerId === "string" && phaseRoleDef?.dualTargetSwap) {
       const existing = phase.nightActions[phaseKey];

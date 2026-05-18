@@ -266,7 +266,7 @@ The Martyr window is always inserted after a Guilty verdict, even when no Martyr
 
 **Who:** Narrator only
 **When:** During Nighttime, during the Evil Empath's phase
-**Effect:** Auto-computes whether the Seer is seated adjacent (circular seating order in `game.playerOrder`) to any living player with `roleDef.isWerewolf === true`. Stores the boolean result in `roleState.evilEmpath.lastResult` on the turn state, marks the Evil Empath's night action as `confirmed` and `resultRevealed`. The result is surfaced to the Evil Empath player as `evilEmpathNightResult` in their player state (only while the action is confirmed, to prevent showing a stale result at the start of a new night). When the Evil Empath dies (night via `start-day`, or day via `kill-player`, `resolve-trial`, `resolve-hunter-revenge`), `roleState.evilEmpath.revealedResult` is set on the turn state so Werewolves see it in their group phase state.
+**Effect:** Auto-computes whether the Seer is seated adjacent (circular seating order in `game.playerOrder`) to any living player with `roleDef.isWerewolf === true`. Stores the boolean result in `roleState.evilEmpath.lastResult` on the turn state, marks the Evil Empath's night action as `confirmed` and `resultRevealed`. The result is surfaced to the Evil Empath player as `evilEmpathNightResult` in their player state (only while the action is confirmed, to prevent showing a stale result at the start of a new night). When the Evil Empath dies (night via `start-day`, or day via `kill-player`, `advance-martyr-window`, `resolve-hunter-revenge`), `roleState.evilEmpath.revealedResult` is set on the turn state so Werewolves see it in their group phase state.
 
 **Payload:** none
 

@@ -28,6 +28,32 @@ describe("WerewolfAction.SetNightTarget", () => {
         }),
       ).toBe(true);
     });
+
+    it("blocks owner from setting Illusion Artist self-target", () => {
+      const game = makePlayingGame(
+        makeNightState({
+          turn: 2,
+          nightPhaseOrder: [WerewolfRole.IllusionArtist],
+          currentPhaseIndex: 0,
+        }),
+        {
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.IllusionArtist },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Seer },
+            { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+            { playerId: "p5", roleDefinitionId: WerewolfRole.Werewolf },
+          ],
+        },
+      );
+
+      expect(
+        action.isValid(game, "owner-1", {
+          roleId: WerewolfRole.IllusionArtist,
+          targetPlayerId: "p1",
+        }),
+      ).toBe(false);
+    });
   });
 
   describe("isValid — player (solo role)", () => {
