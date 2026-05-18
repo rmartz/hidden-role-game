@@ -178,13 +178,13 @@ export function OwnerGameDayScreen({
               gameId={gameId}
               activeTrial={activeTrial}
               players={gameState.players}
-              deadPlayerIds={gameState.deadPlayerIds ?? []}
               votePhaseSeconds={votePhaseSeconds}
               defensePhaseSeconds={defensePhaseSeconds}
               autoAdvance={autoAdvance}
               pendingGuiltId={pendingGuiltId}
               martyrUsed={martyrAbilityUsed}
               noDeviceMartyrPlayerId={noDeviceMartyrPlayerId}
+              defendantEliminated={gameState.activeTrial?.defendantEliminated}
             />
           )}
         </OwnerAdvanceCard>

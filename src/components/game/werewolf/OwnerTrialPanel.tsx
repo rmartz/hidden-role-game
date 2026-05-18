@@ -19,7 +19,6 @@ interface OwnerTrialPanelProps {
   gameId: string;
   activeTrial: ActiveTrial;
   players: PublicLobbyPlayer[];
-  deadPlayerIds: string[];
   votePhaseSeconds: number;
   defensePhaseSeconds: number;
   autoAdvance: boolean;
@@ -27,19 +26,24 @@ interface OwnerTrialPanelProps {
   martyrUsed?: boolean;
   /** ID of the Martyr player if they are a no-device player and still alive; undefined otherwise. */
   noDeviceMartyrPlayerId?: string;
+  /**
+   * Server-computed: true when the defendant was eliminated, false when spared
+   * (Martyr intercept). Only set for Eliminated verdicts; undefined otherwise.
+   */
+  defendantEliminated?: boolean;
 }
 
 export function OwnerTrialPanel({
   gameId,
   activeTrial,
   players,
-  deadPlayerIds,
   votePhaseSeconds,
   defensePhaseSeconds,
   autoAdvance,
   pendingGuiltId,
   martyrUsed,
   noDeviceMartyrPlayerId,
+  defendantEliminated,
 }: OwnerTrialPanelProps) {
   const action = useGameAction(gameId);
   const defendant = players.find((p) => p.id === activeTrial.defendantId);
@@ -90,7 +94,7 @@ export function OwnerTrialPanel({
   const defendantSpared =
     activeTrial.verdict === TrialVerdict.Eliminated &&
     !pendingGuiltId &&
-    !deadPlayerIds.includes(activeTrial.defendantId);
+    defendantEliminated === false;
   const verdictLabel = activeTrial.verdict
     ? pendingGuiltId
       ? trial.verdictLabelPending
