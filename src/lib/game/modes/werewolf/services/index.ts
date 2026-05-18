@@ -7,6 +7,7 @@ import type {
 import { GameStatus, Team } from "@/lib/types";
 import type { VictoryCondition } from "@/server/types/game";
 
+import { confirmEvilEmpathResultAction } from "../actions/confirm-evil-empath-result";
 import { WEREWOLF_COPY } from "../copy";
 import { getWerewolfModeConfig } from "../lobby-config";
 import type { WerewolfPlayerGameState } from "../player-state";
@@ -128,6 +129,13 @@ function extractNonOwnerState(
     }
   }
 
+  // Evil Empath: determine if the caller is an effective Werewolf (including
+  // Alpha Wolf bites via roleOverrides) so the revealed result is shown to
+  // converted Werewolves as well.
+  const callerEffectiveRoleId = ts?.roleOverrides?.[callerId] ?? myRole.id;
+  const isEffectiveWerewolf =
+    getWerewolfRole(callerEffectiveRoleId)?.isWerewolf === true;
+
   return {
     ...nightTargetState,
     ...ghostNightState,
@@ -142,11 +150,10 @@ function extractNonOwnerState(
       : {}),
     ...((monarchKnightingsUsed ?? 0) > 0 ? { monarchKnightingsUsed } : {}),
     ...executionerState,
-    // Evil Empath revealed result: surface to actual Werewolf roles only
-    // (not all bad-team roles like Minion/Wizard), even when nightActions is
-    // absent (e.g. narrator advances to day without recording night actions
-    // and the Evil Empath dies during the day phase).
-    ...(myRole.isWerewolf === true &&
+    // Evil Empath revealed result: surface to Werewolf roles only
+    // (not all bad-team roles like Minion/Wizard), including players whose
+    // effective role is Werewolf via roleOverrides (Alpha Wolf bite).
+    ...(isEffectiveWerewolf &&
     ts?.roleState?.evilEmpath?.revealedResult !== undefined
       ? { evilEmpathRevealedResult: ts.roleState.evilEmpath.revealedResult }
       : {}),
@@ -198,6 +205,19 @@ export const werewolfServices: GameModeServices = {
       victoryCondition: extractVictoryCondition(game),
       ...(mercenaryAlsoWins ? { mercenaryAlsoWins: true } : {}),
     };
+  },
+
+  postInitialize(game: Game): void {
+    // If the Evil Empath is the first phase on night 1, auto-compute the
+    // adjacency result immediately so the player sees it when their phase
+    // becomes active. The same hook runs in startNightAction for subsequent
+    // nights, but the initial night is set up by buildInitialTurnState
+    // which has no equivalent trigger before this hook was added.
+    const ts = currentTurnState(game);
+    if (ts?.phase.type !== WerewolfPhase.Nighttime) return;
+    if (ts.phase.nightPhaseOrder[0] === (WerewolfRole.EvilEmpath as string)) {
+      confirmEvilEmpathResultAction.apply(game, {}, "");
+    }
   },
 };
 

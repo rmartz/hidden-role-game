@@ -5,6 +5,7 @@ import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 
 import { WEREWOLF_ACTIONS, WerewolfAction } from "../actions";
 import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
+import { werewolfServices } from "../services";
 import { extractPlayerNightState } from "../services/player-night-state";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "../timer-config";
 import type { WerewolfTurnState } from "../types";
@@ -344,5 +345,55 @@ describe("Evil Empath — death reveal", () => {
     ).turnState;
     expect(updatedTs).toBeDefined();
     expect(updatedTs?.roleState?.evilEmpath?.revealedResult).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Evil Empath: evilEmpathRevealedResult uses effective role via roleOverrides
+// ---------------------------------------------------------------------------
+
+describe("Evil Empath — evilEmpathRevealedResult surfaces to roleOverride-converted Werewolves", () => {
+  it("surfaces evilEmpathRevealedResult to a player whose effective role is Werewolf via roleOverrides (Alpha Wolf bite)", () => {
+    const ts: WerewolfTurnState = {
+      turn: 2,
+      phase: {
+        type: WerewolfPhase.Daytime,
+        startedAt: 1000,
+        nightActions: {},
+      },
+      deadPlayerIds: ["ee1"],
+      roleState: { evilEmpath: { lastResult: true, revealedResult: true } },
+      roleOverrides: { v1: WerewolfRole.Werewolf },
+    };
+    const game = makeGame({ turnState: ts });
+    // v1's original role is Villager but they are overridden to Werewolf
+    const state = werewolfServices.extractPlayerState(
+      game,
+      "v1",
+      WEREWOLF_ROLES[WerewolfRole.Villager],
+    );
+    expect(state["evilEmpathRevealedResult"]).toBe(true);
+  });
+
+  it("does not surface evilEmpathRevealedResult to a player whose original role is Werewolf but is overridden away", () => {
+    const ts: WerewolfTurnState = {
+      turn: 2,
+      phase: {
+        type: WerewolfPhase.Daytime,
+        startedAt: 1000,
+        nightActions: {},
+      },
+      deadPlayerIds: ["ee1"],
+      roleState: { evilEmpath: { lastResult: true, revealedResult: true } },
+      roleOverrides: { wolf1: WerewolfRole.Villager },
+    };
+    const game = makeGame({ turnState: ts });
+    // wolf1's role is overridden away from Werewolf; should not see the reveal
+    const state = werewolfServices.extractPlayerState(
+      game,
+      "wolf1",
+      WEREWOLF_ROLES[WerewolfRole.Werewolf],
+    );
+    expect(state["evilEmpathRevealedResult"]).toBeUndefined();
   });
 });
