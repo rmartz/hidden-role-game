@@ -565,6 +565,7 @@ export const startDayAction: GameAction = {
       ...(hunterDiedThisNight
         ? { hunter: { revengePlayerId: hunterAssignment.playerId } }
         : {}),
+      ...(rs.martyr?.abilityUsed ? { martyr: rs.martyr } : {}),
       ...(morticianAbilityEnded ? { mortician: { abilityEnded: true } } : {}),
       ...(monarchKnightedPlayerIds.length > 0 || monarchKnightingsUsed > 0
         ? {

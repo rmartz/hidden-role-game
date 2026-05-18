@@ -8,6 +8,7 @@ import type {
   GhostTurnState,
   HunterTurnState,
   IllusionArtistTurnState,
+  MartyrTurnState,
   MercenaryTurnState,
   MirrorcasterTurnState,
   MonarchTurnState,
@@ -32,6 +33,7 @@ export type {
   GhostTurnState,
   HunterTurnState,
   IllusionArtistTurnState,
+  MartyrTurnState,
   MercenaryTurnState,
   MirrorcasterTurnState,
   MonarchTurnState,
@@ -241,6 +243,13 @@ export interface WerewolfDaytimePhase {
   nominations?: Nomination[];
   /** Number of trials that have concluded (with a verdict) this day phase. */
   concludedTrialsCount?: number;
+  /**
+   * The convicted player ID awaiting final elimination after a Guilty verdict.
+   * Set when a Guilty verdict is reached; cleared when the Martyr window is
+   * advanced (narrator confirms death) or the Martyr intercepts. While set,
+   * the game is in a post-trial window before the role reveal.
+   */
+  pendingGuiltId?: string;
 }
 
 export type WerewolfTurnPhase = WerewolfNighttimePhase | WerewolfDaytimePhase;
@@ -260,6 +269,7 @@ export interface WerewolfRoleTurnState {
   ghost?: GhostTurnState;
   hunter?: HunterTurnState;
   illusionArtist?: IllusionArtistTurnState;
+  martyr?: MartyrTurnState;
   mercenary?: MercenaryTurnState;
   mirrorcaster?: MirrorcasterTurnState;
   monarch?: MonarchTurnState;

@@ -15,6 +15,7 @@ export interface FirebaseWerewolfRoleState {
   alphaWolfBiteUsed?: boolean;
   /** Players whose roles have been changed mid-game (Alpha Wolf bite). */
   roleConversions?: { playerId: string; newRoleDefinitionId: string }[];
+  martyrUsed?: boolean;
   witchAbilityUsed?: boolean;
   morticianAbilityEnded?: boolean;
   monarchKnightedPlayerIds?: string[];
@@ -66,6 +67,7 @@ export function werewolfRoleStateToFirebase(
     ...(state.roleConversions?.length
       ? { roleConversions: state.roleConversions }
       : {}),
+    ...(state.martyrUsed ? { martyrUsed: true } : {}),
     ...(state.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
     ...(state.morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),
     ...(state.monarchKnightedPlayerIds?.length
@@ -146,6 +148,7 @@ export function werewolfRoleStateFromFirebase(
     ...(raw.roleConversions?.length
       ? { roleConversions: raw.roleConversions }
       : {}),
+    ...(raw.martyrUsed ? { martyrUsed: true } : {}),
     ...(raw.witchAbilityUsed ? { witchAbilityUsed: true } : {}),
     ...(raw.morticianAbilityEnded ? { morticianAbilityEnded: true } : {}),
     ...(raw.monarchKnightedPlayerIds?.length

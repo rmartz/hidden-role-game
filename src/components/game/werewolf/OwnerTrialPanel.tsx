@@ -22,6 +22,15 @@ interface OwnerTrialPanelProps {
   votePhaseSeconds: number;
   defensePhaseSeconds: number;
   autoAdvance: boolean;
+  pendingGuiltId?: string;
+  martyrUsed?: boolean;
+  /** ID of the Martyr player if they are a no-device player and still alive; undefined otherwise. */
+  noDeviceMartyrPlayerId?: string;
+  /**
+   * Server-computed: true when the defendant was eliminated, false when spared
+   * (Martyr intercept). Only set for Eliminated verdicts; undefined otherwise.
+   */
+  defendantEliminated?: boolean;
 }
 
 export function OwnerTrialPanel({
@@ -31,6 +40,10 @@ export function OwnerTrialPanel({
   votePhaseSeconds,
   defensePhaseSeconds,
   autoAdvance,
+  pendingGuiltId,
+  martyrUsed,
+  noDeviceMartyrPlayerId,
+  defendantEliminated,
 }: OwnerTrialPanelProps) {
   const action = useGameAction(gameId);
   const defendant = players.find((p) => p.id === activeTrial.defendantId);
@@ -46,6 +59,14 @@ export function OwnerTrialPanel({
 
   const handleResolve = useCallback(() => {
     action.mutate({ actionId: WerewolfAction.ResolveTrial });
+  }, [action]);
+
+  const handleAdvanceMartyrWindow = useCallback(() => {
+    action.mutate({ actionId: WerewolfAction.AdvanceMartyrWindow });
+  }, [action]);
+
+  const handleUseMartyrAbility = useCallback(() => {
+    action.mutate({ actionId: WerewolfAction.UseMartyrAbility });
   }, [action]);
 
   const handleSkipDefense = useCallback(() => {
@@ -70,10 +91,18 @@ export function OwnerTrialPanel({
       ? new Date(activeTrial.pausedAt)
       : undefined;
   const trialPauseOffset = activeTrial.pauseOffset ?? 0;
+  const defendantSpared =
+    activeTrial.verdict === TrialVerdict.Eliminated &&
+    !pendingGuiltId &&
+    defendantEliminated === false;
   const verdictLabel = activeTrial.verdict
-    ? activeTrial.verdict === TrialVerdict.Eliminated
-      ? trial.verdictLabelEliminated
-      : trial.verdictLabelInnocent
+    ? pendingGuiltId
+      ? trial.verdictLabelPending
+      : defendantSpared
+        ? trial.verdictLabelSpared
+        : activeTrial.verdict === TrialVerdict.Eliminated
+          ? trial.verdictLabelEliminated
+          : trial.verdictLabelInnocent
     : undefined;
   const trialStartedAt = new Date(activeTrial.startedAt);
   const voteTimerStartedAt = activeTrial.voteStartedAt
@@ -87,9 +116,32 @@ export function OwnerTrialPanel({
           <p className="font-semibold mb-1">
             {trial.narratorVerdictHeading(defendantName, verdictLabel)}
           </p>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground mb-2">
             {trial.guiltyInnocentCount(guiltyCount, innocentCount)}
           </p>
+          {pendingGuiltId && (
+            <div className="flex flex-col gap-2 mt-1">
+              <Button
+                size="sm"
+                onClick={handleAdvanceMartyrWindow}
+                disabled={action.isPending}
+              >
+                {trial.advanceToSentencing}
+              </Button>
+              {noDeviceMartyrPlayerId &&
+                !martyrUsed &&
+                noDeviceMartyrPlayerId !== pendingGuiltId && (
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={handleUseMartyrAbility}
+                    disabled={action.isPending}
+                  >
+                    {trial.narratorMartyrSacrificeButton}
+                  </Button>
+                )}
+            </div>
+          )}
         </>
       ) : activeTrial.phase === TrialPhase.Defense ? (
         <>
@@ -206,7 +258,7 @@ export function OwnerTrialPanel({
               onClick={handleResolve}
               disabled={action.isPending}
             >
-              {trial.resolveTrial}
+              {trial.revealTrialResults}
             </Button>
             <Button
               size="sm"

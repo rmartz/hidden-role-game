@@ -1,17 +1,9 @@
 import type { Game, GameAction } from "@/lib/types";
-import { GameStatus } from "@/lib/types";
 
 import { WerewolfRole } from "../roles";
 import type { ActiveTrial, WerewolfTurnState } from "../types";
 import { DaytimeVote, TrialPhase, TrialVerdict, WerewolfPhase } from "../types";
-import {
-  checkWinCondition,
-  currentTurnState,
-  isOwnerPlaying,
-  WerewolfWinner,
-  withMercenaryCoWin,
-} from "../utils";
-import { cleanupAfterDaytimeKill, didWolfCubDie } from "./helpers";
+import { checkWinCondition, currentTurnState, isOwnerPlaying } from "../utils";
 
 export function applyTrialVerdict(
   activeTrial: ActiveTrial,
@@ -53,14 +45,16 @@ export function applyTrialVerdict(
     ts.phase.concludedTrialsCount = (ts.phase.concludedTrialsCount ?? 0) + 1;
   }
 
-  if (eliminated) {
-    const { defendantId } = activeTrial;
-    if (!ts.deadPlayerIds.includes(defendantId)) {
-      ts.deadPlayerIds = [...ts.deadPlayerIds, defendantId];
-      if (didWolfCubDie([defendantId], game)) {
-        ts.roleState = { ...(ts.roleState ?? {}), wolfCub: { died: true } };
-      }
-      cleanupAfterDaytimeKill(defendantId, ts, game);
+  if (eliminated && ts.phase.type === WerewolfPhase.Daytime) {
+    // Store the convicted player ID as pending; actual death is deferred to
+    // AdvanceMartyrWindow so the narrator can reveal the role (and the Martyr
+    // may optionally intervene) before the player is formally eliminated.
+    ts.phase.pendingGuiltId = activeTrial.defendantId;
+  } else if (!eliminated) {
+    // Innocent verdict: no pending death — check win condition directly.
+    const winResult = checkWinCondition(game, ts.deadPlayerIds);
+    if (winResult) {
+      game.status = winResult;
     }
   }
 }
@@ -82,57 +76,5 @@ export const resolveTrialAction: GameAction = {
     const { activeTrial } = ts.phase;
     if (!activeTrial) return;
     applyTrialVerdict(activeTrial, ts, game);
-
-    if (activeTrial.verdict === TrialVerdict.Eliminated) {
-      const { defendantId } = activeTrial;
-
-      // Executioner wins if their target was eliminated and the Executioner is alive.
-      // Check Executioner before Tanner (if target is also the Tanner, Executioner wins).
-      if (ts.roleState?.executioner?.targetId === defendantId) {
-        const executionerAssignment = game.roleAssignments.find(
-          (a) => a.roleDefinitionId === (WerewolfRole.Executioner as string),
-        );
-        const executionerAlive =
-          executionerAssignment !== undefined &&
-          !ts.deadPlayerIds.includes(executionerAssignment.playerId);
-        if (executionerAlive) {
-          game.status = withMercenaryCoWin(
-            { type: GameStatus.Finished, winner: WerewolfWinner.Executioner },
-            game,
-            ts.deadPlayerIds,
-          );
-          return;
-        }
-      }
-
-      // Tanner wins immediately if eliminated at trial.
-      const tannerAssignment = game.roleAssignments.find(
-        (a) => a.roleDefinitionId === (WerewolfRole.Tanner as string),
-      );
-      if (tannerAssignment?.playerId === defendantId) {
-        game.status = {
-          type: GameStatus.Finished,
-          winner: WerewolfWinner.Tanner,
-        };
-        return;
-      }
-
-      // Hunter revenge: if the eliminated player is the Hunter, defer win check.
-      const eliminatedRole = game.roleAssignments.find(
-        (a) => a.playerId === defendantId,
-      )?.roleDefinitionId;
-      if (eliminatedRole === (WerewolfRole.Hunter as string)) {
-        ts.roleState = {
-          ...(ts.roleState ?? {}),
-          hunter: { revengePlayerId: defendantId },
-        };
-        return;
-      }
-    }
-
-    const winResult = checkWinCondition(game, ts.deadPlayerIds);
-    if (winResult) {
-      game.status = winResult;
-    }
   },
 };

@@ -21,6 +21,7 @@ import { ILLUMINATI_ROLE } from "./illuminati";
 import { ILLUSION_ARTIST_ROLE } from "./illusion-artist";
 import { INSOMNIAC_ROLE } from "./insomniac";
 import { LONE_WOLF_ROLE } from "./lone-wolf";
+import { MARTYR_ROLE } from "./martyr";
 import { MASON_ROLE } from "./mason";
 import { MAYOR_ROLE } from "./mayor";
 import { MENTALIST_ROLE } from "./mentalist";
@@ -73,6 +74,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
   [WerewolfRole.IllusionArtist]: ILLUSION_ARTIST_ROLE,
   [WerewolfRole.Insomniac]: INSOMNIAC_ROLE,
   [WerewolfRole.LoneWolf]: LONE_WOLF_ROLE,
+  [WerewolfRole.Martyr]: MARTYR_ROLE,
   [WerewolfRole.Mason]: MASON_ROLE,
   [WerewolfRole.Mayor]: MAYOR_ROLE,
   [WerewolfRole.Mentalist]: MENTALIST_ROLE,
