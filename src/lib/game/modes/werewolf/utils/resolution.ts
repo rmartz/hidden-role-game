@@ -12,7 +12,7 @@ import type {
 } from "../types";
 import { isTeamNightAction, TargetCategory } from "../types";
 import { baseGroupPhaseKey, isGroupPhaseKey, isRoleActive } from "./phase-keys";
-import { getGroupPhasePlayerIds } from "./targeting";
+import { computeSuggestedTarget, getGroupPhasePlayerIds } from "./targeting";
 
 export const SMITE_PHASE_KEY = "__narrator_smite__";
 export const OLD_MAN_TIMER_KEY = "__old_man_timer__";
@@ -381,14 +381,38 @@ export function resolveNightActions(
         // Target has a solo phase — remove it (including any suffixed repeat keys).
         const blockedPhaseKey = targetRole.id as string;
         resolvedNightActions = Object.fromEntries(
-          Object.entries(nightActions).filter(
+          Object.entries(resolvedNightActions).filter(
             ([k]) => baseGroupPhaseKey(k) !== blockedPhaseKey,
           ),
         );
+      } else {
+        // Target participates in a group phase — remove only their own contribution
+        // and recompute each matching phase's suggested target.
+        const blockedGroupPhaseKey = (targetRole.wakesWith ?? targetRole.id) as
+          string;
+        resolvedNightActions = Object.fromEntries(
+          Object.entries(resolvedNightActions).map(([phaseKey, action]) => {
+            if (baseGroupPhaseKey(phaseKey) !== blockedGroupPhaseKey) {
+              return [phaseKey, action];
+            }
+            if (!isTeamNightAction(action)) {
+              return [phaseKey, action];
+            }
+
+            const votes = action.votes.filter((vote) => vote.playerId !== tkTarget);
+            const suggestedTargetId = computeSuggestedTarget(votes);
+            const nextAction = { ...action, votes };
+            if (suggestedTargetId !== undefined) {
+              nextAction.suggestedTargetId = suggestedTargetId;
+            } else {
+              delete nextAction.suggestedTargetId;
+            }
+
+            return [phaseKey, nextAction];
+          }),
+        );
       }
-      // If the target uses a group phase (primary team phase or wakesWith),
-      // removing that phase would cancel teammates' actions. Skip phase removal
-      // and emit the hangover only.
+
       hangoverEvents.push({ type: "hangover", targetPlayerId: tkTarget });
     }
   }
