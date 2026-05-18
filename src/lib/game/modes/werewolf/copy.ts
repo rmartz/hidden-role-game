@@ -223,6 +223,8 @@ export const WEREWOLF_COPY = {
     investigationResultLabel: "Investigation result:",
     teamStatus: (isWerewolfTeam: boolean) =>
       isWerewolfTeam ? "Evil" : "not Evil",
+    seerAlignmentStatus: (isWerewolf: boolean) =>
+      isWerewolf ? "Werewolf" : "Not a Werewolf",
     investigationResultRevealed: "Result revealed to player.",
     revealToPlayer: "Reveal to player",
     smite: "Smite",

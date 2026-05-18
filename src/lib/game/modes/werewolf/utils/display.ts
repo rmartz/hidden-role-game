@@ -167,7 +167,7 @@ export function getInvestigationResultForNarrator(
     return {
       targetName: activeTargetName ?? activeTarget,
       isWerewolfTeam: roleDef?.isWerewolf === true,
-      resultLabel: targetAssignment.role.name,
+      resultLabel: roleDef?.name ?? targetAssignment.role.name,
     };
   }
 
@@ -206,7 +206,7 @@ export function getInvestigationResultForNarrator(
       ? {
           illusionFlipLabel:
             WEREWOLF_COPY.illusionArtist.narratorFlipAnnotation(
-              WEREWOLF_COPY.narrator.teamStatus(isWerewolf),
+              WEREWOLF_COPY.narrator.seerAlignmentStatus(isWerewolf),
             ),
         }
       : {}),
