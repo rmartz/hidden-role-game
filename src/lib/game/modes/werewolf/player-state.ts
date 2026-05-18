@@ -144,6 +144,14 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
   pendingSmitePlayerIds?: string[];
   /** Arsonist: player IDs that have been doused by the Arsonist. */
   arsonistDousedPlayerIds?: string[];
+  /**
+   * Convicted player ID awaiting final elimination during the post-verdict
+   * Martyr window. Populated for all players so the UI can present the window.
+   * Cleared when the Martyr intercepts or the narrator advances past it.
+   */
+  pendingGuiltId?: string;
+  /** True once the Martyr has used their once-per-game substitution ability. */
+  martyrUsed?: boolean;
   /** True if the player is silenced this day. */
   isSilenced?: boolean;
   /** True if the player is hypnotized by the Mummy. */
@@ -170,18 +178,26 @@ export interface WerewolfPlayerGameState extends BasePlayerGameState {
     mustVoteInnocent?: boolean;
     voteResults?: { playerName: string; vote: DaytimeVote }[];
     eliminatedRole?: { id: string; name: string; team: Team };
+    /**
+     * True when the defendant was actually eliminated (added to `deadPlayerIds`).
+     * False when the defendant survived (e.g. Martyr intercept).
+     * Only set when `verdict` is present.
+     */
+    defendantEliminated?: boolean;
   };
 }
 
 /**
  * Returns true when no new nominations can be started — either a trial is
- * active (no verdict yet) or the per-day trial cap has been reached.
+ * active (no verdict yet), the Martyr window is open (pendingGuiltId set),
+ * or the per-day trial cap has been reached.
  */
 export function isNominationsBlocked(
   gameState: WerewolfPlayerGameState,
 ): boolean {
   const hasActiveTrial =
-    !!gameState.activeTrial && !gameState.activeTrial.verdict;
+    (!!gameState.activeTrial && !gameState.activeTrial.verdict) ||
+    !!gameState.pendingGuiltId;
   return (
     hasActiveTrial ||
     (gameState.trialsPerDay !== undefined &&

@@ -109,6 +109,8 @@ describe("Werewolf player state round-trip", () => {
       monarchKnightedPlayerIds: ["p2", "p3"],
       monarchKnightingsUsed: 2,
       hunterRevengePlayerId: "p1",
+      pendingGuiltId: "p3",
+      martyrUsed: true,
     });
     const result = firebaseToPlayerState(
       playerStateToFirebase(state),
@@ -126,6 +128,8 @@ describe("Werewolf player state round-trip", () => {
     expect(result.monarchKnightedPlayerIds).toEqual(["p2", "p3"]);
     expect(result.monarchKnightingsUsed).toBe(2);
     expect(result.hunterRevengePlayerId).toBe("p1");
+    expect(result.pendingGuiltId).toBe("p3");
+    expect(result.martyrUsed).toBe(true);
   });
 
   it("preserves Veteran alert fields when present", () => {

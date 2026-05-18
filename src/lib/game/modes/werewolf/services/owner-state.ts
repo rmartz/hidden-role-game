@@ -264,7 +264,21 @@ export function extractDaytimePlayerState(
         vote: v.vote,
       }));
 
+      // Expose whether the defendant was actually eliminated so both player
+      // and narrator panels can derive "spared" from the same source of truth.
+      // Only meaningful for Eliminated verdicts; leave undefined for Innocent.
       if (activeTrial.verdict === TrialVerdict.Eliminated) {
+        result.activeTrial.defendantEliminated = ts.deadPlayerIds.includes(
+          activeTrial.defendantId,
+        );
+      }
+
+      // Suppress eliminatedRole if the defendant survived (e.g. Martyr intercept).
+      // Only reveal when the defendant is actually dead.
+      if (
+        activeTrial.verdict === TrialVerdict.Eliminated &&
+        ts.deadPlayerIds.includes(activeTrial.defendantId)
+      ) {
         const assignment = game.roleAssignments.find(
           (a) => a.playerId === activeTrial.defendantId,
         );
@@ -285,6 +299,22 @@ export function extractDaytimePlayerState(
   // Concluded trials count for this day.
   if (phase.concludedTrialsCount) {
     result.concludedTrialsCount = phase.concludedTrialsCount;
+  }
+
+  // Martyr window: expose pendingGuiltId so the UI can display the window.
+  if (phase.pendingGuiltId) {
+    result.pendingGuiltId = phase.pendingGuiltId;
+  }
+
+  // Martyr ability used flag: only expose to the Martyr player so they know
+  // whether they can still intervene.
+  const callerMartyrAssignment = game.roleAssignments.find(
+    (a) =>
+      a.playerId === callerId &&
+      a.roleDefinitionId === (WerewolfRole.Martyr as string),
+  );
+  if (callerMartyrAssignment && ts.roleState?.martyr?.abilityUsed) {
+    result.martyrUsed = true;
   }
 
   // Ghost clues — visible to all players during daytime.

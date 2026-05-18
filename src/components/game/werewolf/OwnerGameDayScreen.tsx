@@ -16,6 +16,7 @@ import {
   getOrderedAffectedPlayers,
   WerewolfAction,
   WerewolfPhase,
+  WerewolfRole,
 } from "@/lib/game/modes/werewolf";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
@@ -78,7 +79,9 @@ export function OwnerGameDayScreen({
   const daytimePhase = phase;
   const modeConfig = GAME_MODES[gameState.gameMode];
   const activeTrial = daytimePhase.activeTrial;
-  const hasActiveTrial = !!activeTrial && !activeTrial.verdict;
+  const pendingGuiltId = daytimePhase.pendingGuiltId;
+  const hasActiveTrial =
+    (!!activeTrial && !activeTrial.verdict) || !!pendingGuiltId;
   const nominationsBlocked = isNominationsBlocked(gameState);
   const hunterRevengePending = !!gameState.hunterRevengePlayerId;
   const glossaryRoles = gameState.rolesInPlay?.length
@@ -99,6 +102,17 @@ export function OwnerGameDayScreen({
     (gameState.players.find((p) => p.id === nextToReveal.playerId)?.name ??
       nextToReveal.playerId);
   const knightedPlayerId = daytimePhase.knightedPlayerId;
+
+  const martyrAssignment = gameState.visibleRoleAssignments.find(
+    (a) => a.role?.id === WerewolfRole.Martyr,
+  );
+  const martyrPlayer = martyrAssignment?.player;
+  const noDeviceMartyrPlayerId =
+    martyrPlayer?.noDevice === true &&
+    !(gameState.deadPlayerIds ?? []).includes(martyrPlayer.id)
+      ? martyrPlayer.id
+      : undefined;
+  const martyrAbilityUsed = turnState.roleState?.martyr?.abilityUsed;
 
   return (
     <div className="p-5 max-w-4xl mx-auto">
@@ -167,6 +181,10 @@ export function OwnerGameDayScreen({
               votePhaseSeconds={votePhaseSeconds}
               defensePhaseSeconds={defensePhaseSeconds}
               autoAdvance={autoAdvance}
+              pendingGuiltId={pendingGuiltId}
+              martyrUsed={martyrAbilityUsed}
+              noDeviceMartyrPlayerId={noDeviceMartyrPlayerId}
+              defendantEliminated={gameState.activeTrial?.defendantEliminated}
             />
           )}
         </OwnerAdvanceCard>
