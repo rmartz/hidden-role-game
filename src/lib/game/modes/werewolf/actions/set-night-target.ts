@@ -14,6 +14,7 @@ import {
   getInterimAttackedPlayerIds,
   isGroupPhaseKey,
   isRoleActive,
+  resolveRoleId,
   validateActiveNightPlayer,
 } from "../utils";
 
@@ -135,7 +136,17 @@ export const setNightTargetAction: GameAction = {
       const actingPlayerAssignment = game.roleAssignments.find(
         (a) => a.roleDefinitionId === phaseKey,
       );
-      if (actingPlayerAssignment?.playerId === targetPlayerId) return false;
+      const actingPlayerId =
+        actingPlayerAssignment?.playerId ??
+        game.roleAssignments.find(
+          (a) =>
+            resolveRoleId(
+              a.playerId,
+              game.roleAssignments,
+              ts.roleOverrides,
+            ) === phaseKey,
+        )?.playerId;
+      if (actingPlayerId === targetPlayerId) return false;
     }
 
     // Dual-target swap roles (e.g. Swapper) cannot select the same player for both targets.

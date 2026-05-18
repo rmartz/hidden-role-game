@@ -106,7 +106,7 @@ describe("werewolfServices.postInitialize (Evil Empath night 1 auto-compute)", (
   });
 
   it("does not throw when EvilEmpath is not the first phase", () => {
-    // Seer is first — Evil Empath should not be auto-computed
+    // Werewolf is first — Evil Empath should not be auto-computed
     const roleAssignments = [
       { playerId: "wolf1", roleDefinitionId: WerewolfRole.Werewolf },
       { playerId: "seer1", roleDefinitionId: WerewolfRole.Seer },
