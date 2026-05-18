@@ -14,7 +14,6 @@ import {
   getInterimAttackedPlayerIds,
   isGroupPhaseKey,
   isRoleActive,
-  resolveRoleId,
   validateActiveNightPlayer,
 } from "../utils";
 
@@ -138,14 +137,9 @@ export const setNightTargetAction: GameAction = {
       );
       const actingPlayerId =
         actingPlayerAssignment?.playerId ??
-        game.roleAssignments.find(
-          (a) =>
-            resolveRoleId(
-              a.playerId,
-              game.roleAssignments,
-              ts.roleOverrides,
-            ) === phaseKey,
-        )?.playerId;
+        Object.entries(ts.roleOverrides ?? {}).find(
+          ([, overrideRoleId]) => overrideRoleId === phaseKey,
+        )?.[0];
       if (actingPlayerId === targetPlayerId) return false;
     }
 
