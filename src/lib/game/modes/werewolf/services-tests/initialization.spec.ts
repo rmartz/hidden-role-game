@@ -7,7 +7,7 @@ import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 import { werewolfServices } from "../services";
 import { buildInitialTurnState } from "../services/initialization";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "../timer-config";
-import type { WerewolfTurnState } from "../types";
+import type { WerewolfNighttimePhase, WerewolfTurnState } from "../types";
 
 describe("buildInitialTurnState (Werewolf)", () => {
   it("returns a WerewolfTurnState", () => {
@@ -49,6 +49,7 @@ describe("werewolfServices.postInitialize (Evil Empath night 1 auto-compute)", (
     // index 0 of nightPhaseOrder — a Villager is overridden to Werewolf via
     // roleOverrides so the adjacency check still produces a meaningful result.
     // playerOrder: [ee1, seer1, v1, v2] — v1 is adjacent to seer1 (right neighbour)
+    const playerOrder = ["ee1", "seer1", "v1", "v2"];
     const roleAssignments = [
       { playerId: "ee1", roleDefinitionId: WerewolfRole.EvilEmpath },
       { playerId: "seer1", roleDefinitionId: WerewolfRole.Seer },
@@ -56,7 +57,7 @@ describe("werewolfServices.postInitialize (Evil Empath night 1 auto-compute)", (
       { playerId: "v2", roleDefinitionId: WerewolfRole.Villager },
     ];
     const turnState = buildInitialTurnState(roleAssignments, {
-      playerOrder: ["ee1", "seer1", "v1", "v2"],
+      playerOrder,
     });
 
     // Override v1 (adjacent to seer1) to Werewolf so adjacency = true
@@ -77,7 +78,7 @@ describe("werewolfServices.postInitialize (Evil Empath night 1 auto-compute)", (
       configuredRoleBuckets: [],
       showRolesInPlay: ShowRolesInPlay.None,
       ownerPlayerId: "owner1",
-      playerOrder: ["ee1", "seer1", "v1", "v2"],
+      playerOrder,
       modeConfig: {
         gameMode: GameMode.Werewolf,
         nominationsEnabled: false,
@@ -92,10 +93,10 @@ describe("werewolfServices.postInitialize (Evil Empath night 1 auto-compute)", (
 
     // Verify that EvilEmpath is actually at index 0 (no EvilKilling roles present)
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
-    expect(
-      ts.phase.type === WerewolfPhase.Nighttime && ts.phase.nightPhaseOrder[0],
-    ).toBe(WerewolfRole.EvilEmpath);
-
+    expect(ts.phase.type).toBe(WerewolfPhase.Nighttime);
+    expect((ts.phase as WerewolfNighttimePhase).nightPhaseOrder[0]).toBe(
+      WerewolfRole.EvilEmpath,
+    );
     werewolfServices.postInitialize?.(game);
 
     const updatedTs = (game.status as { turnState: WerewolfTurnState })
