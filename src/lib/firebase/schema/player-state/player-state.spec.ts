@@ -132,6 +132,27 @@ describe("Werewolf player state round-trip", () => {
     expect(result.martyrUsed).toBe(true);
   });
 
+  it("preserves Veteran alert fields when present", () => {
+    const state = makeWerewolfState({
+      veteranAlertsUsed: 2,
+      myNightAlerted: true,
+    });
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.veteranAlertsUsed).toBe(2);
+    expect(result.myNightAlerted).toBe(true);
+  });
+
+  it("omits Veteran alert fields when absent", () => {
+    const state = makeWerewolfState();
+    const result = firebaseToPlayerState(
+      playerStateToFirebase(state),
+    ) as WerewolfPlayerGameState;
+    expect(result.veteranAlertsUsed).toBeUndefined();
+    expect(result.myNightAlerted).toBeUndefined();
+  });
+
   it("round-trips alphaWolfBiteUsed", () => {
     const state = makeWerewolfState({ alphaWolfBiteUsed: true });
     const result = firebaseToPlayerState(

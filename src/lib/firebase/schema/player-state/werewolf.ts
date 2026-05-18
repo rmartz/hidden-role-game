@@ -35,6 +35,7 @@ export interface FirebaseWerewolfPlayerState
   nightStatus?: NightStatusEntry[];
   previousNightTargetId?: string;
   investigationResult?: { targetPlayerId: string; isWerewolfTeam: boolean };
+  myNightAlerted?: boolean;
   activeTrial?: {
     defendantId: string;
     startedAt: number;
@@ -92,6 +93,7 @@ export function werewolfStateToFirebase(
     ...(state.investigationResult
       ? { investigationResult: state.investigationResult }
       : {}),
+    ...(state.myNightAlerted ? { myNightAlerted: true } : {}),
     ...(state.activeTrial ? { activeTrial: state.activeTrial } : {}),
     nominationsEnabled: state.nominationsEnabled,
     ...(state.trialsPerDay !== undefined
@@ -147,6 +149,7 @@ export function werewolfStateFromFirebase(
     ...(raw.investigationResult
       ? { investigationResult: raw.investigationResult }
       : {}),
+    ...(raw.myNightAlerted ? { myNightAlerted: true } : {}),
     ...(raw.activeTrial
       ? {
           activeTrial:

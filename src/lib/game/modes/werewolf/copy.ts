@@ -263,6 +263,16 @@ export const WEREWOLF_COPY = {
     narratorProtectMode: "Mercenary is in Protect mode.",
     narratorBribeMode: "Mercenary is charged — Bribe mode.",
   },
+  veteran: {
+    alertButton: "Go on Alert",
+    alertsRemaining: (n: number) =>
+      `${String(n)} alert${n === 1 ? "" : "s"} remaining`,
+    skipButton: "Stay Home",
+    dayAnnouncementWolfRepel: (veteranName: string, wolfName: string) =>
+      `${veteranName} was on alert — ${wolfName} was killed repelling the attack.`,
+    dayAnnouncementVisitorKilled: (veteranName: string, visitorName: string) =>
+      `${veteranName} was on alert and counter-killed ${visitorName}, who visited them.`,
+  },
   altruist: {
     attackedIntro:
       "The following players are under attack. You may sacrifice yourself to save one of them.",

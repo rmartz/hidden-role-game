@@ -109,6 +109,11 @@ export interface WolfCubTurnState {
   died: boolean;
 }
 
+export interface VeteranTurnState {
+  /** Number of nights the Veteran has chosen to go on Alert. Maximum 3. */
+  alertsUsed: number;
+}
+
 export interface ZombieTurnState {
   /** Player IDs that have been infected. Accumulated across nights. */
   infected: string[];

@@ -2,6 +2,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
+import { VeteranCounterkillSource } from "@/lib/game/modes/werewolf/types";
 import type { DaytimeNightStatusEntry } from "@/server/types";
 import type { PublicLobbyPlayer } from "@/server/types/lobby";
 
@@ -100,5 +101,43 @@ describe("PlayerNightSummary", () => {
     expect(
       screen.getByText(WEREWOLF_COPY.oldMan.peacefulDeath("Charlie")),
     ).toBeDefined();
+  });
+
+  it("renders veteran-counterkill wolf-repel text", () => {
+    const nightStatus: DaytimeNightStatusEntry[] = [
+      {
+        targetPlayerId: "p1",
+        effect: "veteran-counterkill",
+        veteranPlayerId: "p2",
+        veteranCounterkillSource: VeteranCounterkillSource.WolfRepel,
+      },
+    ];
+
+    render(<PlayerNightSummary players={players} nightStatus={nightStatus} />);
+
+    const expectedText = WEREWOLF_COPY.veteran.dayAnnouncementWolfRepel(
+      "Bob",
+      "Alice",
+    );
+    expect(screen.getByText(expectedText)).toBeDefined();
+  });
+
+  it("renders veteran-counterkill visitor text", () => {
+    const nightStatus: DaytimeNightStatusEntry[] = [
+      {
+        targetPlayerId: "p1",
+        effect: "veteran-counterkill",
+        veteranPlayerId: "p3",
+        veteranCounterkillSource: VeteranCounterkillSource.Visitor,
+      },
+    ];
+
+    render(<PlayerNightSummary players={players} nightStatus={nightStatus} />);
+
+    const expectedText = WEREWOLF_COPY.veteran.dayAnnouncementVisitorKilled(
+      "Charlie",
+      "Alice",
+    );
+    expect(screen.getByText(expectedText)).toBeDefined();
   });
 });

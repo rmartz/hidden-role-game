@@ -82,6 +82,7 @@ export enum WerewolfRole {
   Tanner = "werewolf-tanner",
   TheThing = "werewolf-the-thing",
   ToughGuy = "werewolf-tough-guy",
+  Veteran = "werewolf-veteran",
   Vigilante = "werewolf-vigilante",
   VillageDrunk = "werewolf-village-drunk",
   VillageIdiot = "werewolf-village-idiot",

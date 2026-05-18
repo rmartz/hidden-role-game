@@ -41,6 +41,7 @@ export interface FirebaseWerewolfRoleState {
   hiddenRoleIds?: string[];
   arsonistDousedPlayerIds?: string[];
   pendingSmitePlayerIds?: string[];
+  veteranAlertsUsed?: number;
   ghostClues?: { turn: number; clue: string }[];
   ghostClueSubmittedThisTurn?: boolean;
   ghostVisible?: boolean;
@@ -107,6 +108,9 @@ export function werewolfRoleStateToFirebase(
       : {}),
     ...(state.pendingSmitePlayerIds?.length
       ? { pendingSmitePlayerIds: state.pendingSmitePlayerIds }
+      : {}),
+    ...(state.veteranAlertsUsed !== undefined
+      ? { veteranAlertsUsed: state.veteranAlertsUsed }
       : {}),
     ...(state.ghostClues?.length ? { ghostClues: state.ghostClues } : {}),
     ...(state.ghostClueSubmittedThisTurn
@@ -182,6 +186,9 @@ export function werewolfRoleStateFromFirebase(
       : {}),
     ...(raw.pendingSmitePlayerIds?.length
       ? { pendingSmitePlayerIds: raw.pendingSmitePlayerIds }
+      : {}),
+    ...(raw.veteranAlertsUsed !== undefined
+      ? { veteranAlertsUsed: raw.veteranAlertsUsed }
       : {}),
     ...(raw.ghostClues?.length ? { ghostClues: raw.ghostClues } : {}),
     ...(raw.ghostClueSubmittedThisTurn

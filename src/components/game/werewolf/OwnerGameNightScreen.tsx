@@ -43,6 +43,7 @@ import { OwnerIlluminatiRevealPanel } from "./OwnerIlluminatiRevealPanel";
 import { OwnerInvestigationConfirm } from "./OwnerInvestigationConfirm";
 import { OwnerNightTargetPanel } from "./OwnerNightTargetPanel";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
+import { VeteranActionPanelView } from "./VeteranActionPanelView";
 
 /**
  * Derives per-player night action status markers from the narrator's night actions.
@@ -217,6 +218,24 @@ export function OwnerGameNightScreen({
     [action, activePhaseKey],
   );
 
+  const handleVeteranAlert = useCallback(() => {
+    action.mutate({
+      actionId: WerewolfAction.SetNightTarget,
+      payload: { roleId: activePhaseKey, alerted: true },
+    });
+  }, [action, activePhaseKey]);
+
+  const handleVeteranSkip = useCallback(() => {
+    action.mutate({
+      actionId: WerewolfAction.SetNightTarget,
+      payload: { roleId: activePhaseKey, targetPlayerId: null },
+    });
+  }, [action, activePhaseKey]);
+
+  const handleVeteranConfirm = useCallback(() => {
+    action.mutate({ actionId: WerewolfAction.ConfirmNightTarget });
+  }, [action]);
+
   if (!isNighttime) return null;
 
   const modeConfig = GAME_MODES[gameState.gameMode];
@@ -270,6 +289,17 @@ export function OwnerGameNightScreen({
   const isWitchAbilitySkipped =
     isRoleActive(activePhaseKey, WerewolfRole.Witch) &&
     turnState.roleState?.witch?.abilityUsed;
+
+  const isVeteranPhase =
+    !isFirstTurn && isRoleActive(activePhaseKey, WerewolfRole.Veteran);
+  const veteranAction =
+    isVeteranPhase && activeAction && !isTeamNightAction(activeAction)
+      ? activeAction
+      : undefined;
+  const isVeteranAlerted = veteranAction?.alerted === true;
+  const veteranHasDecided = veteranAction !== undefined;
+  const narratorVeteranAlertsUsed =
+    turnState.roleState?.veteran?.alertsUsed ?? 0;
 
   const activeRoleDef = modeConfig.roles[baseActivePhaseKey] as
     | WerewolfRoleDefinition
@@ -510,22 +540,35 @@ export function OwnerGameNightScreen({
                   </div>
                 </div>
               )}
-              {(!isWitchAbilitySkipped || abilityBypass) && (
-                <OwnerNightTargetPanel
-                  groupAction={!!groupAction}
-                  groupMemberCount={activePlayerNames.length}
-                  resolvedVotes={resolvedVotes}
-                  activeTargetName={activeTargetName}
-                  activeTargetConfirmed={activeTargetConfirmed}
-                  targetablePlayers={targetablePlayers}
-                  activeTarget={activeTarget}
-                  onTargetClick={handleTargetClick}
+              {isVeteranPhase ? (
+                <VeteranActionPanelView
+                  alertsUsed={narratorVeteranAlertsUsed}
+                  isAlerted={isVeteranAlerted}
+                  hasDecided={veteranHasDecided}
+                  isConfirmed={isActionConfirmed}
                   isPending={action.isPending}
-                  previousTargetId={previousTargetId}
-                  requiresDualTarget={requiresDualTarget}
-                  secondTarget={secondTargetId}
-                  dualTargetPrompt={dualTargetPrompt}
+                  onAlert={handleVeteranAlert}
+                  onSkip={handleVeteranSkip}
+                  onConfirm={handleVeteranConfirm}
                 />
+              ) : (
+                (!isWitchAbilitySkipped || abilityBypass) && (
+                  <OwnerNightTargetPanel
+                    groupAction={!!groupAction}
+                    groupMemberCount={activePlayerNames.length}
+                    resolvedVotes={resolvedVotes}
+                    activeTargetName={activeTargetName}
+                    activeTargetConfirmed={activeTargetConfirmed}
+                    targetablePlayers={targetablePlayers}
+                    activeTarget={activeTarget}
+                    onTargetClick={handleTargetClick}
+                    isPending={action.isPending}
+                    previousTargetId={previousTargetId}
+                    requiresDualTarget={requiresDualTarget}
+                    secondTarget={secondTargetId}
+                    dualTargetPrompt={dualTargetPrompt}
+                  />
+                )
               )}
             </>
           )}
