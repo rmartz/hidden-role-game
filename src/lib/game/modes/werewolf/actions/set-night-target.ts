@@ -130,6 +130,19 @@ export const setNightTargetAction: GameAction = {
     )
       return false;
 
+    // Narrator path: roles with preventSelfTarget cannot target themselves.
+    if (isOwner && phaseRoleDef?.preventSelfTarget) {
+      const actingPlayerAssignment = game.roleAssignments.find(
+        (a) => a.roleDefinitionId === phaseKey,
+      );
+      const actingPlayerId =
+        actingPlayerAssignment?.playerId ??
+        Object.entries(ts.roleOverrides ?? {}).find(
+          ([, overrideRoleId]) => overrideRoleId === phaseKey,
+        )?.[0];
+      if (actingPlayerId === targetPlayerId) return false;
+    }
+
     // Dual-target swap roles (e.g. Swapper) cannot select the same player for both targets.
     if (typeof targetPlayerId === "string" && phaseRoleDef?.dualTargetSwap) {
       const existing = phase.nightActions[phaseKey];
@@ -168,8 +181,10 @@ export const setNightTargetAction: GameAction = {
       const callerAssignment = game.roleAssignments.find(
         (a) => a.playerId === callerId,
       );
-      const callerRoleDef = callerAssignment
-        ? getWerewolfRole(callerAssignment.roleDefinitionId)
+      const effectiveCallerRoleId =
+        ts.roleOverrides?.[callerId] ?? callerAssignment?.roleDefinitionId;
+      const callerRoleDef = effectiveCallerRoleId
+        ? getWerewolfRole(effectiveCallerRoleId)
         : undefined;
       if (
         callerRoleDef?.targetCategory === TargetCategory.Attack ||

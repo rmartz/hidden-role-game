@@ -1,9 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { WerewolfRole } from "../roles";
+import { Team } from "@/lib/types";
+
+import { WEREWOLF_COPY } from "../copy";
+import { WEREWOLF_ROLES, WerewolfRole } from "../roles";
 import {
   buildNightSummary,
   getConfirmLabel,
+  getInvestigationResultForNarrator,
   getPhaseLabel,
   isPlayersTurn,
 } from "./display";
@@ -331,5 +335,208 @@ describe("getConfirmLabel", () => {
 
   it("returns 'Confirm' for unknown roleId", () => {
     expect(getConfirmLabel("unknown-role")).toBe("Confirm");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getInvestigationResultForNarrator
+// ---------------------------------------------------------------------------
+
+describe("getInvestigationResultForNarrator", () => {
+  const seerRole = WEREWOLF_ROLES[WerewolfRole.Seer];
+  const mysticSeerRole = WEREWOLF_ROLES[WerewolfRole.MysticSeer];
+
+  const wolfAssignment = {
+    player: { id: "wolf1", name: "Wolf" },
+    reason: "revealed" as const,
+    role: { id: WerewolfRole.Werewolf, name: "Werewolf", team: Team.Bad },
+  };
+  const villagerAssignment = {
+    player: { id: "v1", name: "Villager" },
+    reason: "revealed" as const,
+    role: { id: WerewolfRole.Villager, name: "Villager", team: Team.Good },
+  };
+  const minionAssignment = {
+    player: { id: "minion1", name: "Minion" },
+    reason: "revealed" as const,
+    role: { id: WerewolfRole.Minion, name: "Minion", team: Team.Bad },
+  };
+
+  it("returns undefined when isInvestigatePhase is false", () => {
+    expect(
+      getInvestigationResultForNarrator(
+        false,
+        "wolf1",
+        true,
+        "Wolf",
+        [wolfAssignment],
+        seerRole,
+      ),
+    ).toBeUndefined();
+  });
+
+  it("returns undefined when activeTarget is undefined", () => {
+    expect(
+      getInvestigationResultForNarrator(
+        true,
+        undefined,
+        true,
+        undefined,
+        [wolfAssignment],
+        seerRole,
+      ),
+    ).toBeUndefined();
+  });
+
+  it("returns undefined when activeTargetConfirmed is false", () => {
+    expect(
+      getInvestigationResultForNarrator(
+        true,
+        "wolf1",
+        false,
+        "Wolf",
+        [wolfAssignment],
+        seerRole,
+      ),
+    ).toBeUndefined();
+  });
+
+  it("returns isWerewolfTeam true for a Werewolf target (Seer investigation)", () => {
+    const result = getInvestigationResultForNarrator(
+      true,
+      "wolf1",
+      true,
+      "Wolf",
+      [wolfAssignment],
+      seerRole,
+    );
+    expect(result?.isWerewolfTeam).toBe(true);
+    expect(result?.targetName).toBe("Wolf");
+    expect(result?.illusionFlipLabel).toBeUndefined();
+  });
+
+  it("returns isWerewolfTeam false for a Villager target", () => {
+    const result = getInvestigationResultForNarrator(
+      true,
+      "v1",
+      true,
+      "Villager",
+      [villagerAssignment],
+      seerRole,
+    );
+    expect(result?.isWerewolfTeam).toBe(false);
+    expect(result?.illusionFlipLabel).toBeUndefined();
+  });
+
+  it("flips result and adds annotation when Illusion Artist targets the same player", () => {
+    // wolf1 is Werewolf, but Illusion Artist has targeted wolf1 → Seer sees false
+    const result = getInvestigationResultForNarrator(
+      true,
+      "wolf1",
+      true,
+      "Wolf",
+      [wolfAssignment],
+      seerRole,
+      undefined,
+      undefined,
+      "wolf1", // illusionTargetId
+    );
+    expect(result?.isWerewolfTeam).toBe(false);
+    expect(result?.illusionFlipLabel).toBe(
+      WEREWOLF_COPY.illusionArtist.narratorFlipAnnotation(
+        WEREWOLF_COPY.narrator.seerAlignmentStatus(true),
+      ),
+    );
+  });
+
+  it("flip annotation uses seerAlignmentStatus not teamStatus for a non-wolf Bad-team target (Minion)", () => {
+    // Minion: Bad team, but isWerewolf=false. The Illusion Artist flips a "not a Werewolf" to "Werewolf".
+    // Annotation should say "Flipped from actual: Not a Werewolf", not "Flipped from actual: not Evil".
+    const result = getInvestigationResultForNarrator(
+      true,
+      "minion1",
+      true,
+      "Minion",
+      [minionAssignment],
+      seerRole,
+      undefined,
+      undefined,
+      "minion1", // illusionTargetId
+    );
+    expect(result?.isWerewolfTeam).toBe(true); // flipped from false
+    expect(result?.illusionFlipLabel).toBe(
+      WEREWOLF_COPY.illusionArtist.narratorFlipAnnotation(
+        WEREWOLF_COPY.narrator.seerAlignmentStatus(false),
+      ),
+    );
+    // Ensure it does NOT say "not Evil"
+    expect(result?.illusionFlipLabel).not.toContain(
+      WEREWOLF_COPY.narrator.teamStatus(false),
+    );
+  });
+
+  it("does not flip result when Illusion Artist targets a different player", () => {
+    const result = getInvestigationResultForNarrator(
+      true,
+      "wolf1",
+      true,
+      "Wolf",
+      [wolfAssignment],
+      seerRole,
+      undefined,
+      undefined,
+      "v1", // illusionTargetId is different from activeTarget
+    );
+    expect(result?.isWerewolfTeam).toBe(true);
+    expect(result?.illusionFlipLabel).toBeUndefined();
+  });
+
+  it("applies roleOverrides for Seer result — overridden Villager shows as Werewolf", () => {
+    // v1 is originally Villager but Alpha Wolf converted them
+    const result = getInvestigationResultForNarrator(
+      true,
+      "v1",
+      true,
+      "Villager",
+      [villagerAssignment],
+      seerRole,
+      undefined,
+      undefined,
+      undefined,
+      { v1: WerewolfRole.Werewolf }, // roleOverrides
+    );
+    expect(result?.isWerewolfTeam).toBe(true);
+  });
+
+  it("applies roleOverrides for Mystic Seer — resultLabel uses effective role name", () => {
+    // v1 was originally Villager, but is overridden to Werewolf
+    const result = getInvestigationResultForNarrator(
+      true,
+      "v1",
+      true,
+      "Villager",
+      [villagerAssignment],
+      mysticSeerRole,
+      undefined,
+      undefined,
+      undefined,
+      { v1: WerewolfRole.Werewolf }, // roleOverrides
+    );
+    // After override the effective role is Werewolf
+    expect(result?.resultLabel).toBe("Werewolf");
+    expect(result?.isWerewolfTeam).toBe(true);
+  });
+
+  it("Mystic Seer without roleOverrides shows original role name", () => {
+    const result = getInvestigationResultForNarrator(
+      true,
+      "v1",
+      true,
+      "Villager",
+      [villagerAssignment],
+      mysticSeerRole,
+    );
+    expect(result?.resultLabel).toBe("Villager");
+    expect(result?.isWerewolfTeam).toBe(false);
   });
 });

@@ -329,6 +329,14 @@ export function OwnerGameNightScreen({
     ? (getPlayerName(gameState.players, secondTargetId) ?? secondTargetId)
     : undefined;
 
+  const illusionAction = nightActions[WerewolfRole.IllusionArtist as string];
+  const illusionTargetId =
+    illusionAction &&
+    !isTeamNightAction(illusionAction) &&
+    illusionAction.confirmed
+      ? illusionAction.targetPlayerId
+      : undefined;
+
   const requiresDualTarget =
     activeRoleDef?.dualTargetSwap === true ||
     activeRoleDef?.dualTargetInvestigate === true;
@@ -362,6 +370,8 @@ export function OwnerGameNightScreen({
     activeRoleDef,
     secondTargetId,
     secondTargetName,
+    illusionTargetId,
+    turnState.roleOverrides,
   );
 
   const exposerRevealData = turnState.roleState?.exposer?.reveal;
@@ -374,6 +384,16 @@ export function OwnerGameNightScreen({
         )?.role?.name ?? exposerRevealData.roleId,
       )
     : undefined;
+
+  const isEvilEmpathPhase = isRoleActive(
+    activePhaseKey,
+    WerewolfRole.EvilEmpath,
+  );
+  const evilEmpathNightResult =
+    isEvilEmpathPhase &&
+    turnState.roleState?.evilEmpath?.lastResult !== undefined
+      ? turnState.roleState.evilEmpath.lastResult
+      : undefined;
 
   const unconfirmedWarning =
     !isFirstTurn && !isWitchAbilitySkipped && !isActionConfirmed
@@ -552,7 +572,8 @@ export function OwnerGameNightScreen({
                   onConfirm={handleVeteranConfirm}
                 />
               ) : (
-                (!isWitchAbilitySkipped || abilityBypass) && (
+                (!isWitchAbilitySkipped || abilityBypass) &&
+                !isEvilEmpathPhase && (
                   <OwnerNightTargetPanel
                     groupAction={!!groupAction}
                     groupMemberCount={activePlayerNames.length}
@@ -580,6 +601,7 @@ export function OwnerGameNightScreen({
               isResultRevealed={isResultRevealed}
               resultLabel={investigationResult.resultLabel}
               secondTargetName={investigationResult.secondTargetName}
+              illusionFlipLabel={investigationResult.illusionFlipLabel}
             />
           )}
           {isIlluminatiPhase && (
@@ -593,6 +615,13 @@ export function OwnerGameNightScreen({
           {exposerRevealText && (
             <p className="mt-2 text-xs text-muted-foreground italic">
               {exposerRevealText}
+            </p>
+          )}
+          {evilEmpathNightResult !== undefined && (
+            <p className="mt-2 text-sm font-medium">
+              {evilEmpathNightResult
+                ? WEREWOLF_COPY.evilEmpath.adjacentResult
+                : WEREWOLF_COPY.evilEmpath.notAdjacentResult}
             </p>
           )}
         </OwnerAdvanceCard>

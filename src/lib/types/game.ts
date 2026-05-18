@@ -206,6 +206,14 @@ export interface GameModeServices {
     callerId: string,
     myRole: RoleDefinition | undefined,
   ): Record<string, unknown>;
+
+  /**
+   * Optional hook called after the game transitions from Starting → Playing
+   * and `game.status` has been set to the initial Playing status.
+   * Use this to run any mode-specific initialization that requires a full
+   * Game object (e.g. auto-computing initial night-phase results).
+   */
+  postInitialize?: (game: Game) => void;
 }
 
 export interface GameModeConfig {

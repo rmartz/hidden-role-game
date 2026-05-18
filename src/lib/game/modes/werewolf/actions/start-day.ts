@@ -18,6 +18,7 @@ import {
   resolveNightActions,
   WerewolfWinner,
 } from "../utils";
+import { confirmEvilEmpathResultAction } from "./confirm-evil-empath-result";
 import { didWolfCubDie } from "./helpers";
 
 export const startDayAction: GameAction = {
@@ -224,6 +225,58 @@ export const startDayAction: GameAction = {
         exposerReveal = newExposerReveal;
       }
     }
+
+    // Illusion Artist: extract the target from this night's action to carry into
+    // roleState.illusionArtist.illusionTargetId. Seer result resolution reads
+    // this to invert the result when the Seer's target matches this player.
+    const illusionRawAction =
+      nightPhase.nightActions[WerewolfRole.IllusionArtist as string];
+    const illusionAction =
+      illusionRawAction && !isTeamNightAction(illusionRawAction)
+        ? illusionRawAction
+        : undefined;
+    const illusionTargetId =
+      illusionAction?.confirmed && illusionAction.targetPlayerId
+        ? illusionAction.targetPlayerId
+        : undefined;
+
+    // Evil Empath: if the Evil Empath was the last (active) night phase and the
+    // result was never computed (e.g. narrator advanced directly to start-day,
+    // or the generic skip/confirm flow set confirmed without resultRevealed),
+    // auto-compute it now — same guard used in setNightPhaseAction.
+    const finalPhaseKey =
+      nightPhase.nightPhaseOrder[nightPhase.currentPhaseIndex];
+    const finalPhaseAction = nightPhase.nightActions[finalPhaseKey ?? ""];
+    const evilEmpathAlreadyComputed =
+      finalPhaseKey === (WerewolfRole.EvilEmpath as string) &&
+      finalPhaseAction &&
+      !("votes" in finalPhaseAction) &&
+      finalPhaseAction.confirmed === true &&
+      finalPhaseAction.resultRevealed === true;
+    if (
+      finalPhaseKey === (WerewolfRole.EvilEmpath as string) &&
+      !evilEmpathAlreadyComputed
+    ) {
+      confirmEvilEmpathResultAction.apply(game, {}, "");
+    }
+
+    // Evil Empath: carry the last known adjacency result forward so it can be
+    // revealed to Werewolves when the Evil Empath dies.
+    const evilEmpathLastResult = ts.roleState?.evilEmpath?.lastResult;
+
+    // Evil Empath death trigger: if the Evil Empath died this night and there is
+    // a last result, set revealedResult so Werewolves see it. Use
+    // effectiveAssignments so mid-game roleOverrides are respected.
+    const evilEmpathAssignment = effectiveAssignments.find(
+      (a) => a.roleDefinitionId === (WerewolfRole.EvilEmpath as string),
+    );
+    const evilEmpathRevealedResult =
+      ts.roleState?.evilEmpath?.revealedResult ??
+      (evilEmpathAssignment !== undefined &&
+      newDeadIds.includes(evilEmpathAssignment.playerId) &&
+      evilEmpathLastResult !== undefined
+        ? evilEmpathLastResult
+        : undefined);
 
     // Build lastTargets for roles that prevent consecutive same-player targeting.
     const lastTargets: Record<string, string> = {};
@@ -541,6 +594,21 @@ export const startDayAction: GameAction = {
         : {}),
       ...(arsonistDousedPlayerIds.length > 0
         ? { arsonist: { dousedPlayerIds: arsonistDousedPlayerIds } }
+        : {}),
+      ...(illusionTargetId ? { illusionArtist: { illusionTargetId } } : {}),
+      // Evil Empath: carry forward last result and revealed result.
+      ...(evilEmpathLastResult !== undefined ||
+      evilEmpathRevealedResult !== undefined
+        ? {
+            evilEmpath: {
+              ...(evilEmpathLastResult !== undefined
+                ? { lastResult: evilEmpathLastResult }
+                : {}),
+              ...(evilEmpathRevealedResult !== undefined
+                ? { revealedResult: evilEmpathRevealedResult }
+                : {}),
+            },
+          }
         : {}),
       ...(veteranAlertsUsed > 0
         ? { veteran: { alertsUsed: veteranAlertsUsed } }
