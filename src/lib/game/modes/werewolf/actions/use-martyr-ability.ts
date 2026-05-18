@@ -76,7 +76,7 @@ export const useMartyrAbilityAction: GameAction = {
     }
 
     // Executioner wins if their target was the Martyr (who voluntarily died).
-    if (ts.roleState?.executioner?.targetId === martyrId) {
+    if (ts.roleState.executioner?.targetId === martyrId) {
       const executionerAssignment = game.roleAssignments.find(
         (a) => a.roleDefinitionId === (WerewolfRole.Executioner as string),
       );

@@ -50,6 +50,12 @@ export function applyTrialVerdict(
     // AdvanceMartyrWindow so the narrator can reveal the role (and the Martyr
     // may optionally intervene) before the player is formally eliminated.
     ts.phase.pendingGuiltId = activeTrial.defendantId;
+  } else if (!eliminated) {
+    // Innocent verdict: no pending death — check win condition directly.
+    const winResult = checkWinCondition(game, ts.deadPlayerIds);
+    if (winResult) {
+      game.status = winResult;
+    }
   }
 }
 
@@ -70,15 +76,5 @@ export const resolveTrialAction: GameAction = {
     const { activeTrial } = ts.phase;
     if (!activeTrial) return;
     applyTrialVerdict(activeTrial, ts, game);
-
-    // Guilty verdict: pendingGuiltId is now set; narrator must call
-    // AdvanceMartyrWindow to apply the death (enabling the Martyr window).
-    // Innocent verdict: no pending death — check win condition directly.
-    if (activeTrial.verdict !== TrialVerdict.Eliminated) {
-      const winResult = checkWinCondition(game, ts.deadPlayerIds);
-      if (winResult) {
-        game.status = winResult;
-      }
-    }
   },
 };
