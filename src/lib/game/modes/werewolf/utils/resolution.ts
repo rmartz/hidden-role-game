@@ -375,7 +375,9 @@ export function resolveNightActions(
       targetRole &&
       targetRole.targetCategory !== TargetCategory.Investigate
     ) {
-      if (!targetRole.wakesWith) {
+      const targetUsesGroupPhase =
+        targetRole.teamTargeting ?? targetRole.wakesWith !== undefined;
+      if (!targetUsesGroupPhase) {
         // Target has a solo phase — remove it (including any suffixed repeat keys).
         const blockedPhaseKey = targetRole.id as string;
         resolvedNightActions = Object.fromEntries(
@@ -384,8 +386,8 @@ export function resolveNightActions(
           ),
         );
       }
-      // If the target wakes with a group phase (wakesWith is set), removing
-      // that group phase would cancel all teammates' actions. Skip phase removal
+      // If the target uses a group phase (primary team phase or wakesWith),
+      // removing that phase would cancel teammates' actions. Skip phase removal
       // and emit the hangover only.
       hangoverEvents.push({ type: "hangover", targetPlayerId: tkTarget });
     }

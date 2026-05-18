@@ -192,4 +192,23 @@ describe("resolveNightActions — Tavern Keeper hangover mechanic", () => {
     );
     expect(killed?.type === "killed" && killed.died).toBe(true);
   });
+
+  it("emits hangover but does not cancel the group attack when TK targets a primary Werewolf", () => {
+    const events = resolveNightActions(
+      {
+        [WerewolfRole.TavernKeeper]: { targetPlayerId: "w1", confirmed: true },
+        [WerewolfRole.Werewolf]: { votes: [], suggestedTargetId: "p1" },
+      },
+      assignments,
+      [],
+    );
+    const hangover = events.find(
+      (e) => e.type === "hangover" && e.targetPlayerId === "w1",
+    );
+    expect(hangover).toBeDefined();
+    const killed = events.find(
+      (e) => e.type === "killed" && e.targetPlayerId === "p1",
+    );
+    expect(killed?.type === "killed" && killed.died).toBe(true);
+  });
 });
