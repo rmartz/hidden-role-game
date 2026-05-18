@@ -21,7 +21,7 @@ pnpm run secrets-check # Gitleaks secret scan (runs in pre-commit)
 
 ## Worktree Setup
 
-After creating a git worktree (`git worktree add .git-worktrees/<name> -b <branch> origin/main`), run `pnpm install --frozen-lockfile` inside it before invoking any build or test commands. pnpm's `node-modules` linker creates per-directory `node_modules` trees; a fresh worktree has none. The global store is already populated so this step only creates hardlinks — it takes a few seconds and requires no network access.
+After creating a git worktree (`git worktree add .git-worktrees/<name> -b <branch> origin/main`), run `pnpm install --frozen-lockfile` inside it before invoking any build, test, lint, or typecheck commands. pnpm's `node-modules` linker creates per-directory `node_modules` trees; a fresh worktree has none. The global store is already populated so this step only creates hardlinks — it takes a few seconds and requires no network access.
 
 ## Secret Management
 
