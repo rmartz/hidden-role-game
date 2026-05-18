@@ -388,8 +388,8 @@ export function resolveNightActions(
       } else {
         // Target participates in a group phase — remove only their own contribution
         // and recompute each matching phase's suggested target.
-        const blockedGroupPhaseKey = (targetRole.wakesWith ?? targetRole.id) as
-          string;
+        const blockedGroupPhaseKey = (targetRole.wakesWith ??
+          targetRole.id) as string;
         resolvedNightActions = Object.fromEntries(
           Object.entries(resolvedNightActions).map(([phaseKey, action]) => {
             if (baseGroupPhaseKey(phaseKey) !== blockedGroupPhaseKey) {
@@ -399,7 +399,9 @@ export function resolveNightActions(
               return [phaseKey, action];
             }
 
-            const votes = action.votes.filter((vote) => vote.playerId !== tkTarget);
+            const votes = action.votes.filter(
+              (vote) => vote.playerId !== tkTarget,
+            );
             const suggestedTargetId = computeSuggestedTarget(votes);
             const nextAction = { ...action, votes };
             if (suggestedTargetId !== undefined) {
