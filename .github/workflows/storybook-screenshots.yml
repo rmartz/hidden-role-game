@@ -33,7 +33,9 @@ jobs:
           echo "files=${CHANGED}" >> "$GITHUB_OUTPUT"
 
       - name: Generate screenshots config
-        run: pnpm tsx .github/scripts/generate-story-urls.ts ${{ steps.stories.outputs.files }}
+        env:
+          CHANGED_FILES: ${{ steps.stories.outputs.files }}
+        run: pnpm tsx .github/scripts/generate-story-urls.ts $CHANGED_FILES
 
       - name: Build Storybook
         run: pnpm build-storybook --output-dir storybook-static

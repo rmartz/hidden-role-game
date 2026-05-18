@@ -98,6 +98,15 @@ describe("extractTitleFromContent", () => {
     const content = `const meta = { component: HomeLink } satisfies Meta<typeof HomeLink>;`;
     expect(extractTitleFromContent(content)).toBeUndefined();
   });
+
+  it("ignores title in story args (only reads meta block)", () => {
+    const content = `
+const meta = { component: RoleGlossaryDialog } satisfies Meta<typeof RoleGlossaryDialog>;
+export default meta;
+export const Default: Story = { args: { title: "Role Glossary" } };
+    `;
+    expect(extractTitleFromContent(content)).toBeUndefined();
+  });
 });
 
 describe("extractStoryExportNames", () => {

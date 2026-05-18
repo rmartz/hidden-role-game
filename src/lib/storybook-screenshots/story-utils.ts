@@ -37,7 +37,8 @@ export function exportNameToStoryId(exportName: string): string {
 /** Extracts the explicit `title` value from a story file's source, or
  *  returns `undefined` when no title is set (auto-title mode). */
 export function extractTitleFromContent(content: string): string | undefined {
-  const match = /title:\s*["']([^"']+)["']/.exec(content);
+  const metaBlock = content.split(/export\s+default\s+meta\b/)[0] ?? content;
+  const match = /title:\s*["']([^"']+)["']/.exec(metaBlock);
   return match?.[1];
 }
 
@@ -85,10 +86,14 @@ export function generateScreenshotsConfig(
 
   const lines = ["screenshots:"];
   for (const entry of entries) {
-    lines.push(`  - name: "${entry.name}"`);
-    lines.push(`    url: "${entry.url}"`);
+    lines.push(`  - name: ${yamlSingleQuote(entry.name)}`);
+    lines.push(`    url: ${yamlSingleQuote(entry.url)}`);
   }
   return lines.join("\n") + "\n";
+}
+
+function yamlSingleQuote(value: string): string {
+  return `'${value.replace(/'/g, "''")}'`;
 }
 
 function sanitize(str: string): string {
