@@ -181,8 +181,10 @@ export const setNightTargetAction: GameAction = {
       const callerAssignment = game.roleAssignments.find(
         (a) => a.playerId === callerId,
       );
-      const callerRoleDef = callerAssignment
-        ? getWerewolfRole(callerAssignment.roleDefinitionId)
+      const effectiveCallerRoleId =
+        ts.roleOverrides?.[callerId] ?? callerAssignment?.roleDefinitionId;
+      const callerRoleDef = effectiveCallerRoleId
+        ? getWerewolfRole(effectiveCallerRoleId)
         : undefined;
       if (
         callerRoleDef?.targetCategory === TargetCategory.Attack ||

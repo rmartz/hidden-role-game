@@ -73,8 +73,17 @@ export function extractPlayerNightState(
   const ts = currentTurnState(game);
   const nightActions = ts?.phase.nightActions ?? {};
 
+  // Resolve effective role: a roleOverride (e.g. Village Drunk sobering into
+  // a new role) takes precedence over the original assignment.
+  const overriddenRoleId = ts?.roleOverrides?.[callerId];
+  const effectiveRole = overriddenRoleId
+    ? (getWerewolfRole(overriddenRoleId) ?? myRole)
+    : myRole;
+
   // Group phase handling.
-  const groupPhaseKey = myRole.teamTargeting ? myRole.id : myRole.wakesWith;
+  const groupPhaseKey = effectiveRole.teamTargeting
+    ? effectiveRole.id
+    : effectiveRole.wakesWith;
 
   if (groupPhaseKey) {
     return extractGroupPhaseState(
@@ -91,7 +100,7 @@ export function extractPlayerNightState(
   const roleResult = extractRoleSpecificState(
     game,
     callerId,
-    myRole,
+    effectiveRole,
     nightActions,
     deadPlayerIds,
     ts,
@@ -99,7 +108,7 @@ export function extractPlayerNightState(
   if (roleResult) return roleResult;
 
   // Generic solo action handling.
-  return extractGenericSoloState(game, myRole, nightActions, ts);
+  return extractGenericSoloState(game, effectiveRole, nightActions, ts);
 }
 
 function extractGroupPhaseState(
