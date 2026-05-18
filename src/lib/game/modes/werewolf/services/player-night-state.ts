@@ -127,13 +127,23 @@ function extractGroupPhaseState(
     }
   }
 
+  // Gate Evil Empath reveal on effective Werewolf role (respects roleOverrides).
+  const callerAssignment = game.roleAssignments.find(
+    (a) => a.playerId === callerId,
+  );
+  const callerEffectiveRoleId =
+    ts?.roleOverrides?.[callerId] ?? callerAssignment?.roleDefinitionId ?? "";
+  const isEffectiveWerewolf =
+    getWerewolfRole(callerEffectiveRoleId)?.isWerewolf === true;
+
   const action = nightActions[lookupKey];
   if (!action || !isTeamNightAction(action)) {
     return {
       myNightTarget: undefined,
       myNightTargetConfirmed: false,
       ...(previousNightTargetId ? { previousNightTargetId } : {}),
-      ...(ts?.roleState?.evilEmpath?.revealedResult !== undefined
+      ...(isEffectiveWerewolf &&
+      ts?.roleState?.evilEmpath?.revealedResult !== undefined
         ? { evilEmpathRevealedResult: ts.roleState.evilEmpath.revealedResult }
         : {}),
     };
@@ -174,7 +184,8 @@ function extractGroupPhaseState(
     suggestedTargetId: action.suggestedTargetId,
     allAgreed,
     ...(previousNightTargetId ? { previousNightTargetId } : {}),
-    ...(ts?.roleState?.evilEmpath?.revealedResult !== undefined
+    ...(isEffectiveWerewolf &&
+    ts?.roleState?.evilEmpath?.revealedResult !== undefined
       ? { evilEmpathRevealedResult: ts.roleState.evilEmpath.revealedResult }
       : {}),
   };
@@ -695,6 +706,8 @@ function appendInvestigationResult(
     result.investigationResult = {
       targetPlayerId: myAction.targetPlayerId,
       isWerewolfTeam: effectiveIsWerewolf,
+      resultLabel:
+        WEREWOLF_COPY.narrator.seerAlignmentStatus(effectiveIsWerewolf),
     };
   }
 }

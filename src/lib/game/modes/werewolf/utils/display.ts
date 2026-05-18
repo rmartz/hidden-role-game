@@ -199,9 +199,12 @@ export function getInvestigationResultForNarrator(
   // investigator — other roles (One-Eyed Seer, etc.) always show true alignment.
   const isSeerInvestigation = activeRoleDef?.id === WerewolfRole.Seer;
   const isFlipped = isSeerInvestigation && illusionTargetId === activeTarget;
+  const effectiveIsWerewolf = isFlipped ? !isWerewolf : isWerewolf;
   return {
     targetName: activeTargetName ?? activeTarget,
-    isWerewolfTeam: isFlipped ? !isWerewolf : isWerewolf,
+    isWerewolfTeam: effectiveIsWerewolf,
+    resultLabel:
+      WEREWOLF_COPY.narrator.seerAlignmentStatus(effectiveIsWerewolf),
     ...(isFlipped
       ? {
           illusionFlipLabel:

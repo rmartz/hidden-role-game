@@ -86,6 +86,7 @@ describe("extractPlayerNightState (Mentalist targeting)", () => {
     expect(result.investigationResult).toEqual({
       targetPlayerId: "p2",
       isWerewolfTeam: false,
+      resultLabel: "Not a Werewolf",
     });
   });
 });

@@ -150,7 +150,7 @@ export function PlayerNightActionScreen({
   const evilEmpathNightResult = gameState.evilEmpathNightResult;
   const evilEmpathRevealedResult = gameState.evilEmpathRevealedResult;
 
-  return isFirstTurn ? (
+  return isFirstTurn && !isEvilEmpath ? (
     <PlayerFirstTurnScreen
       roleName={gameState.myRole?.name}
       teammateNames={teammateNames}
