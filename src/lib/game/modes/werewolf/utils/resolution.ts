@@ -403,12 +403,7 @@ export function resolveNightActions(
               (vote) => vote.playerId !== tkTarget,
             );
             const suggestedTargetId = computeSuggestedTarget(votes);
-            const nextAction = { ...action, votes };
-            if (suggestedTargetId !== undefined) {
-              nextAction.suggestedTargetId = suggestedTargetId;
-            } else {
-              delete nextAction.suggestedTargetId;
-            }
+            const nextAction = { ...action, votes, suggestedTargetId };
 
             return [phaseKey, nextAction];
           }),
