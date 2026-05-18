@@ -18,6 +18,7 @@ import { ConfirmTargetButton } from "./ConfirmTargetButton";
 import { PlayerFirstTurnScreen } from "./PlayerFirstTurnScreen";
 import { PlayerInvestigationResult } from "./PlayerInvestigationResult";
 import { PlayerTargetSelection } from "./PlayerTargetSelection";
+import { VeteranActionPanel } from "./VeteranActionPanel";
 
 interface PlayerNightActionScreenProps {
   gameId: string;
@@ -107,6 +108,11 @@ export function PlayerNightActionScreen({
     !isGroupPhase &&
     gameState.myRole?.id === (WerewolfRole.EvilEmpath as string);
 
+  const isVeteran =
+    !isGroupPhase && gameState.myRole?.id === WerewolfRole.Veteran;
+  const veteranAlertsUsed = gameState.veteranAlertsUsed ?? 0;
+  const isVeteranAlerted = gameState.myNightAlerted === true;
+
   const isExposerAbilityUsed =
     !isGroupPhase &&
     gameState.myRole?.id === (WerewolfRole.Exposer as string) &&
@@ -193,6 +199,14 @@ export function PlayerNightActionScreen({
             myNightTarget={gameState.myNightTarget}
             isConfirmed={isConfirmed}
             confirmPhaseKey={confirmPhaseKey}
+          />
+        ) : isVeteran ? (
+          <VeteranActionPanel
+            gameId={gameId}
+            alertsUsed={veteranAlertsUsed}
+            isAlerted={isVeteranAlerted}
+            hasDecided={isVeteranAlerted || gameState.myNightTarget === null}
+            isConfirmed={isConfirmed}
           />
         ) : priestWardActive ? (
           <ConfirmTargetButton

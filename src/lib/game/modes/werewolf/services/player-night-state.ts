@@ -251,6 +251,18 @@ function extractRoleSpecificState(
     };
   }
 
+  if (myRole.id === WerewolfRole.Veteran) {
+    const vetAction = nightActions[myRole.id];
+    const soloAction =
+      vetAction && !isTeamNightAction(vetAction) ? vetAction : undefined;
+    return {
+      myNightTarget: soloAction?.skipped ? null : undefined,
+      myNightTargetConfirmed: soloAction?.confirmed ?? false,
+      veteranAlertsUsed: ts?.roleState?.veteran?.alertsUsed ?? 0,
+      myNightAlerted: soloAction?.alerted === true,
+    };
+  }
+
   if (myRole.id === WerewolfRole.Executioner) {
     return {
       myNightTarget: undefined,
@@ -487,7 +499,12 @@ function extractInsomniacState(
       const vote = action.votes.find((v) => v.playerId === neighborId);
       return vote !== undefined && !vote.skipped;
     }
-    return !action.skipped && action.targetPlayerId !== undefined;
+    // alerted: true (Veteran alert action) counts as acting even though it
+    // has no targetPlayerId.
+    return (
+      !action.skipped &&
+      (action.targetPlayerId !== undefined || action.alerted === true)
+    );
   };
 
   return {

@@ -43,6 +43,7 @@ import { SWAPPER_ROLE } from "./swapper";
 import { TANNER_ROLE } from "./tanner";
 import { THE_THING_ROLE } from "./the-thing";
 import { TOUGH_GUY_ROLE } from "./tough-guy";
+import { VETERAN_ROLE } from "./veteran";
 import { VIGILANTE_ROLE } from "./vigilante";
 import { VILLAGE_DRUNK_ROLE } from "./village-drunk";
 import { VILLAGE_IDIOT_ROLE } from "./village-idiot";
@@ -94,6 +95,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
   [WerewolfRole.Tanner]: TANNER_ROLE,
   [WerewolfRole.TheThing]: THE_THING_ROLE,
   [WerewolfRole.ToughGuy]: TOUGH_GUY_ROLE,
+  [WerewolfRole.Veteran]: VETERAN_ROLE,
   [WerewolfRole.Vigilante]: VIGILANTE_ROLE,
   [WerewolfRole.VillageDrunk]: VILLAGE_DRUNK_ROLE,
   [WerewolfRole.VillageIdiot]: VILLAGE_IDIOT_ROLE,

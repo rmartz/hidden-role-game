@@ -334,9 +334,9 @@ describe("StartNight — Wolf Cub bonus phase lifecycle", () => {
   });
 });
 
-describe("StartNight — Mirrorcaster charge persistence", () => {
-  const startNightAction = WEREWOLF_ACTIONS[WerewolfAction.StartNight];
+const startNightAction = WEREWOLF_ACTIONS[WerewolfAction.StartNight];
 
+describe("StartNight — Mirrorcaster charge persistence", () => {
   it("carries mirrorcasterCharged forward to the next night", () => {
     const game = makePlayingGame({
       ...dayTurnState,
@@ -436,5 +436,26 @@ describe("StartNight — Mirrorcaster charge persistence", () => {
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
     expect(ts.roleState?.monarch?.knightedPlayerIds).toBeUndefined();
     expect(ts.roleState?.monarch?.knightingsUsed).toBeUndefined();
+  });
+});
+
+describe("StartNight — veteranAlertsUsed persistence", () => {
+  it("carries veteranAlertsUsed forward to the next night", () => {
+    const game = makePlayingGame({
+      ...dayTurnState,
+      roleState: { veteran: { alertsUsed: 2 } },
+    });
+    startNightAction.apply(game, null, "owner-1");
+
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.roleState?.veteran?.alertsUsed).toBe(2);
+  });
+
+  it("does not carry veteranAlertsUsed when it is undefined", () => {
+    const game = makePlayingGame(dayTurnState);
+    startNightAction.apply(game, null, "owner-1");
+
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.roleState?.veteran).toBeUndefined();
   });
 });

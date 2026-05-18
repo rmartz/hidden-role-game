@@ -152,6 +152,7 @@ export const startNightAction: GameAction = {
             },
           }
         : {}),
+      ...(rs.veteran ? { veteran: rs.veteran } : {}),
       // wolfCub.died is intentionally NOT carried forward — consumed by this night's bonus phase
     };
 

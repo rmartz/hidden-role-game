@@ -5,11 +5,34 @@ import { isTeamNightAction, WerewolfPhase } from "../types";
 import {
   currentTurnState,
   getGroupPhasePlayerIds,
+  isGroupPhaseKey,
   validateActiveNightPlayer,
 } from "../utils";
 
 export const confirmNightTargetAction: GameAction = {
   isValid(game: Game, callerId: string) {
+    // Narrator can confirm for no-device players on any solo phase.
+    if (callerId === game.ownerPlayerId) {
+      const ts = currentTurnState(game);
+      if (ts?.phase.type !== WerewolfPhase.Nighttime) return false;
+      if (ts.turn <= 1) return false;
+      const phase = ts.phase;
+      const activePhaseKey = phase.nightPhaseOrder[phase.currentPhaseIndex];
+      if (!activePhaseKey || isGroupPhaseKey(activePhaseKey)) return false;
+      const action = phase.nightActions[activePhaseKey];
+      if (!action || action.confirmed) return false;
+      // Mentalist requires both targets to be set (unless skipping entirely).
+      // Swapper also requires both targets to be set (unless skipping entirely).
+      const roleDef = getWerewolfRole(activePhaseKey);
+      if (roleDef?.dualTargetInvestigate || roleDef?.dualTargetSwap) {
+        if (!isTeamNightAction(action) && !action.skipped) {
+          if (!action.targetPlayerId || !action.secondTargetPlayerId)
+            return false;
+        }
+      }
+      return true;
+    }
+
     const result = validateActiveNightPlayer(game, callerId);
     if (!result) return false;
 

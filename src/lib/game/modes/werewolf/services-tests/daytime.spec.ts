@@ -6,6 +6,7 @@ import {
   WerewolfPhase,
   WerewolfRole,
 } from "@/lib/game/modes/werewolf";
+import { VeteranCounterkillSource } from "@/lib/game/modes/werewolf/types";
 import type { Game } from "@/lib/types";
 import { GameMode, GameStatus, ShowRolesInPlay } from "@/lib/types";
 
@@ -197,6 +198,76 @@ describe("extractDaytimeNightSummary", () => {
 
     expect(extractVisibleDeadPlayerIds(game, "p1")).toEqual([]);
     expect(extractVisibleDeadPlayerIds(game, "p2")).toEqual(["p2"]);
+  });
+
+  it("nightStatus contains veteran-counterkill entry visible to narrator when counter-killed player died", () => {
+    const game = makeDaytimeGame({
+      nightResolution: [
+        {
+          type: "veteran-counterkilled" as const,
+          counterkilledPlayerId: "p2",
+          veteranPlayerId: "p1",
+          source: VeteranCounterkillSource.Visitor,
+          died: true,
+        },
+      ],
+    });
+
+    const result = extractDaytimeState(game, "owner");
+    expect(result.nightStatus).toEqual([
+      {
+        targetPlayerId: "p2",
+        effect: "veteran-counterkill",
+        veteranPlayerId: "p1",
+        veteranCounterkillSource: VeteranCounterkillSource.Visitor,
+      },
+    ]);
+  });
+
+  it("nightStatus omits veteran-counterkill entry when counter-killed player survived (Tough Guy)", () => {
+    const game = makeDaytimeGame({
+      nightResolution: [
+        {
+          type: "veteran-counterkilled" as const,
+          counterkilledPlayerId: "p2",
+          veteranPlayerId: "p1",
+          source: VeteranCounterkillSource.Visitor,
+          died: false,
+        },
+      ],
+    });
+
+    const result = extractDaytimeState(game, "owner");
+    expect(result.nightStatus).toBeUndefined();
+  });
+
+  it("nightStatus hides veteran-counterkill entry from players before reveal, narrator sees it", () => {
+    const game = makeDaytimeGame({
+      modeConfig: { autoRevealNightOutcome: false },
+      revealedPlayerIds: [],
+      nightResolution: [
+        {
+          type: "veteran-counterkilled" as const,
+          counterkilledPlayerId: "p2",
+          veteranPlayerId: "p1",
+          source: VeteranCounterkillSource.WolfRepel,
+          died: true,
+        },
+      ],
+    });
+
+    const observerResult = extractDaytimeState(game, "p1");
+    expect(observerResult.nightStatus).toBeUndefined();
+
+    const narratorResult = extractDaytimeState(game, "owner");
+    expect(narratorResult.nightStatus).toEqual([
+      {
+        targetPlayerId: "p2",
+        effect: "veteran-counterkill",
+        veteranPlayerId: "p1",
+        veteranCounterkillSource: VeteranCounterkillSource.WolfRepel,
+      },
+    ]);
   });
 
   it("shows the narrator full night outcomes even before reveal", () => {
