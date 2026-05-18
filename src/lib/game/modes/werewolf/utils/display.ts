@@ -138,6 +138,7 @@ export function getInvestigationResultForNarrator(
   secondTargetId?: string,
   secondTargetName?: string,
   illusionTargetId?: string,
+  roleOverrides?: Record<string, string>,
 ): InvestigationResultForNarrator | undefined {
   if (!isInvestigatePhase || !activeTarget || !activeTargetConfirmed)
     return undefined;
@@ -145,10 +146,14 @@ export function getInvestigationResultForNarrator(
     (a) => a.player.id === activeTarget,
   );
   if (!targetAssignment?.role) return undefined;
-  const roleDef = getWerewolfRole(targetAssignment.role.id);
+  // Apply roleOverrides (e.g. Alpha Wolf bite) so the narrator sees the target's
+  // effective alignment rather than their original assigned role.
+  const effectiveRoleId =
+    roleOverrides?.[targetAssignment.player.id] ?? targetAssignment.role.id;
+  const roleDef = getWerewolfRole(effectiveRoleId);
 
   if (activeRoleDef?.checksForSeer) {
-    const isSeer = targetAssignment.role.id === (WerewolfRole.Seer as string);
+    const isSeer = effectiveRoleId === (WerewolfRole.Seer as string);
     return {
       targetName: activeTargetName ?? activeTarget,
       isWerewolfTeam: isSeer,

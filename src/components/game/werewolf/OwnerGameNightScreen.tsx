@@ -371,6 +371,7 @@ export function OwnerGameNightScreen({
     secondTargetId,
     secondTargetName,
     illusionTargetId,
+    turnState.roleOverrides,
   );
 
   const exposerRevealData = turnState.roleState?.exposer?.reveal;

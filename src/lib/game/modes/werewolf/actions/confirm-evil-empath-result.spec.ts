@@ -22,6 +22,7 @@ function makeEmpathGame(
     currentPhaseIndex?: number;
     evilEmpathLastResult?: boolean;
     evilEmpathRevealedResult?: boolean;
+    roleOverrides?: Record<string, string>;
   } = {},
 ): Game {
   const evilEmpathRoleState =
@@ -51,6 +52,7 @@ function makeEmpathGame(
     ...(Object.keys(evilEmpathRoleState).length > 0
       ? { roleState: evilEmpathRoleState }
       : {}),
+    ...(overrides.roleOverrides ? { roleOverrides: overrides.roleOverrides } : {}),
   };
   return {
     id: "game-1",
@@ -182,5 +184,28 @@ describe("WerewolfAction.ConfirmEvilEmpathResult — adjacency (apply)", () => {
     action.apply(game, null, "owner-1");
     const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
     expect(ts.roleState?.evilEmpath?.lastResult).toBe(true);
+  });
+
+  it("returns true when an adjacent Villager is overridden to Werewolf via roleOverrides", () => {
+    // playerOrder: [p3(Villager→Werewolf via override), p2(Seer), p4, w1]
+    // p3 is the Seer's left neighbour; its effective role is overridden to Werewolf.
+    const game = makeEmpathGame({
+      playerOrder: ["p3", "p2", "p4", "w1"],
+      roleOverrides: { p3: WerewolfRole.Werewolf },
+    });
+    action.apply(game, null, "owner-1");
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.roleState?.evilEmpath?.lastResult).toBe(true);
+  });
+
+  it("returns false when the sole adjacent Werewolf is overridden away via roleOverrides", () => {
+    // Default layout: [w1(Werewolf→Villager via override), p2(Seer), p3, p4]
+    // w1 is the Seer's left neighbour, but its effective role is overridden to Villager.
+    const game = makeEmpathGame({
+      roleOverrides: { w1: WerewolfRole.Villager },
+    });
+    action.apply(game, null, "owner-1");
+    const ts = (game.status as { turnState: WerewolfTurnState }).turnState;
+    expect(ts.roleState?.evilEmpath?.lastResult).toBe(false);
   });
 });

@@ -615,8 +615,12 @@ function appendInvestigationResult(
   const targetAssignment = game.roleAssignments.find(
     (a) => a.playerId === myAction.targetPlayerId,
   );
-  const targetRoleDef = targetAssignment
-    ? getWerewolfRole(targetAssignment.roleDefinitionId)
+  const effectiveTargetRoleId = targetAssignment
+    ? (ts?.roleOverrides?.[targetAssignment.playerId] ??
+      targetAssignment.roleDefinitionId)
+    : undefined;
+  const targetRoleDef = effectiveTargetRoleId
+    ? getWerewolfRole(effectiveTargetRoleId)
     : undefined;
 
   if (myRoleDef.checksForSeer) {
