@@ -4,6 +4,7 @@ import { Team } from "@/lib/types";
 import { getWerewolfRole, WerewolfRole } from "../roles";
 import type {
   AnyNightAction,
+  HangoverNightResolutionEvent,
   NightAction,
   NightResolutionEvent,
 } from "../types";
@@ -13,7 +14,7 @@ import {
   VeteranCounterkillSource,
 } from "../types";
 import { baseGroupPhaseKey, isGroupPhaseKey, isRoleActive } from "./phase-keys";
-import { getGroupPhasePlayerIds } from "./targeting";
+import { computeSuggestedTarget, getGroupPhasePlayerIds } from "./targeting";
 
 export const SMITE_PHASE_KEY = "__narrator_smite__";
 export const OLD_MAN_TIMER_KEY = "__old_man_timer__";
@@ -47,7 +48,10 @@ function chupacabraAttackApplies(
   );
 }
 
-/** Removes all occurrences of `value` from `map[key]`, deleting the key if it becomes empty. */
+/**
+ * Removes all occurrences of `value` from `map[key]`.
+ * Deletes `key` entirely when no values remain.
+ */
 function removeFromMapSet(
   map: Map<string, string[]>,
   key: string,
@@ -92,6 +96,7 @@ function collectBaseAttacksAndProtections(
         WerewolfRole.Priest,
         WerewolfRole.Altruist,
         WerewolfRole.Swapper,
+        WerewolfRole.TavernKeeper,
       ])
     )
       continue;
@@ -207,6 +212,74 @@ function applyArsonistIgnite(
 }
 
 /**
+ * Applies Tavern Keeper retroactive undo to the current night's actions.
+ * For solo phases, the target phase is removed. For group phases, only the
+ * target player's votes are removed and suggested targets are recomputed.
+ * Returns the transformed actions and the hangover target when undo applies.
+ */
+function applyTavernKeeperUndo(
+  nightActions: Record<string, AnyNightAction>,
+  roleAssignments: PlayerRoleAssignment[],
+): {
+  resolvedNightActions: Record<string, AnyNightAction>;
+  hangoverTargetPlayerId?: string;
+} {
+  let resolvedNightActions = nightActions;
+  const tkAction = nightActions[WerewolfRole.TavernKeeper];
+
+  if (
+    !tkAction ||
+    isTeamNightAction(tkAction) ||
+    !tkAction.confirmed ||
+    !tkAction.targetPlayerId
+  ) {
+    return { resolvedNightActions };
+  }
+
+  const tkTarget = tkAction.targetPlayerId;
+  const targetAssignment = roleAssignments.find((a) => a.playerId === tkTarget);
+  const targetRole = targetAssignment
+    ? getWerewolfRole(targetAssignment.roleDefinitionId)
+    : undefined;
+
+  if (!targetRole || targetRole.targetCategory === TargetCategory.Investigate) {
+    return { resolvedNightActions };
+  }
+
+  const targetUsesGroupPhase =
+    targetRole.teamTargeting ?? targetRole.wakesWith !== undefined;
+
+  if (!targetUsesGroupPhase) {
+    const blockedPhaseKey = targetRole.id as string;
+    resolvedNightActions = Object.fromEntries(
+      Object.entries(nightActions).filter(
+        ([k]) => baseGroupPhaseKey(k) !== blockedPhaseKey,
+      ),
+    );
+  } else {
+    const blockedGroupPhaseKey = (targetRole.wakesWith ??
+      targetRole.id) as string;
+    resolvedNightActions = Object.fromEntries(
+      Object.entries(resolvedNightActions).map(([phaseKey, action]) => {
+        if (baseGroupPhaseKey(phaseKey) !== blockedGroupPhaseKey) {
+          return [phaseKey, action];
+        }
+        if (!isTeamNightAction(action)) {
+          return [phaseKey, action];
+        }
+
+        const votes = action.votes.filter((vote) => vote.playerId !== tkTarget);
+        const suggestedTargetId = computeSuggestedTarget(votes);
+        const nextAction = { ...action, votes, suggestedTargetId };
+        return [phaseKey, nextAction];
+      }),
+    );
+  }
+
+  return { resolvedNightActions, hangoverTargetPlayerId: tkTarget };
+}
+
+/**
  * Returns player IDs who are currently attacked but not yet protected,
  * excluding the Witch's own action. Used to show the Witch their available
  * targets before they act. Also considers priest wards and Arsonist ignite.
@@ -220,8 +293,12 @@ export function getInterimAttackedPlayerIds(
   mercenaryCharged?: boolean,
   arsonistDousedPlayerIds?: string[],
 ): string[] {
-  const { attacks, protections } = collectBaseAttacksAndProtections(
+  const { resolvedNightActions } = applyTavernKeeperUndo(
     nightActions,
+    roleAssignments,
+  );
+  const { attacks, protections } = collectBaseAttacksAndProtections(
+    resolvedNightActions,
     roleAssignments,
     deadPlayerIds,
     mirrorcasterCharged,
@@ -229,7 +306,7 @@ export function getInterimAttackedPlayerIds(
   );
   applyArsonistIgnite(
     attacks,
-    nightActions,
+    resolvedNightActions,
     roleAssignments,
     arsonistDousedPlayerIds,
   );
@@ -366,8 +443,14 @@ export function resolveNightActions(
   smitedPlayerIds?: string[],
   options?: NightResolutionOptions,
 ): NightResolutionEvent[] {
+  const { resolvedNightActions, hangoverTargetPlayerId } =
+    applyTavernKeeperUndo(nightActions, roleAssignments);
+  const hangoverEvents: HangoverNightResolutionEvent[] = hangoverTargetPlayerId
+    ? [{ type: "hangover", targetPlayerId: hangoverTargetPlayerId }]
+    : [];
+
   const { attacks, protections } = collectBaseAttacksAndProtections(
-    nightActions,
+    resolvedNightActions,
     roleAssignments,
     deadPlayerIds,
     options?.mirrorcasterCharged,
@@ -378,7 +461,7 @@ export function resolveNightActions(
   // Applied before Priest wards and the Witch so that wards/protections can apply to ignite targets.
   applyArsonistIgnite(
     attacks,
-    nightActions,
+    resolvedNightActions,
     roleAssignments,
     options?.arsonistDousedPlayerIds,
   );
@@ -389,7 +472,7 @@ export function resolveNightActions(
   }
 
   // Witch: if target is already attacked → protect; otherwise → attack.
-  const witchAction = nightActions[WerewolfRole.Witch] as
+  const witchAction = resolvedNightActions[WerewolfRole.Witch] as
     | { targetPlayerId?: string }
     | undefined;
   if (witchAction?.targetPlayerId) {
@@ -418,7 +501,7 @@ export function resolveNightActions(
   // not already protected (including by the Witch), redirect the attack onto the
   // Altruist instead. Ignored if the Altruist is themselves already under attack
   // or if the target is the Altruist themselves.
-  const altruistAction = nightActions[WerewolfRole.Altruist] as
+  const altruistAction = resolvedNightActions[WerewolfRole.Altruist] as
     | { targetPlayerId?: string }
     | undefined;
   let altruistInterceptEvent: NightResolutionEvent | undefined;
@@ -448,7 +531,7 @@ export function resolveNightActions(
   // Swapper: swap the attacks and protections between the two selected players.
   // Runs after all other attack/protect modifiers so it operates on the final
   // attack and protection state. Silenced and hypnotized events are swapped later.
-  const swapperAction = nightActions[WerewolfRole.Swapper] as
+  const swapperAction = resolvedNightActions[WerewolfRole.Swapper] as
     | {
         targetPlayerId?: string;
         secondTargetPlayerId?: string;
@@ -502,7 +585,7 @@ export function resolveNightActions(
 
   // Veteran alert: if the Veteran alerted this night, resolve counter-kills.
   // Counter-kills happen after the Altruist and Swapper so both cannot intercept them.
-  const veteranAction = nightActions[WerewolfRole.Veteran];
+  const veteranAction = resolvedNightActions[WerewolfRole.Veteran];
   const veteranAlerted =
     veteranAction !== undefined &&
     !isTeamNightAction(veteranAction) &&
@@ -579,7 +662,7 @@ export function resolveNightActions(
       // (uncharged) or Attack (charged) — treat it as a physical visitor.
       // Mercenary is classified as Special but acts as Protect when uncharged
       // (Protect mode) — treat it as a physical visitor in that mode.
-      for (const [phaseKey, action] of Object.entries(nightActions)) {
+      for (const [phaseKey, action] of Object.entries(resolvedNightActions)) {
         if (isGroupPhaseKey(phaseKey)) continue;
         if (isRoleActive(phaseKey, WerewolfRole.Priest)) continue;
         const soloAction = action as NightAction;
@@ -723,7 +806,7 @@ export function resolveNightActions(
     });
 
   // Spellcaster: emit a silenced event for their target.
-  const spellcasterAction = nightActions[WerewolfRole.Spellcaster] as
+  const spellcasterAction = resolvedNightActions[WerewolfRole.Spellcaster] as
     | { targetPlayerId?: string }
     | undefined;
   const silencedEvents: NightResolutionEvent[] =
@@ -732,7 +815,7 @@ export function resolveNightActions(
       : [];
 
   // Mummy: emit a hypnotized event for their target.
-  const mummyAction = nightActions[WerewolfRole.Mummy] as
+  const mummyAction = resolvedNightActions[WerewolfRole.Mummy] as
     | { targetPlayerId?: string }
     | undefined;
   const mummyPlayerId = roleAssignments.find(
@@ -783,11 +866,25 @@ export function resolveNightActions(
     });
   }
 
+  // Suppress hangover if the target died during the same night.
+  const killedPlayerIds = new Set(
+    combatEvents
+      .filter(
+        (event): event is Extract<NightResolutionEvent, { type: "killed" }> =>
+          event.type === "killed" && event.died,
+      )
+      .map((event) => event.targetPlayerId),
+  );
+  const finalHangoverEvents = hangoverEvents.filter(
+    (event) => !killedPlayerIds.has(event.targetPlayerId),
+  );
+
   return [
     ...combatEvents,
     ...toughGuyEvents,
     ...(altruistInterceptEvent ? [altruistInterceptEvent] : []),
     ...veteranCounterkilledEvents,
+    ...finalHangoverEvents,
     ...finalSilencedEvents,
     ...finalHypnotizedEvents,
     ...swapperEvents,

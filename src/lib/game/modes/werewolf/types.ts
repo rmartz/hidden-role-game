@@ -143,6 +143,11 @@ export interface SwapperSwappedNightResolutionEvent {
   secondPlayerId: string;
 }
 
+export interface HangoverNightResolutionEvent {
+  type: "hangover";
+  targetPlayerId: string;
+}
+
 export enum VeteranCounterkillSource {
   Visitor = "visitor",
   WolfRepel = "wolf-repel",
@@ -167,6 +172,7 @@ export type NightResolutionEvent =
   | ToughGuyAbsorbedNightResolutionEvent
   | AltruistInterceptedNightResolutionEvent
   | SwapperSwappedNightResolutionEvent
+  | HangoverNightResolutionEvent
   | VeteranCounterkilledNightResolutionEvent;
 
 export enum DaytimeVote {
