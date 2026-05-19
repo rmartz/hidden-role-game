@@ -48,7 +48,10 @@ function chupacabraAttackApplies(
   );
 }
 
-/** Removes all occurrences of `value` from `map[key]`, deleting the key if it becomes empty. */
+/**
+ * Removes all occurrences of `value` from `map[key]`.
+ * Deletes `key` entirely when no values remain.
+ */
 function removeFromMapSet(
   map: Map<string, string[]>,
   key: string,
@@ -208,6 +211,12 @@ function applyArsonistIgnite(
   }
 }
 
+/**
+ * Applies Tavern Keeper retroactive undo to the current night's actions.
+ * For solo phases, the target phase is removed. For group phases, only the
+ * target player's votes are removed and suggested targets are recomputed.
+ * Returns the transformed actions and the hangover target when undo applies.
+ */
 function applyTavernKeeperUndo(
   nightActions: Record<string, AnyNightAction>,
   roleAssignments: PlayerRoleAssignment[],
