@@ -46,6 +46,11 @@ export interface HunterTurnState {
   revengePlayerId: string;
 }
 
+export interface MartyrTurnState {
+  /** True once the Martyr has used their once-per-game substitution ability. */
+  abilityUsed: boolean;
+}
+
 export interface MercenaryTurnState {
   /** True when the Mercenary has earned a coin from a successful protection (Bribe mode active). */
   charged: boolean;
@@ -102,6 +107,11 @@ export interface WitchTurnState {
 export interface WolfCubTurnState {
   /** True if the Wolf Cub died this turn — Werewolves get two phases the following night. */
   died: boolean;
+}
+
+export interface VeteranTurnState {
+  /** Number of nights the Veteran has chosen to go on Alert. Maximum 3. */
+  alertsUsed: number;
 }
 
 export interface ZombieTurnState {

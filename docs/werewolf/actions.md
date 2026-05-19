@@ -53,10 +53,10 @@ Additional resolution steps:
 **When:** During Nighttime, turn 2+
 **Effect:** Sets or clears a night target.
 
-- **Solo roles** (Seer, Bodyguard, Witch, etc.): stores `{ targetPlayerId }` under the role's phase key. Passing `targetPlayerId: null` records an intentional skip (`{ skipped: true }`); passing `undefined` clears the selection.
+- **Solo roles** (Seer, Bodyguard, Witch, etc.): stores `{ targetPlayerId }` under the role's phase key. Passing `targetPlayerId: null` records an intentional skip (`{ skipped: true }`); passing `undefined` clears the selection. Passing `alerted: true` (Veteran only) stores `{ alerted: true }` indicating the Veteran has gone on Alert with no target. The Veteran may only alert up to 3 times per game; further alert attempts are rejected.
 - **Group phases** (Werewolves): upserts the caller's vote in `votes[]`. Passing `null` records a skip vote; passing `undefined` removes the vote. The Narrator override sets all alive participants' votes at once and also sets `suggestedTargetId`.
 
-**Payload:** `{ roleId?: string; targetPlayerId?: string | null }`
+**Payload:** `{ roleId?: string; targetPlayerId?: string | null; alerted?: boolean }`
 
 **Validation:**
 
@@ -74,7 +74,7 @@ Additional resolution steps:
 
 ### `confirm-night-target`
 
-**Who:** Active player
+**Who:** Active player (group and solo phases); Narrator (solo phases only, for no-device players)
 **When:** During Nighttime, turn 2+
 **Effect:** Locks in the player's selected target.
 
@@ -147,7 +147,34 @@ Additional resolution steps:
 **When:** During Daytime (after voting completes)
 **Effect:** Resolves the trial verdict — guilty votes exceeding innocent votes results in elimination. The Mayor's vote counts double, and each living Monarch-knighted voter contributes +1 extra vote. Clears One-Eyed Seer lock and Priest wards for a killed player.
 
-- **Hunter revenge detection:** If the condemned player is the Hunter, sets `hunterRevengePlayerId` on the Narrator's state and defers the win-condition check until revenge is resolved.
+On a Guilty verdict, instead of immediately eliminating the player, sets `pendingGuiltId` on the daytime phase and enters the Martyr window. Win-condition checks are deferred until the window is resolved.
+
+---
+
+### `advance-martyr-window`
+
+**Who:** Narrator only
+**When:** During Daytime, when `pendingGuiltId` is set (Guilty verdict pending)
+**Effect:** Applies the pending conviction — adds the convicted player to `deadPlayerIds`, clears One-Eyed Seer lock and Priest wards for the eliminated player, then checks the Executioner win, Tanner win, Hunter revenge, and general win conditions in that order. Clears `pendingGuiltId`.
+
+The Martyr window is always inserted after a Guilty verdict, even when no Martyr is in the game, to build drama before the role reveal.
+
+---
+
+### `use-martyr-ability`
+
+**Who:** Martyr player, or Narrator (narrator-first: no-device Martyr support)
+**When:** During Daytime, when `pendingGuiltId` is set (Guilty verdict pending)
+**Effect:** The Martyr intercepts the conviction — the convicted player is spared, and the Martyr dies instead. Checks win condition after the Martyr's death. Sets `martyrUsed: true` (once-per-game ability).
+
+**Payload:** none — the Martyr is unique, so the action resolves the Martyr's identity automatically by scanning `roleAssignments`.
+
+**Validation:**
+
+- Caller must be the Martyr player, or the Narrator (narrator-first bypass for no-device tables). The Martyr must be alive.
+- `pendingGuiltId` must be set.
+- `martyrUsed` must be `false`.
+- The Martyr cannot use this ability to save themselves (`pendingGuiltId !== martyrId`).
 
 ---
 
@@ -278,41 +305,44 @@ Additional resolution steps:
 
 ## Action Payload Summary
 
-| Action                        | Caller                    | Payload                                                |
-| ----------------------------- | ------------------------- | ------------------------------------------------------ |
-| `start-night`                 | Narrator                  | none                                                   |
-| `start-day`                   | Narrator                  | none                                                   |
-| `set-night-phase`             | Narrator                  | `{ phaseIndex: number }`                               |
-| `set-night-target`            | Narrator or active player | `{ roleId?: string; targetPlayerId?: string \| null }` |
-| `confirm-night-target`        | Active player             | none                                                   |
-| `reveal-investigation-result` | Narrator                  | none                                                   |
-| `mark-player-dead`            | Narrator                  | `{ playerId: string }`                                 |
-| `mark-player-alive`           | Narrator                  | `{ playerId: string }`                                 |
-| `start-trial`                 | Narrator                  | `{ defendantId: string }`                              |
-| `cast-vote`                   | Player                    | `{ vote: "guilty" \| "innocent" }`                     |
-| `resolve-hunter-revenge`      | Narrator                  | `{ targetPlayerId: string }`                           |
-| `resolve-trial`               | Narrator                  | none                                                   |
-| `end-game`                    | Narrator                  | none                                                   |
-| `smite-player`                | Narrator                  | `{ playerId: string }`                                 |
-| `unsmite-player`              | Narrator                  | `{ playerId: string }`                                 |
-| `nominate-player`             | Player                    | `{ defendantId: string }`                              |
-| `withdraw-nomination`         | Player                    | none                                                   |
-| `skip-defense`                | Narrator                  | none                                                   |
-| `kill-player`                 | Narrator                  | `{ playerId: string }`                                 |
-| `submit-ghost-clue`           | Ghost (dead player)       | `{ clue: string }`                                     |
-| `pause-timer`                 | Narrator                  | none                                                   |
-| `resume-timer`                | Narrator                  | none                                                   |
+| Action                        | Caller                                       | Payload                                                                   |
+| ----------------------------- | -------------------------------------------- | ------------------------------------------------------------------------- |
+| `start-night`                 | Narrator                                     | none                                                                      |
+| `start-day`                   | Narrator                                     | none                                                                      |
+| `set-night-phase`             | Narrator                                     | `{ phaseIndex: number }`                                                  |
+| `set-night-target`            | Narrator or active player                    | `{ roleId?: string; targetPlayerId?: string \| null; alerted?: boolean }` |
+| `confirm-night-target`        | Active player or Narrator (solo phases only) | none                                                                      |
+| `reveal-investigation-result` | Narrator                                     | none                                                                      |
+| `mark-player-dead`            | Narrator                                     | `{ playerId: string }`                                                    |
+| `mark-player-alive`           | Narrator                                     | `{ playerId: string }`                                                    |
+| `start-trial`                 | Narrator                                     | `{ defendantId: string }`                                                 |
+| `cast-vote`                   | Player                                       | `{ vote: "guilty" \| "innocent" }`                                        |
+| `resolve-hunter-revenge`      | Narrator                                     | `{ targetPlayerId: string }`                                              |
+| `resolve-trial`               | Narrator                                     | none                                                                      |
+| `advance-martyr-window`       | Narrator                                     | none                                                                      |
+| `use-martyr-ability`          | Martyr player or Narrator                    | none                                                                      |
+| `end-game`                    | Narrator                                     | none                                                                      |
+| `smite-player`                | Narrator                                     | `{ playerId: string }`                                                    |
+| `unsmite-player`              | Narrator                                     | `{ playerId: string }`                                                    |
+| `nominate-player`             | Player                                       | `{ defendantId: string }`                                                 |
+| `withdraw-nomination`         | Player                                       | none                                                                      |
+| `skip-defense`                | Narrator                                     | none                                                                      |
+| `kill-player`                 | Narrator                                     | `{ playerId: string }`                                                    |
+| `submit-ghost-clue`           | Ghost (dead player)                          | `{ clue: string }`                                                        |
+| `pause-timer`                 | Narrator                                     | none                                                                      |
+| `resume-timer`                | Narrator                                     | none                                                                      |
 
 ## Night Action Types
 
 ```typescript
-// Solo role action (Seer, Bodyguard, Witch, Spellcaster, Chupacabra, Doctor, Priest, Mummy, Wizard, One-Eyed Seer, Exposer, Mystic Seer, Altruist, Mortician, Monarch)
+// Solo role action (Seer, Bodyguard, Witch, Spellcaster, Chupacabra, Doctor, Priest, Mummy, Wizard, One-Eyed Seer, Exposer, Mystic Seer, Altruist, Mortician, Monarch, Veteran)
 interface NightAction {
   targetPlayerId?: string; // absent when skipped
   skipped?: true; // set when the player intentionally chose "Skip"
   confirmed?: boolean;
   resultRevealed?: boolean; // Seer, Wizard, One-Eyed Seer, Mystic Seer
   secondTargetPlayerId?: string; // Mentalist dual-target
+  alerted?: boolean; // set when the Veteran chose Alert
 }
 
 // Individual vote within a group phase
@@ -338,20 +368,26 @@ interface TeamNightAction {
 2. Applies Priest ward protection: any player with an active ward has the ward consume the attack (ward is removed, player survives).
 3. Applies Witch action: if target is already under attack → protect; otherwise → attack.
 4. Applies Altruist action (last): if the Altruist's target is under attack, the attack is redirected onto the Altruist (the Altruist dies instead).
-5. Applies Swapper action: swaps the attacks and protections maps between the two selected players, then builds kill events from the swapped state.
-6. Applies Tough Guy absorption: if a Tough Guy is attacked for the first time, the attack is absorbed (survives this night, dies on the next attack).
-7. Applies Smite: any smited player is killed regardless of protections.
-8. Applies Spellcaster action: emits a `silenced` event.
-9. Applies Mummy action: emits a `hypnotized` event for the target.
-10. Applies Swapper to silenced and hypnotized events: swaps the `targetPlayerId` of any silenced or hypnotized event between the two Swapper targets, then emits a `swapper-swapped` event.
-11. Checks Old Man timer (`oldManTimerPlayerId` option): if the timer has fired **and** the Old Man was not attacked this night, emits a killed event with `attackedBy: [OLD_MAN_TIMER_KEY]`, `died: true`. This bypasses protections (applied after `buildKilledEvents`, like smite). If the Old Man was attacked, the attack takes precedence.
-12. Returns `NightResolutionEvent[]`:
+5. Applies Swapper action: swaps the attacks and protections maps between the two selected players. If the Altruist intercept is made stale by the swap, it is cancelled.
+6. Applies Veteran counter-kill (after Altruist and Swapper, so neither can intercept the counter-kill): if the Veteran alerted this night (action has `alerted: true`):
+   - **Wolf repel:** if any wolf group targeted the Veteran, the wolf attack on the Veteran is removed and one alive wolf-group participant is counter-killed instead. Emits `veteran-counterkilled (source: "wolf-repel")`.
+   - **Visitor kill:** any solo role with `TargetCategory.Protect` or `TargetCategory.Attack` (e.g. Bodyguard, Vigilante) that visited the Veteran is counter-killed, plus Mirrorcaster (which physically visits despite its `Special` category) and an uncharged Mercenary in Protect mode (which also physically visits). A charged Mercenary (Bribe mode) is exempt. Investigation-category roles and other Special roles (Spellcaster, Mummy, Dracula, etc.) are exempt. Any attack or protection they provided to the Veteran is discarded. Emits `veteran-counterkilled (source: "visitor")` per killed visitor.
+7. Builds kill events from the final attack/protect state.
+8. Applies Smite: any smited player is killed regardless of protections. Smite deaths cannot be absorbed by Tough Guy.
+9. Checks Old Man timer (`oldManTimerPlayerId` option): if the timer has fired **and** the Old Man was not attacked this night, emits a killed event with `attackedBy: [OLD_MAN_TIMER_KEY]`, `died: true`. Old Man timer deaths cannot be absorbed by Tough Guy.
+10. Applies Tough Guy absorption: if a Tough Guy is attacked (after Smite and the Old Man timer have been applied) for the first time, the attack is absorbed (survives this night, dies on the next attack). Smite and Old Man timer deaths bypass this step.
+11. Emits `veteran-counterkilled` events: emitted here (after Tough Guy absorption) so the `died` field reflects the actual combat outcome (e.g. `died: false` if the counter-killed visitor was a first-hit Tough Guy).
+12. Applies Spellcaster action: emits a `silenced` event.
+13. Applies Mummy action: emits a `hypnotized` event for the target.
+14. Applies Swapper to silenced and hypnotized events: swaps the `targetPlayerId` of any silenced or hypnotized event between the two Swapper targets, then emits a `swapper-swapped` event.
+15. Returns `NightResolutionEvent[]`:
 
 - `{ type: "killed", targetPlayerId, attackedBy, protectedBy, died }`
 - `{ type: "silenced", targetPlayerId }`
 - `{ type: "hypnotized", targetPlayerId }`
 - `{ type: "tough-guy-absorbed", targetPlayerId }`
 - `{ type: "altruist-intercepted", altruistPlayerId, savedPlayerId }`
+- `{ type: "veteran-counterkilled", counterkilledPlayerId, veteranPlayerId, source: "wolf-repel" | "visitor", died }`
 - `{ type: "swapper-swapped", firstPlayerId, secondPlayerId }`
 
 After resolution, `start-day` performs additional checks:
@@ -378,16 +414,28 @@ flowchart TD
     Intercept --> Swapper
     Swapper{Swapper acted?}
     Swapper -->|yes| SwapAP[Swap attacks and protections\nbetween selected players]
-    Swapper -->|no| ToughGuy
-    SwapAP --> ToughGuy
-    ToughGuy{Tough Guy attacked\nfor first time?}
-    ToughGuy -->|yes| Absorb[Absorb attack\nemit tough-guy-absorbed]
-    ToughGuy -->|no| Smite
-    Absorb --> Smite
+    Swapper -->|no| Veteran
+    SwapAP --> Veteran
+    Veteran{Veteran alerted\nthis night?}
+    Veteran -->|yes - wolf targeted Vet| WolfRepel[Remove wolf attack on Vet\ncounter-kill one wolf]
+    Veteran -->|yes - solo visitor| VisitorKill[Counter-kill visiting player\ndiscard visitor's attack/protect]
+    Veteran -->|no| Resolve
+    WolfRepel --> Resolve
+    VisitorKill --> Resolve
+    Resolve[For each collected attack:\nif protected → died = false\nelse → died = true\nemit killed event]
+    Resolve --> Smite
     Smite{Player smited?}
     Smite -->|yes| ForceDeath[Force death regardless\nof protections]
-    Smite -->|no| Spellcaster
-    ForceDeath --> Spellcaster
+    Smite -->|no| OldMan
+    ForceDeath --> OldMan
+    OldMan{Old Man timer expired\nand not attacked?}
+    OldMan -->|yes| Peaceful[Emit killed event\nattackedBy: OLD_MAN_TIMER_KEY\ndied: true]
+    OldMan -->|no| ToughGuy
+    Peaceful --> ToughGuy
+    ToughGuy{Tough Guy attacked\nfor first time?}
+    ToughGuy -->|yes| Absorb[Absorb attack\nemit tough-guy-absorbed]
+    ToughGuy -->|no| Spellcaster
+    Absorb --> Spellcaster
     Spellcaster{Spellcaster acted?}
     Spellcaster -->|yes| Silence[Emit silenced event for target]
     Spellcaster -->|no| Mummy
@@ -398,37 +446,41 @@ flowchart TD
     Hypnotize --> SwapEffects
     SwapEffects{Swapper acted?}
     SwapEffects -->|yes| SwapSH[Swap silenced and hypnotized\nevents between selected players\nemit swapper-swapped]
-    SwapEffects -->|no| Resolve
-    SwapSH --> Resolve
-    Resolve[For each collected attack:\nif protected → died = false\nelse → died = true\nemit killed event]
-    Resolve --> OldMan{Old Man timer expired\nand not attacked?}
-    OldMan -->|yes| Peaceful[Emit killed event\nattackedBy: OLD_MAN_TIMER_KEY\ndied: true]
-    OldMan -->|no| Return
-    Peaceful --> Return
+    SwapEffects -->|no| Return
+    SwapSH --> Return
     Return([Return NightResolutionEvent array])
 ```
 
 ## Trial Resolution
 
-When a player is voted out at trial (via `mark-player-dead` during Daytime), the following checks run in order:
+When a Guilty verdict is reached, `resolve-trial` (or `cast-vote` / `skip-defense` when all votes are in) sets `pendingGuiltId` instead of applying death immediately. This creates the **Martyr window** — a brief pause before elimination.
 
-1. **Tanner check:** If the killed player is the Tanner, the game ends immediately with a Tanner win.
-2. **Executioner target check:** If the killed player is the Executioner's assigned target, the Executioner wins. (The Executioner win is independent of the overall game outcome — the game may continue.)
+The window is resolved in one of two ways:
+
+1. **Narrator calls `advance-martyr-window`** — the convicted player is eliminated and the following checks run in order:
+   1. **Executioner target check:** If the convicted player is the Executioner's assigned target and the Executioner is alive, the Executioner wins.
+   2. **Tanner check:** If the convicted player is the Tanner, the game ends immediately with a Tanner win.
+   3. **Hunter revenge detection:** If the convicted player is the Hunter, sets `hunterRevengePlayerId` and defers the win-condition check.
+   4. **General win condition check.**
+
+2. **Martyr calls `use-martyr-ability`** — the Martyr dies instead. Win condition is checked after the Martyr's death.
+
+Note: The Martyr window is always inserted after a Guilty verdict, even when no Martyr is in the game.
 
 ## Win Condition Logic
 
 Win conditions are evaluated after each death (night resolution or trial). The checks run in the following priority order:
 
-1. **Tanner instant win** — If the Tanner dies (at night or at trial), the game ends immediately with a Tanner win.
-2. **Zombie check** (before all other conditions) — If infected players alive outnumber healthy players alive, the Zombie wins.
-3. **Standard team checks** — Evaluated in this order:
+1. **Executioner win** _(trial only)_ — Evaluated in `advance-martyr-window` / `use-martyr-ability` before the Tanner check. If the convicted player is the Executioner's assigned target and the Executioner is alive, the Executioner wins immediately. This check takes priority over the Tanner: if the convicted player is both the Executioner's target and the Tanner, the Executioner wins.
+2. **Tanner instant win** — If the Tanner dies (at night or at trial, and the Executioner win above was not triggered), the game ends immediately with a Tanner win.
+3. **Zombie check** (before standard team conditions) — If infected players alive outnumber healthy players alive, the Zombie wins.
+4. **Standard team checks** — Evaluated in this order:
    - **Chupacabra win** — If no Bad-team players remain and the Chupacabra is alive with ≤ 1 Good player alive, the Chupacabra wins.
    - **Draw** — If no Bad, Good, or Neutral players remain (simultaneous eliminations), the game ends in a draw.
    - **Village wins** — If no Bad and no Neutral players remain (and Chupacabra is not alive), the Village wins.
    - **Lone Wolf check** (before general wolf win) — When wolves would win (Bad count ≥ non-Bad count) and the Lone Wolf is the only surviving wolf-aligned player, the Lone Wolf wins instead of Team Bad.
    - **Werewolves win** — If Bad team count ≥ non-Bad count (Good + Neutral + Chupacabra), the Werewolves win.
-4. **Illuminati override** (after standard win determined) — If a standard win condition fires and the Illuminati is alive and ≤ 3 total players remain, the Illuminati wins instead.
-5. **Spoiler override** (after team win determined) — If a standard win condition fires and the Spoiler is still alive (and Illuminati did not already override), the Spoiler wins instead of the winning team.
-6. **Mercenary co-win** (after all overrides) — If any win condition fires, the Mercenary is alive, and at least one bribed player is alive on the winning side, the Mercenary also wins alongside the main winner (displayed as e.g. "Village Won (Mercenary also wins)"). The co-win applies to all winners — team wins (Village → bribed player on `Team.Good`; Werewolves → bribed player on `Team.Bad`) and individual-role wins (Spoiler, Illuminati, Lone Wolf, Chupacabra, Executioner, Zombie, Dracula → the bribed player must be the specific winning role-holder).
-7. **Executioner win** — Evaluated independently at trial: if the Executioner's assigned target is voted out, the Executioner wins regardless of overall game state.
+5. **Illuminati override** (after standard win determined) — If a standard win condition fires and the Illuminati is alive and ≤ 3 total players remain, the Illuminati wins instead.
+6. **Spoiler override** (after team win determined) — If a standard win condition fires and the Spoiler is still alive (and Illuminati did not already override), the Spoiler wins instead of the winning team.
+7. **Mercenary co-win** (after all overrides) — If any win condition fires, the Mercenary is alive, and at least one bribed player is alive on the winning side, the Mercenary also wins alongside the main winner (displayed as e.g. "Village Won (Mercenary also wins)"). The co-win applies to all winners — team wins (Village → bribed player on `Team.Good`; Werewolves → bribed player on `Team.Bad`) and individual-role wins (Spoiler, Illuminati, Lone Wolf, Chupacabra, Executioner, Zombie, Dracula → the bribed player must be the specific winning role-holder).
 8. **Dracula win** — Checked separately in `startNightAction`, not in `checkWinCondition`.

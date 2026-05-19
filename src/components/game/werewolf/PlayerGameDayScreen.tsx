@@ -5,14 +5,13 @@ import { useMemo } from "react";
 import { GameTimer, RoleGlossaryDialog } from "@/components/game";
 import { GAME_MODES } from "@/lib/game/modes";
 import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
-import { WerewolfPhase } from "@/lib/game/modes/werewolf";
+import { WerewolfPhase, WerewolfRole } from "@/lib/game/modes/werewolf";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { isNominationsBlocked } from "@/lib/game/modes/werewolf/player-state";
 import {
   WEREWOLF_ROLE_CATEGORY_LABELS,
   WEREWOLF_ROLE_CATEGORY_ORDER,
-  WerewolfRole,
 } from "@/lib/game/modes/werewolf/roles";
 import { getPlayerName } from "@/lib/player";
 
@@ -146,6 +145,9 @@ export function PlayerGameDayScreen({
           autoAdvance={timerConfig.autoAdvance}
           isSilenced={gameState.isSilenced}
           isHypnotized={gameState.isHypnotized}
+          pendingGuiltId={gameState.pendingGuiltId}
+          isMartyr={gameState.myRole?.id === WerewolfRole.Martyr}
+          martyrUsed={gameState.martyrUsed}
         />
       )}
 

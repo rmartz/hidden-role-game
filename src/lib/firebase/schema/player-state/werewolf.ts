@@ -35,6 +35,7 @@ export interface FirebaseWerewolfPlayerState
   nightStatus?: NightStatusEntry[];
   previousNightTargetId?: string;
   investigationResult?: { targetPlayerId: string; isWerewolfTeam: boolean };
+  myNightAlerted?: boolean;
   activeTrial?: {
     defendantId: string;
     startedAt: number;
@@ -50,6 +51,7 @@ export interface FirebaseWerewolfPlayerState
     mustVoteInnocent?: boolean;
     voteResults?: { playerName: string; vote: DaytimeVote }[];
     eliminatedRole?: { id: string; name: string; team: string };
+    defendantEliminated?: boolean;
   };
   nominationsEnabled: boolean;
   trialsPerDay?: number;
@@ -58,6 +60,7 @@ export interface FirebaseWerewolfPlayerState
   autoRevealNightOutcome?: boolean;
   nominations?: { defendantId: string; nominatorIds: string[] }[];
   myNominatedDefendantId?: string;
+  pendingGuiltId?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -90,6 +93,7 @@ export function werewolfStateToFirebase(
     ...(state.investigationResult
       ? { investigationResult: state.investigationResult }
       : {}),
+    ...(state.myNightAlerted ? { myNightAlerted: true } : {}),
     ...(state.activeTrial ? { activeTrial: state.activeTrial } : {}),
     nominationsEnabled: state.nominationsEnabled,
     ...(state.trialsPerDay !== undefined
@@ -104,6 +108,7 @@ export function werewolfStateToFirebase(
     ...(state.myNominatedDefendantId
       ? { myNominatedDefendantId: state.myNominatedDefendantId }
       : {}),
+    ...(state.pendingGuiltId ? { pendingGuiltId: state.pendingGuiltId } : {}),
     ...werewolfRoleStateToFirebase(state),
   };
 }
@@ -144,6 +149,7 @@ export function werewolfStateFromFirebase(
     ...(raw.investigationResult
       ? { investigationResult: raw.investigationResult }
       : {}),
+    ...(raw.myNightAlerted ? { myNightAlerted: true } : {}),
     ...(raw.activeTrial
       ? {
           activeTrial:
@@ -154,6 +160,7 @@ export function werewolfStateFromFirebase(
     ...(raw.myNominatedDefendantId
       ? { myNominatedDefendantId: raw.myNominatedDefendantId }
       : {}),
+    ...(raw.pendingGuiltId ? { pendingGuiltId: raw.pendingGuiltId } : {}),
     ...werewolfRoleStateFromFirebase(raw),
   } as WerewolfPlayerGameState;
 }

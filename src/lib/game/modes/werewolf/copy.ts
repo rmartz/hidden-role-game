@@ -75,6 +75,8 @@ export const WEREWOLF_COPY = {
       `Verdict: ${name} — ${label}`,
     verdictLabelEliminated: "Eliminated",
     verdictLabelInnocent: "Innocent",
+    verdictLabelPending: "Awaiting Sentencing",
+    verdictLabelSpared: "Spared",
     eliminatedWereRole: (name: string) => `${name} was eliminated. They were a`,
     eliminatedRoleSuffix: ".",
     youAreOnTrial: "You are on trial",
@@ -92,7 +94,10 @@ export const WEREWOLF_COPY = {
       `Guilty: ${String(guilty)} · Innocent: ${String(innocent)}`,
     guiltyInnocentTotal: (guilty: number, innocent: number, total: number) =>
       `Guilty: ${String(guilty)} · Innocent: ${String(innocent)} · Total votes: ${String(total)}`,
-    resolveTrial: "Resolve Trial",
+    advanceToSentencing: "Advance to Sentencing",
+    martyrSacrificeButton: "Sacrifice Yourself",
+    narratorMartyrSacrificeButton: "Use Martyr Ability (no-device)",
+    revealTrialResults: "Reveal Trial Results",
     defenseHeading: (name: string) => `${name} has the floor`,
     defenseSubtext: "The accused may speak in their defense.",
     defenseHeadingSelf: "You have the floor",
@@ -258,6 +263,16 @@ export const WEREWOLF_COPY = {
     chooseBribeTarget: "Select a player to bribe",
     narratorProtectMode: "Mercenary is in Protect mode.",
     narratorBribeMode: "Mercenary is charged — Bribe mode.",
+  },
+  veteran: {
+    alertButton: "Go on Alert",
+    alertsRemaining: (n: number) =>
+      `${String(n)} alert${n === 1 ? "" : "s"} remaining`,
+    skipButton: "Stay Home",
+    dayAnnouncementWolfRepel: (veteranName: string, wolfName: string) =>
+      `${veteranName} was on alert — ${wolfName} was killed repelling the attack.`,
+    dayAnnouncementVisitorKilled: (veteranName: string, visitorName: string) =>
+      `${veteranName} was on alert and counter-killed ${visitorName}, who visited them.`,
   },
   altruist: {
     attackedIntro:

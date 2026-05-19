@@ -32,7 +32,9 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "@firebase/util",
+      "@sentry/cli",
       "esbuild",
+      "msw",
       "protobufjs",
       "sharp"
     ]

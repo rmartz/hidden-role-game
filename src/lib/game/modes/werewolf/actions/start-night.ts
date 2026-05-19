@@ -26,6 +26,8 @@ export const startNightAction: GameAction = {
     if (ts.roleState?.hunter?.revengePlayerId) return false;
     // Cannot advance to night while a trial is actively ongoing
     if (ts.phase.activeTrial && !ts.phase.activeTrial.verdict) return false;
+    // Cannot advance to night while a guilty verdict is awaiting resolution
+    if (ts.phase.pendingGuiltId) return false;
     return true;
   },
   apply(game: Game) {
@@ -120,6 +122,7 @@ export const startNightAction: GameAction = {
       ...(rs.exposer?.abilityUsed || rs.exposer?.reveal
         ? { exposer: rs.exposer }
         : {}),
+      ...(rs.martyr?.abilityUsed ? { martyr: rs.martyr } : {}),
       ...(rs.mortician?.abilityEnded ? { mortician: rs.mortician } : {}),
       ...(rs.monarch ? { monarch: rs.monarch } : {}),
       ...(rs.executioner?.targetId ? { executioner: rs.executioner } : {}),
@@ -134,6 +137,7 @@ export const startNightAction: GameAction = {
       ...(aliveDousedPlayerIds.length > 0
         ? { arsonist: { dousedPlayerIds: aliveDousedPlayerIds } }
         : {}),
+      ...(rs.veteran ? { veteran: rs.veteran } : {}),
       // wolfCub.died is intentionally NOT carried forward — consumed by this night's bonus phase
     };
 

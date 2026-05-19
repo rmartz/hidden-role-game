@@ -68,9 +68,12 @@ export function hasKilledOutcome(phase: WerewolfDaytimePhase): boolean {
   );
 }
 
-/** True when at least one player was silenced or hypnotized during the night. */
+/** True when at least one player was silenced, hypnotized, or hungover during the night. */
 export function hasStatusOutcome(phase: WerewolfDaytimePhase): boolean {
   return (phase.nightResolution ?? []).some(
-    (event) => event.type === "silenced" || event.type === "hypnotized",
+    (event) =>
+      event.type === "hangover" ||
+      event.type === "hypnotized" ||
+      event.type === "silenced",
   );
 }

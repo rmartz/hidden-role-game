@@ -179,6 +179,72 @@ describe("WerewolfAction.SetNightTarget", () => {
     });
   });
 
+  describe("isValid — Veteran", () => {
+    const veteranTurn2State = makeNightState({
+      turn: 2,
+      nightPhaseOrder: [WerewolfRole.Veteran],
+      currentPhaseIndex: 0,
+    });
+
+    it("allows alerted: true when alerts remaining", () => {
+      const game = makePlayingGame(veteranTurn2State, {
+        roleAssignments: [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Veteran },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        ],
+      });
+      expect(action.isValid(game, "p1", { alerted: true })).toBe(true);
+    });
+
+    it("blocks alerted: true when 3 alerts already used", () => {
+      const game = makePlayingGame(
+        { ...veteranTurn2State, roleState: { veteran: { alertsUsed: 3 } } },
+        {
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Veteran },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+          ],
+        },
+      );
+      expect(action.isValid(game, "p1", { alerted: true })).toBe(false);
+    });
+
+    it("still allows skip when 3 alerts already used", () => {
+      const game = makePlayingGame(
+        { ...veteranTurn2State, roleState: { veteran: { alertsUsed: 3 } } },
+        {
+          roleAssignments: [
+            { playerId: "p1", roleDefinitionId: WerewolfRole.Veteran },
+            { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+          ],
+        },
+      );
+      expect(action.isValid(game, "p1", { targetPlayerId: null })).toBe(true);
+    });
+
+    it("rejects targetPlayerId string for Veteran", () => {
+      const game = makePlayingGame(veteranTurn2State, {
+        roleAssignments: [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Veteran },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        ],
+      });
+      expect(action.isValid(game, "p1", { targetPlayerId: "p2" })).toBe(false);
+    });
+
+    it("rejects alerted: true combined with a targetPlayerId string", () => {
+      const game = makePlayingGame(veteranTurn2State, {
+        roleAssignments: [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Veteran },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        ],
+      });
+      expect(
+        action.isValid(game, "p1", { alerted: true, targetPlayerId: "p2" }),
+      ).toBe(false);
+    });
+  });
+
   describe("isValid — adjacentTargetOnly (The Thing)", () => {
     function makeThingGame(playerOrder: string[]) {
       const thingTurnState = makeNightState({

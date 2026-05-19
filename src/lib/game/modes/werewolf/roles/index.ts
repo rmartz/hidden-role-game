@@ -19,6 +19,7 @@ import { HUNTER_ROLE } from "./hunter";
 import { ILLUMINATI_ROLE } from "./illuminati";
 import { INSOMNIAC_ROLE } from "./insomniac";
 import { LONE_WOLF_ROLE } from "./lone-wolf";
+import { MARTYR_ROLE } from "./martyr";
 import { MASON_ROLE } from "./mason";
 import { MAYOR_ROLE } from "./mayor";
 import { MENTALIST_ROLE } from "./mentalist";
@@ -42,6 +43,7 @@ import { TANNER_ROLE } from "./tanner";
 import { TAVERN_KEEPER_ROLE } from "./tavern-keeper";
 import { THE_THING_ROLE } from "./the-thing";
 import { TOUGH_GUY_ROLE } from "./tough-guy";
+import { VETERAN_ROLE } from "./veteran";
 import { VIGILANTE_ROLE } from "./vigilante";
 import { VILLAGE_DRUNK_ROLE } from "./village-drunk";
 import { VILLAGE_IDIOT_ROLE } from "./village-idiot";
@@ -69,6 +71,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
   [WerewolfRole.Illuminati]: ILLUMINATI_ROLE,
   [WerewolfRole.Insomniac]: INSOMNIAC_ROLE,
   [WerewolfRole.LoneWolf]: LONE_WOLF_ROLE,
+  [WerewolfRole.Martyr]: MARTYR_ROLE,
   [WerewolfRole.Mason]: MASON_ROLE,
   [WerewolfRole.Mayor]: MAYOR_ROLE,
   [WerewolfRole.Mentalist]: MENTALIST_ROLE,
@@ -92,6 +95,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
   [WerewolfRole.TavernKeeper]: TAVERN_KEEPER_ROLE,
   [WerewolfRole.TheThing]: THE_THING_ROLE,
   [WerewolfRole.ToughGuy]: TOUGH_GUY_ROLE,
+  [WerewolfRole.Veteran]: VETERAN_ROLE,
   [WerewolfRole.Vigilante]: VIGILANTE_ROLE,
   [WerewolfRole.VillageDrunk]: VILLAGE_DRUNK_ROLE,
   [WerewolfRole.VillageIdiot]: VILLAGE_IDIOT_ROLE,

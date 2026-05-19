@@ -1,4 +1,5 @@
 export enum WerewolfAction {
+  AdvanceMartyrWindow = "advance-martyr-window",
   AlphaWolfBite = "alpha-wolf-bite",
   CancelTrial = "cancel-trial",
   CastVote = "cast-vote",
@@ -24,5 +25,6 @@ export enum WerewolfAction {
   StartTrial = "start-trial",
   SubmitGhostClue = "submit-ghost-clue",
   UnsmitePlayer = "unsmite-player",
+  UseMartyrAbility = "use-martyr-ability",
   WithdrawNomination = "withdraw-nomination",
 }
