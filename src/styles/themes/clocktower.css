@@ -1,0 +1,44 @@
+/* Clocktower — gothic cathedral atmosphere with deep purples and silver.
+ * Palette to be refined in follow-up issues. */
+
+[data-theme="clocktower"] {
+  --background: oklch(0.95 0.006 300);
+  --foreground: oklch(0.16 0.02 300);
+  --card: oklch(0.95 0.006 300);
+  --card-foreground: oklch(0.16 0.02 300);
+  --popover: oklch(0.95 0.006 300);
+  --popover-foreground: oklch(0.16 0.02 300);
+  --primary: oklch(0.28 0.1 300);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.88 0.012 300);
+  --secondary-foreground: oklch(0.28 0.1 300);
+  --muted: oklch(0.88 0.012 300);
+  --muted-foreground: oklch(0.45 0.04 300);
+  --accent: oklch(0.65 0.01 0);
+  --accent-foreground: oklch(0.98 0 0);
+  --border: oklch(0.82 0.015 300);
+  --input: oklch(0.82 0.015 300);
+  --ring: oklch(0.65 0.01 0);
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="clocktower"] {
+    --background: oklch(0.1 0.02 300);
+    --foreground: oklch(0.95 0.005 300);
+    --card: oklch(0.16 0.025 300);
+    --card-foreground: oklch(0.95 0.005 300);
+    --popover: oklch(0.16 0.025 300);
+    --popover-foreground: oklch(0.95 0.005 300);
+    --primary: oklch(0.75 0.1 300);
+    --primary-foreground: oklch(0.1 0.02 300);
+    --secondary: oklch(0.2 0.03 300);
+    --secondary-foreground: oklch(0.95 0.005 300);
+    --muted: oklch(0.2 0.03 300);
+    --muted-foreground: oklch(0.6 0.05 300);
+    --accent: oklch(0.72 0.015 0);
+    --accent-foreground: oklch(0.98 0 0);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.72 0.015 0);
+  }
+}

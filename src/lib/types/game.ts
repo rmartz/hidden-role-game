@@ -212,6 +212,12 @@ export interface GameModeConfig {
   readonly name: string;
   /** Whether this game mode is available in production. Unreleased modes are only visible in development. */
   readonly released: boolean;
+  /**
+   * CSS theme identifier applied via `data-theme` when entering a lobby or game for this mode.
+   * Corresponds to a `[data-theme="<value>"]` CSS selector that defines custom properties.
+   * Defaults to `"twilight_modern"` when not specified.
+   */
+  readonly theme?: string;
   readonly minPlayers: number;
   readonly ownerTitle: string | null;
   /**
