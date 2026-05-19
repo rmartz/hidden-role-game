@@ -1,0 +1,33 @@
+/* Shadowplay — general-purpose dark-leaning theme for non-game-mode screens.
+ * Palette to be refined in follow-up issues. */
+
+[data-theme="shadowplay"] {
+  --background: oklch(0.14 0.01 260);
+  --foreground: oklch(0.95 0.005 260);
+  --card: oklch(0.2 0.015 260);
+  --card-foreground: oklch(0.95 0.005 260);
+  --popover: oklch(0.2 0.015 260);
+  --popover-foreground: oklch(0.95 0.005 260);
+  --primary: oklch(0.75 0.1 260);
+  --primary-foreground: oklch(0.14 0.01 260);
+  --secondary: oklch(0.25 0.02 260);
+  --secondary-foreground: oklch(0.95 0.005 260);
+  --muted: oklch(0.25 0.02 260);
+  --muted-foreground: oklch(0.6 0.04 260);
+  --accent: oklch(0.6 0.18 320);
+  --accent-foreground: oklch(0.98 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.6 0.18 320);
+}
+
+@media (prefers-color-scheme: light) {
+  [data-theme="shadowplay"] {
+    --background: oklch(0.22 0.015 260);
+    --foreground: oklch(0.95 0.005 260);
+    --card: oklch(0.28 0.02 260);
+    --card-foreground: oklch(0.95 0.005 260);
+    --popover: oklch(0.28 0.02 260);
+    --popover-foreground: oklch(0.95 0.005 260);
+  }
+}
