@@ -248,8 +248,8 @@ function applyTavernKeeperUndo(
       ),
     );
   } else {
-    const blockedGroupPhaseKey = (targetRole.wakesWith ?? targetRole.id) as
-      string;
+    const blockedGroupPhaseKey = (targetRole.wakesWith ??
+      targetRole.id) as string;
     resolvedNightActions = Object.fromEntries(
       Object.entries(resolvedNightActions).map(([phaseKey, action]) => {
         if (baseGroupPhaseKey(phaseKey) !== blockedGroupPhaseKey) {
@@ -434,10 +434,8 @@ export function resolveNightActions(
   smitedPlayerIds?: string[],
   options?: NightResolutionOptions,
 ): NightResolutionEvent[] {
-  const { resolvedNightActions, hangoverTargetPlayerId } = applyTavernKeeperUndo(
-    nightActions,
-    roleAssignments,
-  );
+  const { resolvedNightActions, hangoverTargetPlayerId } =
+    applyTavernKeeperUndo(nightActions, roleAssignments);
   const hangoverEvents: HangoverNightResolutionEvent[] = hangoverTargetPlayerId
     ? [{ type: "hangover", targetPlayerId: hangoverTargetPlayerId }]
     : [];
@@ -863,9 +861,7 @@ export function resolveNightActions(
   const killedPlayerIds = new Set(
     combatEvents
       .filter(
-        (
-          event,
-        ): event is Extract<NightResolutionEvent, { type: "killed" }> =>
+        (event): event is Extract<NightResolutionEvent, { type: "killed" }> =>
           event.type === "killed" && event.died,
       )
       .map((event) => event.targetPlayerId),
