@@ -6,8 +6,8 @@ import { LOBBY_PAGE_COPY } from "./page.copy";
 
 afterEach(cleanup);
 
-describe("renders the provided title", () => {
-  it("renders the owner's player name in the h1", () => {
+describe("renders provided title strings", () => {
+  it("renders the provided title string in the h1", () => {
     const { container } = render(
       <LobbyPageHeaderView
         title="Marin"
@@ -20,8 +20,8 @@ describe("renders the provided title", () => {
   });
 });
 
-describe("h1 falls back while loading", () => {
-  it("renders the fallback title while loading", () => {
+describe("renders loading title when provided", () => {
+  it("renders the loading title string in the h1", () => {
     const { container } = render(
       <LobbyPageHeaderView
         title={LOBBY_PAGE_COPY.loadingTitle}
