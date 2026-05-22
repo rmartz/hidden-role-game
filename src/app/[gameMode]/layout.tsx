@@ -4,6 +4,8 @@ import { HomeLink } from "@/components/HomeLink";
 import { parseGameMode } from "@/lib/game/modes";
 import { resolveGameModeTheme } from "@/lib/game/theme";
 
+import { BodyThemeOverride } from "./body-theme-override";
+
 interface GameModeLayoutProps {
   children: ReactNode;
   params: Promise<{ gameMode: string }>;
@@ -19,6 +21,7 @@ export default async function GameModeLayout({
 
   return (
     <div data-theme={theme}>
+      <BodyThemeOverride theme={theme} />
       <nav className="px-4 pt-3 pb-1">
         <HomeLink />
       </nav>

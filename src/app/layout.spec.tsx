@@ -9,6 +9,7 @@ vi.mock("@vercel/analytics/next", () => ({
   Analytics: () => null,
 }));
 
+import { BodyThemeOverride } from "./[gameMode]/body-theme-override";
 import RootLayout from "./layout";
 
 afterEach(cleanup);
@@ -26,16 +27,15 @@ describe("data-theme='shadowplay' on root layout", () => {
 });
 
 describe("game and lobby screens are unaffected", () => {
-  it("root layout does not set a game-mode-specific theme", () => {
-    render(
-      <RootLayout>
-        <div>content</div>
-      </RootLayout>,
-    );
-    const dataTheme = document.body.getAttribute("data-theme");
-    expect(dataTheme).not.toBe("werewolf");
-    expect(dataTheme).not.toBe("avalon");
-    expect(dataTheme).not.toBe("secret_villain");
-    expect(dataTheme).not.toBe("twilight_modern");
+  it("game-mode layout override applies and restores body theme for portals", () => {
+    document.body.setAttribute("data-theme", "shadowplay");
+
+    const { unmount } = render(<BodyThemeOverride theme="werewolf" />);
+
+    expect(document.body.getAttribute("data-theme")).toBe("werewolf");
+
+    unmount();
+
+    expect(document.body.getAttribute("data-theme")).toBe("shadowplay");
   });
 });
