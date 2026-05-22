@@ -1,5 +1,5 @@
 export const LOBBY_PAGE_COPY = {
-  loadingTitle: "Loading\u2026",
-  loading: "Loading\u2026",
   errorPrefix: "Error: ",
+  loading: "Loading\u2026",
+  loadingTitle: "Loading\u2026",
 } as const;

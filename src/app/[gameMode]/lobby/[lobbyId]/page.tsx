@@ -29,7 +29,7 @@ import { getLobbyId, getPlayerId, getSessionId, saveGameId } from "@/lib/api";
 import { parseGameMode } from "@/lib/game/modes";
 import { GameMode } from "@/lib/types";
 
-import { LobbyPageHeader } from "./LobbyPageHeader";
+import { LobbyPageHeaderView } from "./LobbyPageHeaderView";
 import { LOBBY_PAGE_COPY } from "./page.copy";
 
 const LOBBY_COUNTDOWN_SECONDS = 5;
@@ -74,6 +74,11 @@ export default function LobbyPage() {
   const ownerName = fetchLobby.data?.players.find(
     (p) => p.id === fetchLobby.data?.ownerPlayerId,
   )?.name;
+  const title =
+    ownerName ??
+    (fetchLobby.isLoading
+      ? LOBBY_PAGE_COPY.loadingTitle
+      : LOBBY_PAGE_COPY.errorPrefix);
 
   useEffect(() => {
     if (!validatedGameMode) router.push("/");
@@ -200,8 +205,8 @@ export default function LobbyPage() {
 
   return (
     <LobbyLayout>
-      <LobbyPageHeader
-        lobbyName={ownerName}
+      <LobbyPageHeaderView
+        title={title}
         lobbyId={lobbyId}
         gameMode={validatedGameMode}
       />
