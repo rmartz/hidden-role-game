@@ -6,7 +6,7 @@ import { LOBBY_PAGE_COPY } from "./page.copy";
 
 afterEach(cleanup);
 
-describe("h1 shows dynamic lobby name when data is loaded", () => {
+describe("renders the provided title", () => {
   it("renders the owner's player name in the h1", () => {
     const { container } = render(
       <LobbyPageHeaderView
@@ -17,7 +17,6 @@ describe("h1 shows dynamic lobby name when data is loaded", () => {
     );
     const h1 = container.querySelector("h1");
     expect(h1?.textContent).toBe("Marin");
-    expect(h1?.textContent).not.toContain(LOBBY_PAGE_COPY.loadingTitle);
   });
 });
 
