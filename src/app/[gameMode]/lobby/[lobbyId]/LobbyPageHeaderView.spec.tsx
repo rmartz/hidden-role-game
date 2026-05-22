@@ -17,18 +17,6 @@ describe("h1 shows dynamic lobby name when data is loaded", () => {
     );
     const h1 = container.querySelector("h1");
     expect(h1?.textContent).toBe("Marin");
-  });
-
-  it("does not render loading fallback when title is provided", () => {
-    const { container } = render(
-      <LobbyPageHeaderView
-        title="Marin"
-        lobbyId="lobby-1"
-        gameMode="werewolf"
-      />,
-    );
-    const h1 = container.querySelector("h1");
-    expect(h1?.textContent).toBe("Marin");
     expect(h1?.textContent).not.toContain(LOBBY_PAGE_COPY.loadingTitle);
   });
 });
