@@ -5,7 +5,7 @@ import { LobbyPageHeaderView } from "./LobbyPageHeaderView";
 
 afterEach(cleanup);
 
-describe("renders provided title string", () => {
+describe("LobbyPageHeaderView", () => {
   it("renders the provided title string in the h1", () => {
     const { container } = render(
       <LobbyPageHeaderView
