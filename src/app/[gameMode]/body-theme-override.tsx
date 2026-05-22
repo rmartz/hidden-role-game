@@ -14,10 +14,9 @@ export function BodyThemeOverride({ theme }: BodyThemeOverrideProps) {
     return () => {
       if (previousTheme === null) {
         document.body.removeAttribute("data-theme");
-        return;
+      } else {
+        document.body.setAttribute("data-theme", previousTheme);
       }
-
-      document.body.setAttribute("data-theme", previousTheme);
     };
   }, [theme]);
 
