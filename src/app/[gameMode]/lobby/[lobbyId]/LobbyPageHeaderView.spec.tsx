@@ -28,6 +28,7 @@ describe("h1 shows dynamic lobby name when data is loaded", () => {
       />,
     );
     const h1 = container.querySelector("h1");
+    expect(h1?.textContent).toBe("Marin");
     expect(h1?.textContent).not.toContain(LOBBY_PAGE_COPY.loadingTitle);
   });
 });
