@@ -49,11 +49,11 @@
     ]
   },
   "dependencies": {
-    "@base-ui/react": "^1.4.1",
-    "@fluentui/react-icons": "^2.0.326",
+    "@base-ui/react": "^1.5.0",
+    "@fluentui/react-icons": "^2.0.328",
     "@reduxjs/toolkit": "^2.11.2",
     "@sentry/nextjs": "^10.52.0",
-    "@tanstack/react-query": "^5.100.9",
+    "@tanstack/react-query": "^5.100.13",
     "@vercel/analytics": "^2.0.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
