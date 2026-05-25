@@ -74,11 +74,7 @@ export default function LobbyPage() {
   const ownerName = fetchLobby.data?.players.find(
     (p) => p.id === fetchLobby.data?.ownerPlayerId,
   )?.name;
-  const title =
-    ownerName ??
-    (fetchLobby.isLoading
-      ? LOBBY_PAGE_COPY.loadingTitle
-      : LOBBY_PAGE_COPY.errorPrefix);
+  const title = ownerName ?? LOBBY_PAGE_COPY.loadingTitle;
 
   useEffect(() => {
     if (!validatedGameMode) router.push("/");
