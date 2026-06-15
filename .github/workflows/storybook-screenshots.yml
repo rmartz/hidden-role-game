@@ -53,7 +53,7 @@ jobs:
           echo "Storybook did not start in time." && exit 1
 
       - name: Capture screenshots
-        uses: yoavf/auto-pr-screenshots-action@v1
+        uses: yoavf/auto-pr-screenshots-action@v1.4.0-beta
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           config-file: .github/screenshots.config.yml
