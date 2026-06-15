@@ -65,6 +65,28 @@ describe("checkWinCondition", () => {
       const result = checkWinCondition(game, ["p1"]);
       expect(result?.winner).toBe(WerewolfWinner.Village);
     });
+
+    it("Village wins when all Bad are dead and a non-killer Neutral (Tanner) is still alive", () => {
+      // Non-killer Neutrals (Tanner, Executioner, Dracula, Zombie) are not a threat to
+      // Village win — only killer Neutrals (Chupacabra, Arsonist) delay the Village win.
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Tanner },
+      ]);
+      const result = checkWinCondition(game, ["p1"]);
+      expect(result?.winner).toBe(WerewolfWinner.Village);
+    });
+
+    it("Village wins when all Bad are dead and an Executioner is still alive alongside Good", () => {
+      const game = makeGame([
+        { playerId: "p1", roleDefinitionId: WerewolfRole.Werewolf },
+        { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+        { playerId: "p3", roleDefinitionId: WerewolfRole.Executioner },
+      ]);
+      const result = checkWinCondition(game, ["p1"]);
+      expect(result?.winner).toBe(WerewolfWinner.Village);
+    });
   });
 
   describe("Werewolves win", () => {
