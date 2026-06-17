@@ -39,15 +39,6 @@
       "sharp"
     ]
   },
-  "lint-staged": {
-    "*.{js,mjs,cjs,ts,tsx,jsx}": [
-      "eslint --fix --max-warnings 0 --no-warn-ignored",
-      "prettier --write"
-    ],
-    "*.{json,md,yml,yaml}": [
-      "prettier --write"
-    ]
-  },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
     "@fluentui/react-icons": "^2.0.326",
