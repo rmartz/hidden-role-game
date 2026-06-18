@@ -1,1 +1,0 @@
-Skipped: empty work list — no open inline threads, no CI failures (all checks passing), branch is MERGEABLE and up to date with main, and the most recent review (2026-06-18) recorded outcome **approved**. Nothing to fix this pass. Anomaly appended to [rmartz/dotfiles#1087](https://github.com/rmartz/dotfiles/issues/1087).
