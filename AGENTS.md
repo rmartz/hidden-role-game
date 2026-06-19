@@ -23,10 +23,12 @@ pnpm run secrets-check # Gitleaks secret scan (runs in pre-commit)
 
 After creating a git worktree (`git worktree add .git-worktrees/<name> -b <branch> origin/main`), run `pnpm install --frozen-lockfile` inside it before invoking any build, test, lint, or typecheck commands. pnpm's `node-modules` linker creates per-directory `node_modules` trees; a fresh worktree has none. The global store is already populated so this step only creates hardlinks — it takes a few seconds and requires no network access.
 
+`new-worktree.py` also sets `core.hooksPath=claude/hooks` in the shared git config, wiring the agent pre-commit hook (`claude/hooks/pre-commit`) for all worktrees. For manually-created worktrees run: `git config core.hooksPath claude/hooks`.
+
 ## Secret Management
 
 - Pull `.env.local` for local development: `pnpm run env:pull` (requires `vercel login`)
-- Secret scanning runs automatically on every commit via `.husky/pre-commit` and is enforced in CI via `.github/workflows/secret-scan.yml`
+- Secret scanning runs automatically on every commit — via `.husky/pre-commit` in the root worktree and via `claude/hooks/pre-commit` in agent worktrees — and is enforced in CI via `.github/workflows/secret-scan.yml`
 - Never commit `.env.local`, `.vercel/`, service account keys, or Firebase private keys. The `.env.example` file contains only placeholder values. `.vercel/` is listed in `.gitignore` — it is local project metadata created by `vercel env pull` / `vercel link` and must not be committed.
 
 ## Firebase Compatibility
