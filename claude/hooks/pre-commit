@@ -6,13 +6,17 @@
 # worktrees, so every worktree created by the script picks up these checks.
 # Root-worktree manual commits go through .husky/pre-commit instead.
 #
-# 1. Secrets scan        — block committing credentials or private keys
-# 2. File-length ratchet — same check CI enforces (.github/scripts/),
+# 1. Conflict markers   — block committing leftover Git merge-conflict markers
+#                          (also prevents the prettier hook from reflowing and
+#                          mangling them in Markdown/YAML)
+# 2. Secrets scan        — block committing credentials or private keys
+# 3. File-length ratchet — same check CI enforces (.github/scripts/),
 #                          so violations surface at commit time rather
 #                          than after a push
 #
 # Bypass: git commit --no-verify
 set -e
 repo_root="$(git rev-parse --show-toplevel)"
+"$repo_root/.github/scripts/check-conflict-markers.sh" --staged
 pnpm run secrets-check
 "$repo_root/.github/scripts/check-file-length.sh" --staged
