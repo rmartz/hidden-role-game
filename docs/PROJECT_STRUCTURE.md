@@ -1,3 +1,10 @@
+---
+type: Reference
+title: Project Structure
+description: Directory-by-directory breakdown of the codebase.
+tags: [architecture, structure, reference]
+---
+
 # Project Structure
 
 A directory-by-directory breakdown of the codebase.

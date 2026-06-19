@@ -70,6 +70,7 @@ After creating a git worktree (`git worktree add .git-worktrees/<name> -b <branc
 ## Documentation
 
 - When adding or modifying roles, actions, game settings, or data flow in a game mode, update the corresponding docs in `docs/<game-mode>/` (`roles.md`, `actions.md`, `data-flow.md`).
+- Pages under `docs/` follow the [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md): every page begins with YAML frontmatter. The required key is `type` (one of `Index`, `Guide`, `Reference`, `Roles`, `Actions`, `DataFlow`); also set `title` and `description`. Per-mode pages additionally set `gameMode` (the mode slug) and `resource` (relative path to the documented source). When you add a new page, include the frontmatter and link it from `docs/README.md` so the index stays complete.
 
 ## React / Next.js Standards
 

@@ -1,3 +1,12 @@
+---
+type: Roles
+title: Avalon — Roles
+description: Three roles with asymmetric initial visibility set up by the app.
+gameMode: avalon
+resource: src/lib/game/modes/avalon
+tags: [avalon, roles, visibility]
+---
+
 # Avalon — Roles
 
 ## Overview
