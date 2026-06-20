@@ -1,3 +1,12 @@
+---
+type: Actions
+title: Clocktower — Actions
+description: Storyteller and player actions, payloads, and validation rules.
+gameMode: clocktower
+resource: src/lib/game/modes/clocktower/actions
+tags: [clocktower, actions]
+---
+
 # Clocktower — Actions
 
 Actions are the mechanism by which the Storyteller and players mutate game state. Each action has an `isValid` guard and an `apply` mutation.
