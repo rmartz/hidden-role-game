@@ -1,3 +1,10 @@
+---
+type: Guide
+title: Getting Started
+description: Onboarding guide for new developers — prerequisites, setup, and local development.
+tags: [onboarding, setup, guide]
+---
+
 # Getting Started
 
 A guide for new developers getting acquainted with the codebase.

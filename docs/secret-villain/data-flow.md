@@ -1,3 +1,12 @@
+---
+type: DataFlow
+title: Secret Villain — Data Flow
+description: PlayerGameState fields by phase and role, Firebase schema, and phase transitions.
+gameMode: secret-villain
+resource: src/lib/game/modes/secret-villain
+tags: [secret-villain, data-flow, firebase]
+---
+
 # Secret Villain — Data Flow
 
 ## Overview
