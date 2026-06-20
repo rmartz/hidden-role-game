@@ -1,10 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import { WerewolfRole } from "../../roles";
-import {
-  getInterimAttackedPlayerIds,
-  resolveNightActions,
-} from "../resolution";
+import { getInterimAttackedPlayerIds } from "../attack-map";
+import { resolveNightActions } from "../resolution";
 import { findKilled } from "./helpers";
 
 describe("resolveNightActions", () => {
