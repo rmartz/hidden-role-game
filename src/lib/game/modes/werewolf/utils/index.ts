@@ -1,3 +1,4 @@
+export { getInterimAttackedPlayerIds } from "./attack-map";
 export * from "./display";
 export * from "./game-state";
 export * from "./narrator-instructions";
