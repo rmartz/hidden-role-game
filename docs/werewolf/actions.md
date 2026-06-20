@@ -1,3 +1,12 @@
+---
+type: Actions
+title: Werewolf — Actions
+description: Narrator and player actions, payloads, validation rules, and night resolution order.
+gameMode: werewolf
+resource: src/lib/game/modes/werewolf/actions
+tags: [werewolf, actions, night-phase]
+---
+
 # Werewolf — Actions
 
 Actions are the mechanism by which the Narrator and players mutate game state. Each action has an `isValid` guard and an `apply` mutation.
