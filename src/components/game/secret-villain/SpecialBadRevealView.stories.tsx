@@ -4,6 +4,7 @@ import { fn } from "storybook/test";
 import { SpecialBadRevealView } from "./SpecialBadRevealView";
 
 const meta = {
+  title: "components/game/secret-villain/SpecialBadRevealView",
   component: SpecialBadRevealView,
   args: {
     chancellorName: "Alice",

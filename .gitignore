@@ -11,3 +11,7 @@ tsconfig.tsbuildinfo
 .env.sentry-build-plugin
 storybook-static
 pnpm-workspace.yaml
+
+# CI-generated Storybook screenshot artifacts (written during the workflow run)
+changed-files.txt
+.github/screenshots.dynamic.yml

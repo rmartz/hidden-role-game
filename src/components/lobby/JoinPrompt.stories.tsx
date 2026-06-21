@@ -4,6 +4,7 @@ import { fn } from "storybook/test";
 import { JoinPromptView } from "./JoinPrompt";
 
 const meta = {
+  title: "components/lobby/JoinPrompt",
   component: JoinPromptView,
   args: {
     onPlayerNameChange: fn(),

@@ -7,6 +7,7 @@ import { NarratorPlayerRoleLists } from "./NarratorPlayerRoleLists";
 import { NightMarkerEffect } from "./NightActionMarker";
 
 const meta = {
+  title: "components/game/werewolf/NarratorPlayerRoleLists",
   component: NarratorPlayerRoleLists,
 } satisfies Meta<typeof NarratorPlayerRoleLists>;
 

@@ -5,6 +5,7 @@ import { GameMode, Team } from "@/lib/types";
 import { PlayerRoleDisplay } from "./PlayerRoleDisplay";
 
 const meta = {
+  title: "components/game/werewolf/PlayerRoleDisplay",
   component: PlayerRoleDisplay,
 } satisfies Meta<typeof PlayerRoleDisplay>;
 

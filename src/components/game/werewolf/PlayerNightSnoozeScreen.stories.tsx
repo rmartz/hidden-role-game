@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { PlayerNightSnoozeScreen } from "./PlayerNightSnoozeScreen";
 
 const meta = {
+  title: "components/game/werewolf/PlayerNightSnoozeScreen",
   component: PlayerNightSnoozeScreen,
 } satisfies Meta<typeof PlayerNightSnoozeScreen>;
 

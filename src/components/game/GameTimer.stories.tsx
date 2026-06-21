@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { GameTimer } from "./GameTimer";
 
 const meta = {
+  title: "components/game/GameTimer",
   component: GameTimer,
 } satisfies Meta<typeof GameTimer>;
 

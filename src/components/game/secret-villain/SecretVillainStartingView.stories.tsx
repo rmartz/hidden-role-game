@@ -8,6 +8,7 @@ import { GameMode, GameStatus, Team } from "@/lib/types";
 import { SecretVillainStartingView } from "./SecretVillainStartingView";
 
 const meta = {
+  title: "components/game/secret-villain/SecretVillainStartingView",
   component: SecretVillainStartingView,
 } satisfies Meta<typeof SecretVillainStartingView>;
 

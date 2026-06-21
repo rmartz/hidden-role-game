@@ -11,6 +11,7 @@ import { GameMode } from "@/lib/types";
 import { SecretVillainConfigPanel } from "./SecretVillainConfigPanel";
 
 const meta = {
+  title: "components/lobby/secret-villain/SecretVillainConfigPanel",
   component: SecretVillainConfigPanel,
 } satisfies Meta<typeof SecretVillainConfigPanel>;
 

@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { ActionGateView } from "./ActionGateView";
 
 const meta = {
+  title: "components/game/secret-villain/ActionGateView",
   component: ActionGateView,
 } satisfies Meta<typeof ActionGateView>;
 

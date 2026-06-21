@@ -4,6 +4,7 @@ import { fn } from "storybook/test";
 import { GhostCluePanelView } from "./GhostCluePanel";
 
 const meta = {
+  title: "components/game/werewolf/GhostCluePanel",
   component: GhostCluePanelView,
   args: {
     onClueChange: fn(),

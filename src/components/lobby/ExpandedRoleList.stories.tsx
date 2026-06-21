@@ -9,6 +9,7 @@ import gameConfigReducer from "@/store/game-config-slice";
 import { ExpandedRoleList } from "./ExpandedRoleList";
 
 const meta = {
+  title: "components/lobby/ExpandedRoleList",
   component: ExpandedRoleList,
   decorators: [
     (Story) => {

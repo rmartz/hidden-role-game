@@ -52,6 +52,71 @@ jobs:
       - uses: ./.github/actions/setup
       - run: pnpm build
 
+  storybook-build:
+    name: Storybook Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: pnpm build-storybook
+
+  storybook-screenshots:
+    name: Storybook Screenshots
+    if: github.event_name == 'pull_request'
+    timeout-minutes: 3
+    concurrency:
+      group: storybook-screenshots-${{ github.event.pull_request.number }}
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+      - name: Generate changed files list
+        run: |
+          git diff --name-only "${{ github.event.pull_request.base.sha }}...${{ github.sha }}" > changed-files.txt
+      - id: screenshot-config
+        name: Generate screenshot config for changed stories
+        run: |
+          node scripts/generate-storybook-screenshots-config.mjs \
+            --changed-files=changed-files.txt \
+            --output=.github/screenshots.dynamic.yml \
+            --github-output="$GITHUB_OUTPUT"
+      - name: Install Playwright Chromium
+        if: steps.screenshot-config.outputs.has_stories == 'true'
+        run: pnpm exec playwright install chromium
+      - name: Start Storybook
+        if: steps.screenshot-config.outputs.has_stories == 'true'
+        run: pnpm storybook --ci --port 6006 &
+      - name: Wait for Storybook
+        if: steps.screenshot-config.outputs.has_stories == 'true'
+        run: |
+          # Max wait: 2 minutes, checking every 2 seconds.
+          TIMEOUT_SECONDS=120
+          RETRY_INTERVAL=2
+          MAX_ATTEMPTS=$((TIMEOUT_SECONDS / RETRY_INTERVAL))
+
+          for attempt in $(seq 1 "$MAX_ATTEMPTS"); do
+            if curl --silent --show-error --fail http://127.0.0.1:6006 >/dev/null; then
+              echo "Storybook is ready."
+              exit 0
+            fi
+            sleep "$RETRY_INTERVAL"
+          done
+          echo "Storybook did not start in time." >&2
+          exit 1
+      - name: Capture Storybook screenshots
+        if: steps.screenshot-config.outputs.has_stories == 'true'
+        uses: yoavf/auto-pr-screenshots-action@v1.4.0-beta
+        with:
+          config-file: .github/screenshots.dynamic.yml
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
   sentry-release:
     name: Sentry Release
     runs-on: ubuntu-latest

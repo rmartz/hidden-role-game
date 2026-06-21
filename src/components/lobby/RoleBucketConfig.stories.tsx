@@ -32,6 +32,7 @@ const populatedBuckets: AdvancedRoleBucket[] = [
 ];
 
 const meta = {
+  title: "components/lobby/RoleBucketConfig",
   component: RoleBucketConfigView,
   args: {
     gameMode: GameMode.Werewolf,

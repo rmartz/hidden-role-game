@@ -10,6 +10,7 @@ import { GameMode, GameStatus } from "@/lib/types";
 import { GhostNightObserverScreen } from "./GhostNightObserverScreen";
 
 const meta = {
+  title: "components/game/werewolf/GhostNightObserverScreen",
   component: GhostNightObserverScreen,
 } satisfies Meta<typeof GhostNightObserverScreen>;
 

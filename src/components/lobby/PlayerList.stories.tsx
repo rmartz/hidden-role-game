@@ -11,6 +11,7 @@ import { PLAYER_LIST_COPY } from "./PlayerList.copy";
 const noop = () => {};
 
 const meta = {
+  title: "components/lobby/PlayerList",
   component: PlayerList,
   args: {
     onRefetch: noop,

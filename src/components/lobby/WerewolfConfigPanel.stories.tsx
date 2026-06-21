@@ -7,6 +7,7 @@ import { WerewolfConfigPanel } from "./WerewolfConfigPanel";
 import { WEREWOLF_CONFIG_PANEL_COPY } from "./WerewolfConfigPanel.copy";
 
 const meta = {
+  title: "components/lobby/WerewolfConfigPanel",
   component: WerewolfConfigPanel,
 } satisfies Meta<typeof WerewolfConfigPanel>;
 

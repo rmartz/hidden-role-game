@@ -10,6 +10,7 @@ const eligiblePlayers = [
 ];
 
 const meta = {
+  title: "components/game/secret-villain/ElectionNominationView",
   component: ElectionNominationView,
   args: {
     onSelectPlayer: fn(),

@@ -7,6 +7,7 @@ import type { VisibleTeammate } from "@/server/types";
 import { VisibilityGroupCard } from "./VisibilityGroupCard";
 
 const meta = {
+  title: "components/game/VisibilityGroupCard",
   component: VisibilityGroupCard,
 } satisfies Meta<typeof VisibilityGroupCard>;
 

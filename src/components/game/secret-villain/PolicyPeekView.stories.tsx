@@ -4,6 +4,7 @@ import { fn } from "storybook/test";
 import { PolicyPeekView } from "./PolicyPeekView";
 
 const meta = {
+  title: "components/game/secret-villain/PolicyPeekView",
   component: PolicyPeekView,
   args: {
     peekedCards: ["bad", "good", "bad"],

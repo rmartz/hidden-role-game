@@ -15,6 +15,7 @@ const MEDIUM_POWER_TABLE = [
 ];
 
 const meta = {
+  title: "components/game/secret-villain/BoardDisplay",
   component: BoardDisplay,
 } satisfies Meta<typeof BoardDisplay>;
 

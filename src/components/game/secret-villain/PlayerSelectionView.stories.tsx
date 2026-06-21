@@ -10,6 +10,7 @@ const players = [
 ];
 
 const meta = {
+  title: "components/game/secret-villain/PlayerSelectionView",
   component: PlayerSelectionView,
   args: {
     heading: "Select a Player",

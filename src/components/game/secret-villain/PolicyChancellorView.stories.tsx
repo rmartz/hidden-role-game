@@ -4,6 +4,7 @@ import { fn } from "storybook/test";
 import { PolicyChancellorView } from "./PolicyChancellorView";
 
 const meta = {
+  title: "components/game/secret-villain/PolicyChancellorView",
   component: PolicyChancellorView,
   args: {
     onSelectCard: fn(),

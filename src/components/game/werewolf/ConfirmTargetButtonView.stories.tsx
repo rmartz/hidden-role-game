@@ -6,6 +6,7 @@ import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import { ConfirmTargetButtonView } from "./ConfirmTargetButtonView";
 
 const meta = {
+  title: "components/game/werewolf/ConfirmTargetButtonView",
   component: ConfirmTargetButtonView,
   args: {
     onConfirm: fn(),

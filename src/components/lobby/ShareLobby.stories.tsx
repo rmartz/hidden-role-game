@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { ShareLobby } from "./ShareLobby";
 
 const meta = {
+  title: "components/lobby/ShareLobby",
   component: ShareLobby,
 } satisfies Meta<typeof ShareLobby>;
 

@@ -4,6 +4,7 @@ import { fn } from "storybook/test";
 import { InvestigationConsentView } from "./InvestigationConsentView";
 
 const meta = {
+  title: "components/game/secret-villain/InvestigationConsentView",
   component: InvestigationConsentView,
   args: {
     presidentName: "Alice",

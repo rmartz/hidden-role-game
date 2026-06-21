@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { HomeLink } from "./HomeLink";
 
 const meta = {
+  title: "components/HomeLink",
   component: HomeLink,
 } satisfies Meta<typeof HomeLink>;
 

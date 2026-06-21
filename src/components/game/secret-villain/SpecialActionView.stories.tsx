@@ -12,6 +12,7 @@ const players = [
 ];
 
 const meta = {
+  title: "components/game/secret-villain/SpecialActionView",
   component: SpecialActionView,
   args: {
     onSelectPlayer: fn(),

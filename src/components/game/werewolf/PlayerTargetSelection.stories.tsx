@@ -6,6 +6,7 @@ import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import { PlayerTargetSelectionView } from "./PlayerTargetSelection";
 
 const meta = {
+  title: "components/game/werewolf/PlayerTargetSelection",
   component: PlayerTargetSelectionView,
   args: {
     onMutate: fn(),

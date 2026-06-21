@@ -5,6 +5,7 @@ import { WerewolfRole } from "@/lib/game/modes/werewolf";
 import { NightOutcomeSummary } from "./NightOutcomeSummary";
 
 const meta = {
+  title: "components/game/werewolf/NightOutcomeSummary",
   component: NightOutcomeSummary,
   args: {
     players: [

@@ -9,6 +9,7 @@ import { GameMode, GameStatus, Team } from "@/lib/types";
 import { GameOverScreenView } from "./GameOverScreenView";
 
 const meta = {
+  title: "components/game/werewolf/GameOverScreenView",
   component: GameOverScreenView,
   args: {
     onReturnToLobby: fn(),

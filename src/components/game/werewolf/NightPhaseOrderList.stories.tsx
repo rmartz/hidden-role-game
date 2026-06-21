@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { NightPhaseOrderList } from "./NightPhaseOrderList";
 
 const meta = {
+  title: "components/game/werewolf/NightPhaseOrderList",
   component: NightPhaseOrderList,
 } satisfies Meta<typeof NightPhaseOrderList>;
 

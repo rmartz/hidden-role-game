@@ -10,6 +10,7 @@ import { GameMode, GameStatus, Team } from "@/lib/types";
 import { SecretVillainGameOverView } from "./SecretVillainGameOverView";
 
 const meta = {
+  title: "components/game/secret-villain/SecretVillainGameOverView",
   component: SecretVillainGameOverView,
   args: {
     onReturnToLobby: fn(),

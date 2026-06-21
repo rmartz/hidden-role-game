@@ -8,6 +8,7 @@ import { HomePageView } from "./HomePageView";
 const noop = fn();
 
 const meta = {
+  title: "app/HomePageView",
   component: HomePageView,
   args: {
     playerName: "Alice",

@@ -46,6 +46,7 @@ const baseGameState: SecretVillainPlayerGameState = {
 };
 
 const meta = {
+  title: "components/game/secret-villain/BoardScreen",
   component: BoardScreen,
 } satisfies Meta<typeof BoardScreen>;
 

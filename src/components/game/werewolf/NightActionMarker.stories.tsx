@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { NightActionMarker, NightMarkerEffect } from "./NightActionMarker";
 
 const meta = {
+  title: "components/game/werewolf/NightActionMarker",
   component: NightActionMarker,
 } satisfies Meta<typeof NightActionMarker>;
 

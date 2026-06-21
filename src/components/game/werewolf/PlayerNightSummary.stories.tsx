@@ -6,6 +6,7 @@ import type { PublicLobbyPlayer } from "@/server/types";
 import { PlayerNightSummary } from "./PlayerNightSummary";
 
 const meta = {
+  title: "components/game/werewolf/PlayerNightSummary",
   component: PlayerNightSummary,
 } satisfies Meta<typeof PlayerNightSummary>;
 

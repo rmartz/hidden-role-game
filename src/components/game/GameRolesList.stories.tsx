@@ -6,6 +6,7 @@ import type { RoleInPlay } from "@/server/types";
 import { GameRolesList } from "./GameRolesList";
 
 const meta = {
+  title: "components/game/GameRolesList",
   component: GameRolesList,
 } satisfies Meta<typeof GameRolesList>;
 

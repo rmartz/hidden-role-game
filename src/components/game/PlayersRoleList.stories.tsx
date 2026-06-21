@@ -6,6 +6,7 @@ import type { VisibleTeammate } from "@/server/types";
 import { PlayersRoleList } from "./PlayersRoleList";
 
 const meta = {
+  title: "components/game/PlayersRoleList",
   component: PlayersRoleList,
 } satisfies Meta<typeof PlayersRoleList>;
 

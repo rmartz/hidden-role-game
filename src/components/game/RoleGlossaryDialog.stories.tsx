@@ -11,6 +11,7 @@ import { GameMode, Team } from "@/lib/types";
 import { RoleGlossaryDialog } from "./RoleGlossaryDialog";
 
 const meta = {
+  title: "components/game/RoleGlossaryDialog",
   component: RoleGlossaryDialog,
 } satisfies Meta<typeof RoleGlossaryDialog>;
 

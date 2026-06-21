@@ -6,6 +6,7 @@ import { SpecialActionType } from "@/lib/game/modes/secret-villain/types";
 import { CustomPowerTableEditor } from "./CustomPowerTableEditor";
 
 const meta = {
+  title: "components/lobby/secret-villain/CustomPowerTableEditor",
   component: CustomPowerTableEditor,
 } satisfies Meta<typeof CustomPowerTableEditor>;
 

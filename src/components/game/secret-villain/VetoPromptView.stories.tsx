@@ -4,6 +4,7 @@ import { fn } from "storybook/test";
 import { VetoPromptView } from "./VetoPromptView";
 
 const meta = {
+  title: "components/game/secret-villain/VetoPromptView",
   component: VetoPromptView,
   args: {
     onAccept: fn(),

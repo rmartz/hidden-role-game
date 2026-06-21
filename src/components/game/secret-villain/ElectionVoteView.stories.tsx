@@ -4,6 +4,7 @@ import { fn } from "storybook/test";
 import { ElectionVoteView } from "./ElectionVoteView";
 
 const meta = {
+  title: "components/game/secret-villain/ElectionVoteView",
   component: ElectionVoteView,
   args: {
     onVote: fn(),

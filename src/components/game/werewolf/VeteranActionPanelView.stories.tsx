@@ -4,6 +4,7 @@ import { fn } from "storybook/test";
 import { VeteranActionPanelView } from "./VeteranActionPanelView";
 
 const meta = {
+  title: "components/game/werewolf/VeteranActionPanelView",
   component: VeteranActionPanelView,
   args: {
     onAlert: fn(),
