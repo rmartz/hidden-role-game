@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 import { DEFAULT_WEREWOLF_TIMER_CONFIG } from "@/lib/game/modes/werewolf/timer-config";
-import { GameMode, GameStatus, Team } from "@/lib/types";
+import { DEFAULT_TIMER_CONFIG, GameMode, GameStatus, Team } from "@/lib/types";
 
 import { firebaseToPlayerState, playerStateToFirebase } from "./index";
 
@@ -28,7 +28,6 @@ function makeWerewolfState(
     ...overrides,
   };
 }
-
 
 describe("Werewolf player state round-trip", () => {
   it("preserves base fields", () => {
@@ -437,7 +436,6 @@ describe("Werewolf player state round-trip", () => {
     expect(result.ghostVisible).toBeUndefined();
   });
 });
-
 
 describe("firebaseToPlayerState", () => {
   it("throws for unknown game mode", () => {

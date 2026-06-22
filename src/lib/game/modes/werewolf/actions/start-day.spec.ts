@@ -578,4 +578,3 @@ describe("WerewolfAction.StartDay — Hunter and Vigilante", () => {
     });
   });
 });
-

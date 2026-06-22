@@ -26,22 +26,22 @@ import type { LobbyPlayer, TimerConfig } from "./lobby";
 import type { ModeConfig } from "./mode-config";
 import type { RoleDefinition, Team } from "./role";
 
+export {
+  type FinishedGameStatus,
+  GameStatus,
+  type GameStatusState,
+  type GameWinner,
+  type PlayingGameStatus,
+  type StartingGameStatus,
+} from "./game-status";
 export type {
   DeviceLobbyPlayer,
-  NoDeviceLobbyPlayer,
   LobbyPlayer,
+  NoDeviceLobbyPlayer,
   TimerConfig,
 } from "./lobby";
 export { DEFAULT_TIMER_CONFIG } from "./lobby";
-export type { Team, RoleDefinition } from "./role";
-export {
-  GameStatus,
-  type GameWinner,
-  type StartingGameStatus,
-  type PlayingGameStatus,
-  type FinishedGameStatus,
-  type GameStatusState,
-} from "./game-status";
+export { type RoleDefinition, Team } from "./role";
 
 // --- Game Modes ---
 

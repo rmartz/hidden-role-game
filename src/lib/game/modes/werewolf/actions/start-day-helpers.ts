@@ -272,7 +272,9 @@ interface BuildNewRoleStateParams {
  * Builds the new WerewolfRoleTurnState to carry into the daytime phase.
  * Only includes fields for roles that are active or have relevant state.
  */
-export function buildNewRoleState(p: BuildNewRoleStateParams): WerewolfRoleTurnState {
+export function buildNewRoleState(
+  p: BuildNewRoleStateParams,
+): WerewolfRoleTurnState {
   return {
     ...(p.rs.alphaWolf?.biteUsed ? { alphaWolf: { biteUsed: true } } : {}),
     ...(p.witchAbilityUsed ? { witch: { abilityUsed: true } } : {}),
@@ -320,13 +322,20 @@ export function buildNewRoleState(p: BuildNewRoleStateParams): WerewolfRoleTurnS
         }
       : {}),
     ...(p.thingTapped ? { theThing: { tapped: p.thingTapped } } : {}),
-    ...(p.draculaWives.length > 0 ? { dracula: { wives: p.draculaWives } } : {}),
-    ...(p.zombieInfected.length > 0 ? { zombie: { infected: p.zombieInfected } } : {}),
+    ...(p.draculaWives.length > 0
+      ? { dracula: { wives: p.draculaWives } }
+      : {}),
+    ...(p.zombieInfected.length > 0
+      ? { zombie: { infected: p.zombieInfected } }
+      : {}),
     ...(p.arsonistDousedPlayerIds.length > 0
       ? { arsonist: { dousedPlayerIds: p.arsonistDousedPlayerIds } }
       : {}),
-    ...(p.illusionTargetId ? { illusionArtist: { illusionTargetId: p.illusionTargetId } } : {}),
-    ...(p.evilEmpathLastResult !== undefined || p.evilEmpathRevealedResult !== undefined
+    ...(p.illusionTargetId
+      ? { illusionArtist: { illusionTargetId: p.illusionTargetId } }
+      : {}),
+    ...(p.evilEmpathLastResult !== undefined ||
+    p.evilEmpathRevealedResult !== undefined
       ? {
           evilEmpath: {
             ...(p.evilEmpathLastResult !== undefined
@@ -338,7 +347,9 @@ export function buildNewRoleState(p: BuildNewRoleStateParams): WerewolfRoleTurnS
           },
         }
       : {}),
-    ...(p.veteranAlertsUsed > 0 ? { veteran: { alertsUsed: p.veteranAlertsUsed } } : {}),
+    ...(p.veteranAlertsUsed > 0
+      ? { veteran: { alertsUsed: p.veteranAlertsUsed } }
+      : {}),
   };
 }
 

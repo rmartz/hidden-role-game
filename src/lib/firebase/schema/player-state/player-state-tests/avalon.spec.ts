@@ -6,8 +6,7 @@ import {
   QuestCard,
   TeamVote,
 } from "@/lib/game/modes/avalon/types";
-import { GameMode } from "@/lib/types";
-import { DEFAULT_TIMER_CONFIG } from "@/lib/types";
+import { DEFAULT_TIMER_CONFIG, GameMode, GameStatus } from "@/lib/types";
 
 import { firebaseToPlayerState, playerStateToFirebase } from "../index";
 
@@ -16,9 +15,9 @@ function makeAvalonState(
 ): AvalonPlayerGameState {
   return {
     lobbyId: "lobby-1",
-    players: [{ id: "p1", name: "Alice", sessionId: "s1" }],
+    players: [{ id: "p1", name: "Alice" }],
     visibleRoleAssignments: [],
-    status: { type: "Playing" } as const,
+    status: { type: GameStatus.Playing } as const,
     gameMode: GameMode.Avalon,
     timerConfig: DEFAULT_TIMER_CONFIG,
     ...overrides,

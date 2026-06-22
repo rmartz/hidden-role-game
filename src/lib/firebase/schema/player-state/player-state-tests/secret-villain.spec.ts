@@ -13,7 +13,7 @@ function makeSecretVillainState(
 ): SecretVillainPlayerGameState {
   return {
     lobbyId: "lobby-1",
-    players: [{ id: "p1", name: "Alice", sessionId: "s1" }],
+    players: [{ id: "p1", name: "Alice" }],
     visibleRoleAssignments: [],
     status: { type: GameStatus.Playing } as const,
     gameMode: GameMode.SecretVillain,

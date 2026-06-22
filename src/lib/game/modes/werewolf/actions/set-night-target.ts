@@ -4,18 +4,18 @@ import type { Game, GameAction } from "@/lib/types";
 import { VETERAN_ALERTS_LIMIT } from "../constants";
 import { getWerewolfRole, WerewolfRole } from "../roles";
 import type { TeamNightAction } from "../types";
-import { isTeamNightAction, TargetCategory, WerewolfPhase } from "../types";
+import { isTeamNightAction, WerewolfPhase } from "../types";
 import {
   baseGroupPhaseKey,
   computeSuggestedTarget,
   currentTurnState,
   getGroupPhaseMemberIds,
   getGroupPhasePlayerIds,
-  getInterimAttackedPlayerIds,
   isGroupPhaseKey,
   isRoleActive,
   validateActiveNightPlayer,
 } from "../utils";
+import { validateRoleSpecificRestrictions } from "./set-night-target-helpers";
 
 export const setNightTargetAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {
@@ -165,79 +165,20 @@ export const setNightTargetAction: GameAction = {
     )
       return false;
 
-    // Priest cannot target when they have an active ward on a living player.
-    if (
-      isRoleActive(phaseKey, WerewolfRole.Priest) &&
-      ts.roleState?.priest?.wards
-    ) {
-      const hasActiveWard = Object.keys(ts.roleState.priest.wards).some(
-        (wardedId) => !ts.deadPlayerIds.includes(wardedId),
-      );
-      if (hasActiveWard) return false;
-    }
-
-    // Attack and Investigate roles cannot target themselves.
-    if (targetPlayerId === callerId) {
-      const callerAssignment = game.roleAssignments.find(
-        (a) => a.playerId === callerId,
-      );
-      const effectiveCallerRoleId =
-        ts.roleOverrides?.[callerId] ?? callerAssignment?.roleDefinitionId;
-      const callerRoleDef = effectiveCallerRoleId
-        ? getWerewolfRole(effectiveCallerRoleId)
-        : undefined;
-      if (
-        callerRoleDef?.targetCategory === TargetCategory.Attack ||
-        callerRoleDef?.targetCategory === TargetCategory.Investigate ||
-        callerRoleDef?.preventSelfTarget === true
-      )
-        return false;
-    }
-
-    // Roles with adjacentTargetOnly may only target immediate seating neighbours.
     if (!isOwner) {
-      const callerAssignment = game.roleAssignments.find(
-        (a) => a.playerId === callerId,
+      const roleRestriction = validateRoleSpecificRestrictions(
+        game,
+        callerId,
+        phaseKey,
+        targetPlayerId,
+        ts,
       );
-      const callerRoleDef = callerAssignment
-        ? getWerewolfRole(callerAssignment.roleDefinitionId)
-        : undefined;
-      if (callerRoleDef?.adjacentTargetOnly) {
-        const rawOrder = game.playerOrder ?? game.players.map((p) => p.id);
-        // Exclude the narrator so a player seated next to the narrator still
-        // has two selectable neighbours, matching the pattern used by
-        // extractCountState and extractTheThingState.
-        const playerOrder = rawOrder.filter((id) => id !== game.ownerPlayerId);
-        const idx = playerOrder.indexOf(callerId);
-        if (idx === -1 || playerOrder.length < 2) return false;
-        const left =
-          playerOrder[(idx - 1 + playerOrder.length) % playerOrder.length];
-        const right = playerOrder[(idx + 1) % playerOrder.length];
-        if (targetPlayerId !== left && targetPlayerId !== right) return false;
-      }
+      if (roleRestriction === false) return false;
     }
 
     // Zombie cannot infect an already-infected player.
     if (isRoleActive(phaseKey, WerewolfRole.Zombie)) {
       if (ts.roleState?.zombie?.infected.includes(targetPlayerId)) return false;
-    }
-
-    // Witch cannot self-target unless under attack (self-protect is OK,
-    // self-attack is not).
-    if (
-      isRoleActive(phaseKey, WerewolfRole.Witch) &&
-      targetPlayerId === callerId
-    ) {
-      const attacked = getInterimAttackedPlayerIds(
-        phase.nightActions,
-        game.roleAssignments,
-        ts.deadPlayerIds,
-        ts.roleState?.priest?.wards,
-        ts.roleState?.mirrorcaster?.charged,
-        ts.roleState?.mercenary?.charged,
-        ts.roleState?.arsonist?.dousedPlayerIds,
-      );
-      if (!attacked.includes(callerId)) return false;
     }
 
     // Group phases: cannot target players the caller knows are team members.

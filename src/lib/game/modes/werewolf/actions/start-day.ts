@@ -142,7 +142,10 @@ export const startDayAction: GameAction = {
 
     // Consume priest wards for any warded player who was attacked this night,
     // regardless of whether other protections also saved them.
-    const priestWards = computePriestWards(nightResolution, priestWardsForResolution);
+    const priestWards = computePriestWards(
+      nightResolution,
+      priestWardsForResolution,
+    );
 
     // One-Eyed Seer lock: if the OES investigated a werewolf this night, lock them on.
     // If the OES's locked target died this night, the lock is cleared.
