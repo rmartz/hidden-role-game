@@ -10,18 +10,29 @@ jobs:
   check:
     name: Check file lengths
     runs-on: ubuntu-latest
+    timeout-minutes: 2
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Check changed file lengths
         run: |
-          # Thresholds from CLAUDE.md — 2× the split threshold ("+100% of recommended max")
-          # Source files: recommended split at ~240 lines → CI fails at 480+
-          # Test files:   recommended split at ~360 lines → CI fails at 720+
-          SOURCE_LIMIT=480
-          TEST_LIMIT=720
+          # Ratchet, not a hard ceiling. A changed file that is over the limit only
+          # fails CI if the PR grows it or leaves its length unchanged. Reducing an
+          # oversized file passes — even if it is still over the limit — because
+          # progress toward a healthy codebase is always allowed. Files under the
+          # limit always pass, and a newly-added file over the limit always fails.
+          #
+          # Thresholds: 2× the recommended max from CLAUDE.md
+          # Source files: recommended max ~200 lines → hard cap 400
+          # Test files:   recommended max ~300 lines → hard cap 600
+          SOURCE_LIMIT=400
+          TEST_LIMIT=600
+
+          # Compare against the merge-base so an advancing base branch never skews
+          # the "old" line count, and use the same commit for the changed-file list.
+          base=$(git merge-base "origin/${{ github.base_ref }}" HEAD)
 
           failed=0
 
@@ -47,19 +58,34 @@ jobs:
                 ;;
             esac
 
-            lines=$(wc -l < "$file")
+            new=$(wc -l < "$file")
 
-            if [ "$lines" -ge "$limit" ]; then
-              echo "::error file=$file,title=File too long::$file — $lines lines ($kind limit: $limit)"
-              failed=1
+            # Under the limit — always fine.
+            if [ "$new" -lt "$limit" ]; then
+              continue
             fi
-          done < <(git diff --name-only "origin/${{ github.base_ref }}...HEAD")
+
+            # Over the limit — allowed only if this PR reduces the file's length.
+            # `git show` prints nothing (0 lines) for a file new on this branch,
+            # so a newly-added oversized file never counts as a reduction.
+            old=$(git show "$base:$file" 2>/dev/null | wc -l)
+
+            if [ "$new" -lt "$old" ]; then
+              echo "::notice file=$file,title=Oversized but improving::$file — $new lines, down from $old ($kind limit: $limit); reducing, allowed"
+              continue
+            fi
+
+            echo "::error file=$file,title=File too long::$file — $new lines, was $old ($kind limit: $limit); over limit and not reduced by this PR"
+            failed=1
+          done < <(git diff --name-only "$base" HEAD)
 
           if [ "$failed" -ne 0 ]; then
             echo ""
-            echo "One or more files exceed the maximum allowed line count."
-            echo "  Source files: split at ~240 lines, CI fails at ${SOURCE_LIMIT}+"
-            echo "  Test files:   split at ~360 lines, CI fails at ${TEST_LIMIT}+"
-            echo "Split large files by logical concern before merging."
+            echo "One or more changed files are over the maximum line count and were not reduced by this PR."
+            echo "  Source files: recommended max ~200 lines, hard cap ${SOURCE_LIMIT}"
+            echo "  Test files:   recommended max ~300 lines, hard cap ${TEST_LIMIT}"
+            echo "A file over the limit passes only if this PR reduces its line count"
+            echo "(progress is allowed even while the file is still over the limit)."
+            echo "Reduce or split the flagged files by logical concern before merging."
             exit 1
           fi
