@@ -11,6 +11,7 @@ jobs:
   pr-title:
     name: Validate PR title
     runs-on: ubuntu-latest
+    timeout-minutes: 1
     steps:
       - name: Check PR title format
         env:
