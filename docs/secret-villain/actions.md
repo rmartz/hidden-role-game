@@ -1,3 +1,12 @@
+---
+type: Actions
+title: Secret Villain — Actions
+description: All player actions across election, policy, and presidential special-action phases.
+gameMode: secret-villain
+resource: src/lib/game/modes/secret-villain/actions
+tags: [secret-villain, actions]
+---
+
 # Secret Villain — Actions
 
 Secret Villain is fully app-mediated. All gameplay flows through the actions listed below.
