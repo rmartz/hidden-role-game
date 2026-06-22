@@ -1,3 +1,12 @@
+---
+type: Roles
+title: Werewolf — Roles
+description: All Werewolf roles, their teams, night-waking behavior, night actions, and visibility rules.
+gameMode: werewolf
+resource: src/lib/game/modes/werewolf
+tags: [werewolf, roles, night-phase]
+---
+
 # Werewolf — Roles
 
 ## Overview
