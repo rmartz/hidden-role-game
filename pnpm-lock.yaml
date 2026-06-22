@@ -168,6 +168,9 @@ importers:
       vitest:
         specifier: ^4.1.9
         version: 4.1.9(@opentelemetry/api@1.9.1)(@types/node@26.0.0)(@vitest/browser-playwright@4.1.9)(happy-dom@20.10.6)(msw@2.14.6(@types/node@26.0.0)(typescript@6.0.3))(vite@8.0.16(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0))
+      yaml:
+        specifier: ^2.9.0
+        version: 2.9.0
 
 packages:
 
@@ -10677,8 +10680,7 @@ snapshots:
 
   yallist@3.1.1: {}
 
-  yaml@2.9.0:
-    optional: true
+  yaml@2.9.0: {}
 
   yargs-parser@21.1.1: {}
 
