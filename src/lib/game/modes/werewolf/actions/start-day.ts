@@ -21,21 +21,25 @@ import {
 import { confirmEvilEmpathResultAction } from "./confirm-evil-empath-result";
 import { didWolfCubDie } from "./helpers";
 import {
+  computeArsonistDousedPlayerIds,
+  computeDraculaWives,
+  computeMercenaryState,
+  computeMirrorcasterCharged,
+  computeZombieInfected,
+} from "./start-day-carry-forward";
+import {
   applyVigilanteSelfDeath,
   buildLastTargets,
   buildNewRoleState,
-  computeArsonistDousedPlayerIds,
-  computeDraculaWives,
-  computeExposerReveal,
-  computeMercenaryState,
-  computeMirrorcasterCharged,
-  computeMonarchKnightingState,
   computeMorticianAbilityEnded,
+} from "./start-day-helpers";
+import {
+  computeExposerReveal,
+  computeMonarchKnightingState,
   computeOesLockedTargetId,
   computeOldManTimerPlayerId,
   computePriestWards,
-  computeZombieInfected,
-} from "./start-day-helpers";
+} from "./start-day-night-resolution";
 
 export const startDayAction: GameAction = {
   isValid(game: Game, callerId: string) {
