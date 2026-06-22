@@ -19,6 +19,10 @@ pnpm run env:pull     # Pull .env.local from Vercel (requires vercel login)
 pnpm run secrets-check # Gitleaks secret scan (runs in pre-commit)
 ```
 
+## Worktree Setup
+
+After creating a git worktree (`git worktree add .git-worktrees/<name> -b <branch> origin/main`), run `pnpm install --frozen-lockfile` inside it before invoking any build, test, lint, or typecheck commands. pnpm's `node-modules` linker creates per-directory `node_modules` trees; a fresh worktree has none. The global store is already populated so this step only creates hardlinks — it takes a few seconds and requires no network access.
+
 ## Secret Management
 
 - Pull `.env.local` for local development: `pnpm run env:pull` (requires `vercel login`)
@@ -66,6 +70,7 @@ pnpm run secrets-check # Gitleaks secret scan (runs in pre-commit)
 ## Documentation
 
 - When adding or modifying roles, actions, game settings, or data flow in a game mode, update the corresponding docs in `docs/<game-mode>/` (`roles.md`, `actions.md`, `data-flow.md`).
+- Pages under `docs/` follow the [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md): every page begins with YAML frontmatter. The required key is `type` (one of `Index`, `Guide`, `Reference`, `Roles`, `Actions`, `DataFlow`); also set `title` and `description`. Per-mode pages additionally set `gameMode` (the mode slug) and `resource` (relative path to the documented source). When you add a new page, include the frontmatter and link it from `docs/README.md` so the index stays complete.
 
 ## React / Next.js Standards
 

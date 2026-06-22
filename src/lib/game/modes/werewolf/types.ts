@@ -6,6 +6,7 @@ import type {
   ExposerTurnState,
   GhostTurnState,
   HunterTurnState,
+  MartyrTurnState,
   MercenaryTurnState,
   MirrorcasterTurnState,
   MonarchTurnState,
@@ -14,6 +15,7 @@ import type {
   PriestTurnState,
   TheThingTurnState,
   ToughGuyTurnState,
+  VeteranTurnState,
   WitchTurnState,
   WolfCubTurnState,
   ZombieTurnState,
@@ -27,6 +29,7 @@ export type {
   ExposerTurnState,
   GhostTurnState,
   HunterTurnState,
+  MartyrTurnState,
   MercenaryTurnState,
   MirrorcasterTurnState,
   MonarchTurnState,
@@ -35,6 +38,7 @@ export type {
   PriestTurnState,
   TheThingTurnState,
   ToughGuyTurnState,
+  VeteranTurnState,
   WitchTurnState,
   WolfCubTurnState,
   ZombieTurnState,
@@ -51,6 +55,8 @@ export type NightAction = {
   resultRevealed?: boolean;
   /** For Mentalist only: the second target player ID. */
   secondTargetPlayerId?: string;
+  /** True when the Veteran has chosen to be on alert this night. */
+  alerted?: boolean;
 } & (
   | { targetPlayerId: string; skipped?: never }
   | { skipped: true; targetPlayerId?: never }
@@ -137,13 +143,31 @@ export interface SwapperSwappedNightResolutionEvent {
   secondPlayerId: string;
 }
 
+export enum VeteranCounterkillSource {
+  Visitor = "visitor",
+  WolfRepel = "wolf-repel",
+}
+
+export interface VeteranCounterkilledNightResolutionEvent {
+  type: "veteran-counterkilled";
+  /** The player targeted by the Veteran's counter-kill. */
+  counterkilledPlayerId: string;
+  /** The Veteran player who counter-killed. */
+  veteranPlayerId: string;
+  /** Whether the counter-kill was from repelling a wolf attack or killing a visiting player. */
+  source: VeteranCounterkillSource;
+  /** Whether the counter-killed player actually died (false if saved by a protection or Tough Guy absorption). */
+  died: boolean;
+}
+
 export type NightResolutionEvent =
   | AttackNightResolutionEvent
   | SilencedNightResolutionEvent
   | HypnotizedNightResolutionEvent
   | ToughGuyAbsorbedNightResolutionEvent
   | AltruistInterceptedNightResolutionEvent
-  | SwapperSwappedNightResolutionEvent;
+  | SwapperSwappedNightResolutionEvent
+  | VeteranCounterkilledNightResolutionEvent;
 
 export enum DaytimeVote {
   Guilty = "guilty",
@@ -215,6 +239,13 @@ export interface WerewolfDaytimePhase {
   nominations?: Nomination[];
   /** Number of trials that have concluded (with a verdict) this day phase. */
   concludedTrialsCount?: number;
+  /**
+   * The convicted player ID awaiting final elimination after a Guilty verdict.
+   * Set when a Guilty verdict is reached; cleared when the Martyr window is
+   * advanced (narrator confirms death) or the Martyr intercepts. While set,
+   * the game is in a post-trial window before the role reveal.
+   */
+  pendingGuiltId?: string;
 }
 
 export type WerewolfTurnPhase = WerewolfNighttimePhase | WerewolfDaytimePhase;
@@ -232,6 +263,7 @@ export interface WerewolfRoleTurnState {
   exposer?: ExposerTurnState;
   ghost?: GhostTurnState;
   hunter?: HunterTurnState;
+  martyr?: MartyrTurnState;
   mercenary?: MercenaryTurnState;
   mirrorcaster?: MirrorcasterTurnState;
   monarch?: MonarchTurnState;
@@ -240,6 +272,7 @@ export interface WerewolfRoleTurnState {
   priest?: PriestTurnState;
   theThing?: TheThingTurnState;
   toughGuy?: ToughGuyTurnState;
+  veteran?: VeteranTurnState;
   witch?: WitchTurnState;
   wolfCub?: WolfCubTurnState;
   zombie?: ZombieTurnState;

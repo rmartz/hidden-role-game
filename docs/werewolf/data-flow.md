@@ -1,3 +1,12 @@
+---
+type: DataFlow
+title: Werewolf — Data Flow
+description: PlayerGameState fields per player type, Firebase schema, and per-phase data flow.
+gameMode: werewolf
+resource: src/lib/game/modes/werewolf
+tags: [werewolf, data-flow, firebase]
+---
+
 # Werewolf — Data Flow
 
 ## Overview
@@ -55,6 +64,12 @@ The Narrator's session is stored separately and receives a different (fuller) `P
 | `monarchKnightingsUsed`    | Number of Monarch knightings already used (max 3)                                                                                                  |
 | `hiddenRoleIds`            | Role IDs drawn from the pool but not assigned to any player; stored in `FirebaseWerewolfPlayerState` (session-scoped, not in `FirebaseGamePublic`) |
 
+### Narrator-Only (Daytime)
+
+| Field                   | Description                                                                                  |
+| ----------------------- | -------------------------------------------------------------------------------------------- |
+| `pendingSmitePlayerIds` | Player IDs awaiting a narrator-controlled smite; only exposed to the narrator (owner) caller |
+
 ### Player Fields — Nighttime (own turn only)
 
 These fields are only populated when the active phase matches the player's role.
@@ -78,21 +93,29 @@ These fields are only populated when the active phase matches the player's role.
 | `monarchKnightedPlayerIds`  | All players                                         | Public list of knighted players                                                                                                                                                           |
 | `monarchKnightingsUsed`     | All players                                         | Number of knightings used by the Monarch (0-3)                                                                                                                                            |
 | `arsonistDousedPlayerIds`   | Arsonist                                            | List of player IDs currently doused by the Arsonist; shown to the Arsonist at night. Reset after an ignite (self-target).                                                                 |
+| `veteranAlertsUsed`         | Veteran                                             | Number of nights the Veteran has chosen to Alert so far this game (0–3 max)                                                                                                               |
+| `myNightAlerted`            | Veteran                                             | Whether the Veteran has toggled Alert on for this night (`true` when alerted, `undefined` when not)                                                                                       |
 | `ghostVisible`              | Ghost (dead only)                                   | `true` when the Ghost is dead during nighttime; enables narrator-level night observer view. When set, `nightActions` is also fully populated for this player.                             |
 
 ### Player Fields — Daytime (day start)
 
-| Field                        | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `nightStatus`                | `{ targetPlayerId, effect }[]` — outcome of the previous night. Effects: `"killed"`, `"knighted"`, `"silenced"`, `"hypnotized"`, `"smited"`, `"survived"`, `"peaceful"`, `"altruist-sacrifice"`, `"exposed"` (`"peaceful"` indicates the Old Man died from timer expiring; `"altruist-sacrifice"` entries also carry a `savedPlayerId` field with the player who was saved; `"exposed"` entries also carry a `roleName` field containing the revealed role name) |
-| `nominations`                | Current nominations for trial defendants                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| `myNominatedDefendantId`     | The defendant this player has nominated (if any)                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `activeTrial`                | Active trial state (defendant, phase, votes) if a trial is in progress                                                                                                                                                                                                                                                                                                                                                                                           |
-| `isSilenced`                 | Whether this player is silenced (cannot vote or nominate)                                                                                                                                                                                                                                                                                                                                                                                                        |
-| `isHypnotized`               | Whether this player is hypnotized (vote mirrors the Mummy)                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `altruistSave`               | Information about an Altruist intercept that saved a player                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `ghostClues`                 | `{ turn: number; clue: string }[]` — all clues submitted by the Ghost player; visible to all players                                                                                                                                                                                                                                                                                                                                                             |
-| `ghostClueSubmittedThisTurn` | Ghost player only. `true` when the Ghost has already submitted a clue this turn; disables the clue submission UI                                                                                                                                                                                                                                                                                                                                                 |
+All fields in this section, including trial-related state (`activeTrial`, `pendingGuiltId`), are visible to all players. Contrast with the Narrator-Only (Daytime) section above, which lists fields exposed exclusively to the narrator.
+
+| Field                        | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `nightStatus`                | `{ targetPlayerId, effect }[]` — outcome of the previous night. Effects: `"killed"`, `"knighted"`, `"silenced"`, `"hypnotized"`, `"smited"`, `"survived"`, `"peaceful"`, `"altruist-sacrifice"`, `"exposed"`, `"veteran-counterkill"` (`"peaceful"` indicates the Old Man died from timer expiring; `"altruist-sacrifice"` entries also carry a `savedPlayerId` field with the player who was saved; `"exposed"` entries also carry a `roleName` field containing the revealed role name; `"veteran-counterkill"` indicates the player was counter-killed by the Veteran) |
+| `nominations`                | Current nominations for trial defendants                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `myNominatedDefendantId`     | The defendant this player has nominated (if any)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `activeTrial`                | Active trial state (defendant, phase, votes) if a trial is in progress                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| `isSilenced`                 | Whether this player is silenced (cannot vote or nominate)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| `isHypnotized`               | Whether this player is hypnotized (vote mirrors the Mummy)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `exposerReveal`              | Publicly revealed role from the Exposer's ability (if any)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| `monarchKnightedPlayerIds`   | Public list of players knighted by the Monarch                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `altruistSave`               | Information about an Altruist intercept that saved a player                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `pendingGuiltId`             | Player ID of the convicted player awaiting execution during the Martyr window; set on a Guilty verdict; cleared by `advance-martyr-window` or `use-martyr-ability`; visible to all players                                                                                                                                                                                                                                                                                                                                                                                |
+| `martyrUsed`                 | `true` once the Martyr has used their once-per-game substitution ability; present only for the Martyr player                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `ghostClues`                 | `{ turn: number; clue: string }[]` — all clues submitted by the Ghost player; visible to all players                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `ghostClueSubmittedThisTurn` | Ghost player only. `true` when the Ghost has already submitted a clue this turn; disables the clue submission UI                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 
 ## Game Phase State Machine
 
@@ -172,10 +195,17 @@ Narrator starts day (start-day)
     3. Apply Priest wards (ward absorbs attack, ward is consumed)
     4. Apply Witch action (protect or attack)
     5. Apply Altruist intercept (redirects attack onto self)
-    6. Apply Tough Guy absorption (survives first attack)
-    7. Apply Smite (forced death regardless of protections)
-    8. Apply Spellcaster silence and Mummy hypnotize
-    9. Resolve remaining attacks (protected → survived, else → killed)
+    6. Apply Swapper action (swaps attacks/protections between two targets; cancels stale Altruist intercept)
+    7. Apply Veteran counter-kill (after Altruist and Swapper, so neither can intercept the counter-kill):
+       - Wolf repel: wolf attack on alerted Veteran removed, one wolf counter-killed
+       - Visitor kill: Protect/Attack roles, Mirrorcaster, and uncharged Mercenary (Protect mode) that physically visited the Veteran are counter-killed; charged Mercenary is exempt
+    8. Build kill events from the final attack/protect state (protected → survived, else → killed)
+    9. Apply Smite (forced death regardless of protections)
+   10. Check Old Man timer
+   11. Apply Tough Guy absorption (survives first attack; Smite and Old Man timer deaths are forced and bypass this)
+   12. Emit veteran-counterkilled events (after Tough Guy absorption, so died reflects actual outcome)
+   13. Apply Spellcaster silence and Mummy hypnotize
+   14. Apply Swapper to silenced/hypnotized events (swaps targetPlayerId between Swapper targets)
   → Arsonist doused list updated:
     - Self-target (ignite): list reset to empty after attacks resolved
     - Other-target (douse): target appended to arsonistDousedPlayerIds (dead targets skipped)
@@ -201,8 +231,12 @@ Trial flow (if nominations are enabled):
      - Hypnotized votes mirror the Mummy
      - Silenced/dead players cannot vote
      - Mayor's vote counts double
-  4. Narrator calls resolve-trial → guilty > innocent = eliminated
-     - Clears OES lock and Priest wards for killed player
+  4. Narrator calls resolve-trial (or auto-resolve on final vote) → verdict determined
+     - Innocent: trial concludes, no elimination
+     - Guilty: sets pendingGuiltId on daytime phase (Martyr window begins)
+  5. Martyr window (pendingGuiltId is set):
+     - Martyr player may call use-martyr-ability → Martyr dies instead, convicted player survives; clears OES lock and Priest wards for the Martyr
+     - Narrator calls advance-martyr-window → convicted player is eliminated; clears OES lock and Priest wards for the convicted player; downstream checks run
 
 Narrator may also:
   - kill-player → immediately kills a player (for in-person trials)
@@ -213,6 +247,8 @@ Narrator may also:
 Narrator starts next night (start-night)
   → New turn begins; nightPhaseOrder rebuilt
   → Night fields (myNightTarget, teamVotes, etc.) cleared for all players
+  → Blocked while pendingGuiltId is set (Martyr window must be resolved first)
+  → Blocked while hunterRevengePlayerId is set (Hunter revenge must be resolved first)
 ```
 
 ## Role Visibility Details

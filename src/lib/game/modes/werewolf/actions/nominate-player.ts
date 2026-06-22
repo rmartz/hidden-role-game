@@ -15,8 +15,9 @@ export const nominatePlayerAction: GameAction = {
     const ts = currentTurnState(game);
     if (!ts) return false;
     if (ts.phase.type !== WerewolfPhase.Daytime) return false;
-    // Cannot nominate while a trial is active and unresolved
+    // Cannot nominate while a trial is active and unresolved, or while the Martyr window is open
     if (ts.phase.activeTrial && !ts.phase.activeTrial.verdict) return false;
+    if (ts.phase.pendingGuiltId) return false;
     // Trials-per-day limit: cannot nominate once the limit has been reached
     if (
       trialsPerDay !== undefined &&

@@ -13,7 +13,8 @@ import { currentTurnState } from "./game-state";
  * 1. Chupacabra/Arsonist wins: exactly one neutral killer alive (Chupacabra or Arsonist)
  *    with ≤1 Good player alive
  * 2. Draw: no Bad, no Neutral, no Good players alive (everyone eliminated simultaneously)
- * 3. Village wins: no Bad and no Neutral players remain
+ * 3. Village wins: no Bad and no killer Neutral (Chupacabra/Arsonist) remain;
+ *    non-killer Neutrals (Tanner, Executioner, Dracula, Zombie) may still be alive
  *    (Chupacabra/Arsonist still alive with >1 Good → game continues)
  *
  * When badAlive > 0:
@@ -136,7 +137,7 @@ export function checkWinCondition(
       if (goodAlive === 0 && neutralAlive === 0) {
         winResult = { type: GameStatus.Finished, winner: WerewolfWinner.Draw };
       } else {
-        // Village wins: no Bad and no Neutral remain
+        // Village wins: no Bad and no killer Neutral remain (non-killer Neutrals may still be alive)
         winResult = {
           type: GameStatus.Finished,
           winner: WerewolfWinner.Village,

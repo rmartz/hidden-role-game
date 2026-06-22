@@ -1,3 +1,10 @@
+---
+type: Reference
+title: Game Mode Documentation
+description: Overview of every supported game mode and links to its roles, actions, and data-flow pages.
+tags: [game-modes, overview]
+---
+
 # Game Mode Documentation
 
 This directory contains documentation for each supported game mode.
