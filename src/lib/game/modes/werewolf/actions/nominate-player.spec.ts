@@ -407,6 +407,27 @@ describe("WerewolfAction.NominatePlayer — isValid", () => {
   });
 });
 
+describe("WerewolfAction.NominatePlayer — Martyr window", () => {
+  const action = WEREWOLF_ACTIONS[WerewolfAction.NominatePlayer];
+
+  it("returns false when pendingGuiltId is set", () => {
+    const ds = makeDayState();
+    (ds.phase as WerewolfDaytimePhase).pendingGuiltId = "p1";
+    const game = makePlayingGame(ds, {
+      modeConfig: {
+        gameMode: GameMode.Werewolf,
+        nominationsEnabled: true,
+        trialsPerDay: undefined,
+        revealProtections: true,
+        hiddenRoleCount: 0,
+        showRolesOnDeath: true,
+        autoRevealNightOutcome: true,
+      },
+    });
+    expect(action.isValid(game, "p2", { defendantId: "p3" })).toBe(false);
+  });
+});
+
 describe("WerewolfAction.NominatePlayer — trialsPerDay", () => {
   const action = WEREWOLF_ACTIONS[WerewolfAction.NominatePlayer];
 

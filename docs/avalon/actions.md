@@ -1,3 +1,12 @@
+---
+type: Actions
+title: Avalon — Actions
+description: Quest Leader and player actions; questing and voting happen outside the app.
+gameMode: avalon
+resource: src/lib/game/modes/avalon/actions
+tags: [avalon, actions]
+---
+
 # Avalon — Actions
 
 Actions are the mechanism by which the Quest Leader and players mutate game state. Each action has an `isValid` guard and an `apply` mutation.

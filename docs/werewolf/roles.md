@@ -1,3 +1,12 @@
+---
+type: Roles
+title: Werewolf — Roles
+description: All Werewolf roles, their teams, night-waking behavior, night actions, and visibility rules.
+gameMode: werewolf
+resource: src/lib/game/modes/werewolf
+tags: [werewolf, roles, night-phase]
+---
+
 # Werewolf — Roles
 
 ## Overview
@@ -23,6 +32,7 @@ Each player is secretly assigned one role. The Narrator has no role and runs the
 | Illuminati    | `werewolf-illuminati`    | Neutral | First Night Only          | —                      | On night 1, Narrator reveals all players' roles to the Illuminati. Wins if alive in the final 3 players when the game ends (`revealsFullRoleList`)                                                                                                                                                                                                                              |
 | Insomniac     | `werewolf-insomniac`     | Good    | Every Night (last)        | —                      | Wakes after all other roles (including Altruist); learns whether each immediate neighbor (by `playerOrder`) woke and performed a night action this night. `unique`.                                                                                                                                                                                                             |
 | Lone Wolf     | `werewolf-lone-wolf`     | Neutral | Every Night               | — (wakes with wolves)  | `isWerewolf`; `wakesWith: Werewolf`. Werewolves don't know the Lone Wolf's identity. Wins only if they are the last wolf-aligned player alive                                                                                                                                                                                                                                   |
+| Martyr        | `werewolf-martyr`        | Good    | Never                     | —                      | Once per game, after a Guilty verdict and before the role reveal, may step forward to be eliminated in place of the convicted player. Cannot save themselves. (`unique`)                                                                                                                                                                                                        |
 | Mason         | `werewolf-mason`         | Good    | First Night Only          | —                      | Masons see each other's identities (`awareOf: Masons`); no action after night 1. **Must always be added in pairs** — exactly 1 Mason is invalid and rejected by `validateRoleConfig`                                                                                                                                                                                            |
 | Mayor         | `werewolf-mayor`         | Good    | Never                     | —                      | Vote counts double during trials (secret — not revealed to other players)                                                                                                                                                                                                                                                                                                       |
 | Mentalist     | `werewolf-mentalist`     | Good    | Every Night               | Investigate (dual)     | Selects two players and learns whether they are on the same team (`dualTargetInvestigate`)                                                                                                                                                                                                                                                                                      |

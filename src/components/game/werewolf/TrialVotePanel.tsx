@@ -27,6 +27,9 @@ interface TrialVotePanelProps {
   autoAdvance: boolean;
   isSilenced?: boolean;
   isHypnotized?: boolean;
+  pendingGuiltId?: string;
+  isMartyr?: boolean;
+  martyrUsed?: boolean;
 }
 
 export function TrialVotePanel({
@@ -40,6 +43,9 @@ export function TrialVotePanel({
   autoAdvance,
   isSilenced,
   isHypnotized,
+  pendingGuiltId,
+  isMartyr,
+  martyrUsed,
 }: TrialVotePanelProps) {
   const action = useGameAction(gameId);
   const defendant = players.find((p) => p.id === activeTrial.defendantId);
@@ -52,15 +58,27 @@ export function TrialVotePanel({
     [action],
   );
 
+  const handleUseMartyrAbility = useCallback(() => {
+    action.mutate({ actionId: WerewolfAction.UseMartyrAbility });
+  }, [action]);
+
   const { trial } = WEREWOLF_COPY;
   const [silencedDefenseMessage] = useState(() => {
     const msgs = trial.defenseSilenced;
     return msgs[Math.floor(Math.random() * msgs.length)];
   });
+  const defendantSpared =
+    activeTrial.verdict === TrialVerdict.Eliminated &&
+    !pendingGuiltId &&
+    activeTrial.defendantEliminated === false;
   const verdictLabel = activeTrial.verdict
-    ? activeTrial.verdict === TrialVerdict.Eliminated
-      ? trial.verdictLabelEliminated
-      : trial.verdictLabelInnocent
+    ? pendingGuiltId
+      ? trial.verdictLabelPending
+      : defendantSpared
+        ? trial.verdictLabelSpared
+        : activeTrial.verdict === TrialVerdict.Eliminated
+          ? trial.verdictLabelEliminated
+          : trial.verdictLabelInnocent
     : undefined;
   const isDefendant = myPlayerId === activeTrial.defendantId;
   const canVote = !amDead && !isDefendant;
@@ -75,6 +93,12 @@ export function TrialVotePanel({
       ? new Date(activeTrial.pausedAt)
       : undefined;
   const trialPauseOffset = activeTrial.pauseOffset ?? 0;
+  const canUseMartyrAbility =
+    isMartyr &&
+    !amDead &&
+    !martyrUsed &&
+    !isDefendant &&
+    pendingGuiltId === activeTrial.defendantId;
 
   const defenseTimer = (
     <GameTimer
@@ -124,6 +148,18 @@ export function TrialVotePanel({
             {trial.eliminatedRoleSuffix}
           </p>
         )}
+      {canUseMartyrAbility && (
+        <div className="mt-3">
+          <Button
+            size="sm"
+            variant="destructive"
+            onClick={handleUseMartyrAbility}
+            disabled={action.isPending}
+          >
+            {trial.martyrSacrificeButton}
+          </Button>
+        </div>
+      )}
     </>
   ) : activeTrial.phase === TrialPhase.Defense ? (
     <>
