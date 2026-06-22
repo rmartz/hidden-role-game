@@ -21,84 +21,27 @@ import type {
 } from "@/lib/game/modes/werewolf/lobby-config";
 import type { WerewolfTimerConfig } from "@/lib/game/modes/werewolf/timer-config";
 
+import type { GameStatusState } from "./game-status";
+import type { LobbyPlayer, TimerConfig } from "./lobby";
 import type { ModeConfig } from "./mode-config";
+import type { RoleDefinition, Team } from "./role";
 
-export interface DeviceLobbyPlayer {
-  id: string;
-  name: string;
-  sessionId: string;
-  noDevice?: false;
-}
-
-export interface NoDeviceLobbyPlayer {
-  id: string;
-  name: string;
-  sessionId?: undefined;
-  noDevice: true;
-}
-
-/**
- * Discriminated union: a `DeviceLobbyPlayer` always has a `sessionId`; a
- * `NoDeviceLobbyPlayer` never does and is managed entirely by the lobby owner.
- * Narrow on `noDevice` (or `sessionId !== undefined`) to access the typed field.
- */
-export type LobbyPlayer = DeviceLobbyPlayer | NoDeviceLobbyPlayer;
-
-// --- Game Status (no Lobby — Lobby is a separate concept) ---
-
-export enum GameStatus {
-  Starting = "Starting",
-  Playing = "Playing",
-  Finished = "Finished",
-}
-
-export interface StartingGameStatus {
-  type: GameStatus.Starting;
-  /** Unix epoch ms when the game entered Starting status. */
-  startedAt?: number;
-}
-
-export interface PlayingGameStatus {
-  type: GameStatus.Playing;
-  /** Present for game modes with structured turns (e.g. Werewolf). Typed per game mode. */
-  turnState?: unknown;
-}
-
-/**
- * Union of all valid winner identifiers across game modes.
- * Werewolf: "Arsonist", "Village", "Werewolves", "Chupacabra", "Draw", "LoneWolf", "Tanner", "Spoiler", "Executioner", "Illuminati", "Dracula", "Zombie"
- * Secret Villain: "Good", "Bad"
- */
-export type GameWinner =
-  | "Arsonist"
-  | "Village"
-  | "Werewolves"
-  | "Chupacabra"
-  | "Draw"
-  | "Dracula"
-  | "Illuminati"
-  | "LoneWolf"
-  | "Mercenary"
-  | "Tanner"
-  | "Spoiler"
-  | "Executioner"
-  | "Evil"
-  | "Good"
-  | "Bad"
-  | "Zombie";
-
-export interface FinishedGameStatus {
-  type: GameStatus.Finished;
-  /** The winning team or role identifier. */
-  winner?: GameWinner;
-  /** Mode-specific key identifying which win condition triggered the game end. */
-  victoryConditionKey?: string;
-}
-
-export type GameStatusState =
-  | StartingGameStatus
-  | PlayingGameStatus
-  | FinishedGameStatus;
+export type {
+  DeviceLobbyPlayer,
+  NoDeviceLobbyPlayer,
+  LobbyPlayer,
+  TimerConfig,
+} from "./lobby";
+export { DEFAULT_TIMER_CONFIG } from "./lobby";
+export type { Team, RoleDefinition } from "./role";
+export {
+  GameStatus,
+  type GameWinner,
+  type StartingGameStatus,
+  type PlayingGameStatus,
+  type FinishedGameStatus,
+  type GameStatusState,
+} from "./game-status";
 
 // --- Game Modes ---
 
@@ -127,47 +70,129 @@ export enum ShowRolesInPlay {
   RoleAndCount = "RoleAndCount",
 }
 
-// --- Roles ---
-
-export enum Team {
-  Good = "Good",
-  Bad = "Bad",
-  Neutral = "Neutral",
+export interface PlayerRoleAssignment {
+  playerId: string;
+  roleDefinitionId: string;
 }
 
-export interface RoleDefinition<
-  Role extends string = string,
-  T extends string = string,
-> {
-  id: Role;
-  name: string;
-  team: T;
-  /** Short one-line description shown in tooltips and glossary headers. */
-  summary?: string;
-  /** Full description shown in the expanded glossary entry. */
-  description?: string;
+/**
+ * A single role entry within an advanced role bucket.
+ * `max` is undefined for non-unique roles (can fill the whole bucket);
+ * set to a number to cap how many copies can be drawn
+ * (e.g. max: 1 means at most one copy drawn from this bucket).
+ */
+export interface RoleBucketSlot {
+  roleId: string;
+  max?: number;
+}
+
+/** A bucket that always assigns exactly `playerCount` copies of a single role. */
+export interface SimpleRoleBucket {
+  playerCount: number;
+  roleId: string;
+}
+
+/**
+ * A bucket with a multi-role pool that draws `playerCount` roles using
+ * min/max constraints per slot. Used in Advanced mode.
+ */
+export interface AdvancedRoleBucket {
+  playerCount: number;
+  roles: RoleBucketSlot[];
+  /** Optional display name shown in the config UI and post-game lobby. */
+  name?: string;
+}
+
+export type RoleBucket = SimpleRoleBucket | AdvancedRoleBucket;
+
+export function isSimpleRoleBucket(b: RoleBucket): b is SimpleRoleBucket {
+  return "roleId" in b;
+}
+
+export type VisibilityReason = "wake-partner" | "aware-of";
+
+export interface VisiblePlayer {
+  playerId: string;
+  reason: VisibilityReason;
+  /** When set, the player's role is known (not just their identity). */
+  roleId?: string;
+}
+
+export type GamePlayer = LobbyPlayer & { visiblePlayers: VisiblePlayer[] };
+
+// --- Game (exists only after the game has been started) ---
+
+/** Shared game fields. Game-mode-specific variants extend this. */
+export interface BaseGame {
+  id: string;
+  lobbyId: string;
+  status: GameStatusState;
+  players: GamePlayer[];
+  roleAssignments: PlayerRoleAssignment[];
+  configuredRoleBuckets: RoleBucket[];
+  showRolesInPlay: ShowRolesInPlay;
+  ownerPlayerId?: string;
+  /** Executioner: the player ID the Executioner must get eliminated at trial. */
+  executionerTargetId?: string;
+  /** Lobby seating order: player IDs in position order, used to set president rotation in Secret Villain. */
+  playerOrder?: string[];
+}
+
+export interface WerewolfGame extends BaseGame {
+  gameMode: GameMode.Werewolf;
+  timerConfig: WerewolfTimerConfig;
+  modeConfig: WerewolfModeConfig;
+  /** Role IDs that were drawn but not assigned to players (hidden from everyone except the Narrator). */
+  hiddenRoleIds?: string[];
+}
+
+export interface SecretVillainGame extends BaseGame {
+  gameMode: GameMode.SecretVillain;
+  timerConfig: SecretVillainTimerConfig;
+  modeConfig: SecretVillainModeConfig;
+}
+
+export interface AvalonGame extends BaseGame {
+  gameMode: GameMode.Avalon;
+  timerConfig: TimerConfig;
+  modeConfig: AvalonModeConfig;
+}
+
+export interface ClocktowerGame extends BaseGame {
+  gameMode: GameMode.Clocktower;
+  timerConfig: TimerConfig;
+  modeConfig: ClocktowerModeConfig;
   /**
-   * Players matching these criteria are visible.
-   * - Team matches (`teams`) reveal identity only, not role.
-   * - Role matches (`roles`) reveal the exact role by default. Set
-   *   `revealRole: false` to suppress this (e.g. Percival sees Merlin and
-   *   Morgana but cannot tell them apart). Set `revealRole: true` to force
-   *   role revelation even for team matches.
-   * - `excludeRoles` removes specific roles from team-based matching (e.g.
-   *   Merlin excludes Mordred from Evil team awareness; Evil roles exclude Oberon).
+   * The Townsfolk role ID shown to the Drunk player as their fake token.
+   * Assigned at game creation; only present when the Drunk is in play.
    */
-  awareOf?: {
-    teams?: T[];
-    roles?: Role[];
-    revealRole?: boolean;
-    excludeRoles?: Role[];
-  };
-  /** Used to group roles in the role config UI and glossary. */
-  category?: string;
-  /** Alternative names or terms this role can be found by when searching. */
-  aliases?: string[];
-  /** Roles that wake alone with unique individual mechanics — multiple copies would break narrator UX. */
-  unique?: true;
+  drunkFakeRoleId?: string;
+}
+
+export interface CodenamesGame extends BaseGame {
+  gameMode: GameMode.Codenames;
+  timerConfig: TimerConfig;
+  modeConfig: CodenamesModeConfig;
+}
+
+/**
+ * Discriminated union of all game-mode-specific game objects.
+ * Narrow on `gameMode` to access typed `timerConfig` and `modeConfig`.
+ */
+export type Game =
+  | WerewolfGame
+  | SecretVillainGame
+  | AvalonGame
+  | ClocktowerGame
+  | CodenamesGame;
+
+/**
+ * A game-mode-defined action that can be applied to a game. Actions are
+ * validated before application; isValid must return true for apply to be called.
+ */
+export interface GameAction {
+  isValid(game: Game, callerId: string, payload: unknown): boolean;
+  apply(game: Game, payload: unknown, callerId: string): void;
 }
 
 /**
@@ -301,148 +326,6 @@ export interface GameModeConfig {
   readonly actions: Record<string, GameAction>;
   readonly services: GameModeServices;
 }
-
-export interface PlayerRoleAssignment {
-  playerId: string;
-  roleDefinitionId: string;
-}
-
-/**
- * A single role entry within an advanced role bucket.
- * `max` is undefined for non-unique roles (can fill the whole bucket);
- * set to a number to cap how many copies can be drawn
- * (e.g. max: 1 means at most one copy drawn from this bucket).
- */
-export interface RoleBucketSlot {
-  roleId: string;
-  max?: number;
-}
-
-/** A bucket that always assigns exactly `playerCount` copies of a single role. */
-export interface SimpleRoleBucket {
-  playerCount: number;
-  roleId: string;
-}
-
-/**
- * A bucket with a multi-role pool that draws `playerCount` roles using
- * min/max constraints per slot. Used in Advanced mode.
- */
-export interface AdvancedRoleBucket {
-  playerCount: number;
-  roles: RoleBucketSlot[];
-  /** Optional display name shown in the config UI and post-game lobby. */
-  name?: string;
-}
-
-export type RoleBucket = SimpleRoleBucket | AdvancedRoleBucket;
-
-export function isSimpleRoleBucket(b: RoleBucket): b is SimpleRoleBucket {
-  return "roleId" in b;
-}
-
-export type VisibilityReason = "wake-partner" | "aware-of";
-
-export interface VisiblePlayer {
-  playerId: string;
-  reason: VisibilityReason;
-  /** When set, the player's role is known (not just their identity). */
-  roleId?: string;
-}
-
-export type GamePlayer = LobbyPlayer & { visiblePlayers: VisiblePlayer[] };
-
-// --- Game (exists only after the game has been started) ---
-
-/** Shared game fields. Game-mode-specific variants extend this. */
-export interface BaseGame {
-  id: string;
-  lobbyId: string;
-  status: GameStatusState;
-  players: GamePlayer[];
-  roleAssignments: PlayerRoleAssignment[];
-  configuredRoleBuckets: RoleBucket[];
-  showRolesInPlay: ShowRolesInPlay;
-  ownerPlayerId?: string;
-  /** Executioner: the player ID the Executioner must get eliminated at trial. */
-  executionerTargetId?: string;
-  /** Lobby seating order: player IDs in position order, used to set president rotation in Secret Villain. */
-  playerOrder?: string[];
-}
-
-export interface WerewolfGame extends BaseGame {
-  gameMode: GameMode.Werewolf;
-  timerConfig: WerewolfTimerConfig;
-  modeConfig: WerewolfModeConfig;
-  /** Role IDs that were drawn but not assigned to players (hidden from everyone except the Narrator). */
-  hiddenRoleIds?: string[];
-}
-
-export interface SecretVillainGame extends BaseGame {
-  gameMode: GameMode.SecretVillain;
-  timerConfig: SecretVillainTimerConfig;
-  modeConfig: SecretVillainModeConfig;
-}
-
-export interface AvalonGame extends BaseGame {
-  gameMode: GameMode.Avalon;
-  timerConfig: TimerConfig;
-  modeConfig: AvalonModeConfig;
-}
-
-export interface ClocktowerGame extends BaseGame {
-  gameMode: GameMode.Clocktower;
-  timerConfig: TimerConfig;
-  modeConfig: ClocktowerModeConfig;
-  /**
-   * The Townsfolk role ID shown to the Drunk player as their fake token.
-   * Assigned at game creation; only present when the Drunk is in play.
-   */
-  drunkFakeRoleId?: string;
-}
-
-export interface CodenamesGame extends BaseGame {
-  gameMode: GameMode.Codenames;
-  timerConfig: TimerConfig;
-  modeConfig: CodenamesModeConfig;
-}
-
-/**
- * Discriminated union of all game-mode-specific game objects.
- * Narrow on `gameMode` to access typed `timerConfig` and `modeConfig`.
- */
-export type Game =
-  | WerewolfGame
-  | SecretVillainGame
-  | AvalonGame
-  | ClocktowerGame
-  | CodenamesGame;
-
-/**
- * A game-mode-defined action that can be applied to a game. Actions are
- * validated before application; isValid must return true for apply to be called.
- */
-export interface GameAction {
-  isValid(game: Game, callerId: string, payload: unknown): boolean;
-  apply(game: Game, payload: unknown, callerId: string): void;
-}
-
-// --- Phase Timer Configuration ---
-
-/** Base timer configuration shared across all game modes. */
-export interface TimerConfig {
-  /** When true, each phase automatically advances when its timer expires. */
-  autoAdvance: boolean;
-  /** Seconds for game-start countdown. */
-  startCountdownSeconds: number;
-  /** Index signature for game-mode-specific timer fields (e.g. nightPhaseSeconds). */
-  [field: string]: boolean | number;
-}
-
-export const DEFAULT_TIMER_CONFIG: TimerConfig = {
-  autoAdvance: false,
-  startCountdownSeconds: 10,
-};
 
 // --- Lobby (top-level entity; game is absent until started) ---
 
