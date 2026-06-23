@@ -41,7 +41,7 @@ export const advanceMartyrWindowAction: GameAction = {
       if (didWolfCubDie([pendingGuiltId], game)) {
         ts.roleState = { ...(ts.roleState ?? {}), wolfCub: { died: true } };
       }
-      cleanupAfterDaytimeKill(pendingGuiltId, ts);
+      cleanupAfterDaytimeKill(pendingGuiltId, ts, game);
     }
 
     // Executioner wins if their target was eliminated and the Executioner is alive.

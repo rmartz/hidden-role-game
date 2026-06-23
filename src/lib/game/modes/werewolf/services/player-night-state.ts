@@ -2,7 +2,6 @@ import type { Game } from "@/lib/types";
 import { Team } from "@/lib/types";
 import type { NighttimeNightStatusEntry } from "@/server/types";
 
-import { WEREWOLF_COPY } from "../copy";
 import type { WerewolfPlayerGameState } from "../player-state";
 import type { WerewolfRoleDefinition } from "../roles";
 import { getWerewolfRole, WerewolfRole } from "../roles";
@@ -14,6 +13,7 @@ import {
   getGroupPhasePlayerIds,
   getInterimAttackedPlayerIds,
 } from "../utils";
+import { appendInvestigationResult } from "./player-night-state-helpers";
 
 /**
  * Returns the player IDs immediately adjacent to `playerId` in the given
@@ -73,8 +73,17 @@ export function extractPlayerNightState(
   const ts = currentTurnState(game);
   const nightActions = ts?.phase.nightActions ?? {};
 
+  // Resolve effective role: a roleOverride (e.g. Village Drunk sobering into
+  // a new role) takes precedence over the original assignment.
+  const overriddenRoleId = ts?.roleOverrides?.[callerId];
+  const effectiveRole = overriddenRoleId
+    ? (getWerewolfRole(overriddenRoleId) ?? myRole)
+    : myRole;
+
   // Group phase handling.
-  const groupPhaseKey = myRole.teamTargeting ? myRole.id : myRole.wakesWith;
+  const groupPhaseKey = effectiveRole.teamTargeting
+    ? effectiveRole.id
+    : effectiveRole.wakesWith;
 
   if (groupPhaseKey) {
     return extractGroupPhaseState(
@@ -91,7 +100,7 @@ export function extractPlayerNightState(
   const roleResult = extractRoleSpecificState(
     game,
     callerId,
-    myRole,
+    effectiveRole,
     nightActions,
     deadPlayerIds,
     ts,
@@ -99,7 +108,7 @@ export function extractPlayerNightState(
   if (roleResult) return roleResult;
 
   // Generic solo action handling.
-  return extractGenericSoloState(game, myRole, nightActions, ts);
+  return extractGenericSoloState(game, effectiveRole, nightActions, ts);
 }
 
 function extractGroupPhaseState(
@@ -127,12 +136,25 @@ function extractGroupPhaseState(
     }
   }
 
+  // Gate Evil Empath reveal on effective Werewolf role (respects roleOverrides).
+  const callerAssignment = game.roleAssignments.find(
+    (a) => a.playerId === callerId,
+  );
+  const callerEffectiveRoleId =
+    ts?.roleOverrides?.[callerId] ?? callerAssignment?.roleDefinitionId ?? "";
+  const isEffectiveWerewolf =
+    getWerewolfRole(callerEffectiveRoleId)?.isWerewolf === true;
+
   const action = nightActions[lookupKey];
   if (!action || !isTeamNightAction(action)) {
     return {
       myNightTarget: undefined,
       myNightTargetConfirmed: false,
       ...(previousNightTargetId ? { previousNightTargetId } : {}),
+      ...(isEffectiveWerewolf &&
+      ts?.roleState?.evilEmpath?.revealedResult !== undefined
+        ? { evilEmpathRevealedResult: ts.roleState.evilEmpath.revealedResult }
+        : {}),
     };
   }
 
@@ -171,6 +193,10 @@ function extractGroupPhaseState(
     suggestedTargetId: action.suggestedTargetId,
     allAgreed,
     ...(previousNightTargetId ? { previousNightTargetId } : {}),
+    ...(isEffectiveWerewolf &&
+    ts?.roleState?.evilEmpath?.revealedResult !== undefined
+      ? { evilEmpathRevealedResult: ts.roleState.evilEmpath.revealedResult }
+      : {}),
   };
 }
 
@@ -342,6 +368,22 @@ function extractRoleSpecificState(
     return {
       myNightTarget: undefined,
       myNightTargetConfirmed: false,
+    };
+  }
+
+  if (myRole.id === WerewolfRole.EvilEmpath) {
+    const empathAction = nightActions[myRole.id];
+    const soloAction =
+      empathAction && !isTeamNightAction(empathAction)
+        ? empathAction
+        : undefined;
+    return {
+      myNightTarget: undefined,
+      myNightTargetConfirmed: soloAction?.confirmed ?? false,
+      ...(soloAction?.confirmed &&
+      ts?.roleState?.evilEmpath?.lastResult !== undefined
+        ? { evilEmpathNightResult: ts.roleState.evilEmpath.lastResult }
+        : {}),
     };
   }
 
@@ -577,67 +619,8 @@ function extractGenericSoloState(
     myAction.resultRevealed &&
     myAction.targetPlayerId
   ) {
-    appendInvestigationResult(result, game, myRole, myAction);
+    appendInvestigationResult(result, game, myRole, myAction, ts);
   }
 
   return result;
-}
-
-function appendInvestigationResult(
-  result: Partial<WerewolfPlayerGameState>,
-  game: Game,
-  myRoleDef: WerewolfRoleDefinition,
-  myAction: { targetPlayerId: string; secondTargetPlayerId?: string },
-): void {
-  const targetAssignment = game.roleAssignments.find(
-    (a) => a.playerId === myAction.targetPlayerId,
-  );
-  const targetRoleDef = targetAssignment
-    ? getWerewolfRole(targetAssignment.roleDefinitionId)
-    : undefined;
-
-  if (myRoleDef.checksForSeer) {
-    const isSeer = targetRoleDef?.id === WerewolfRole.Seer;
-    result.investigationResult = {
-      targetPlayerId: myAction.targetPlayerId,
-      isWerewolfTeam: isSeer,
-      resultLabel: isSeer
-        ? WEREWOLF_COPY.wizard.isSeer
-        : WEREWOLF_COPY.wizard.isNotSeer,
-    };
-  } else if (myRoleDef.revealsExactRole) {
-    result.investigationResult = {
-      targetPlayerId: myAction.targetPlayerId,
-      isWerewolfTeam: targetRoleDef?.isWerewolf === true,
-      resultLabel: targetRoleDef?.name ?? "Unknown",
-    };
-  } else if (myRoleDef.dualTargetInvestigate && myAction.secondTargetPlayerId) {
-    const secondAssignment = game.roleAssignments.find(
-      (a) => a.playerId === myAction.secondTargetPlayerId,
-    );
-    const secondRoleDef = secondAssignment
-      ? getWerewolfRole(secondAssignment.roleDefinitionId)
-      : undefined;
-    const sameTeam =
-      targetRoleDef?.team !== Team.Neutral &&
-      secondRoleDef?.team !== Team.Neutral &&
-      targetRoleDef?.team === secondRoleDef?.team;
-    const playerById = new Map(game.players.map((p) => [p.id, p]));
-    const secondName =
-      playerById.get(myAction.secondTargetPlayerId)?.name ??
-      myAction.secondTargetPlayerId;
-    result.investigationResult = {
-      targetPlayerId: myAction.targetPlayerId,
-      isWerewolfTeam: sameTeam,
-      resultLabel: sameTeam
-        ? WEREWOLF_COPY.mentalist.sameTeam
-        : WEREWOLF_COPY.mentalist.differentTeams,
-      secondTargetName: secondName,
-    };
-  } else {
-    result.investigationResult = {
-      targetPlayerId: myAction.targetPlayerId,
-      isWerewolfTeam: targetRoleDef?.isWerewolf === true,
-    };
-  }
 }

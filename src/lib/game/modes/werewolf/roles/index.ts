@@ -12,11 +12,13 @@ import { COUNT_ROLE } from "./count";
 import { DOCTOR_ROLE } from "./doctor";
 import { DRACULA_ROLE } from "./dracula";
 import { ELUSIVE_SEER_ROLE } from "./elusive-seer";
+import { EVIL_EMPATH_ROLE } from "./evil-empath";
 import { EXECUTIONER_ROLE } from "./executioner";
 import { EXPOSER_ROLE } from "./exposer";
 import { GHOST_ROLE } from "./ghost";
 import { HUNTER_ROLE } from "./hunter";
 import { ILLUMINATI_ROLE } from "./illuminati";
+import { ILLUSION_ARTIST_ROLE } from "./illusion-artist";
 import { INSOMNIAC_ROLE } from "./insomniac";
 import { LONE_WOLF_ROLE } from "./lone-wolf";
 import { MARTYR_ROLE } from "./martyr";
@@ -63,11 +65,13 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
   [WerewolfRole.Doctor]: DOCTOR_ROLE,
   [WerewolfRole.Dracula]: DRACULA_ROLE,
   [WerewolfRole.ElusiveSeer]: ELUSIVE_SEER_ROLE,
+  [WerewolfRole.EvilEmpath]: EVIL_EMPATH_ROLE,
   [WerewolfRole.Executioner]: EXECUTIONER_ROLE,
   [WerewolfRole.Exposer]: EXPOSER_ROLE,
   [WerewolfRole.Ghost]: GHOST_ROLE,
   [WerewolfRole.Hunter]: HUNTER_ROLE,
   [WerewolfRole.Illuminati]: ILLUMINATI_ROLE,
+  [WerewolfRole.IllusionArtist]: ILLUSION_ARTIST_ROLE,
   [WerewolfRole.Insomniac]: INSOMNIAC_ROLE,
   [WerewolfRole.LoneWolf]: LONE_WOLF_ROLE,
   [WerewolfRole.Martyr]: MARTYR_ROLE,

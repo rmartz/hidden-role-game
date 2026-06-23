@@ -1,3 +1,5 @@
+// --- Game Status (no Lobby — Lobby is a separate concept) ---
+
 export enum GameStatus {
   Starting = "Starting",
   Playing = "Playing",

@@ -113,6 +113,11 @@ export interface InvestigationResultForNarrator {
   resultLabel?: string;
   /** For Mentalist: the second target's player name. */
   secondTargetName?: string;
+  /**
+   * When the Illusion Artist has flipped this target's alignment, contains the
+   * annotation text showing the true (unflipped) alignment for the narrator.
+   */
+  illusionFlipLabel?: string;
 }
 
 /**
@@ -120,6 +125,8 @@ export interface InvestigationResultForNarrator {
  * Returns the target name and alignment (plus optional custom label), or
  * undefined if conditions aren't met.
  * Pass `activeRoleDef` to compute role-specific results (Wizard, Mystic Seer, Mentalist).
+ * Pass `illusionTargetId` to apply Illusion Artist inversion: when the active target
+ * matches the illusion target, the result is flipped and an annotation is included.
  */
 export function getInvestigationResultForNarrator(
   isInvestigatePhase: boolean,
@@ -130,6 +137,8 @@ export function getInvestigationResultForNarrator(
   activeRoleDef?: WerewolfRoleDefinition,
   secondTargetId?: string,
   secondTargetName?: string,
+  illusionTargetId?: string,
+  roleOverrides?: Record<string, string>,
 ): InvestigationResultForNarrator | undefined {
   if (!isInvestigatePhase || !activeTarget || !activeTargetConfirmed)
     return undefined;
@@ -137,10 +146,14 @@ export function getInvestigationResultForNarrator(
     (a) => a.player.id === activeTarget,
   );
   if (!targetAssignment?.role) return undefined;
-  const roleDef = getWerewolfRole(targetAssignment.role.id);
+  // Apply roleOverrides (e.g. Alpha Wolf bite) so the narrator sees the target's
+  // effective alignment rather than their original assigned role.
+  const effectiveRoleId =
+    roleOverrides?.[targetAssignment.player.id] ?? targetAssignment.role.id;
+  const roleDef = getWerewolfRole(effectiveRoleId);
 
   if (activeRoleDef?.checksForSeer) {
-    const isSeer = targetAssignment.role.id === (WerewolfRole.Seer as string);
+    const isSeer = effectiveRoleId === (WerewolfRole.Seer as string);
     return {
       targetName: activeTargetName ?? activeTarget,
       isWerewolfTeam: isSeer,
@@ -154,7 +167,7 @@ export function getInvestigationResultForNarrator(
     return {
       targetName: activeTargetName ?? activeTarget,
       isWerewolfTeam: roleDef?.isWerewolf === true,
-      resultLabel: targetAssignment.role.name,
+      resultLabel: roleDef?.name ?? targetAssignment.role.name,
     };
   }
 
@@ -163,7 +176,9 @@ export function getInvestigationResultForNarrator(
       (a) => a.player.id === secondTargetId,
     );
     if (!secondAssignment?.role) return undefined;
-    const secondRoleDef = getWerewolfRole(secondAssignment.role.id);
+    const effectiveSecondRoleId =
+      roleOverrides?.[secondAssignment.player.id] ?? secondAssignment.role.id;
+    const secondRoleDef = getWerewolfRole(effectiveSecondRoleId);
     // Neutral players win individually, so treat them as never sharing a team.
     const sameTeam =
       roleDef?.team !== Team.Neutral &&
@@ -179,9 +194,25 @@ export function getInvestigationResultForNarrator(
     };
   }
 
+  const isWerewolf = roleDef?.isWerewolf === true;
+  // Illusion Artist inversion only applies when the Seer is the active
+  // investigator — other roles (One-Eyed Seer, etc.) always show true alignment.
+  const isSeerInvestigation = activeRoleDef?.id === WerewolfRole.Seer;
+  const isFlipped = isSeerInvestigation && illusionTargetId === activeTarget;
+  const effectiveIsWerewolf = isFlipped ? !isWerewolf : isWerewolf;
   return {
     targetName: activeTargetName ?? activeTarget,
-    isWerewolfTeam: roleDef?.isWerewolf === true,
+    isWerewolfTeam: effectiveIsWerewolf,
+    resultLabel:
+      WEREWOLF_COPY.narrator.seerAlignmentStatus(effectiveIsWerewolf),
+    ...(isFlipped
+      ? {
+          illusionFlipLabel:
+            WEREWOLF_COPY.illusionArtist.narratorFlipAnnotation(
+              WEREWOLF_COPY.narrator.seerAlignmentStatus(isWerewolf),
+            ),
+        }
+      : {}),
   };
 }
 
