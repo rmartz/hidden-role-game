@@ -1,0 +1,45 @@
+/* Twilight Modern — fallback theme for game modes without a specific theme.
+ * Light: cool slate bg, deep navy primary, electric indigo accent.
+ * Dark: midnight bg, muted indigo accent. */
+
+[data-theme="twilight_modern"] {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.263 0.123 267);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.9 0.01 261);
+  --secondary-foreground: oklch(0.263 0.123 267);
+  --muted: oklch(0.9 0.01 261);
+  --muted-foreground: oklch(0.45 0.04 261);
+  --accent: oklch(0.574 0.219 264);
+  --accent-foreground: oklch(0.985 0 0);
+  --border: oklch(0.85 0.015 261);
+  --input: oklch(0.85 0.015 261);
+  --ring: oklch(0.574 0.219 264);
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="twilight_modern"] {
+    --background: oklch(0.101 0.025 266);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.15 0.03 266);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.15 0.03 266);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.83 0.08 264);
+    --primary-foreground: oklch(0.101 0.025 266);
+    --secondary: oklch(0.2 0.04 266);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.2 0.04 266);
+    --muted-foreground: oklch(0.65 0.05 264);
+    --accent: oklch(0.657 0.168 264);
+    --accent-foreground: oklch(0.985 0 0);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.657 0.168 264);
+  }
+}

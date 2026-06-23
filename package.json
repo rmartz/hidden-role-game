@@ -40,10 +40,10 @@
     ]
   },
   "dependencies": {
-    "@base-ui/react": "^1.5.0",
+    "@base-ui/react": "^1.6.0",
     "@fluentui/react-icons": "^2.0.330",
     "@reduxjs/toolkit": "^2.11.2",
-    "@sentry/nextjs": "^10.58.0",
+    "@sentry/nextjs": "^10.59.0",
     "@tanstack/react-query": "^5.101.0",
     "@vercel/analytics": "^2.0.1",
     "class-variance-authority": "^0.7.1",
@@ -51,7 +51,7 @@
     "firebase": "^12.15.0",
     "firebase-admin": "^14.0.0",
     "lodash": "^4.18.1",
-    "lucide-react": "^1.20.0",
+    "lucide-react": "^1.21.0",
     "next": "^16.2.9",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.7",
@@ -69,7 +69,7 @@
     "@tailwindcss/postcss": "^4.3.1",
     "@testing-library/react": "^16.3.2",
     "@types/lodash": "^4.17.24",
-    "@types/node": "^25.9.3",
+    "@types/node": "^26.0.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^6.0.1",
@@ -80,7 +80,7 @@
     "eslint-plugin-simple-import-sort": "^13.0.0",
     "eslint-plugin-storybook": "^10.4.6",
     "globals": "^17.6.0",
-    "happy-dom": "^20.10.5",
+    "happy-dom": "^20.10.6",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.7",
     "playwright": "^1.61.0",
@@ -94,7 +94,8 @@
     "typescript-eslint": "^8.61.1",
     "vercel-deploy-scripts": "https://github.com/rmartz/vercel-deploy-scripts/archive/refs/tags/v3.1.0.tar.gz",
     "vite": "^8.0.16",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.9",
+    "yaml": "^2.9.0"
   },
   "packageManager": "pnpm@10.33.4+sha512.1c67b3b359b2d408119ba1ed289f34b8fc3c6873412bec6fd264fbdc82489e510fcbecb9ce9d22dae7f3b76269d8441046014bdca53b9979cd7a561ad631b800"
 }

@@ -228,6 +228,8 @@ export const WEREWOLF_COPY = {
     investigationResultLabel: "Investigation result:",
     teamStatus: (isWerewolfTeam: boolean) =>
       isWerewolfTeam ? "Evil" : "not Evil",
+    seerAlignmentStatus: (isWerewolf: boolean) =>
+      isWerewolf ? "Werewolf" : "Not a Werewolf",
     investigationResultRevealed: "Result revealed to player.",
     revealToPlayer: "Reveal to player",
     smite: "Smite",
@@ -352,6 +354,15 @@ export const WEREWOLF_COPY = {
     confirmCancel: "Cancel",
     undo: "Undo Smite",
   },
+  evilEmpath: {
+    adjacentResult: "Yes — the Seer is adjacent to a Werewolf.",
+    notAdjacentResult: "No — the Seer is not adjacent to a Werewolf.",
+    waitingForResult: "Waiting for the Narrator to reveal the result.",
+    revealedToWerewolves: (result: boolean) =>
+      result
+        ? "The Evil Empath revealed: Seer was adjacent to a Werewolf."
+        : "The Evil Empath revealed: Seer was not adjacent to a Werewolf.",
+  },
   ghost: {
     clueHeading: "Leave a clue for the living",
     clueInputPlaceholder: "Enter a word or letter…",
@@ -365,5 +376,11 @@ export const WEREWOLF_COPY = {
       "As a Ghost you can watch all activity, but cannot act.",
     targetSkipped: "skipped",
     targetNone: "—",
+  },
+  illusionArtist: {
+    targetLabel: "Illusion target",
+    narratorTargetLabel: (name: string) => `Illusion Artist targeted: ${name}`,
+    narratorFlipAnnotation: (actual: string) =>
+      `Flipped from actual: ${actual}`,
   },
 } as const;
