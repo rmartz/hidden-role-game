@@ -14,7 +14,7 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className={cn("font-sans", geist.variable)}>
-      <body>
+      <body data-theme="shadowplay">
         <Providers>{children}</Providers>
         <Analytics />
       </body>
