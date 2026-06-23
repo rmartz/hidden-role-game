@@ -25,6 +25,7 @@ import type { GameStatusState } from "./game-status";
 import type { LobbyPlayer, TimerConfig } from "./lobby";
 import type { ModeConfig } from "./mode-config";
 import type { RoleDefinition, Team } from "./role";
+import type { RoleBucket } from "./role-bucket";
 
 export {
   type FinishedGameStatus,
@@ -73,40 +74,6 @@ export enum ShowRolesInPlay {
 export interface PlayerRoleAssignment {
   playerId: string;
   roleDefinitionId: string;
-}
-
-/**
- * A single role entry within an advanced role bucket.
- * `max` is undefined for non-unique roles (can fill the whole bucket);
- * set to a number to cap how many copies can be drawn
- * (e.g. max: 1 means at most one copy drawn from this bucket).
- */
-export interface RoleBucketSlot {
-  roleId: string;
-  max?: number;
-}
-
-/** A bucket that always assigns exactly `playerCount` copies of a single role. */
-export interface SimpleRoleBucket {
-  playerCount: number;
-  roleId: string;
-}
-
-/**
- * A bucket with a multi-role pool that draws `playerCount` roles using
- * min/max constraints per slot. Used in Advanced mode.
- */
-export interface AdvancedRoleBucket {
-  playerCount: number;
-  roles: RoleBucketSlot[];
-  /** Optional display name shown in the config UI and post-game lobby. */
-  name?: string;
-}
-
-export type RoleBucket = SimpleRoleBucket | AdvancedRoleBucket;
-
-export function isSimpleRoleBucket(b: RoleBucket): b is SimpleRoleBucket {
-  return "roleId" in b;
 }
 
 export type VisibilityReason = "wake-partner" | "aware-of";
@@ -245,6 +212,12 @@ export interface GameModeConfig {
   readonly name: string;
   /** Whether this game mode is available in production. Unreleased modes are only visible in development. */
   readonly released: boolean;
+  /**
+   * CSS theme identifier applied via `data-theme` when entering a lobby or game for this mode.
+   * Corresponds to a `[data-theme="<value>"]` CSS selector that defines custom properties.
+   * Defaults to `"twilight_modern"` when not specified.
+   */
+  readonly theme?: string;
   readonly minPlayers: number;
   readonly ownerTitle: string | null;
   /**

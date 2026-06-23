@@ -3,3 +3,4 @@ export * from "./game-status";
 export * from "./lobby";
 export * from "./mode-config";
 export * from "./role";
+export * from "./role-bucket";
