@@ -21,7 +21,9 @@ import type {
 } from "@/lib/game/modes/werewolf/lobby-config";
 import type { WerewolfTimerConfig } from "@/lib/game/modes/werewolf/timer-config";
 
+import type { GameStatusState } from "./game-status";
 import type { ModeConfig } from "./mode-config";
+import type { RoleBucket } from "./role-bucket";
 
 export interface DeviceLobbyPlayer {
   id: string;
@@ -43,62 +45,6 @@ export interface NoDeviceLobbyPlayer {
  * Narrow on `noDevice` (or `sessionId !== undefined`) to access the typed field.
  */
 export type LobbyPlayer = DeviceLobbyPlayer | NoDeviceLobbyPlayer;
-
-// --- Game Status (no Lobby — Lobby is a separate concept) ---
-
-export enum GameStatus {
-  Starting = "Starting",
-  Playing = "Playing",
-  Finished = "Finished",
-}
-
-export interface StartingGameStatus {
-  type: GameStatus.Starting;
-  /** Unix epoch ms when the game entered Starting status. */
-  startedAt?: number;
-}
-
-export interface PlayingGameStatus {
-  type: GameStatus.Playing;
-  /** Present for game modes with structured turns (e.g. Werewolf). Typed per game mode. */
-  turnState?: unknown;
-}
-
-/**
- * Union of all valid winner identifiers across game modes.
- * Werewolf: "Arsonist", "Village", "Werewolves", "Chupacabra", "Draw", "LoneWolf", "Tanner", "Spoiler", "Executioner", "Illuminati", "Dracula", "Zombie"
- * Secret Villain: "Good", "Bad"
- */
-export type GameWinner =
-  | "Arsonist"
-  | "Village"
-  | "Werewolves"
-  | "Chupacabra"
-  | "Draw"
-  | "Dracula"
-  | "Illuminati"
-  | "LoneWolf"
-  | "Mercenary"
-  | "Tanner"
-  | "Spoiler"
-  | "Executioner"
-  | "Evil"
-  | "Good"
-  | "Bad"
-  | "Zombie";
-
-export interface FinishedGameStatus {
-  type: GameStatus.Finished;
-  /** The winning team or role identifier. */
-  winner?: GameWinner;
-  /** Mode-specific key identifying which win condition triggered the game end. */
-  victoryConditionKey?: string;
-}
-
-export type GameStatusState =
-  | StartingGameStatus
-  | PlayingGameStatus
-  | FinishedGameStatus;
 
 // --- Game Modes ---
 
@@ -303,40 +249,6 @@ export interface GameModeConfig {
 export interface PlayerRoleAssignment {
   playerId: string;
   roleDefinitionId: string;
-}
-
-/**
- * A single role entry within an advanced role bucket.
- * `max` is undefined for non-unique roles (can fill the whole bucket);
- * set to a number to cap how many copies can be drawn
- * (e.g. max: 1 means at most one copy drawn from this bucket).
- */
-export interface RoleBucketSlot {
-  roleId: string;
-  max?: number;
-}
-
-/** A bucket that always assigns exactly `playerCount` copies of a single role. */
-export interface SimpleRoleBucket {
-  playerCount: number;
-  roleId: string;
-}
-
-/**
- * A bucket with a multi-role pool that draws `playerCount` roles using
- * min/max constraints per slot. Used in Advanced mode.
- */
-export interface AdvancedRoleBucket {
-  playerCount: number;
-  roles: RoleBucketSlot[];
-  /** Optional display name shown in the config UI and post-game lobby. */
-  name?: string;
-}
-
-export type RoleBucket = SimpleRoleBucket | AdvancedRoleBucket;
-
-export function isSimpleRoleBucket(b: RoleBucket): b is SimpleRoleBucket {
-  return "roleId" in b;
 }
 
 export type VisibilityReason = "wake-partner" | "aware-of";
