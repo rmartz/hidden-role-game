@@ -27,6 +27,7 @@ function hiddenRoleCountFromConfig(modeConfig: ModeConfig): number {
 export const WEREWOLF_CONFIG = {
   name: "Werewolf",
   released: true,
+  theme: "werewolf",
   minPlayers: MIN_PLAYERS,
   ownerTitle: "Narrator",
   teamLabels: {
