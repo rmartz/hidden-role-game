@@ -21,6 +21,7 @@ function hasBoard(modeConfig: ModeConfig): boolean {
 export const SECRET_VILLAIN_CONFIG = {
   name: "Secret Villain",
   released: true,
+  theme: "secret_villain",
   minPlayers: MIN_PLAYERS,
   ownerTitle: null,
 

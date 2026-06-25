@@ -1,7 +1,7 @@
 import type { Game, GameAction } from "@/lib/types";
 
 import { currentTurnState, isOwnerPlaying } from "../utils";
-import { didWolfCubDie } from "./helpers";
+import { cleanupAfterDaytimeKill, didWolfCubDie } from "./helpers";
 
 export const markPlayerDeadAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {
@@ -24,6 +24,7 @@ export const markPlayerDeadAction: GameAction = {
     if (didWolfCubDie([playerId], game)) {
       ts.roleState = { ...(ts.roleState ?? {}), wolfCub: { died: true } };
     }
+    cleanupAfterDaytimeKill(playerId, ts, game);
   },
 };
 

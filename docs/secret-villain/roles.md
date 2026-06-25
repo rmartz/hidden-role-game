@@ -1,3 +1,12 @@
+---
+type: Roles
+title: Secret Villain — Roles
+description: Three roles with deliberate visibility asymmetry around the Special Bad.
+gameMode: secret-villain
+resource: src/lib/game/modes/secret-villain
+tags: [secret-villain, roles, visibility]
+---
+
 # Secret Villain — Roles
 
 ## Overview
