@@ -39,6 +39,8 @@ export interface FirebaseWerewolfRoleState {
   exposerAbilityUsed?: boolean;
   hunterRevengePlayerId?: string;
   hiddenRoleIds?: string[];
+  evilEmpathRevealedResult?: boolean;
+  evilEmpathNightResult?: boolean;
   arsonistDousedPlayerIds?: string[];
   pendingSmitePlayerIds?: string[];
   veteranAlertsUsed?: number;
@@ -102,6 +104,12 @@ export function werewolfRoleStateToFirebase(
       : {}),
     ...(state.hiddenRoleIds?.length
       ? { hiddenRoleIds: state.hiddenRoleIds }
+      : {}),
+    ...(state.evilEmpathRevealedResult !== undefined
+      ? { evilEmpathRevealedResult: state.evilEmpathRevealedResult }
+      : {}),
+    ...(state.evilEmpathNightResult !== undefined
+      ? { evilEmpathNightResult: state.evilEmpathNightResult }
       : {}),
     ...(state.arsonistDousedPlayerIds?.length
       ? { arsonistDousedPlayerIds: state.arsonistDousedPlayerIds }
@@ -181,6 +189,12 @@ export function werewolfRoleStateFromFirebase(
       ? { hunterRevengePlayerId: raw.hunterRevengePlayerId }
       : {}),
     ...(raw.hiddenRoleIds?.length ? { hiddenRoleIds: raw.hiddenRoleIds } : {}),
+    ...(raw.evilEmpathRevealedResult !== undefined
+      ? { evilEmpathRevealedResult: raw.evilEmpathRevealedResult }
+      : {}),
+    ...(raw.evilEmpathNightResult !== undefined
+      ? { evilEmpathNightResult: raw.evilEmpathNightResult }
+      : {}),
     ...(raw.arsonistDousedPlayerIds?.length
       ? { arsonistDousedPlayerIds: raw.arsonistDousedPlayerIds }
       : {}),

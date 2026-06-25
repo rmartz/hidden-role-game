@@ -24,6 +24,20 @@ export interface DraculaTurnState {
   wives: string[];
 }
 
+export interface EvilEmpathTurnState {
+  /**
+   * The last adjacency result received by the Evil Empath
+   * (true = Seer is adjacent to a Werewolf). Carried forward each night so
+   * the Werewolves can learn it when the Evil Empath dies.
+   */
+  lastResult?: boolean;
+  /**
+   * Set when the Evil Empath dies, revealing their last adjacency result to
+   * the Werewolves. Persists for the rest of the game.
+   */
+  revealedResult?: boolean;
+}
+
 export interface ExecutionerTurnState {
   /** The player ID the Executioner must get eliminated at trial to win. */
   targetId: string;
@@ -44,6 +58,15 @@ export interface GhostTurnState {
 export interface HunterTurnState {
   /** Set when the Hunter dies — blocks win-condition checks until resolved. */
   revengePlayerId: string;
+}
+
+export interface IllusionArtistTurnState {
+  /**
+   * The player ID targeted by the Illusion Artist this night.
+   * Seer investigations against this player return an inverted result for
+   * the night. Not carried forward to subsequent nights.
+   */
+  illusionTargetId?: string;
 }
 
 export interface MartyrTurnState {

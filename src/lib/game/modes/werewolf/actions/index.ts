@@ -5,6 +5,7 @@ import { advanceMartyrWindowAction } from "./advance-martyr-window";
 import { alphaWolfBiteAction } from "./alpha-wolf-bite";
 import { cancelTrialAction } from "./cancel-trial";
 import { castVoteAction } from "./cast-vote";
+import { confirmEvilEmpathResultAction } from "./confirm-evil-empath-result";
 import { confirmNightTargetAction } from "./confirm-night-target";
 import { endGameAction } from "./end-game";
 import { killPlayerAction } from "./kill-player";
@@ -17,6 +18,7 @@ import { resolveTrialAction } from "./resolve-trial";
 import { resumeTimerAction } from "./resume-timer";
 import { revealInvestigationResultAction } from "./reveal-investigation-result";
 import { revealNightOutcomeStepAction } from "./reveal-night-outcome-step";
+import { setIllusionTargetAction } from "./set-illusion-target";
 import { setNightPhaseAction } from "./set-night-phase";
 import { setNightTargetAction } from "./set-night-target";
 import { skipDefenseAction } from "./skip-defense";
@@ -35,6 +37,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.AlphaWolfBite]: alphaWolfBiteAction,
   [WerewolfAction.CancelTrial]: cancelTrialAction,
   [WerewolfAction.CastVote]: castVoteAction,
+  [WerewolfAction.ConfirmEvilEmpathResult]: confirmEvilEmpathResultAction,
   [WerewolfAction.ConfirmNightTarget]: confirmNightTargetAction,
   [WerewolfAction.EndGame]: endGameAction,
   [WerewolfAction.KillPlayer]: killPlayerAction,
@@ -48,6 +51,7 @@ export const WEREWOLF_ACTIONS: Record<WerewolfAction, GameAction> = {
   [WerewolfAction.ResumeTimer]: resumeTimerAction,
   [WerewolfAction.RevealInvestigationResult]: revealInvestigationResultAction,
   [WerewolfAction.RevealNightOutcomeStep]: revealNightOutcomeStepAction,
+  [WerewolfAction.SetIllusionTarget]: setIllusionTargetAction,
   [WerewolfAction.SetNightPhase]: setNightPhaseAction,
   [WerewolfAction.SetNightTarget]: setNightTargetAction,
   [WerewolfAction.SkipDefense]: skipDefenseAction,

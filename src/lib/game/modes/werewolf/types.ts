@@ -2,10 +2,12 @@ import type {
   AlphaWolfTurnState,
   ArsonistTurnState,
   DraculaTurnState,
+  EvilEmpathTurnState,
   ExecutionerTurnState,
   ExposerTurnState,
   GhostTurnState,
   HunterTurnState,
+  IllusionArtistTurnState,
   MartyrTurnState,
   MercenaryTurnState,
   MirrorcasterTurnState,
@@ -25,10 +27,12 @@ export type {
   AlphaWolfTurnState,
   ArsonistTurnState,
   DraculaTurnState,
+  EvilEmpathTurnState,
   ExecutionerTurnState,
   ExposerTurnState,
   GhostTurnState,
   HunterTurnState,
+  IllusionArtistTurnState,
   MartyrTurnState,
   MercenaryTurnState,
   MirrorcasterTurnState,
@@ -143,6 +147,11 @@ export interface SwapperSwappedNightResolutionEvent {
   secondPlayerId: string;
 }
 
+export interface HangoverNightResolutionEvent {
+  type: "hangover";
+  targetPlayerId: string;
+}
+
 export enum VeteranCounterkillSource {
   Visitor = "visitor",
   WolfRepel = "wolf-repel",
@@ -167,6 +176,7 @@ export type NightResolutionEvent =
   | ToughGuyAbsorbedNightResolutionEvent
   | AltruistInterceptedNightResolutionEvent
   | SwapperSwappedNightResolutionEvent
+  | HangoverNightResolutionEvent
   | VeteranCounterkilledNightResolutionEvent;
 
 export enum DaytimeVote {
@@ -259,10 +269,12 @@ export interface WerewolfRoleTurnState {
   alphaWolf?: AlphaWolfTurnState;
   arsonist?: ArsonistTurnState;
   dracula?: DraculaTurnState;
+  evilEmpath?: EvilEmpathTurnState;
   executioner?: ExecutionerTurnState;
   exposer?: ExposerTurnState;
   ghost?: GhostTurnState;
   hunter?: HunterTurnState;
+  illusionArtist?: IllusionArtistTurnState;
   martyr?: MartyrTurnState;
   mercenary?: MercenaryTurnState;
   mirrorcaster?: MirrorcasterTurnState;
