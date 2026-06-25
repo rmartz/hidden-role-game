@@ -143,6 +143,8 @@ export function RoleConfig(props: RoleConfigProps) {
               roleDefinitions={roleDefinitions}
               gameMode={gameMode}
               disabled={props.disabled}
+              categoryOrder={categoryOrder}
+              categoryLabels={categoryLabels}
             />
           )}
           {readOnly && isAdvanced && (

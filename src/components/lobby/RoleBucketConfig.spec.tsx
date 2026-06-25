@@ -1,18 +1,35 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { AdvancedRoleBucket, RoleDefinition } from "@/lib/types";
 import { GameMode, Team } from "@/lib/types";
 
+import { ROLE_BUCKET_ADD_DIALOG_COPY } from "./RoleBucketAddDialog.copy";
 import { RoleBucketConfigView } from "./RoleBucketConfig";
 import { ROLE_BUCKET_CONFIG_COPY } from "./RoleBucketConfig.copy";
 
 afterEach(cleanup);
 
 const mockRoles: RoleDefinition<string, Team>[] = [
-  { id: "villager", name: "Villager", team: Team.Good },
-  { id: "werewolf", name: "Werewolf", team: Team.Bad },
-  { id: "seer", name: "Seer", team: Team.Good, unique: true },
+  {
+    id: "villager",
+    name: "Villager",
+    team: Team.Good,
+    description: "No night action.",
+  },
+  {
+    id: "werewolf",
+    name: "Werewolf",
+    team: Team.Bad,
+    description: "Votes to eliminate villagers at night.",
+  },
+  {
+    id: "seer",
+    name: "Seer",
+    team: Team.Good,
+    unique: true,
+    description: "Investigates one player each night.",
+  },
 ];
 
 const defaultProps = {
@@ -82,7 +99,7 @@ describe("RoleBucketConfigView", () => {
     expect(removeButtons).toHaveLength(2);
   });
 
-  it("renders the add role dropdown only when unassigned roles exist", () => {
+  it("shows all roles as Added in the add role dialog when bucket already has every role", () => {
     const buckets: AdvancedRoleBucket[] = [
       {
         playerCount: 3,
@@ -94,7 +111,35 @@ describe("RoleBucketConfigView", () => {
       },
     ];
     render(<RoleBucketConfigView {...defaultProps} buckets={buckets} />);
-    expect(screen.queryByText(ROLE_BUCKET_CONFIG_COPY.addRole)).toBeNull();
+    fireEvent.click(screen.getByText(ROLE_BUCKET_ADD_DIALOG_COPY.addRole));
+    const addedButtons = screen.getAllByText(ROLE_BUCKET_ADD_DIALOG_COPY.added);
+    expect(addedButtons).toHaveLength(3);
+  });
+
+  it("opens the add role dialog from the add role button", () => {
+    const buckets: AdvancedRoleBucket[] = [{ playerCount: 1, roles: [] }];
+    render(<RoleBucketConfigView {...defaultProps} buckets={buckets} />);
+    fireEvent.click(screen.getByText(ROLE_BUCKET_ADD_DIALOG_COPY.addRole));
+    expect(screen.getByText(ROLE_BUCKET_ADD_DIALOG_COPY.title)).toBeDefined();
+    expect(screen.getByText("No night action.")).toBeDefined();
+  });
+
+  it("adds a role and closes the dialog when Add is clicked", () => {
+    const onAddRole = vi.fn();
+    const buckets: AdvancedRoleBucket[] = [{ playerCount: 1, roles: [] }];
+    render(
+      <RoleBucketConfigView
+        {...defaultProps}
+        buckets={buckets}
+        onAddRole={onAddRole}
+      />,
+    );
+    fireEvent.click(screen.getByText(ROLE_BUCKET_ADD_DIALOG_COPY.addRole));
+    fireEvent.click(
+      screen.getAllByText(ROLE_BUCKET_ADD_DIALOG_COPY.addRoleButton)[0]!,
+    );
+    expect(onAddRole).toHaveBeenCalledWith(0, "villager", false);
+    expect(screen.queryByText(ROLE_BUCKET_ADD_DIALOG_COPY.title)).toBeNull();
   });
 
   it("disables all interactive elements when disabled is true", () => {

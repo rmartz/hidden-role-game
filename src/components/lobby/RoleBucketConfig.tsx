@@ -5,13 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { getAdvancedBucketMaxCapacity } from "@/lib/game/modes";
 import type {
   AdvancedRoleBucket,
@@ -32,18 +25,23 @@ import {
 } from "@/store/game-config-slice";
 
 import { Incrementer } from "./Incrementer";
+import { RoleBucketAddDialog } from "./RoleBucketAddDialog";
 import { ROLE_BUCKET_CONFIG_COPY } from "./RoleBucketConfig.copy";
 
 interface RoleBucketConfigProps {
   roleDefinitions: Record<string, RoleDefinition<string, Team>>;
   gameMode: GameMode;
   disabled: boolean;
+  categoryOrder?: string[];
+  categoryLabels?: Record<string, string>;
 }
 
 export function RoleBucketConfig({
   roleDefinitions,
   gameMode,
   disabled,
+  categoryOrder,
+  categoryLabels,
 }: RoleBucketConfigProps) {
   const dispatch = useAppDispatch();
   const buckets = useAppSelector((s) => s.gameConfig.roleBuckets);
@@ -58,6 +56,8 @@ export function RoleBucketConfig({
       allRoles={allRoles}
       gameMode={gameMode}
       disabled={disabled}
+      categoryOrder={categoryOrder}
+      categoryLabels={categoryLabels}
       onAddBucket={() => {
         dispatch(addBucket());
       }}
@@ -88,6 +88,8 @@ export interface RoleBucketConfigViewProps {
   allRoles: RoleDefinition<string, Team>[];
   gameMode: GameMode;
   disabled: boolean;
+  categoryOrder?: string[];
+  categoryLabels?: Record<string, string>;
   onAddBucket: () => void;
   onRemoveBucket: (bucketIndex: number) => void;
   onSetBucketName: (bucketIndex: number, name: string) => void;
@@ -106,6 +108,8 @@ export function RoleBucketConfigView({
   allRoles,
   gameMode,
   disabled,
+  categoryOrder,
+  categoryLabels,
   onAddBucket,
   onRemoveBucket,
   onSetBucketName,
@@ -124,6 +128,8 @@ export function RoleBucketConfigView({
           allRoles={allRoles}
           gameMode={gameMode}
           disabled={disabled}
+          categoryOrder={categoryOrder}
+          categoryLabels={categoryLabels}
           onRemove={() => {
             onRemoveBucket(bucketIndex);
           }}
@@ -162,6 +168,8 @@ interface BucketEditorProps {
   allRoles: RoleDefinition<string, Team>[];
   gameMode: GameMode;
   disabled: boolean;
+  categoryOrder?: string[];
+  categoryLabels?: Record<string, string>;
   onRemove: () => void;
   onSetName: (name: string) => void;
   onSetPlayerCount: (count: number) => void;
@@ -176,6 +184,8 @@ function BucketEditor({
   allRoles,
   gameMode,
   disabled,
+  categoryOrder,
+  categoryLabels,
   onRemove,
   onSetName,
   onSetPlayerCount,
@@ -184,7 +194,6 @@ function BucketEditor({
   onSetBucketUnique,
 }: BucketEditorProps) {
   const assignedRoleIds = new Set(bucket.roles.map((r) => r.roleId));
-  const availableRoles = allRoles.filter((r) => !assignedRoleIds.has(r.id));
 
   const roleDefById = new Map(allRoles.map((r) => [r.id, r]));
   const nonUniqueSlots = bucket.roles.filter(
@@ -309,29 +318,17 @@ function BucketEditor({
         </p>
       )}
 
-      {availableRoles.length > 0 && (
-        <Select
-          disabled={disabled}
-          onValueChange={(roleId) => {
-            if (!roleId) return;
-            onAddRole(roleId as string, bucketIsUnique);
-          }}
-        >
-          <SelectTrigger
-            className="w-48 h-8 text-sm"
-            aria-label={ROLE_BUCKET_CONFIG_COPY.addRole}
-          >
-            <SelectValue placeholder={ROLE_BUCKET_CONFIG_COPY.addRole} />
-          </SelectTrigger>
-          <SelectContent>
-            {availableRoles.map((role) => (
-              <SelectItem key={role.id} value={role.id}>
-                {role.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      )}
+      <RoleBucketAddDialog
+        allRoles={allRoles}
+        gameMode={gameMode}
+        assignedRoleIds={assignedRoleIds}
+        disabled={disabled}
+        categoryOrder={categoryOrder}
+        categoryLabels={categoryLabels}
+        onAddRole={(roleId) => {
+          onAddRole(roleId, bucketIsUnique);
+        }}
+      />
     </div>
   );
 }
