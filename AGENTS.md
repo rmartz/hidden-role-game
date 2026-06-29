@@ -15,8 +15,6 @@ pnpm test             # Run tests with Vitest
 pnpm tsc              # Type check
 pnpm storybook        # Start Storybook dev server (port 6006)
 pnpm build-storybook  # Build static Storybook
-pnpm run env:pull     # Pull .env.local from Vercel (requires vercel login)
-pnpm run secrets-check # Gitleaks secret scan (runs in pre-commit)
 ```
 
 ## Worktree Setup
@@ -25,8 +23,8 @@ After creating a git worktree (`git worktree add .git-worktrees/<name> -b <branc
 
 ## Secret Management
 
-- Pull `.env.local` for local development: `pnpm run env:pull` (requires `vercel login`)
-- Secret scanning runs automatically on every commit via `.husky/pre-commit` and is enforced in CI via `.github/workflows/secret-scan.yml`
+- Environment configuration lives in `deployment/*.yml` (`environments.yml`, `production.yml`, `schema.yml`). Local env-config management (formerly the `vercel-deploy-scripts` scripts, e.g. `pnpm run env:pull` / `sync-env`) will be handled by a forthcoming local CLI, `envctl` (usage TBD); it is local-only and not part of CI.
+- Secret scanning is enforced in CI via `.github/workflows/secret-scan.yml` (a reusable workflow), which runs on every PR and push to `main`. There is no local pre-commit secret scan (it was removed with `vercel-deploy-scripts`); CI is the secret-scanning gate.
 - Never commit `.env.local`, `.vercel/`, service account keys, or Firebase private keys. The `.env.example` file contains only placeholder values. `.vercel/` is listed in `.gitignore` — it is local project metadata created by `vercel env pull` / `vercel link` and must not be committed.
 
 ## Firebase Compatibility

@@ -159,9 +159,6 @@ importers:
       typescript-eslint:
         specifier: ^8.61.1
         version: 8.62.0(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3)
-      vercel-deploy-scripts:
-        specifier: https://github.com/rmartz/vercel-deploy-scripts/archive/refs/tags/v3.1.0.tar.gz
-        version: https://github.com/rmartz/vercel-deploy-scripts/archive/refs/tags/v3.1.0.tar.gz
       vite:
         specifier: ^8.0.16
         version: 8.0.16(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.47.1)(tsx@4.22.4)(yaml@2.9.0)
@@ -3212,10 +3209,6 @@ packages:
   end-of-stream@1.4.5:
     resolution: {integrity: sha512-ooEGc6HP26xXq/N+GCGOT0JKCLDGrq2bQUZrQ7gyrJiZANJ/8YDTxTpQBXGMn+WbIQXNVpyWymm7KYVICQnyOg==}
 
-  enhanced-resolve@5.21.2:
-    resolution: {integrity: sha512-xe9vQb5kReirPUxgQrXA3ihgbCqssmTiM7cOZ+Gzu+VeGWgpV98lLZvp0dl4yriyAePcewxGUs9UpKD8PET9KQ==}
-    engines: {node: '>=10.13.0'}
-
   enhanced-resolve@5.21.6:
     resolution: {integrity: sha512-aNnGCvbJ/RIyWo1IuhNdVjnNF+EjH9wpzpNHt+ci/m9He9LJvUN8wrCcXjp9cWsGNAuvSpVFTx/vraAFQ8qGjQ==}
     engines: {node: '>=10.13.0'}
@@ -5147,12 +5140,6 @@ packages:
   vary@1.1.2:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
-
-  vercel-deploy-scripts@https://github.com/rmartz/vercel-deploy-scripts/archive/refs/tags/v3.1.0.tar.gz:
-    resolution: {tarball: https://github.com/rmartz/vercel-deploy-scripts/archive/refs/tags/v3.1.0.tar.gz}
-    version: 0.0.0
-    engines: {node: '>=18', pnpm: '>=9'}
-    hasBin: true
 
   vite-plugin-storybook-nextjs@3.2.4:
     resolution: {integrity: sha512-shFOJpGQsWDS1FLm8BR8b6FIQC65pFZ5a0IUFGLiBHAX1eRz0N8TOhUJN4p708zfPBLDXqWzj++ocECe8gSoMg==}
@@ -8310,11 +8297,6 @@ snapshots:
       once: 1.4.0
     optional: true
 
-  enhanced-resolve@5.21.2:
-    dependencies:
-      graceful-fs: 4.2.11
-      tapable: 2.3.3
-
   enhanced-resolve@5.21.6:
     dependencies:
       graceful-fs: 4.2.11
@@ -10536,10 +10518,6 @@ snapshots:
 
   vary@1.1.2: {}
 
-  vercel-deploy-scripts@https://github.com/rmartz/vercel-deploy-scripts/archive/refs/tags/v3.1.0.tar.gz:
-    dependencies:
-      js-yaml: 4.1.1
-
   vite-plugin-storybook-nextjs@3.2.4(next@16.2.9(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(storybook@10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.17)(prettier@3.8.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(typescript@6.0.3)(vite@8.0.16(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.47.1)(tsx@4.22.4)(yaml@2.9.0)):
     dependencies:
       '@next/env': 16.0.0
@@ -10639,7 +10617,7 @@ snapshots:
       acorn-import-phases: 1.0.4(acorn@8.16.0)
       browserslist: 4.28.2
       chrome-trace-event: 1.0.4
-      enhanced-resolve: 5.21.2
+      enhanced-resolve: 5.21.6
       es-module-lexer: 2.1.0
       eslint-scope: 5.1.1
       events: 3.3.0
