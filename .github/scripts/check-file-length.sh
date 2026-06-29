@@ -65,6 +65,7 @@ while IFS= read -r file; do
   # Get line counts and skip deleted files
   if [ "$mode" = "staged" ]; then
     # Use the staged blob, not the working tree; --diff-filter=ACMR already
+
     # excludes deletions. Any stray unindexed file yields new=0, which
     # naturally passes the under-limit check.
     new=$(git show ":$file" 2>/dev/null | wc -l)
