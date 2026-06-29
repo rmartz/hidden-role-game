@@ -1,3 +1,20 @@
 #!/usr/bin/env sh
+# Skip in git worktrees — .git is a file there, not a directory.
+# In worktrees, correctness checks run via claude/hooks/pre-commit instead
+# (wired by new-worktree.py). PostToolUse hooks handle formatting for agents,
+# making lint-staged redundant there.
+[ -f ".git" ] && exit 0
+
+# Abort on the first failing check so every guard below is blocking regardless
+# of order. Without set -e only the last line's exit status would matter, so a
+# failing earlier check would be silently ignored.
+set -e
+
+repo_root="$(git rev-parse --show-toplevel)"
+
+# Conflict-marker guard runs first: catch leftover markers before lint-staged's
+# prettier pass reflows them in Markdown/YAML and mangles them.
+"$repo_root/.github/scripts/check-conflict-markers.sh" --staged
 pnpm exec lint-staged
-"$(git rev-parse --show-toplevel)/.github/scripts/check-file-length.sh" --staged
+pnpm run secrets-check
+"$repo_root/.github/scripts/check-file-length.sh" --staged
