@@ -23,9 +23,6 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "pr-title-lint.yml": {
     "pr-title": 1,
   },
-  // The only job is a reusable-workflow caller (`uses:`), which cannot carry
-  // timeout-minutes — the upstream reusable workflow owns its own timeout.
-  "secret-scan.yml": {},
   "storybook-screenshots.yml": {
     screenshots: 5,
   },
