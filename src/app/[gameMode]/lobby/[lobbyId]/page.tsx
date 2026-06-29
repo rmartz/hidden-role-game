@@ -9,7 +9,6 @@ import {
   JoinPrompt,
   LobbyLayout,
   PlayerList,
-  ShareLobby,
   WerewolfLobbyGlossary,
 } from "@/components/lobby";
 import {
@@ -30,6 +29,7 @@ import { getLobbyId, getPlayerId, getSessionId, saveGameId } from "@/lib/api";
 import { parseGameMode } from "@/lib/game/modes";
 import { GameMode } from "@/lib/types";
 
+import { LobbyPageHeaderView } from "./LobbyPageHeaderView";
 import { LOBBY_PAGE_COPY } from "./page.copy";
 
 const LOBBY_COUNTDOWN_SECONDS = 5;
@@ -71,6 +71,10 @@ export default function LobbyPage() {
     !!fetchLobby.data && fetchLobby.data.ownerPlayerId === myPlayerId;
   const gameId = fetchLobby.data?.gameId;
   const actualGameMode = fetchLobby.data?.config.gameMode;
+  const ownerName = fetchLobby.data?.players.find(
+    (p) => p.id === fetchLobby.data?.ownerPlayerId,
+  )?.name;
+  const title = ownerName ?? LOBBY_PAGE_COPY.loadingTitle;
 
   useEffect(() => {
     if (!validatedGameMode) router.push("/");
@@ -197,10 +201,11 @@ export default function LobbyPage() {
 
   return (
     <LobbyLayout>
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold">{LOBBY_PAGE_COPY.title}</h1>
-        <ShareLobby lobbyId={lobbyId} gameMode={validatedGameMode} />
-      </div>
+      <LobbyPageHeaderView
+        title={title}
+        lobbyId={lobbyId}
+        gameMode={validatedGameMode}
+      />
 
       {fetchLobby.isLoading && (
         <p className="text-muted-foreground">{LOBBY_PAGE_COPY.loading}</p>
