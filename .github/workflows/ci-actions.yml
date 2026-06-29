@@ -12,12 +12,34 @@ jobs:
   tests:
     name: Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      # Headless suites only (node / hooks / components) — no browser, so this
+      # job stays fast and skips the Playwright install. The browser-based
+      # storybook project runs separately in `storybook-tests`.
+      - run: pnpm exec vitest run --project node --project hooks --project components
+
+  storybook-tests:
+    name: Storybook Tests
+    runs-on: ubuntu-latest
     timeout-minutes: 4
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
-      - run: pnpm exec playwright install chromium --with-deps
-      - run: pnpm test
+      - name: Install Playwright Chromium
+        # Retry: the browser/system-deps install hits transient apt/CDN failures.
+        run: |
+          for i in 1 2 3; do
+            if pnpm exec playwright install chromium --with-deps; then
+              exit 0
+            fi
+            echo "playwright install failed (attempt $i/3) — retrying in 5s"
+            sleep 5
+          done
+          exit 1
+      - run: pnpm exec vitest run --project storybook
 
   lint:
     name: Lint
