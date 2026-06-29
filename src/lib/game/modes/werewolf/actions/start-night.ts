@@ -13,6 +13,7 @@ import {
   WerewolfWinner,
   withMercenaryCoWin,
 } from "../utils";
+import { confirmEvilEmpathResultAction } from "./confirm-evil-empath-result";
 
 /** Night at which the Village Drunk sobers up and gains their alternate role. */
 const VILLAGE_DRUNK_SOBER_TURN = 3;
@@ -137,6 +138,23 @@ export const startNightAction: GameAction = {
       ...(aliveDousedPlayerIds.length > 0
         ? { arsonist: { dousedPlayerIds: aliveDousedPlayerIds } }
         : {}),
+      // Evil Empath: carry both revealedResult (Werewolves' death-reveal) and
+      // lastResult (fallback if the Empath is killed before computing a new result
+      // this night) forward across night starts. lastResult is replaced when the
+      // adjacency is recomputed for the new night.
+      ...(rs.evilEmpath?.revealedResult !== undefined ||
+      rs.evilEmpath?.lastResult !== undefined
+        ? {
+            evilEmpath: {
+              ...(rs.evilEmpath.revealedResult !== undefined
+                ? { revealedResult: rs.evilEmpath.revealedResult }
+                : {}),
+              ...(rs.evilEmpath.lastResult !== undefined
+                ? { lastResult: rs.evilEmpath.lastResult }
+                : {}),
+            },
+          }
+        : {}),
       ...(rs.veteran ? { veteran: rs.veteran } : {}),
       // wolfCub.died is intentionally NOT carried forward — consumed by this night's bonus phase
     };
@@ -159,8 +177,17 @@ export const startNightAction: GameAction = {
         ...(Object.keys(newRoleState).length > 0
           ? { roleState: newRoleState }
           : {}),
+        // illusionTargetId is night-specific — not carried forward.
+        // evilEmpath.lastResult and revealedResult are carried above.
       },
     };
+
+    // If the Evil Empath is the first phase (index 0), auto-compute their
+    // adjacency result immediately so the player can see it as soon as their
+    // phase becomes active, without waiting for the narrator to advance.
+    if (nightPhaseOrder[0] === (WerewolfRole.EvilEmpath as string)) {
+      confirmEvilEmpathResultAction.apply(game, {}, "");
+    }
 
     // Dracula wins at the start of night if alive and ≥3 wives are alive.
     // Only checked from turn 2 onward — wives can't accumulate on turn 1.

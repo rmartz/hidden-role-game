@@ -4,24 +4,36 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # Let releases age before applying them, to reduce exposure to compromised
+    # package versions (supply-chain attacks are typically caught and yanked
+    # within days). Applies to all update types.
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: "chore"
       prefix-development: "chore"
       include: "scope"
+    # Group only minor and patch bumps into batched PRs. Major bumps match no
+    # group, so each is raised as an individual PR — they are the ones most
+    # likely to need code changes and warrant isolated review.
     groups:
       dev-dependencies:
         dependency-type: development
-        patterns:
-          - "*"
+        update-types:
+          - "minor"
+          - "patch"
       production-dependencies:
         dependency-type: production
-        patterns:
-          - "*"
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: "chore"
       include: "scope"

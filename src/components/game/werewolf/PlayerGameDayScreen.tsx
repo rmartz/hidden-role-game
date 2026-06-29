@@ -96,6 +96,14 @@ export function PlayerGameDayScreen({
         myPlayerId={gameState.myPlayerId}
       />
 
+      {gameState.evilEmpathRevealedResult !== undefined && (
+        <p className="mb-4 text-sm font-medium">
+          {WEREWOLF_COPY.evilEmpath.revealedToWerewolves(
+            gameState.evilEmpathRevealedResult,
+          )}
+        </p>
+      )}
+
       {executionerTargetName && (
         <p className="mb-4 text-sm text-muted-foreground italic">
           {WEREWOLF_COPY.executioner.yourTarget(executionerTargetName)}
