@@ -24,6 +24,7 @@ import { avalonServices } from "./services";
 export const AVALON_CONFIG = {
   name: "Avalon",
   released: false,
+  theme: "avalon",
   minPlayers: MIN_PLAYERS,
   ownerTitle: null,
   teamLabels: {

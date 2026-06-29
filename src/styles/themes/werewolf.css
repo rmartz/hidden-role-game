@@ -1,0 +1,44 @@
+/* Werewolf — dark forest atmosphere with earthy greens and deep browns.
+ * Palette to be refined in follow-up issues. */
+
+[data-theme="werewolf"] {
+  --background: oklch(0.95 0.008 120);
+  --foreground: oklch(0.16 0.02 50);
+  --card: oklch(0.95 0.008 120);
+  --card-foreground: oklch(0.16 0.02 50);
+  --popover: oklch(0.95 0.008 120);
+  --popover-foreground: oklch(0.16 0.02 50);
+  --primary: oklch(0.28 0.06 120);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.88 0.015 120);
+  --secondary-foreground: oklch(0.28 0.06 120);
+  --muted: oklch(0.88 0.015 120);
+  --muted-foreground: oklch(0.45 0.03 120);
+  --accent: oklch(0.52 0.14 50);
+  --accent-foreground: oklch(0.98 0 0);
+  --border: oklch(0.82 0.02 120);
+  --input: oklch(0.82 0.02 120);
+  --ring: oklch(0.52 0.14 50);
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="werewolf"] {
+    --background: oklch(0.11 0.015 120);
+    --foreground: oklch(0.95 0.005 120);
+    --card: oklch(0.17 0.02 120);
+    --card-foreground: oklch(0.95 0.005 120);
+    --popover: oklch(0.17 0.02 120);
+    --popover-foreground: oklch(0.95 0.005 120);
+    --primary: oklch(0.72 0.12 120);
+    --primary-foreground: oklch(0.11 0.015 120);
+    --secondary: oklch(0.22 0.025 120);
+    --secondary-foreground: oklch(0.95 0.005 120);
+    --muted: oklch(0.22 0.025 120);
+    --muted-foreground: oklch(0.6 0.04 120);
+    --accent: oklch(0.62 0.16 50);
+    --accent-foreground: oklch(0.98 0 0);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.62 0.16 50);
+  }
+}

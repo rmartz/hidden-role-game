@@ -1,3 +1,12 @@
+---
+type: Actions
+title: Werewolf — Actions
+description: Narrator and player actions, payloads, validation rules, and night resolution order.
+gameMode: werewolf
+resource: src/lib/game/modes/werewolf/actions
+tags: [werewolf, actions, night-phase]
+---
+
 # Werewolf — Actions
 
 Actions are the mechanism by which the Narrator and players mutate game state. Each action has an `isValid` guard and an `apply` mutation.
@@ -33,6 +42,9 @@ Additional resolution steps:
 - **Vigilante self-death:** If the Vigilante's target is a Good-team player and was killed, the Vigilante also dies.
 - **Hunter revenge detection:** If a killed player is the Hunter, sets `hunterRevengePlayerId` on the Narrator's state and defers the win-condition check until revenge is resolved.
 - **Monarch updates:** Applies the Monarch's dynamic night protection, records newly knighted players (`monarchKnightedPlayerIds`), and increments `monarchKnightingsUsed` (max 3).
+- **Illusion Artist:** If the Illusion Artist confirmed a target this night, stores `roleState.illusionArtist.illusionTargetId` on the new daytime turn state. This is night-specific and not carried forward to the next night.
+- **Evil Empath death trigger:** If the Evil Empath was killed this night and `roleState.evilEmpath.lastResult` is set, populates `roleState.evilEmpath.revealedResult` on the turn state so Werewolves see the result.
+- **Evil Empath carry-forward:** `roleState.evilEmpath.lastResult` and `roleState.evilEmpath.revealedResult` are preserved across the day/night boundary.
 - **Arsonist douse/ignite:** If the Arsonist targeted another player, that player is added to `arsonistDousedPlayerIds` in the new turn state. If the Arsonist self-targeted (ignite), all players in the existing `arsonistDousedPlayerIds` are simultaneously attacked (protections apply to each independently), and the doused list is reset to empty. Dead players are removed from the doused list during this step.
 
 ---
@@ -236,9 +248,36 @@ The Martyr window is always inserted after a Guilty verdict, even when no Martyr
 
 **Who:** Narrator only
 **When:** During Daytime
-**Effect:** Immediately kills a player (for in-person trials). Checks win condition. Clears One-Eyed Seer lock and Priest wards for the killed player.
+**Effect:** Immediately kills a player (for in-person trials). Checks win condition. Clears One-Eyed Seer lock and Priest wards for the killed player. If the killed player is the Evil Empath and `roleState.evilEmpath.lastResult` is recorded, sets `roleState.evilEmpath.revealedResult` so Werewolves see the result.
 
 **Payload:** `{ playerId: string }`
+
+---
+
+### `set-illusion-target`
+
+**Who:** Illusion Artist player only
+**When:** During Nighttime, during the Illusion Artist's phase, turn 2+
+**Effect:** Stores the target in `nightActions[IllusionArtist].targetPlayerId`. When the Seer investigates that target during the same night, the investigation result is inverted. The `illusionTargetId` is carried into the daytime turn state so the Seer's result display sees the correct (inverted) value. Not carried into the next night.
+
+**Payload:** `{ targetPlayerId: string }`
+
+**Validation:**
+
+- Caller must be the Illusion Artist.
+- Active night phase must be `IllusionArtist`.
+- Target must be alive and not the caller.
+- Target cannot be the same player targeted the previous night (`preventRepeatTarget` via `lastTargets`).
+
+---
+
+### `confirm-evil-empath-result`
+
+**Who:** Narrator only
+**When:** During Nighttime, during the Evil Empath's phase
+**Effect:** Auto-computes whether the Seer is seated adjacent (circular seating order in `game.playerOrder`) to any living player with `roleDef.isWerewolf === true`. Stores the boolean result in `roleState.evilEmpath.lastResult` on the turn state, marks the Evil Empath's night action as `confirmed` and `resultRevealed`. The result is surfaced to the Evil Empath player as `evilEmpathNightResult` in their player state (only while the action is confirmed, to prevent showing a stale result at the start of a new night). When the Evil Empath dies (night via `start-day`, or day via `kill-player`, `advance-martyr-window`, `resolve-hunter-revenge`), `roleState.evilEmpath.revealedResult` is set on the turn state so Werewolves see it in their group phase state.
+
+**Payload:** none
 
 ---
 
@@ -328,6 +367,8 @@ The Martyr window is always inserted after a Guilty verdict, even when no Martyr
 | `withdraw-nomination`         | Player                                       | none                                                                      |
 | `skip-defense`                | Narrator                                     | none                                                                      |
 | `kill-player`                 | Narrator                                     | `{ playerId: string }`                                                    |
+| `set-illusion-target`         | Illusion Artist player                       | `{ targetPlayerId: string }`                                              |
+| `confirm-evil-empath-result`  | Narrator                                     | none                                                                      |
 | `submit-ghost-clue`           | Ghost (dead player)                          | `{ clue: string }`                                                        |
 | `pause-timer`                 | Narrator                                     | none                                                                      |
 | `resume-timer`                | Narrator                                     | none                                                                      |

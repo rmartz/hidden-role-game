@@ -72,7 +72,7 @@ export const useMartyrAbilityAction: GameAction = {
       if (didWolfCubDie([martyrId], game)) {
         ts.roleState = { ...(ts.roleState ?? {}), wolfCub: { died: true } };
       }
-      cleanupAfterDaytimeKill(martyrId, ts);
+      cleanupAfterDaytimeKill(martyrId, ts, game);
     }
 
     // Executioner wins if their target was the Martyr (who voluntarily died).

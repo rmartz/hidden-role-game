@@ -1,3 +1,12 @@
+---
+type: DataFlow
+title: Werewolf — Data Flow
+description: PlayerGameState fields per player type, Firebase schema, and per-phase data flow.
+gameMode: werewolf
+resource: src/lib/game/modes/werewolf
+tags: [werewolf, data-flow, firebase]
+---
+
 # Werewolf — Data Flow
 
 ## Overview

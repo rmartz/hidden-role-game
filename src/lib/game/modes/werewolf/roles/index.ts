@@ -12,11 +12,13 @@ import { COUNT_ROLE } from "./count";
 import { DOCTOR_ROLE } from "./doctor";
 import { DRACULA_ROLE } from "./dracula";
 import { ELUSIVE_SEER_ROLE } from "./elusive-seer";
+import { EVIL_EMPATH_ROLE } from "./evil-empath";
 import { EXECUTIONER_ROLE } from "./executioner";
 import { EXPOSER_ROLE } from "./exposer";
 import { GHOST_ROLE } from "./ghost";
 import { HUNTER_ROLE } from "./hunter";
 import { ILLUMINATI_ROLE } from "./illuminati";
+import { ILLUSION_ARTIST_ROLE } from "./illusion-artist";
 import { INSOMNIAC_ROLE } from "./insomniac";
 import { LONE_WOLF_ROLE } from "./lone-wolf";
 import { MARTYR_ROLE } from "./martyr";
@@ -40,6 +42,7 @@ import { SPELLCASTER_ROLE } from "./spellcaster";
 import { SPOILER_ROLE } from "./spoiler";
 import { SWAPPER_ROLE } from "./swapper";
 import { TANNER_ROLE } from "./tanner";
+import { TAVERN_KEEPER_ROLE } from "./tavern-keeper";
 import { THE_THING_ROLE } from "./the-thing";
 import { TOUGH_GUY_ROLE } from "./tough-guy";
 import { VETERAN_ROLE } from "./veteran";
@@ -63,11 +66,13 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
   [WerewolfRole.Doctor]: DOCTOR_ROLE,
   [WerewolfRole.Dracula]: DRACULA_ROLE,
   [WerewolfRole.ElusiveSeer]: ELUSIVE_SEER_ROLE,
+  [WerewolfRole.EvilEmpath]: EVIL_EMPATH_ROLE,
   [WerewolfRole.Executioner]: EXECUTIONER_ROLE,
   [WerewolfRole.Exposer]: EXPOSER_ROLE,
   [WerewolfRole.Ghost]: GHOST_ROLE,
   [WerewolfRole.Hunter]: HUNTER_ROLE,
   [WerewolfRole.Illuminati]: ILLUMINATI_ROLE,
+  [WerewolfRole.IllusionArtist]: ILLUSION_ARTIST_ROLE,
   [WerewolfRole.Insomniac]: INSOMNIAC_ROLE,
   [WerewolfRole.LoneWolf]: LONE_WOLF_ROLE,
   [WerewolfRole.Martyr]: MARTYR_ROLE,
@@ -91,6 +96,7 @@ export const WEREWOLF_ROLES: Record<WerewolfRole, WerewolfRoleDefinition> = {
   [WerewolfRole.Spoiler]: SPOILER_ROLE,
   [WerewolfRole.Swapper]: SWAPPER_ROLE,
   [WerewolfRole.Tanner]: TANNER_ROLE,
+  [WerewolfRole.TavernKeeper]: TAVERN_KEEPER_ROLE,
   [WerewolfRole.TheThing]: THE_THING_ROLE,
   [WerewolfRole.ToughGuy]: TOUGH_GUY_ROLE,
   [WerewolfRole.Veteran]: VETERAN_ROLE,

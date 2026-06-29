@@ -4,6 +4,11 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # Let releases age before applying them, to reduce exposure to compromised
+    # package versions (supply-chain attacks are typically caught and yanked
+    # within days). Applies to all update types.
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: "chore"
       prefix-development: "chore"
@@ -22,6 +27,8 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
     commit-message:
       prefix: "chore"
       include: "scope"

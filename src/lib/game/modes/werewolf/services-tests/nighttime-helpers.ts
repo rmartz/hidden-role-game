@@ -27,9 +27,11 @@ export function makeNighttimeGame(
       nightActions: nightActions as Record<string, AnyNightAction>,
     },
     deadPlayerIds: [],
-    ...(witchAbilityUsed
-      ? { roleState: { witch: { abilityUsed: true } } }
-      : {}),
+    ...(witchAbilityUsed && {
+      roleState: {
+        witch: { abilityUsed: true },
+      },
+    }),
   };
   return {
     id: "game-1",

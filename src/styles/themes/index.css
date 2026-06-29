@@ -1,0 +1,11 @@
+/* Game-mode CSS themes — each file defines custom properties scoped to
+ * [data-theme="<name>"] with automatic light/dark via prefers-color-scheme.
+ * Import this file once from globals.css to make all themes globally available. */
+
+@import "./avalon.css";
+@import "./clocktower.css";
+@import "./codenames.css";
+@import "./secret_villain.css";
+@import "./shadowplay.css";
+@import "./twilight_modern.css";
+@import "./werewolf.css";

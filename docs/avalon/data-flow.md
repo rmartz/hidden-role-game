@@ -1,3 +1,12 @@
+---
+type: DataFlow
+title: Avalon — Data Flow
+description: PlayerGameState fields and visibility rules; no night-phase mechanics.
+gameMode: avalon
+resource: src/lib/game/modes/avalon
+tags: [avalon, data-flow, firebase]
+---
+
 # Avalon — Data Flow
 
 ## Overview
