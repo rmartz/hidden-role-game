@@ -16,5 +16,4 @@ repo_root="$(git rev-parse --show-toplevel)"
 # prettier pass reflows them in Markdown/YAML and mangles them.
 "$repo_root/.github/scripts/check-conflict-markers.sh" --staged
 pnpm exec lint-staged
-pnpm run secrets-check
 "$repo_root/.github/scripts/check-file-length.sh" --staged

@@ -25,9 +25,7 @@
     "format:check": "prettier --check .",
     "prepare": "husky",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
-    "env:pull": "generate-local-env",
-    "secrets-check": "secrets-check --config .gitleaks.toml"
+    "build-storybook": "storybook build"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -92,7 +90,6 @@
     "tsx": "^4.22.4",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.61.1",
-    "vercel-deploy-scripts": "https://github.com/rmartz/vercel-deploy-scripts/archive/refs/tags/v3.1.0.tar.gz",
     "vite": "^8.0.16",
     "vitest": "^4.1.9",
     "yaml": "^2.9.0"

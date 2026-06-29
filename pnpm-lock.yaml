@@ -159,9 +159,6 @@ importers:
       typescript-eslint:
         specifier: ^8.61.1
         version: 8.62.0(eslint@10.5.0(jiti@2.7.0))(typescript@6.0.3)
-      vercel-deploy-scripts:
-        specifier: https://github.com/rmartz/vercel-deploy-scripts/archive/refs/tags/v3.1.0.tar.gz
-        version: https://github.com/rmartz/vercel-deploy-scripts/archive/refs/tags/v3.1.0.tar.gz
       vite:
         specifier: ^8.0.16
         version: 8.0.16(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)
@@ -5185,12 +5182,6 @@ packages:
   vary@1.1.2:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
-
-  vercel-deploy-scripts@https://github.com/rmartz/vercel-deploy-scripts/archive/refs/tags/v3.1.0.tar.gz:
-    resolution: {tarball: https://github.com/rmartz/vercel-deploy-scripts/archive/refs/tags/v3.1.0.tar.gz}
-    version: 0.0.0
-    engines: {node: '>=18', pnpm: '>=9'}
-    hasBin: true
 
   vite-plugin-storybook-nextjs@3.2.4:
     resolution: {integrity: sha512-shFOJpGQsWDS1FLm8BR8b6FIQC65pFZ5a0IUFGLiBHAX1eRz0N8TOhUJN4p708zfPBLDXqWzj++ocECe8gSoMg==}
@@ -10617,10 +10608,6 @@ snapshots:
   validate-npm-package-name@7.0.2: {}
 
   vary@1.1.2: {}
-
-  vercel-deploy-scripts@https://github.com/rmartz/vercel-deploy-scripts/archive/refs/tags/v3.1.0.tar.gz:
-    dependencies:
-      js-yaml: 4.1.1
 
   vite-plugin-storybook-nextjs@3.2.4(next@16.2.9(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(storybook@10.4.6(@testing-library/dom@10.4.1)(@types/react@19.2.17)(prettier@3.8.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(typescript@6.0.3)(vite@8.0.16(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.22.4)(yaml@2.9.0)):
     dependencies:
