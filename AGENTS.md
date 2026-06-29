@@ -21,6 +21,8 @@ pnpm build-storybook  # Build static Storybook
 
 After creating a git worktree (`git worktree add .git-worktrees/<name> -b <branch> origin/main`), run `pnpm install --frozen-lockfile` inside it before invoking any build, test, lint, or typecheck commands. pnpm's `node-modules` linker creates per-directory `node_modules` trees; a fresh worktree has none. The global store is already populated so this step only creates hardlinks — it takes a few seconds and requires no network access.
 
+`new-worktree.py` also sets `core.hooksPath=claude/hooks` in the shared git config, wiring the agent pre-commit hook (`claude/hooks/pre-commit`) for all worktrees. For manually-created worktrees run: `git config core.hooksPath claude/hooks`.
+
 ## Secret Management
 
 - Environment configuration lives in `deployment/*.yml` (`environments.yml`, `production.yml`, `schema.yml`). Local env-config management (formerly the `vercel-deploy-scripts` scripts, e.g. `pnpm run env:pull` / `sync-env`) will be handled by a forthcoming local CLI, `envctl` (usage TBD); it is local-only and not part of CI.
