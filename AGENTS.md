@@ -26,7 +26,7 @@ After creating a git worktree (`git worktree add .git-worktrees/<name> -b <branc
 ## Secret Management
 
 - Environment configuration lives in `deployment/*.yml` (`environments.yml`, `production.yml`, `schema.yml`). Local env-config management (formerly the `vercel-deploy-scripts` scripts, e.g. `pnpm run env:pull` / `sync-env`) will be handled by a forthcoming local CLI, `envctl` (usage TBD); it is local-only and not part of CI.
-- Secret scanning is enforced in CI via `.github/workflows/secret-scan.yml` (a reusable workflow), which runs on every PR and push to `main`. There is no local pre-commit secret scan (it was removed with `vercel-deploy-scripts`); CI is the secret-scanning gate.
+- Secret scanning: there is currently no automated secret scanning — the local pre-commit scan was removed with `vercel-deploy-scripts` (#746), and the CI workflow (`secret-scan.yml`) was also removed (#747) as it depended on VDS. Secret scanning will be re-added as part of the forthcoming env/secrets redesign.
 - Never commit `.env.local`, `.vercel/`, service account keys, or Firebase private keys. The `.env.example` file contains only placeholder values. `.vercel/` is listed in `.gitignore` — it is local project metadata created by `vercel env pull` / `vercel link` and must not be committed.
 
 ## Firebase Compatibility
