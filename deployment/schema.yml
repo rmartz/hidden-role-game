@@ -20,9 +20,9 @@ allowed_patterns:
 allowed_keys:
   - FIREBASE_DATABASE_URL # Non-sensitive RTDB URL; also exposed as NEXT_PUBLIC_FIREBASE_DATABASE_URL
   - FIREBASE_PROJECT_ID # Non-sensitive; also exposed via NEXT_PUBLIC_FIREBASE_PROJECT_ID
-  - FIREBASE_SA_EMAIL # Service account email (identifier, not a key); used by sync-env --rotate-keys
-  - SENTRY_ORG # Non-sensitive org slug; used by sync-env --init sentry and withSentryConfig
-  - SENTRY_PROJECT # Non-sensitive project slug; used by sync-env --init sentry and withSentryConfig
+  - FIREBASE_SA_EMAIL # Service account email (identifier, not a key)
+  - SENTRY_ORG # Non-sensitive org slug; used by withSentryConfig
+  - SENTRY_PROJECT # Non-sensitive project slug; used by withSentryConfig
 
 # Keys matching these patterns are always rejected, even if they match allowed_patterns.
 # Belt-and-suspenders: catches common secret naming conventions.
