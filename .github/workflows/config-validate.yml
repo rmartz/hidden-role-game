@@ -1,0 +1,31 @@
+name: Config Validation
+
+# Validates deployment/*.yml against deployment/schema.yml. Gated to runs that
+# actually change the deployment config (or the validator itself) — the check's
+# only inputs are under deployment/ plus this script/workflow, so a paths
+# allowlist is safe here: if none of them changed, there is nothing to validate.
+on:
+  pull_request:
+    paths:
+      - "deployment/**"
+      - "scripts/validate-config.mjs"
+      - ".github/workflows/config-validate.yml"
+  push:
+    branches: [main]
+    paths:
+      - "deployment/**"
+      - "scripts/validate-config.mjs"
+      - ".github/workflows/config-validate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-config:
+    name: Validate deployment config
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: node scripts/validate-config.mjs
