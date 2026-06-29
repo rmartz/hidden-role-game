@@ -13,15 +13,20 @@ updates:
       prefix: "chore"
       prefix-development: "chore"
       include: "scope"
+    # Group only minor and patch bumps into batched PRs. Major bumps match no
+    # group, so each is raised as an individual PR — they are the ones most
+    # likely to need code changes and warrant isolated review.
     groups:
       dev-dependencies:
         dependency-type: development
-        patterns:
-          - "*"
+        update-types:
+          - "minor"
+          - "patch"
       production-dependencies:
         dependency-type: production
-        patterns:
-          - "*"
+        update-types:
+          - "minor"
+          - "patch"
 
   - package-ecosystem: github-actions
     directory: /
