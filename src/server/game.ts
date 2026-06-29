@@ -110,6 +110,9 @@ export async function advanceToPlaying(gameId: string): Promise<Game | null> {
   if (game?.status.type !== GameStatus.Starting) return null;
 
   game.status = buildPlayingStatus(game);
+  // Run any mode-specific post-initialization (e.g. auto-compute night-phase
+  // results that require the full game object, such as Evil Empath on night 1).
+  getModeDefinition(game.gameMode).services.postInitialize?.(game);
 
   await updateGameStatus(gameId, game.status);
   await writePlayerStates(game);

@@ -11,49 +11,55 @@ permissions:
   contents: write
   pull-requests: write
 
+concurrency:
+  group: storybook-screenshots-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   screenshots:
     name: Capture Storybook Screenshots
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Forked PRs receive a read-only GITHUB_TOKEN that cannot push to the
+    # gh-screenshots branch, so skip them rather than fail.
+    if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
-      - uses: ./.github/actions/setup
-
-      - name: Install Playwright Chromium
-        run: pnpm exec playwright install chromium --with-deps
+      - name: Fetch base branch
+        run: git fetch origin ${{ github.base_ref }}
 
       - name: Detect changed story files
         id: stories
         run: |
           CHANGED=$(git diff --name-only --diff-filter=ACMR origin/${{ github.base_ref }}...HEAD \
-            -- 'src/**/*.stories.tsx' 'src/**/*.stories.ts' | tr '\n' ' ')
-          echo "files=${CHANGED}" >> "$GITHUB_OUTPUT"
+            -- 'src/**/*.stories.tsx' 'src/**/*.stories.ts')
+          if [ -z "$CHANGED" ]; then
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            printf 'files<<EOF\n%s\nEOF\n' "$CHANGED" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Generate screenshots config
-        env:
-          CHANGED_FILES: ${{ steps.stories.outputs.files }}
-        run: pnpm tsx .github/scripts/generate-story-urls.ts $CHANGED_FILES
+      - uses: ./.github/actions/setup
+        if: steps.stories.outputs.found == 'true'
+
+      - name: Install Playwright Chromium
+        if: steps.stories.outputs.found == 'true'
+        run: pnpm exec playwright install --with-deps chromium
 
       - name: Build Storybook
-        run: pnpm build-storybook --output-dir storybook-static
+        if: steps.stories.outputs.found == 'true'
+        run: pnpm build-storybook
 
-      - name: Serve Storybook
-        run: npx --yes serve storybook-static -l 6006 &
-
-      - name: Wait for Storybook
-        run: |
-          echo "Waiting for Storybook on port 6006…"
-          for i in $(seq 1 60); do
-            curl -sf http://localhost:6006 > /dev/null && echo "Ready." && exit 0
-            sleep 2
-          done
-          echo "Storybook did not start in time." && exit 1
-
-      - name: Capture screenshots
-        uses: yoavf/auto-pr-screenshots-action@v1
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          config-file: .github/screenshots.config.yml
+      - name: Capture screenshots and post PR comment
+        if: steps.stories.outputs.found == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          CHANGED_FILES: ${{ steps.stories.outputs.files }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: node .github/scripts/storybook-screenshots.mjs
