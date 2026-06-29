@@ -4,6 +4,7 @@ import { getWerewolfRole, WerewolfRole } from "../roles";
 import type { AnyNightAction, NightResolutionEvent } from "../types";
 import { TargetCategory } from "../types";
 import { isGroupPhaseKey, isRoleActive } from "./phase-keys";
+import { applyTavernKeeperUndo } from "./tavern-keeper-resolution";
 
 function allWerewolvesAreDead(
   roleAssignments: PlayerRoleAssignment[],
@@ -79,6 +80,7 @@ export function collectBaseAttacksAndProtections(
         WerewolfRole.Priest,
         WerewolfRole.Altruist,
         WerewolfRole.Swapper,
+        WerewolfRole.TavernKeeper,
       ])
     )
       continue;
@@ -207,8 +209,12 @@ export function getInterimAttackedPlayerIds(
   mercenaryCharged?: boolean,
   arsonistDousedPlayerIds?: string[],
 ): string[] {
-  const { attacks, protections } = collectBaseAttacksAndProtections(
+  const { resolvedNightActions } = applyTavernKeeperUndo(
     nightActions,
+    roleAssignments,
+  );
+  const { attacks, protections } = collectBaseAttacksAndProtections(
+    resolvedNightActions,
     roleAssignments,
     deadPlayerIds,
     mirrorcasterCharged,
@@ -216,7 +222,7 @@ export function getInterimAttackedPlayerIds(
   );
   applyArsonistIgnite(
     attacks,
-    nightActions,
+    resolvedNightActions,
     roleAssignments,
     arsonistDousedPlayerIds,
   );

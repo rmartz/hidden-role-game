@@ -1,9 +1,10 @@
 import type { NightResolutionEvent, WerewolfDaytimePhase } from "../types";
 
 export enum NightOutcomeEffect {
+  Hangover = "hangover",
+  Hypnotized = "hypnotized",
   Killed = "killed",
   Silenced = "silenced",
-  Hypnotized = "hypnotized",
 }
 
 export interface AffectedPlayerOutcome {
@@ -39,6 +40,11 @@ export function getOrderedAffectedPlayers(
         playerId: event.targetPlayerId,
         effect: NightOutcomeEffect.Hypnotized,
       };
+    } else if (event.type === "hangover") {
+      outcome = {
+        playerId: event.targetPlayerId,
+        effect: NightOutcomeEffect.Hangover,
+      };
     }
     if (outcome && !seen.has(outcome.playerId)) {
       seen.add(outcome.playerId);
@@ -62,9 +68,12 @@ export function hasKilledOutcome(phase: WerewolfDaytimePhase): boolean {
   );
 }
 
-/** True when at least one player was silenced or hypnotized during the night. */
+/** True when at least one player was silenced, hypnotized, or hungover during the night. */
 export function hasStatusOutcome(phase: WerewolfDaytimePhase): boolean {
   return (phase.nightResolution ?? []).some(
-    (event) => event.type === "silenced" || event.type === "hypnotized",
+    (event) =>
+      event.type === "hangover" ||
+      event.type === "hypnotized" ||
+      event.type === "silenced",
   );
 }

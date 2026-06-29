@@ -1,7 +1,11 @@
 import type { PlayerRoleAssignment } from "@/lib/types";
 
 import { WerewolfRole } from "../roles";
-import type { AnyNightAction, NightResolutionEvent } from "../types";
+import type {
+  AnyNightAction,
+  HangoverNightResolutionEvent,
+  NightResolutionEvent,
+} from "../types";
 import {
   applyArsonistIgnite,
   applyPriestWards,
@@ -9,6 +13,7 @@ import {
   collectBaseAttacksAndProtections,
 } from "./attack-map";
 import { applyMonarchProtection } from "./monarch-resolution";
+import { applyTavernKeeperUndo } from "./tavern-keeper-resolution";
 import { collectVeteranCounterkills } from "./veteran-resolution";
 
 export const SMITE_PHASE_KEY = "__narrator_smite__";
@@ -56,8 +61,14 @@ export function resolveNightActions(
   smitedPlayerIds?: string[],
   options?: NightResolutionOptions,
 ): NightResolutionEvent[] {
+  const { resolvedNightActions, hangoverTargetPlayerId } =
+    applyTavernKeeperUndo(nightActions, roleAssignments);
+  const hangoverEvents: HangoverNightResolutionEvent[] = hangoverTargetPlayerId
+    ? [{ type: "hangover", targetPlayerId: hangoverTargetPlayerId }]
+    : [];
+
   const { attacks, protections } = collectBaseAttacksAndProtections(
-    nightActions,
+    resolvedNightActions,
     roleAssignments,
     deadPlayerIds,
     options?.mirrorcasterCharged,
@@ -68,7 +79,7 @@ export function resolveNightActions(
   // Applied before Priest wards and the Witch so that wards/protections can apply to ignite targets.
   applyArsonistIgnite(
     attacks,
-    nightActions,
+    resolvedNightActions,
     roleAssignments,
     options?.arsonistDousedPlayerIds,
   );
@@ -79,7 +90,7 @@ export function resolveNightActions(
   }
 
   // Witch: if target is already attacked → protect; otherwise → attack.
-  const witchAction = nightActions[WerewolfRole.Witch] as
+  const witchAction = resolvedNightActions[WerewolfRole.Witch] as
     | { targetPlayerId?: string }
     | undefined;
   if (witchAction?.targetPlayerId) {
@@ -108,7 +119,7 @@ export function resolveNightActions(
   // not already protected (including by the Witch), redirect the attack onto the
   // Altruist instead. Ignored if the Altruist is themselves already under attack
   // or if the target is the Altruist themselves.
-  const altruistAction = nightActions[WerewolfRole.Altruist] as
+  const altruistAction = resolvedNightActions[WerewolfRole.Altruist] as
     | { targetPlayerId?: string }
     | undefined;
   let altruistInterceptEvent: NightResolutionEvent | undefined;
@@ -138,7 +149,7 @@ export function resolveNightActions(
   // Swapper: swap the attacks and protections between the two selected players.
   // Runs after all other attack/protect modifiers so it operates on the final
   // attack and protection state. Silenced and hypnotized events are swapped later.
-  const swapperAction = nightActions[WerewolfRole.Swapper] as
+  const swapperAction = resolvedNightActions[WerewolfRole.Swapper] as
     | {
         targetPlayerId?: string;
         secondTargetPlayerId?: string;
@@ -293,7 +304,7 @@ export function resolveNightActions(
     });
 
   // Spellcaster: emit a silenced event for their target.
-  const spellcasterAction = nightActions[WerewolfRole.Spellcaster] as
+  const spellcasterAction = resolvedNightActions[WerewolfRole.Spellcaster] as
     | { targetPlayerId?: string }
     | undefined;
   const silencedEvents: NightResolutionEvent[] =
@@ -302,7 +313,7 @@ export function resolveNightActions(
       : [];
 
   // Mummy: emit a hypnotized event for their target.
-  const mummyAction = nightActions[WerewolfRole.Mummy] as
+  const mummyAction = resolvedNightActions[WerewolfRole.Mummy] as
     | { targetPlayerId?: string }
     | undefined;
   const mummyPlayerId = roleAssignments.find(
@@ -353,11 +364,25 @@ export function resolveNightActions(
     });
   }
 
+  // Suppress hangover if the target died during the same night.
+  const killedPlayerIds = new Set(
+    combatEvents
+      .filter(
+        (event): event is Extract<NightResolutionEvent, { type: "killed" }> =>
+          event.type === "killed" && event.died,
+      )
+      .map((event) => event.targetPlayerId),
+  );
+  const finalHangoverEvents = hangoverEvents.filter(
+    (event) => !killedPlayerIds.has(event.targetPlayerId),
+  );
+
   return [
     ...combatEvents,
     ...toughGuyEvents,
     ...(altruistInterceptEvent ? [altruistInterceptEvent] : []),
     ...veteranCounterkilledEvents,
+    ...finalHangoverEvents,
     ...finalSilencedEvents,
     ...finalHypnotizedEvents,
     ...swapperEvents,
