@@ -249,6 +249,28 @@ describe("buildNightPhaseOrder", () => {
     expect(vigilanteIdx).toBeLessThan(seerIdx);
   });
 
+  it("places TavernKeeper after Werewolf (sorts by category — VillagerSupport after EvilKilling)", () => {
+    const withTK = [
+      { playerId: "tk1", roleDefinitionId: WerewolfRole.TavernKeeper },
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "s1", roleDefinitionId: WerewolfRole.Seer },
+    ];
+    const order = buildNightPhaseOrder(2, withTK);
+    const werewolfIdx = order.indexOf(WerewolfRole.Werewolf);
+    const tkIdx = order.indexOf(WerewolfRole.TavernKeeper);
+    expect(werewolfIdx).toBeLessThan(tkIdx);
+  });
+
+  it("excludes TavernKeeper when they are dead", () => {
+    const withTK = [
+      { playerId: "tk1", roleDefinitionId: WerewolfRole.TavernKeeper },
+      { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
+      { playerId: "s1", roleDefinitionId: WerewolfRole.Seer },
+    ];
+    const order = buildNightPhaseOrder(2, withTK, ["tk1"]);
+    expect(order).not.toContain(WerewolfRole.TavernKeeper);
+  });
+
   it("places Insomniac absolutely last — after Seer, Witch, and Altruist", () => {
     const withInsomniac = [
       { playerId: "w1", roleDefinitionId: WerewolfRole.Werewolf },
