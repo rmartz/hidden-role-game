@@ -17,6 +17,9 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
     tests: 4,
     typecheck: 1,
   },
+  "config-validate.yml": {
+    "validate-config": 2,
+  },
   "file-length.yml": {
     check: 2,
   },
