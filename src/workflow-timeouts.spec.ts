@@ -26,6 +26,9 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "pr-title-lint.yml": {
     "pr-title": 1,
   },
+  "storybook-screenshots-cleanup.yml": {
+    cleanup: 1,
+  },
   "storybook-screenshots.yml": {
     screenshots: 5,
   },
