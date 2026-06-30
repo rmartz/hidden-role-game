@@ -1,0 +1,29 @@
+name: Storybook Screenshots Cleanup
+
+# When a PR closes (merged or not), delete its per-PR screenshots branch
+# (gh-screenshots-pr-<N>) so the image branches don't accumulate unboundedly.
+# Trade-off: the screenshot images in that PR's review comment 404 after close —
+# acceptable for ephemeral preview tooling (the review already happened).
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    name: Delete per-PR screenshots branch
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Delete gh-screenshots-pr-<number> if present
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          BRANCH="gh-screenshots-pr-${{ github.event.pull_request.number }}"
+          if gh api -X DELETE "repos/${{ github.repository }}/git/refs/heads/${BRANCH}"; then
+            echo "Deleted ${BRANCH}."
+          else
+            echo "No ${BRANCH} branch to delete (PR had no story changes, or already removed)."
+          fi
