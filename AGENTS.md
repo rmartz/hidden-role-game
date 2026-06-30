@@ -3,6 +3,7 @@
 ## Package Manager
 
 - Always use `pnpm`. Never `npm` or `yarn`.
+- **Pin every dependency to a full `major.minor.patch` version**, including the range annotation — e.g. `"prettier": "^3.8.4"`, never `"^3"` or `"^3.8"`. A partial pin lets Dependabot bump the package without changing `package.json` (only `pnpm-lock.yaml` moves), so the update is invisible in the PR diff and a version bump that requires code or formatting changes looks like it "appeared from nowhere". Full pins make every bump explicit in `package.json`. This applies to registry version ranges only; non-registry specifiers (tarball URLs, `git+`, `workspace:`, `file:`, `link:`, dist-tags) are exempt. Enforced by `src/package-version-pins.spec.ts`.
 
 ## Common Commands
 
