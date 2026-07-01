@@ -72,4 +72,5 @@ jobs:
           SENTRY_PROJECT: hidden-role-game
         with:
           environment: production
+          ignore_missing: true
           version: ${{ github.sha }}
