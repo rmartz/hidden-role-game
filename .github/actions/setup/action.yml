@@ -6,6 +6,14 @@ inputs:
     description: "Use --frozen-lockfile for pnpm install"
     required: false
     default: "true"
+  playwright:
+    description: >-
+      Space-separated Playwright browsers to install (e.g. "chromium"). When
+      set, the browser binaries are cached at ~/.cache/ms-playwright and
+      restored across runs and jobs, so only a cache miss pays the download.
+      Leave empty (default) for jobs that need no browser.
+    required: false
+    default: ""
 
 runs:
   using: "composite"
@@ -17,3 +25,44 @@ runs:
         cache: "pnpm"
     - run: pnpm install ${{ inputs.frozen-lockfile == 'true' && '--frozen-lockfile' || '--no-frozen-lockfile' }}
       shell: bash
+
+    # Cache the Playwright browser binaries so the ~130MB Chromium download is
+    # paid once and then shared by every browser job across both workflow files
+    # (the Actions cache is repo-global). Keyed on the lockfile so a Playwright
+    # version bump busts it; the prefix restore-key still restores the previous
+    # browsers on a partial hit, so a miss re-downloads only when the browser
+    # revision actually changed.
+    - name: Cache Playwright browsers
+      if: inputs.playwright != ''
+      id: playwright-cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+        restore-keys: |
+          playwright-${{ runner.os }}-
+
+    - name: Install Playwright browsers
+      if: inputs.playwright != ''
+      shell: bash
+      env:
+        PLAYWRIGHT_BROWSERS: ${{ inputs.playwright }}
+        CACHE_HIT: ${{ steps.playwright-cache.outputs.cache-hit }}
+      # On an exact cache hit the browser binary is already present, so only
+      # ensure the OS libraries (fast, no download). Otherwise install the
+      # browser plus its system deps. Retry either way: the browser/apt install
+      # hits transient CDN/apt failures.
+      run: |
+        if [ "$CACHE_HIT" = "true" ]; then
+          install_cmd="pnpm exec playwright install-deps $PLAYWRIGHT_BROWSERS"
+        else
+          install_cmd="pnpm exec playwright install --with-deps $PLAYWRIGHT_BROWSERS"
+        fi
+        for i in 1 2 3; do
+          if $install_cmd; then
+            exit 0
+          fi
+          echo "playwright install failed (attempt $i/3) — retrying in 5s"
+          sleep 5
+        done
+        exit 1

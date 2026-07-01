@@ -45,10 +45,8 @@ jobs:
 
       - uses: ./.github/actions/setup
         if: steps.stories.outputs.found == 'true'
-
-      - name: Install Playwright Chromium
-        if: steps.stories.outputs.found == 'true'
-        run: pnpm exec playwright install --with-deps chromium
+        with:
+          playwright: chromium
 
       - name: Build Storybook
         if: steps.stories.outputs.found == 'true'
