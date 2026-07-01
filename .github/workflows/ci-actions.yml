@@ -31,12 +31,14 @@ jobs:
       - name: Install Playwright Chromium
         # Retry: the browser/system-deps install hits transient apt/CDN failures.
         run: |
-          for i in 1 2 3; do
+          for i in 0 1 2; do
+            if [ $i -gt 0 ]; then
+              echo "playwright install failed (attempt $i/3) — retrying in 5s"
+              sleep 5
+            fi
             if pnpm exec playwright install chromium --with-deps; then
               exit 0
             fi
-            echo "playwright install failed (attempt $i/3) — retrying in 5s"
-            sleep 5
           done
           exit 1
       - run: pnpm exec vitest run --project storybook
