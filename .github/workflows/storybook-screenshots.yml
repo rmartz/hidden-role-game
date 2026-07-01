@@ -11,6 +11,10 @@ permissions:
   contents: write
   pull-requests: write
 
+# Per-PR concurrency: serialize only same-PR runs (cancel the older when a newer
+# one starts). Cross-PR safety needs no group — each PR force-pushes its own
+# image branch (gh-screenshots-pr-<N>), so two different PRs never share a
+# resource. This group only stops two runs of the SAME PR force-pushing at once.
 concurrency:
   group: storybook-screenshots-${{ github.event.pull_request.number }}
   cancel-in-progress: true
@@ -19,6 +23,12 @@ jobs:
   screenshots:
     name: Capture Storybook Screenshots
     runs-on: ubuntu-latest
+    # Advisory: this is preview tooling (posts a screenshot gallery), not a
+    # correctness gate. It depends on Playwright + a git push + the GitHub API,
+    # any of which can fail transiently. A failure must never block a code
+    # merge, so report green regardless. The timeout-minutes below still bounds
+    # a hang.
+    continue-on-error: true
     timeout-minutes: 5
     # Forked PRs receive a read-only GITHUB_TOKEN that cannot push to the
     # gh-screenshots branch, so skip them rather than fail.
