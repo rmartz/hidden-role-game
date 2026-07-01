@@ -38,9 +38,9 @@ runs:
       uses: actions/cache@v4
       with:
         path: ~/.cache/ms-playwright
-        key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+        key: playwright-${{ runner.os }}-${{ inputs.playwright }}-${{ hashFiles('pnpm-lock.yaml') }}
         restore-keys: |
-          playwright-${{ runner.os }}-
+          playwright-${{ runner.os }}-${{ inputs.playwright }}-
 
     - name: Install Playwright browsers
       if: inputs.playwright != ''
