@@ -18,11 +18,17 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
     tests: 2,
     typecheck: 1,
   },
+  "config-validate.yml": {
+    "validate-config": 2,
+  },
   "file-length.yml": {
     check: 2,
   },
   "pr-title-lint.yml": {
     "pr-title": 1,
+  },
+  "storybook-screenshots-cleanup.yml": {
+    cleanup: 1,
   },
   "storybook-screenshots.yml": {
     screenshots: 5,
