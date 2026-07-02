@@ -68,12 +68,32 @@ jobs:
       - uses: ./.github/actions/setup
       - run: pnpm build
 
+  # Gating coverage for the production Storybook bundle. build-storybook uses a
+  # different entrypoint/bundler than `pnpm build` (Next.js) and is a render
+  # surface the vitest `storybook-tests` job never exercises, so neither of
+  # those covers it. Without this job, build-storybook runs only inside the
+  # advisory, story-gated screenshots job (under continue-on-error), where a
+  # broken Storybook build is masked (neutralized) and — for a non-story change
+  # like a .storybook/ or preview/addon edit — never even runs. This job closes
+  # both holes. It is browser-free (build only, no render), so it omits the
+  # playwright input. Render coverage of the built bundle stays advisory by
+  # design (see docs/guidance / rmartz/ai#6).
+  storybook-build:
+    name: Storybook Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: pnpm build-storybook
+
   sentry-release:
     name: Sentry Release
     runs-on: ubuntu-latest
     timeout-minutes: 2
     if: github.event_name == 'push'
-    needs: [tests, storybook-tests, lint, format, typecheck, build]
+    needs:
+      [tests, storybook-tests, lint, format, typecheck, build, storybook-build]
     steps:
       - uses: actions/checkout@v7
         with:
