@@ -86,11 +86,16 @@ jobs:
         with:
           environment: production
           version: ${{ github.sha }}
-          # Create/finalize the release only — do not associate commits.
-          # Commit association (`set_commits: auto`/`manual`) requires the repo
-          # to be registered in Sentry via its GitHub integration; it is not, so
-          # sentry-cli fails ("Unknown repo" in manual mode, "Could not find the
-          # SHA of the previous release" in auto mode). Skipping keeps release
-          # tracking working; re-enable set_commits once the Sentry GitHub
-          # integration is configured (tracked as a follow-up).
-          set_commits: skip
+          # Associate commits via an explicit range now that the repo is
+          # connected to Sentry's GitHub integration. Manual mode is used over
+          # `auto` deliberately: `auto` resolves the *previous release* and
+          # needs its commit reachable — fragile with our squash-merge workflow
+          # (a squashed preview commit as predecessor breaks it). Manual passes
+          # an explicit range instead — github.event.before is main's tip before
+          # this push (always a reachable main commit), so the range
+          # (before, sha] is exactly the commits this push introduced, and
+          # Sentry resolves them server-side through the GitHub integration.
+          set_commits: manual
+          repo: ${{ github.repository }}
+          commit: ${{ github.sha }}
+          previous_commit: ${{ github.event.before }}
