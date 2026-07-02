@@ -3,6 +3,7 @@
 ## Package Manager
 
 - Always use `pnpm`. Never `npm` or `yarn`.
+- **Pin every dependency to a full `major.minor.patch` version**, including the range annotation — e.g. `"prettier": "^3.8.4"`, never `"^3"` or `"^3.8"`. A partial pin lets Dependabot bump the package without changing `package.json` (only `pnpm-lock.yaml` moves), so the update is invisible in the PR diff and a version bump that requires code or formatting changes looks like it "appeared from nowhere". Full pins make every bump explicit in `package.json`. This applies to registry version ranges only; non-registry specifiers (tarball URLs, `git+`, `workspace:`, `file:`, `link:`, dist-tags) are exempt. Enforced in CI by `pnpm run check:pins` (`scripts/check-package-pins.mjs`), which runs via the `Package Pins` workflow on any PR that changes `package.json`.
 
 ## Common Commands
 
@@ -57,7 +58,7 @@ After creating a git worktree (`git worktree add .git-worktrees/<name> -b <branc
 - **No function-style imports.** Do not use inline `import("…").Type` syntax in type annotations. Use module-level `import type { … } from "…"` statements at the top of the file. Dynamic `await import("…")` for services that require conditional loading (e.g., Sentry instrumentation) is acceptable.
 - **No unnecessary helpers.** Do not extract logic into a helper function unless it separates significant logic or belongs in a different module. Three similar lines is better than a premature abstraction.
 - **Enums and constant objects** should be kept in alphabetical order to minimize merge conflicts.
-- **Prefer enums over string literal unions** for any domain concept with two or more named states (e.g., use `enum TrialPhase { Defense = "defense", Voting = "voting" }` rather than `"defense" | "voting"`). String enum values must match the current serialized schema (keep code and literals in sync); do not add compatibility shims for old serialized values. Export new enums from the module barrel.
+- **Value sets: default to a structural string union over an `enum`.** For a fixed set of named values, prefer a string union (`type TrialPhase = "defense" | "voting"`), or an `as const` array when the values are also needed at runtime for validation/iteration (`const TRIAL_PHASES = ["defense", "voting"] as const; type TrialPhase = (typeof TRIAL_PHASES)[number]`). Both stay **structural**, so serialized/wire strings (Firebase documents, API payloads, query/path params) assign without a cast and emit ~no runtime — whereas a string `enum` is **nominal** (it rejects the underlying literal, forcing a cast at every serialization boundary) and ships a runtime object. The deciding axis is the **serialization boundary**: does the value cross a wire/persistence boundary? → structural union / `as const`. Reserve `enum` for internal-only state you iterate as a unit and never serialize raw, **or** for a value set already paired with an explicit converter seam (`{domain}ToFirebase()` / `firebaseTo{domain}()`, `parseGameMode`) that centralizes the boundary cast — the existing game-domain enums are deliberately in this category, so do not churn them. Export new value-set types from the module barrel.
 
 ## User-Facing Text
 
