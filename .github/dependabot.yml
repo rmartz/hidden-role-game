@@ -13,10 +13,26 @@ updates:
       prefix: "chore"
       prefix-development: "chore"
       include: "scope"
-    # Group only minor and patch bumps into batched PRs. Major bumps match no
-    # group, so each is raised as an individual PR — they are the ones most
-    # likely to need code changes and warrant isolated review.
+    # Group only minor and patch bumps into batched PRs. Most major bumps match
+    # no group and are raised as individual PRs — they are the ones most likely
+    # to need code changes and warrant isolated review. (Prettier major+minor
+    # are the exception — see the prettier group below.)
     groups:
+      # Prettier is special-cased ahead of dev-dependencies. Dependabot assigns
+      # each update to the FIRST group it matches, so listing prettier first
+      # routes its major AND minor bumps into a dedicated PR — a Prettier minor
+      # bump routinely reformats files (the trip-split #114 case), so it needs
+      # isolated review even though it is "just" a minor. Prettier *patch* bumps
+      # match no update-type here and fall through to dev-dependencies below,
+      # staying batched with the other trivial dev updates. (Ordering is
+      # semantically required here, so this group is intentionally not in
+      # alphabetical order with the two below.)
+      prettier:
+        patterns:
+          - "prettier"
+        update-types:
+          - "major"
+          - "minor"
       dev-dependencies:
         dependency-type: development
         update-types:
