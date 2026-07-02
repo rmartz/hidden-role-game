@@ -24,6 +24,9 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "file-length.yml": {
     check: 2,
   },
+  "package-pins.yml": {
+    "check-pins": 1,
+  },
   "pr-title-lint.yml": {
     "pr-title": 1,
   },
