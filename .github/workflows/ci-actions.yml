@@ -9,10 +9,56 @@ permissions:
   contents: read
 
 jobs:
+  # Decide whether the heavy jobs (tests / storybook-* / build / typecheck) need
+  # to run. They are skipped only when a PR changes *nothing but* provably-inert
+  # documentation — a DENYLIST, not a code allowlist: anything not matched here
+  # (including .mdx, package.json, lockfiles, configs, workflows, assets) fails
+  # SAFE and runs the full suite. Non-PR events (push to main) always run
+  # everything. Format + Lint are never gated (Prettier validates .md).
+  detect-changes:
+    name: Detect code changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    outputs:
+      code_changed: ${{ steps.detect.outputs.code_changed }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - id: detect
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          if [ "$EVENT_NAME" != "pull_request" ]; then
+            echo "Not a pull_request event — running the full suite."
+            echo "code_changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git fetch --quiet origin "$BASE_REF"
+          changed=$(git diff --name-only "origin/$BASE_REF...HEAD")
+          echo "Changed files:"
+          echo "$changed"
+          code_changed=false
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            case "$file" in
+              *.md | docs/* | LICENSE | *.txt) ;;
+              *)
+                code_changed=true
+                break
+                ;;
+            esac
+          done <<< "$changed"
+          echo "Resolved code_changed=$code_changed"
+          echo "code_changed=$code_changed" >> "$GITHUB_OUTPUT"
+
   tests:
     name: Tests
     runs-on: ubuntu-latest
     timeout-minutes: 2
+    needs: detect-changes
+    if: needs.detect-changes.outputs.code_changed == 'true'
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
@@ -25,6 +71,8 @@ jobs:
     name: Storybook Tests
     runs-on: ubuntu-latest
     timeout-minutes: 4
+    needs: detect-changes
+    if: needs.detect-changes.outputs.code_changed == 'true'
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
@@ -54,6 +102,8 @@ jobs:
     name: Typecheck
     runs-on: ubuntu-latest
     timeout-minutes: 1
+    needs: detect-changes
+    if: needs.detect-changes.outputs.code_changed == 'true'
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
@@ -63,6 +113,8 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 2
+    needs: detect-changes
+    if: needs.detect-changes.outputs.code_changed == 'true'
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
@@ -82,6 +134,8 @@ jobs:
     name: Storybook Build
     runs-on: ubuntu-latest
     timeout-minutes: 3
+    needs: detect-changes
+    if: needs.detect-changes.outputs.code_changed == 'true'
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
