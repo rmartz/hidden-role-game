@@ -17,13 +17,14 @@ const DEPENDENCY_SECTIONS = [
   "peerDependencies",
 ];
 
-// A simple registry version range: optional ^ or ~ followed by a version number.
-// Non-registry specifiers (tarball URLs, git+, workspace:, file:, link:,
-// dist-tags like "latest", "*") do not match and are exempt from the rule.
-const REGISTRY_RANGE = /^[\^~]?\d/;
+// A registry version range: optional range annotation (^, ~, >=, >, <=, <, =)
+// followed by a version number. Non-registry specifiers (tarball URLs, git+,
+// workspace:, file:, link:, dist-tags like "latest", "*") do not start with
+// a version-range character or digit and are exempt from the rule.
+const REGISTRY_RANGE = /^(?:[\^~]|[><]=?|=)?\d/;
 
 // Full major.minor.patch, optional range annotation, optional prerelease/build.
-const FULL_SEMVER = /^[\^~]?\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/;
+const FULL_SEMVER = /^(?:[\^~]|[><]=?|=)?\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/;
 
 const pinnedEntries = DEPENDENCY_SECTIONS.flatMap((section) =>
   Object.entries(packageJson[section] ?? {})
