@@ -8,10 +8,9 @@ name: Preview Deploy
 #
 # Requires repo secrets: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID.
 #
-# NOTE: additive/test phase — the branch-prefix Vercel auto-preview
-# (scripts/vercel-ignore-build.sh, #763) is still active. Once this is confirmed
-# working, a follow-up disables the auto-preview so label-based is the sole
-# preview path (completing #764).
+# This is the sole preview path: automatic Git-integration previews are disabled
+# in scripts/vercel-ignore-build.sh (production-only), so a preview is created
+# only via this label-driven workflow.
 on:
   pull_request:
     types: [labeled, synchronize, reopened]
