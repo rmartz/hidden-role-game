@@ -28,19 +28,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
-      - name: Install Playwright Chromium
-        # Retry: the browser/system-deps install hits transient apt/CDN failures.
-        run: |
-          for i in 0 1 2; do
-            if [ $i -gt 0 ]; then
-              echo "playwright install failed (attempt $i/3) — retrying in 5s"
-              sleep 5
-            fi
-            if pnpm exec playwright install chromium --with-deps; then
-              exit 0
-            fi
-          done
-          exit 1
+        with:
+          playwright: chromium
       - run: pnpm exec vitest run --project storybook
 
   lint:
@@ -97,16 +86,11 @@ jobs:
         with:
           environment: production
           version: ${{ github.sha }}
-          # Associate commits explicitly instead of `set_commits: auto`. Auto
-          # resolves the *previous release* and needs its commit to exist in
-          # git history; because we squash-merge (and Vercel builds create
-          # releases keyed on commit SHAs), the previous release is often a
-          # commit that no longer exists on main, so auto fails with "Could not
-          # find the SHA of the previous release". Manual mode uses an explicit
-          # range: github.event.before is main's tip before this push — always a
-          # reachable main commit — so the range (before, sha] is exactly the
-          # commits this push introduced.
-          set_commits: manual
-          repo: ${{ github.repository }}
-          commit: ${{ github.sha }}
-          previous_commit: ${{ github.event.before }}
+          # Create/finalize the release only — do not associate commits.
+          # Commit association (`set_commits: auto`/`manual`) requires the repo
+          # to be registered in Sentry via its GitHub integration; it is not, so
+          # sentry-cli fails ("Unknown repo" in manual mode, "Could not find the
+          # SHA of the previous release" in auto mode). Skipping keeps release
+          # tracking working; re-enable set_commits once the Sentry GitHub
+          # integration is configured (tracked as a follow-up).
+          set_commits: skip
