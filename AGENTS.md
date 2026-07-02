@@ -3,6 +3,7 @@
 ## Package Manager
 
 - Always use `pnpm`. Never `npm` or `yarn`.
+- **Pin every dependency to a full `major.minor.patch` version**, including the range annotation — e.g. `"prettier": "^3.8.4"`, never `"^3"` or `"^3.8"`. A partial pin lets Dependabot bump the package without changing `package.json` (only `pnpm-lock.yaml` moves), so the update is invisible in the PR diff and a version bump that requires code or formatting changes looks like it "appeared from nowhere". Full pins make every bump explicit in `package.json`. This applies to registry version ranges only; non-registry specifiers (tarball URLs, `git+`, `workspace:`, `file:`, `link:`, dist-tags) are exempt. Enforced by `src/package-version-pins.spec.ts`.
 
 ## Common Commands
 
@@ -125,6 +126,7 @@ After creating a git worktree (`git worktree add .git-worktrees/<name> -b <branc
 - Commit messages: imperative verbs (Add, Implement, Fix, Update, Extract, Remove). No `feat:`/`fix:` prefixes.
 - PR titles must follow Conventional Commits format: `<type>: description` or `<type>(<scope>): description`. This Conventional Commits requirement applies to PR titles only; commit messages remain imperative and should not use `feat:`/`fix:` prefixes. Valid types: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `style`, `perf`, `ci`, `build`, `revert`. A `!` suffix is allowed before the colon to denote breaking changes (e.g., `feat!: remove legacy auth`). This is enforced by CI.
 - PR descriptions must use `Closes #123`, `Fixes #123`, or `Resolves #123` to trigger GitHub's automatic issue close on merge. Phrases like "Addresses #123" or "Related to #123" do NOT trigger auto-close.
+- **Vercel preview deploys are gated by branch prefix.** To conserve the daily preview-deploy quota, `scripts/vercel-ignore-build.sh` (wired via `ignoreCommand` in `vercel.json`) builds previews only for `feat/`, `feature/`, and `fix/` branches (plus production `main`); `chore/`, `docs/`, `refactor/`, `test/`, Dependabot, and agent (`copilot/`, `claude/`) branches are skipped. Use the correct prefix if a PR needs a preview for UAT. A label-driven replacement (deploy only when `ready for UAT`) is tracked as a follow-up.
 
 ## Storybook
 
