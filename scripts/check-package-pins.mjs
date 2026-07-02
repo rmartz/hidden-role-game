@@ -7,7 +7,8 @@
  * package.json diff and a behavior/formatting change appears out of nowhere.
  *
  * Non-registry specifiers are exempt: tarball/git URLs, workspace:, catalog:,
- * link:, file:, and dist-tags (e.g. "latest", "*").
+ * link:, file:, and dist-tags (e.g. "latest", "*"). Other valid registry ranges
+ * using >=, >, <=, <, = annotations are also recognised and must be fully pinned.
  *
  * Exits 0 if all pins are full versions, 1 if any violations are found, naming
  * each offending section / dependency / range.
@@ -26,13 +27,14 @@ const DEPENDENCY_SECTIONS = [
   "peerDependencies",
 ];
 
-// A simple registry version range: optional ^ or ~ followed by a version
-// number. Anything else (URLs, workspace:/catalog:/link:/file:, dist-tags) does
-// not match and is exempt from the rule.
-const REGISTRY_RANGE = /^[\^~]?\d/;
+// A registry version range: optional range annotation (^, ~, >=, >, <=, <, =)
+// followed by a version number. Non-registry specifiers (tarball URLs, git+,
+// workspace:, file:, link:, dist-tags like "latest", "*") do not start with
+// a version-range character or digit and are exempt from the rule.
+const REGISTRY_RANGE = /^(?:[\^~]|[><]=?|=)?\d/;
 
 // Full major.minor.patch, optional range annotation, optional prerelease/build.
-const FULL_SEMVER = /^[\^~]?\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/;
+const FULL_SEMVER = /^(?:[\^~]|[><]=?|=)?\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/;
 
 const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
 
