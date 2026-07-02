@@ -22,7 +22,7 @@ import type { NarratorInstruction } from "@/lib/game/modes/werewolf/utils/narrat
 import { getPlayerName } from "@/lib/player";
 import type { GameModeConfig } from "@/lib/types";
 
-interface ResolvedVote {
+export interface ResolvedVote {
   key: string;
   voterName: string;
   targetName: string;
@@ -168,45 +168,21 @@ export function deriveNightNarratorState({
       activeAction.resultRevealed
     );
 
-  const secondTargetId =
-    activeAction && !isTeamNightAction(activeAction)
-      ? activeAction.secondTargetPlayerId
-      : undefined;
-  const secondTargetName = secondTargetId
-    ? (getPlayerName(gameState.players, secondTargetId) ?? secondTargetId)
-    : undefined;
-
-  const illusionAction = nightActions[WerewolfRole.IllusionArtist as string];
-  const illusionTargetId =
-    illusionAction &&
-    !isTeamNightAction(illusionAction) &&
-    illusionAction.confirmed
-      ? illusionAction.targetPlayerId
-      : undefined;
-
-  const requiresDualTarget =
-    activeRoleDef?.dualTargetSwap === true ||
-    activeRoleDef?.dualTargetInvestigate === true;
-
-  const dualTargetPrompt = deriveDualTargetPrompt(
+  const {
+    secondTargetId,
+    requiresDualTarget,
+    dualTargetPrompt,
+    investigationResult,
+  } = deriveTargetingState(
     activeRoleDef,
+    activeAction,
     activeTarget,
     activeTargetName,
-    secondTargetId,
-    secondTargetName,
-  );
-
-  const investigationResult = getInvestigationResultForNarrator(
     isInvestigatePhase,
-    activeTarget,
     activeTargetConfirmed,
-    activeTargetName,
-    gameState.visibleRoleAssignments,
-    activeRoleDef,
-    secondTargetId,
-    secondTargetName,
-    illusionTargetId,
-    turnState.roleOverrides,
+    gameState,
+    turnState,
+    nightActions,
   );
 
   const exposerRevealData = turnState.roleState?.exposer?.reveal;
@@ -243,7 +219,7 @@ export function deriveNightNarratorState({
     key: vote.playerId,
     voterName: getPlayerName(gameState.players, vote.playerId) ?? vote.playerId,
     targetName: vote.skipped
-      ? "No target"
+      ? WEREWOLF_COPY.targetSelection.noTarget
       : (getPlayerName(gameState.players, vote.targetPlayerId) ?? "Unknown"),
   }));
 
@@ -343,4 +319,71 @@ function derivePreviousTargetId(
   return baseAction && isTeamNightAction(baseAction)
     ? baseAction.suggestedTargetId
     : undefined;
+}
+
+interface TargetingState {
+  secondTargetId: string | undefined;
+  requiresDualTarget: boolean;
+  dualTargetPrompt: string | undefined;
+  investigationResult: InvestigationResultForNarrator | undefined;
+}
+
+function deriveTargetingState(
+  activeRoleDef: WerewolfRoleDefinition | undefined,
+  activeAction: AnyNightAction | undefined,
+  activeTarget: string | undefined,
+  activeTargetName: string | undefined,
+  isInvestigatePhase: boolean,
+  activeTargetConfirmed: boolean,
+  gameState: WerewolfPlayerGameState,
+  turnState: WerewolfTurnState,
+  nightActions: Record<string, AnyNightAction>,
+): TargetingState {
+  const secondTargetId =
+    activeAction && !isTeamNightAction(activeAction)
+      ? activeAction.secondTargetPlayerId
+      : undefined;
+  const secondTargetName = secondTargetId
+    ? (getPlayerName(gameState.players, secondTargetId) ?? secondTargetId)
+    : undefined;
+
+  const illusionAction = nightActions[WerewolfRole.IllusionArtist as string];
+  const illusionTargetId =
+    illusionAction &&
+    !isTeamNightAction(illusionAction) &&
+    illusionAction.confirmed
+      ? illusionAction.targetPlayerId
+      : undefined;
+
+  const requiresDualTarget =
+    activeRoleDef?.dualTargetSwap === true ||
+    activeRoleDef?.dualTargetInvestigate === true;
+
+  const dualTargetPrompt = deriveDualTargetPrompt(
+    activeRoleDef,
+    activeTarget,
+    activeTargetName,
+    secondTargetId,
+    secondTargetName,
+  );
+
+  const investigationResult = getInvestigationResultForNarrator(
+    isInvestigatePhase,
+    activeTarget,
+    activeTargetConfirmed,
+    activeTargetName,
+    gameState.visibleRoleAssignments,
+    activeRoleDef,
+    secondTargetId,
+    secondTargetName,
+    illusionTargetId,
+    turnState.roleOverrides,
+  );
+
+  return {
+    secondTargetId,
+    requiresDualTarget,
+    dualTargetPrompt,
+    investigationResult,
+  };
 }

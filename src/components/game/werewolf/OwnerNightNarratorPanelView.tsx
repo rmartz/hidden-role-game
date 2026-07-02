@@ -10,16 +10,11 @@ import type { NarratorInstruction } from "@/lib/game/modes/werewolf/utils/narrat
 import type { VisibleTeammate } from "@/server/types";
 
 import { NarratorNightInstruction } from "./NarratorNightInstruction";
+import type { ResolvedVote } from "./OwnerGameNightScreen-derive";
 import { OwnerIlluminatiRevealPanel } from "./OwnerIlluminatiRevealPanel";
 import { OwnerInvestigationConfirm } from "./OwnerInvestigationConfirm";
 import { OwnerNightTargetPanel } from "./OwnerNightTargetPanel";
 import { VeteranActionPanelView } from "./VeteranActionPanelView";
-
-interface ResolvedVote {
-  key: string;
-  voterName: string;
-  targetName: string;
-}
 
 export interface OwnerNightNarratorPanelViewProps {
   gameId: string;
