@@ -43,6 +43,7 @@ jobs:
           while IFS= read -r file; do
             [ -z "$file" ] && continue
             case "$file" in
+              *.mdx) code_changed=true; break;;
               *.md | docs/* | LICENSE | *.txt) ;;
               *)
                 code_changed=true
