@@ -1,0 +1,79 @@
+name: Preview Deploy
+
+# Label-driven Vercel preview deploy (rmartz/ai-tracked #764). A preview exists
+# to enable UAT, so we deploy one only when a PR is marked `ready for UAT` —
+# not on every push. Triggered when the label is added, and re-deployed when new
+# commits land on an already-labelled PR. The deploy URL is posted as a sticky
+# PR comment.
+#
+# Requires repo secrets: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID.
+#
+# NOTE: additive/test phase — the branch-prefix Vercel auto-preview
+# (scripts/vercel-ignore-build.sh, #763) is still active. Once this is confirmed
+# working, a follow-up disables the auto-preview so label-based is the sole
+# preview path (completing #764).
+on:
+  pull_request:
+    types: [labeled, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: preview-deploy-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  deploy-preview:
+    name: Deploy preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Same-repo PRs only (forks can't read secrets), carrying `ready for UAT`,
+    # not held by `do not merge`, and not a draft.
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.draft == false &&
+      contains(github.event.pull_request.labels.*.name, 'ready for UAT') &&
+      !contains(github.event.pull_request.labels.*.name, 'do not merge')
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: ./.github/actions/setup
+      - name: Install Vercel CLI
+        run: pnpm add -g vercel@54.19.0
+      - name: Pull Vercel preview environment
+        run: vercel pull --yes --environment=preview --token="$VERCEL_TOKEN"
+      - name: Build
+        run: vercel build --token="$VERCEL_TOKEN"
+      - name: Deploy prebuilt preview
+        id: deploy
+        run: |
+          url=$(vercel deploy --prebuilt --token="$VERCEL_TOKEN" | tail -1)
+          echo "url=$url" >> "$GITHUB_OUTPUT"
+          echo "Preview deployed to: $url"
+      - name: Post or update sticky PR comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          URL: ${{ steps.deploy.outputs.url }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          marker="<!-- vercel-preview-bot -->"
+          body="$marker
+          🔺 **Vercel preview** (\`ready for UAT\`) for commit \`${SHA:0:7}\`:
+
+          $URL"
+          existing=$(gh api "repos/$REPO/issues/$PR/comments?per_page=100" --paginate \
+            --jq "[.[] | select(.body | startswith(\"$marker\"))][0].id // empty")
+          if [ -n "$existing" ]; then
+            gh api -X PATCH "repos/$REPO/issues/comments/$existing" -f body="$body" >/dev/null
+          else
+            gh api -X POST "repos/$REPO/issues/$PR/comments" -f body="$body" >/dev/null
+          fi
