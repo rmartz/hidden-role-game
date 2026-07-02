@@ -146,7 +146,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     if: github.event_name == 'push'
-    needs: [tests, storybook-tests, lint, format, typecheck, build]
+    needs:
+      [tests, storybook-tests, lint, format, typecheck, build, storybook-build]
     steps:
       - uses: actions/checkout@v7
         with:
