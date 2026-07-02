@@ -14,7 +14,8 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
     format: 2,
     lint: 2,
     "sentry-release": 2,
-    tests: 4,
+    "storybook-tests": 4,
+    tests: 2,
     typecheck: 1,
   },
   "config-validate.yml": {
@@ -22,6 +23,9 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   },
   "file-length.yml": {
     check: 2,
+  },
+  "package-pins.yml": {
+    "check-pins": 1,
   },
   "pr-title-lint.yml": {
     "pr-title": 1,

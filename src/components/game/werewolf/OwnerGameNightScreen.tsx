@@ -11,38 +11,22 @@ import { GameTimer } from "@/components/game";
 import { Button } from "@/components/ui/button";
 import { useGameAction } from "@/hooks";
 import { GAME_MODES } from "@/lib/game/modes";
-import type {
-  WerewolfRoleDefinition,
-  WerewolfTurnState,
-} from "@/lib/game/modes/werewolf";
+import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
 import {
-  baseGroupPhaseKey,
-  getInvestigationResultForNarrator,
-  getPhaseLabel,
   getSoloTarget,
-  getTargetablePlayers,
-  isGroupPhaseKey,
-  isTeamNightAction,
-  TargetCategory,
   WerewolfAction,
   WerewolfPhase,
 } from "@/lib/game/modes/werewolf";
-import { isRoleActive } from "@/lib/game/modes/werewolf";
-import { buildNarratorInstruction } from "@/lib/game/modes/werewolf";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
-import { getWerewolfRole, WerewolfRole } from "@/lib/game/modes/werewolf/roles";
-import { getPlayerName } from "@/lib/player";
+import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
 
-import { NarratorNightInstruction } from "./NarratorNightInstruction";
 import { NightPhaseOrderList } from "./NightPhaseOrderList";
 import { OwnerAdvanceCard } from "./OwnerAdvanceCard";
+import { deriveNightNarratorState } from "./OwnerGameNightScreen-derive";
 import { buildNightMarkers } from "./OwnerGameNightScreen-helpers";
-import { OwnerIlluminatiRevealPanel } from "./OwnerIlluminatiRevealPanel";
-import { OwnerInvestigationConfirm } from "./OwnerInvestigationConfirm";
-import { OwnerNightTargetPanel } from "./OwnerNightTargetPanel";
+import { OwnerNightNarratorPanelView } from "./OwnerNightNarratorPanelView";
 import { OwnerPlayerActionsGrid } from "./OwnerPlayerActionsGrid";
-import { VeteranActionPanelView } from "./VeteranActionPanelView";
 
 interface OwnerGameNightScreenProps {
   gameId: string;
@@ -142,212 +126,40 @@ export function OwnerGameNightScreen({
     action.mutate({ actionId: WerewolfAction.ConfirmNightTarget });
   }, [action]);
 
+  const handleRestoreWitchAbility = useCallback(() => {
+    action.mutate({
+      actionId: WerewolfAction.ResetAbility,
+      payload: { roleId: WerewolfRole.Witch },
+    });
+  }, [action]);
+
+  const handleBypassWitchAbility = useCallback(() => {
+    setAbilityBypass(true);
+  }, []);
+
   if (!isNighttime) return null;
 
   const modeConfig = GAME_MODES[gameState.gameMode];
-  const activePhaseLabel = getPhaseLabel(activePhaseKey, modeConfig.roles);
-  const isGroupPhase = isGroupPhaseKey(activePhaseKey);
-  // For suffixed repeat phases (e.g. "werewolf-werewolf:2"), strip the suffix
-  // to match role IDs and look up role definitions.
-  const baseActivePhaseKey = baseGroupPhaseKey(activePhaseKey);
-
-  const activePlayerNames = gameState.visibleRoleAssignments
-    .filter((a) => {
-      // Narrator always receives role info (reason: "revealed"), but the
-      // type allows role to be undefined for player-facing entries.
-      if (!a.role) return false;
-      if (a.role.id === baseActivePhaseKey) return true;
-      if (isGroupPhase) {
-        const roleDef = getWerewolfRole(a.role.id);
-        return (
-          (roleDef?.wakesWith as string | undefined) === baseActivePhaseKey
-        );
-      }
-      return false;
-    })
-    .filter((a) => !turnState.deadPlayerIds.includes(a.player.id))
-    .map((a) => getPlayerName(gameState.players, a.player.id) ?? a.player.id);
-
-  const activeTargetName = activeTarget
-    ? getPlayerName(gameState.players, activeTarget)
-    : undefined;
-
-  const groupAction =
-    isGroupPhase && activeAction && isTeamNightAction(activeAction)
-      ? activeAction
-      : undefined;
-
   const isFirstTurn = turnState.turn === 1;
-  const activeRoleIds = isFirstTurn
-    ? new Set(
-        gameState.visibleRoleAssignments.flatMap((a) =>
-          a.role ? [a.role.id] : [],
-        ),
-      )
-    : new Set<string>();
-  const narratorInstruction = isFirstTurn
-    ? buildNarratorInstruction(activePhaseKey, activeRoleIds)
-    : undefined;
 
-  const isActionConfirmed = isGroupPhase
-    ? !!groupAction?.confirmed
-    : activeTargetConfirmed;
-  const isWitchAbilitySkipped =
-    isRoleActive(activePhaseKey, WerewolfRole.Witch) &&
-    turnState.roleState?.witch?.abilityUsed;
-
-  const isVeteranPhase =
-    !isFirstTurn && isRoleActive(activePhaseKey, WerewolfRole.Veteran);
-  const veteranAction =
-    isVeteranPhase && activeAction && !isTeamNightAction(activeAction)
-      ? activeAction
-      : undefined;
-  const isVeteranAlerted = veteranAction?.alerted === true;
-  const veteranHasDecided = veteranAction !== undefined;
-  const narratorVeteranAlertsUsed =
-    turnState.roleState?.veteran?.alertsUsed ?? 0;
-
-  const activeRoleDef = modeConfig.roles[baseActivePhaseKey] as
-    | WerewolfRoleDefinition
-    | undefined;
-  const isInvestigatePhase =
-    activeRoleDef?.targetCategory === TargetCategory.Investigate;
-  const isResultRevealed = !!(
-    activeAction &&
-    "resultRevealed" in activeAction &&
-    activeAction.resultRevealed
-  );
-
-  const isIlluminatiPhase = activeRoleDef?.revealsFullRoleList === true;
-  const isIlluminatiRevealed =
-    isIlluminatiPhase &&
-    !!(
-      activeAction &&
-      !isTeamNightAction(activeAction) &&
-      activeAction.resultRevealed
-    );
-
-  const secondTargetId =
-    activeAction && !isTeamNightAction(activeAction)
-      ? activeAction.secondTargetPlayerId
-      : undefined;
-  const secondTargetName = secondTargetId
-    ? (getPlayerName(gameState.players, secondTargetId) ?? secondTargetId)
-    : undefined;
-
-  const illusionAction = nightActions[WerewolfRole.IllusionArtist as string];
-  const illusionTargetId =
-    illusionAction &&
-    !isTeamNightAction(illusionAction) &&
-    illusionAction.confirmed
-      ? illusionAction.targetPlayerId
-      : undefined;
-
-  const requiresDualTarget =
-    activeRoleDef?.dualTargetSwap === true ||
-    activeRoleDef?.dualTargetInvestigate === true;
-
-  const dualTargetPrompt = activeRoleDef?.dualTargetSwap
-    ? activeTarget !== undefined && secondTargetId !== undefined
-      ? WEREWOLF_COPY.swapper.narratorTwoTargets(
-          activeTargetName ?? activeTarget,
-          secondTargetName ?? secondTargetId,
-        )
-      : activeTarget !== undefined
-        ? WEREWOLF_COPY.swapper.narratorOneTarget
-        : WEREWOLF_COPY.swapper.narratorNoTargets
-    : activeRoleDef?.dualTargetInvestigate
-      ? activeTarget !== undefined && secondTargetId !== undefined
-        ? WEREWOLF_COPY.mentalist.narratorTwoTargets(
-            activeTargetName ?? activeTarget,
-            secondTargetName ?? secondTargetId,
-          )
-        : activeTarget !== undefined
-          ? WEREWOLF_COPY.mentalist.narratorOneTarget
-          : WEREWOLF_COPY.mentalist.narratorNoTargets
-      : undefined;
-
-  const investigationResult = getInvestigationResultForNarrator(
-    isInvestigatePhase,
+  const narratorState = deriveNightNarratorState({
+    gameState,
+    turnState,
+    modeConfig,
+    activePhaseKey,
+    activeAction,
     activeTarget,
     activeTargetConfirmed,
-    activeTargetName,
-    gameState.visibleRoleAssignments,
-    activeRoleDef,
-    secondTargetId,
-    secondTargetName,
-    illusionTargetId,
-    turnState.roleOverrides,
-  );
+    nightActions,
+    isFirstTurn,
+  });
 
-  const exposerRevealData = turnState.roleState?.exposer?.reveal;
-  const exposerRevealText = exposerRevealData
-    ? WEREWOLF_COPY.narrator.exposerRevealLabel(
-        getPlayerName(gameState.players, exposerRevealData.playerId) ??
-          exposerRevealData.playerId,
-        gameState.visibleRoleAssignments.find(
-          (a) => a.player.id === exposerRevealData.playerId,
-        )?.role?.name ?? exposerRevealData.roleId,
-      )
-    : undefined;
-
-  const isEvilEmpathPhase = isRoleActive(
-    activePhaseKey,
-    WerewolfRole.EvilEmpath,
-  );
-  const evilEmpathNightResult =
-    isEvilEmpathPhase &&
-    turnState.roleState?.evilEmpath?.lastResult !== undefined
-      ? turnState.roleState.evilEmpath.lastResult
-      : undefined;
-
-  const unconfirmedWarning =
-    !isFirstTurn && !isWitchAbilitySkipped && !isActionConfirmed
-      ? WEREWOLF_COPY.narrator.playerUnconfirmed
-      : investigationResult && !isResultRevealed
-        ? WEREWOLF_COPY.narrator.investigationUnrevealed
-        : isIlluminatiPhase && !isIlluminatiRevealed
-          ? WEREWOLF_COPY.illuminati.revealUnconfirmed
-          : undefined;
-
-  const advanceIcon = unconfirmedWarning ? (
+  const advanceIcon = narratorState.unconfirmedWarning ? (
     <ClockWarningRegular />
   ) : isLastPhase ? (
     <WeatherSunnyLowRegular />
   ) : (
     <BedRegular />
-  );
-
-  const resolvedVotes = (groupAction?.votes ?? []).map((vote) => ({
-    key: vote.playerId,
-    voterName: getPlayerName(gameState.players, vote.playerId) ?? vote.playerId,
-    targetName: vote.skipped
-      ? "No target"
-      : (getPlayerName(gameState.players, vote.targetPlayerId) ?? "Unknown"),
-  }));
-
-  // Cross-night exclusion for roles with preventRepeatTarget (Bodyguard, Spellcaster).
-  // Within-night exclusion for suffixed repeat group phases (e.g. "werewolf-werewolf:2"):
-  // the second phase cannot target whoever the first phase selected.
-  const previousTargetId: string | undefined =
-    activeRoleDef?.preventRepeatTarget
-      ? turnState.lastTargets?.[baseActivePhaseKey]
-      : baseActivePhaseKey !== activePhaseKey
-        ? (() => {
-            const baseAction = nightActions[baseActivePhaseKey];
-            return baseAction && isTeamNightAction(baseAction)
-              ? baseAction.suggestedTargetId
-              : undefined;
-          })()
-        : undefined;
-
-  const targetablePlayers = getTargetablePlayers(
-    gameState.players,
-    gameState.gameOwner?.id,
-    turnState.deadPlayerIds,
-    activePhaseKey,
-    undefined,
-    gameState.visibleRoleAssignments,
   );
 
   return (
@@ -405,131 +217,52 @@ export function OwnerGameNightScreen({
           onAdvance={handleAdvance}
           disabled={action.isPending}
           icon={advanceIcon}
-          unconfirmedWarning={unconfirmedWarning}
+          unconfirmedWarning={narratorState.unconfirmedWarning}
         >
-          <p className="mb-4 text-muted-foreground">
-            {WEREWOLF_COPY.narrator.currentlyAwake}{" "}
-            <strong className="text-foreground">{activePhaseLabel}</strong>
-            {activePlayerNames.length > 0 && (
-              <span> ({activePlayerNames.join(", ")})</span>
-            )}
-          </p>
-          {isFirstTurn && narratorInstruction && (
-            <NarratorNightInstruction instruction={narratorInstruction} />
-          )}
-          {isRoleActive(activePhaseKey, WerewolfRole.Mercenary) && (
-            <p className="mb-3 text-sm text-muted-foreground italic">
-              {turnState.roleState?.mercenary?.charged
-                ? WEREWOLF_COPY.mercenary.narratorBribeMode
-                : WEREWOLF_COPY.mercenary.narratorProtectMode}
-            </p>
-          )}
-          {isRoleActive(activePhaseKey, WerewolfRole.Mirrorcaster) && (
-            <p className="mb-3 text-sm text-muted-foreground italic">
-              {turnState.roleState?.mirrorcaster?.charged
-                ? WEREWOLF_COPY.mirrorcaster.narratorAttackMode
-                : WEREWOLF_COPY.mirrorcaster.narratorProtectMode}
-            </p>
-          )}
-          {!isFirstTurn && (
-            <>
-              {isWitchAbilitySkipped && !activeTargetConfirmed && (
-                <div className="mb-4">
-                  <p className="text-sm text-muted-foreground italic mb-2">
-                    {WEREWOLF_COPY.night.witchAbilityUsed}
-                  </p>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        action.mutate({
-                          actionId: WerewolfAction.ResetAbility,
-                          payload: { roleId: WerewolfRole.Witch },
-                        });
-                      }}
-                      disabled={action.isPending}
-                    >
-                      {WEREWOLF_COPY.narrator.restoreAbility}
-                    </Button>
-                    {!abilityBypass && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          setAbilityBypass(true);
-                        }}
-                      >
-                        {WEREWOLF_COPY.narrator.bypassAbility}
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              )}
-              {isVeteranPhase ? (
-                <VeteranActionPanelView
-                  alertsUsed={narratorVeteranAlertsUsed}
-                  isAlerted={isVeteranAlerted}
-                  hasDecided={veteranHasDecided}
-                  isConfirmed={isActionConfirmed}
-                  isPending={action.isPending}
-                  onAlert={handleVeteranAlert}
-                  onSkip={handleVeteranSkip}
-                  onConfirm={handleVeteranConfirm}
-                />
-              ) : (
-                (!isWitchAbilitySkipped || abilityBypass) &&
-                !isEvilEmpathPhase && (
-                  <OwnerNightTargetPanel
-                    groupAction={!!groupAction}
-                    groupMemberCount={activePlayerNames.length}
-                    resolvedVotes={resolvedVotes}
-                    activeTargetName={activeTargetName}
-                    activeTargetConfirmed={activeTargetConfirmed}
-                    targetablePlayers={targetablePlayers}
-                    activeTarget={activeTarget}
-                    onTargetClick={handleTargetClick}
-                    isPending={action.isPending}
-                    previousTargetId={previousTargetId}
-                    requiresDualTarget={requiresDualTarget}
-                    secondTarget={secondTargetId}
-                    dualTargetPrompt={dualTargetPrompt}
-                  />
-                )
-              )}
-            </>
-          )}
-          {investigationResult && (
-            <OwnerInvestigationConfirm
-              gameId={gameId}
-              targetName={investigationResult.targetName}
-              isWerewolfTeam={investigationResult.isWerewolfTeam}
-              isResultRevealed={isResultRevealed}
-              resultLabel={investigationResult.resultLabel}
-              secondTargetName={investigationResult.secondTargetName}
-              illusionFlipLabel={investigationResult.illusionFlipLabel}
-            />
-          )}
-          {isIlluminatiPhase && (
-            <OwnerIlluminatiRevealPanel
-              gameId={gameId}
-              players={gameState.players}
-              roleAssignments={gameState.visibleRoleAssignments}
-              isRevealed={isIlluminatiRevealed}
-            />
-          )}
-          {exposerRevealText && (
-            <p className="mt-2 text-xs text-muted-foreground italic">
-              {exposerRevealText}
-            </p>
-          )}
-          {evilEmpathNightResult !== undefined && (
-            <p className="mt-2 text-sm font-medium">
-              {evilEmpathNightResult
-                ? WEREWOLF_COPY.evilEmpath.adjacentResult
-                : WEREWOLF_COPY.evilEmpath.notAdjacentResult}
-            </p>
-          )}
+          <OwnerNightNarratorPanelView
+            gameId={gameId}
+            activePhaseKey={activePhaseKey}
+            activePhaseLabel={narratorState.activePhaseLabel}
+            activePlayerNames={narratorState.activePlayerNames}
+            isFirstTurn={isFirstTurn}
+            narratorInstruction={narratorState.narratorInstruction}
+            mercenaryCharged={narratorState.mercenaryCharged}
+            mirrorcasterCharged={narratorState.mirrorcasterCharged}
+            isWitchAbilitySkipped={narratorState.isWitchAbilitySkipped}
+            activeTargetConfirmed={activeTargetConfirmed}
+            abilityBypass={abilityBypass}
+            onRestoreWitchAbility={handleRestoreWitchAbility}
+            onBypassWitchAbility={handleBypassWitchAbility}
+            isVeteranPhase={narratorState.isVeteranPhase}
+            veteranAlertsUsed={narratorState.veteranAlertsUsed}
+            isVeteranAlerted={narratorState.isVeteranAlerted}
+            veteranHasDecided={narratorState.veteranHasDecided}
+            isActionConfirmed={narratorState.isActionConfirmed}
+            onVeteranAlert={handleVeteranAlert}
+            onVeteranSkip={handleVeteranSkip}
+            onVeteranConfirm={handleVeteranConfirm}
+            isEvilEmpathPhase={narratorState.isEvilEmpathPhase}
+            hasGroupAction={narratorState.hasGroupAction}
+            groupMemberCount={narratorState.activePlayerNames.length}
+            resolvedVotes={narratorState.resolvedVotes}
+            activeTargetName={narratorState.activeTargetName}
+            targetablePlayers={narratorState.targetablePlayers}
+            activeTarget={activeTarget}
+            onTargetClick={handleTargetClick}
+            previousTargetId={narratorState.previousTargetId}
+            requiresDualTarget={narratorState.requiresDualTarget}
+            secondTargetId={narratorState.secondTargetId}
+            dualTargetPrompt={narratorState.dualTargetPrompt}
+            investigationResult={narratorState.investigationResult}
+            isResultRevealed={narratorState.isResultRevealed}
+            isIlluminatiPhase={narratorState.isIlluminatiPhase}
+            illuminatiPlayers={gameState.players}
+            illuminatiRoleAssignments={gameState.visibleRoleAssignments}
+            isIlluminatiRevealed={narratorState.isIlluminatiRevealed}
+            exposerRevealText={narratorState.exposerRevealText}
+            evilEmpathNightResult={narratorState.evilEmpathNightResult}
+            isPending={action.isPending}
+          />
         </OwnerAdvanceCard>
         <NightPhaseOrderList
           nightPhaseOrder={nightPhaseOrder}

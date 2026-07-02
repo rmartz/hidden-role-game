@@ -12,12 +12,25 @@ jobs:
   tests:
     name: Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      # Headless suites only (node / hooks / components) — no browser, so this
+      # job stays fast and skips the Playwright install. The browser-based
+      # storybook project runs separately in `storybook-tests`.
+      - run: pnpm exec vitest run --project node --project hooks --project components
+
+  storybook-tests:
+    name: Storybook Tests
+    runs-on: ubuntu-latest
     timeout-minutes: 4
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
-      - run: pnpm exec playwright install chromium --with-deps
-      - run: pnpm test
+        with:
+          playwright: chromium
+      - run: pnpm exec vitest run --project storybook
 
   lint:
     name: Lint
@@ -60,7 +73,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 2
     if: github.event_name == 'push'
-    needs: [tests, lint, format, typecheck, build]
+    needs: [tests, storybook-tests, lint, format, typecheck, build]
     steps:
       - uses: actions/checkout@v7
         with:
@@ -73,3 +86,16 @@ jobs:
         with:
           environment: production
           version: ${{ github.sha }}
+          # Associate commits via an explicit range now that the repo is
+          # connected to Sentry's GitHub integration. Manual mode is used over
+          # `auto` deliberately: `auto` resolves the *previous release* and
+          # needs its commit reachable — fragile with our squash-merge workflow
+          # (a squashed preview commit as predecessor breaks it). Manual passes
+          # an explicit range instead — github.event.before is main's tip before
+          # this push (always a reachable main commit), so the range
+          # (before, sha] is exactly the commits this push introduced, and
+          # Sentry resolves them server-side through the GitHub integration.
+          set_commits: manual
+          repo: ${{ github.repository }}
+          commit: ${{ github.sha }}
+          previous_commit: ${{ github.event.before }}
