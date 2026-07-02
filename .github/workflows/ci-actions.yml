@@ -86,15 +86,15 @@ jobs:
         with:
           environment: production
           version: ${{ github.sha }}
-          # Associate commits explicitly instead of `set_commits: auto`. Auto
-          # resolves the *previous release* and needs its commit to exist in
-          # git history; because we squash-merge (and Vercel builds create
-          # releases keyed on commit SHAs), the previous release is often a
-          # commit that no longer exists on main, so auto fails with "Could not
-          # find the SHA of the previous release". Manual mode uses an explicit
-          # range: github.event.before is main's tip before this push — always a
-          # reachable main commit — so the range (before, sha] is exactly the
-          # commits this push introduced.
+          # Associate commits via an explicit range now that the repo is
+          # connected to Sentry's GitHub integration. Manual mode is used over
+          # `auto` deliberately: `auto` resolves the *previous release* and
+          # needs its commit reachable — fragile with our squash-merge workflow
+          # (a squashed preview commit as predecessor breaks it). Manual passes
+          # an explicit range instead — github.event.before is main's tip before
+          # this push (always a reachable main commit), so the range
+          # (before, sha] is exactly the commits this push introduced, and
+          # Sentry resolves them server-side through the GitHub integration.
           set_commits: manual
           repo: ${{ github.repository }}
           commit: ${{ github.sha }}

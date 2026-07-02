@@ -106,7 +106,7 @@ Players are identified by a UUID session ID stored in `localStorage` and sent wi
 ## Recommended Reading Order
 
 1. **[docs/PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md)** — directory-by-directory breakdown
-2. **`src/lib/types/game.ts` and `lobby.ts`** — the core data shapes everything else is built on
+2. **`src/lib/types/game/` and `lobby.ts`** — the core data shapes everything else is built on
 3. **`src/lib/game/modes/secret-villain/services.ts`** — a well-commented example of `buildInitialTurnState` and `extractPlayerState`
 4. **`src/lib/game/modes/secret-villain/actions/nominate-chancellor.ts`** — a short, self-contained action
 5. **`src/server/game.ts`** — the orchestration layer that connects actions to Firebase
@@ -216,7 +216,7 @@ export const MY_GAME_CONFIG = {
 
 ### 5. Register the mode in `src/lib/game/modes.ts`
 
-Add the mode's enum value to `GameMode` in `src/lib/types/game.ts`, then add an entry to `GAME_MODES` in `src/lib/game/modes.ts`:
+Add the mode's enum value to `GameMode` in `src/lib/types/game/mode.ts`, then add an entry to `GAME_MODES` in `src/lib/game/modes.ts`:
 
 ```ts
 export const GAME_MODES: Record<GameMode, GameModeConfig> = {
