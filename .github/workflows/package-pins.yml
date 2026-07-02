@@ -1,0 +1,32 @@
+name: Package Pins
+
+# Enforces the full major.minor.patch pin rule on package.json (see AGENTS.md).
+# Gated to runs that actually change package.json (or the checker itself) — the
+# check's only input is package.json plus this script/workflow, so a paths
+# allowlist is safe: if none of them changed, the pins were already validated
+# when they merged and there is nothing to re-check.
+on:
+  pull_request:
+    paths:
+      - "package.json"
+      - "scripts/check-package-pins.mjs"
+      - ".github/workflows/package-pins.yml"
+  push:
+    branches: [main]
+    paths:
+      - "package.json"
+      - "scripts/check-package-pins.mjs"
+      - ".github/workflows/package-pins.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  check-pins:
+    name: Check package.json version pins
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: pnpm run check:pins
