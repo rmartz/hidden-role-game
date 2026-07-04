@@ -40,9 +40,9 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
-    "@fluentui/react-icons": "^2.0.330",
+    "@fluentui/react-icons": "^2.0.331",
     "@reduxjs/toolkit": "^2.12.0",
-    "@sentry/nextjs": "^10.61.0",
+    "@sentry/nextjs": "^10.62.0",
     "@tanstack/react-query": "^5.101.1",
     "@vercel/analytics": "^2.0.1",
     "class-variance-authority": "^0.7.1",
