@@ -15,5 +15,6 @@ repo_root="$(git rev-parse --show-toplevel)"
 # Conflict-marker guard runs first: catch leftover markers before lint-staged's
 # prettier pass reflows them in Markdown/YAML and mangles them.
 "$repo_root/.github/scripts/check-conflict-markers.sh" --staged
+# lint-staged runs eslint on staged files, which enforces the file-length hard
+# cap via the `max-lines` rule (no separate length check needed).
 pnpm exec lint-staged
-"$repo_root/.github/scripts/check-file-length.sh" --staged

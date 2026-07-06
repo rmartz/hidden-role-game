@@ -100,4 +100,33 @@ export default tseslint.config(
       "simple-import-sort/exports": "error",
     },
   },
+  // File-length hard cap (was the file-length.yml CI job + check-file-length.sh).
+  // Enforced in-editor and via `pnpm lint`. Source 400, tests 600 (2x the
+  // recommended ~200/~300 split-at target in AGENTS.md). A single-tier hard cap:
+  // a soft warn tier is tracked in #789 for when ESLint supports two thresholds
+  // per rule natively.
+  {
+    files: ["**/*.{ts,tsx}"],
+    rules: {
+      "max-lines": [
+        "error",
+        { max: 400, skipBlankLines: false, skipComments: false },
+      ],
+    },
+  },
+  // Test files (and shared fixtures under a `*-tests/` dir) get the higher cap.
+  // Listed after the base block so it wins for these files (last match wins).
+  {
+    files: [
+      "**/*.spec.{ts,tsx}",
+      "**/*.test.{ts,tsx}",
+      "**/*-tests/**/*.{ts,tsx}",
+    ],
+    rules: {
+      "max-lines": [
+        "error",
+        { max: 600, skipBlankLines: false, skipComments: false },
+      ],
+    },
+  },
 );
