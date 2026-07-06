@@ -43,8 +43,8 @@ After creating a git worktree (`git worktree add .git-worktrees/<name> -b <branc
 
 ## File Organization
 
-- **Source files**: Keep under ~200 lines (split at ~240). Large files should be split by logical concern.
-- **Test files**: Keep under ~300 lines (split at ~360). Use `.spec.ts` / `.spec.tsx` extension (not `.test.ts`). When splitting, organize into a `{module}-tests/` directory with domain-specific files (e.g., `resolution-tests/altruist.spec.ts`).
+- **Source files**: Keep under ~200 lines (split at ~240). Large files should be split by logical concern. A **hard cap of 400 lines** is enforced by the eslint `max-lines` rule (`pnpm lint` / editor / CI); the ~200/240 targets are what you aim for well under it, not the limit.
+- **Test files**: Keep under ~300 lines (split at ~360), **hard cap 600** (also eslint `max-lines`). Use `.spec.ts` / `.spec.tsx` extension (not `.test.ts`). When splitting, organize into a `{module}-tests/` directory with domain-specific files (e.g., `resolution-tests/altruist.spec.ts`).
 - **Components**: A component file contains its primary component and props interface. A sub-component may be co-located in the same file if it owns no hooks, state, effects, or context, and is used only by the parent component in that file — e.g., a context wrapper, structural template, or props alias. A sub-component must be in its own file when any of these are true: it owns hooks, state, effects, or context; it is referenced from multiple parents; or it is substantial enough to warrant its own stories or tests (e.g., list items, row components, panels, form sections). All component props must be defined as an explicitly named interface (e.g., `interface PlayerListProps`), never inline in the function signature.
 - **Type files**: Convert large type files into barrel-exported directories with one file per logical domain (e.g., `lobby.ts`, `game.ts`, `player.ts`).
 - Add a barrel `index.ts` when a directory is imported from outside its own subtree; omit it for self-contained or framework-generated directories (e.g. `src/components/ui/`).
