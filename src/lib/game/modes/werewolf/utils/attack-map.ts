@@ -177,8 +177,7 @@ export function applyArsonistIgnite(
 ): void {
   if (!arsonistDousedPlayerIds?.length) return;
   const arsonistAction = nightActions[WerewolfRole.Arsonist] as
-    | { targetPlayerId?: string }
-    | undefined;
+    { targetPlayerId?: string } | undefined;
   const arsonistPlayerId = roleAssignments.find(
     (a) => a.roleDefinitionId === (WerewolfRole.Arsonist as string),
   )?.playerId;

@@ -70,8 +70,7 @@ export interface FirebaseAdvancedRoleBucket {
 }
 
 export type FirebaseRoleBucket =
-  | FirebaseSimpleRoleBucket
-  | FirebaseAdvancedRoleBucket;
+  FirebaseSimpleRoleBucket | FirebaseAdvancedRoleBucket;
 
 export interface FirebaseLobbyPrivate {
   ownerSessionId: string;

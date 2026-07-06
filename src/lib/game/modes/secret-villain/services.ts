@@ -78,8 +78,7 @@ function extractSvVictoryCondition(
 ): VictoryCondition | undefined {
   if (game.status.type !== GameStatus.Finished) return undefined;
   const conditionKey = game.status.victoryConditionKey as
-    | SvVictoryConditionKey
-    | undefined;
+    SvVictoryConditionKey | undefined;
   if (!conditionKey) return undefined;
   const themeLabels = getSvThemeLabels(svTheme);
   const vc = SECRET_VILLAIN_COPY.gameOver.victoryConditions;
@@ -146,8 +145,7 @@ export const secretVillainServices: GameModeServices = {
       (options?.["boardPreset"] as SvBoardPreset | undefined) ??
       getDefaultBoardPreset(playerIds.length);
     const customPowerTable = options?.["customPowerTable"] as
-      | SvCustomPowerConfig
-      | undefined;
+      SvCustomPowerConfig | undefined;
     const powerTable = resolvePowerTable(
       boardPreset,
       customPowerTable,

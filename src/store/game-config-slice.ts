@@ -89,12 +89,10 @@ const gameConfigSlice = createSlice({
         // Pre-populate from current role counts — one bucket per role type
         state.roleBuckets = Object.entries(state.roleCounts)
           .filter(([, count]) => count > 0)
-          .map(
-            ([roleId, count]): AdvancedRoleBucket => ({
-              playerCount: count,
-              roles: [{ roleId, ...(count === 1 ? { max: 1 } : {}) }],
-            }),
-          );
+          .map(([roleId, count]): AdvancedRoleBucket => ({
+            playerCount: count,
+            roles: [{ roleId, ...(count === 1 ? { max: 1 } : {}) }],
+          }));
       } else {
         // Custom — sync buckets from current counts
         state.roleBuckets = roleBucketsFromCounts(state.roleCounts);

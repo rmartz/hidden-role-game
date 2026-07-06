@@ -34,12 +34,10 @@ export function extractWitchState(
       ts?.roleState?.arsonist?.dousedPlayerIds,
     );
     if (attacked.length > 0) {
-      result.nightStatus = attacked.map(
-        (id): NighttimeNightStatusEntry => ({
-          targetPlayerId: id,
-          effect: "attacked",
-        }),
-      );
+      result.nightStatus = attacked.map((id): NighttimeNightStatusEntry => ({
+        targetPlayerId: id,
+        effect: "attacked",
+      }));
     }
   }
   return result;
@@ -59,8 +57,7 @@ export function extractAltruistState(
       ? altruistAction
       : undefined;
   const witchAction = nightActions[WerewolfRole.Witch] as
-    | { targetPlayerId?: string }
-    | undefined;
+    { targetPlayerId?: string } | undefined;
   const witchProtectedId = witchAction?.targetPlayerId;
   const attacked = getInterimAttackedPlayerIds(
     nightActions,
@@ -76,12 +73,10 @@ export function extractAltruistState(
     myNightTargetConfirmed: soloAction?.confirmed ?? false,
   };
   if (attacked.length > 0) {
-    result.nightStatus = attacked.map(
-      (id): NighttimeNightStatusEntry => ({
-        targetPlayerId: id,
-        effect: "attacked",
-      }),
-    );
+    result.nightStatus = attacked.map((id): NighttimeNightStatusEntry => ({
+      targetPlayerId: id,
+      effect: "attacked",
+    }));
   }
   return result;
 }

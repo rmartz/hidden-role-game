@@ -149,8 +149,7 @@ export function deriveNightNarratorState({
   const veteranAlertsUsed = turnState.roleState?.veteran?.alertsUsed ?? 0;
 
   const activeRoleDef = modeConfig.roles[baseActivePhaseKey] as
-    | WerewolfRoleDefinition
-    | undefined;
+    WerewolfRoleDefinition | undefined;
   const isInvestigatePhase =
     activeRoleDef?.targetCategory === TargetCategory.Investigate;
   const isResultRevealed = !!(

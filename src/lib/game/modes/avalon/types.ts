@@ -85,10 +85,7 @@ export interface AssassinationPhase {
 // ---------------------------------------------------------------------------
 
 export type AvalonTurnPhase =
-  | TeamProposalPhase
-  | TeamVotePhase
-  | QuestPhase
-  | AssassinationPhase;
+  TeamProposalPhase | TeamVotePhase | QuestPhase | AssassinationPhase;
 
 // ---------------------------------------------------------------------------
 // Quest outcome
