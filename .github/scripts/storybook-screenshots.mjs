@@ -13,12 +13,21 @@
  * in place on re-runs. The per-PR branch is deleted when the PR closes by
  * .github/workflows/storybook-screenshots-cleanup.yml.
  *
+ * Fail-fast, not time-out: each story gets a short render budget and the whole
+ * capture has a wall-clock deadline set below the job's `timeout-minutes`. On a
+ * render failure or the deadline the script exits non-zero. This matters because
+ * a job that hits `timeout-minutes` is *cancelled* (which the PR coordinator
+ * escalates to a human), whereas a non-zero exit is a *failure* (auto-routed to
+ * fix-review, where a bad or slow story can be fixed). We want the latter — the
+ * job's own `continue-on-error` keeps that failure non-blocking for the PR.
+ *
  * Expected environment variables:
- *   GITHUB_TOKEN  – token with contents:write and pull-requests:write
- *   REPO          – "owner/repo"
- *   PR_NUMBER     – pull request number
- *   CHANGED_FILES – newline-separated list of changed *.stories.{ts,tsx} paths
- *   PR_HEAD_SHA   – HEAD SHA of the PR branch
+ *   GITHUB_TOKEN         – token with contents:write and pull-requests:write
+ *   REPO                 – "owner/repo"
+ *   PR_NUMBER            – pull request number
+ *   CHANGED_FILES        – newline-separated changed *.stories.{ts,tsx} paths
+ *   PR_HEAD_SHA          – HEAD SHA of the PR branch
+ *   CAPTURE_DEADLINE_MS  – optional wall-clock capture budget (default 4 min)
  */
 
 import { execSync } from "child_process";
@@ -37,6 +46,15 @@ const COMMENT_MARKER = "<!-- storybook-screenshots-bot -->";
 // Per-PR image branch — each PR owns its own, so runs never race across PRs.
 const SCREENSHOTS_BRANCH = `gh-screenshots-pr-${PR_NUMBER}`;
 const STORYBOOK_PORT = 6006;
+
+// Whole-capture wall-clock budget, kept below the job's timeout-minutes so we
+// exit (a *failure*, routed to fix-review) before the job is *cancelled*.
+const DEADLINE_MS = Number(process.env.CAPTURE_DEADLINE_MS ?? 4 * 60 * 1000);
+// Per-story budgets. domcontentloaded (not networkidle) is the load signal — a
+// story with ongoing network never reaches networkidle and would burn the full
+// timeout, so a few such stories used to overrun the job into cancellation.
+const NAV_TIMEOUT_MS = 15_000;
+const RENDER_TIMEOUT_MS = 5_000;
 
 const MIME_TYPES = {
   ".css": "text/css",
@@ -116,34 +134,56 @@ async function captureScreenshots() {
   const server = await startStaticServer();
   const browser = await chromium.launch();
   const results = [];
+  let failed = 0;
+  let deadlineHit = false;
+  const startedAt = Date.now();
 
   try {
     for (const story of matchingStories) {
+      if (Date.now() - startedAt > DEADLINE_MS) {
+        deadlineHit = true;
+        const unattempted = matchingStories.length - results.length - failed;
+        console.error(
+          `Capture deadline (${DEADLINE_MS}ms) exceeded — stopping with ${unattempted} stor${unattempted === 1 ? "y" : "ies"} unattempted.`,
+        );
+        break;
+      }
+
       console.log(`  Screenshotting: ${story.title} / ${story.name}`);
       const page = await browser.newPage();
       await page.setViewportSize({ width: 1280, height: 720 });
 
       const url = `http://localhost:${STORYBOOK_PORT}/iframe.html?id=${story.id}&viewMode=story`;
-      await page.goto(url, { waitUntil: "networkidle", timeout: 30_000 });
-      await page
-        .waitForSelector("#storybook-root", {
-          state: "visible",
-          timeout: 10_000,
-        })
-        .catch(() => {
-          // Some stories render outside #storybook-root; continue anyway.
+      try {
+        await page.goto(url, {
+          waitUntil: "domcontentloaded",
+          timeout: NAV_TIMEOUT_MS,
         });
-
-      const buffer = await page.screenshot({ type: "png" });
-      results.push({ story, buffer });
-      await page.close();
+        await page
+          .waitForSelector("#storybook-root", {
+            state: "visible",
+            timeout: RENDER_TIMEOUT_MS,
+          })
+          .catch(() => {
+            // Some stories render outside #storybook-root; continue anyway.
+          });
+        const buffer = await page.screenshot({ type: "png" });
+        results.push({ story, buffer });
+      } catch (error) {
+        // A story that fails to load/render is a bad story the agent can fix —
+        // count it so the run exits non-zero and routes to fix-review.
+        failed += 1;
+        console.error(`Failed to capture ${story.id}: ${error.message}`);
+      } finally {
+        await page.close();
+      }
     }
   } finally {
     await browser.close();
     server.close();
   }
 
-  return results;
+  return { results, failed, deadlineHit };
 }
 
 // ---------------------------------------------------------------------------
@@ -271,13 +311,26 @@ async function postPrComment(fileNames) {
 // Main
 // ---------------------------------------------------------------------------
 
-const screenshots = await captureScreenshots();
+const { results, failed, deadlineHit } = await captureScreenshots();
 
-if (screenshots.length === 0) {
-  console.log("No screenshots captured — skipping.");
-  process.exit(0);
+// Publish whatever captured cleanly so a partial run still surfaces a gallery.
+if (results.length > 0) {
+  const fileNames = pushScreenshots(results);
+  await postPrComment(fileNames);
+  console.log(`Published ${results.length} screenshot(s).`);
+} else {
+  console.log("No screenshots captured.");
 }
 
-const fileNames = pushScreenshots(screenshots);
-await postPrComment(fileNames);
+// Exit non-zero on a render failure or the deadline so the advisory job reports
+// a *failure* (auto-routed to fix-review, where a bad or slow story can be
+// fixed) rather than running to timeout-minutes and being *cancelled* (which
+// escalates to a human). The job's continue-on-error keeps this non-blocking.
+if (deadlineHit || failed > 0) {
+  console.error(
+    `Screenshot capture incomplete: ${failed} failed, deadline ${deadlineHit ? "hit" : "not hit"} — failing so this routes to fix-review.`,
+  );
+  process.exit(1);
+}
+
 console.log("Done.");

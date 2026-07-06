@@ -26,10 +26,17 @@ jobs:
     # Advisory: this is preview tooling (posts a screenshot gallery), not a
     # correctness gate. It depends on Playwright + a git push + the GitHub API,
     # any of which can fail transiently. A failure must never block a code
-    # merge, so report green regardless. The timeout-minutes below still bounds
-    # a hang.
+    # merge, so continue-on-error reports green regardless.
+    #
+    # Fail (fix-review) over cancel (human escalation): the capture script
+    # enforces its own CAPTURE_DEADLINE_MS (4 min) and exits non-zero on the
+    # deadline or a bad story, so a slow/broken story surfaces as a job
+    # *failure* the PR coordinator routes to fix-review — where an agent can fix
+    # it. timeout-minutes is only a backstop for a hang that escapes the script
+    # (it produces a *cancellation*, which escalates to a human), so it is set
+    # above (setup + build + the 4-min deadline) to let the deadline fire first.
     continue-on-error: true
-    timeout-minutes: 5
+    timeout-minutes: 8
     # Forked PRs receive a read-only GITHUB_TOKEN that cannot push to the
     # gh-screenshots branch, so skip them rather than fail.
     if: github.event.pull_request.head.repo.full_name == github.repository
@@ -70,4 +77,7 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
           CHANGED_FILES: ${{ steps.stories.outputs.files }}
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          # Must stay below the job's timeout-minutes (minus setup + build) so
+          # this deadline fails the run before the job timeout cancels it.
+          CAPTURE_DEADLINE_MS: "240000"
         run: node .github/scripts/storybook-screenshots.mjs
