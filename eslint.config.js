@@ -1,9 +1,24 @@
 import js from "@eslint/js";
+// ⚠️ UNSUPPORTED ESLint internal API. See the maxLinesWarn note below — this
+// repository is the intentional canary for #789, deliberately depending on this
+// entry point so its removal breaks CI here first.
+import { builtinRules } from "eslint/use-at-your-own-risk";
 import reactHooks from "eslint-plugin-react-hooks";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import storybook from "eslint-plugin-storybook";
 import globals from "globals";
 import tseslint from "typescript-eslint";
+
+// ⚠️ UNSUPPORTED — see #789. Two-tier max-lines (a soft `warn` nudge below the
+// hard `error` cap) cannot be expressed with one rule natively: a rule takes a
+// single severity, and a duplicate `max-lines` key in one `rules` object
+// silently collapses to the last. Aliasing the built-in rule under a second
+// plugin namespace (`max-lines-warn/max-lines`) lets us register it twice at
+// two severities. This repo is the ONLY one doing this, on purpose: if a future
+// ESLint drops or changes `eslint/use-at-your-own-risk`, `pnpm lint` fails to
+// load this config and CI breaks here first — an early nudge to check whether
+// ESLint has landed native per-rule multi-threshold support and migrate off it.
+const maxLinesWarn = { rules: { "max-lines": builtinRules.get("max-lines") } };
 
 export default tseslint.config(
   {
@@ -100,29 +115,42 @@ export default tseslint.config(
       "simple-import-sort/exports": "error",
     },
   },
-  // File-length hard cap (was the file-length.yml CI job + check-file-length.sh).
-  // Enforced in-editor and via `pnpm lint`. Source 400, tests 600 (2x the
-  // recommended ~200/~300 split-at target in AGENTS.md). A single-tier hard cap:
-  // a soft warn tier is tracked in #789 for when ESLint supports two thresholds
-  // per rule natively.
+  // File-length cap, two tiers (was the file-length.yml CI job). The hard
+  // `error` cap fails `pnpm lint` / CI; the soft `warn` tier below it is
+  // advisory — it surfaces in the editor and CI logs but does NOT fail the
+  // build, which is why `pnpm lint` dropped `--max-warnings 0`. Warn ≈ the
+  // AGENTS.md "split at" target, error = the hard cap. Source: warn 240 /
+  // error 400. The warn tier uses the aliased built-in rule — see maxLinesWarn
+  // above and #789 (this repo is the canary for that unsupported API).
   {
     files: ["**/*.{ts,tsx}"],
+    plugins: { "max-lines-warn": maxLinesWarn },
     rules: {
+      "max-lines-warn/max-lines": [
+        "warn",
+        { max: 240, skipBlankLines: false, skipComments: false },
+      ],
       "max-lines": [
         "error",
         { max: 400, skipBlankLines: false, skipComments: false },
       ],
     },
   },
-  // Test files (and shared fixtures under a `*-tests/` dir) get the higher cap.
-  // Listed after the base block so it wins for these files (last match wins).
+  // Test files (and shared fixtures under a `*-tests/` dir) get the higher
+  // thresholds: warn 360 / error 600. Listed after the base block so it wins
+  // for these files (last match wins).
   {
     files: [
       "**/*.spec.{ts,tsx}",
       "**/*.test.{ts,tsx}",
       "**/*-tests/**/*.{ts,tsx}",
     ],
+    plugins: { "max-lines-warn": maxLinesWarn },
     rules: {
+      "max-lines-warn/max-lines": [
+        "warn",
+        { max: 360, skipBlankLines: false, skipComments: false },
+      ],
       "max-lines": [
         "error",
         { max: 600, skipBlankLines: false, skipComments: false },

@@ -21,7 +21,7 @@
     "test": "vitest",
     "tsc": "tsc --noEmit",
     "check:pins": "node scripts/check-package-pins.mjs",
-    "lint": "eslint --max-warnings 0 .",
+    "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "prepare": "husky",
