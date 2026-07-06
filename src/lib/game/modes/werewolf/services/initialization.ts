@@ -38,8 +38,7 @@ export function buildInitialTurnState(
   options?: Record<string, unknown>,
 ): WerewolfTurnState {
   const executionerTargetId = options?.["executionerTargetId"] as
-    | string
-    | undefined;
+    string | undefined;
   const nightPhaseOrder = buildNightPhaseOrder(1, roleAssignments);
   const phase: WerewolfNighttimePhase = {
     type: WerewolfPhase.Nighttime,

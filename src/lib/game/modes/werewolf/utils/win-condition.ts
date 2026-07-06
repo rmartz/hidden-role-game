@@ -114,8 +114,7 @@ export function checkWinCondition(
     (chupacabraAlive ? 1 : 0) + (arsonistAlive ? 1 : 0);
 
   let winResult:
-    | { type: GameStatus.Finished; winner: WerewolfWinner }
-    | undefined;
+    { type: GameStatus.Finished; winner: WerewolfWinner } | undefined;
 
   if (badAlive === 0) {
     if (killerNeutralsAlive === 1) {

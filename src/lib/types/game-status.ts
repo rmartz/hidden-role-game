@@ -50,6 +50,4 @@ export interface FinishedGameStatus {
 }
 
 export type GameStatusState =
-  | StartingGameStatus
-  | PlayingGameStatus
-  | FinishedGameStatus;
+  StartingGameStatus | PlayingGameStatus | FinishedGameStatus;

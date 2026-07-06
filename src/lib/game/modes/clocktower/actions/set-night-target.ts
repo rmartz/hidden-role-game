@@ -79,12 +79,10 @@ export const setNightTargetAction: GameAction = {
 
     // secondTargetPlayerId is Fortune Teller-only; reject it for any other role
     if (secondTargetPlayerId !== undefined) {
-      if (
-        !(
-          isClocktowerRole(activeRoleId) &&
-          activeRoleId === ClocktowerRole.FortuneTeller
-        )
-      )
+      if (!(
+        isClocktowerRole(activeRoleId) &&
+        activeRoleId === ClocktowerRole.FortuneTeller
+      ))
         return false;
       if (typeof secondTargetPlayerId !== "string") return false;
       if (!game.players.some((p) => p.id === secondTargetPlayerId))
@@ -126,12 +124,10 @@ export const setNightTargetAction: GameAction = {
       };
       if (secondTargetPlayerId !== undefined) {
         updated.secondTargetPlayerId = secondTargetPlayerId;
-      } else if (
-        !(
-          isClocktowerRole(activeRoleId) &&
-          activeRoleId === ClocktowerRole.FortuneTeller
-        )
-      ) {
+      } else if (!(
+        isClocktowerRole(activeRoleId) &&
+        activeRoleId === ClocktowerRole.FortuneTeller
+      )) {
         delete updated.secondTargetPlayerId;
       }
       phase.nightActions[activeRoleId] = updated;

@@ -71,8 +71,7 @@ export interface NighttimeNightStatusEntry {
 }
 
 export type NightStatusEntry =
-  | DaytimeNightStatusEntry
-  | NighttimeNightStatusEntry;
+  DaytimeNightStatusEntry | NighttimeNightStatusEntry;
 
 /** Explains the specific win condition that ended the game. */
 export interface VictoryCondition {

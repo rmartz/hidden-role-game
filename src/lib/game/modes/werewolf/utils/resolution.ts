@@ -91,8 +91,7 @@ export function resolveNightActions(
 
   // Witch: if target is already attacked → protect; otherwise → attack.
   const witchAction = resolvedNightActions[WerewolfRole.Witch] as
-    | { targetPlayerId?: string }
-    | undefined;
+    { targetPlayerId?: string } | undefined;
   if (witchAction?.targetPlayerId) {
     const tid = witchAction.targetPlayerId;
     if (attacks.has(tid)) {
@@ -120,8 +119,7 @@ export function resolveNightActions(
   // Altruist instead. Ignored if the Altruist is themselves already under attack
   // or if the target is the Altruist themselves.
   const altruistAction = resolvedNightActions[WerewolfRole.Altruist] as
-    | { targetPlayerId?: string }
-    | undefined;
+    { targetPlayerId?: string } | undefined;
   let altruistInterceptEvent: NightResolutionEvent | undefined;
   if (altruistAction?.targetPlayerId) {
     const savedId = altruistAction.targetPlayerId;
@@ -305,8 +303,7 @@ export function resolveNightActions(
 
   // Spellcaster: emit a silenced event for their target.
   const spellcasterAction = resolvedNightActions[WerewolfRole.Spellcaster] as
-    | { targetPlayerId?: string }
-    | undefined;
+    { targetPlayerId?: string } | undefined;
   const silencedEvents: NightResolutionEvent[] =
     spellcasterAction?.targetPlayerId
       ? [{ type: "silenced", targetPlayerId: spellcasterAction.targetPlayerId }]
@@ -314,8 +311,7 @@ export function resolveNightActions(
 
   // Mummy: emit a hypnotized event for their target.
   const mummyAction = resolvedNightActions[WerewolfRole.Mummy] as
-    | { targetPlayerId?: string }
-    | undefined;
+    { targetPlayerId?: string } | undefined;
   const mummyPlayerId = roleAssignments.find(
     (a) => a.roleDefinitionId === (WerewolfRole.Mummy as string),
   )?.playerId;
