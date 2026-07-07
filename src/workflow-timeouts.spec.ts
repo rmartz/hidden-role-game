@@ -36,7 +36,7 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
     cleanup: 1,
   },
   "storybook-screenshots.yml": {
-    screenshots: 5,
+    screenshots: 8,
   },
 };
 
