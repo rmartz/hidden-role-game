@@ -1,14 +1,8 @@
 import type { Game, GameAction } from "@/lib/types";
-import { GameStatus } from "@/lib/types";
 
 import { ClocktowerRole, isClocktowerRole } from "../roles";
-import type { ClocktowerTurnState } from "../types";
 import { ClocktowerPhase } from "../types";
-
-function currentTurnState(game: Game): ClocktowerTurnState | undefined {
-  if (game.status.type !== GameStatus.Playing) return undefined;
-  return game.status.turnState as ClocktowerTurnState | undefined;
-}
+import { currentTurnState } from "../utils";
 
 /**
  * Resolves which role ID the caller is acting for.

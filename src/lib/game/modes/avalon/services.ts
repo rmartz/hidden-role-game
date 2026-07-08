@@ -1,10 +1,11 @@
+import { shuffle } from "@/lib/game/shuffle";
 import { resolvePlayerOrder } from "@/lib/player-order";
 import type { Game, GameModeServices, PlayerRoleAssignment } from "@/lib/types";
-import { GameStatus } from "@/lib/types";
 
 import type { AvalonPublicPhase } from "./player-state";
 import type { AvalonTurnState } from "./types";
 import { AvalonPhase } from "./types";
+import { currentTurnState } from "./utils";
 
 // ---------------------------------------------------------------------------
 // Quest configuration tables (standard Avalon rules)
@@ -47,35 +48,11 @@ function getQuestTeamSizes(
 }
 
 // ---------------------------------------------------------------------------
-// Shuffle utility
-// ---------------------------------------------------------------------------
-
-function shuffle<T>(array: T[]): T[] {
-  const result = [...array];
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    const temp = result[i] as T;
-    result[i] = result[j] as T;
-    result[j] = temp;
-  }
-  return result;
-}
-
-// ---------------------------------------------------------------------------
 // Build options type
 // ---------------------------------------------------------------------------
 
 interface BuildTurnStateOptions {
   playerOrder?: string[];
-}
-
-// ---------------------------------------------------------------------------
-// currentTurnState helper
-// ---------------------------------------------------------------------------
-
-function currentTurnState(game: Game): AvalonTurnState | undefined {
-  if (game.status.type !== GameStatus.Playing) return undefined;
-  return game.status.turnState as AvalonTurnState | undefined;
 }
 
 // ---------------------------------------------------------------------------
