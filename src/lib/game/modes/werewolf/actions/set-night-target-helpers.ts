@@ -47,11 +47,15 @@ export function validateRoleSpecificRestrictions(
   }
 
   // Roles with adjacentTargetOnly may only target immediate seating neighbours.
+  // Resolve the effective role (honouring roleOverrides, e.g. a Village Drunk
+  // sobering into The Thing) so the restriction follows the current role.
   const callerAssignment = game.roleAssignments.find(
     (a) => a.playerId === callerId,
   );
-  const callerRoleDef = callerAssignment
-    ? getWerewolfRole(callerAssignment.roleDefinitionId)
+  const effectiveCallerRoleId =
+    ts.roleOverrides?.[callerId] ?? callerAssignment?.roleDefinitionId;
+  const callerRoleDef = effectiveCallerRoleId
+    ? getWerewolfRole(effectiveCallerRoleId)
     : undefined;
   if (callerRoleDef?.adjacentTargetOnly) {
     const rawOrder = game.playerOrder ?? game.players.map((p) => p.id);

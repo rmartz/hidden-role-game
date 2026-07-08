@@ -355,5 +355,31 @@ describe("WerewolfAction.SetNightTarget", () => {
       // p3 is still not adjacent to p1 after narrator removal
       expect(action.isValid(game, "p1", { targetPlayerId: "p3" })).toBe(false);
     });
+
+    it("enforces adjacency when roleOverrides grant The Thing to a base non-adjacent role", () => {
+      // p1 is assigned Villager (no adjacentTargetOnly) but sobers into The
+      // Thing via roleOverrides. The adjacency restriction must be derived from
+      // the effective (overridden) role, not the base assignment.
+      const thingTurnState = makeNightState({
+        turn: 2,
+        nightPhaseOrder: [WerewolfRole.TheThing],
+        currentPhaseIndex: 0,
+        roleOverrides: { p1: WerewolfRole.TheThing },
+      });
+      const game = makePlayingGame(thingTurnState, {
+        roleAssignments: [
+          { playerId: "p1", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p2", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p3", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p4", roleDefinitionId: WerewolfRole.Villager },
+          { playerId: "p5", roleDefinitionId: WerewolfRole.Villager },
+        ],
+        playerOrder: ["p1", "p2", "p3", "p4", "p5"],
+      });
+      // p3 is not adjacent to p1 (neighbours are p2 and p5) — must be rejected.
+      expect(action.isValid(game, "p1", { targetPlayerId: "p3" })).toBe(false);
+      // Adjacent neighbours remain valid.
+      expect(action.isValid(game, "p1", { targetPlayerId: "p2" })).toBe(true);
+    });
   });
 });
