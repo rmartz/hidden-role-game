@@ -1,6 +1,5 @@
 import { resolvePlayerOrder } from "@/lib/player-order";
 import type { Game, GameModeServices, PlayerRoleAssignment } from "@/lib/types";
-import { GameStatus } from "@/lib/types";
 import type { ClocktowerGame } from "@/lib/types/game";
 
 import type { ClocktowerRoleDefinition } from "./roles";
@@ -11,15 +10,7 @@ import {
 } from "./roles";
 import type { ClocktowerTurnState } from "./types";
 import { ClocktowerPhase } from "./types";
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function currentTurnState(game: Game): ClocktowerTurnState | undefined {
-  if (game.status.type !== GameStatus.Playing) return undefined;
-  return game.status.turnState as ClocktowerTurnState | undefined;
-}
+import { currentTurnState } from "./utils";
 
 /**
  * Pick a random Townsfolk role from the game's role assignments to serve as
