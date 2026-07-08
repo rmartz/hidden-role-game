@@ -31,9 +31,11 @@ const YAML = /\.ya?ml$/;
 // optional list dash and optional quotes around the ref.
 const USES = /^\s*(?:-\s*)?uses:\s*["']?([^"'#\s]+)["']?\s*(?:#\s*(.*?)\s*)?$/;
 const SHA = /^[0-9a-f]{40}$/;
-// Accept v-prefixed major, major.minor, or full semver (Dependabot maintains
-// any of these); the leading token of the comment is what it reads.
-const VERSION_COMMENT = /^v\d+(?:\.\d+){0,2}(?:[-+][0-9A-Za-z.-]+)?$/;
+// Require a full v-prefixed MAJOR.MINOR.PATCH (optional prerelease/build) — not
+// a floating `v7` or `v7.0`. Dependabot anchors the pin on this comment, and a
+// precise version is what lets it detect and write the next exact release; the
+// leading token of the comment is what it reads.
+const VERSION_COMMENT = /^v\d+\.\d+\.\d+(?:[-+][0-9A-Za-z.-]+)?$/;
 
 function walk(dir) {
   let files = [];
@@ -53,8 +55,11 @@ function checkRef(ref, comment) {
   if (!SHA.test(version)) {
     return `pinned to "${version}" — must be a 40-char commit SHA`;
   }
-  if (!comment || !VERSION_COMMENT.test(comment.split(/\s+/)[0])) {
-    return "missing `# vX.Y.Z` version comment (Dependabot needs it to track the pin)";
+  if (!comment) {
+    return "missing a `# vX.Y.Z` version comment (Dependabot needs it to track the pin)";
+  }
+  if (!VERSION_COMMENT.test(comment.split(/\s+/)[0])) {
+    return `version comment "${comment}" is not full semver — use \`# vMAJOR.MINOR.PATCH\` so Dependabot can track the pin`;
   }
   return undefined;
 }
