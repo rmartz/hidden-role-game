@@ -1,0 +1,33 @@
+name: Action Pins
+
+# Enforces the GitHub Actions SHA-pinning rule (see AGENTS.md): every external
+# action must pin a commit SHA with a `# vX.Y.Z` version comment, so a repointed
+# tag cannot inject code and Dependabot keeps the pin current. Gated to runs
+# that change a workflow, a composite action, or the checker itself — the check's
+# only inputs are those files, so a paths allowlist is safe: if none changed, the
+# pins were validated when they merged and there is nothing to re-check.
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/**"
+      - ".github/actions/**"
+      - "scripts/check-action-pins.mjs"
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/**"
+      - ".github/actions/**"
+      - "scripts/check-action-pins.mjs"
+
+permissions:
+  contents: read
+
+jobs:
+  check-action-pins:
+    name: Check GitHub Actions are SHA-pinned
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: ./.github/actions/setup
+      - run: pnpm run check:action-pins

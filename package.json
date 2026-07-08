@@ -20,6 +20,7 @@
     "start": "next start",
     "test": "vitest",
     "tsc": "tsc --noEmit",
+    "check:action-pins": "node scripts/check-action-pins.mjs",
     "check:pins": "node scripts/check-package-pins.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",
