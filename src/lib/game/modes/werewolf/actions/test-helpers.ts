@@ -54,6 +54,7 @@ export function makeNightState(
     deadPlayerIds: string[];
     currentPhaseIndex: number;
     nightPhaseOrder: string[];
+    roleOverrides: Record<string, string>;
   }> = {},
 ): WerewolfTurnState {
   return {
@@ -69,6 +70,9 @@ export function makeNightState(
       nightActions: overrides.nightActions ?? {},
     },
     deadPlayerIds: overrides.deadPlayerIds ?? [],
+    ...(overrides.roleOverrides
+      ? { roleOverrides: overrides.roleOverrides }
+      : {}),
   };
 }
 
