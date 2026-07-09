@@ -9,6 +9,9 @@ import { parse } from "yaml";
 // workflow requires registering it here, or the test below fails — forcing a
 // deliberate cap rather than leaving a job unbounded.
 const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
+  "action-pins.yml": {
+    "check-action-pins": 1,
+  },
   "ci-actions.yml": {
     build: 2,
     "detect-changes": 1,

@@ -1,13 +1,8 @@
 import type { Game, GameAction } from "@/lib/types";
-import { GameStatus } from "@/lib/types";
 
-import type { ClocktowerNomination, ClocktowerTurnState } from "../types";
+import type { ClocktowerNomination } from "../types";
 import { ClocktowerPhase } from "../types";
-
-function currentTurnState(game: Game): ClocktowerTurnState | undefined {
-  if (game.status.type !== GameStatus.Playing) return undefined;
-  return game.status.turnState as ClocktowerTurnState | undefined;
-}
+import { currentTurnState } from "../utils";
 
 /**
  * Determines the nomination to execute, if any.

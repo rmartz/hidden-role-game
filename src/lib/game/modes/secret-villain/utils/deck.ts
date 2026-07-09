@@ -1,18 +1,9 @@
+import { shuffle } from "@/lib/game/shuffle";
+
 import { DECK_BAD_CARDS, DECK_GOOD_CARDS, PolicyCard } from "../types";
 
 /** Minimum cards required in the deck before a draw. Below this, reshuffle. */
 const MIN_DECK_SIZE = 3;
-
-/** Fisher-Yates shuffle (in-place, returns the same array). */
-function shuffle<T>(array: T[]): T[] {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    const temp = array[i] as T;
-    array[i] = array[j] as T;
-    array[j] = temp;
-  }
-  return array;
-}
 
 /** Creates a fresh shuffled deck with the standard card distribution. */
 export function createDeck(): PolicyCard[] {

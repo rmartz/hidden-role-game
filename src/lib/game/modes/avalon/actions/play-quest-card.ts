@@ -1,15 +1,10 @@
 import type { Game, GameAction } from "@/lib/types";
-import { GameStatus, Team } from "@/lib/types";
+import { Team } from "@/lib/types";
 
 import type { AvalonRole } from "../roles";
 import { AVALON_ROLES } from "../roles";
-import type { AvalonTurnState } from "../types";
 import { AvalonPhase, QuestCard } from "../types";
-
-function currentTurnState(game: Game): AvalonTurnState | undefined {
-  if (game.status.type !== GameStatus.Playing) return undefined;
-  return game.status.turnState as AvalonTurnState | undefined;
-}
+import { currentTurnState } from "../utils";
 
 function isGoodPlayer(game: Game, playerId: string): boolean {
   const assignment = game.roleAssignments.find((a) => a.playerId === playerId);
