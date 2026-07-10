@@ -18,7 +18,9 @@ updates:
     # the ones most likely to need code changes, so they warrant isolated
     # review. The exceptions, listed FIRST to win group-assignment precedence:
     # the version-locked families (so a member never bumps without the rest, an
-    # inherently broken update) and prettier major+minor (its own PR).
+    # inherently broken update) and the prettier and typescript major+minor
+    # bumps (each isolated into its own PR — a formatter or compiler bump is
+    # higher-impact than a routine dependency and warrants visibility).
     groups:
       # Version-locked families. The scope of each depends on whether it crosses
       # the dev/prod boundary:
@@ -101,6 +103,18 @@ updates:
       prettier:
         patterns:
           - "prettier"
+        update-types:
+          - "major"
+          - "minor"
+      typescript:
+        # TypeScript is the language itself, not just another dependency — a
+        # compiler major/minor can surface new type errors across the codebase,
+        # so isolate it into its own PR for visibility (like prettier above). A
+        # typescript *patch* matches no update-type here and falls through to
+        # dev-dependencies, staying batched. The exact "typescript" pattern
+        # leaves typescript-eslint untouched (it stays in the eslint family).
+        patterns:
+          - "typescript"
         update-types:
           - "major"
           - "minor"
