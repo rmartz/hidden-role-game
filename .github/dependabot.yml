@@ -13,11 +13,70 @@ updates:
       prefix: "chore"
       prefix-development: "chore"
       include: "scope"
-    # Group only minor and patch bumps into batched PRs. Most major bumps match
-    # no group and are raised as individual PRs — they are the ones most likely
-    # to need code changes and warrant isolated review. (Prettier major+minor
-    # are the exception — see the prettier group below.)
+    # Trivial minor/patch bumps batch by dev/prod (the two catch-all groups at
+    # the bottom). Most MAJOR bumps match no group and raise individual PRs —
+    # the ones most likely to need code changes, so they warrant isolated
+    # review. Two kinds of exception are listed FIRST to win group-assignment
+    # precedence: the version-locked families (react, storybook, vite, eslint,
+    # tailwind, lodash), which group their majors too because a family member
+    # bumping without the rest is an inherently broken update; and prettier
+    # major+minor, which splits into its own PR.
     groups:
+      # Version-locked families. Each is a set of packages that ship on a shared
+      # version line (or whose majors are dictated by one member), so a bump to
+      # one not matched by a bump to the rest breaks the build. Grouped across
+      # ALL update types — major, minor, AND patch — so any bump within a family
+      # lands as one atomic PR (a react patch without react-dom is as broken as
+      # a major), and so the prod members are not scattered from their dev
+      # @types across the two catch-all groups below.
+      react:
+        # react + react-dom ship the same version; @types/react(-dom) track
+        # react's major. Spans prod (react, react-dom) and dev (the @types).
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+      storybook:
+        # The storybook CLI, every @storybook/* addon, and the eslint plugin
+        # share one Storybook version line. Listed before vite and eslint so
+        # @storybook/*-vite addons and eslint-plugin-storybook route here.
+        patterns:
+          - "storybook"
+          - "@storybook/*"
+          - "eslint-plugin-storybook"
+      vite:
+        # vite + its react plugin + vitest + @vitest/* are one interlocked
+        # toolchain (the @vitejs/plugin-react 6 <-> vite 8 coupling), so their
+        # majors move together.
+        patterns:
+          - "vite"
+          - "@vitejs/*"
+          - "vitest"
+          - "@vitest/*"
+      eslint:
+        # eslint + @eslint/js share a version line; typescript-eslint and the
+        # react-hooks plugin track the eslint major. (eslint-plugin-storybook is
+        # claimed by the storybook group above; eslint-plugin-simple-import-sort
+        # versions independently and stays with the dev catch-all.)
+        patterns:
+          - "eslint"
+          - "@eslint/js"
+          - "typescript-eslint"
+          - "eslint-plugin-react-hooks"
+      tailwind:
+        # tailwindcss core + its postcss plugin ship in lockstep (both on 4.3.x);
+        # a mismatch fails the build.
+        patterns:
+          - "tailwindcss"
+          - "@tailwindcss/*"
+      lodash:
+        # @types/lodash's major tracks lodash's; grouping keeps the prod runtime
+        # and its dev types moving together instead of splitting across the
+        # dev/prod catch-alls.
+        patterns:
+          - "lodash"
+          - "@types/lodash"
       # Prettier is special-cased ahead of dev-dependencies. Dependabot assigns
       # each update to the FIRST group it matches, so listing prettier first
       # routes its major AND minor bumps into a dedicated PR — a Prettier minor
