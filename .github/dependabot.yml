@@ -16,22 +16,24 @@ updates:
     # Trivial minor/patch bumps batch by dev/prod (the two catch-all groups at
     # the bottom). Most MAJOR bumps match no group and raise individual PRs —
     # the ones most likely to need code changes, so they warrant isolated
-    # review. Two kinds of exception are listed FIRST to win group-assignment
-    # precedence: the version-locked families (react, storybook, vite, eslint,
-    # tailwind, lodash), which group their majors too because a family member
-    # bumping without the rest is an inherently broken update; and prettier
-    # major+minor, which splits into its own PR.
+    # review. The exceptions, listed FIRST to win group-assignment precedence:
+    # the version-locked families (so a member never bumps without the rest, an
+    # inherently broken update) and prettier major+minor (its own PR).
     groups:
-      # Version-locked families. Each is a set of packages that ship on a shared
-      # version line (or whose majors are dictated by one member), so a bump to
-      # one not matched by a bump to the rest breaks the build. Grouped across
-      # ALL update types — major, minor, AND patch — so any bump within a family
-      # lands as one atomic PR (a react patch without react-dom is as broken as
-      # a major), and so the prod members are not scattered from their dev
-      # @types across the two catch-all groups below.
+      # Version-locked families. The scope of each depends on whether it crosses
+      # the dev/prod boundary:
+      #  - A family split across dev AND prod (react, lodash) groups across ALL
+      #    update types, because on a minor/patch bump the dev/prod catch-alls
+      #    below would otherwise scatter its prod members from their dev @types.
+      #  - A family entirely within one realm (storybook, vite, eslint, tailwind
+      #    are all-dev) groups for MAJOR only. Its minor/patch bumps already move
+      #    in lockstep inside the single dev-dependencies group, so a separate
+      #    family PR for those would just add noise; major is the only update
+      #    type the catch-alls exclude, and the only one where a split family
+      #    actually breaks.
       react:
-        # react + react-dom ship the same version; @types/react(-dom) track
-        # react's major. Spans prod (react, react-dom) and dev (the @types).
+        # react + react-dom (prod) ship the same version; @types/react(-dom)
+        # (dev) track react's major. Cross-realm -> grouped across all types.
         patterns:
           - "react"
           - "react-dom"
@@ -39,41 +41,51 @@ updates:
           - "@types/react-dom"
       storybook:
         # The storybook CLI, every @storybook/* addon, and the eslint plugin
-        # share one Storybook version line. Listed before vite and eslint so
-        # @storybook/*-vite addons and eslint-plugin-storybook route here.
+        # share one Storybook version line — all dev, so major-only (minor/patch
+        # ride dev-dependencies). Listed before vite and eslint so @storybook/*
+        # -vite addons and eslint-plugin-storybook route here.
         patterns:
           - "storybook"
           - "@storybook/*"
           - "eslint-plugin-storybook"
+        update-types:
+          - "major"
       vite:
         # vite + its react plugin + vitest + @vitest/* are one interlocked
-        # toolchain (the @vitejs/plugin-react 6 <-> vite 8 coupling), so their
-        # majors move together.
+        # toolchain (the @vitejs/plugin-react 6 <-> vite 8 coupling) — all dev,
+        # so major-only; minor/patch ride dev-dependencies.
         patterns:
           - "vite"
           - "@vitejs/*"
           - "vitest"
           - "@vitest/*"
+        update-types:
+          - "major"
       eslint:
         # eslint + @eslint/js share a version line; typescript-eslint and the
-        # react-hooks plugin track the eslint major. (eslint-plugin-storybook is
-        # claimed by the storybook group above; eslint-plugin-simple-import-sort
+        # react-hooks plugin track the eslint major — all dev, so major-only;
+        # minor/patch ride dev-dependencies. (eslint-plugin-storybook is claimed
+        # by the storybook group above; eslint-plugin-simple-import-sort
         # versions independently and stays with the dev catch-all.)
         patterns:
           - "eslint"
           - "@eslint/js"
           - "typescript-eslint"
           - "eslint-plugin-react-hooks"
+        update-types:
+          - "major"
       tailwind:
-        # tailwindcss core + its postcss plugin ship in lockstep (both on 4.3.x);
-        # a mismatch fails the build.
+        # tailwindcss core + its postcss plugin ship in lockstep (both on 4.3.x)
+        # — all dev, so major-only; minor/patch ride dev-dependencies.
         patterns:
           - "tailwindcss"
           - "@tailwindcss/*"
+        update-types:
+          - "major"
       lodash:
-        # @types/lodash's major tracks lodash's; grouping keeps the prod runtime
-        # and its dev types moving together instead of splitting across the
-        # dev/prod catch-alls.
+        # lodash (prod) + @types/lodash (dev): the types major tracks lodash's.
+        # Cross-realm -> grouped across all types, so the runtime and its types
+        # are not split across the dev/prod catch-alls.
         patterns:
           - "lodash"
           - "@types/lodash"
