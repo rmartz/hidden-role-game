@@ -9,6 +9,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import {
+  getDefaultBoardPreset,
+  presetToCustomConfig,
+  type SvConcretePreset,
+} from "@/lib/game/modes/secret-villain";
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
 import type { SecretVillainModeConfig } from "@/lib/game/modes/secret-villain/lobby-config";
 import type { SecretVillainLobbyConfig } from "@/lib/game/modes/secret-villain/lobby-config";
@@ -16,11 +21,6 @@ import { SV_THEMES, SvTheme } from "@/lib/game/modes/secret-villain/themes";
 import type { SecretVillainTimerConfig } from "@/lib/game/modes/secret-villain/timer-config";
 import type { SvCustomPowerConfig } from "@/lib/game/modes/secret-villain/types";
 import { SvBoardPreset } from "@/lib/game/modes/secret-villain/types";
-import {
-  getDefaultBoardPreset,
-  presetToCustomConfig,
-  type SvConcretePreset,
-} from "@/lib/game/modes/secret-villain/utils";
 import type { ModeConfigField } from "@/lib/types";
 
 import { CustomPowerTableEditor } from "./CustomPowerTableEditor";

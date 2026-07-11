@@ -6,8 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useGameAction } from "@/hooks";
-import { WerewolfAction } from "@/lib/game/modes/werewolf";
-import { GHOST_CLUE_MAX_LENGTH } from "@/lib/game/modes/werewolf/actions/submit-ghost-clue";
+import {
+  GHOST_CLUE_MAX_LENGTH,
+  WerewolfAction,
+} from "@/lib/game/modes/werewolf";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 
 export interface GhostCluePanelViewProps {

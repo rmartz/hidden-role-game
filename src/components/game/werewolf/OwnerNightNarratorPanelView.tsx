@@ -1,12 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import type { TargetablePlayer } from "@/lib/game/modes/werewolf";
+import type {
+  InvestigationResultForNarrator,
+  NarratorInstruction,
+  TargetablePlayer,
+} from "@/lib/game/modes/werewolf";
 import { isRoleActive } from "@/lib/game/modes/werewolf";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import { WerewolfRole } from "@/lib/game/modes/werewolf/roles";
-import type { InvestigationResultForNarrator } from "@/lib/game/modes/werewolf/utils/display";
-import type { NarratorInstruction } from "@/lib/game/modes/werewolf/utils/narrator-instructions";
 import type { VisibleTeammate } from "@/server/types";
 
 import { NarratorNightInstruction } from "./NarratorNightInstruction";
