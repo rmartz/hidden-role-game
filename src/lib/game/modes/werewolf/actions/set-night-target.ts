@@ -1,7 +1,6 @@
 import { getPlayer } from "@/lib/player";
 import type { Game, GameAction } from "@/lib/types";
 
-import { VETERAN_ALERTS_LIMIT } from "../constants";
 import { getWerewolfRole, WerewolfRole } from "../roles";
 import type { TeamNightAction } from "../types";
 import { isTeamNightAction, WerewolfPhase } from "../types";
@@ -16,6 +15,9 @@ import {
   validateActiveNightPlayer,
 } from "../utils";
 import { validateRoleSpecificRestrictions } from "./set-night-target-helpers";
+
+/** Maximum number of Alert uses a Veteran can make per game. */
+export const VETERAN_ALERTS_LIMIT = 3;
 
 export const setNightTargetAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {
