@@ -109,9 +109,10 @@ export default tseslint.config(
   // `utils/` and `actions/` are its implementation; code outside the mode
   // (components, app routes, server, the firebase/store layers) must not reach
   // into them. Everything the outside legitimately consumes — a mode's `copy`,
-  // `roles`, `types`, `player-state`, `*-config`, `themes`, `constants` — is its
-  // public data surface and is expressed by re-exporting through those public
-  // modules (or the mode barrel), so a logic refactor stays inside the mode.
+  // `roles`, `types`, `player-state`, `*-config`, `themes` — is its public data
+  // surface and is expressed by re-exporting through those public modules (or the
+  // mode barrel), so a logic refactor stays inside the mode. Rule-threshold
+  // constants live with the action that owns them and flow through the barrel.
   //
   // Scoped to `utils/` + `actions/` deliberately: forcing the pervasive data
   // imports through a single mega-barrel would be a 300-site rewrite with no
@@ -137,7 +138,7 @@ export default tseslint.config(
                 "@/lib/game/modes/*/actions/**",
               ],
               message:
-                "Don't import a game mode's utils/ or actions/ internals from outside the mode — re-export what you need through the mode's public surface (its barrel, types, or constants).",
+                "Don't import a game mode's utils/ or actions/ internals from outside the mode — use the mode barrel (@/lib/game/modes/<mode>) or its public data modules (types, copy, roles, etc.).",
             },
           ],
         },

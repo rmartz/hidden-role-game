@@ -6,7 +6,7 @@ import { currentTurnState, getSilencedPlayerIds } from "../utils";
 import { startTrialAction } from "./start-trial";
 
 /** Number of nominations required to automatically start an elimination trial. */
-export const NOMINATION_VOTE_THRESHOLD = 2;
+const NOMINATION_VOTE_THRESHOLD = 2;
 
 export const nominatePlayerAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {
