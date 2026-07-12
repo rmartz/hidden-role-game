@@ -1,6 +1,5 @@
 export * from "./actions";
 export * from "./config";
-export * from "./constants";
 export * from "./copy";
 export * from "./lobby-config";
 export * from "./player-state";

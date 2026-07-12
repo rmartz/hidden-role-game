@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { VETERAN_ALERTS_LIMIT } from "@/lib/game/modes/werewolf/constants";
+import { VETERAN_ALERTS_LIMIT } from "@/lib/game/modes/werewolf";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 
 export interface VeteranActionPanelViewProps {

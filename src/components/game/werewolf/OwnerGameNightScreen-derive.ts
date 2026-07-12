@@ -1,5 +1,7 @@
 import type {
   AnyNightAction,
+  InvestigationResultForNarrator,
+  NarratorInstruction,
   WerewolfRoleDefinition,
   WerewolfTurnState,
 } from "@/lib/game/modes/werewolf";
@@ -17,8 +19,6 @@ import {
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { getWerewolfRole, WerewolfRole } from "@/lib/game/modes/werewolf/roles";
-import type { InvestigationResultForNarrator } from "@/lib/game/modes/werewolf/utils/display";
-import type { NarratorInstruction } from "@/lib/game/modes/werewolf/utils/narrator-instructions";
 import { getPlayerName } from "@/lib/player";
 import type { GameModeConfig } from "@/lib/types";
 

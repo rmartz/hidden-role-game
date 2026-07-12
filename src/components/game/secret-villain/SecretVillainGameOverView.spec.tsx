@@ -1,11 +1,11 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { SecretVillainWinner } from "@/lib/game/modes/secret-villain";
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
 import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
 import { SV_THEMES, SvTheme } from "@/lib/game/modes/secret-villain/themes";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "@/lib/game/modes/secret-villain/timer-config";
-import { SecretVillainWinner } from "@/lib/game/modes/secret-villain/utils/win-condition";
 import { GameMode, GameStatus, Team } from "@/lib/types";
 
 import { SecretVillainGameOverView } from "./SecretVillainGameOverView";

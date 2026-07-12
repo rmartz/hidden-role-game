@@ -2,12 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SecretVillainWinner } from "@/lib/game/modes/secret-villain";
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
 import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
 import { SecretVillainRole } from "@/lib/game/modes/secret-villain/roles";
 import type { SvThemeLabels } from "@/lib/game/modes/secret-villain/themes";
 import { getSvThemeLabels } from "@/lib/game/modes/secret-villain/themes";
-import { SecretVillainWinner } from "@/lib/game/modes/secret-villain/utils/win-condition";
 import type { FinishedGameStatus } from "@/lib/types";
 import { Team } from "@/lib/types";
 import type { VisibleTeammate } from "@/server/types";

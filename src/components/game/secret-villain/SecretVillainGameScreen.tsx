@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { useAdvanceGame, useGameAction, useReturnToLobby } from "@/hooks";
-import { SecretVillainAction } from "@/lib/game/modes/secret-villain/actions";
+import { SecretVillainAction } from "@/lib/game/modes/secret-villain";
 import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
 import { SpecialActionType } from "@/lib/game/modes/secret-villain/types";
 import type { StartingGameStatus } from "@/lib/types";

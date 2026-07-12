@@ -4,6 +4,7 @@ import { WerewolfRole } from "../roles";
 import { WerewolfPhase } from "../types";
 import { currentTurnState } from "../utils";
 
+/** Maximum length, in characters, of a Ghost's clue. */
 export const GHOST_CLUE_MAX_LENGTH = 20;
 
 export const submitGhostClueAction: GameAction = {

@@ -105,6 +105,46 @@ export default tseslint.config(
     },
   },
   ...storybook.configs["flat/recommended"],
+  // Vertical boundaries — seal each game mode's *logic internals*. A mode's
+  // `utils/` and `actions/` are its implementation; code outside the mode
+  // (components, app routes, server, the firebase/store layers) must not reach
+  // into them. Everything the outside legitimately consumes — a mode's `copy`,
+  // `roles`, `types`, `player-state`, `*-config`, `themes` — is its public data
+  // surface and is expressed by re-exporting through those public modules (or the
+  // mode barrel), so a logic refactor stays inside the mode. Rule-threshold
+  // constants live with the action that owns them and flow through the barrel.
+  //
+  // Scoped to `utils/` + `actions/` deliberately: forcing the pervasive data
+  // imports through a single mega-barrel would be a 300-site rewrite with no
+  // real safety gain (tracked separately). A path-based `no-restricted-imports`
+  // (stable core rule) is used because eslint-plugin-boundaries' matching
+  // `entry-point` rule is deprecated in v7, and this repo avoids new
+  // deprecated-API dependencies (see the #789 canary). Mode files are exempt so
+  // a mode importing its *own* internals by absolute path is unaffected;
+  // cross-mode internal imports are currently zero.
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: ["src/lib/game/modes/**"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "@/lib/game/modes/*/utils",
+                "@/lib/game/modes/*/utils/**",
+                "@/lib/game/modes/*/actions",
+                "@/lib/game/modes/*/actions/**",
+              ],
+              message:
+                "Don't import a game mode's utils/ or actions/ internals from outside the mode — use the mode barrel (@/lib/game/modes/<mode>) or its public data modules (types, copy, roles, etc.).",
+            },
+          ],
+        },
+      ],
+    },
+  },
   {
     files: ["**/*.{ts,tsx,js,mjs,cjs}"],
     plugins: {
