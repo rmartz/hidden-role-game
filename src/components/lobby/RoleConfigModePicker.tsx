@@ -2,7 +2,8 @@
 
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RoleConfigMode } from "@/lib/types";
+import type { RoleConfigMode } from "@/lib/types";
+import { ROLE_CONFIG_MODE_ORDER } from "@/lib/types";
 import { useAppDispatch, useAppSelector } from "@/store";
 import { setRoleConfigMode } from "@/store/game-config-slice";
 
@@ -26,7 +27,7 @@ export function RoleConfigModePicker({ disabled }: RoleConfigModePickerProps) {
         }}
       >
         <TabsList>
-          {Object.values(RoleConfigMode).map((mode) => (
+          {ROLE_CONFIG_MODE_ORDER.map((mode) => (
             <TabsTrigger key={mode} value={mode} disabled={disabled}>
               {mode}
             </TabsTrigger>

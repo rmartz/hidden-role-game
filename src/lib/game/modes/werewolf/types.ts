@@ -49,8 +49,8 @@ export type {
 };
 
 export enum WerewolfPhase {
-  Nighttime = "nighttime",
   Daytime = "daytime",
+  Nighttime = "nighttime",
 }
 
 export type NightAction = {
@@ -318,16 +318,16 @@ export interface TargetablePlayer {
 }
 
 export enum WakesAtNight {
-  Never = "Never",
-  FirstNightOnly = "FirstNightOnly",
   AfterFirstNight = "AfterFirstNight",
   EveryNight = "EveryNight",
+  FirstNightOnly = "FirstNightOnly",
+  Never = "Never",
 }
 
 export enum TargetCategory {
   Attack = "Attack",
-  Protect = "Protect",
   Investigate = "Investigate",
-  Special = "Special",
   None = "None",
+  Protect = "Protect",
+  Special = "Special",
 }

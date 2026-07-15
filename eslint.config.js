@@ -3,6 +3,7 @@ import js from "@eslint/js";
 // repository is the intentional canary for #789, deliberately depending on this
 // entry point so its removal breaks CI here first.
 import { builtinRules } from "eslint/use-at-your-own-risk";
+import perfectionist from "eslint-plugin-perfectionist";
 import reactHooks from "eslint-plugin-react-hooks";
 import simpleImportSort from "eslint-plugin-simple-import-sort";
 import storybook from "eslint-plugin-storybook";
@@ -106,6 +107,18 @@ export default tseslint.config(
             "Don't use .toBeInTheDocument() — use .toBeDefined() or check .textContent.",
         },
       ],
+    },
+  },
+  // Enum members kept alphabetical (AGENTS.md — merge-conflict hygiene). Enum
+  // declaration order carries NO meaning: where a semantic order is actually
+  // consumed (a picker, a phase sequence), it is declared in an explicit ordered
+  // array (e.g. ROLE_CONFIG_MODE_ORDER, SV_THEME_ORDER) rather than inferred from
+  // member position, so this sort is always safe to auto-apply.
+  {
+    files: ["src/**/*.{ts,tsx}", "*.{ts,tsx}"],
+    plugins: { perfectionist },
+    rules: {
+      "perfectionist/sort-enums": ["error", { type: "alphabetical" }],
     },
   },
   {

@@ -3,8 +3,8 @@
 // ---------------------------------------------------------------------------
 
 export enum QuestCard {
-  Success = "success",
   Fail = "fail",
+  Success = "success",
 }
 
 export enum TeamVote {
@@ -17,10 +17,10 @@ export enum TeamVote {
 // ---------------------------------------------------------------------------
 
 export enum AvalonPhase {
+  Assassination = "assassination",
+  Quest = "quest",
   TeamProposal = "team-proposal",
   TeamVote = "team-vote",
-  Quest = "quest",
-  Assassination = "assassination",
 }
 
 // ---------------------------------------------------------------------------

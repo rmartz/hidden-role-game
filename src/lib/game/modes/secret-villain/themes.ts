@@ -1,10 +1,22 @@
 /** Available theme identifiers for Secret Villain. */
 export enum SvTheme {
+  Business = "business",
   Default = "default",
   Original = "original",
   StarWars = "star-wars",
-  Business = "business",
 }
+
+/**
+ * Display order for the theme picker. Declared explicitly so the `SvTheme`
+ * members can be alphabetized (merge-conflict hygiene) without changing the
+ * order the picker options render in.
+ */
+export const SV_THEME_ORDER = [
+  SvTheme.Default,
+  SvTheme.Original,
+  SvTheme.StarWars,
+  SvTheme.Business,
+] as const;
 
 /** Theme-sensitive labels for Secret Villain UI. */
 export interface SvThemeLabels {

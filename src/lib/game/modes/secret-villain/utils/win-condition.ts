@@ -9,17 +9,17 @@ import {
 } from "../types";
 
 export enum SecretVillainWinner {
-  Good = "Good",
   Bad = "Bad",
+  Good = "Good",
 }
 
 /** Keys identifying which specific win condition triggered the end of a Secret Villain game. */
 export enum SvVictoryConditionKey {
-  GoodPolicy = "good-policy",
   BadPolicy = "bad-policy",
-  SpecialBadElected = "special-bad-elected",
-  GoodShoot = "good-shoot",
   Chaos = "chaos",
+  GoodPolicy = "good-policy",
+  GoodShoot = "good-shoot",
+  SpecialBadElected = "special-bad-elected",
 }
 
 export interface WinConditionResult {
