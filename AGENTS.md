@@ -39,7 +39,6 @@ After creating a git worktree (`git worktree add .git-worktrees/<name> -b <branc
 - Strict mode throughout. No `any` types. No `@ts-ignore`.
 - Do not use `null` unless required for API compatibility or when explicitly distinguishing `null` from `undefined`. Prefer `undefined` for absent/optional values throughout the codebase.
 - Prefer explicit `interface` names scoped to their component (e.g., `interface OwnerAdvanceCardProps` not `interface Props`).
-- Use `async/await`, not `.then()` chains.
 
 ## File Organization
 
@@ -55,10 +54,9 @@ After creating a git worktree (`git worktree add .git-worktrees/<name> -b <branc
 
 - **Favor type inference.** Explicit generic type arguments (for example, `someFn<Foo>(...)`) are a code smell when TypeScript can infer them.
 - **No spurious variables.** Do not assign a value to a variable only to immediately return it on the next line — return the expression directly instead.
-- **No IIFEs.** Do not use immediately-invoked function expressions. Extract the logic into a named helper function or compute the value with a plain expression instead.
-- **No function-style imports.** Do not use inline `import("…").Type` syntax in type annotations. Use module-level `import type { … } from "…"` statements at the top of the file. Dynamic `await import("…")` for services that require conditional loading (e.g., Sentry instrumentation) is acceptable.
 - **No unnecessary helpers.** Do not extract logic into a helper function unless it separates significant logic or belongs in a different module. Three similar lines is better than a premature abstraction.
-- **Enums and constant objects** should be kept in alphabetical order to minimize merge conflicts.
+- **Constant objects** (lookup maps, config records) should be kept in alphabetical order to minimize merge conflicts. (Enum members are alphabetized automatically by eslint — see the enum-order rule below.)
+- **Enums have no inherent order.** An enum's member declaration order is meaningless and may be reordered at any time — members are kept alphabetical, auto-enforced by `perfectionist/sort-enums`. **Never** rely on `Object.values(SomeEnum)` / `Object.keys` / `Object.entries` iteration order for a meaningful sequence (a UI display order, a phase progression, a priority ranking). When an order matters, declare it **explicitly** in a separate structure and drive the sequence from that — an ordered array (`const X_ORDER = [SomeEnum.A, SomeEnum.B, …] as const`) or a member→position record (`const X_SORT: Record<SomeEnum, number> = { … }`). See `ROLE_CONFIG_MODE_ORDER` / `SV_THEME_ORDER` for the pattern.
 - **Value sets: default to a structural string union over an `enum`.** For a fixed set of named values, prefer a string union (`type TrialPhase = "defense" | "voting"`), or an `as const` array when the values are also needed at runtime for validation/iteration (`const TRIAL_PHASES = ["defense", "voting"] as const; type TrialPhase = (typeof TRIAL_PHASES)[number]`). Both stay **structural**, so serialized/wire strings (Firebase documents, API payloads, query/path params) assign without a cast and emit ~no runtime — whereas a string `enum` is **nominal** (it rejects the underlying literal, forcing a cast at every serialization boundary) and ships a runtime object. The deciding axis is the **serialization boundary**: does the value cross a wire/persistence boundary? → structural union / `as const`. Reserve `enum` for internal-only state you iterate as a unit and never serialize raw, **or** for a value set already paired with an explicit converter seam (`{domain}ToFirebase()` / `firebaseTo{domain}()`, `parseGameMode`) that centralizes the boundary cast — the existing game-domain enums are deliberately in this category, so do not churn them. Export new value-set types from the module barrel.
 
 ## User-Facing Text
@@ -104,7 +102,6 @@ After creating a git worktree (`git worktree add .git-worktrees/<name> -b <branc
 
 ## Testing Conventions
 
-- Use `describe`/`it` from Vitest (not `test`).
 - Test fixture generators use `make{DomainName}()` (e.g., `makePlayingGame()`, `makeGameState()`).
 - When splitting large test files, organize into `{module}-tests/` directories (e.g., `resolution-tests/altruist.spec.ts`).
 
@@ -142,7 +139,6 @@ After creating a git worktree (`git worktree add .git-worktrees/<name> -b <branc
 - Test files are co-located with their component: `ComponentName.spec.tsx`.
 - When adding or modifying a UI component, add or update its test to verify rendering behavior and key prop-driven states.
 - Use `@testing-library/react` with `vitest`. Always call `afterEach(cleanup)`.
-- Do not use `.toBeInTheDocument()` — use `.toBeDefined()` or check `.textContent` instead.
 - Assert against copy constants (e.g., `WEREWOLF_COPY`) rather than hardcoded strings.
 - Test presentational view components directly; avoid mocking hooks in tests where possible.
 
