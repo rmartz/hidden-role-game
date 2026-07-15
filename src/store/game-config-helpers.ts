@@ -1,8 +1,13 @@
 import { sum } from "lodash";
 
 import { GAME_MODES, getAdvancedBucketMaxCapacity } from "@/lib/game/modes";
-import type { ModeConfig, RoleBucket, SimpleRoleBucket } from "@/lib/types";
-import { GameMode, isSimpleRoleBucket, RoleConfigMode } from "@/lib/types";
+import type {
+  GameMode,
+  ModeConfig,
+  RoleBucket,
+  SimpleRoleBucket,
+} from "@/lib/types";
+import { isSimpleRoleBucket, RoleConfigMode } from "@/lib/types";
 
 import type { GameConfigState } from "./game-config-state";
 

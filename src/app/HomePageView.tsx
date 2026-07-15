@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { GAME_MODES } from "@/lib/game/modes";
-import { GameMode } from "@/lib/types";
+import type { GameMode } from "@/lib/types";
 
 import { HOME_PAGE_COPY } from "./page.copy";
 

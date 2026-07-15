@@ -5,7 +5,7 @@ import {
   isGameModeEnabled,
   parseGameMode,
 } from "@/lib/game/modes";
-import { GameMode } from "@/lib/types";
+import type { GameMode } from "@/lib/types";
 import { addLobby } from "@/server/lobby";
 import { type CreateLobbyRequest, ServerResponseStatus } from "@/server/types";
 import {

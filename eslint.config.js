@@ -62,6 +62,52 @@ export default tseslint.config(
       "react-hooks/exhaustive-deps": "error",
     },
   },
+  // Static enforcement of prose code-style conventions (AGENTS.md): type-only
+  // imports go through `import type`; no inline `import("…").Type`; no IIFEs;
+  // async/await over `.then()`; and the Vitest conventions (`it()` not `test()`,
+  // no `.toBeInTheDocument()`). Rules the review process used to enforce by eye.
+  {
+    files: ["src/**/*.{ts,tsx}", "*.{ts,tsx}"],
+    rules: {
+      "@typescript-eslint/consistent-type-imports": [
+        "error",
+        { fixStyle: "separate-type-imports" },
+      ],
+      "@typescript-eslint/no-import-type-side-effects": "error",
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "TSImportType",
+          message:
+            'No inline import("…").Type — use a module-level `import type { … } from "…"`.',
+        },
+        {
+          selector: "CallExpression > FunctionExpression.callee",
+          message:
+            "No IIFEs — extract a named helper or compute the value with a plain expression.",
+        },
+        {
+          selector: "CallExpression > ArrowFunctionExpression.callee",
+          message:
+            "No IIFEs — extract a named helper or compute the value with a plain expression.",
+        },
+        {
+          selector: "CallExpression[callee.property.name='then']",
+          message: "Use async/await, not a .then() chain.",
+        },
+        {
+          selector:
+            "CallExpression[callee.name='test'][callee.type='Identifier']",
+          message: "Use it() from Vitest, not test().",
+        },
+        {
+          selector: "MemberExpression[property.name='toBeInTheDocument']",
+          message:
+            "Don't use .toBeInTheDocument() — use .toBeDefined() or check .textContent.",
+        },
+      ],
+    },
+  },
   {
     files: ["**/*.{js,mjs,cjs}"],
     extends: [...tseslint.configs.recommended],

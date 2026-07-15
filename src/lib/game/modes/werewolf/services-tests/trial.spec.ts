@@ -1,8 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
+import type { DaytimeVote, WerewolfTurnState } from "@/lib/game/modes/werewolf";
 import {
-  DaytimeVote,
   DEFAULT_WEREWOLF_TIMER_CONFIG,
   TrialPhase,
   WerewolfPhase,

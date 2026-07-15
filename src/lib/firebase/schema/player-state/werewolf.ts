@@ -1,5 +1,5 @@
 import type { AnyNightAction, DaytimeVote } from "@/lib/game/modes/werewolf";
-import { TrialVerdict } from "@/lib/game/modes/werewolf";
+import type { TrialVerdict } from "@/lib/game/modes/werewolf";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
 import { GameMode } from "@/lib/types";
 import type { NightStatusEntry } from "@/server/types";

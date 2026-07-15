@@ -149,6 +149,11 @@ export default function LobbyPage() {
     startGameMutation.mutate({ gameMode });
   }
 
+  async function handleTransferOwner(playerId: string) {
+    await flushConfigSync();
+    transferOwnerMutation.mutate(playerId);
+  }
+
   const startGameMutationRef = useRef(startGameMutation);
   startGameMutationRef.current = startGameMutation;
   const flushConfigSyncRef = useRef(flushConfigSync);
@@ -269,11 +274,7 @@ export default function LobbyPage() {
           onRemovePlayer={(playerId: string) => {
             removeMutation.mutate(playerId);
           }}
-          onTransferOwner={(playerId: string) => {
-            void flushConfigSync().then(() => {
-              transferOwnerMutation.mutate(playerId);
-            });
-          }}
+          onTransferOwner={(playerId) => void handleTransferOwner(playerId)}
           onRenamePlayer={(playerName) => {
             renameMutation.mutate(playerName);
           }}

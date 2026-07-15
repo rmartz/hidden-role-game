@@ -1,6 +1,7 @@
 import type { Game, GameAction } from "@/lib/types";
 
-import { PolicyCard, SecretVillainPhase, SpecialActionType } from "../types";
+import type { PolicyCard } from "../types";
+import { SecretVillainPhase, SpecialActionType } from "../types";
 import { currentTurnState } from "../utils";
 import { advanceToNextElection } from "./advance-to-election";
 
