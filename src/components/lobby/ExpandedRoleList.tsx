@@ -1,5 +1,5 @@
 import type { GameMode, RoleDefinition, Team } from "@/lib/types";
-import { RoleConfigMode } from "@/lib/types";
+import type { RoleConfigMode } from "@/lib/types";
 
 import { ROLE_CONFIG_COPY } from "./RoleConfig.copy";
 import { RoleListEntry } from "./RoleListEntry";

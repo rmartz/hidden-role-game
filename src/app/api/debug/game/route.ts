@@ -5,9 +5,10 @@ import type {
   LobbyPlayer,
   ModeConfig,
   RoleBucket,
+  ShowRolesInPlay,
   TimerConfig,
 } from "@/lib/types";
-import { GameMode, ShowRolesInPlay } from "@/lib/types";
+import { GameMode } from "@/lib/types";
 import { createGame, getModeDefinition } from "@/server/game";
 import { ServerResponseStatus } from "@/server/types";
 import {

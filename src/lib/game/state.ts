@@ -9,10 +9,11 @@ import type {
   ModeConfig,
   PlayingGameStatus,
   RoleBucket,
+  ShowRolesInPlay,
   TimerConfig,
 } from "@/lib/types";
-import { GameStatus, ShowRolesInPlay } from "@/lib/types";
-import { GameMode } from "@/lib/types";
+import type { GameMode } from "@/lib/types";
+import { GameStatus } from "@/lib/types";
 import type { PlayerGameState, VisibleTeammate } from "@/server/types";
 import {
   assignRolesFromBuckets,

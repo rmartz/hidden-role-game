@@ -12,7 +12,7 @@ import type {
   ShowRolesInPlay,
   TimerConfig,
 } from "@/lib/types";
-import { GameMode } from "@/lib/types";
+import type { GameMode } from "@/lib/types";
 
 export interface PublicLobbyPlayer {
   id: string;

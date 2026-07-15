@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import type { PolicyCard } from "../types";
 import {
-  PolicyCard,
   SecretVillainPhase,
   type SecretVillainTurnState,
   SvBoardPreset,

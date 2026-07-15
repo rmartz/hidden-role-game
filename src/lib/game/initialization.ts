@@ -5,9 +5,10 @@ import type {
   LobbyPlayer,
   PlayerRoleAssignment,
   RoleDefinition,
+  Team,
   VisiblePlayer,
 } from "@/lib/types";
-import { isSimpleRoleBucket, ShowRolesInPlay, Team } from "@/lib/types";
+import { isSimpleRoleBucket, ShowRolesInPlay } from "@/lib/types";
 import type { RoleInPlay } from "@/server/types";
 
 /**

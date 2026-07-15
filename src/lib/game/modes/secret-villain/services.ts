@@ -8,11 +8,14 @@ import { SECRET_VILLAIN_COPY } from "./copy";
 import { SecretVillainRole } from "./roles";
 import type { SvTheme } from "./themes";
 import { getSvThemeLabels } from "./themes";
-import type { SecretVillainTurnState, SvCustomPowerConfig } from "./types";
+import type {
+  SecretVillainTurnState,
+  SvBoardPreset,
+  SvCustomPowerConfig,
+} from "./types";
 import {
   SecretVillainPhase,
   SpecialActionType,
-  SvBoardPreset,
   VETO_UNLOCK_THRESHOLD,
 } from "./types";
 import {

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/field";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { ShowRolesInPlay } from "@/lib/types";
+import type { ShowRolesInPlay } from "@/lib/types";
 
 import {
   SHOW_ROLES_IN_PLAY_PICKER_COPY,

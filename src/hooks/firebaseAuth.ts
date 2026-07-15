@@ -51,13 +51,15 @@ export function useFirebaseAuth(): { isReady: boolean } {
   useEffect(() => {
     let cancelled = false;
     setIsReady(false);
-    ensureSignedIn()
-      .then(() => {
+    const signIn = async () => {
+      try {
+        await ensureSignedIn();
         if (!cancelled) setIsReady(true);
-      })
-      .catch((err: unknown) => {
+      } catch (err: unknown) {
         console.error("[useFirebaseAuth] Sign-in failed", err);
-      });
+      }
+    };
+    void signIn();
     return () => {
       cancelled = true;
     };

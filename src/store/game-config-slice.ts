@@ -4,16 +4,13 @@ import { createSlice } from "@reduxjs/toolkit";
 import { GAME_MODES } from "@/lib/game/modes";
 import type {
   AdvancedRoleBucket,
+  GameMode,
   ModeConfig,
   ModeConfigField,
+  ShowRolesInPlay,
   TimerConfig,
 } from "@/lib/types";
-import {
-  GameMode,
-  isSimpleRoleBucket,
-  RoleConfigMode,
-  ShowRolesInPlay,
-} from "@/lib/types";
+import { isSimpleRoleBucket, RoleConfigMode } from "@/lib/types";
 import type { GameConfig } from "@/server/types";
 
 import {

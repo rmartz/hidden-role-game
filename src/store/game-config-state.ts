@@ -1,6 +1,11 @@
 import { DEFAULT_GAME_MODE, GAME_MODES } from "@/lib/game/modes";
-import type { ModeConfig, RoleBucket, TimerConfig } from "@/lib/types";
-import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
+import type {
+  GameMode,
+  ModeConfig,
+  RoleBucket,
+  TimerConfig,
+} from "@/lib/types";
+import { RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
 
 export interface GameConfigState {
   gameMode: GameMode;

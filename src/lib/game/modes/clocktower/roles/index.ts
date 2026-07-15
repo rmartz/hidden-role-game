@@ -2,7 +2,7 @@ export * from "./_distribution";
 export * from "./_types";
 
 import type { ClocktowerRoleDefinition } from "./_types";
-import { ClocktowerRole } from "./_types";
+import type { ClocktowerRole } from "./_types";
 import { CLOCKTOWER_DEMON_ROLES } from "./demons";
 import { CLOCKTOWER_MINION_ROLES } from "./minions";
 import { CLOCKTOWER_OUTSIDER_ROLES } from "./outsiders";
