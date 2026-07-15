@@ -8,11 +8,11 @@ export enum WerewolfRoleCategory {
   EvilSupport = "evil-support",
   NeutralKilling = "neutral-killing",
   NeutralManipulation = "neutral-manipulation",
-  VillagerInvestigation = "villager-investigation",
-  VillagerProtection = "villager-protection",
-  VillagerKilling = "villager-killing",
-  VillagerSupport = "villager-support",
   VillagerHandicap = "villager-handicap",
+  VillagerInvestigation = "villager-investigation",
+  VillagerKilling = "villager-killing",
+  VillagerProtection = "villager-protection",
+  VillagerSupport = "villager-support",
 }
 
 export const WEREWOLF_ROLE_CATEGORY_ORDER: WerewolfRoleCategory[] = [

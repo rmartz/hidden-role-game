@@ -5,8 +5,8 @@
 export enum SecretVillainPhase {
   ElectionNomination = "election-nomination",
   ElectionVote = "election-vote",
-  PolicyPresident = "policy-president",
   PolicyChancellor = "policy-chancellor",
+  PolicyPresident = "policy-president",
   SpecialAction = "special-action",
   SpecialBadReveal = "special-bad-reveal",
 }
@@ -16,8 +16,8 @@ export enum SecretVillainPhase {
 // ---------------------------------------------------------------------------
 
 export enum PolicyCard {
-  Good = "good",
   Bad = "bad",
+  Good = "good",
 }
 
 /** Number of Good and Bad cards in a fresh deck. */
@@ -51,8 +51,8 @@ export enum SvBoardPreset {
 export enum SpecialActionType {
   InvestigateTeam = "investigate-team",
   PolicyPeek = "policy-peek",
-  SpecialElection = "special-election",
   Shoot = "shoot",
+  SpecialElection = "special-election",
 }
 
 /** Power table: actions triggered when the Nth Bad card is played (index 0 = 1st card). */

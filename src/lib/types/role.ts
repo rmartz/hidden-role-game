@@ -1,8 +1,8 @@
 // --- Team and Role Definition types ---
 
 export enum Team {
-  Good = "Good",
   Bad = "Bad",
+  Good = "Good",
   Neutral = "Neutral",
 }
 

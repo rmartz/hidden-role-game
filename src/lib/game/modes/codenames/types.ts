@@ -3,15 +3,15 @@
 // ---------------------------------------------------------------------------
 
 export enum CodenamesTeam {
-  Red = "red",
   Blue = "blue",
+  Red = "red",
 }
 
 export enum BoardCardColor {
-  Red = "red",
+  Assassin = "assassin",
   Blue = "blue",
   Neutral = "neutral",
-  Assassin = "assassin",
+  Red = "red",
 }
 
 // ---------------------------------------------------------------------------

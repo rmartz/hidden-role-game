@@ -1,6 +1,6 @@
 export enum ServerResponseStatus {
-  Success = "success",
   Error = "error",
+  Success = "success",
 }
 
 export interface BaseServerResponse {

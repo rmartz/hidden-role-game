@@ -1,9 +1,9 @@
 // --- Game Status (no Lobby — Lobby is a separate concept) ---
 
 export enum GameStatus {
-  Starting = "Starting",
-  Playing = "Playing",
   Finished = "Finished",
+  Playing = "Playing",
+  Starting = "Starting",
 }
 
 export interface StartingGameStatus {

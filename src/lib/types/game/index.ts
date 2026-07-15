@@ -25,7 +25,12 @@ export type {
   WerewolfGame,
 } from "./game";
 export type { BaseLobbyConfig, Lobby, LobbyConfig } from "./lobby";
-export { GameMode, RoleConfigMode, ShowRolesInPlay } from "./mode";
+export {
+  GameMode,
+  ROLE_CONFIG_MODE_ORDER,
+  RoleConfigMode,
+  ShowRolesInPlay,
+} from "./mode";
 export type { GameModeConfig, GameModeServices } from "./mode-services";
 export type {
   GamePlayer,
