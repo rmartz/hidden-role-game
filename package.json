@@ -22,6 +22,7 @@
     "tsc": "tsc --noEmit",
     "check:action-pins": "node scripts/check-action-pins.mjs",
     "check:pins": "node scripts/check-package-pins.mjs",
+    "check:release-age": "node scripts/check-release-age.mjs",
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
