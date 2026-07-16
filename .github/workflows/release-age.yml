@@ -1,0 +1,40 @@
+name: Release Age
+
+# Dependency-cooldown gate (POC): fails a PR that introduces a package version
+# younger than the cooldown window (default 7 days). Enforces our "let releases
+# age before we adopt them" supply-chain policy at the layer we control, rather
+# than relying on Dependabot's own `cooldown` (advisory, with documented npm
+# reliability gaps). See scripts/check-release-age.mjs for why this inspects the
+# lockfile diff instead of setting pnpm's `minimum-release-age` (which would slow
+# Dependabot's own resolution to a crawl).
+#
+# pull_request only: the gate blocks a hot version from *landing*. Running it on
+# push-to-main would only fail an already-merged commit. Gated to runs that
+# change the lockfile (or the checker itself) — nothing else affects the result.
+on:
+  pull_request:
+    paths:
+      - "pnpm-lock.yaml"
+      - "scripts/check-release-age.mjs"
+      - ".github/workflows/release-age.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  check-release-age:
+    name: Check dependency release age
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      # fetch-depth: 0 so the base commit is present for `git show <base>:...`.
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+      # The check needs only Node + git + network (no dependency install).
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24.x
+      - run: node scripts/check-release-age.mjs "$BASE_SHA"
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
