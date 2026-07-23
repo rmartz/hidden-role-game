@@ -21,6 +21,16 @@ import tseslint from "typescript-eslint";
 // ESLint has landed native per-rule multi-threshold support and migrate off it.
 const maxLinesWarn = { rules: { "max-lines": builtinRules.get("max-lines") } };
 
+// ⚠️ UNSUPPORTED — same aliasing technique as maxLinesWarn (see #789). The core
+// `no-restricted-syntax` is already registered at `error` for the hard bans
+// (IIFEs, `.then()`, inline import types, etc.). A rule carries a single
+// severity, so a soft `warn`-tier restriction can't live in that same rule
+// entry — aliasing the built-in under a second plugin namespace lets us also
+// register it at `warn` for advisory code smells that aren't outright invalid.
+const restrictedSyntaxWarn = {
+  rules: { "no-restricted-syntax": builtinRules.get("no-restricted-syntax") },
+};
+
 export default tseslint.config(
   {
     ignores: [
@@ -105,6 +115,32 @@ export default tseslint.config(
           selector: "MemberExpression[property.name='toBeInTheDocument']",
           message:
             "Don't use .toBeInTheDocument() — use .toBeDefined() or check .textContent.",
+        },
+      ],
+    },
+  },
+  // Advisory `warn`-tier restriction (not a hard ban — see restrictedSyntaxWarn).
+  // Coalescing an optional to the empty string (`optional ?? ""`) is type-valid
+  // by construction, so no type-aware rule flags it — but it silently hides an
+  // absent value behind a type that claims the string is always present. It's a
+  // code smell, not an error: often the honest fix is to model the field as
+  // optional and handle `undefined`. Warn (not error) because empty-string is
+  // sometimes a legitimate default (display fallbacks, mock helpers); triage the
+  // warnings rather than auto-failing CI on them.
+  {
+    files: ["src/**/*.{ts,tsx}", "*.{ts,tsx}"],
+    plugins: { "no-restricted-syntax-warn": restrictedSyntaxWarn },
+    rules: {
+      "no-restricted-syntax-warn/no-restricted-syntax": [
+        "warn",
+        {
+          selector:
+            'LogicalExpression[operator="??"] > Literal.right[value=""]',
+          message:
+            'Coercing an optional to "" hides an absent value behind a ' +
+            "required-string type. This is a code smell, not an error — often " +
+            "the better fix is to model the field as optional and handle " +
+            "undefined. If the empty-string default is genuinely correct, keep it.",
         },
       ],
     },
