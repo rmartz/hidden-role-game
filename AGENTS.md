@@ -39,6 +39,7 @@ After creating a git worktree (`git worktree add .git-worktrees/<name> -b <branc
 - Strict mode throughout. No `any` types. No `@ts-ignore`.
 - Do not use `null` unless required for API compatibility or when explicitly distinguishing `null` from `undefined`. Prefer `undefined` for absent/optional values throughout the codebase.
 - Prefer explicit `interface` names scoped to their component (e.g., `interface OwnerAdvanceCardProps` not `interface Props`).
+- **Coercing an optional to a falsy sentinel is a code smell — treat it as a prompt to reconsider the type.** `optional ?? ""` (and its siblings `?? 0`, `?? false`) is type-valid by construction, so no type-aware rule catches it — but it hides an absent value behind a type that claims the value is always present. eslint flags `?? ""` at `warn` severity (`no-restricted-syntax-warn`, advisory only — it does not fail CI). Before silencing it, ask whether the field should be **optional** in its type (`string | undefined`) with the absence handled explicitly, rather than papered over with a default. Keep the empty-string default only when it is a genuinely correct, meaningful value (a display fallback, a mock helper) — not merely to satisfy a type that should have been optional.
 
 ## File Organization
 
