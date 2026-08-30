@@ -4,11 +4,12 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    # Let releases age before applying them, to reduce exposure to compromised
-    # package versions (supply-chain attacks are typically caught and yanked
-    # within days). Applies to all update types.
-    cooldown:
-      default-days: 7
+    # NOTE: no `cooldown` here. A 7-day cooldown was tried (#740) but broke every
+    # npm run: Dependabot enforces cooldown by passing pnpm a `minimumReleaseAge`,
+    # and pnpm hard-fails lockfile resolution (ERR_PNPM_NO_MATURE_MATCHING_VERSION)
+    # whenever any transitive dep in the fast-moving Storybook/Vite toolchain has
+    # a version published within the window instead of falling back to an older
+    # mature one — so no update could ever complete. Removed to restore updates.
     commit-message:
       prefix: "chore"
       prefix-development: "chore"
