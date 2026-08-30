@@ -52,6 +52,7 @@ const defaultProps = {
   showRemovePlayer: true,
   showMakeOwner: true,
   showRefresh: false,
+  allowNoDevicePlayers: true,
   isFetching: false,
   disabled: false,
   isReadyPending: false,
@@ -117,6 +118,21 @@ describe("PlayerList", () => {
       />,
     );
     expect(container.textContent).toContain(PLAYER_LIST_COPY.addNoDeviceButton);
+  });
+
+  it("hides add-no-device button when the mode disallows no-device players", () => {
+    const { container } = render(
+      <PlayerList
+        {...defaultProps}
+        isOwner={true}
+        userPlayerId="p1"
+        allowNoDevicePlayers={false}
+        lobby={baseLobby}
+      />,
+    );
+    expect(container.textContent).not.toContain(
+      PLAYER_LIST_COPY.addNoDeviceButton,
+    );
   });
 
   it("shows Not Ready button when current user is already ready", () => {

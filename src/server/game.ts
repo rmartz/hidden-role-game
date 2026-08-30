@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
 
+import { gameAllowsNoDevicePlayers } from "@/lib/game/modes";
 import {
   buildAllPlayerStates,
   buildGame,
@@ -162,6 +163,15 @@ export function validateGameStartPrerequisites(
   }
   const definition = getModeDefinition(gameMode);
   const modeConfig = lobby.config.modeConfig;
+  if (
+    lobby.players.some((p) => p.noDevice) &&
+    !gameAllowsNoDevicePlayers(gameMode, modeConfig)
+  ) {
+    return {
+      error:
+        "No-device players require a narrator who can privately reveal roles. Remove them before starting.",
+    };
+  }
   const ownerTitle =
     definition.resolveOwnerTitle?.(modeConfig) ?? definition.ownerTitle;
   const ownerPlayerId = ownerTitle

@@ -8,6 +8,26 @@ import { GameMode, RoleConfigMode, ShowRolesInPlay } from "@/lib/types";
 
 import { validateGameStartPrerequisites } from "./game";
 
+function makeWerewolfConfig(): Lobby["config"] {
+  return {
+    gameMode: GameMode.Werewolf,
+    roleConfigMode: RoleConfigMode.Default,
+    roleBuckets: [],
+    showConfigToPlayers: false,
+    showRolesInPlay: ShowRolesInPlay.None,
+    modeConfig: {
+      gameMode: GameMode.Werewolf,
+      nominationsEnabled: false,
+      trialsPerDay: undefined,
+      revealProtections: false,
+      hiddenRoleCount: 0,
+      showRolesOnDeath: true,
+      autoRevealNightOutcome: true,
+    },
+    timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
+  };
+}
+
 function makeLobby(overrides: Partial<Lobby> = {}): Lobby {
   return {
     id: "lobby-1",
@@ -53,23 +73,7 @@ describe("validateGameStartPrerequisites", () => {
 
   it("returns the owner's player ID for a mode with an owner role (Werewolf)", () => {
     const lobby = makeLobby({
-      config: {
-        gameMode: GameMode.Werewolf,
-        roleConfigMode: RoleConfigMode.Default,
-        roleBuckets: [],
-        showConfigToPlayers: false,
-        showRolesInPlay: ShowRolesInPlay.None,
-        modeConfig: {
-          gameMode: GameMode.Werewolf,
-          nominationsEnabled: false,
-          trialsPerDay: undefined,
-          revealProtections: false,
-          hiddenRoleCount: 0,
-          showRolesOnDeath: true,
-          autoRevealNightOutcome: true,
-        },
-        timerConfig: DEFAULT_WEREWOLF_TIMER_CONFIG,
-      },
+      config: makeWerewolfConfig(),
     });
     const result = validateGameStartPrerequisites(lobby, GameMode.Werewolf);
     expect("error" in result).toBe(false);
@@ -77,5 +81,31 @@ describe("validateGameStartPrerequisites", () => {
     expect(
       (result as { ownerPlayerId: string | undefined }).ownerPlayerId,
     ).toBe("player-1");
+  });
+
+  it("returns an error when a no-device player is present without an omniscient narrator (SecretVillain)", () => {
+    const lobby = makeLobby({
+      players: [
+        { id: "player-1", name: "Alice", sessionId: "session-owner" },
+        { id: "nd-1", name: "Ghost", noDevice: true },
+      ],
+    });
+    const result = validateGameStartPrerequisites(
+      lobby,
+      GameMode.SecretVillain,
+    );
+    expect("error" in result).toBe(true);
+  });
+
+  it("allows a no-device player when the mode has an omniscient narrator (Werewolf)", () => {
+    const lobby = makeLobby({
+      players: [
+        { id: "player-1", name: "Alice", sessionId: "session-owner" },
+        { id: "nd-1", name: "Ghost", noDevice: true },
+      ],
+      config: makeWerewolfConfig(),
+    });
+    const result = validateGameStartPrerequisites(lobby, GameMode.Werewolf);
+    expect("error" in result).toBe(false);
   });
 });

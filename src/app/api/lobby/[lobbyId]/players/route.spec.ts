@@ -6,6 +6,7 @@ import {
   makeLobbyParams as makeParams,
   postRequest,
 } from "@/app/api/test-utils";
+import { GameMode } from "@/lib/types";
 
 import { POST as createLobby } from "../../create/route";
 import { PUT as updateConfig } from "../config/route";
@@ -156,9 +157,34 @@ describe("POST /api/lobby/[lobbyId]/players", () => {
     expect(res.status).toBe(409);
   });
 
-  it("creates a no-device player and returns 201 with the updated lobby", async () => {
+  it("returns 400 when the game mode has no omniscient narrator", async () => {
+    // The default game mode (Secret Villain) has no narrator who sees roles,
+    // so no-device players — whose roles only a narrator can reveal — are barred.
     const createRes = await createLobby(
       postRequest("http://localhost/api/lobby/create", { playerName: "Alice" }),
+    );
+    const { data } = await createRes.json();
+
+    const res = await createNoDevicePlayer(
+      new Request(`http://localhost/api/lobby/${data.lobby.id}/players`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-session-id": data.sessionId,
+        },
+        body: JSON.stringify({ playerName: "Bob (no device)" }),
+      }),
+      makeParams(data.lobby.id),
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it("creates a no-device player and returns 201 with the updated lobby", async () => {
+    const createRes = await createLobby(
+      postRequest("http://localhost/api/lobby/create", {
+        playerName: "Alice",
+        gameMode: GameMode.Werewolf,
+      }),
     );
     const { data } = await createRes.json();
 

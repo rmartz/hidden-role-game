@@ -24,6 +24,7 @@ const meta = {
     isRenamePending: false,
     isOwnerRenamePending: false,
     isAddNoDevicePending: false,
+    allowNoDevicePlayers: true,
   },
 } satisfies Meta<typeof PlayerList>;
 
