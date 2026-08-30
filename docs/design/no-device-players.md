@@ -66,73 +66,90 @@ already exists as "similar to the Narrator in Werewolf" ([#297]) and its presenc
 is a lobby-time flag (`includeBoard`). Turning it into a no-device reveal surface
 requires the following, none of which is trivial.
 
-### 1. Role visibility (significant concern)
+### 1. The model: the Board acts as a no-device player, intermittently
 
-The Board is **intentionally role-blind**: `resolveOwnerSeesRoleAssignments`
-returns `false` when a Board is present, and [#297] specifies the Board "should
-NOT see any hidden information." Supporting no-device players reverses this.
+The Board keeps its **own** role-blind view — `resolveOwnerSeesRoleAssignments`
+stays `false` and [#297]'s "the Board sees no hidden information" is preserved.
+The Board never becomes omniscient. Instead it gains a gated **"act as
+&lt;no-device player&gt;"** mode: a scoped, privacy-preserving variant of the
+existing debug per-player view
+([`DebugGameView`](../../src/app/debug/DebugGameView.tsx) /
+[`GameScreenForPlayer`](../../src/app/debug/GameScreenForPlayer.tsx)), which
+already renders the whole game _as_ a chosen player from that player's own scoped
+`PlayerGameState`.
 
-- **Scope the reversal narrowly**: deliver only the _no-device players'_ role
-  map to the Board client, not every player's role, preserving the rest of
-  #297's privacy intent.
-- The Board's `PlayerGameState` (see
-  [`secret-villain/data-flow.md`](../secret-villain/data-flow.md)) currently
-  carries no role assignments at all; this is a server/player-state change, not
-  just a UI change.
-- The reveal UI should reuse Werewolf's pattern — the shared
-  [`PlayersRoleList`](../../src/components/game/PlayersRoleList.tsx) grid with
-  tap-to-reveal and grey-out-after-viewing (`OwnerStartingScreen`) — surfaced on
-  the Board during the Starting phase.
+- The Board momentarily switches into a single no-device player's seat, sees and
+  acts on **only that player's** state, then reverts to Board mode.
+- **Per-player scoping is inherent, not new work.** Each player's
+  `PlayerGameState` is already computed server-side per caller, so fetching one
+  no-device player's state leaks nothing about any other player — the Board is
+  handed one player's view at a time, never a merged god-view. This is exactly
+  why the role-blind `resolveOwnerSeesRoleAssignments` does **not** need
+  reversing (superseding this doc's earlier framing).
+- **The switcher is restricted to no-device players only.** Device-holding
+  players' seats are never selectable — the Board may only stand in for players
+  who have no screen of their own.
 
-### 2. Mid-game action mediation (the hard part)
+**Implementation seam:** the one genuinely new server capability is authorizing
+the lobby owner to fetch a _no-device_ player's scoped `PlayerGameState` by that
+player's id (device players excluded). The per-caller state builder already
+exists; only the authorization boundary is new.
 
-Werewolf no-device players are simple: night actions are already narrator-driven.
-Secret Villain is **not** — its core loop is a private, seat-specific exchange:
+This single mechanism covers **both** the Starting-phase role reveal (act as
+player X → X sees their own role, just as a device player would) and the
+mid-game private actions below.
+
+### 2. Mid-game action mediation
+
+Secret Villain's core loop is a private, seat-specific exchange:
 
 | Seat / phase        | Private information / action                      |
 | ------------------- | ------------------------------------------------- |
 | President (policy)  | Draws 3 policy cards, discards 1                  |
 | Chancellor (policy) | Receives 2 cards, plays 1; may propose veto       |
 | President (veto)    | Accepts / rejects the chancellor's veto           |
-| Any voter           | Ja / Nein election vote                           |
 | President (powers)  | Investigate, policy peek, special election, shoot |
 
-If a no-device player holds one of these seats, the narrator must conduct their
-hidden action on their device **without leaking it to anyone else**. The
-**worst case is both President and Chancellor being no-device** — the entire
-hidden policy exchange (draw → discard → pass → play) then happens on a single
-device and must stay concealed from the table.
+The "act as player" mechanism handles each: the Board switches into the
+no-device seat, the player acts behind the existing
+[`ActionGateView`](../../src/components/game/secret-villain/ActionGateView.tsx)
+privacy prompt, then the Board reverts. The **both-President-and-Chancellor
+no-device** worst case is handled by two sequential hand-offs (act as President →
+revert → act as Chancellor), never one combined screen.
 
-Open questions this raises:
+### 3. Voting is the exception — record the outcome, not each vote
 
-- Does the Board device conduct these actions, or a separate owner surface?
-- How are the existing `ActionGateView` privacy patterns adapted when the
-  "player" is the narrator acting for someone else?
-- Elections: how does the narrator enter Ja/Nein for each no-device voter
-  without revealing the running tally prematurely?
+Elections happen constantly and must be rapid, so a per-player "act as" hand-off
+for every vote is impractical. Instead, assume **no-device players vote in
+person** (thumbs up / thumbs down at the table) and use the Board only to
+**record the aggregate election result**, not each no-device player's individual
+Ja/Nein. This keeps the frequent path fast and avoids passing the tablet around
+mid-vote. (Device players still vote on their own screens.)
 
-### 3. Board privacy surface
+### 4. Handheld requirement & the projected-board hazard (must warn)
 
-The Board is described as a **shared/projected display** (big text, TV). That is
-the worst possible place to reveal a secret role or conduct a hidden card
-exchange. Werewolf's Narrator model assumes a **handheld** device. A decision is
-needed:
+The whole model depends on the Board being a **handheld** surface — a tablet the
+owner holds and individual no-device players can briefly pick up. The intended
+workflow:
 
-- Assume the Board is handheld whenever no-device players are present; **or**
-- Introduce a distinct owner/narrator surface for no-device mediation, separate
-  from the projected Board.
+> player picks up the tablet → Board switches to "act as me" → player acts behind
+> the ActionGate → reverts to Board mode → player sets the tablet down.
 
-The tap-to-reveal + grey-out guard mitigates a projected reveal but does not
-eliminate the risk.
+A **projected / cast / TV Board fundamentally breaks this** — a private reveal or
+card exchange would be shown to the whole room. When no-device players are
+present, the UI must **strictly warn against projecting the Board**, and we
+should consider hard-disallowing screen-share / cast in that configuration. The
+tap-to-reveal + grey-out guard mitigates an accidental glance but does not make a
+projected Board safe.
 
 ## Alternatives considered
 
 - **Keep Secret Villain permanently no-device-free.** Cheapest; the interim gate
-  already delivers this. Acceptable if the mediation complexity in §2 is judged
-  not worth the payoff.
-- **Support no-device only when a Board is enabled**, accepting §1 and §2 as
-  scoped follow-up work. Preferred if narrator-run Secret Villain is a desired
-  mode of play.
+  already delivers this. Acceptable if the act-as-player mediation (§1–§4) is
+  judged not worth the payoff.
+- **Support no-device only when a Board is enabled**, accepting §1–§4 as scoped
+  follow-up work. Preferred if narrator-run Secret Villain is a desired mode of
+  play.
 
 ## References
 
@@ -140,6 +157,8 @@ eliminate the risk.
 - [#297] — Secret Villain optional Board player (role-blind by design).
 - [`mode-services.ts`](../../src/lib/types/game/mode-services.ts) — the
   `resolveOwnerTitle` / `resolveOwnerSeesRoleAssignments` seams.
+- [`DebugGameView`](../../src/app/debug/DebugGameView.tsx) — the existing
+  per-player "view as X" pattern the act-as-player model is based on.
 - Project principle: **Narrator-First / No-Device Player Principle** in
   `CLAUDE.md`.
 
