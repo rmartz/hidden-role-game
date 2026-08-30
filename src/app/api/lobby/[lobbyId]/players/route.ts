@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
 
+import { gameAllowsNoDevicePlayers } from "@/lib/game/modes";
 import { addPlayer, validatePlayerJoin } from "@/server/lobby";
 import type { CreateNoDevicePlayerRequest } from "@/server/types";
 import { ServerResponseStatus } from "@/server/types";
@@ -37,6 +38,15 @@ export async function POST(
   const joinError = validatePlayerJoin(lobby, displayName);
   if (joinError) {
     return errorResponse(joinError, 400);
+  }
+
+  if (
+    !gameAllowsNoDevicePlayers(lobby.config.gameMode, lobby.config.modeConfig)
+  ) {
+    return errorResponse(
+      "No-device players are only available in games with a narrator who can privately reveal roles.",
+      400,
+    );
   }
 
   const newPlayer = {

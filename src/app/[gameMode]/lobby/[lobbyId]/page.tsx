@@ -26,7 +26,7 @@ import {
   useTransferOwner,
 } from "@/hooks";
 import { getLobbyId, getPlayerId, getSessionId, saveGameId } from "@/lib/api";
-import { parseGameMode } from "@/lib/game/modes";
+import { gameAllowsNoDevicePlayers, parseGameMode } from "@/lib/game/modes";
 import { GameMode } from "@/lib/types";
 
 import { LobbyPageHeaderView } from "./LobbyPageHeaderView";
@@ -266,6 +266,10 @@ export default function LobbyPage() {
           showRemovePlayer={isOwner}
           showMakeOwner={isOwner}
           showRefresh={!wsConnected}
+          allowNoDevicePlayers={gameAllowsNoDevicePlayers(
+            fetchLobby.data.config.gameMode,
+            fetchLobby.data.config.modeConfig,
+          )}
           isFetching={fetchLobby.isFetching}
           disabled={startGameMutation.isPending || gameId !== undefined}
           isReadyPending={toggleReadyMutation.isPending}

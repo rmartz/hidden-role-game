@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import { DEFAULT_SECRET_VILLAIN_MODE_CONFIG } from "@/lib/game/modes/secret-villain/lobby-config";
+import { DEFAULT_WEREWOLF_MODE_CONFIG } from "@/lib/game/modes/werewolf/lobby-config";
 import { GameMode } from "@/lib/types";
 
 import {
@@ -7,6 +9,7 @@ import {
   DEFAULT_GAME_MODE,
   ENABLED_GAME_MODES,
   GAME_MODES,
+  gameAllowsNoDevicePlayers,
   isGameModeEnabled,
   parseGameMode,
 } from "./modes";
@@ -83,6 +86,35 @@ describe("ALL_GAME_MODES", () => {
     const names = ALL_GAME_MODES.map((m) => GAME_MODES[m].name);
     const sorted = [...names].sort((a, b) => a.localeCompare(b));
     expect(names).toEqual(sorted);
+  });
+});
+
+describe("gameAllowsNoDevicePlayers", () => {
+  it("allows no-device players in Werewolf (owner is the omniscient Narrator)", () => {
+    expect(
+      gameAllowsNoDevicePlayers(
+        GameMode.Werewolf,
+        DEFAULT_WEREWOLF_MODE_CONFIG,
+      ),
+    ).toBe(true);
+  });
+
+  it("forbids no-device players in Secret Villain with a Board (owner is role-blind)", () => {
+    expect(
+      gameAllowsNoDevicePlayers(GameMode.SecretVillain, {
+        ...DEFAULT_SECRET_VILLAIN_MODE_CONFIG,
+        includeBoard: true,
+      }),
+    ).toBe(false);
+  });
+
+  it("forbids no-device players in Secret Villain without a Board (no owner surface)", () => {
+    expect(
+      gameAllowsNoDevicePlayers(GameMode.SecretVillain, {
+        ...DEFAULT_SECRET_VILLAIN_MODE_CONFIG,
+        includeBoard: false,
+      }),
+    ).toBe(false);
   });
 });
 

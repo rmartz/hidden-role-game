@@ -26,6 +26,10 @@ Curated reference knowledge for this codebase. Each page carries [Open Knowledge
 - [Project Structure](PROJECT_STRUCTURE.md) — directory-by-directory breakdown of the codebase.
 - [Game Mode Documentation](GAME_MODES.md) — overview of every supported game mode.
 
+## Design
+
+- [No-Device Players & the Omniscient-Narrator Requirement](design/no-device-players.md) — why no-device players require an omniscient narrator, the interim gate, and what full Secret Villain support would require.
+
 ## Game modes
 
 ### Werewolf

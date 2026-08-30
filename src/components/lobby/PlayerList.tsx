@@ -30,6 +30,8 @@ interface PlayerListProps {
   showRemovePlayer: boolean;
   showMakeOwner: boolean;
   showRefresh: boolean;
+  /** Whether this game mode supports owner-managed no-device players. */
+  allowNoDevicePlayers: boolean;
   isFetching: boolean;
   disabled: boolean;
   isReadyPending: boolean;
@@ -132,6 +134,7 @@ export function PlayerList({
   showRemovePlayer,
   showMakeOwner,
   showRefresh,
+  allowNoDevicePlayers,
   isFetching,
   disabled,
   isReadyPending,
@@ -349,7 +352,7 @@ export function PlayerList({
               : PLAYER_LIST_COPY.readyButton}
           </Button>
         )}
-        {isOwner && (
+        {isOwner && allowNoDevicePlayers && (
           <AddNoDevicePlayerDialog
             disabled={disabled || isAddNoDevicePending}
             onAdd={onAddNoDevicePlayer}

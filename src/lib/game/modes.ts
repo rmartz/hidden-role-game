@@ -80,6 +80,34 @@ export function getRoleSlotsRequired(
 }
 
 /**
+ * Whether no-device players may be added to a game with this configuration.
+ *
+ * No-device players are managed entirely by the lobby owner, including the
+ * private reveal of their secret role. They therefore require an *omniscient
+ * narrator* — an owner surface that (a) exists at all and (b) sees every role
+ * assignment. Both conditions are required: `resolveOwnerSeesRoleAssignments`
+ * defaults to `true`, so a mode with no owner surface would otherwise slip
+ * through on the visibility check alone.
+ *
+ * - Werewolf: owner is the Narrator (sees all roles) → allowed.
+ * - Secret Villain + Board: owner exists but is role-blind → not allowed.
+ * - Secret Villain without Board: no owner surface → not allowed.
+ *
+ * Interim gate for #857; lifting it for Secret Villain is scoped in
+ * `docs/design/no-device-players.md`.
+ */
+export function gameAllowsNoDevicePlayers(
+  gameMode: GameMode,
+  modeConfig: ModeConfig,
+): boolean {
+  const config = GAME_MODES[gameMode];
+  const ownerTitle =
+    config.resolveOwnerTitle?.(modeConfig) ?? config.ownerTitle;
+  if (ownerTitle === null) return false;
+  return config.resolveOwnerSeesRoleAssignments?.(modeConfig) ?? true;
+}
+
+/**
  * Computes the total draw capacity of an advanced bucket: the sum of each
  * slot's `max`, treating `undefined` (uncapped) as `bucket.playerCount`.
  */
