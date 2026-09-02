@@ -1,0 +1,59 @@
+name: Attach POC
+
+# Throwaway spike for #861: does the ubuntu-latest runner's gh support the new
+# --attach flag (gh >= 2.99.0), and does it work with the Actions GITHUB_TOKEN?
+# This workflow is meant to be reverted once the answer is recorded on #861.
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/attach-poc.yml"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  attach-poc:
+    name: gh --attach POC
+    runs-on: ubuntu-latest
+    # Same-repo only — a forked PR's GITHUB_TOKEN is read-only and this is a spike.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PR: ${{ github.event.pull_request.number }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Probe gh version and --attach flag
+        run: |
+          echo "=== gh version ==="
+          gh --version
+          echo "=== is --attach supported on 'gh pr comment'? ==="
+          if gh pr comment --help 2>&1 | grep -qi -- '--attach'; then
+            echo "FLAG PRESENT — runner gh has --attach"
+          else
+            echo "FLAG ABSENT — runner gh predates v2.99.0"
+          fi
+
+      - name: Generate a test image
+        run: |
+          convert -size 360x140 xc:'#1d76db' -gravity center -pointsize 20 -fill white \
+            -annotate 0 "gh --attach POC #${PR}" attach-test.png
+          ls -la attach-test.png
+
+      - name: Attempt --attach with the Actions GITHUB_TOKEN
+        run: |
+          echo "=== gh pr comment --attach (auth = Actions GITHUB_TOKEN) ==="
+          set +e
+          gh pr comment "$PR" --repo "$REPO" \
+            --body "🧪 **gh --attach POC (#861)** — native attachment upload test using the Actions GITHUB_TOKEN. If an image renders below, GITHUB_TOKEN works and we can drop the orphan-branch mechanism." \
+            --attach attach-test.png
+          CODE=$?
+          echo "attach exit code: $CODE"
+          if [ "$CODE" -eq 0 ]; then
+            echo "RESULT: SUCCESS — GITHUB_TOKEN works with --attach"
+          else
+            echo "RESULT: FAILURE — GITHUB_TOKEN rejected or flag/version unavailable (see error above)"
+          fi
+          exit 0
