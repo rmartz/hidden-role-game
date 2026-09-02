@@ -1,8 +1,9 @@
 name: Attach POC
 
-# Throwaway spike for #861: does the ubuntu-latest runner's gh support the new
-# --attach flag (gh >= 2.99.0), and does it work with the Actions GITHUB_TOKEN?
-# This workflow is meant to be reverted once the answer is recorded on #861.
+# Throwaway spike for #861. The ubuntu-latest runner ships gh 2.98.0, which
+# predates the --attach flag (gh >= 2.99.0). So this installs gh 2.99.0
+# explicitly and tests the real gating question: does the Actions GITHUB_TOKEN
+# work with --attach, or is a classic PAT required? Revert once recorded on #861.
 
 on:
   pull_request:
@@ -18,42 +19,48 @@ jobs:
   attach-poc:
     name: gh --attach POC
     runs-on: ubuntu-latest
-    # Same-repo only — a forked PR's GITHUB_TOKEN is read-only and this is a spike.
     if: github.event.pull_request.head.repo.full_name == github.repository
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       PR: ${{ github.event.pull_request.number }}
       REPO: ${{ github.repository }}
+      GH_VER: "2.99.0"
     steps:
-      - name: Probe gh version and --attach flag
+      - name: Run POC
+        shell: bash
         run: |
-          echo "=== gh version ==="
-          gh --version
-          echo "=== is --attach supported on 'gh pr comment'? ==="
-          if gh pr comment --help 2>&1 | grep -qi -- '--attach'; then
-            echo "FLAG PRESENT — runner gh has --attach"
+          set +e
+          echo "=== system gh version (runner default) ==="
+          gh --version | head -1
+
+          echo "=== download gh ${GH_VER} ==="
+          curl -sSL "https://github.com/cli/cli/releases/download/v${GH_VER}/gh_${GH_VER}_linux_amd64.tar.gz" -o /tmp/gh.tar.gz
+          tar -xzf /tmp/gh.tar.gz -C /tmp
+          GH="/tmp/gh_${GH_VER}_linux_amd64/bin/gh"
+          echo "downloaded gh version:"
+          "$GH" --version | head -1
+
+          echo "=== does downloaded gh have --attach? ==="
+          if "$GH" pr comment --help 2>&1 | grep -qi -- '--attach'; then
+            echo "FLAG PRESENT on gh ${GH_VER}"
           else
-            echo "FLAG ABSENT — runner gh predates v2.99.0"
+            echo "FLAG ABSENT even on gh ${GH_VER} — download or flag name wrong"
           fi
 
-      - name: Generate a test image
-        run: |
-          convert -size 360x140 xc:'#1d76db' -gravity center -pointsize 20 -fill white \
-            -annotate 0 "gh --attach POC #${PR}" attach-test.png
-          ls -la attach-test.png
+          echo "=== write a tiny valid PNG (no ImageMagick dependency) ==="
+          printf '%s' 'iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAHElEQVR42mNkYPhfz0AEYBxVSF+Fo6MKBgYAdj0GAdVeS0IAAAAASUVORK5CYII=' | base64 -d > /tmp/attach-test.png
+          ls -la /tmp/attach-test.png
+          file /tmp/attach-test.png || true
 
-      - name: Attempt --attach with the Actions GITHUB_TOKEN
-        run: |
-          echo "=== gh pr comment --attach (auth = Actions GITHUB_TOKEN) ==="
-          set +e
-          gh pr comment "$PR" --repo "$REPO" \
-            --body "🧪 **gh --attach POC (#861)** — native attachment upload test using the Actions GITHUB_TOKEN. If an image renders below, GITHUB_TOKEN works and we can drop the orphan-branch mechanism." \
-            --attach attach-test.png
+          echo "=== attempt: gh pr comment --attach with Actions GITHUB_TOKEN ==="
+          "$GH" pr comment "$PR" --repo "$REPO" \
+            --body "🧪 **gh --attach POC (#861)** — gh ${GH_VER} installed on the runner, auth = Actions GITHUB_TOKEN. If an image renders below, GITHUB_TOKEN works with --attach and we can drop the orphan-branch mechanism." \
+            --attach /tmp/attach-test.png
           CODE=$?
           echo "attach exit code: $CODE"
           if [ "$CODE" -eq 0 ]; then
-            echo "RESULT: SUCCESS — GITHUB_TOKEN works with --attach"
+            echo "RESULT: SUCCESS — Actions GITHUB_TOKEN works with --attach"
           else
-            echo "RESULT: FAILURE — GITHUB_TOKEN rejected or flag/version unavailable (see error above)"
+            echo "RESULT: FAILURE — GITHUB_TOKEN rejected by --attach (see error above); a classic PAT is likely required"
           fi
           exit 0
