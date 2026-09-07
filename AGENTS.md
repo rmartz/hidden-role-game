@@ -73,6 +73,13 @@ After creating a git worktree (`git worktree add .git-worktrees/<name> -b <branc
 - When adding or modifying roles, actions, game settings, or data flow in a game mode, update the corresponding docs in `docs/<game-mode>/` (`roles.md`, `actions.md`, `data-flow.md`).
 - Pages under `docs/` follow the [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md): every page begins with YAML frontmatter. The required key is `type` (one of `Index`, `Guide`, `Reference`, `Roles`, `Actions`, `DataFlow`); also set `title` and `description`. Per-mode pages additionally set `gameMode` (the mode slug) and `resource` (relative path to the documented source). When you add a new page, include the frontmatter and link it from `docs/README.md` so the index stays complete.
 
+## Agent Directive Files
+
+- **All directives live in `AGENTS.md`.** `AGENTS.md` is the single source of truth for a directory's agent instructions; author and edit directives there, never in `CLAUDE.md`.
+- **Every `AGENTS.md` has a companion `CLAUDE.md`** in the same directory, and every `CLAUDE.md` has a companion `AGENTS.md`. The two files are always paired.
+- **Every `CLAUDE.md` is a bare wrapper** whose only content is the Claude Code import line `@AGENTS.md` — no directives, no other text, no symlinks. This feeds the `AGENTS.md` directives to Claude Code while keeping them authored once, so the two files cannot drift.
+- Enforced in CI by `pnpm run check:agents-md` (`scripts/check-agents-md.mjs`), which runs via the `Agent Directive Files` workflow on any PR that changes an `AGENTS.md` / `CLAUDE.md` file (or the checker itself).
+
 ## React / Next.js Standards
 
 ### Framework

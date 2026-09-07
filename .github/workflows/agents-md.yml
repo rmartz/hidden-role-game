@@ -1,0 +1,41 @@
+name: Agent Directive Files
+
+# Enforces the agent directive-file convention (see AGENTS.md): directives are
+# authored once in AGENTS.md, and every AGENTS.md is paired with a companion
+# CLAUDE.md whose only content is the bare `@AGENTS.md` import (no symlinks).
+# The checker validates the whole tree, but its only inputs are AGENTS.md /
+# CLAUDE.md files plus the checker/workflow themselves — so a paths allowlist is
+# safe. Any add, edit, rename, or delete of a directive file matches (the `**`
+# and bare globs cover both root and nested files) and reruns the whole-tree
+# check; if none changed, it was already validated when it merged.
+on:
+  pull_request:
+    paths:
+      - "AGENTS.md"
+      - "CLAUDE.md"
+      - "**/AGENTS.md"
+      - "**/CLAUDE.md"
+      - "scripts/check-agents-md.mjs"
+      - ".github/workflows/agents-md.yml"
+  push:
+    branches: [main]
+    paths:
+      - "AGENTS.md"
+      - "CLAUDE.md"
+      - "**/AGENTS.md"
+      - "**/CLAUDE.md"
+      - "scripts/check-agents-md.mjs"
+      - ".github/workflows/agents-md.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  check-agents-md:
+    name: Check AGENTS.md / CLAUDE.md pairing
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+      - run: pnpm run check:agents-md
