@@ -20,7 +20,7 @@
  */
 
 import { existsSync, readdirSync, readFileSync } from "fs";
-import { dirname, join, relative, resolve } from "path";
+import { basename, dirname, isAbsolute, join, relative, resolve } from "path";
 import { fileURLToPath } from "url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -44,8 +44,7 @@ const MODE_TYPES = new Set(["Actions", "DataFlow", "Roles"]);
 
 /** A file is a directory index when it is named index.md (the OKF index). */
 function isIndexFile(absPath) {
-  const name = absPath.slice(absPath.lastIndexOf("/") + 1);
-  return name === "index.md";
+  return basename(absPath) === "index.md";
 }
 
 /**
@@ -64,6 +63,8 @@ function parseFrontmatter(content) {
     const key = lines[i].slice(0, colon).trim();
     const value = lines[i]
       .slice(colon + 1)
+      .trim()
+      .replace(/#.*$/, "")
       .trim()
       .replace(/^["']|["']$/g, "");
     if (key) result[key] = value;
@@ -115,10 +116,17 @@ function frontmatterViolations(absPath) {
         `${rel}: \`type: ${type}\` requires frontmatter field \`resource\``,
       );
   }
-  if (resource && !existsSync(join(root, resource))) {
-    violations.push(
-      `${rel}: \`resource: ${resource}\` does not exist in the repo`,
-    );
+  if (resource) {
+    const resolved = resolve(root, resource);
+    if (
+      isAbsolute(resource) ||
+      relative(root, resolved).startsWith("..") ||
+      !existsSync(resolved)
+    ) {
+      violations.push(
+        `${rel}: \`resource: ${resource}\` does not exist in the repo`,
+      );
+    }
   }
 
   return violations;
@@ -140,7 +148,8 @@ function linkedPages(indexPath) {
     if (!raw || /^[a-z][a-z0-9+.-]*:/i.test(raw) || !raw.endsWith(".md"))
       continue;
     const abs = resolve(dirname(indexPath), raw);
-    if (abs.startsWith(docsDir + "/")) targets.add(abs);
+    const rel = relative(docsDir, abs);
+    if (!rel.startsWith("..") && !isAbsolute(rel)) targets.add(abs);
   }
   return targets;
 }
