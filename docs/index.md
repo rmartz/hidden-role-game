@@ -7,7 +7,7 @@ tags: [index, documentation]
 
 # Documentation Index
 
-Curated reference knowledge for this codebase. Each page carries [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) YAML frontmatter so agents can retrieve and traverse it before a task. This page is the OKF `index.md`-style directory listing.
+Curated reference knowledge for this codebase. Each page carries [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) YAML frontmatter so agents can retrieve and traverse it before a task. This is the OKF root `index.md` directory listing; every page below is reachable from here.
 
 ## Page types
 

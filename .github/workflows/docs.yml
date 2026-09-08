@@ -3,7 +3,7 @@ name: Docs
 # Enforces the docs/ conventions (see AGENTS.md): every page under docs/ opens
 # with OKF frontmatter (a valid `type` plus `title` / `description`, and
 # `gameMode` / `resource` for per-mode pages), and every page is reachable by
-# navigating index links from docs/README.md. The check reads only docs/ files
+# navigating index links from docs/index.md. The check reads only docs/ files
 # plus the checker/workflow, so a paths allowlist is safe: a page add, edit,
 # rename, or delete matches and reruns the whole-tree check; if none changed, it
 # was already validated when it merged. `resource:` paths point into src/, so a

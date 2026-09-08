@@ -8,10 +8,10 @@
  *      `gameMode` and a `resource` path, and any `resource:` path must exist.
  *
  *   2. Index reachability — every page is reachable by navigating markdown
- *      links from the top-level index (`docs/README.md`) through index files
- *      only (`README.md` / `index.md`). This is exactly the "listed in an
- *      index, and every sub-index reachable from its parent" rule: a reader
- *      (or agent) can reach any page by walking index → sub-index → page.
+ *      links from the top-level index (`docs/index.md`) through index files
+ *      only (`index.md`, the OKF directory index). This is exactly the "listed
+ *      in an index, and every sub-index reachable from its parent" rule: a
+ *      reader (or agent) can reach any page by walking index → sub-index → page.
  *
  * Frontmatter is parsed directly (no dependency), the same constrained-YAML
  * way `validate-config.mjs` parses `deployment/`.
@@ -27,9 +27,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const docsDir = join(root, "docs");
 
 // The top-level index every other page must be reachable from.
-const ROOT_INDEX = join(docsDir, "README.md");
+const ROOT_INDEX = join(docsDir, "index.md");
 
-// Canonical OKF `type` vocabulary for this repo (see docs/README.md).
+// Canonical OKF `type` vocabulary for this repo (see docs/index.md).
 const ALLOWED_TYPES = [
   "Actions",
   "DataFlow",
@@ -42,10 +42,10 @@ const ALLOWED_TYPES = [
 // Per-mode page types additionally require `gameMode` and `resource`.
 const MODE_TYPES = new Set(["Actions", "DataFlow", "Roles"]);
 
-/** A file is a directory index when it is named README.md or index.md. */
+/** A file is a directory index when it is named index.md (the OKF index). */
 function isIndexFile(absPath) {
   const name = absPath.slice(absPath.lastIndexOf("/") + 1);
-  return name === "README.md" || name === "index.md";
+  return name === "index.md";
 }
 
 /**
@@ -151,7 +151,7 @@ function linkedPages(indexPath) {
  */
 function reachabilityViolations(pages) {
   if (!existsSync(ROOT_INDEX)) {
-    return [`docs/README.md: top-level index is missing`];
+    return [`docs/index.md: top-level index is missing`];
   }
   const pageSet = new Set(pages);
   const reached = new Set([ROOT_INDEX]);
@@ -170,7 +170,7 @@ function reachabilityViolations(pages) {
     .filter((page) => !reached.has(page))
     .map(
       (page) =>
-        `${relative(root, page)}: not reachable from docs/README.md — link it from an index (README.md / index.md)`,
+        `${relative(root, page)}: not reachable from docs/index.md — link it from an index.md`,
     );
 }
 
@@ -184,7 +184,7 @@ function main() {
     console.error("Documentation convention violations:\n");
     for (const violation of violations) console.error(`  ✗ ${violation}`);
     console.error(
-      `\n${violations.length} violation(s). See docs/README.md for the docs conventions.`,
+      `\n${violations.length} violation(s). See docs/index.md for the docs conventions.`,
     );
     process.exit(1);
   }
