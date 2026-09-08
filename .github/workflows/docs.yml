@@ -1,0 +1,36 @@
+name: Docs
+
+# Enforces the docs/ conventions (see AGENTS.md): every page under docs/ opens
+# with OKF frontmatter (a valid `type` plus `title` / `description`, and
+# `gameMode` / `resource` for per-mode pages), and every page is reachable by
+# navigating index links from docs/README.md. The check reads only docs/ files
+# plus the checker/workflow, so a paths allowlist is safe: a page add, edit,
+# rename, or delete matches and reruns the whole-tree check; if none changed, it
+# was already validated when it merged. `resource:` paths point into src/, so a
+# source move could strand one — that is caught when the docs page itself is next
+# touched, the same closed-input tradeoff as the sibling pin checks.
+on:
+  pull_request:
+    paths:
+      - "docs/**"
+      - "scripts/check-docs.mjs"
+      - ".github/workflows/docs.yml"
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "scripts/check-docs.mjs"
+      - ".github/workflows/docs.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  check-docs:
+    name: Check docs frontmatter and index
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./.github/actions/setup
+      - run: pnpm run check:docs
