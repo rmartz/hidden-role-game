@@ -21,9 +21,9 @@ import { fileURLToPath } from "url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-// Directories that never contain first-party directive files. `.claude` holds
-// gitignored local worktrees (full repo checkouts on other branches); walking
-// them would flag stale copies that are not part of this commit.
+// Directories that never contain first-party directive files. `.claude` is
+// Claude Code's project-level config directory; it is not first-party codebase
+// and should not be validated.
 const SKIP_DIRS = new Set([
   ".claude",
   ".git",
