@@ -7,7 +7,7 @@ tags: [index, documentation]
 
 # Documentation Index
 
-Curated reference knowledge for this codebase. Each page carries [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) YAML frontmatter so agents can retrieve and traverse it before a task. This page is the OKF `index.md`-style directory listing.
+Curated reference knowledge for this codebase. Each page carries [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) YAML frontmatter so agents can retrieve and traverse it before a task. This is the OKF root `index.md` directory listing; every page below is reachable from here.
 
 ## Page types
 
@@ -25,6 +25,7 @@ Curated reference knowledge for this codebase. Each page carries [Open Knowledge
 - [Getting Started](GETTING_STARTED.md) — onboarding guide for new developers.
 - [Project Structure](PROJECT_STRUCTURE.md) — directory-by-directory breakdown of the codebase.
 - [Game Mode Documentation](GAME_MODES.md) — overview of every supported game mode.
+- [Open Knowledge Format (OKF)](open-knowledge-format.md) — the frontmatter + `index.md` convention these docs follow, and the authoritative spec.
 
 ## Design
 
@@ -56,4 +57,4 @@ Curated reference knowledge for this codebase. Each page carries [Open Knowledge
 
 ## Adding a page
 
-New pages under `docs/` must begin with OKF frontmatter — at minimum the required `type` key, plus `title` and `description`. Per-mode pages also set `gameMode` and a `resource` path to the documented source. After adding a page, link it from the relevant section above so the index stays complete.
+New pages under `docs/` must begin with OKF frontmatter — at minimum the required `type` key, plus `title` and `description`. Per-mode pages also set `gameMode` and a `resource` path to the documented source. After adding a page, link it from the relevant section above so the index stays complete. See [Open Knowledge Format (OKF)](open-knowledge-format.md) for the full convention and the authoritative spec.
