@@ -6,8 +6,7 @@ import { WerewolfPhase } from "../types";
 import { currentTurnState, isOwnerPlaying } from "../utils";
 
 export const revealNightOutcomeStepAction: GameAction = {
-  isValid(game: Game, callerId: string, payload: unknown) {
-    void payload;
+  isValid(game: Game, callerId: string) {
     if (!isOwnerPlaying(game, callerId)) return false;
     if (getWerewolfModeConfig(game).autoRevealNightOutcome) return false;
     const ts = currentTurnState(game);
