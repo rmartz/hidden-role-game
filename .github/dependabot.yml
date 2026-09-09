@@ -4,12 +4,17 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    # NOTE: no `cooldown` here. A 7-day cooldown was tried (#740) but broke every
-    # npm run: Dependabot enforces cooldown by passing pnpm a `minimumReleaseAge`,
-    # and pnpm hard-fails lockfile resolution (ERR_PNPM_NO_MATURE_MATCHING_VERSION)
-    # whenever any transitive dep in the fast-moving Storybook/Vite toolchain has
-    # a version published within the window instead of falling back to an older
-    # mature one — so no update could ever complete. Removed to restore updates.
+    # NOTE: cooldown is deliberately not used anywhere in this file, and should
+    # not be re-added. It adds friction without achieving its goal:
+    #  - Dependabot's own `cooldown` is leaky — it holds the initial update but
+    #    then immediately raises a follow-up for the newer version, so the delay
+    #    is not actually enforced.
+    #  - Enforcing our own cooldown via `minimumReleaseAge` fails for npm:
+    #    Dependabot keeps its PRs current, so even a pinned-back release still
+    #    pulls transitive deps that are too new — the very freshness the cooldown
+    #    was meant to avoid — and pnpm hard-fails lockfile resolution
+    #    (ERR_PNPM_NO_MATURE_MATCHING_VERSION) whenever any transitive dep in the
+    #    fast-moving Storybook/Vite toolchain is inside the window (tried in #740).
     commit-message:
       prefix: "chore"
       prefix-development: "chore"
@@ -134,8 +139,6 @@ updates:
     directory: /
     schedule:
       interval: weekly
-    cooldown:
-      default-days: 7
     commit-message:
       prefix: "chore"
       include: "scope"
