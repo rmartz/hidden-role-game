@@ -1,19 +1,15 @@
 ---
-type: Index
-title: Documentation Index
-description: Directory listing of all docs/ reference pages, grouped by kind.
-tags: [index, documentation]
+okf_version: "0.2"
 ---
 
 # Documentation Index
 
-Curated reference knowledge for this codebase. Each page carries [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) YAML frontmatter so agents can retrieve and traverse it before a task. This is the OKF root `index.md` directory listing; every page below is reachable from here.
+Curated reference knowledge for this codebase. Each **content** page carries [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) YAML frontmatter so agents can retrieve and traverse it before a task. This is the OKF root `index.md` directory listing — a reserved index file that, per the spec, carries no frontmatter beyond `okf_version`; every page below is reachable from here.
 
 ## Page types
 
 | Type        | Meaning                                                     |
 | ----------- | ----------------------------------------------------------- |
-| `Index`     | This directory listing.                                     |
 | `Guide`     | Task-oriented walkthrough (onboarding, how-to).             |
 | `Reference` | Structural reference not tied to a single game mode.        |
 | `Roles`     | A game mode's roles, teams, and visibility rules.           |
@@ -57,4 +53,4 @@ Curated reference knowledge for this codebase. Each page carries [Open Knowledge
 
 ## Adding a page
 
-New pages under `docs/` must begin with OKF frontmatter — at minimum the required `type` key, plus `title` and `description`. Per-mode pages also set `gameMode` and a `resource` path to the documented source. After adding a page, link it from the relevant section above so the index stays complete. See [Open Knowledge Format (OKF)](open-knowledge-format.md) for the full convention and the authoritative spec.
+New content pages under `docs/` must begin with OKF frontmatter — at minimum the required `type` key, plus `title` and `description`. Per-mode pages also set `gameMode` and a `resource` path to the documented source. After adding a content page, link it from the relevant section above so the index stays complete. Index files (`index.md`) are reserved filenames and must not carry frontmatter (the root `docs/index.md` may optionally carry `okf_version`). See [Open Knowledge Format (OKF)](open-knowledge-format.md) for the full convention and the authoritative spec.
