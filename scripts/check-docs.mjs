@@ -2,10 +2,13 @@
 /**
  * Enforces the documentation conventions for pages under `docs/`:
  *
- *   1. OKF frontmatter — every `docs/**\/*.md` opens with a YAML frontmatter
- *      block carrying a `type` from the allowed vocabulary plus `title` and
- *      `description`. Per-mode pages (Roles / Actions / DataFlow) also carry
- *      `gameMode` and a `resource` path, and any `resource:` path must exist.
+ *   1. OKF frontmatter — every content page under `docs/` opens with a YAML
+ *      frontmatter block carrying a `type` from the allowed vocabulary plus
+ *      `title` and `description`. Per-mode pages (Roles / Actions / DataFlow)
+ *      also carry `gameMode` and a `resource` path, and any `resource:` path
+ *      must exist. The reserved `index.md` (OKF §8/§11) is exempt from this
+ *      requirement: it carries no frontmatter, with the single exception that it
+ *      MAY carry an `okf_version` key — any other key on an index.md is rejected.
  *
  *   2. Index reachability — every page is reachable by navigating markdown
  *      links from the top-level index (`docs/index.md`) through index files
@@ -81,10 +84,31 @@ function collectPages() {
     .sort();
 }
 
+/**
+ * OKF reserves the index filename (§8, §11): an `index.md` carries no
+ * frontmatter, with the single exception that it MAY carry an `okf_version`
+ * key. It is exempt from the `type`/`title`/`description` requirement content
+ * pages must satisfy; any frontmatter key beyond `okf_version` is rejected.
+ */
+function indexFrontmatterViolations(rel, content) {
+  const frontmatter = parseFrontmatter(content);
+  if (!frontmatter) return []; // no frontmatter — the OKF default for an index
+  const disallowed = Object.keys(frontmatter).filter(
+    (key) => key !== "okf_version",
+  );
+  if (disallowed.length === 0) return [];
+  return [
+    `${rel}: index files carry no OKF frontmatter beyond \`okf_version\` (found: ${disallowed.join(", ")})`,
+  ];
+}
+
 /** Frontmatter violations for a single page, as `path: reason` strings. */
 function frontmatterViolations(absPath) {
   const rel = relative(root, absPath);
-  const frontmatter = parseFrontmatter(readFileSync(absPath, "utf8"));
+  const content = readFileSync(absPath, "utf8");
+  if (isIndexFile(absPath)) return indexFrontmatterViolations(rel, content);
+
+  const frontmatter = parseFrontmatter(content);
   if (!frontmatter) {
     return [`${rel}: missing OKF frontmatter (no leading \`---\` block)`];
   }

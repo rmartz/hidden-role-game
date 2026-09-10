@@ -26,7 +26,8 @@ silently rot.
 
 ## Frontmatter
 
-Every page begins with a YAML frontmatter block delimited by `---` fences:
+Every **content** page begins with a YAML frontmatter block delimited by `---` fences (the
+reserved `index.md` is exempt — see [The index](#the-index)):
 
 ```yaml
 ---
@@ -74,6 +75,10 @@ to support progressive disclosure. In this repo:
 
 - The top-level index is [`docs/index.md`](index.md); a subdirectory that needs its own index uses
   `<dir>/index.md`.
+- **The `index.md` filename is reserved and carries no frontmatter.** Per the spec (§8, §11) an
+  index file is exempt from the `type`/`title`/`description` requirement above; the one allowed key
+  is `okf_version` (which the root `index.md` MAY carry). Any other frontmatter key on an `index.md`
+  is rejected. This is why [`docs/index.md`](index.md) opens with only `okf_version: "0.2"`.
 - **Every page must be reachable from `docs/index.md` by following links through `index.md` files** —
   directly, or via a sub-`index.md` that (transitively) links to it — so a reader can navigate
   `docs/index.md → sub-index → page`. A page that no index reaches is an orphan and is rejected.

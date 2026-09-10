@@ -1,13 +1,10 @@
 ---
-type: Index
-title: Documentation Index
-description: Directory listing of all docs/ reference pages, grouped by kind.
-tags: [index, documentation]
+okf_version: "0.2"
 ---
 
 # Documentation Index
 
-Curated reference knowledge for this codebase. Each page carries [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) YAML frontmatter so agents can retrieve and traverse it before a task. This is the OKF root `index.md` directory listing; every page below is reachable from here.
+Curated reference knowledge for this codebase. Each **content** page carries [Open Knowledge Format (OKF)](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) YAML frontmatter so agents can retrieve and traverse it before a task. This is the OKF root `index.md` directory listing — a reserved index file that, per the spec, carries no frontmatter beyond `okf_version`; every page below is reachable from here.
 
 ## Page types
 
