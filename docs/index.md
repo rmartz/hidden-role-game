@@ -10,7 +10,6 @@ Curated reference knowledge for this codebase. Each **content** page carries [Op
 
 | Type        | Meaning                                                     |
 | ----------- | ----------------------------------------------------------- |
-| `Index`     | This directory listing.                                     |
 | `Guide`     | Task-oriented walkthrough (onboarding, how-to).             |
 | `Reference` | Structural reference not tied to a single game mode.        |
 | `Roles`     | A game mode's roles, teams, and visibility rules.           |
@@ -54,4 +53,4 @@ Curated reference knowledge for this codebase. Each **content** page carries [Op
 
 ## Adding a page
 
-New pages under `docs/` must begin with OKF frontmatter — at minimum the required `type` key, plus `title` and `description`. Per-mode pages also set `gameMode` and a `resource` path to the documented source. After adding a page, link it from the relevant section above so the index stays complete. See [Open Knowledge Format (OKF)](open-knowledge-format.md) for the full convention and the authoritative spec.
+New content pages under `docs/` must begin with OKF frontmatter — at minimum the required `type` key, plus `title` and `description`. Per-mode pages also set `gameMode` and a `resource` path to the documented source. After adding a content page, link it from the relevant section above so the index stays complete. Index files (`index.md`) are reserved filenames and must not carry frontmatter (the root `docs/index.md` may optionally carry `okf_version`). See [Open Knowledge Format (OKF)](open-knowledge-format.md) for the full convention and the authoritative spec.

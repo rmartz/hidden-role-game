@@ -33,14 +33,7 @@ const docsDir = join(root, "docs");
 const ROOT_INDEX = join(docsDir, "index.md");
 
 // Canonical OKF `type` vocabulary for this repo (see docs/index.md).
-const ALLOWED_TYPES = [
-  "Actions",
-  "DataFlow",
-  "Guide",
-  "Index",
-  "Reference",
-  "Roles",
-];
+const ALLOWED_TYPES = ["Actions", "DataFlow", "Guide", "Reference", "Roles"];
 
 // Per-mode page types additionally require `gameMode` and `resource`.
 const MODE_TYPES = new Set(["Actions", "DataFlow", "Roles"]);
@@ -57,7 +50,7 @@ function isIndexFile(absPath) {
  */
 function parseFrontmatter(content) {
   const lines = content.split("\n");
-  if (lines[0]?.trim() !== "---") return undefined;
+  if (lines[0]?.trim() !== "---") return null;
   const result = {};
   for (let i = 1; i < lines.length; i++) {
     if (lines[i].trim() === "---") return result;
@@ -86,15 +79,25 @@ function collectPages() {
 
 /**
  * OKF reserves the index filename (§8, §11): an `index.md` carries no
- * frontmatter, with the single exception that it MAY carry an `okf_version`
- * key. It is exempt from the `type`/`title`/`description` requirement content
- * pages must satisfy; any frontmatter key beyond `okf_version` is rejected.
+ * frontmatter, with the single exception that the bundle-root `index.md` MAY
+ * carry an `okf_version` key. Nested index files carry no frontmatter at all.
+ * A malformed (unclosed) or empty frontmatter block is also a violation.
  */
-function indexFrontmatterViolations(rel, content) {
+function indexFrontmatterViolations(rel, content, absPath) {
   const frontmatter = parseFrontmatter(content);
-  if (!frontmatter) return []; // no frontmatter — the OKF default for an index
+  if (frontmatter === null) return []; // absent — the OKF default for an index
+  if (frontmatter === undefined) {
+    return [
+      `${rel}: index file has a malformed frontmatter block (unclosed \`---\`)`,
+    ];
+  }
+  if (Object.keys(frontmatter).length === 0) {
+    return [
+      `${rel}: index file has an empty frontmatter block — omit it entirely`,
+    ];
+  }
   const disallowed = Object.keys(frontmatter).filter(
-    (key) => key !== "okf_version",
+    (key) => key !== "okf_version" || absPath !== ROOT_INDEX,
   );
   if (disallowed.length === 0) return [];
   return [
@@ -106,7 +109,8 @@ function indexFrontmatterViolations(rel, content) {
 function frontmatterViolations(absPath) {
   const rel = relative(root, absPath);
   const content = readFileSync(absPath, "utf8");
-  if (isIndexFile(absPath)) return indexFrontmatterViolations(rel, content);
+  if (isIndexFile(absPath))
+    return indexFrontmatterViolations(rel, content, absPath);
 
   const frontmatter = parseFrontmatter(content);
   if (!frontmatter) {
