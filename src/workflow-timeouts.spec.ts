@@ -29,6 +29,9 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "config-validate.yml": {
     "validate-config": 2,
   },
+  "dependabot-audit.yml": {
+    audit: 10,
+  },
   "docs.yml": {
     "check-docs": 1,
   },
