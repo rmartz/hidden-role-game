@@ -23,6 +23,10 @@ Curated reference knowledge for this codebase. Each **content** page carries [Op
 - [Game Mode Documentation](GAME_MODES.md) — overview of every supported game mode.
 - [Open Knowledge Format (OKF)](open-knowledge-format.md) — the frontmatter + `index.md` convention these docs follow, and the authoritative spec.
 
+## Tooling
+
+- [Dependabot grouping audit](dependabot-audit.md) — how `scripts/dependabot-audit.mjs` measures per-group intervention rates to keep the Dependabot grouping strategy evidence-based.
+
 ## Design
 
 - [No-Device Players & the Omniscient-Narrator Requirement](design/no-device-players.md) — why no-device players require an omniscient narrator, the interim gate, and what full Secret Villain support would require.

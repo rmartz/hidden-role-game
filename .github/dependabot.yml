@@ -23,22 +23,32 @@ updates:
     # the bottom). Most MAJOR bumps match no group and raise individual PRs —
     # the ones most likely to need code changes, so they warrant isolated
     # review. The exceptions, listed FIRST to win group-assignment precedence:
-    # the version-locked families (so a member never bumps without the rest, an
+    # the lockstep families (so a member never bumps without the rest, an
     # inherently broken update) and the prettier and typescript major+minor
     # bumps (each isolated into its own PR — a formatter or compiler bump is
     # higher-impact than a routine dependency and warrants visibility).
+    #
+    # This set is evidence-based, not assumed: scripts/dependabot-audit.mjs
+    # measures the per-group human-intervention rate over all Dependabot PR
+    # history (see docs/dependabot-audit.md, issue #885). The prettier (#785)
+    # and typescript (#872) isolations are each validated by a real breakage the
+    # group contained; react/vite have merged cleanly where exercised; lodash
+    # has no merged PR history but is retained for cross-realm lockstep.
+    # The former storybook, eslint, and tailwind major-only family groups were
+    # REMOVED because they never produced a merged PR — their lockstep benefit
+    # was 100% assumed. Ungrouped, a future major of one of them surfaces as
+    # individual per-package PRs the audit can measure; if one actually breaks
+    # when split apart, that is the evidence to re-add its group.
     groups:
-      # Version-locked families. The scope of each depends on whether it crosses
-      # the dev/prod boundary:
+      # Lockstep families. The scope of each depends on whether it crosses the
+      # dev/prod boundary:
       #  - A family split across dev AND prod (react, lodash) groups across ALL
       #    update types, because on a minor/patch bump the dev/prod catch-alls
       #    below would otherwise scatter its prod members from their dev @types.
-      #  - A family entirely within one realm (storybook, vite, eslint, tailwind
-      #    are all-dev) groups for MAJOR only. Its minor/patch bumps already move
-      #    in lockstep inside the single dev-dependencies group, so a separate
-      #    family PR for those would just add noise; major is the only update
-      #    type the catch-alls exclude, and the only one where a split family
-      #    actually breaks.
+      #  - vite is all-dev and interlocked (the @vitejs/plugin-react <-> vite <->
+      #    vitest coupling), so it groups for MAJOR only: minor/patch already ride
+      #    the single dev-dependencies group, and major is the only update type
+      #    the catch-alls exclude and the only one where a split family breaks.
       react:
         # react + react-dom (prod) ship the same version; @types/react(-dom)
         # (dev) track react's major. Cross-realm -> grouped across all types.
@@ -47,17 +57,6 @@ updates:
           - "react-dom"
           - "@types/react"
           - "@types/react-dom"
-      storybook:
-        # The storybook CLI, every @storybook/* addon, and the eslint plugin
-        # share one Storybook version line — all dev, so major-only (minor/patch
-        # ride dev-dependencies). Listed before vite and eslint so @storybook/*
-        # -vite addons and eslint-plugin-storybook route here.
-        patterns:
-          - "storybook"
-          - "@storybook/*"
-          - "eslint-plugin-storybook"
-        update-types:
-          - "major"
       vite:
         # vite + its react plugin + vitest + @vitest/* are one interlocked
         # toolchain (the @vitejs/plugin-react 6 <-> vite 8 coupling) — all dev,
@@ -67,27 +66,6 @@ updates:
           - "@vitejs/*"
           - "vitest"
           - "@vitest/*"
-        update-types:
-          - "major"
-      eslint:
-        # eslint + @eslint/js share a version line; typescript-eslint and the
-        # react-hooks plugin track the eslint major — all dev, so major-only;
-        # minor/patch ride dev-dependencies. (eslint-plugin-storybook is claimed
-        # by the storybook group above; eslint-plugin-simple-import-sort
-        # versions independently and stays with the dev catch-all.)
-        patterns:
-          - "eslint"
-          - "@eslint/js"
-          - "typescript-eslint"
-          - "eslint-plugin-react-hooks"
-        update-types:
-          - "major"
-      tailwind:
-        # tailwindcss core + its postcss plugin ship in lockstep (both on 4.3.x)
-        # — all dev, so major-only; minor/patch ride dev-dependencies.
-        patterns:
-          - "tailwindcss"
-          - "@tailwindcss/*"
         update-types:
           - "major"
       lodash:
