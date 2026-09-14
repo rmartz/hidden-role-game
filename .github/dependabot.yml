@@ -32,9 +32,10 @@ updates:
     # measures the per-group human-intervention rate over all Dependabot PR
     # history (see docs/dependabot-audit.md, issue #885). The prettier (#785)
     # and typescript (#872) isolations are each validated by a real breakage the
-    # group contained; react/lodash/vite have merged cleanly where exercised.
+    # group contained; react/vite have merged cleanly where exercised; lodash
+    # has no merged PR history but is retained for cross-realm lockstep.
     # The former storybook, eslint, and tailwind major-only family groups were
-    # REMOVED because they never produced a single PR — their lockstep benefit
+    # REMOVED because they never produced a merged PR — their lockstep benefit
     # was 100% assumed. Ungrouped, a future major of one of them surfaces as
     # individual per-package PRs the audit can measure; if one actually breaks
     # when split apart, that is the evidence to re-add its group.
