@@ -9,12 +9,6 @@ import { parse } from "yaml";
 // workflow requires registering it here, or the test below fails — forcing a
 // deliberate cap rather than leaving a job unbounded.
 const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
-  "action-pins.yml": {
-    "check-action-pins": 1,
-  },
-  "agents-md.yml": {
-    "check-agents-md": 1,
-  },
   "ci-actions.yml": {
     build: 2,
     "detect-changes": 1,
@@ -32,15 +26,14 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "dependabot-audit.yml": {
     audit: 10,
   },
-  "docs.yml": {
-    "check-docs": 1,
-  },
-  "package-pins.yml": {
-    "check-pins": 1,
-  },
   "pr-title-lint.yml": {
     "pr-title": 1,
   },
+  // @rmartz/repo-hygiene reusable-workflow caller: its `hygiene` job uses
+  // `uses:`, and GitHub Actions rejects timeout-minutes on reusable-workflow
+  // callers — so it registers with no job caps (handled by the `uses` branch
+  // in the test below).
+  "repo-hygiene.yml": {},
   "preview-deploy.yml": {
     "deploy-preview": 10,
   },
