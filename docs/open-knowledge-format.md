@@ -90,13 +90,9 @@ of following the OKF canonical filename.
 
 ## Enforcement
 
-Both rules — valid frontmatter and index reachability — are checked in CI by
-`pnpm run check:docs` (`scripts/check-docs.mjs`), which runs via the **Docs** workflow on any PR that
-changes a `docs/` page or the checker. Run it locally with:
-
-```bash
-pnpm run check:docs
-```
+Both rules — valid frontmatter and index reachability — are checked in CI by the
+`okf` and `okf-index` checks in [`@rmartz/repo-hygiene`](https://github.com/rmartz/repo-hygiene),
+which run via the **Repo Hygiene** workflow (configured in `.repo-hygiene.yml`).
 
 ## Related
 

@@ -1,0 +1,45 @@
+# Repository hygiene gates, enforced by @rmartz/repo-hygiene via the reusable
+# workflow (.github/workflows/repo-hygiene.yml). The enabled set is named there;
+# only checks that need per-repo settings appear below. Every check runs at
+# `severity: error` — a healthy repo gates on all of them (the checklist's
+# zero-soft-tier stance; `warn` is only ever a temporary migration ramp).
+#
+# These replace the repo's former bespoke checkers 1:1:
+#   - action-pins   ← scripts/check-action-pins.mjs
+#   - package-pins  ← scripts/check-package-pins.mjs
+#   - md-pairing    ← scripts/check-agents-md.mjs (bare `@AGENTS.md` wrapper)
+#   - okf + okf-index ← scripts/check-docs.mjs (frontmatter + index reachability)
+# conflict-markers and docs-links are net-new CI coverage.
+#
+# Known coverage delta vs. the old check-docs.mjs: `okf` does not validate our
+# custom `gameMode` frontmatter field on mode pages (it enforces
+# type/title/description/resource). The `resource` path already encodes the
+# mode, so this is an accepted minor reduction.
+checks:
+  conflict-markers:
+    severity: error
+  action-pins:
+    severity: error
+  package-pins:
+    severity: error
+  docs-links:
+    roots: [docs]
+    severity: error
+  md-pairing:
+    # Directives live in AGENTS.md; each CLAUDE.md is a bare `@AGENTS.md` wrapper.
+    wrapper: "@AGENTS.md"
+    severity: error
+  okf:
+    # This repo's closed OKF type vocabulary (see docs/index.md).
+    types: [Actions, DataFlow, Guide, Reference, Roles]
+    roots: [docs]
+    # Mode pages (Actions/DataFlow/Roles) carry a `resource`; Guide/Reference
+    # pages document a concept, not a single file, so they need none.
+    resourceExemptTypes: [Guide, Reference]
+    severity: error
+  okf-index:
+    roots: [docs]
+    # Our docs are a flat bundle: a single root docs/index.md links every page,
+    # with no per-subdirectory index.md.
+    nestedIndexes: false
+    severity: error
