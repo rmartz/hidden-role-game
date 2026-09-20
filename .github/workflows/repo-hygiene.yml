@@ -1,11 +1,17 @@
 name: Repo Hygiene
 
-# @rmartz/repo-hygiene quality gates, run via its published reusable workflow.
-# This one SHA-pinned caller replaces our previously-bespoke check workflows and
-# scripts (action-pins, package-pins, docs/OKF, AGENTS.md/CLAUDE.md pairing) and
-# adds a CI conflict-markers backstop. The `@<sha>` pin is kept current by
-# Dependabot's github-actions ecosystem, so new checks and fixes propagate with
-# no edit here. Per-check settings live in .repo-hygiene.yml (passed as `config`).
+# @rmartz/repo-hygiene quality gates, run via the rmartz/repo-hygiene-action
+# composite action (the successor to the package's reusable workflow). This one
+# SHA-pinned caller replaces our previously-bespoke check workflows and scripts
+# (action-pins, package-pins, docs/OKF, AGENTS.md/CLAUDE.md pairing) and adds a
+# CI conflict-markers backstop. The `@<sha>` pin is kept current by Dependabot's
+# github-actions ecosystem, so new check logic (released through the action)
+# propagates with no edit here. Per-check settings live in .repo-hygiene.yml
+# (passed as `config`).
+#
+# We own the job now (the action is a step, not a reusable workflow): it checks
+# out the repo first — the action scans the workspace and does no checkout of its
+# own — and runs tree-based checks, so no `fetch-depth: 0` is needed.
 #
 # `checks` is explicit (not the default-on set) because we need the opt-in
 # `package-pins` and want a curated list; the tradeoff is that a future
@@ -22,12 +28,17 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+  packages: read # read the public @rmartz/repo-hygiene package from GitHub Packages
+
 jobs:
   hygiene:
-    permissions:
-      contents: read
-      packages: read
-    uses: rmartz/repo-hygiene/.github/workflows/hygiene.yml@a0607d987a9ab7b86d6ed489459ba4ee9832d6c6 # v3.0.0
-    with:
-      checks: conflict-markers action-pins package-pins docs-links md-pairing okf okf-index
-      config: .repo-hygiene.yml
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: rmartz/repo-hygiene-action@66118369122afacf29241703137f60cbfa0315f0 # v1.0.0
+        with:
+          checks: conflict-markers action-pins package-pins docs-links md-pairing okf okf-index
+          config: .repo-hygiene.yml
