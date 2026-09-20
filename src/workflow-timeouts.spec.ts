@@ -29,11 +29,11 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "pr-title-lint.yml": {
     "pr-title": 1,
   },
-  // @rmartz/repo-hygiene reusable-workflow caller: its `hygiene` job uses
-  // `uses:`, and GitHub Actions rejects timeout-minutes on reusable-workflow
-  // callers — so it registers with no job caps (handled by the `uses` branch
-  // in the test below).
-  "repo-hygiene.yml": {},
+  // @rmartz/repo-hygiene-action caller: we own the job (the action is a step,
+  // not a reusable workflow), so its `hygiene` job carries a real timeout.
+  "repo-hygiene.yml": {
+    hygiene: 5,
+  },
   "preview-deploy.yml": {
     "deploy-preview": 10,
   },
