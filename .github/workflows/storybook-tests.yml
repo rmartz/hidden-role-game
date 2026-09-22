@@ -1,0 +1,35 @@
+name: Storybook Tests
+
+# Gating Storybook CI, delegated to the shared rmartz/storybook-ci reusable
+# workflow (issue #906). It runs two jobs: the Vitest browser-mode story suite in
+# real Chromium (`Storybook Tests`), and the production `build-storybook` compile
+# check (`Storybook Build`) — a distinct render surface the story suite never
+# exercises, since it renders through the addon-vitest transform and never
+# invokes `storybook build`.
+#
+# Everything this repo used to hand-roll in ci-actions.yml — Chromium
+# provisioning + binary caching with a retry, the docs-only change denylist,
+# fail-vs-cancel budgeting — now lives in the shared workflow. No `with:` block is
+# needed here: the shared defaults (`pnpm exec vitest run --project storybook` and
+# `pnpm build-storybook`) already match this repo's `storybook` Vitest project and
+# its package script.
+#
+# The `@<sha>` pin is kept current by Dependabot's github-actions ecosystem, so
+# shared-logic fixes propagate with no edit here.
+#
+# Required-check note: the gating is a `detect-changes` job + per-job `if:` inside
+# the reusable workflow, NOT an `on.paths` filter. A skipped required job counts as
+# passing; a required check that never runs because its paths did not match hangs
+# the PR forever. Do not add `paths` here.
+
+on:
+  pull_request:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  storybook-tests:
+    uses: rmartz/storybook-ci/.github/workflows/storybook-tests.yml@8ff19856f03b239964f9a01b091dcf9616511f47 # v1.2.0
