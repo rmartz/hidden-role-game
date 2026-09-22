@@ -20,8 +20,6 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
     format: 2,
     lint: 2,
     "sentry-release": 2,
-    "storybook-build": 3,
-    "storybook-tests": 4,
     tests: 2,
     typecheck: 1,
   },
@@ -47,12 +45,12 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "preview-deploy.yml": {
     "deploy-preview": 10,
   },
-  "storybook-screenshots-cleanup.yml": {
-    cleanup: 1,
-  },
-  "storybook-screenshots.yml": {
-    screenshots: 8,
-  },
+  // rmartz/storybook-ci reusable-workflow callers: both jobs use `uses:`, and
+  // GitHub Actions rejects timeout-minutes on reusable-workflow callers — so
+  // they register with no job caps (handled by the `uses` branch in the test
+  // below). The real caps live in the shared workflow.
+  "storybook-screenshots.yml": {},
+  "storybook-tests.yml": {},
 };
 
 const workflowsDir = resolve(import.meta.dirname, "../.github/workflows");

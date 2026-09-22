@@ -1,83 +1,44 @@
 name: Storybook Screenshots
 
+# Advisory per-PR screenshot gallery, delegated to the shared rmartz/storybook-ci
+# reusable workflow (issue #906). It builds Storybook, screenshots the stories a
+# PR's changes touch, and posts them as one update-in-place PR comment whose
+# images are GitHub user-attachments uploaded by `gh --attach` — replacing the
+# per-PR orphan image branch (`gh-screenshots-pr-<N>`) this repo pushed before
+# (#861). With no branch to write, the caller needs no `contents: write`, and
+# storybook-screenshots-cleanup.yml is deleted rather than ported.
+#
+# The advisory isolation (`continue-on-error`), per-PR concurrency, fork-skip,
+# capture deadline, and change gating all live in the shared workflow, so no
+# `concurrency` or `continue-on-error` block belongs here.
+#
+# `secrets: inherit` forwards STORYBOOK_SCREENSHOT_PAT, required because the
+# user-attachments upload endpoint rejects the Actions GITHUB_TOKEN. As of
+# storybook-ci v1.1.0 a preflight step runs before the expensive Storybook build:
+# when the PAT is missing or invalid it posts one non-blocking advisory PR comment
+# and skips the build and capture, so a misconfigured PAT announces itself instead
+# of looking like success. The whole job is skipped on fork PRs so the PAT never
+# reaches fork-authored code.
+#
+# This is advisory and never a required check, so unlike storybook-tests.yml it
+# may safely use an `on.paths` filter to stay off unrelated PRs. The filter is
+# `src/**` rather than only `*.stories.*` because the shared default resolver is
+# `colocation`: a component edited without touching its story still regenerates
+# the co-located story's screenshot, which is the false negative this repo's
+# bespoke changed-stories-only capture had.
+
 on:
   pull_request:
     branches: ["main"]
     paths:
-      - "src/**/*.stories.tsx"
-      - "src/**/*.stories.ts"
+      - "src/**"
+      - ".storybook/**"
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: write
-
-# Per-PR concurrency: serialize only same-PR runs (cancel the older when a newer
-# one starts). Cross-PR safety needs no group — each PR force-pushes its own
-# image branch (gh-screenshots-pr-<N>), so two different PRs never share a
-# resource. This group only stops two runs of the SAME PR force-pushing at once.
-concurrency:
-  group: storybook-screenshots-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
 
 jobs:
   screenshots:
-    name: Capture Storybook Screenshots
-    runs-on: ubuntu-latest
-    # Advisory: this is preview tooling (posts a screenshot gallery), not a
-    # correctness gate. It depends on Playwright + a git push + the GitHub API,
-    # any of which can fail transiently. A failure must never block a code
-    # merge, so continue-on-error reports green regardless.
-    #
-    # Fail (fix-review) over cancel (human escalation): the capture script
-    # enforces its own CAPTURE_DEADLINE_MS (4 min) and exits non-zero on the
-    # deadline or a bad story, so a slow/broken story surfaces as a job
-    # *failure* the PR coordinator routes to fix-review — where an agent can fix
-    # it. timeout-minutes is only a backstop for a hang that escapes the script
-    # (it produces a *cancellation*, which escalates to a human), so it is set
-    # above (setup + build + the 4-min deadline) to let the deadline fire first.
-    continue-on-error: true
-    timeout-minutes: 8
-    # Forked PRs receive a read-only GITHUB_TOKEN that cannot push to the
-    # gh-screenshots branch, so skip them rather than fail.
-    if: github.event.pull_request.head.repo.full_name == github.repository
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-
-      - name: Fetch base branch
-        run: git fetch origin ${{ github.base_ref }}
-
-      - name: Detect changed story files
-        id: stories
-        run: |
-          CHANGED=$(git diff --name-only --diff-filter=ACMR origin/${{ github.base_ref }}...HEAD \
-            -- 'src/**/*.stories.tsx' 'src/**/*.stories.ts')
-          if [ -z "$CHANGED" ]; then
-            echo "found=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "found=true" >> "$GITHUB_OUTPUT"
-            printf 'files<<EOF\n%s\nEOF\n' "$CHANGED" >> "$GITHUB_OUTPUT"
-          fi
-
-      - uses: ./.github/actions/setup
-        if: steps.stories.outputs.found == 'true'
-        with:
-          playwright: chromium
-
-      - name: Build Storybook
-        if: steps.stories.outputs.found == 'true'
-        run: pnpm build-storybook
-
-      - name: Capture screenshots and post PR comment
-        if: steps.stories.outputs.found == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          CHANGED_FILES: ${{ steps.stories.outputs.files }}
-          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          # Must stay below the job's timeout-minutes (minus setup + build) so
-          # this deadline fails the run before the job timeout cancels it.
-          CAPTURE_DEADLINE_MS: "240000"
-        run: node .github/scripts/storybook-screenshots.mjs
+    uses: rmartz/storybook-ci/.github/workflows/storybook-screenshots.yml@731dada2cdeb712b5443c4e2b29a3065f90ffd81 # v1.2.1
+    secrets: inherit
