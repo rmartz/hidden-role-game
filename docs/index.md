@@ -26,6 +26,7 @@ Curated reference knowledge for this codebase. Each **content** page carries [Op
 ## Tooling
 
 - [Dependabot grouping audit](dependabot-audit.md) — how `scripts/dependabot-audit.mjs` measures per-group intervention rates to keep the Dependabot grouping strategy evidence-based.
+- [Storybook CI](storybook-ci.md) — how the Storybook test and screenshot checks delegate to the shared `rmartz/storybook-ci` reusable workflows.
 
 ## Design
 

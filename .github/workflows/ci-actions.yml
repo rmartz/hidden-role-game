@@ -64,22 +64,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup
       # Headless suites only (node / hooks / components) — no browser, so this
-      # job stays fast and skips the Playwright install. The browser-based
-      # storybook project runs separately in `storybook-tests`.
+      # job stays fast and needs no Playwright install. The browser-based
+      # storybook project runs in the separate storybook-tests.yml workflow,
+      # which delegates to the shared rmartz/storybook-ci (issue #906).
       - run: pnpm exec vitest run --project node --project hooks --project components
-
-  storybook-tests:
-    name: Storybook Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 4
-    needs: detect-changes
-    if: needs.detect-changes.outputs.code_changed == 'true'
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: ./.github/actions/setup
-        with:
-          playwright: chromium
-      - run: pnpm exec vitest run --project storybook
 
   lint:
     name: Lint
@@ -121,34 +109,18 @@ jobs:
       - uses: ./.github/actions/setup
       - run: pnpm build
 
-  # Gating coverage for the production Storybook bundle. build-storybook uses a
-  # different entrypoint/bundler than `pnpm build` (Next.js) and is a render
-  # surface the vitest `storybook-tests` job never exercises, so neither of
-  # those covers it. Without this job, build-storybook runs only inside the
-  # advisory, story-gated screenshots job (under continue-on-error), where a
-  # broken Storybook build is masked (neutralized) and — for a non-story change
-  # like a .storybook/ or preview/addon edit — never even runs. This job closes
-  # both holes. It is browser-free (build only, no render), so it omits the
-  # playwright input. Render coverage of the built bundle stays advisory by
-  # design (see docs/guidance / rmartz/ai#6).
-  storybook-build:
-    name: Storybook Build
-    runs-on: ubuntu-latest
-    timeout-minutes: 3
-    needs: detect-changes
-    if: needs.detect-changes.outputs.code_changed == 'true'
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: ./.github/actions/setup
-      - run: pnpm build-storybook
-
   sentry-release:
     name: Sentry Release
     runs-on: ubuntu-latest
     timeout-minutes: 2
     if: github.event_name == 'push'
-    needs:
-      [tests, storybook-tests, lint, format, typecheck, build, storybook-build]
+    # Gates on every job in THIS workflow. The Storybook checks moved to
+    # storybook-tests.yml (a reusable-workflow caller), and `needs` cannot
+    # reach across workflow files — so a Storybook failure on main no longer
+    # holds the release back. Acceptable: the commit is already on main by
+    # then, and this job only associates commits with a Sentry release for
+    # error attribution; it deploys nothing.
+    needs: [tests, lint, format, typecheck, build]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
