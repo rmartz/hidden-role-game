@@ -1,0 +1,39 @@
+name: bot-automerge
+
+# rmartz/bot-automerge-action classifies a trusted bot PR (Dependabot
+# patch/minor bumps; release-please release PRs where used) and enables
+# GitHub-native auto-merge on it. It posts no check-run — it only makes the PR
+# *eligible* to auto-merge; the repo's required status checks (merge-safety +
+# the CI gates, required on the default branch) are what it then waits on, so an
+# untrusted change never rides straight to main.
+#
+# `pull_request_target` (not `pull_request`): Dependabot PRs run with a
+# read-only token, and enabling auto-merge needs base-context write. This is
+# expected for this action, not a review flag. A composite action can't declare
+# its own triggers or use `secrets: inherit`, so the caller owns the trigger,
+# the write scopes, and the checkout.
+#
+# `release-please-token` is intentionally omitted: this repo is a deployed app
+# with no release-please/semantic-release, so only the Dependabot eligibility
+# path applies and the action falls back to the job token.
+#
+# The pin is kept current by Dependabot's github-actions ecosystem.
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, labeled]
+
+permissions:
+  contents: write # enable GitHub-native auto-merge on the PR
+  pull-requests: write # read PR metadata + turn on auto-merge
+  packages: read # install the public @rmartz/bot-automerge package
+
+jobs:
+  bot-automerge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: rmartz/bot-automerge-action@7acd74697ddcce0319ca0d6733681dc76d4e60d6 # v1.0.0
+        with:
+          pr: ${{ github.event.pull_request.number }}
