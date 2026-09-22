@@ -26,6 +26,11 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "dependabot-audit.yml": {
     audit: 10,
   },
+  // @rmartz/merge-safety reusable-workflow caller: its `merge-safety` job uses
+  // `uses:`, and GitHub Actions rejects timeout-minutes on reusable-workflow
+  // callers — so it registers with no job caps (handled by the `uses` branch in
+  // the test below).
+  "merge-safety.yml": {},
   "pr-title-lint.yml": {
     "pr-title": 1,
   },

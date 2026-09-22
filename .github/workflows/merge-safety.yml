@@ -1,0 +1,52 @@
+name: merge-safety
+
+# @rmartz/merge-safety posts the pre-auto-merge safety verdict (base-currency,
+# breaking-change, and conflict facts) as the `merge-safety` check-run, and
+# re-holds every open PR when the base branch moves. It is the prerequisite for
+# safely enabling native auto-merge on trusted bot PRs (bot-automerge).
+#
+# This caller is intentionally NOT trigger-free: a reusable workflow can't
+# declare its own `on:` triggers, and effective permissions are the intersection
+# of caller-granted and workflow-declared — so the caller carries both.
+#
+# `pull_request_target` (not `pull_request`): GitHub cannot build the synthetic
+# merge commit for an unmergeable PR, so a `pull_request` run never fires on a
+# conflicting PR — exactly when the verdict matters most — and a required check
+# that never posts hangs the PR forever. `pull_request_target` runs in the base
+# context and needs no merge commit. It is safe here because the reusable
+# `evaluate` job checks out the base ref and treats the PR head as git data only
+# (it never executes PR-authored code).
+#
+# `check_suite: [completed]` re-holds PRs when the base branch's CI flips
+# red/green after a push (the push itself fires while base CI is still pending).
+#
+# The pin is kept current by Dependabot's github-actions ecosystem. Requiring
+# the `merge-safety` check on the default-branch ruleset is a separate step (done
+# once the check has posted at least once).
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
+  push:
+    branches: [main]
+  check_suite:
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: PR number to evaluate
+        required: true
+
+permissions:
+  checks: write # post/flip the merge-safety check-run
+  pull-requests: write # reconcile update-required / merge-conflict labels
+  contents: read
+  actions: write # dispatch per-PR evaluate runs on the push fan-out
+  packages: read # install the CLI from GitHub Packages
+
+jobs:
+  merge-safety:
+    uses: rmartz/merge-safety/.github/workflows/merge-safety.yml@db145fb8c20164185eb9e1a1c237dc4d9085c69f # v0.1.0
+    with:
+      pr: ${{ inputs.pr }} # thread the workflow_dispatch input through
+    secrets: inherit
