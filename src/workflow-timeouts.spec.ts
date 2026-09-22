@@ -9,6 +9,11 @@ import { parse } from "yaml";
 // workflow requires registering it here, or the test below fails — forcing a
 // deliberate cap rather than leaving a job unbounded.
 const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
+  // rmartz/bot-automerge-action caller: we own the job (the action is a step,
+  // not a reusable workflow), so its `bot-automerge` job carries a real timeout.
+  "bot-automerge.yml": {
+    "bot-automerge": 5,
+  },
   "ci-actions.yml": {
     build: 2,
     "detect-changes": 1,
