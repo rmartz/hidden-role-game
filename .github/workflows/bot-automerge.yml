@@ -45,6 +45,6 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: rmartz/bot-automerge-action@5ce5706808ecf07238081047327e1908255da4df # v1.0.1
+      - uses: rmartz/bot-automerge-action@a46eafc1396993ffc04918f452b3d1c0e3c80f4f # v1.1.1
         with:
           pr: ${{ github.event.pull_request.number }}
