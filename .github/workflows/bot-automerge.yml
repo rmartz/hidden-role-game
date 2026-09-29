@@ -13,9 +13,9 @@ name: bot-automerge
 # its own triggers or use `secrets: inherit`, so the caller owns the trigger,
 # the write scopes, and the checkout.
 #
-# `release-please-token` is intentionally omitted: this repo is a deployed app
-# with no release-please/semantic-release, so only the Dependabot eligibility
-# path applies and the action falls back to the job token.
+# Auto-merge is enabled with the BOT_AUTOMERGE_TOKEN real-actor PAT, not the
+# job token: a merge enabled with GITHUB_TOKEN fires no push workflows, so a
+# bot merge would reach main with no CI or deploy run.
 #
 # The pin is kept current by Dependabot's github-actions ecosystem.
 
@@ -26,25 +26,33 @@ on:
 permissions:
   contents: write # enable GitHub-native auto-merge on the PR
   pull-requests: write # read PR metadata + turn on auto-merge
-  packages: read # install the public @rmartz/bot-automerge package
 
 jobs:
   bot-automerge:
     # Skip the job outright on PRs the CLI could never trust, so a human PR shows a
     # free `skipped` instead of checking out and installing the CLI just to no-op.
-    # The three conditions mirror the CLI's own detectBotPrType exactly —
-    # Dependabot by author, release-please by branch prefix OR pending label — so
-    # nothing eligible is skipped. It is deliberately not an author test:
-    # release-please run under a PAT authors its release PR as that real user, not
-    # a [bot] account, so an author-only guard would skip release PRs.
+    # The two conditions mirror the CLI's own detectBotPrType exactly —
+    # Dependabot by author, release-please by head branch prefix — so nothing
+    # eligible is skipped. The `autorelease: pending` label is not a signal: since
+    # v2.0.0 the CLI ignores it, because anyone with triage permission can apply it
+    # (rmartz/bot-automerge#41).
+    # It is deliberately not an author test: release-please run under a PAT
+    # authors its release PR as that real user, not a [bot] account, so an
+    # author-only guard would skip release PRs.
     if: >-
       github.event.pull_request.user.login == 'dependabot[bot]'
       || startsWith(github.event.pull_request.head.ref, 'release-please--')
-      || contains(github.event.pull_request.labels.*.name, 'autorelease: pending')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: rmartz/bot-automerge-action@a46eafc1396993ffc04918f452b3d1c0e3c80f4f # v1.1.1
+      - uses: rmartz/bot-automerge-action@3e26c765f2da6c360fd39ab8aef7a50090a96657 # v2.1.1
         with:
           pr: ${{ github.event.pull_request.number }}
+          # Real-actor PAT, stored as both an Actions and a Dependabot secret (a
+          # Dependabot-triggered run sees only the latter). An auto-merge enabled
+          # with GITHUB_TOKEN fires no push workflows, so a bot merge would reach
+          # main with no push-triggered CI, release, or merge-safety run
+          # (rmartz/bot-automerge-action#31). When the secret is unset the action
+          # falls back to GITHUB_TOKEN itself.
+          token: ${{ secrets.BOT_AUTOMERGE_TOKEN }}
