@@ -39,6 +39,7 @@ on:
 
 permissions:
   checks: write # post/flip the merge-safety check-run
+  statuses: write # set the merge-safety commit status the merge gate relies on (rmartz/merge-safety#73)
   pull-requests: write # reconcile update-required / merge-conflict labels
   contents: read
   actions: write # dispatch per-PR evaluate runs on the push fan-out
