@@ -9,6 +9,7 @@
 const KNOWN_GROUPS = [
   "dev-dependencies",
   "eslint",
+  "github-actions",
   "lodash",
   "prettier",
   "production-dependencies",

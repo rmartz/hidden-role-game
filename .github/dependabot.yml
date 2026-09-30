@@ -132,3 +132,12 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
+    # Every action bump, majors included, lands in one PR (unlike the npm groups
+    # above, where majors are individual). bot-automerge holds a group containing
+    # a major for human review (fetch-metadata reports the group's highest
+    # update-type), and a major that breaks CI is split out into its own fix PR
+    # rather than holding the rest of the group back.
+    groups:
+      github-actions:
+        patterns:
+          - "*"
