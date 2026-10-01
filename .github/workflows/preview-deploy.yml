@@ -29,10 +29,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     # Same-repo PRs only (forks can't read secrets), carrying `ready for UAT`,
-    # not held by `do not merge`, and not a draft.
+    # not held by `do not merge`, and not a draft or `[WIP]`-titled PR.
     if: >-
       github.event.pull_request.head.repo.full_name == github.repository &&
       github.event.pull_request.draft == false &&
+      !contains(github.event.pull_request.title, '[WIP]') &&
       contains(github.event.pull_request.labels.*.name, 'ready for UAT') &&
       !contains(github.event.pull_request.labels.*.name, 'do not merge')
     env:
