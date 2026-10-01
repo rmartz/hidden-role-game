@@ -6,5 +6,10 @@
       "schedule": "0 5 * * *"
     }
   ],
-  "ignoreCommand": "bash scripts/vercel-ignore-build.sh"
+  "git": {
+    "deploymentEnabled": {
+      "**": false,
+      "main": true
+    }
+  }
 }
