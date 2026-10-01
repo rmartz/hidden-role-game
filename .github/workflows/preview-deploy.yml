@@ -23,5 +23,8 @@ permissions:
 
 jobs:
   preview:
+    # `[WIP]`-titled PRs are held as unfinished work and get no preview. The
+    # shared workflow gates on draft status but not the title, so it is kept here.
+    if: ${{ !contains(github.event.pull_request.title, '[WIP]') }}
     uses: rmartz/vercel-preview-ci/.github/workflows/vercel-preview.yml@129b1339e8b7d80f20e5af6fe6f78ea99da5ad0d # v1.0.0
     secrets: inherit
