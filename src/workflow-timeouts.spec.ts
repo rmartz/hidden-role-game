@@ -34,6 +34,11 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   // callers — so it registers with no job caps (handled by the `uses` branch in
   // the test below).
   "merge-safety.yml": {},
+  // rmartz/pr-policy-action caller: we own the job (the action is a step, not a
+  // reusable workflow), so its `pr-policy` job carries a real timeout.
+  "pr-policy.yml": {
+    "pr-policy": 5,
+  },
   "pr-title-lint.yml": {
     "pr-title": 1,
   },
