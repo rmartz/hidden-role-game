@@ -1,45 +1,56 @@
-# Repository hygiene gates, enforced by @rmartz/repo-hygiene via the reusable
-# workflow (.github/workflows/repo-hygiene.yml). The enabled set is named there;
-# only checks that need per-repo settings appear below. Every check runs at
-# `severity: error` — a healthy repo gates on all of them (the checklist's
-# zero-soft-tier stance; `warn` is only ever a temporary migration ramp).
+# Repository hygiene gates, enforced by @rmartz/repo-hygiene via the composite
+# action (.github/workflows/repo-hygiene.yml). The enabled set is named there;
+# per-check settings live below.
 #
-# These replace the repo's former bespoke checkers 1:1:
-#   - action-pins   ← scripts/check-action-pins.mjs
-#   - package-pins  ← scripts/check-package-pins.mjs
-#   - md-pairing    ← scripts/check-agents-md.mjs (bare `@AGENTS.md` wrapper)
-#   - okf + okf-index ← scripts/check-docs.mjs (frontmatter + index reachability)
-# conflict-markers and docs-links are net-new CI coverage.
+# Strict by default: this config adopts the "default strict, override as
+# needed" model ahead of the upstream default flips (rmartz/repo-hygiene#106–
+# #111). Settings fall into two groups:
+#
+#   - INTERIM: pre-states an upcoming upstream default. Delete the line once the
+#     pinned action ships that default — the behavior does not change.
+#   - OVERRIDE: a deliberate, permanent departure from the package default,
+#     with the reason alongside.
+#
+# Every check runs at error; there is no warn tier (`warn` is only ever a
+# temporary migration ramp).
 #
 # Known coverage delta vs. the old check-docs.mjs: `okf` does not validate our
 # custom `gameMode` frontmatter field on mode pages (it enforces
 # type/title/description/resource). The `resource` path already encodes the
 # mode, so this is an accepted minor reduction.
 checks:
-  conflict-markers:
-    severity: error
-  action-pins:
-    severity: error
-  package-pins:
-    severity: error
   docs-links:
-    roots: [docs]
-    severity: error
+    # INTERIM (#108): validate #anchor fragments, not just file targets.
+    anchors: true
   md-pairing:
-    # Directives live in AGENTS.md; each CLAUDE.md is a bare `@AGENTS.md` wrapper.
+    # INTERIM (#106, #107): error severity and the bare `@AGENTS.md` wrapper.
     wrapper: "@AGENTS.md"
     severity: error
   okf:
-    # This repo's closed OKF type vocabulary (see docs/index.md).
+    # OVERRIDE: this repo's own closed OKF type vocabulary (see docs/index.md),
+    # which documents game modes rather than scripts/libraries.
     types: [Actions, DataFlow, Guide, Reference, Roles]
-    roots: [docs]
-    # Mode pages (Actions/DataFlow/Roles) carry a `resource`; Guide/Reference
-    # pages document a concept, not a single file, so they need none.
+    # OVERRIDE: mode pages (Actions/DataFlow/Roles) carry a `resource`;
+    # Guide/Reference pages document a concept, not a single file.
     resourceExemptTypes: [Guide, Reference]
+    # INTERIM (#106).
     severity: error
   okf-index:
-    roots: [docs]
-    # Our docs are a flat bundle: a single root docs/index.md links every page,
-    # with no per-subdirectory index.md.
-    nestedIndexes: false
+    # INTERIM (#106).
     severity: error
+  file-caps:
+    # INTERIM (#109): the strict, error-only shared caps. Ordered first-match-
+    # wins. The code and test caps match our eslint `max-lines` error tiers.
+    overrides:
+      - glob: "**/pnpm-lock.yaml"
+        lines: { error: 100000 }
+      - glob: "**/{AGENTS,CLAUDE}.md"
+        lines: { error: 300 }
+      - glob: "**/*.{test,spec}.{ts,tsx,js,jsx,mts,cts,mjs,cjs}"
+        lines: { error: 600 }
+      - glob: "**/*.{ts,tsx,js,jsx,mts,cts,mjs,cjs}"
+        lines: { error: 400 }
+      - glob: "**/*.md"
+        lines: { error: 400 }
+      - glob: "**/*"
+        lines: { error: 400 }
