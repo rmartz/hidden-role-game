@@ -38,6 +38,7 @@ Curated reference knowledge for this codebase. Each **content** page carries [Op
 
 - [Roles](werewolf/roles.md)
 - [Actions](werewolf/actions.md)
+- [Resolution](werewolf/resolution.md)
 - [Data Flow](werewolf/data-flow.md)
 
 ### Secret Villain
