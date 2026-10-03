@@ -1,28 +1,19 @@
 name: merge-safety
 
-# @rmartz/merge-safety posts the pre-auto-merge safety verdict (base-currency,
-# breaking-change, and conflict facts) as the `merge-safety` check-run, and
-# re-holds every open PR when the base branch moves. It is the prerequisite for
-# safely enabling native auto-merge on trusted bot PRs (bot-automerge).
-#
-# This caller is intentionally NOT trigger-free: a reusable workflow can't
-# declare its own `on:` triggers, and effective permissions are the intersection
-# of caller-granted and workflow-declared — so the caller carries both.
+# Thin caller of the rmartz/merge-safety-action composite Action. It posts the
+# `merge-safety` check-run carrying the base-currency / breaking-change / conflict
+# verdict and re-holds open PRs when main moves, so a PR auto-merges only once it
+# is genuinely safe against the current base. The `@<sha>` pin is bumped by
+# Dependabot. See https://github.com/rmartz/merge-safety-action/blob/main/docs/consuming.md.
 #
 # `pull_request_target` (not `pull_request`): GitHub cannot build the synthetic
 # merge commit for an unmergeable PR, so a `pull_request` run never fires on a
-# conflicting PR — exactly when the verdict matters most — and a required check
-# that never posts hangs the PR forever. `pull_request_target` runs in the base
-# context and needs no merge commit. It is safe here because the reusable
-# `evaluate` job checks out the base ref and treats the PR head as git data only
-# (it never executes PR-authored code).
+# conflicting PR — exactly when the verdict matters most. It is safe here because
+# the action fetches the PR head as git data only and never executes PR code.
+# `check_suite: [completed]` re-holds PRs when main's own CI flips red/green.
 #
-# `check_suite: [completed]` re-holds PRs when the base branch's CI flips
-# red/green after a push (the push itself fires while base CI is still pending).
-#
-# The pin is kept current by Dependabot's github-actions ecosystem. Requiring
-# the `merge-safety` check on the default-branch ruleset is a separate step (done
-# once the check has posted at least once).
+# THE CHECK-RUN NAME `merge-safety` IS A FLEET CONTRACT — it is required on the
+# default branch and the auto-merge gate keys off it; never rename it here.
 
 on:
   pull_request_target:
@@ -39,15 +30,33 @@ on:
 
 permissions:
   checks: write # post/flip the merge-safety check-run
-  statuses: write # set the merge-safety commit status the merge gate relies on (rmartz/merge-safety#73)
+  statuses: write # mirror the verdict to the merge-safety commit status
   pull-requests: write # reconcile update-required / merge-conflict labels
   contents: read
-  actions: write # dispatch per-PR evaluate runs on the push fan-out
-  packages: read # install the CLI from GitHub Packages
+  actions: write # re-dispatch this workflow per open PR when the base moves
 
 jobs:
   merge-safety:
-    uses: rmartz/merge-safety/.github/workflows/merge-safety.yml@02ba21fbaec01941c98dbf65cc69c8a220434754 # v0.13.0
-    with:
-      pr: ${{ inputs.pr }} # thread the workflow_dispatch input through
-    secrets: inherit
+    # Skip, without a runner, the events the action would no-op on: another app's
+    # check suite, a non-default branch's suite, a tag push, a branch deletion.
+    if: >-
+      (github.event_name != 'push' && github.event_name != 'check_suite') ||
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/') && !github.event.deleted) ||
+      (github.event_name == 'check_suite' &&
+       github.event.check_suite.app.slug == 'github-actions' &&
+       github.event.check_suite.head_branch == github.event.repository.default_branch)
+    # Base-moved fan-outs serialize per branch and are never cancelled; each per-PR
+    # evaluate run gets its own group (run_id), so a burst of PR events never
+    # queues or cancels a run.
+    concurrency:
+      group: >-
+        ${{ (github.event_name == 'push' || github.event_name == 'check_suite')
+        && format('merge-safety-invalidate-{0}', github.event_name == 'push' && github.ref_name || github.event.check_suite.head_branch)
+        || format('merge-safety-evaluate-{0}', github.run_id) }}
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: rmartz/merge-safety-action@a327f9599a1da413a08e4b831d8babe075935e27 # v0.1.0
+        with:
+          pr: ${{ inputs.pr }}
