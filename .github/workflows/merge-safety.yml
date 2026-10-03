@@ -47,7 +47,7 @@ permissions:
 
 jobs:
   merge-safety:
-    uses: rmartz/merge-safety/.github/workflows/merge-safety.yml@02ba21fbaec01941c98dbf65cc69c8a220434754 # v0.13.0
+    uses: rmartz/merge-safety/.github/workflows/merge-safety.yml@2e377e7d4ba631dd2d3dd7a7ab542db3b394a55a # v0.14.0
     with:
       pr: ${{ inputs.pr }} # thread the workflow_dispatch input through
     secrets: inherit

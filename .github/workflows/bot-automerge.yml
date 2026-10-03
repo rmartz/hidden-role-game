@@ -46,7 +46,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: rmartz/bot-automerge-action@eb743a87c71cbca234e6787e8561928fe7c09aba # v2.1.4
+      - uses: rmartz/bot-automerge-action@a67b7de61ed8b20964ed4b8e4f2fd0aa43d00113 # v2.1.5
         with:
           pr: ${{ github.event.pull_request.number }}
           # Real-actor PAT, stored as both an Actions and a Dependabot secret (a
