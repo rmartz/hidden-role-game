@@ -1,0 +1,39 @@
+name: pr-policy
+
+# Runs the @rmartz/pr-policy read-only PR content checks via
+# rmartz/pr-policy-action, which posts the `pr-policy` verdict (a check-run and a
+# matching commit status) and owns the `CI approval needed` label. The checks are
+# listed in rmartz/pr-policy's docs/checks/index.md.
+#
+# This repo is a Next.js app, so it keeps the UAT gate: a PR stays pending until
+# it carries `no UAT needed` or a person's `UAT passed`. Don't set `skip-uat`.
+#
+# pull_request_target is safe here only because nothing checks out or runs the
+# PR's code; the Action reads everything through the API. It is needed so fork
+# and Dependabot PRs still get a write token for the check-run, status, and label.
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
+
+permissions:
+  checks: write # post the pr-policy check-run
+  pull-requests: write # write the labels pr-policy owns (CI approval needed)
+  contents: read # read changed files at the merge base and head
+  statuses: write # post the pr-policy commit status and one per policy check (pr-policy / <check>)
+
+concurrency:
+  group: pr-policy-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  # Not named `pr-policy`: the Action posts its own check-run and status under that
+  # exact name, and a same-named job would add a second, always-green entry.
+  pr-policy:
+    name: pr-policy (evaluate)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: rmartz/pr-policy-action@cdb083960965d0b2cc5033271186ec04020f87f4 # v1.4.5
+        with:
+          pr: ${{ github.event.pull_request.number }}
