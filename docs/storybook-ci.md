@@ -2,7 +2,7 @@
 type: Reference
 title: Storybook CI (shared rmartz/storybook-ci)
 description: How this repo's Storybook test and screenshot CI is delegated to the shared rmartz/storybook-ci reusable workflows — what the two caller workflows configure, what the shared workflows own, and the operational facts (required-check context, PAT, resolver gap) a maintainer needs.
-resource: ../.github/workflows/storybook-tests.yml
+resource: .github/workflows/storybook-tests.yml
 ---
 
 # Storybook CI

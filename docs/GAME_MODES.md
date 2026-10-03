@@ -16,7 +16,8 @@ This directory contains documentation for each supported game mode.
 A night-phase deduction game. Villagers try to identify and eliminate Werewolves during the day; Werewolves secretly eliminate Villagers at night. The owner acts as Narrator and controls the night phase progression. The app mediates all gameplay: night-phase targeting, daytime nominations and trials, and win condition detection.
 
 - [Roles](werewolf/roles.md) — all roles, their teams, night-waking behavior, and visibility rules
-- [Actions](werewolf/actions.md) — narrator and player actions, payloads, validation rules, and night resolution
+- [Actions](werewolf/actions.md) — narrator and player actions, payloads, and validation rules
+- [Resolution](werewolf/resolution.md) — night action state, night resolution order, trial resolution, and win-condition priority
 - [Data Flow](werewolf/data-flow.md) — `PlayerGameState` fields per player type, Firebase schema, and per-phase data flow
 
 ### Secret Villain
