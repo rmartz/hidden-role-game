@@ -30,32 +30,15 @@ Curated reference knowledge for this codebase. Each **content** page carries [Op
 
 ## Design
 
-- [No-Device Players & the Omniscient-Narrator Requirement](design/no-device-players.md) — why no-device players require an omniscient narrator, the interim gate, and what full Secret Villain support would require.
+- [Design notes](design/index.md) — design notes and decision records, such as the no-device player / omniscient-narrator requirement.
 
 ## Game modes
 
-### Werewolf
-
-- [Roles](werewolf/roles.md)
-- [Actions](werewolf/actions.md)
-- [Data Flow](werewolf/data-flow.md)
-
-### Secret Villain
-
-- [Roles](secret-villain/roles.md)
-- [Actions](secret-villain/actions.md)
-- [Data Flow](secret-villain/data-flow.md)
-
-### Avalon
-
-- [Roles](avalon/roles.md)
-- [Actions](avalon/actions.md)
-- [Data Flow](avalon/data-flow.md)
-
-### Clocktower
-
-- [Actions](clocktower/actions.md)
+- [Werewolf](werewolf/index.md)
+- [Secret Villain](secret-villain/index.md)
+- [Avalon](avalon/index.md)
+- [Clocktower](clocktower/index.md)
 
 ## Adding a page
 
-New content pages under `docs/` must begin with OKF frontmatter — at minimum the required `type` key, plus `title` and `description`. Per-mode pages also set `gameMode` and a `resource` path to the documented source. After adding a content page, link it from the relevant section above so the index stays complete. Index files (`index.md`) are reserved filenames and must not carry frontmatter (the root `docs/index.md` may optionally carry `okf_version`). See [Open Knowledge Format (OKF)](open-knowledge-format.md) for the full convention and the authoritative spec.
+New content pages under `docs/` must begin with OKF frontmatter — at minimum the required `type` key, plus `title` and `description`. Per-mode pages also set `gameMode` and a `resource` path to the documented source. After adding a content page, link it from the nearest `index.md` — the root index for a top-level page, or its subdirectory's `index.md` (e.g. `werewolf/index.md`) for a page in a subdirectory — so every page stays reachable. Index files (`index.md`) are reserved filenames and must not carry frontmatter (the root `docs/index.md` may optionally carry `okf_version`). See [Open Knowledge Format (OKF)](open-knowledge-format.md) for the full convention and the authoritative spec.

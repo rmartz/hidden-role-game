@@ -42,9 +42,11 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "repo-hygiene.yml": {
     hygiene: 5,
   },
-  "preview-deploy.yml": {
-    "deploy-preview": 10,
-  },
+  // rmartz/vercel-preview-ci reusable-workflow caller: its `preview` job uses
+  // `uses:`, and GitHub Actions rejects timeout-minutes on reusable-workflow
+  // callers — so it registers with no job caps (handled by the `uses` branch in
+  // the test below). The real cap lives in the shared workflow.
+  "preview-deploy.yml": {},
   // rmartz/storybook-ci reusable-workflow callers: both jobs use `uses:`, and
   // GitHub Actions rejects timeout-minutes on reusable-workflow callers — so
   // they register with no job caps (handled by the `uses` branch in the test

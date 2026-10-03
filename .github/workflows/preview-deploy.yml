@@ -1,79 +1,30 @@
 name: Preview Deploy
 
-# Label-driven Vercel preview deploy (rmartz/ai-tracked #764). A preview exists
-# to enable UAT, so we deploy one only when a PR is marked `ready for UAT` —
-# not on every push. Triggered when the label is added, and re-deployed when new
-# commits land on an already-labelled PR. The deploy URL is posted as a sticky
-# PR comment.
-#
-# Requires repo secrets: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID.
+# Label-driven Vercel preview deploy via the shared rmartz/vercel-preview-ci
+# reusable workflow (#764). A PR gets a preview only while it carries `UAT ready`
+# (the legacy `ready for UAT` is also accepted during the rename, #912); it is
+# redeployed on each new push and the URL is posted as a sticky PR comment. The
+# gate, fork safety, and per-PR concurrency live in the shared workflow:
+# https://github.com/rmartz/vercel-preview-ci/blob/main/docs/consuming.md
 #
 # This is the sole preview path: vercel.json's `git.deploymentEnabled` disables
-# Vercel's Git-integration deploys for every branch except `main`, so pushes
-# never create previews on their own.
+# Vercel's Git-integration deploys for every branch except `main`.
+#
+# Requires repo secrets: VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID.
+
 on:
   pull_request:
-    types: [labeled, synchronize, reopened]
+    types: [labeled, unlabeled, synchronize, reopened, ready_for_review]
 
 permissions:
   contents: read
+  packages: read
   pull-requests: write
 
-concurrency:
-  group: preview-deploy-${{ github.event.pull_request.number }}
-  cancel-in-progress: true
-
 jobs:
-  deploy-preview:
-    name: Deploy preview
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    # Same-repo PRs only (forks can't read secrets), carrying `ready for UAT`,
-    # not held by `do not merge`, and not a draft or `[WIP]`-titled PR.
-    if: >-
-      github.event.pull_request.head.repo.full_name == github.repository &&
-      github.event.pull_request.draft == false &&
-      !contains(github.event.pull_request.title, '[WIP]') &&
-      contains(github.event.pull_request.labels.*.name, 'ready for UAT') &&
-      !contains(github.event.pull_request.labels.*.name, 'do not merge')
-    env:
-      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-      - uses: ./.github/actions/setup
-      - name: Install Vercel CLI
-        run: pnpm add -g vercel@54.19.0
-      - name: Pull Vercel preview environment
-        run: vercel pull --yes --environment=preview --token="$VERCEL_TOKEN"
-      - name: Build
-        run: vercel build --token="$VERCEL_TOKEN"
-      - name: Deploy prebuilt preview
-        id: deploy
-        run: |
-          url=$(vercel deploy --prebuilt --token="$VERCEL_TOKEN" | tail -1)
-          echo "url=$url" >> "$GITHUB_OUTPUT"
-          echo "Preview deployed to: $url"
-      - name: Post or update sticky PR comment
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-          PR: ${{ github.event.pull_request.number }}
-          URL: ${{ steps.deploy.outputs.url }}
-          SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          marker="<!-- vercel-preview-bot -->"
-          body="$marker
-          🔺 **Vercel preview** (\`ready for UAT\`) for commit \`${SHA:0:7}\`:
-
-          $URL"
-          existing=$(gh api "repos/$REPO/issues/$PR/comments?per_page=100" --paginate \
-            --jq "[.[] | select(.body | startswith(\"$marker\"))][0].id // empty")
-          if [ -n "$existing" ]; then
-            gh api -X PATCH "repos/$REPO/issues/comments/$existing" -f body="$body" >/dev/null
-          else
-            gh api -X POST "repos/$REPO/issues/$PR/comments" -f body="$body" >/dev/null
-          fi
+  preview:
+    # `[WIP]`-titled PRs are held as unfinished work and get no preview. The
+    # shared workflow gates on draft status but not the title, so it is kept here.
+    if: ${{ !contains(github.event.pull_request.title, '[WIP]') }}
+    uses: rmartz/vercel-preview-ci/.github/workflows/vercel-preview.yml@129b1339e8b7d80f20e5af6fe6f78ea99da5ad0d # v1.0.0
+    secrets: inherit
