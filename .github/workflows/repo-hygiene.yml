@@ -15,9 +15,10 @@ name: Repo Hygiene
 #
 # `checks` is explicit (not the default-on set) because we need the opt-in
 # `package-pins` and want a curated list; the tradeoff is that a future
-# default-on check does not auto-join — add it here when we want it. `file-caps`
-# is intentionally omitted: our eslint `max-lines` rule already enforces
-# per-file line caps for source and tests.
+# default-on check does not auto-join — add it here when we want it. Once
+# `package-pins` is default-on upstream (rmartz/repo-hygiene#111), drop the list
+# to run the full default set. `file-caps` overlaps our eslint `max-lines` rule
+# for source and tests (same caps) and additionally caps Markdown and config.
 #
 # Local pre-commit conflict-marker checking stays wired via
 # .github/scripts/check-conflict-markers.sh (claude/hooks + .husky), so no local
@@ -40,5 +41,5 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: rmartz/repo-hygiene-action@bca5c484060d5d608333810b4e042cd39c59f7a9 # v3.2.0
         with:
-          checks: conflict-markers action-pins package-pins docs-links md-pairing okf okf-index
+          checks: conflict-markers action-pins package-pins docs-links file-caps md-pairing okf okf-index
           config: .repo-hygiene.yml
