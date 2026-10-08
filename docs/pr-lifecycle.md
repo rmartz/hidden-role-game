@@ -2,7 +2,7 @@
 type: Reference
 title: pr-lifecycle (shared rmartz/pr-lifecycle-action)
 description: The shared @rmartz/pr-lifecycle reconciler, run via rmartz/pr-lifecycle-action, which keeps each PR's lifecycle labels in step with its current facts; labels only for now (no auto-merge arming).
-resource: ../.github/workflows/pr-lifecycle.yml
+resource: .github/workflows/pr-lifecycle.yml
 tags: [ci, github-actions, pr-lifecycle, labels]
 ---
 
