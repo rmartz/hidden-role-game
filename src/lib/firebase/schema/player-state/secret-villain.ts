@@ -1,4 +1,5 @@
 import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
+import type { SvTheme } from "@/lib/game/modes/secret-villain/themes";
 import { GameMode } from "@/lib/types";
 
 import {
@@ -12,8 +13,7 @@ import {
 // ---------------------------------------------------------------------------
 
 export interface FirebaseSecretVillainPlayerState extends FirebaseBasePlayerState {
-  /** SvTheme enum value stored as string. */
-  svTheme?: string;
+  svTheme?: SvTheme;
   /** JSON-serialized SvPhaseInfo. */
   svPhase?: string;
   /** JSON-serialized SvBoardState. */
@@ -108,9 +108,7 @@ export function secretVillainStateFromFirebase(
   return {
     ...baseStateFromFirebase(raw),
     gameMode: GameMode.SecretVillain,
-    ...(raw.svTheme !== undefined
-      ? { svTheme: raw.svTheme as SecretVillainPlayerGameState["svTheme"] }
-      : {}),
+    ...(raw.svTheme !== undefined ? { svTheme: raw.svTheme } : {}),
     ...(raw.svPhase !== undefined
       ? {
           svPhase: JSON.parse(

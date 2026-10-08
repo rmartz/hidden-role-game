@@ -1,3 +1,4 @@
+import { isEnumValue } from "@/lib/enum";
 import type { BaseLobbyConfig } from "@/lib/types";
 import { GameMode } from "@/lib/types";
 
@@ -5,7 +6,7 @@ import { SvTheme } from "./themes";
 import type { SecretVillainTimerConfig } from "./timer-config";
 import { DEFAULT_SECRET_VILLAIN_TIMER_CONFIG } from "./timer-config";
 import type { SvCustomPowerConfig, SvCustomPowerSlot } from "./types";
-import { SpecialActionType, SvBoardPreset } from "./types";
+import { isCustomPowerAction, SvBoardPreset } from "./types";
 
 /** Secret Villain–specific mode configuration. */
 export interface SecretVillainModeConfig {
@@ -35,17 +36,8 @@ export const DEFAULT_SECRET_VILLAIN_MODE_CONFIG: SecretVillainModeConfig = {
   boardPreset: SvBoardPreset.Default,
 };
 
-const VALID_CUSTOM_SLOTS = new Set<string>([
-  SpecialActionType.InvestigateTeam,
-  SpecialActionType.PolicyPeek,
-  SpecialActionType.SpecialElection,
-]);
-
 function parseCustomPowerSlot(value: unknown): SvCustomPowerSlot {
-  if (typeof value === "string" && VALID_CUSTOM_SLOTS.has(value)) {
-    return value as SvCustomPowerSlot;
-  }
-  return undefined;
+  return isCustomPowerAction(value) ? value : undefined;
 }
 
 /**
@@ -76,25 +68,20 @@ export function parseSecretVillainModeConfig(
   raw: Record<string, unknown>,
 ): SecretVillainModeConfig {
   const boardPreset = raw["boardPreset"];
-  const isValidPreset =
-    typeof boardPreset === "string" &&
-    Object.values(SvBoardPreset).includes(boardPreset as SvBoardPreset);
+  const isValidPreset = isEnumValue(SvBoardPreset, boardPreset);
 
   const customPowerTable =
-    isValidPreset && boardPreset === (SvBoardPreset.Custom as string)
+    isValidPreset && boardPreset === SvBoardPreset.Custom
       ? parseCustomPowerTable(raw["customPowerTable"])
       : undefined;
 
   const theme = raw["theme"];
-  const isValidTheme =
-    typeof theme === "string" &&
-    Object.values(SvTheme).includes(theme as SvTheme);
 
   return {
     gameMode: GameMode.SecretVillain,
-    ...(isValidPreset ? { boardPreset: boardPreset as SvBoardPreset } : {}),
+    ...(isValidPreset ? { boardPreset } : {}),
     ...(customPowerTable ? { customPowerTable } : {}),
-    ...(isValidTheme ? { theme: theme as SvTheme } : {}),
+    ...(isEnumValue(SvTheme, theme) ? { theme } : {}),
     ...(raw["includeBoard"] === true ? { includeBoard: true } : {}),
   };
 }

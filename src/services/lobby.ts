@@ -302,7 +302,7 @@ export async function updateConfig(
   }
   if (
     config.gameMode !== undefined &&
-    (config.gameMode as string) !== data.public.config.gameMode
+    config.gameMode !== data.public.config.gameMode
   ) {
     updates["public/config/gameMode"] = config.gameMode;
     data.public.config.gameMode = config.gameMode;

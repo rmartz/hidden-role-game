@@ -6,7 +6,9 @@ import { firebaseToPlayerState } from "../index";
 
 describe("firebaseToPlayerState", () => {
   it("throws for unknown game mode", () => {
-    const raw = {
+    // Deliberately malformed stored data: "unknown-mode" is not a GameMode, so
+    // it is typed `unknown` rather than asserted into the enum-typed schema.
+    const raw: unknown = {
       gameMode: "unknown-mode",
       statusJson: JSON.stringify({ type: GameStatus.Playing }),
       lobbyId: "lobby-1",

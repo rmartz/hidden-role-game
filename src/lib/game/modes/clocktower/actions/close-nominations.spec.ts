@@ -4,6 +4,7 @@ import type { Game } from "@/lib/types";
 import { GameStatus } from "@/lib/types";
 
 import type { ClocktowerDayPhase, ClocktowerTurnState } from "../types";
+import { ClocktowerPhase } from "../types";
 import { closeNominationsAction } from "./close-nominations";
 import { makeDayTurnState, makePlayingGame } from "./test-helpers";
 
@@ -33,8 +34,11 @@ describe("closeNominationsAction.isValid", () => {
 
   it("rejects during the night phase", () => {
     const ts = makeDayTurnState();
-    // @ts-expect-error — override phase for test
-    ts.phase = { type: "night", currentActionIndex: 0, nightActions: {} };
+    ts.phase = {
+      type: ClocktowerPhase.Night,
+      currentActionIndex: 0,
+      nightActions: {},
+    };
     const game = makePlayingGame(ts);
     expect(closeNominationsAction.isValid(game, "owner-1", {})).toBe(false);
   });

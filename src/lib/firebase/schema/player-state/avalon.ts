@@ -1,4 +1,5 @@
 import type { AvalonPlayerGameState } from "@/lib/game/modes/avalon/player-state";
+import type { QuestCard, TeamVote } from "@/lib/game/modes/avalon/types";
 import { GameMode } from "@/lib/types";
 
 import {
@@ -19,14 +20,12 @@ export interface FirebaseAvalonPlayerState extends FirebaseBasePlayerState {
   /** JSON-serialized AvalonPublicPhase. */
   avalonPhase?: string;
   proposedTeam?: string[];
-  /** TeamVote enum value stored as string. */
-  myTeamVote?: string;
+  myTeamVote?: TeamVote;
   /** JSON-serialized { playerId: string; vote: TeamVote }[]. */
   avalonTeamVotes?: string;
   teamVotePassed?: boolean;
   consecutiveRejections?: number;
-  /** QuestCard enum value stored as string. */
-  myQuestCard?: string;
+  myQuestCard?: QuestCard;
   questFailCount?: number;
   assassinationTarget?: string;
   eligibleTeamMemberIds?: string[];
@@ -108,11 +107,7 @@ export function avalonStateFromFirebase(
         }
       : {}),
     ...(raw.proposedTeam?.length ? { proposedTeam: raw.proposedTeam } : {}),
-    ...(raw.myTeamVote !== undefined
-      ? {
-          myTeamVote: raw.myTeamVote as AvalonPlayerGameState["myTeamVote"],
-        }
-      : {}),
+    ...(raw.myTeamVote !== undefined ? { myTeamVote: raw.myTeamVote } : {}),
     ...(raw.avalonTeamVotes !== undefined
       ? {
           teamVotes: JSON.parse(
@@ -126,11 +121,7 @@ export function avalonStateFromFirebase(
     ...(raw.consecutiveRejections !== undefined
       ? { consecutiveRejections: raw.consecutiveRejections }
       : {}),
-    ...(raw.myQuestCard !== undefined
-      ? {
-          myQuestCard: raw.myQuestCard as AvalonPlayerGameState["myQuestCard"],
-        }
-      : {}),
+    ...(raw.myQuestCard !== undefined ? { myQuestCard: raw.myQuestCard } : {}),
     ...(raw.questFailCount !== undefined
       ? { questFailCount: raw.questFailCount }
       : {}),

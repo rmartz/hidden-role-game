@@ -1,4 +1,4 @@
-import type { GameStatusState, Team, TimerConfig } from "@/lib/types";
+import type { GameMode, GameStatusState, Team, TimerConfig } from "@/lib/types";
 import type {
   PlayerGameState,
   RoleInPlay,
@@ -10,22 +10,22 @@ import { parseTimerConfig } from "../lobby";
 
 export interface FirebaseBasePlayerState {
   statusJson: string;
-  gameMode: string;
+  gameMode: GameMode;
   lobbyId: string;
   players?: FirebaseLobbyPlayer[];
   gameOwner: FirebaseLobbyPlayer | null;
   myPlayerId: string | null;
-  myRole: { id: string; name: string; team: string } | null;
+  myRole: { id: string; name: string; team: Team } | null;
   visibleRoleAssignments?: {
     player: FirebaseLobbyPlayer;
     reason: string;
-    role?: { id: string; name: string; team: string };
+    role?: { id: string; name: string; team: Team };
   }[];
   rolesInPlay?: RoleInPlay[] | null;
   amDead?: boolean;
   deadPlayerIds?: string[];
   timerConfig: TimerConfig;
-  victoryCondition?: { label: string; winner: string };
+  victoryCondition?: { label: string; winner: Team };
 }
 
 export function baseStateToFirebase(
@@ -64,7 +64,7 @@ export function baseStateFromFirebase(raw: FirebaseBasePlayerState) {
       ? {
           id: raw.myRole.id,
           name: raw.myRole.name,
-          team: raw.myRole.team as Team,
+          team: raw.myRole.team,
         }
       : undefined,
     visibleRoleAssignments: (raw.visibleRoleAssignments ?? []).map(
@@ -76,7 +76,7 @@ export function baseStateFromFirebase(raw: FirebaseBasePlayerState) {
               role: {
                 id: v.role.id,
                 name: v.role.name,
-                team: v.role.team as Team,
+                team: v.role.team,
               },
             }
           : {}),
@@ -88,7 +88,7 @@ export function baseStateFromFirebase(raw: FirebaseBasePlayerState) {
     victoryCondition: raw.victoryCondition
       ? {
           label: raw.victoryCondition.label,
-          winner: raw.victoryCondition.winner as Team,
+          winner: raw.victoryCondition.winner,
         }
       : undefined,
     // Old Firebase documents may have partial data (e.g. missing autoAdvance);

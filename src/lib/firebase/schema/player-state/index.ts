@@ -69,13 +69,12 @@ export function playerStateToFirebase(
 export function firebaseToPlayerState(
   raw: FirebasePlayerState,
 ): PlayerGameState {
-  // gameMode is typed as string on FirebaseBasePlayerState (Firebase boundary),
-  // so the discriminated union cannot be narrowed at compile time. Cast to
-  // GameMode for the switch. Only the Werewolf branch needs a further per-branch
-  // cast because FirebaseWerewolfPlayerState has required fields absent from the
-  // base type; the other modes add only optional fields and TypeScript accepts
-  // raw directly.
-  switch (raw.gameMode as GameMode) {
+  // FirebasePlayerState is not a discriminated union, so switching on gameMode
+  // does not narrow raw. Only the Werewolf and Clocktower branches need a
+  // per-branch cast because their Firebase states have required fields absent
+  // from the base type; the other modes add only optional fields and
+  // TypeScript accepts raw directly.
+  switch (raw.gameMode) {
     case GameMode.Werewolf:
       return werewolfStateFromFirebase(raw as FirebaseWerewolfPlayerState);
     case GameMode.SecretVillain:
@@ -87,6 +86,7 @@ export function firebaseToPlayerState(
     case GameMode.Codenames:
       return codenamesStateFromFirebase(raw);
     default:
-      throw new Error(`Unknown game mode: ${raw.gameMode}`);
+      // Reachable at runtime when a stored document holds an unknown mode.
+      throw new Error(`Unknown game mode: ${String(raw.gameMode)}`);
   }
 }

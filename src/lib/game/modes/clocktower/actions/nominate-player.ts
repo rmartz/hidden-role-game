@@ -4,6 +4,7 @@ import {
   CLOCKTOWER_ROLES,
   ClocktowerCharacterType,
   ClocktowerRole,
+  isClocktowerRole,
 } from "../roles";
 import type { ClocktowerTurnState } from "../types";
 import { ClocktowerPhase } from "../types";
@@ -16,9 +17,7 @@ function getPlayerRole(
   const assignment = game.roleAssignments.find((a) => a.playerId === playerId);
   if (!assignment) return undefined;
   const roleId = assignment.roleDefinitionId;
-  return Object.values(ClocktowerRole).includes(roleId as ClocktowerRole)
-    ? (roleId as ClocktowerRole)
-    : undefined;
+  return isClocktowerRole(roleId) ? roleId : undefined;
 }
 
 /**

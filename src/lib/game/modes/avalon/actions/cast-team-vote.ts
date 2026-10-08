@@ -1,9 +1,8 @@
+import { isEnumValue } from "@/lib/enum";
 import type { Game, GameAction } from "@/lib/types";
 
 import { AvalonPhase, TeamVote } from "../types";
 import { currentTurnState } from "../utils";
-
-const VALID_VOTES: TeamVote[] = [TeamVote.Approve, TeamVote.Reject];
 
 export const castTeamVoteAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {
@@ -16,7 +15,7 @@ export const castTeamVoteAction: GameAction = {
 
     if (!payload || typeof payload !== "object") return false;
     const { vote } = payload as { vote?: unknown };
-    return typeof vote === "string" && VALID_VOTES.includes(vote as TeamVote);
+    return isEnumValue(TeamVote, vote);
   },
 
   apply(game: Game, payload: unknown, callerId: string) {

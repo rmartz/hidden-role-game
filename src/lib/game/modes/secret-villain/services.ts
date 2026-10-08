@@ -1,3 +1,4 @@
+import { isEnumValue } from "@/lib/enum";
 import { shuffle } from "@/lib/game/shuffle";
 import { resolvePlayerOrder } from "@/lib/player-order";
 import type { Game, GameModeServices, PlayerRoleAssignment } from "@/lib/types";
@@ -70,9 +71,8 @@ function extractSvVictoryCondition(
   svTheme: SvTheme | undefined,
 ): VictoryCondition | undefined {
   if (game.status.type !== GameStatus.Finished) return undefined;
-  const conditionKey = game.status.victoryConditionKey as
-    SvVictoryConditionKey | undefined;
-  if (!conditionKey) return undefined;
+  const conditionKey = game.status.victoryConditionKey;
+  if (!isEnumValue(SvVictoryConditionKey, conditionKey)) return undefined;
   const themeLabels = getSvThemeLabels(svTheme);
   const vc = SECRET_VILLAIN_COPY.gameOver.victoryConditions;
   let label: string;
@@ -184,19 +184,14 @@ export const secretVillainServices: GameModeServices = {
       (a) => a.playerId === callerId,
     );
     if (
-      (callerAssignment?.roleDefinitionId as SecretVillainRole | undefined) ===
-      SecretVillainRole.SpecialBad
+      callerAssignment?.roleDefinitionId ===
+      (SecretVillainRole.SpecialBad as string)
     ) {
       const badTeamIds = game.roleAssignments
-        .filter(
-          (a) =>
-            (a.roleDefinitionId as SecretVillainRole) === SecretVillainRole.Bad,
-        )
+        .filter((a) => a.roleDefinitionId === (SecretVillainRole.Bad as string))
         .map((a) => a.playerId);
       const specialBadCount = game.roleAssignments.filter(
-        (a) =>
-          (a.roleDefinitionId as SecretVillainRole) ===
-          SecretVillainRole.SpecialBad,
+        (a) => a.roleDefinitionId === (SecretVillainRole.SpecialBad as string),
       ).length;
       if (badTeamIds.length === 1 && specialBadCount === 1) {
         result["modeVisiblePlayerIds"] = badTeamIds;

@@ -1,6 +1,6 @@
 import type { Game, GameAction } from "@/lib/types";
 
-import { ClocktowerRole } from "../roles";
+import { ClocktowerRole, isClocktowerRole } from "../roles";
 import { ClocktowerPhase } from "../types";
 import { currentTurnState } from "../utils";
 
@@ -11,9 +11,7 @@ function getPlayerRole(
   const assignment = game.roleAssignments.find((a) => a.playerId === playerId);
   if (!assignment) return undefined;
   const roleId = assignment.roleDefinitionId;
-  return Object.values(ClocktowerRole).includes(roleId as ClocktowerRole)
-    ? (roleId as ClocktowerRole)
-    : undefined;
+  return isClocktowerRole(roleId) ? roleId : undefined;
 }
 
 export const castPublicVoteAction: GameAction = {
