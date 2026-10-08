@@ -39,7 +39,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: rmartz/repo-hygiene-action@138948be98cb7544b59492208e2083cfcce94f07 # v4.1.0
+      - uses: rmartz/repo-hygiene-action@d7cd3ba50e4057242e8ebb1285c1ceaae441f152 # v5.0.0
         with:
           checks: conflict-markers action-pins package-pins docs-links file-caps md-pairing okf okf-index
           config: .repo-hygiene.yml
