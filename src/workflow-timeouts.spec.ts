@@ -39,6 +39,12 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   "pr-policy.yml": {
     "pr-policy": 5,
   },
+  // rmartz/pr-lifecycle-action caller: we own the job (the action is a step, not
+  // a reusable workflow), so its `reconcile` job carries a real timeout. It
+  // covers the CLI's settle wait (up to 30s) with room to spare.
+  "pr-lifecycle.yml": {
+    reconcile: 5,
+  },
   // @rmartz/repo-hygiene-action caller: we own the job (the action is a step,
   // not a reusable workflow), so its `hygiene` job carries a real timeout.
   "repo-hygiene.yml": {
