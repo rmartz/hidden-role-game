@@ -2,7 +2,7 @@
 type: Reference
 title: pr-policy (shared rmartz/pr-policy-action)
 description: How this repo runs the shared @rmartz/pr-policy PR content checks via rmartz/pr-policy-action on pull_request_target — the pr-policy verdict it posts, why this Next.js app keeps the UAT gate, and why the trigger is pull_request_target.
-resource: ../.github/workflows/pr-policy.yml
+resource: .github/workflows/pr-policy.yml
 ---
 
 # pr-policy
