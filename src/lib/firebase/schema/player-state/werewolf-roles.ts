@@ -33,7 +33,7 @@ export interface FirebaseWerewolfRoleState {
   illuminatiRoleAssignments?: {
     playerId: string;
     roleName: string;
-    team: string;
+    team: Team;
   }[];
   mySecondNightTarget?: string;
   exposerAbilityUsed?: boolean;
@@ -175,10 +175,7 @@ export function werewolfRoleStateFromFirebase(
       : {}),
     ...(raw.illuminatiRoleAssignments?.length
       ? {
-          illuminatiRoleAssignments: raw.illuminatiRoleAssignments.map((a) => ({
-            ...a,
-            team: a.team as Team,
-          })),
+          illuminatiRoleAssignments: raw.illuminatiRoleAssignments,
         }
       : {}),
     ...(raw.mySecondNightTarget

@@ -1,19 +1,18 @@
+import { isEnumValue } from "@/lib/enum";
 import type { Game, GameAction } from "@/lib/types";
 import { Team } from "@/lib/types";
 
-import type { AvalonRole } from "../roles";
-import { AVALON_ROLES } from "../roles";
+import { AVALON_ROLES, AvalonRole } from "../roles";
 import { AvalonPhase, QuestCard } from "../types";
 import { currentTurnState } from "../utils";
 
 function isGoodPlayer(game: Game, playerId: string): boolean {
-  const assignment = game.roleAssignments.find((a) => a.playerId === playerId);
-  if (!assignment) return false;
-  const role = AVALON_ROLES[assignment.roleDefinitionId as AvalonRole];
-  return role.team === Team.Good;
+  const roleId = game.roleAssignments.find(
+    (a) => a.playerId === playerId,
+  )?.roleDefinitionId;
+  if (!isEnumValue(AvalonRole, roleId)) return false;
+  return AVALON_ROLES[roleId].team === Team.Good;
 }
-
-const VALID_CARDS: QuestCard[] = [QuestCard.Success, QuestCard.Fail];
 
 export const playQuestCardAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {
@@ -29,13 +28,10 @@ export const playQuestCardAction: GameAction = {
 
     if (!payload || typeof payload !== "object") return false;
     const { card } = payload as { card?: unknown };
-    if (typeof card !== "string") return false;
-    if (!VALID_CARDS.includes(card as QuestCard)) return false;
+    if (!isEnumValue(QuestCard, card)) return false;
 
-    // Good-aligned players must play Success; cast to QuestCard after inclusion check
-    const typedCard = card as QuestCard;
-    if (typedCard === QuestCard.Fail && isGoodPlayer(game, callerId))
-      return false;
+    // Good-aligned players must play Success
+    if (card === QuestCard.Fail && isGoodPlayer(game, callerId)) return false;
 
     return true;
   },

@@ -1,4 +1,5 @@
 import type { CodenamesPlayerGameState } from "@/lib/game/modes/codenames/player-state";
+import type { CodenamesTeam } from "@/lib/game/modes/codenames/types";
 import { GameMode } from "@/lib/types";
 
 import {
@@ -19,8 +20,8 @@ export interface FirebaseCodenamesPlayerState extends FirebaseBasePlayerState {
   /** JSON-serialized Clue[]. */
   clueHistory?: string;
   codenamesTurn?: number;
-  activeTeam?: string;
-  startingTeam?: string;
+  activeTeam?: CodenamesTeam;
+  startingTeam?: CodenamesTeam;
 }
 
 // ---------------------------------------------------------------------------
@@ -79,16 +80,9 @@ export function codenamesStateFromFirebase(
     ...(raw.codenamesTurn !== undefined
       ? { codenamesTurn: raw.codenamesTurn }
       : {}),
-    ...(raw.activeTeam !== undefined
-      ? {
-          activeTeam: raw.activeTeam as CodenamesPlayerGameState["activeTeam"],
-        }
-      : {}),
+    ...(raw.activeTeam !== undefined ? { activeTeam: raw.activeTeam } : {}),
     ...(raw.startingTeam !== undefined
-      ? {
-          startingTeam:
-            raw.startingTeam as CodenamesPlayerGameState["startingTeam"],
-        }
+      ? { startingTeam: raw.startingTeam }
       : {}),
   };
 }

@@ -68,6 +68,19 @@ export type SvCustomPowerSlot =
   | SpecialActionType.SpecialElection
   | undefined;
 
+const CUSTOM_POWER_ACTIONS: readonly unknown[] = [
+  SpecialActionType.InvestigateTeam,
+  SpecialActionType.PolicyPeek,
+  SpecialActionType.SpecialElection,
+];
+
+/** Type guard: whether `value` is a power that may fill a custom board slot. */
+export function isCustomPowerAction(
+  value: unknown,
+): value is NonNullable<SvCustomPowerSlot> {
+  return CUSTOM_POWER_ACTIONS.includes(value);
+}
+
 /** Custom power configuration for Bad cards #1–#3. */
 export type SvCustomPowerConfig = [
   SvCustomPowerSlot,

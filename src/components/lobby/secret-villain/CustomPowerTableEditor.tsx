@@ -14,7 +14,10 @@ import type {
   SvCustomPowerConfig,
   SvCustomPowerSlot,
 } from "@/lib/game/modes/secret-villain/types";
-import { SpecialActionType } from "@/lib/game/modes/secret-villain/types";
+import {
+  isCustomPowerAction,
+  SpecialActionType,
+} from "@/lib/game/modes/secret-villain/types";
 
 import { SECRET_VILLAIN_CONFIG_PANEL_COPY } from "./SecretVillainConfigPanel.copy";
 
@@ -57,7 +60,8 @@ function toSelectLabel(slot: SvCustomPowerSlot): string {
 }
 
 function fromSelectValue(value: string): SvCustomPowerSlot {
-  return value === NONE_VALUE ? undefined : (value as SvCustomPowerSlot);
+  // NONE_VALUE (and anything else that is not a slot power) maps to an empty slot.
+  return isCustomPowerAction(value) ? value : undefined;
 }
 
 export function CustomPowerTableEditor({

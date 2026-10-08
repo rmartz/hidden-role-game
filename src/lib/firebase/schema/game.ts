@@ -5,6 +5,7 @@ import type {
   GameStatusState,
   PlayerRoleAssignment,
   RoleBucket,
+  ShowRolesInPlay,
   TimerConfig,
 } from "@/lib/types";
 import { GameMode } from "@/lib/types";
@@ -19,7 +20,7 @@ import {
 
 export interface FirebaseGamePublic {
   lobbyId: string;
-  gameMode: string;
+  gameMode: GameMode;
   /** JSON-serialised GameStatusState (preserves the turnState `unknown` type). */
   status: string;
   players: Record<string, FirebaseLobbyPlayer>;
@@ -27,7 +28,7 @@ export interface FirebaseGamePublic {
   roleAssignments?: Record<string, string>;
   /** Optional — Firebase omits empty objects. */
   configuredRoleBuckets?: Record<string, FirebaseRoleBucket>;
-  showRolesInPlay: string;
+  showRolesInPlay: ShowRolesInPlay;
   ownerPlayerId: string | null;
   timerConfig: TimerConfig;
   /** Game-mode-specific config stored as a flat record. Firebase omits empty objects. */
@@ -100,14 +101,15 @@ export function firebaseToGame(
     pub.roleAssignments ?? {},
   ).map(([playerId, roleDefinitionId]) => ({ playerId, roleDefinitionId }));
 
-  const gameMode = pub.gameMode as GameMode;
+  const { gameMode } = pub;
   const rawModeConfig = pub.modeConfig ?? {};
   const modeConfig = Object.values(GameMode).includes(gameMode)
     ? GAME_MODES[gameMode].parseModeConfig(rawModeConfig)
     : GAME_MODES[GameMode.Werewolf].parseModeConfig(rawModeConfig);
 
   // Cast required: Game is a discriminated union keyed on gameMode, but we
-  // construct from runtime Firebase data where the discriminant is a string.
+  // construct from runtime Firebase data where gameMode and modeConfig are read
+  // independently, so TypeScript cannot correlate the discriminant.
   // This is the single boundary-cast location for Game deserialization.
   const configuredRoleBuckets: RoleBucket[] = pub.configuredRoleBuckets
     ? Object.values(pub.configuredRoleBuckets).map(firebaseToRoleBucket)
@@ -116,12 +118,12 @@ export function firebaseToGame(
   return {
     id: gameId,
     lobbyId: pub.lobbyId,
-    gameMode: pub.gameMode as Game["gameMode"],
+    gameMode,
     status: JSON.parse(pub.status) as GameStatusState,
     players: gamePlayers,
     roleAssignments,
     configuredRoleBuckets,
-    showRolesInPlay: pub.showRolesInPlay as Game["showRolesInPlay"],
+    showRolesInPlay: pub.showRolesInPlay,
     ownerPlayerId: pub.ownerPlayerId ?? undefined,
     // Old Firebase documents may have partial data (e.g. missing autoAdvance);
     // parseTimerConfig validates each field and fills defaults.

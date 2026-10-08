@@ -1,3 +1,4 @@
+import { isEnumValue } from "@/lib/enum";
 import type { Game, GameAction } from "@/lib/types";
 
 import { isWerewolfRole, WEREWOLF_ROLES, WerewolfRole } from "../roles";
@@ -8,8 +9,6 @@ import {
   getSilencedPlayerIds,
 } from "../utils";
 import { applyTrialVerdict } from "./resolve-trial";
-
-const VALID_VOTES: DaytimeVote[] = [DaytimeVote.Guilty, DaytimeVote.Innocent];
 
 export const castVoteAction: GameAction = {
   isValid(game: Game, callerId: string, payload: unknown) {
@@ -32,8 +31,7 @@ export const castVoteAction: GameAction = {
     if (getHypnotizedPlayerId(ts) === callerId) return false;
     if (!payload || typeof payload !== "object") return false;
     const { vote } = payload as { vote?: unknown };
-    if (typeof vote !== "string" || !VALID_VOTES.includes(vote as DaytimeVote))
-      return false;
+    if (!isEnumValue(DaytimeVote, vote)) return false;
     const callerRoleId = game.roleAssignments.find(
       (a) => a.playerId === callerId,
     )?.roleDefinitionId;
@@ -42,7 +40,7 @@ export const castVoteAction: GameAction = {
       callerRoleId !== undefined &&
       isWerewolfRole(callerRoleId) &&
       WEREWOLF_ROLES[callerRoleId].alwaysVotesGuilty &&
-      (vote as DaytimeVote) !== DaytimeVote.Guilty
+      vote !== DaytimeVote.Guilty
     )
       return false;
     // Roles with alwaysVotesInnocent must always vote innocent
@@ -50,7 +48,7 @@ export const castVoteAction: GameAction = {
       callerRoleId !== undefined &&
       isWerewolfRole(callerRoleId) &&
       WEREWOLF_ROLES[callerRoleId].alwaysVotesInnocent &&
-      (vote as DaytimeVote) !== DaytimeVote.Innocent
+      vote !== DaytimeVote.Innocent
     )
       return false;
     return true;

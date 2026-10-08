@@ -1,3 +1,4 @@
+import { isEnumValue } from "@/lib/enum";
 import { AVALON_CONFIG } from "@/lib/game/modes/avalon";
 import { CLOCKTOWER_CONFIG } from "@/lib/game/modes/clocktower";
 import { CODENAMES_CONFIG } from "@/lib/game/modes/codenames";
@@ -18,9 +19,7 @@ export { SecretVillainRole } from "@/lib/game/modes/secret-villain";
 export { WerewolfRole } from "@/lib/game/modes/werewolf";
 
 export function parseGameMode(value: string): GameMode | undefined {
-  return (Object.values(GameMode) as string[]).includes(value)
-    ? (value as GameMode)
-    : undefined;
+  return isEnumValue(GameMode, value) ? value : undefined;
 }
 
 export const GAME_MODES: Record<GameMode, GameModeConfig> = {

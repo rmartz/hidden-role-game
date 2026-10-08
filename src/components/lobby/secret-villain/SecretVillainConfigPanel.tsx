@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { isEnumValue } from "@/lib/enum";
 import {
   getDefaultBoardPreset,
   presetToCustomConfig,
@@ -81,9 +82,8 @@ export function SecretVillainConfigPanel({
   const customPowerTable: SvCustomPowerConfig =
     modeConfig.customPowerTable ?? presetToCustomConfig(previousConcretePreset);
 
-  const handlePresetChange = (value: string | null) => {
-    if (!value) return;
-    const newPreset = value as SvBoardPreset;
+  const handlePresetChange = (newPreset: string | null) => {
+    if (!isEnumValue(SvBoardPreset, newPreset)) return;
     if (
       newPreset === SvBoardPreset.Custom &&
       !modeConfig.customPowerTable &&

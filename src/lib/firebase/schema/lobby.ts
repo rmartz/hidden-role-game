@@ -7,6 +7,8 @@ import type {
   ModeConfig,
   RoleBucket,
   RoleBucketSlot,
+  RoleConfigMode,
+  ShowRolesInPlay,
   TimerConfig,
 } from "@/lib/types";
 import { isSimpleRoleBucket } from "@/lib/types";
@@ -39,12 +41,12 @@ export interface FirebaseLobbyPlayer {
 }
 
 export interface FirebaseLobbyConfig {
-  gameMode: string;
-  roleConfigMode: string;
+  gameMode: GameMode;
+  roleConfigMode: RoleConfigMode;
   /** Optional — Firebase omits empty objects. */
   roleBuckets?: Record<string, FirebaseRoleBucket>;
   showConfigToPlayers: boolean;
-  showRolesInPlay: string;
+  showRolesInPlay: ShowRolesInPlay;
   timerConfig: TimerConfig;
   /** Game-mode-specific config stored as a flat record. Firebase omits empty objects. */
   modeConfig?: Record<string, unknown>;
@@ -212,14 +214,15 @@ export function firebaseToLobby(
 }
 
 function firebaseToLobbyConfig(config: FirebaseLobbyConfig): LobbyConfig {
-  const gameMode = config.gameMode as LobbyConfig["gameMode"];
+  const { gameMode } = config;
   const rawModeConfig = config.modeConfig ?? {};
   const modeConfig = Object.values(GameMode).includes(gameMode)
     ? GAME_MODES[gameMode].parseModeConfig(rawModeConfig)
     : GAME_MODES[GameMode.Werewolf].parseModeConfig(rawModeConfig);
 
   // Cast required: LobbyConfig is a discriminated union keyed on gameMode, but
-  // we construct from runtime Firebase data where the discriminant is a string.
+  // we construct from runtime Firebase data where gameMode and modeConfig are
+  // read independently, so TypeScript cannot correlate the discriminant.
   // This is the single boundary-cast location for LobbyConfig deserialization.
   const roleBuckets: RoleBucket[] = config.roleBuckets
     ? Object.values(config.roleBuckets).map(firebaseToRoleBucket)
@@ -227,10 +230,10 @@ function firebaseToLobbyConfig(config: FirebaseLobbyConfig): LobbyConfig {
 
   return {
     gameMode,
-    roleConfigMode: config.roleConfigMode as LobbyConfig["roleConfigMode"],
+    roleConfigMode: config.roleConfigMode,
     roleBuckets,
     showConfigToPlayers: config.showConfigToPlayers,
-    showRolesInPlay: config.showRolesInPlay as LobbyConfig["showRolesInPlay"],
+    showRolesInPlay: config.showRolesInPlay,
     timerConfig: parseTimerConfig(config.timerConfig),
     modeConfig,
   } as LobbyConfig;

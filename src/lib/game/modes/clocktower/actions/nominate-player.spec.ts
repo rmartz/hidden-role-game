@@ -5,6 +5,7 @@ import { GameStatus } from "@/lib/types";
 
 import { ClocktowerRole } from "../roles";
 import type { ClocktowerDayPhase, ClocktowerTurnState } from "../types";
+import { ClocktowerPhase } from "../types";
 import { nominatePlayerAction } from "./nominate-player";
 import { makeDayTurnState, makePlayingGame } from "./test-helpers";
 
@@ -38,8 +39,11 @@ describe("nominatePlayerAction.isValid", () => {
 
   it("rejects during the night phase", () => {
     const ts = makeDayTurnState();
-    // @ts-expect-error — override phase for test
-    ts.phase = { type: "night", currentActionIndex: 0, nightActions: {} };
+    ts.phase = {
+      type: ClocktowerPhase.Night,
+      currentActionIndex: 0,
+      nightActions: {},
+    };
     const game = makePlayingGame(ts);
     expect(nominatePlayerAction.isValid(game, "p2", { nomineeId: "p3" })).toBe(
       false,

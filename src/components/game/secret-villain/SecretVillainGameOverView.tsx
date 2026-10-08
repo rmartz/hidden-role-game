@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { isEnumValue } from "@/lib/enum";
 import { SecretVillainWinner } from "@/lib/game/modes/secret-villain";
 import { SECRET_VILLAIN_COPY } from "@/lib/game/modes/secret-villain/copy";
 import type { SecretVillainPlayerGameState } from "@/lib/game/modes/secret-villain/player-state";
@@ -25,12 +26,13 @@ interface RoleAssignmentListProps {
 }
 
 function themedRoleName(roleId: string, themeLabels: SvThemeLabels): string {
-  const roleMap: Partial<Record<SecretVillainRole, string>> = {
+  if (!isEnumValue(SecretVillainRole, roleId)) return roleId;
+  const roleMap: Record<SecretVillainRole, string> = {
     [SecretVillainRole.Good]: themeLabels.goodRole,
     [SecretVillainRole.Bad]: themeLabels.badRole,
     [SecretVillainRole.SpecialBad]: themeLabels.specialBadRole,
   };
-  return roleMap[roleId as SecretVillainRole] ?? roleId;
+  return roleMap[roleId];
 }
 
 function RoleAssignmentList({
