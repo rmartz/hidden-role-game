@@ -27,9 +27,9 @@ updates:
     # the ones most likely to need code changes, so they warrant isolated
     # review. The exceptions, listed FIRST to win group-assignment precedence:
     # the lockstep families (so a member never bumps without the rest, an
-    # inherently broken update) and the prettier and typescript major+minor
-    # bumps (each isolated into its own PR — a formatter or compiler bump is
-    # higher-impact than a routine dependency and warrants visibility).
+    # inherently broken update) and every prettier and typescript bump (each
+    # isolated into its own PR — a formatter or compiler bump is higher-impact
+    # than a routine dependency and warrants visibility).
     #
     # This set is evidence-based, not assumed: scripts/dependabot-audit.mjs
     # measures the per-group human-intervention rate over all Dependabot PR
@@ -80,31 +80,22 @@ updates:
           - "@types/lodash"
       # Prettier is special-cased ahead of dev-dependencies. Dependabot assigns
       # each update to the FIRST group it matches, so listing prettier first
-      # routes its major AND minor bumps into a dedicated PR — a Prettier minor
-      # bump routinely reformats files (the trip-split #114 case), so it needs
-      # isolated review even though it is "just" a minor. Prettier *patch* bumps
-      # match no update-type here and fall through to dev-dependencies below,
-      # staying batched with the other trivial dev updates. (Ordering is
-      # semantically required here, so this group is intentionally not in
-      # alphabetical order with the two below.)
+      # routes every prettier bump (major, minor, and patch) into a dedicated PR
+      # — a Prettier minor bump routinely reformats files (the trip-split #114
+      # case), so it needs isolated review even though it is "just" a minor.
+      # (Ordering is semantically required here, so this group is intentionally
+      # not in alphabetical order with the two below.)
       prettier:
         patterns:
           - "prettier"
-        update-types:
-          - "major"
-          - "minor"
       typescript:
         # TypeScript is the language itself, not just another dependency — a
-        # compiler major/minor can surface new type errors across the codebase,
-        # so isolate it into its own PR for visibility (like prettier above). A
-        # typescript *patch* matches no update-type here and falls through to
-        # dev-dependencies, staying batched. The exact "typescript" pattern
-        # leaves typescript-eslint untouched (it stays in the eslint family).
+        # compiler bump can surface new type errors across the codebase, so
+        # every typescript bump is isolated into its own PR for visibility
+        # (like prettier above). The exact "typescript" pattern leaves
+        # typescript-eslint untouched.
         patterns:
           - "typescript"
-        update-types:
-          - "major"
-          - "minor"
       dev-dependencies:
         dependency-type: development
         update-types:
@@ -132,12 +123,13 @@ updates:
     commit-message:
       prefix: "chore"
       include: "scope"
-    # Every action bump, majors included, lands in one PR (unlike the npm groups
-    # above, where majors are individual). bot-automerge holds a group containing
-    # a major for human review (fetch-metadata reports the group's highest
-    # update-type), and a major that breaks CI is split out into its own fix PR
-    # rather than holding the rest of the group back.
+    # Minor and patch action bumps batch into one PR; every major opens as its
+    # own PR (like the npm catch-alls above), so a pending major never holds
+    # routine bumps back from auto-merge.
     groups:
       github-actions:
         patterns:
           - "*"
+        update-types:
+          - "minor"
+          - "patch"
