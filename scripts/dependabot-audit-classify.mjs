@@ -4,9 +4,11 @@
 
 // Group names Dependabot can name in a PR title. A SUPERSET of the groups
 // currently in .github/dependabot.yml: it also keeps names since removed
-// (storybook, eslint, tailwind — pruned in #885) so historical PRs that used
-// them still attribute correctly. Add a name here, never remove one.
+// (storybook, eslint, tailwind — pruned in #885; prettier — folded into ci) so
+// historical PRs that used them still attribute correctly. Add a name here,
+// never remove one.
 const KNOWN_GROUPS = [
+  "ci",
   "dev-dependencies",
   "eslint",
   "github-actions",
