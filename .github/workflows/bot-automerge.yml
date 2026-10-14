@@ -56,7 +56,7 @@ jobs:
         with:
           client-id: ${{ secrets.MERGE_BOT_CLIENT_ID }}
           private-key: ${{ secrets.MERGE_BOT_PRIVATE_KEY }}
-      - uses: rmartz/bot-automerge-action@093d999beb473766da21ef872c82d15a07595c14 # v2.1.7
+      - uses: rmartz/bot-automerge-action@6b23093a6cfd17cad6582cd68b2037eea5eeb4a6 # v2.2.1
         with:
           pr: ${{ github.event.pull_request.number }}
           # Installation token for the rmartz-merge-bot GitHub App, never
