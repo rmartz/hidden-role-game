@@ -13,9 +13,11 @@ name: bot-automerge
 # its own triggers or use `secrets: inherit`, so the caller owns the trigger,
 # the write scopes, and the checkout.
 #
-# Auto-merge is enabled with the BOT_AUTOMERGE_TOKEN real-actor PAT, not the
-# job token: a merge enabled with GITHUB_TOKEN fires no push workflows, so a
-# bot merge would reach main with no CI or deploy run.
+# Auto-merge is enabled with an installation token for the rmartz-merge-bot
+# GitHub App, not the job token: a merge enabled with GITHUB_TOKEN fires no push
+# workflows, so a bot merge would reach main with no CI or deploy run.
+# App-authored events do trigger them, and the App has its own rate-limit pool,
+# separate from the user's (rmartz/scripts#22).
 #
 # The pin is kept current by Dependabot's github-actions ecosystem.
 
@@ -36,9 +38,10 @@ jobs:
     # eligible is skipped. The `autorelease: pending` label is not a signal: since
     # v2.0.0 the CLI ignores it, because anyone with triage permission can apply it
     # (rmartz/bot-automerge#41).
-    # It is deliberately not an author test: release-please run under a PAT
-    # authors its release PR as that real user, not a [bot] account, so an
-    # author-only guard would skip release PRs.
+    # It is deliberately not an author test: a release PR is authored by
+    # whichever identity release-please runs under (a bot App or a real user),
+    # so its author is not predictable and an author-only guard could skip
+    # release PRs. The head branch prefix is the stable signal.
     if: >-
       github.event.pull_request.user.login == 'dependabot[bot]'
       || startsWith(github.event.pull_request.head.ref, 'release-please--')
@@ -46,13 +49,21 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # The App's Client ID and private key are stored as both Actions and
+      # Dependabot secrets (a Dependabot-triggered run sees only the latter).
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: app-token
+        with:
+          client-id: ${{ secrets.MERGE_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.MERGE_BOT_PRIVATE_KEY }}
       - uses: rmartz/bot-automerge-action@093d999beb473766da21ef872c82d15a07595c14 # v2.1.7
         with:
           pr: ${{ github.event.pull_request.number }}
-          # Real-actor PAT, stored as both an Actions and a Dependabot secret (a
-          # Dependabot-triggered run sees only the latter). An auto-merge enabled
-          # with GITHUB_TOKEN fires no push workflows, so a bot merge would reach
-          # main with no push-triggered CI, release, or merge-safety run
-          # (rmartz/bot-automerge-action#31). When the secret is unset the action
-          # falls back to GITHUB_TOKEN itself.
-          token: ${{ secrets.BOT_AUTOMERGE_TOKEN }}
+          # Installation token for the rmartz-merge-bot GitHub App, never
+          # GITHUB_TOKEN. An auto-merge enabled with GITHUB_TOKEN fires no push
+          # workflows, so a bot merge would reach main with no push-triggered CI,
+          # release, or merge-safety run (rmartz/bot-automerge-action#31).
+          # App-authored events do trigger them, and the App has its own
+          # rate-limit pool, separate from the user's (rmartz/scripts#22). The
+          # token step fails closed if the App secrets are missing.
+          token: ${{ steps.app-token.outputs.token }}
