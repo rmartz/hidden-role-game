@@ -8,10 +8,11 @@ run-name: pr-lifecycle (${{ github.event_name }}${{ github.event.action && forma
 # lifecycle state and converges its labels (approved, changes requested,
 # blocked, escalation needed, fix required, ci failing, review requested).
 #
-# LABELS ONLY (pilot phase of rmartz/pr-lifecycle#75): `arm-auto-merge` is off
-# and no real-actor token is passed, so this never arms, merges, disarms, or
-# updates a branch. bot-automerge.yml still handles eligible bot PRs.
-# Arming is turned on, and bot-automerge retired, in later PRs. See
+# PILOT (rmartz/pr-lifecycle#75): `arm-auto-merge` is off, so this never arms,
+# merges, or disarms; bot-automerge.yml still handles eligible bot PRs.
+# `auto-update` is on: an approved PR that merge-safety labels `update required`
+# is brought current (update-branch, or `@dependabot rebase` for a Dependabot
+# PR). Arming is turned on, and bot-automerge retired, in later PRs. See
 # https://github.com/rmartz/pr-lifecycle-action/blob/main/docs/consuming.md.
 #
 # Every read and write goes through an installation token for the
@@ -99,8 +100,8 @@ jobs:
         with:
           client-id: ${{ secrets.MERGE_BOT_CLIENT_ID }}
           private-key: ${{ secrets.MERGE_BOT_PRIVATE_KEY }}
-          permission-pull-requests: write # labels, review requests
-          permission-contents: read # branch rules, base head, commits for approval carry-over
+          permission-pull-requests: write # labels, review requests, update-branch, the @dependabot rebase comment
+          permission-contents: write # branch rules, base head, commits for approval carry-over; update-branch pushes to the PR branch
           permission-checks: read # the CI gate
           permission-statuses: read # the CI gate
           permission-actions: write # report a transient failure as a cancelled run
@@ -108,3 +109,4 @@ jobs:
         with:
           github-token: ${{ steps.app-token.outputs.token }}
           arm-auto-merge: false
+          auto-update: true
