@@ -13,6 +13,13 @@ run-name: pr-lifecycle (${{ github.event_name }}${{ github.event.action && forma
 # updates a branch. bot-automerge.yml still handles eligible bot PRs.
 # Arming is turned on, and bot-automerge retired, in later PRs. See
 # https://github.com/rmartz/pr-lifecycle-action/blob/main/docs/consuming.md.
+#
+# Every read and write goes through an installation token for the
+# rmartz-merge-bot GitHub App, not GITHUB_TOKEN, so labels are attributed to the
+# bot and API calls draw on the App's own rate-limit pool rather than the
+# user's (rmartz/scripts#22). Unlike GITHUB_TOKEN, App-authored events trigger
+# workflows, so the job skips the label and review-request events the App
+# itself causes; see the job's `if`.
 
 on:
   # pull_request_target: Dependabot PRs get a read-only token under pull_request,
@@ -51,21 +58,28 @@ on:
         description: PR number to reconcile
         required: true
 
-permissions:
-  pull-requests: write # labels, review requests
-  contents: read # branch rules, base head, commits for approval carry-over
-  checks: read # the CI gate
-  statuses: read # the CI gate
-  actions: write # report a transient failure as a cancelled run
+# GITHUB_TOKEN is unused: the App token below carries every permission the
+# action needs.
+permissions: {}
 
 jobs:
   reconcile:
     # A review on a fork PR runs with a read-only token and no secrets, so it
     # cannot write labels; skip it. The fork PR is reconciled on its next
     # pull_request_target event, or on demand via workflow_dispatch.
+    #
+    # Also skip the label and review-request events this workflow's own writes
+    # cause. Every run recomputes the PR from its current facts, so the run that
+    # wrote them already converged, and a follow-up run would only no-op while
+    # cancelling the in-flight writer. Only the App's own login is excluded: a
+    # label from a person or another workflow still re-reconciles.
     if: >-
-      github.event_name != 'pull_request_review' ||
-      github.event.pull_request.head.repo.full_name == github.repository
+      (github.event_name != 'pull_request_review' ||
+      github.event.pull_request.head.repo.full_name == github.repository) &&
+      !(github.event_name == 'pull_request_target' &&
+      github.event.sender.login == 'rmartz-merge-bot[bot]' &&
+      contains(fromJSON('["labeled", "unlabeled", "review_requested", "review_request_removed"]'),
+      github.event.action))
     runs-on: ubuntu-latest
     timeout-minutes: 5
     # One run per PR at a time; a newer event supersedes an in-flight run, since
@@ -77,6 +91,20 @@ jobs:
         github.event.workflow_run.head_sha || github.event.check_suite.head_sha }}
       cancel-in-progress: true
     steps:
+      # The App's Client ID and private key are stored as both Actions and
+      # Dependabot secrets (a Dependabot-triggered run sees only the latter). The
+      # step fails closed if they are missing or the App lacks a permission.
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: app-token
+        with:
+          client-id: ${{ secrets.MERGE_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.MERGE_BOT_PRIVATE_KEY }}
+          permission-pull-requests: write # labels, review requests
+          permission-contents: read # branch rules, base head, commits for approval carry-over
+          permission-checks: read # the CI gate
+          permission-statuses: read # the CI gate
+          permission-actions: write # report a transient failure as a cancelled run
       - uses: rmartz/pr-lifecycle-action@1916e94c1956f3cef31ac6496a03ffb3d4824f33 # v4.2.1
         with:
+          github-token: ${{ steps.app-token.outputs.token }}
           arm-auto-merge: false
