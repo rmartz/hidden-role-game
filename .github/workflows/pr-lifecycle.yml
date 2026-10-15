@@ -8,10 +8,11 @@ run-name: pr-lifecycle (${{ github.event_name }}${{ github.event.action && forma
 # lifecycle state and converges its labels (approved, changes requested,
 # blocked, escalation needed, fix required, ci failing, review requested).
 #
-# LABELS ONLY (pilot phase of rmartz/pr-lifecycle#75): `arm-auto-merge` is off
-# and no real-actor token is passed, so this never arms, merges, disarms, or
-# updates a branch. bot-automerge.yml still handles eligible bot PRs.
-# Arming is turned on, and bot-automerge retired, in later PRs. See
+# PILOT (rmartz/pr-lifecycle#75): `arm-auto-merge` is off, so this never arms,
+# merges, or disarms; bot-automerge.yml still handles eligible bot PRs.
+# `auto-update` is on: an approved PR that merge-safety labels `update required`
+# is brought current (update-branch, or `@dependabot rebase` for a Dependabot
+# PR). Arming is turned on, and bot-automerge retired, in later PRs. See
 # https://github.com/rmartz/pr-lifecycle-action/blob/main/docs/consuming.md.
 
 on:
@@ -77,6 +78,20 @@ jobs:
         github.event.workflow_run.head_sha || github.event.check_suite.head_sha }}
       cancel-in-progress: true
     steps:
+      # The real actor for branch updates: a push made with GITHUB_TOKEN would run
+      # no CI, so the new head could never go green. Reads and labels stay on
+      # GITHUB_TOKEN. The App's Client ID and private key are stored as both
+      # Actions and Dependabot secrets (a Dependabot-triggered run sees only the
+      # latter). The step fails closed if they are missing.
+      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        id: app-token
+        with:
+          client-id: ${{ secrets.MERGE_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.MERGE_BOT_PRIVATE_KEY }}
+          permission-contents: write # update-branch pushes to the PR branch
+          permission-pull-requests: write # update-branch, the @dependabot rebase comment
       - uses: rmartz/pr-lifecycle-action@1916e94c1956f3cef31ac6496a03ffb3d4824f33 # v4.2.1
         with:
+          token: ${{ steps.app-token.outputs.token }}
           arm-auto-merge: false
+          auto-update: true
