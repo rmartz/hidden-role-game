@@ -12,7 +12,7 @@ The grouping in [`.github/dependabot.yml`](../.github/dependabot.yml) is a set o
 bets: that isolating certain packages (`typescript`, and the CI-sensitive
 prettier/eslint families in the `ci` group) keeps their breakages out of the
 shared batch, and that cross-realm and interlocked families
-(`react`, `lodash`, `vite`) must bump atomically. [`scripts/dependabot-audit.mjs`](../scripts/dependabot-audit.mjs)
+(`react`, `vite`) must bump atomically. [`scripts/dependabot-audit.mjs`](../scripts/dependabot-audit.mjs)
 checks those bets against history — it reads every Dependabot PR the repository
 has ever opened, classifies how each one ended, and reports the per-group rate at
 which a bump needed a human fix.
@@ -23,7 +23,10 @@ that never needs one is a candidate to drop. When the `storybook`, `eslint`, and
 this audit became the instrument that measures whether an ungrouped major of one
 of them actually breaks — the evidence that would justify re-adding it. (eslint
 has since joined the `ci` group, for pr-policy's `ci`-title rule rather than as a
-lockstep family, so the audit no longer measures it ungrouped.)
+lockstep family, so the audit no longer measures it ungrouped.) The `lodash`
+group was later dropped on the same grounds: it never produced a merged PR and
+only ever carried lone `@types/lodash` patches, which version independently of
+the `lodash` runtime.
 
 ## Usage
 
