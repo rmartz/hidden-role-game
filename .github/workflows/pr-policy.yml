@@ -37,3 +37,6 @@ jobs:
       - uses: rmartz/pr-policy-action@15f4b1e32580609854648cf1b330375bf169271a # v1.5.0
         with:
           pr: ${{ github.event.pull_request.number }}
+          # Retitle a Dependabot linter/formatter bump to ci(...), the type the
+          # pr-policy title check requires for it, instead of blocking on a hand edit.
+          retitle-dependabot-ci: true
