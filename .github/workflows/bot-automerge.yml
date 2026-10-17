@@ -51,12 +51,12 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       # The App's Client ID and private key are stored as both Actions and
       # Dependabot secrets (a Dependabot-triggered run sees only the latter).
-      - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         id: app-token
         with:
           client-id: ${{ secrets.MERGE_BOT_CLIENT_ID }}
           private-key: ${{ secrets.MERGE_BOT_PRIVATE_KEY }}
-      - uses: rmartz/bot-automerge-action@6b23093a6cfd17cad6582cd68b2037eea5eeb4a6 # v2.2.1
+      - uses: rmartz/bot-automerge-action@4ab67b0f5254bf47e615731cb79e7cd4a949edcb # v2.2.3
         with:
           pr: ${{ github.event.pull_request.number }}
           # Installation token for the rmartz-merge-bot GitHub App, never
