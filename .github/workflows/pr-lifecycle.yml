@@ -8,12 +8,16 @@ run-name: pr-lifecycle (${{ github.event_name }}${{ github.event.action && forma
 # lifecycle state and converges its labels (approved, changes requested,
 # blocked, escalation needed, fix required, ci failing, review requested).
 #
-# PILOT (rmartz/pr-lifecycle#75): `arm-auto-merge` is off, so this never arms,
-# merges, or disarms; bot-automerge.yml still handles eligible bot PRs.
-# `auto-update` is on: an approved PR that merge-safety labels `update required`
-# is brought current (update-branch, or `@dependabot rebase` for a Dependabot
-# PR). Arming is turned on, and bot-automerge retired, in later PRs. See
+# It also arms GitHub-native auto-merge when a PR reaches `approved`, including
+# an eligible Dependabot PR (rmartz/pr-lifecycle#75; this replaced
+# bot-automerge.yml), and with `auto-update` brings an approved PR that
+# merge-safety labels `update required` current with update-branch. A Dependabot
+# PR is never updated: a person or Dependabot itself rebases it. See
 # https://github.com/rmartz/pr-lifecycle-action/blob/main/docs/consuming.md.
+#
+# SAFETY: auto-merge lands the moment the default-branch ruleset's required
+# checks pass (CI, merge-safety, pr-policy including its UAT gate, repo
+# hygiene). This is only safe while those checks are REQUIRED on main.
 #
 # Every read and write goes through an installation token for the
 # rmartz-merge-bot GitHub App, not GITHUB_TOKEN, so labels are attributed to the
@@ -105,12 +109,13 @@ jobs:
           permission-checks: read # the CI gate
           permission-statuses: read # the CI gate
           permission-actions: write # report a transient failure as a cancelled run
-      - uses: rmartz/pr-lifecycle-action@1916e94c1956f3cef31ac6496a03ffb3d4824f33 # v4.2.1
+      - uses: rmartz/pr-lifecycle-action@dde7cfcc50817551ff06523dff0497609127c027 # v4.2.2
         with:
-          # The App token is also the real actor for branch updates (`token`): a
-          # push made with GITHUB_TOKEN would run no CI, so the new head could
-          # never go green. Without `token`, auto-update skips every update.
+          # The App token is also the real actor (`token`) that arms, merges, and
+          # updates branches: a merge armed with GITHUB_TOKEN fires no `on: push`
+          # workflows, and a branch update pushed with it runs no CI. Without
+          # `token`, arming and updating are skipped, never done with GITHUB_TOKEN.
           github-token: ${{ steps.app-token.outputs.token }}
           token: ${{ steps.app-token.outputs.token }}
-          arm-auto-merge: false
+          arm-auto-merge: true
           auto-update: true
