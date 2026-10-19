@@ -32,6 +32,7 @@ on:
 permissions:
   contents: read
   statuses: write # post one `repo-hygiene / <check>` status per check
+  actions: write # cancel the run when a check is inconclusive (on-inconclusive: cancel)
   packages: read # read the public @rmartz/repo-hygiene package from GitHub Packages
 
 jobs:
