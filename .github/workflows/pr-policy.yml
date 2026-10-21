@@ -11,10 +11,15 @@ name: pr-policy
 # pull_request_target is safe here only because nothing checks out or runs the
 # PR's code; the Action reads everything through the API. It is needed so fork
 # and Dependabot PRs still get a write token for the check-run, status, and label.
+# The `status` trigger re-runs the gate when pr-lifecycle posts its
+# `pr-lifecycle/sign-off` status (which sign-off this head needs), since it can
+# land after this run for the push. Like pull_request_target, a `status`
+# workflow always runs from the default branch.
 
 on:
   pull_request_target:
     types: [opened, synchronize, reopened, edited, labeled, unlabeled]
+  status:
 
 permissions:
   checks: write # post the pr-policy check-run
@@ -23,7 +28,8 @@ permissions:
   statuses: write # post the pr-policy commit status and one per policy check (pr-policy / <check>)
 
 concurrency:
-  group: pr-policy-${{ github.event.pull_request.number }}
+  # A status event has no PR number; group it by its commit instead.
+  group: pr-policy-${{ github.event.pull_request.number || github.event.sha }}
   cancel-in-progress: true
 
 jobs:
@@ -31,10 +37,15 @@ jobs:
   # exact name, and a same-named job would add a second, always-green entry.
   pr-policy:
     name: pr-policy (evaluate)
+    # Every commit status fires `status`, including pr-policy's own; only
+    # pr-lifecycle's sign-off status re-runs the gate.
+    if: github.event_name != 'status' || github.event.context == 'pr-lifecycle/sign-off'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: rmartz/pr-policy-action@15f4b1e32580609854648cf1b330375bf169271a # v1.5.0
+      # On a status event `pr` is empty: the Action evaluates every open PR
+      # whose head is the event's commit.
+      - uses: rmartz/pr-policy-action@03783c06cd357924014cfec0b323af7a7287b401 # v1.6.0
         with:
           pr: ${{ github.event.pull_request.number }}
           # Retitle a Dependabot linter/formatter bump to ci(...), the type the

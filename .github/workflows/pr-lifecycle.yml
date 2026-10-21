@@ -19,12 +19,14 @@ run-name: pr-lifecycle (${{ github.event_name }}${{ github.event.action && forma
 # checks pass (CI, merge-safety, pr-policy including its UAT gate, repo
 # hygiene). This is only safe while those checks are REQUIRED on main.
 #
-# Every read and write goes through an installation token for the
+# Every read and label write goes through an installation token for the
 # rmartz-merge-bot GitHub App, not GITHUB_TOKEN, so labels are attributed to the
-# bot and API calls draw on the App's own rate-limit pool rather than the
-# user's (rmartz/scripts#22). Unlike GITHUB_TOKEN, App-authored events trigger
+# bot and reads draw on the App's own rate-limit pool rather than the user's
+# (rmartz/scripts#22). Unlike GITHUB_TOKEN, App-authored events trigger
 # workflows, so the job skips the label and review-request events the App
-# itself causes; see the job's `if`.
+# itself causes; see the job's `if`. Arming, merging, updating, and the
+# `pr-lifecycle/sign-off` status use a person's PAT (`token`), since pr-policy
+# trusts that status only from a person.
 
 on:
   # pull_request_target: Dependabot PRs get a read-only token under pull_request,
@@ -63,8 +65,8 @@ on:
         description: PR number to reconcile
         required: true
 
-# GITHUB_TOKEN is unused: the App token below carries every permission the
-# action needs.
+# GITHUB_TOKEN is unused: the App token below carries every read and label
+# permission, and the PAT carries the writes that need a person.
 permissions: {}
 
 jobs:
@@ -96,26 +98,31 @@ jobs:
         github.event.workflow_run.head_sha || github.event.check_suite.head_sha }}
       cancel-in-progress: true
     steps:
-      # The App's Client ID and private key are stored as both Actions and
-      # Dependabot secrets (a Dependabot-triggered run sees only the latter). The
-      # step fails closed if they are missing or the App lacks a permission.
+      # The App's Client ID and private key, and the PAT below, are stored as
+      # both Actions and Dependabot secrets (a Dependabot-triggered run sees only
+      # the latter). The step fails closed if they are missing or the App lacks
+      # a permission.
       - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
         id: app-token
         with:
           client-id: ${{ secrets.MERGE_BOT_CLIENT_ID }}
           private-key: ${{ secrets.MERGE_BOT_PRIVATE_KEY }}
-          permission-pull-requests: write # labels, review requests, update-branch, the @dependabot rebase comment
-          permission-contents: write # branch rules, base head, commits for approval carry-over; update-branch pushes to the PR branch
+          permission-pull-requests: write # labels, review requests, the @dependabot rebase comment
+          permission-contents: read # branch rules, base head, commits for approval carry-over; the PAT merges and updates branches
           permission-checks: read # the CI gate
           permission-statuses: read # the CI gate
           permission-actions: write # report a transient failure as a cancelled run
-      - uses: rmartz/pr-lifecycle-action@dde7cfcc50817551ff06523dff0497609127c027 # v4.2.2
+      - uses: rmartz/pr-lifecycle-action@cb58fb834f4761dcf691d6801b8ba2e23316a04a # v4.3.0
         with:
-          # The App token is also the real actor (`token`) that arms, merges, and
-          # updates branches: a merge armed with GITHUB_TOKEN fires no `on: push`
-          # workflows, and a branch update pushed with it runs no CI. Without
-          # `token`, arming and updating are skipped, never done with GITHUB_TOKEN.
           github-token: ${{ steps.app-token.outputs.token }}
-          token: ${{ steps.app-token.outputs.token }}
+          # A person's fine-grained PAT (Contents, Pull requests, and Commit
+          # statuses: read and write) to arm, merge, disarm, update, and post
+          # the `pr-lifecycle/sign-off` status. pr-policy trusts that status
+          # only from a write-access user, so an App token won't do. Without
+          # `token`, those writes are skipped, never done with GITHUB_TOKEN.
+          token: ${{ secrets.PR_LIFECYCLE_TOKEN }}
+          # A Next.js app with something to user-test: a PR that could be
+          # user-facing stays `UAT pending` until a person signs it off.
+          uat: "on"
           arm-auto-merge: true
           auto-update: true
