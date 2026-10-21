@@ -23,7 +23,7 @@ ruleset's required checks pass, the `pr-policy` UAT gate included. This replaced
 `bot-automerge.yml` ([rmartz/pr-lifecycle#75](https://github.com/rmartz/pr-lifecycle/issues/75)).
 With `auto-update` it also brings an approved PR that merge-safety labels
 `update required` current with update-branch, but never a Dependabot PR: a person
-or Dependabot itself rebases those. The rmartz-merge-bot App token is the real
+or Dependabot itself rebases those. The rmartz-pr-lifecycle App token is the real
 actor for arming, merging, and updating, so the merge and the new head trigger
 workflows as usual.
 
@@ -31,7 +31,7 @@ workflows as usual.
 `UAT pending`, `UAT ready`, or `UAT passed` on each PR, and posts the
 `pr-lifecycle/sign-off` commit status saying which human sign-off the head
 needs. The pr-policy caller gates on that status, trusting it from
-`rmartz-merge-bot[bot]` (`sign-off-status-creators`).
+`rmartz-pr-lifecycle[bot]` (`sign-off-status-creators`).
 
 **Triggers.** It runs on `pull_request_target`, so Dependabot PRs get a token that
 can write labels. It reads the PR over the API and never checks out PR code.

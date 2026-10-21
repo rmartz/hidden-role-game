@@ -45,9 +45,9 @@ jobs:
       - uses: rmartz/pr-policy-action@80ade584e206ca645780f9a839581531d292076a # v1.7.0
         with:
           pr: ${{ github.event.pull_request.number }}
-          # pr-lifecycle posts its sign-off status with the rmartz-merge-bot App
-          # token; trust that App's bot account (exact login, Bot accounts only).
-          sign-off-status-creators: rmartz-merge-bot[bot]
+          # pr-lifecycle posts its sign-off status as the rmartz-pr-lifecycle App;
+          # trust that App's bot account (exact login, Bot accounts only).
+          sign-off-status-creators: rmartz-pr-lifecycle[bot]
           # Retitle a Dependabot linter/formatter bump to ci(...), the type the
           # pr-policy title check requires for it, instead of blocking on a hand edit.
           retitle-dependabot-ci: true
