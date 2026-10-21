@@ -15,6 +15,10 @@ name: pr-policy
 on:
   pull_request_target:
     types: [opened, synchronize, reopened, edited, labeled, unlabeled]
+  # Re-run when pr-lifecycle posts its `pr-lifecycle/sign-off` status, which can
+  # land after this run for the push. A `status` workflow runs from the default
+  # branch too, so a PR can't change what it does.
+  status:
 
 permissions:
   checks: write # post the pr-policy check-run
@@ -23,7 +27,8 @@ permissions:
   statuses: write # post the pr-policy commit status and one per policy check (pr-policy / <check>)
 
 concurrency:
-  group: pr-policy-${{ github.event.pull_request.number }}
+  # A status event has no PR number; group it by its commit instead.
+  group: pr-policy-${{ github.event.pull_request.number || github.event.sha }}
   cancel-in-progress: true
 
 jobs:
@@ -31,12 +36,18 @@ jobs:
   # exact name, and a same-named job would add a second, always-green entry.
   pr-policy:
     name: pr-policy (evaluate)
+    # Every commit status fires `status`, including pr-policy's own; only
+    # pr-lifecycle's sign-off status re-runs the gate.
+    if: github.event_name != 'status' || github.event.context == 'pr-lifecycle/sign-off'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: rmartz/pr-policy-action@15f4b1e32580609854648cf1b330375bf169271a # v1.5.0
+      - uses: rmartz/pr-policy-action@80ade584e206ca645780f9a839581531d292076a # v1.7.0
         with:
           pr: ${{ github.event.pull_request.number }}
+          # pr-lifecycle posts its sign-off status as the rmartz-pr-lifecycle App;
+          # trust that App's bot account (exact login, Bot accounts only).
+          sign-off-status-creators: rmartz-pr-lifecycle[bot]
           # Retitle a Dependabot linter/formatter bump to ci(...), the type the
           # pr-policy title check requires for it, instead of blocking on a hand edit.
           retitle-dependabot-ci: true
