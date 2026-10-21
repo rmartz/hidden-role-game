@@ -19,12 +19,10 @@ run-name: pr-lifecycle (${{ github.event_name }}${{ github.event.action && forma
 # checks pass (CI, merge-safety, pr-policy including its UAT gate, repo
 # hygiene). This is only safe while those checks are REQUIRED on main.
 #
-# Every read and write goes through an installation token for the
-# rmartz-pr-lifecycle GitHub App, not GITHUB_TOKEN, so labels are attributed to the
-# bot and API calls draw on the App's own rate-limit pool rather than the
-# user's (rmartz/scripts#22). Unlike GITHUB_TOKEN, App-authored events trigger
-# workflows, so the job skips the label and review-request events the App
-# itself causes; see the job's `if`.
+# Reads and label writes use the workflow's GITHUB_TOKEN. The action creates a
+# real-actor token from the rmartz-pr-lifecycle App (the PR_LIFECYCLE_CLIENT_ID /
+# PR_LIFECYCLE_PRIVATE_KEY secrets) for the writes that need one; until those
+# secrets are set, it reconciles labels only.
 
 on:
   # pull_request_target: Dependabot PRs get a read-only token under pull_request,
@@ -63,28 +61,21 @@ on:
         description: PR number to reconcile
         required: true
 
-# GITHUB_TOKEN is unused: the App token below carries every permission the
-# action needs.
-permissions: {}
+permissions:
+  pull-requests: write # labels, review requests, advisory comment, disarming
+  contents: read # branch rules, base head, commits for approval carry-over
+  checks: read # the CI gate
+  statuses: read # the CI gate
+  actions: write # report a transient failure as a cancelled run
 
 jobs:
   reconcile:
     # A review on a fork PR runs with a read-only token and no secrets, so it
     # cannot write labels; skip it. The fork PR is reconciled on its next
     # pull_request_target event, or on demand via workflow_dispatch.
-    #
-    # Also skip the label and review-request events this workflow's own writes
-    # cause. Every run recomputes the PR from its current facts, so the run that
-    # wrote them already converged, and a follow-up run would only no-op while
-    # cancelling the in-flight writer. Only the App's own login is excluded: a
-    # label from a person or another workflow still re-reconciles.
     if: >-
-      (github.event_name != 'pull_request_review' ||
-      github.event.pull_request.head.repo.full_name == github.repository) &&
-      !(github.event_name == 'pull_request_target' &&
-      github.event.sender.login == 'rmartz-pr-lifecycle[bot]' &&
-      contains(fromJSON('["labeled", "unlabeled", "review_requested", "review_request_removed"]'),
-      github.event.action))
+      github.event_name != 'pull_request_review' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 5
     # One run per PR at a time; a newer event supersedes an in-flight run, since
@@ -96,32 +87,16 @@ jobs:
         github.event.workflow_run.head_sha || github.event.check_suite.head_sha }}
       cancel-in-progress: true
     steps:
-      # An installation token for the rmartz-pr-lifecycle App, which
-      # pr-lifecycle acts as. Its Client ID and private key are stored as both
-      # Actions and Dependabot secrets (a Dependabot-triggered run sees only the
-      # latter). The step fails closed if they are missing or the App lacks a
-      # permission.
-      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
-        id: app-token
+      - uses: rmartz/pr-lifecycle-action@056397621b976d9279b562f232adeab60e281624 # v4.4.0
         with:
-          client-id: ${{ secrets.PR_LIFECYCLE_CLIENT_ID }}
-          private-key: ${{ secrets.PR_LIFECYCLE_PRIVATE_KEY }}
-          permission-contents: write # branch rules, base head, carry-over commits; merging and updating a branch
-          permission-pull-requests: write # labels, review requests, arming
-          permission-issues: write # labels and the advisory comment
-          permission-statuses: write # the pr-lifecycle/sign-off status
-          permission-workflows: write # updating a branch whose diff touches a workflow file
-          permission-checks: read # the CI gate
-      - uses: rmartz/pr-lifecycle-action@cb58fb834f4761dcf691d6801b8ba2e23316a04a # v4.3.0
-        with:
+          # The action creates its real-actor token from the rmartz-pr-lifecycle
+          # App: it arms, merges, updates, and posts the pr-lifecycle/sign-off
+          # status. Both are Actions and Dependabot secrets; until they are set,
+          # the run reconciles labels only.
+          app-client-id: ${{ secrets.PR_LIFECYCLE_CLIENT_ID }}
+          app-private-key: ${{ secrets.PR_LIFECYCLE_PRIVATE_KEY }}
           # A Next.js app with something to user-test: a PR that could be
           # user-facing stays `UAT pending` until a person signs it off.
           uat: "on"
-          # The App token is also the real actor (`token`) that arms, merges, and
-          # updates branches: a merge armed with GITHUB_TOKEN fires no `on: push`
-          # workflows, and a branch update pushed with it runs no CI. Without
-          # `token`, arming and updating are skipped, never done with GITHUB_TOKEN.
-          github-token: ${{ steps.app-token.outputs.token }}
-          token: ${{ steps.app-token.outputs.token }}
           arm-auto-merge: true
           auto-update: true
