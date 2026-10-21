@@ -107,7 +107,7 @@ jobs:
           permission-pull-requests: write # labels, review requests, update-branch, the @dependabot rebase comment
           permission-contents: write # branch rules, base head, commits for approval carry-over; update-branch pushes to the PR branch
           permission-checks: read # the CI gate
-          permission-statuses: read # the CI gate
+          permission-statuses: write # read: the CI gate; write: the pr-lifecycle/sign-off status
           permission-actions: write # report a transient failure as a cancelled run
       - uses: rmartz/pr-lifecycle-action@cb58fb834f4761dcf691d6801b8ba2e23316a04a # v4.3.0
         with:
