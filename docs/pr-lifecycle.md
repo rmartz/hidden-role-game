@@ -1,7 +1,7 @@
 ---
 type: Reference
 title: pr-lifecycle (shared rmartz/pr-lifecycle-action)
-description: The shared @rmartz/pr-lifecycle reconciler, run via rmartz/pr-lifecycle-action, which keeps each PR's lifecycle and UAT labels in step with its current facts, posts the pr-lifecycle/sign-off status pr-policy gates on, and arms auto-merge when a PR reaches approved.
+description: The shared @rmartz/pr-lifecycle reconciler, run via rmartz/pr-lifecycle-action, which keeps each PR's lifecycle labels in step with its current facts, and arms auto-merge when a PR reaches approved.
 resource: .github/workflows/pr-lifecycle.yml
 tags: [ci, github-actions, pr-lifecycle, labels]
 ---
@@ -23,18 +23,15 @@ ruleset's required checks pass, the `pr-policy` UAT gate included. This replaced
 `bot-automerge.yml` ([rmartz/pr-lifecycle#75](https://github.com/rmartz/pr-lifecycle/issues/75)).
 With `auto-update` it also brings an approved PR that merge-safety labels
 `update required` current with update-branch, but never a Dependabot PR: a person
-or Dependabot itself rebases those.
+or Dependabot itself rebases those. The rmartz-merge-bot App token is the real
+actor for arming, merging, and updating, so the merge and the new head trigger
+workflows as usual.
 
-**UAT and the sign-off status.** With `uat: 'on'`, it keeps exactly one of
-`no UAT needed`, `UAT pending`, `UAT ready`, or `UAT passed` on each PR, and
-posts the `pr-lifecycle/sign-off` commit status saying which human sign-off the
-head needs. The `pr-policy` gate reads that status (see [pr-policy](pr-policy.md)).
-
-**Tokens.** A person's fine-grained PAT, the `PR_LIFECYCLE_TOKEN` secret (an
-Actions and a Dependabot secret), is the real actor for arming, merging,
-updating, and the sign-off status. pr-policy trusts the status only from a
-write-access user, so the rmartz-merge-bot App token can't post it. The App
-token does every read and label write, on its own rate-limit pool.
+**UAT.** With `uat: "on"` it keeps exactly one of `no UAT needed`,
+`UAT pending`, `UAT ready`, or `UAT passed` on each PR, and posts the
+`pr-lifecycle/sign-off` commit status saying which human sign-off the head
+needs. Until this repo's pr-policy caller gates on that status, pr-policy keeps
+classifying UAT itself.
 
 **Triggers.** It runs on `pull_request_target`, so Dependabot PRs get a token that
 can write labels. It reads the PR over the API and never checks out PR code.
