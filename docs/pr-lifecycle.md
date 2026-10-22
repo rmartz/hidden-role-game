@@ -31,7 +31,7 @@ workflows as usual.
 `UAT pending`, `UAT ready`, or `UAT passed` on each PR, and posts the
 `pr-lifecycle/sign-off` commit status saying which human sign-off the head
 needs. The pr-policy caller gates on that status, trusting it from
-`rmartz-pr-lifecycle[bot]` (`sign-off-status-creators`).
+`rmartz-pr-lifecycle[bot]` (the `sign-off-status-creators` default).
 
 **Triggers.** It runs on `pull_request_target`, so Dependabot PRs get a token that
 can write labels. It reads the PR over the API and never checks out PR code.
