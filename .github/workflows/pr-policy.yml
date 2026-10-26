@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: rmartz/pr-policy-action@0eb43793e1a79b6af2bf2eb6352067f0d03125fd # v1.9.0
+      - uses: rmartz/pr-policy-action@8a474a38cc91b596bd1800739a3c7ee1a6235910 # v1.9.1
         with:
           pr: ${{ github.event.pull_request.number }}
           # Hold a PR with no UAT label, so every merge has an explicit UAT
