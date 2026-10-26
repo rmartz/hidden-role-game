@@ -18,6 +18,7 @@ const KNOWN_GROUPS = [
   "production-dependencies",
   "react",
   "storybook",
+  "storybook-ci",
   "tailwind",
   "typescript",
   "vite",

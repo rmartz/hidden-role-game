@@ -133,6 +133,15 @@ updates:
     # own PR (like the npm catch-alls above), so a pending major never holds
     # routine bumps back from auto-merge.
     groups:
+      # rmartz/storybook-ci ships its two reusable workflows on one version
+      # line, so they always bump together. Dependabot names a reusable
+      # workflow by its full path and opens one PR per file once a major
+      # leaves the catch-all below; this group, listed first to win precedence
+      # and with no update-types filter, keeps every bump (majors included) in
+      # one PR titled by the group name.
+      storybook-ci:
+        patterns:
+          - "rmartz/storybook-ci/*"
       github-actions:
         patterns:
           - "*"
