@@ -1,7 +1,7 @@
 "use client";
 
 import { throttle } from "lodash";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useEffectEvent, useMemo, useRef } from "react";
 
 import { useAppSelector } from "@/store";
 import { selectRoleBuckets } from "@/store/game-config-slice";
@@ -27,61 +27,57 @@ export function useConfigSync(
   const syncVersion = useAppSelector((s) => s.gameConfig.syncVersion);
   const updateConfig = useUpdateLobbyConfig(lobbyId);
 
-  // Keep refs so the throttled function always reads fresh values without
-  // needing to be recreated.
-  const gameConfigRef = useRef(gameConfig);
-  const mutateRef = useRef(updateConfig.mutate);
   // True when there are owner-initiated changes not yet acknowledged by the server.
   const hasPendingChangeRef = useRef(false);
   // Resolvers waiting for the next sync to settle (success or error).
   const pendingFlushResolversRef = useRef<(() => void)[]>([]);
 
-  useEffect(() => {
-    gameConfigRef.current = gameConfig;
-  });
-  useEffect(() => {
-    mutateRef.current = updateConfig.mutate;
+  // Sends the current config. An Effect Event, so it always reads the latest
+  // config and mutation without the throttled wrapper being recreated.
+  const sync = useEffectEvent(() => {
+    const {
+      gameMode,
+      roleConfigMode,
+      showConfigToPlayers,
+      showRolesInPlay,
+      timerConfig,
+      modeConfig,
+    } = gameConfig;
+    const roleBuckets = selectRoleBuckets(gameConfig);
+    const drainResolvers = () => {
+      const resolvers = pendingFlushResolversRef.current.splice(0);
+      resolvers.forEach((r) => {
+        r();
+      });
+    };
+    updateConfig.mutate(
+      {
+        gameMode,
+        roleConfigMode,
+        showConfigToPlayers,
+        showRolesInPlay,
+        roleBuckets,
+        timerConfig,
+        modeConfig,
+      },
+      {
+        onSuccess: () => {
+          hasPendingChangeRef.current = false;
+          drainResolvers();
+        },
+        onError: () => {
+          drainResolvers();
+        },
+      },
+    );
   });
 
+  // Throttles whatever send it is handed; the effects below hand it `sync`.
   const throttledSync = useMemo(
     () =>
       throttle(
-        () => {
-          const {
-            gameMode,
-            roleConfigMode,
-            showConfigToPlayers,
-            showRolesInPlay,
-            timerConfig,
-            modeConfig,
-          } = gameConfigRef.current;
-          const roleBuckets = selectRoleBuckets(gameConfigRef.current);
-          const drainResolvers = () => {
-            const resolvers = pendingFlushResolversRef.current.splice(0);
-            resolvers.forEach((r) => {
-              r();
-            });
-          };
-          mutateRef.current(
-            {
-              gameMode,
-              roleConfigMode,
-              showConfigToPlayers,
-              showRolesInPlay,
-              roleBuckets,
-              timerConfig,
-              modeConfig,
-            },
-            {
-              onSuccess: () => {
-                hasPendingChangeRef.current = false;
-                drainResolvers();
-              },
-              onError: () => {
-                drainResolvers();
-              },
-            },
-          );
+        (send: () => void) => {
+          send();
         },
         SYNC_INTERVAL_MS,
         { leading: true, trailing: true },
@@ -92,7 +88,9 @@ export function useConfigSync(
   useEffect(() => {
     if (!isOwner || syncVersion === 0) return;
     hasPendingChangeRef.current = true;
-    throttledSync();
+    throttledSync(() => {
+      sync();
+    });
   }, [syncVersion, isOwner, throttledSync]);
 
   // On reconnect, flush any pending change that wasn't acknowledged.
