@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { useCreateLobby, useJoinLobby, useStoredLobbyQuery } from "@/hooks";
 import { getLobbyId, getPlayerId } from "@/lib/api";
@@ -18,7 +18,7 @@ const GAME_MODE_OPTIONS = ENABLED_GAME_MODES.map((mode) => ({
 
 export default function Home() {
   const router = useRouter();
-  const [playerName, setPlayerName] = useState("");
+  const [editedName, setPlayerName] = useState("");
   const [lobbyIdInput, setLobbyIdInput] = useState("");
   const [selectedGameMode, setSelectedGameMode] = useState(GameMode.Werewolf);
 
@@ -35,11 +35,8 @@ export default function Home() {
   const storedPlayerName =
     getPlayerName(storedLobbyQuery.data?.players, myPlayerId) ?? "";
 
-  useEffect(() => {
-    if (storedPlayerName && !playerName) {
-      setPlayerName(storedPlayerName);
-    }
-  }, [storedPlayerName, playerName]);
+  // An empty field shows the player's name from their stored lobby.
+  const playerName = editedName || storedPlayerName;
 
   const error = createMutation.error?.message ?? joinMutation.error?.message;
   const loading = createMutation.isPending || joinMutation.isPending;

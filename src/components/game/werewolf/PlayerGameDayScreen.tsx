@@ -1,7 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
-
 import { GameTimer, RoleGlossaryDialog } from "@/components/game";
 import { GAME_MODES } from "@/lib/game/modes";
 import type { WerewolfTurnState } from "@/lib/game/modes/werewolf";
@@ -36,10 +34,7 @@ export function PlayerGameDayScreen({
   const timerConfig = gameState.timerConfig;
   const { phase } = turnState;
   const isDaytime = phase.type === WerewolfPhase.Daytime;
-  const phaseStartedAt = useMemo(
-    () => new Date(isDaytime ? phase.startedAt : Date.now()),
-    [isDaytime, phase.startedAt],
-  );
+  const phaseStartedAt = new Date(phase.startedAt);
   const executionerTargetName = getPlayerName(
     gameState.players,
     gameState.executionerTargetId,

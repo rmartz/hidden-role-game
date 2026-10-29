@@ -164,7 +164,7 @@ export function PlayerList({
     readyEligiblePlayers.every((p) => readySet.has(p.id));
 
   const countdownStartedAt = lobby.countdownStartedAt;
-  const [secondsLeft, setSecondsLeft] = useState(() => {
+  const [tickedSecondsLeft, setSecondsLeft] = useState(() => {
     if (!countdownStartedAt) return 0;
     return Math.max(
       0,
@@ -173,11 +173,10 @@ export function PlayerList({
     );
   });
 
+  const secondsLeft = countdownStartedAt ? tickedSecondsLeft : 0;
+
   useEffect(() => {
-    if (!countdownStartedAt) {
-      setSecondsLeft(0);
-      return;
-    }
+    if (!countdownStartedAt) return;
     const tick = () => {
       const remaining = Math.max(
         0,

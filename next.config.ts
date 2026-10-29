@@ -1,7 +1,9 @@
 import { withSentryConfig } from "@sentry/nextjs/config";
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  reactCompiler: true,
+};
 
 // Only create Sentry releases / upload source maps for production deploys.
 //

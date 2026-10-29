@@ -1,7 +1,7 @@
 "use client";
 
 import { WeatherMoonRegular } from "@fluentui/react-icons";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 
 import {
   GameRolesList,
@@ -69,12 +69,9 @@ export function OwnerGameDayScreen({
   const { phase } = turnState;
   const isDaytime = phase.type === WerewolfPhase.Daytime;
 
-  const phaseStartedAt = useMemo(
-    () => new Date(isDaytime ? phase.startedAt : Date.now()),
-    [isDaytime, phase.startedAt],
-  );
-
   if (!isDaytime) return null;
+
+  const phaseStartedAt = new Date(phase.startedAt);
 
   const daytimePhase = phase;
   const modeConfig = GAME_MODES[gameState.gameMode];
