@@ -2,7 +2,13 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+} from "react";
 
 import {
   GameConfigurationPanel,
@@ -14,6 +20,7 @@ import {
 import {
   useAddNoDevicePlayer,
   useConfigSync,
+  useIsHydrated,
   useLobbyErrorHandler,
   useLobbyQuery,
   useLobbyWebSocket,
@@ -34,6 +41,11 @@ import { LOBBY_PAGE_COPY } from "./page.copy";
 
 const LOBBY_COUNTDOWN_SECONDS = 5;
 
+interface StoredSession {
+  lobbyId: string | undefined;
+  sessionId: string | undefined;
+}
+
 export default function LobbyPage() {
   const { lobbyId, gameMode: gameModeParam } = useParams<{
     lobbyId: string;
@@ -44,16 +56,19 @@ export default function LobbyPage() {
 
   const validatedGameMode = parseGameMode(gameModeParam);
 
-  // null = not yet read from localStorage (avoid SSR mismatch)
-  // undefined = read but no lobby stored
-  const [storedLobbyId, setStoredLobbyId] = useState<string | undefined | null>(
-    null,
-  );
-  const [sessionId, setSessionId] = useState<string | undefined>(undefined);
-  useEffect(() => {
-    setStoredLobbyId(getLobbyId());
-    setSessionId(getSessionId());
-  }, []);
+  // Read localStorage only after hydration to avoid an SSR mismatch. Once this
+  // page changes the session (cleared, or a new one from joining), `session`
+  // holds it instead.
+  const isHydrated = useIsHydrated();
+  const [session, setSession] = useState<StoredSession>();
+  const storedSession =
+    session ??
+    (isHydrated
+      ? { lobbyId: getLobbyId(), sessionId: getSessionId() }
+      : undefined);
+  // null = not yet read from localStorage, undefined = read but no lobby stored
+  const storedLobbyId = storedSession ? storedSession.lobbyId : null;
+  const sessionId = storedSession?.sessionId;
 
   const hasReadStorage = storedLobbyId !== null;
   const hasDifferentLobby =
@@ -111,8 +126,7 @@ export default function LobbyPage() {
   }, [gameId, actualGameMode, router]);
 
   const handleSessionCleared = useCallback(() => {
-    setSessionId(undefined);
-    setStoredLobbyId(undefined);
+    setSession({ lobbyId: undefined, sessionId: undefined });
   }, []);
 
   useLobbyErrorHandler(fetchLobby.error, lobbyId, handleSessionCleared);
@@ -154,10 +168,11 @@ export default function LobbyPage() {
     transferOwnerMutation.mutate(playerId);
   }
 
-  const startGameMutationRef = useRef(startGameMutation);
-  startGameMutationRef.current = startGameMutation;
-  const flushConfigSyncRef = useRef(flushConfigSync);
-  flushConfigSyncRef.current = flushConfigSync;
+  const onCountdownElapsed = useEffectEvent(async (gameMode: GameMode) => {
+    if (startGameMutation.isPending) return;
+    await flushConfigSync();
+    startGameMutation.mutate({ gameMode });
+  });
 
   const countdownStartedAt = fetchLobby.data?.countdownStartedAt;
   useEffect(() => {
@@ -166,12 +181,7 @@ export default function LobbyPage() {
       0,
       LOBBY_COUNTDOWN_SECONDS * 1000 - (Date.now() - countdownStartedAt),
     );
-    const startGame = async () => {
-      if (startGameMutationRef.current.isPending) return;
-      await flushConfigSyncRef.current();
-      startGameMutationRef.current.mutate({ gameMode: actualGameMode });
-    };
-    const id = setTimeout(() => void startGame(), delay);
+    const id = setTimeout(() => void onCountdownElapsed(actualGameMode), delay);
     return () => {
       clearTimeout(id);
     };
@@ -229,7 +239,10 @@ export default function LobbyPage() {
         <JoinPrompt
           lobbyId={lobbyId}
           onJoined={() => {
-            setSessionId(getSessionId());
+            setSession({
+              lobbyId: storedLobbyId ?? undefined,
+              sessionId: getSessionId(),
+            });
           }}
         />
       )}

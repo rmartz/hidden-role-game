@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useState } from "react";
 
 import {
   GameRolesList,
@@ -23,10 +23,8 @@ export function PlayerStartingScreen({ gameState }: PlayerStartingScreenProps) {
     gameState.status.type === GameStatus.Starting
       ? gameState.status.startedAt
       : undefined;
-  const startedAt = useMemo(
-    () => new Date(startedAtMs ?? Date.now()),
-    [startedAtMs],
-  );
+  const [mountedAtMs] = useState(() => Date.now());
+  const startedAt = new Date(startedAtMs ?? mountedAtMs);
 
   const fullRole = gameState.myRole
     ? GAME_MODES[gameState.gameMode].roles[gameState.myRole.id]

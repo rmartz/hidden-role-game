@@ -50,7 +50,6 @@ export function useFirebaseAuth(): { isReady: boolean } {
 
   useEffect(() => {
     let cancelled = false;
-    setIsReady(false);
     const signIn = async () => {
       try {
         await ensureSignedIn();

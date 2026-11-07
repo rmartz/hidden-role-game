@@ -32,17 +32,13 @@ export default function LobbyConflictPage() {
 
   const defaultName =
     getPlayerName(conflictLobbyQuery.data?.players, myPlayerId) ?? "";
-  const [playerName, setPlayerName] = useState("");
+  const [editedName, setPlayerName] = useState("");
+  // An empty field shows the player's name from the conflicting lobby.
+  const playerName = editedName || defaultName;
 
   useEffect(() => {
     if (!validatedGameMode) router.push("/");
   }, [validatedGameMode, router]);
-
-  useEffect(() => {
-    if (defaultName && !playerName) {
-      setPlayerName(defaultName);
-    }
-  }, [defaultName, playerName]);
 
   // If the target lobby doesn't exist, redirect to the stored lobby (or home if none).
   useEffect(() => {

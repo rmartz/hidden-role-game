@@ -32,8 +32,10 @@ export function GameTimer({
   pausedAt,
   pauseOffset = 0,
 }: GameTimerProps) {
+  // An invalid startedAt falls back to when the timer mounted.
+  const [mountedAtMs] = useState(() => Date.now());
   const rawStartedAtMs = startedAt.getTime();
-  const startedAtMs = isNaN(rawStartedAtMs) ? Date.now() : rawStartedAtMs;
+  const startedAtMs = isNaN(rawStartedAtMs) ? mountedAtMs : rawStartedAtMs;
 
   const isPaused = pausedAt !== undefined;
 
@@ -49,7 +51,7 @@ export function GameTimer({
     [isPaused, pausedAt, pauseOffset, startedAtMs],
   );
 
-  const [elapsedSeconds, setElapsedSeconds] = useState(() =>
+  const [tickedElapsedSeconds, setElapsedSeconds] = useState(() =>
     computeElapsed(Date.now()),
   );
   const hasTriggeredRef = useRef(false);
@@ -76,11 +78,16 @@ export function GameTimer({
     reset();
   }, [resetKey, durationSeconds, reset]);
 
+  // While paused the display is frozen at the pause moment, so it is derived
+  // rather than ticked. An invalid pausedAt keeps the last ticked value.
+  const pausedAtMs = pausedAt?.getTime();
+  const elapsedSeconds =
+    pausedAtMs !== undefined && !isNaN(pausedAtMs)
+      ? computeElapsed(pausedAtMs)
+      : tickedElapsedSeconds;
+
   useEffect(() => {
-    if (isPaused) {
-      setElapsedSeconds(computeElapsed(Date.now()));
-      return;
-    }
+    if (isPaused) return;
 
     const tick = () => {
       const elapsed = computeElapsed(Date.now());
