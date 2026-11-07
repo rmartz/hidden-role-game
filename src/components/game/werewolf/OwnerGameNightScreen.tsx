@@ -5,7 +5,7 @@ import {
   ClockWarningRegular,
   WeatherSunnyLowRegular,
 } from "@fluentui/react-icons";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { GameTimer } from "@/components/game";
 import { Button } from "@/components/ui/button";
@@ -40,7 +40,9 @@ export function OwnerGameNightScreen({
   turnState,
 }: OwnerGameNightScreenProps) {
   const action = useGameAction(gameId);
-  const [abilityBypass, setAbilityBypass] = useState(false);
+  // The night phase (turn + role) the narrator bypassed the ability for, so the
+  // bypass ends on its own once the phase advances.
+  const [abilityBypassPhase, setAbilityBypassPhase] = useState<string>();
 
   const timerConfig = gameState.timerConfig;
 
@@ -64,11 +66,6 @@ export function OwnerGameNightScreen({
     }
   }, [action, isLastPhase, currentPhaseIndex]);
 
-  const phaseStartedAt = useMemo(
-    () => new Date(isNighttime ? phase.startedAt : Date.now()),
-    [isNighttime, phase.startedAt],
-  );
-
   const nightActions = phase.nightActions;
   const nightStatusMarkers = useMemo(
     () =>
@@ -87,9 +84,8 @@ export function OwnerGameNightScreen({
     ],
   );
   const activePhaseKey = nightPhaseOrder[currentPhaseIndex] ?? "";
-  useEffect(() => {
-    setAbilityBypass(false);
-  }, [activePhaseKey]);
+  const nightPhaseId = `${String(turnState.turn)}:${activePhaseKey}`;
+  const abilityBypass = abilityBypassPhase === nightPhaseId;
   const activeAction = nightActions[activePhaseKey];
   const { targetPlayerId: activeTarget, confirmed: activeTargetConfirmed } =
     getSoloTarget(activeAction);
@@ -134,10 +130,12 @@ export function OwnerGameNightScreen({
   }, [action]);
 
   const handleBypassWitchAbility = useCallback(() => {
-    setAbilityBypass(true);
-  }, []);
+    setAbilityBypassPhase(nightPhaseId);
+  }, [nightPhaseId]);
 
   if (!isNighttime) return null;
+
+  const phaseStartedAt = new Date(phase.startedAt);
 
   const modeConfig = GAME_MODES[gameState.gameMode];
   const isFirstTurn = turnState.turn === 1;

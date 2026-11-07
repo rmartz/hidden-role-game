@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { GameRolesList, PlayersRoleList } from "@/components/game";
 import { RoleLabel } from "@/components/RoleLabel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useIsHydrated } from "@/hooks";
 import { GAME_MODES } from "@/lib/game/modes";
 import { WEREWOLF_COPY } from "@/lib/game/modes/werewolf/copy";
 import type { WerewolfPlayerGameState } from "@/lib/game/modes/werewolf/player-state";
@@ -13,6 +14,16 @@ import { GameMode, GameStatus } from "@/lib/types";
 
 import { OwnerHeader } from "./OwnerHeader";
 import { OWNER_STARTING_SCREEN_COPY } from "./OwnerStartingScreen.copy";
+
+function readViewedPlayerIds(sessionStorageKey: string): string[] {
+  try {
+    const stored = sessionStorage.getItem(sessionStorageKey);
+    return stored ? (JSON.parse(stored) as string[]) : [];
+  } catch {
+    // Storage access may be blocked or data may be malformed; fall back to none.
+    return [];
+  }
+}
 
 interface OwnerStartingScreenProps {
   gameId: string;
@@ -29,38 +40,30 @@ export function OwnerStartingScreen({
     gameState.status.type === GameStatus.Starting
       ? gameState.status.startedAt
       : undefined;
-  const startedAt = useMemo(
-    () => new Date(startedAtMs ?? Date.now()),
-    [startedAtMs],
-  );
+  const [mountedAtMs] = useState(() => Date.now());
+  const startedAt = new Date(startedAtMs ?? mountedAtMs);
 
   const sessionStorageKey = useMemo(
     () => `no-device-roles-viewed-${gameId}`,
     [gameId],
   );
 
-  const [viewedPlayerIds, setViewedPlayerIds] = useState<Set<string>>(
-    new Set<string>(),
-  );
-  const [storageHydrated, setStorageHydrated] = useState(false);
+  // Players confirmed as viewed since mount, kept in state as well as
+  // sessionStorage so the grid still updates when storage is blocked.
+  const [confirmedPlayerIds, setConfirmedPlayerIds] = useState<
+    ReadonlySet<string>
+  >(new Set<string>());
   const [revealingPlayerId, setRevealingPlayerId] = useState<
     string | undefined
   >(undefined);
 
-  // Read viewed state from sessionStorage after mount to avoid SSR hydration mismatch.
+  // Read viewed state from sessionStorage only after hydration to avoid an SSR mismatch.
   // Block interaction until hydrated so previously-viewed cards are not briefly re-clickable.
-  useEffect(() => {
-    try {
-      const stored = sessionStorage.getItem(sessionStorageKey);
-      if (stored) {
-        setViewedPlayerIds(new Set<string>(JSON.parse(stored) as string[]));
-      }
-    } catch {
-      // Storage access may be blocked or data may be malformed; fall back to empty set.
-    } finally {
-      setStorageHydrated(true);
-    }
-  }, [sessionStorageKey]);
+  const storageHydrated = useIsHydrated();
+  const storedViewedIds = storageHydrated
+    ? readViewedPlayerIds(sessionStorageKey)
+    : [];
+  const viewedPlayerIds = new Set([...storedViewedIds, ...confirmedPlayerIds]);
 
   const hiddenRoles = (gameState.hiddenRoleIds ?? []).flatMap((roleId) => {
     const role = GAME_MODES[GameMode.Werewolf].roles[roleId];
@@ -84,16 +87,15 @@ export function OwnerStartingScreen({
 
   function handleConfirmViewed(playerId: string) {
     setRevealingPlayerId(undefined);
-    setViewedPlayerIds((prev) => {
-      const next = new Set(prev);
-      next.add(playerId);
-      try {
-        sessionStorage.setItem(sessionStorageKey, JSON.stringify([...next]));
-      } catch {
-        // Storage may be full or blocked; continue without persisting.
-      }
-      return next;
-    });
+    try {
+      sessionStorage.setItem(
+        sessionStorageKey,
+        JSON.stringify([...viewedPlayerIds, playerId]),
+      );
+    } catch {
+      // Storage may be full or blocked; continue without persisting.
+    }
+    setConfirmedPlayerIds((prev) => new Set([...prev, playerId]));
   }
 
   const timerConfig = gameState.timerConfig;

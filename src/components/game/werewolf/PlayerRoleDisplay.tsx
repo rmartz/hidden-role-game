@@ -26,20 +26,16 @@ export function PlayerRoleDisplay({ role, gameMode }: PlayerRoleDisplayProps) {
   const [revealed, setRevealed] = useState(false);
   const [tooltipOpen, setTooltipOpen] = useState(false);
 
+  // Hiding the role also closes its tooltip, so a later reveal starts closed.
   useEffect(() => {
     if (!revealed) return;
     const timer = setTimeout(() => {
       setRevealed(false);
+      setTooltipOpen(false);
     }, REVEAL_DURATION_MS);
     return () => {
       clearTimeout(timer);
     };
-  }, [revealed]);
-
-  useEffect(() => {
-    if (!revealed) {
-      setTooltipOpen(false);
-    }
   }, [revealed]);
 
   const modeConfig = gameMode ? GAME_MODES[gameMode] : undefined;
@@ -53,6 +49,7 @@ export function PlayerRoleDisplay({ role, gameMode }: PlayerRoleDisplayProps) {
       onClick={(e) => {
         e.stopPropagation();
         setRevealed(false);
+        setTooltipOpen(false);
       }}
     >
       {WEREWOLF_COPY.roleDisplay.roleRevealed(role.name, teamLabel)}
