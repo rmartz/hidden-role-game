@@ -11,7 +11,7 @@ A guide for new developers getting acquainted with the codebase.
 
 ## Prerequisites
 
-- Node.js 20+
+- Node.js 26+
 - pnpm (`npm install -g pnpm`)
 - A Firebase project with Realtime Database enabled (or use the in-memory mock for tests)
 
