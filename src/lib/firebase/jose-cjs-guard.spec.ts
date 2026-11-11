@@ -11,7 +11,7 @@ import { describe, expect, it } from "vitest";
 // require() an ES module throws ERR_REQUIRE_ESM — the route module fails to load
 // and returns a 500 HTML page, which the client's res.json() surfaces as
 // "SyntaxError: The string did not match the expected pattern." On Vercel that
-// runtime is Turbopack's external-module loader, which does NOT use Node 24's
+// runtime is Turbopack's external-module loader, which does NOT use Node 26's
 // native require(ESM) support. We pin jose to the last CJS-capable major (5.x)
 // via pnpm.overrides in package.json. (Same failure and fix as
 // rmartz/group-picks#408 and rmartz/trip-planner#438.)
