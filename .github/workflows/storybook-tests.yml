@@ -33,6 +33,6 @@ permissions:
 
 jobs:
   storybook-tests:
-    uses: rmartz/storybook-ci/.github/workflows/storybook-tests.yml@2cf1c787fd9cf92ff16fc177f4f49028c34e4c48 # v2.0.1
+    uses: rmartz/storybook-ci/.github/workflows/storybook-tests.yml@652cb863dd5fca4df6cdc56b0ccc698efb7b80e6 # v2.0.2
     with:
       node-version: 26.x
