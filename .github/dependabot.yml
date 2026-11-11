@@ -32,6 +32,12 @@ updates:
       # react/react#37406.
       - dependency-name: "@babel/core"
         versions: [">= 8.0.0"]
+      # @types/node tracks the Node runtime's major, which Dependabot never bumps
+      # (`.nvmrc`, the setup action's `node-version: 24.x`, the Vercel runtime). A
+      # lone types major would type-check APIs the runtime lacks, so it moves by
+      # hand with the runtime upgrade. Minors and patches still flow.
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
     # Trivial minor/patch bumps batch by dev/prod (the two catch-all groups at
     # the bottom). Most MAJOR bumps match no group and raise individual PRs —
     # the ones most likely to need code changes, so they warrant isolated
