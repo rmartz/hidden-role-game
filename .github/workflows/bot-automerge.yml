@@ -2,8 +2,7 @@ name: bot-automerge
 
 # Enables GitHub-native auto-merge for green Dependabot patch/minor bumps (majors
 # stay manual) by calling the rmartz/bot-automerge-action composite Action
-# (SHA-pinned, Dependabot-bumped). This took over from pr-lifecycle's
-# `arm-auto-merge` when pr-lifecycle was retired.
+# (SHA-pinned, Dependabot-bumped).
 #
 # Auto-merge is enabled with an installation token for the rmartz-merge-bot
 # GitHub App, never GITHUB_TOKEN: GitHub fires no `push` workflows for a merge
