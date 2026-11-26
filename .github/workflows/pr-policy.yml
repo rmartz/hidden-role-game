@@ -15,16 +15,6 @@ name: pr-policy
 on:
   pull_request_target:
     types: [opened, synchronize, reopened, edited, labeled, unlabeled]
-  # Re-run when pr-lifecycle posts its `pr-lifecycle/sign-off` status, which can
-  # land after this run for the push. A `status` workflow runs from the default
-  # branch too, so a PR can't change what it does.
-  status:
-  # Re-run when the pr-lifecycle caller finishes: it writes the UAT label with
-  # GITHUB_TOKEN, which starts no `labeled` run, so require-uat-label would
-  # otherwise never see it. Like `status`, this runs from the default branch.
-  workflow_run:
-    workflows: [pr-lifecycle]
-    types: [completed]
 
 permissions:
   checks: write # post the pr-policy check-run
@@ -33,8 +23,8 @@ permissions:
   statuses: write # post the pr-policy commit status and one per policy check (pr-policy / <check>)
 
 concurrency:
-  # A status or workflow_run event has no PR number; group it by its commit.
-  group: pr-policy-${{ github.event.pull_request.number || github.event.sha || github.event.workflow_run.head_sha }}
+  # Latest-wins per PR: a label burst should post the newest label state.
+  group: pr-policy-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
@@ -42,18 +32,12 @@ jobs:
   # exact name, and a same-named job would add a second, always-green entry.
   pr-policy:
     name: pr-policy (evaluate)
-    # Every commit status fires `status`, including pr-policy's own; only
-    # pr-lifecycle's sign-off status re-runs the gate.
-    if: github.event_name != 'status' || github.event.context == 'pr-lifecycle/sign-off'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: rmartz/pr-policy-action@6bc1c22dabf9c6ac5343ef3464a69b749d0536a2 # v1.9.2
+      - uses: rmartz/pr-policy-action@653c22e683c7a5034b0d72a6b4e7d40fe24f6ae9 # v2.0.0
         with:
           pr: ${{ github.event.pull_request.number }}
-          # Hold a PR with no UAT label, so every merge has an explicit UAT
-          # determination (pr-lifecycle keeps one on every open PR).
-          require-uat-label: true
           # Retitle a Dependabot linter/formatter bump to ci(...), the type the
           # pr-policy title check requires for it, instead of blocking on a hand edit.
           retitle-dependabot-ci: true
