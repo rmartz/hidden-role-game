@@ -1,0 +1,51 @@
+name: bot-automerge
+
+# Enables GitHub-native auto-merge for green Dependabot patch/minor bumps (majors
+# stay manual) by calling the rmartz/bot-automerge-action composite Action
+# (SHA-pinned, Dependabot-bumped). This took over from pr-lifecycle's
+# `arm-auto-merge` when pr-lifecycle was retired.
+#
+# Auto-merge is enabled with an installation token for the rmartz-merge-bot
+# GitHub App, never GITHUB_TOKEN: GitHub fires no `push` workflows for a merge
+# whose auto-merge was enabled with GITHUB_TOKEN (rmartz/bot-automerge#8), and
+# the App draws on its own rate-limit pool. A composite action cannot
+# `secrets: inherit`, so the token is passed as the explicit `token` input.
+#
+# No `concurrency` group: GitHub permits only one pending run per group and
+# cancels any it supersedes, so a burst of pull_request_target events would leave
+# `cancelled` check-runs on the PR.
+#
+# SAFETY: native auto-merge lands the moment the default-branch ruleset's
+# required checks pass (CI, Storybook, merge-safety, pr-policy, repo hygiene), so
+# it never merges ahead of them. `pull_request_target` (not `pull_request`) is
+# required so Dependabot's read-only-token PRs get base-context write.
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bot-automerge:
+    # Skip the job outright on PRs the CLI could never trust, so a human PR shows
+    # a free `skipped` instead of installing the CLI just to no-op. This repo has
+    # no release-please, so Dependabot (by author) is the only eligible source.
+    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # The App's Client ID and private key are stored as both Actions and
+      # Dependabot secrets (a Dependabot-triggered run sees only the latter).
+      - uses: actions/create-github-app-token@64ab729a6294000f5aa4a4bc0b73d1f32bc45510 # v3.3.0
+        id: app-token
+        with:
+          client-id: ${{ secrets.MERGE_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.MERGE_BOT_PRIVATE_KEY }}
+      - uses: rmartz/bot-automerge-action@48d54c1608287e1f48a4e14568f07b6e5ca806b7 # v2.3.0
+        with:
+          pr: ${{ github.event.pull_request.number }}
+          token: ${{ steps.app-token.outputs.token }}

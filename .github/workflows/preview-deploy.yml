@@ -1,10 +1,11 @@
 name: Preview Deploy
 
-# Label-driven Vercel preview deploy via the shared rmartz/vercel-preview-ci
-# reusable workflow (#764). A PR gets a preview only while it carries `UAT ready`
-# (the legacy `ready for UAT` is also accepted during the rename, #912); it is
-# redeployed on each new push and the URL is posted as a sticky PR comment. The
-# gate, fork safety, and per-PR concurrency live in the shared workflow:
+# Vercel preview deploy via the shared rmartz/vercel-preview-ci reusable
+# workflow (#764). A PR gets a preview when its title has a functional type
+# (`feat`, `fix`, `perf`, `revert`) or it carries the `preview` label;
+# `no preview` always skips. It is redeployed on each new push and the URL is
+# posted as a sticky PR comment. The gate, fork safety, and per-PR concurrency
+# live in the shared workflow:
 # https://github.com/rmartz/vercel-preview-ci/blob/main/docs/consuming.md
 #
 # This is the sole preview path: vercel.json's `git.deploymentEnabled` disables
@@ -14,7 +15,7 @@ name: Preview Deploy
 
 on:
   pull_request:
-    types: [labeled, unlabeled, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled]
 
 permissions:
   contents: read
@@ -26,7 +27,5 @@ jobs:
     # `[WIP]`-titled PRs are held as unfinished work and get no preview. The
     # shared workflow gates on draft status but not the title, so it is kept here.
     if: ${{ !contains(github.event.pull_request.title, '[WIP]') }}
-    uses: rmartz/vercel-preview-ci/.github/workflows/vercel-preview.yml@a8d050a79e096643d7b0d01ff205e6e454ceb47d # v1.4.2
-    with:
-      node-version: 26.x
+    uses: rmartz/vercel-preview-ci/.github/workflows/vercel-preview.yml@52dca86876bf76f85b11a8fe0365879ab7e0f110 # v3.0.0
     secrets: inherit

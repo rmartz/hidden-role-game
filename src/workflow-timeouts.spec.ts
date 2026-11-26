@@ -9,6 +9,11 @@ import { parse } from "yaml";
 // workflow requires registering it here, or the test below fails — forcing a
 // deliberate cap rather than leaving a job unbounded.
 const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
+  // rmartz/bot-automerge-action caller: we own the job (the action is a step,
+  // not a reusable workflow), so its `bot-automerge` job carries a real timeout.
+  "bot-automerge.yml": {
+    "bot-automerge": 5,
+  },
   "ci-actions.yml": {
     build: 2,
     "detect-changes": 1,
@@ -33,12 +38,6 @@ const EXPECTED_TIMEOUT_MINUTES: Record<string, Record<string, number>> = {
   // reusable workflow), so its `pr-policy` job carries a real timeout.
   "pr-policy.yml": {
     "pr-policy": 5,
-  },
-  // rmartz/pr-lifecycle-action caller: we own the job (the action is a step, not
-  // a reusable workflow), so its `reconcile` job carries a real timeout. It
-  // covers the CLI's settle wait (up to 30s) with room to spare.
-  "pr-lifecycle.yml": {
-    reconcile: 5,
   },
   // @rmartz/repo-hygiene-action caller: we own the job (the action is a step,
   // not a reusable workflow), so its `hygiene` job carries a real timeout.
