@@ -10,6 +10,10 @@ Sentry.init({
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
 
+  // Send events through the server's managed tunnel (serveTunnelIntegration in
+  // sentry.server.config.ts) so ad-blockers don't drop them
+  tunnel: true,
+
   integrations: [Sentry.replayIntegration()],
 });
 

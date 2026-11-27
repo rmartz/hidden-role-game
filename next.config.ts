@@ -29,7 +29,6 @@ export default withSentryConfig(nextConfig, {
   project: "hidden-role-game",
   authToken: process.env["SENTRY_AUTH_TOKEN"],
   widenClientFileUpload: true,
-  tunnelRoute: "/monitoring",
   silent: !process.env["CI"],
   release: {
     create: isProductionDeploy,

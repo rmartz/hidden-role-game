@@ -7,4 +7,7 @@ Sentry.init({
 
   // Attach local variable values to stack frames
   includeLocalVariables: true,
+
+  // Answer the browser SDK's `tunnel: true` requests and forward them to Sentry
+  integrations: [Sentry.serveTunnelIntegration()],
 });
